@@ -1,0 +1,64 @@
+from abc import abstractmethod
+from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from .scanner import Scanner
+from .story_map import StoryMap, StoryNode, StoryGroup
+from .domain_concept_node import DomainConceptNode
+
+class StoryScanner(Scanner):
+    
+    def scan(
+        self, 
+        story_graph: Dict[str, Any], 
+        rule_obj: Any = None,
+        test_files: Optional[List['Path']] = None,
+        code_files: Optional[List['Path']] = None,
+        on_file_scanned: Optional[Any] = None
+    ) -> List[Dict[str, Any]]:
+        if not rule_obj:
+            raise ValueError("rule_obj parameter is required for StoryScanner")
+        
+        violations = []
+        story_graph_data = story_graph.get('story_graph', story_graph)
+        story_map = StoryMap(story_graph_data)
+        
+        
+        for epic in story_map.epics():
+            for node in story_map.walk(epic):
+                if not isinstance(node, StoryGroup):
+                    node_violations = self.scan_story_node(node, rule_obj)
+                    violations.extend(node_violations)
+        
+        return violations
+    
+    def _scan_domain_concepts(
+        self,
+        domain_concepts: List[Dict[str, Any]],
+        epic_idx: int,
+        sub_epic_path: Optional[List[int]],
+        rule_obj: Any
+    ) -> List[Dict[str, Any]]:
+        violations = []
+        
+        for concept_idx, concept_data in enumerate(domain_concepts):
+            concept_name = concept_data.get('name', '')
+            responsibilities = concept_data.get('responsibilities', [])
+            
+            domain_concept_node = DomainConceptNode(
+                concept_data,
+                epic_idx,
+                sub_epic_path,
+                concept_idx
+            )
+            
+            concept_violations = self.scan_domain_concept(domain_concept_node, rule_obj)
+            violations.extend(concept_violations)
+        
+        return violations
+    
+    @abstractmethod
+    def scan_story_node(self, node: StoryNode, rule_obj: Any) -> List[Dict[str, Any]]:
+        pass
+    
+    def scan_domain_concept(self, node: 'DomainConceptNode', rule_obj: Any) -> List[Dict[str, Any]]:
+        return []
+

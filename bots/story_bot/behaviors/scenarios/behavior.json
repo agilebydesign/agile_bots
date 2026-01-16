@@ -1,0 +1,98 @@
+{
+  "behaviorName": "specification_scenarios",
+  "order": 5,
+  "description": "Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story",
+  "goal": "Specify stories with detailed, testable scenarios using plain English",
+  "inputs": "Acceptance criteria from exploration, integration contracts, domain language/concepts",
+  "outputs": "Individual story .md files with detailed scenarios (no variables/examples tables)",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Organize stories into delivery increments based on business value, dependencies, and risk"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": []
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "build",
+        "instructions": []
+      },
+      {
+        "name": "build",
+        "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "Follow agile_bot/bots/story_bot/behaviors/scenarios/content/story_graph/instructions.json",
+          "specification_scenarios: build scenarios using domain language",
+          "Use proper domain terminology in scenario steps - refer to domain concepts and entities",
+          "Add/update scenarios and scenario_outlines ONLY in main epics section (single source of truth), NOT in increments section"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
+        "next_action": "render",
+        "instructions": [
+          "specification_scenarios: validate scenario structure and domain language usage",
+          "Validate that scenarios use proper domain terminology and reference domain concepts correctly"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 5,
+        "instructions": [
+          "specification_scenarios: render story documents with scenarios"
+        ]
+      },
+      {
+        "name": "rules",
+        "instructions": [
+          "Display digested rules for this behavior as AI context"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to specification scenarios writing behavior",
+    "patterns": [
+      "specify.*scenarios",
+      "*specification",
+      "write.*scenarios",
+      "define.*test.*scenario",
+      "write.*details",
+      "get.*to.*exact.*flow",
+      "describe.*step.*by.*step",
+      "elaborate.*flow",
+      "model.*edge.*cases",
+      "walk.*through.*test.*case",
+      "spec.*acceptance.*scenario",
+      "detail.*logic",
+      "level.*specification",
+      "define.*preconditions",
+      "create.*test.*scenarios",
+      "scenario.*based.*design",
+      "specification.*scenarios",
+      "specify.*examples",
+      "add.*test.*data",
+      "define.*test.*data",
+      "write.*examples",
+      "create.*examples.*table",
+      "add.*variables.*to.*scenarios",
+      "convert.*to.*scenario.*outline",
+      "add.*examples.*to.*scenarios",
+      "define.*inputs",
+      "define.*expected.*functionality",
+      "capture.*data.*needs",
+      "specification.*examples",
+      "test.*data"
+    ]
+  }
+}
+
+

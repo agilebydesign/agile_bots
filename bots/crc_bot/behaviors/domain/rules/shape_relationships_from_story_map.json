@@ -1,0 +1,44 @@
+{
+  "priority": 11,
+  "description": "Shape domain concept relationships from the story map. Collaborators should come from stories showing how concepts work together to accomplish user goals.",
+  "scanners": [],
+  "do": {
+    "description": "Derive collaborators from story interactions",
+    "guidance": [
+      {
+        "description": "Identify collaborators from stories showing how concepts interact to deliver value",
+        "example": [
+          "Story: User rebalances portfolio to target allocation",
+          "",
+          "Derived concepts:",
+          "RebalanceRecommendation",
+          "    Generates trades to achieve target allocation: Trade, Portfolio, TargetAllocation",
+          "    Compares current allocation to target: AllocationDifference, Portfolio, TargetAllocation",
+          "",
+          "Portfolio",
+          "    Get holdings: Holding",
+          "    Calculates current allocation: Allocation, Holding",
+          "",
+          "(Collaborators Portfolio, TargetAllocation, Trade, AllocationDifference come from story)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't invent collaborators not present in stories",
+    "guidance": [
+      {
+        "description": "Don't add collaborators that aren't implied by the stories",
+        "example": [
+          "Story: User creates order",
+          "",
+          "Order",
+          "    Get audit log: AuditLog (WRONG: not in story)",
+          "    Get version history: Version (WRONG: not in story)",
+          "",
+          "(Audit, versioning not mentioned in stories - don't add)"
+        ]
+      }
+    ]
+  }
+}

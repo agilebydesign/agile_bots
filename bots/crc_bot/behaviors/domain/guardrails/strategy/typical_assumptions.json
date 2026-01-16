@@ -1,0 +1,22 @@
+{
+  "typical_assumptions": [
+    "Domain concepts emerge from stories and business language, not technical implementation",
+    "Use ubiquitous language from domain experts and business stakeholders",
+    "Model domain concepts, not technical classes or database tables",
+    "Focus on core domain concepts first, supporting concepts later",
+    "Concepts are placed at the most specific level (sub-epic) and elevated to parent level only if shared",
+    "Each bounded context has its own view of domain concepts with specific meanings",
+    "Domain concepts capture WHAT exists in the business domain, not HOW it's implemented",
+    "Responsibilities describe what a concept does in the business domain",
+    "Collaborators show which concepts work together to accomplish business goals",
+    "Relationships between concepts should reflect business rules and constraints",
+    "Domain language should be understood by both business and technical teams",
+    "Avoid generic technical terms (Manager, Handler, Service, Controller) in concept names",
+    "Favor nouns and resources over verbs and actions",
+    "Domain concepts should be technology-agnostic and implementation-independent",
+    "Start lightweight - concept names and responsibilities - then add detail as needed",
+    "Domain model refinement happens iteratively as understanding deepens",
+    "Existing code and documentation are sources for concept discovery, not the definition",
+    "Sub-epics typically represent bounded contexts with cohesive domain concepts"
+  ]
+}

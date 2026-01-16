@@ -1,0 +1,12 @@
+{
+  "description": "Domain detail level",
+  "question": "How much detail should be captured for each domain concept?",
+  "options": [
+    "Minimal - Just concept names and high-level purpose",
+    "Moderate - Concept names, responsibilities, key relationships",
+    "Detailed - Full responsibilities, all collaborators, relationship types",
+    "Comprehensive - Everything plus business rules, invariants, lifecycle"
+  ],
+  "note": "Higher detail levels provide more guidance for implementation but take longer to create and maintain."
+}
+

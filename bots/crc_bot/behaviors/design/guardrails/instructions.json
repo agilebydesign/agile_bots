@@ -1,0 +1,10 @@
+{
+  "instructions": [
+    "Apply OOP design principles to domain concepts",
+    "Ensure proper encapsulation, delegation, and dependency injection",
+    "Follow SOLID principles for object design",
+    "Define clear object responsibilities and collaborations",
+    "Use design patterns appropriately for the domain"
+  ]
+}
+

@@ -1,0 +1,7 @@
+{
+  "name": "render_crc_class_diagram",
+  "path": "docs/crc",
+  "input": "story-graph.json",
+  "output": "crc-class-diagram.mmd",
+  "template": "templates/class-diagram.mmd"
+}

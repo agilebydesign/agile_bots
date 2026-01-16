@@ -1,0 +1,127 @@
+{
+  "priority": 1,
+  "description": "Integrate related capabilities under parent concepts and organize by business domain. Avoid noun redundancy by nesting related capabilities together, group by business capabilities not technical layers.",
+  "scanners": [
+    "agile_bot.bots.base_bot.src.scanners.noun_redundancy_scanner.NounRedundancyScanner",
+    "agile_bot.bots.base_bot.src.scanners.domain_grouping_scanner.DomainGroupingScanner"
+  ],
+  "do": {
+    "description": "Integrate related capabilities under parent concepts, organize by business domain",
+    "guidance": [
+      {
+        "description": "Nest related capabilities under a single domain concept instead of creating separate concepts with the same noun",
+        "example": [
+          "Character Animation (parent domain concept)",
+          "    Plays walk animation: AnimationClip, CharacterState",
+          "    Plays run animation: AnimationClip, CharacterState",
+          "    Transitions to jump: AnimationClip, CharacterState, JumpTrigger",
+          "    Blends idle animations: AnimationClip, CharacterState, BlendWeight",
+          "",
+          "(One concept with multiple responsibilities, not separate Walk Animation, Run Animation concepts)"
+        ]
+      },
+      {
+        "description": "Integrate all related capabilities as responsibilities under a single parent concept",
+        "example": [
+          "Portfolio (parent integrating related capabilities)",
+          "    Get holdings: Holding",
+          "    Calculates total value across all holdings: Money, Holding, MarketPrice",
+          "    Evaluates risk score with market conditions: RiskScore, RiskModel, MarketData",
+          "    Analyzes asset allocation distribution: Allocation, Holding, TargetAllocation",
+          "    Finds by account identifier: AccountId",
+          "",
+          "(All portfolio-related capabilities integrated under Portfolio)"
+        ]
+      },
+      {
+        "description": "Group concepts around business capabilities and subject areas that collaborate frequently",
+        "example": [
+          "Order Management Domain:",
+          "",
+          "Order",
+          "    Creates from shopping cart: Cart, Customer",
+          "    Calculates total with taxes: Money, LineItem, TaxRate",
+          "    Validates inventory before submission: LineItem, InventoryService",
+          "",
+          "LineItem",
+          "    Get product: Product",
+          "    Get quantity: Quantity",
+          "    Calculates extended price: Money, Product, Quantity, Discount",
+          "",
+          "(Grouped by Order Management business capability)"
+        ]
+      },
+      {
+        "description": "Use subject-area nouns when domains are genuinely separate and cannot be integrated",
+        "example": [
+          "Combat (distinct subject area)",
+          "    Executes attack sequence: CombatAnimation, Target, Weapon",
+          "    Calculates damage with modifiers: Damage, Target, Weapon, CriticalHit",
+          "",
+          "Movement (distinct subject area)",
+          "    Animates locomotion: MovementAnimation, Terrain, Speed",
+          "    Calculates velocity with terrain effects: Speed, Terrain, Slope",
+          "",
+          "(Separate concepts because combat and movement are distinct domains)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't create redundant/fragmented concepts or group by technical layers",
+    "guidance": [
+      {
+        "description": "Don't create separate concepts with the same noun when they should be integrated under one parent",
+        "example": [
+          "Walk Animation (WRONG: redundant noun)",
+          "    Get walk sequence: AnimationClip",
+          "",
+          "Run Animation (WRONG: redundant noun)",
+          "    Get run sequence: AnimationClip",
+          "",
+          "Jump Animation (WRONG: redundant noun)",
+          "    Get jump sequence: AnimationClip",
+          "",
+          "(Should be integrated under Character Animation)"
+        ]
+      },
+      {
+        "description": "Don't split related capabilities into separate sibling concepts",
+        "example": [
+          "PortfolioValue (WRONG: separate concept)",
+          "    Get total value: Money",
+          "",
+          "PortfolioRisk (WRONG: separate concept)",
+          "    Get risk score: RiskScore",
+          "",
+          "PortfolioAllocation (WRONG: separate concept)",
+          "    Get asset allocation: Allocation",
+          "",
+          "(Should be integrated into Portfolio as responsibilities)"
+        ]
+      },
+      {
+        "description": "Don't group concepts by technical layers like Data, Business Logic, Presentation",
+        "example": [
+          "Data Layer: (WRONG: technical grouping)",
+          "    OrderData, LineItemData, ProductData",
+          "",
+          "Business Logic Layer: (WRONG: technical grouping)",
+          "    OrderProcessor, LineItemCalculator, ProductValidator",
+          "",
+          "(Should be grouped by Order Management domain)"
+        ]
+      },
+      {
+        "description": "Don't organize by implementation patterns like Factories, Builders, Repositories",
+        "example": [
+          "Factories: (WRONG: implementation pattern grouping)",
+          "    OrderFactory, TradeFactory, PortfolioFactory",
+          "",
+          "(Should be: Order with 'Creates from cart', Trade with 'Creates from recommendation' in respective domains)"
+        ]
+      }
+    ]
+  }
+}
+

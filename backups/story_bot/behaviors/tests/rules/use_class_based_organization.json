@@ -1,0 +1,67 @@
+{
+    "priority":  20,
+    "description":  "Test structure matches story graph: file = sub-epic (test_\u003csub_epic\u003e.py), class = story (Test\u003cExactStoryName\u003e), method = scenario (test_\u003cscenario_snake_case\u003e). Classes in story map order. Example: test_generate_bot_tools.py, class TestGenerateBotTools, def test_generator_creates_tool_for_test_bot",
+    "do":  {
+               "description":  "Map story hierarchy to test structure exactly. Example: Sub-epic \u0027Generate Bot Tools\u0027 -\u003e test_generate_bot_tools.py, Story \u0027Generate Bot Tools\u0027 -\u003e TestGenerateBotTools",
+               "guidance":  [
+                                {
+                                    "description":  "Test file matches sub-epic name in snake_case",
+                                    "example":  [
+                                                    "# Sub-epic: \u0027Generate Bot Server And Tools\u0027",
+                                                    "# File: test_generate_bot_server_and_tools.py"
+                                                ]
+                                },
+                                {
+                                    "description":  "Test class matches story name EXACTLY in PascalCase",
+                                    "example":  [
+                                                    "# Story: \u0027Inject Guardrails as Part of Clarify Requirements\u0027",
+                                                    "class TestInjectGuardrailsAsPartOfClarifyRequirements:"
+                                                ]
+                                },
+                                {
+                                    "description":  "Test method matches scenario name EXACTLY in snake_case",
+                                    "example":  [
+                                                    "# Scenario: \u0027Generator creates bot tool for test_bot\u0027",
+                                                    "def test_generator_creates_bot_tool_for_test_bot(self):"
+                                                ]
+                                },
+                                {
+                                    "description":  "Test classes in same order as stories in story map",
+                                    "example":  [
+                                                    "class TestGenerateBotTools:  # First story",
+                                                    "class TestGenerateBehaviorTools:  # Second story"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t use generic/abbreviated names or wrong order. Example: class TestToolGen (wrong - use TestGenerateBotTools)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t abbreviate class names",
+                                      "example":  [
+                                                      "class TestGenBotTools:  # WRONG - use TestGenerateBotTools"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use generic class names",
+                                      "example":  [
+                                                      "class TestGuardrailsInjection:  # WRONG - story is \u0027Inject Guardrails as Part of Clarify Requirements\u0027"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t abbreviate method names",
+                                      "example":  [
+                                                      "def test_creates_tool(self):  # WRONG - scenario is \u0027Generator creates bot tool for test_bot\u0027"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t put test classes out of story map order",
+                                      "example":  [
+                                                      "class TestGenerateMCPBotServer:  # WRONG - should be after TestGenerateBotTools"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
+}

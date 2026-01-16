@@ -1,0 +1,33 @@
+classDiagram
+    namespace {module} {
+        class {ConceptName} {
+            +{responsibility}()
+            +{responsibility}()
+            +{responsibility}()
+        }
+        
+        class {AnotherConcept} {
+            +{responsibility}()
+            +{responsibility}()
+        }
+    }
+    
+    namespace {another_module} {
+        class {ConceptInOtherModule} {
+            +{responsibility}()
+        }
+    }
+    
+    %% Inheritance
+    {ChildConcept} --|> {ParentConcept}
+    
+    %% Associations
+    {ConceptName} --> {CollaboratorConcept} : {relationship_label}
+    {ConceptName} --> {AnotherConcept} : uses
+
+%% Instructions:
+%% - Group domain concepts by module (source folder structure)
+%% - Module names use dot notation for nested folders (e.g., repl_cli.cli_bot)
+%% - Show inheritance relationships with --|>
+%% - Show associations/collaborations with -->
+

@@ -1,0 +1,39 @@
+{
+  "_explanation": {
+    "purpose": "Design phase - refines domain concepts with OOP design patterns, object responsibilities, and technical implementation details",
+    "scope": "ONLY refines domain_concepts with detailed object responsibilities, collaborations, and design patterns. Does NOT modify story structure",
+    "design_patterns": "Add object responsibilities showing encapsulation, delegation, dependency injection, and factory patterns",
+    "structure": "Each domain concept has: name, module (source folder path), inherits_from (optional base class), responsibilities (with collaborators showing dependencies), instantiation details, and ownership patterns",
+    "module_field": "REQUIRED - Preserve module field from domain phase and verify accuracy (see preserve_module_from_domain rule for details)",
+    "inherits_from_field": "OPTIONAL - When a class inherits from a base class, include inherits_from field with base class name. Preserve from domain phase if present"
+  },
+  "epics": [
+    {
+      "name": "",
+      "domain_concepts": [
+        {
+          "name": "",
+          "module": "",
+          "inherits_from": "",
+          "instantiated_with": ["Collaborator1", "Collaborator2"],
+          "responsibilities": [
+            {
+              "name": "Get X",
+              "collaborators": ["Collaborator1"]
+            },
+            {
+              "name": "Creates from context",
+              "collaborators": ["ContextType"]
+            }
+          ],
+          "ownership": {
+            "has": ["OwnedType"],
+            "references": ["ReferencedType"]
+          }
+        }
+      ],
+      "sub_epics": []
+    }
+  ]
+}
+

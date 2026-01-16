@@ -1,0 +1,84 @@
+{
+  "priority": 1,
+  "description": "Apply exhaustive logic decomposition. Cover all validation paths, calculation branches, and edge cases explicitly. Use inheritance for variations, not enumeration. Example: Order -> Creates, Validates, Calculates total, Submits (complete flow); ShippingCalculator base, InternationalShippingCalculator : ShippingCalculator (inheritance for variations).",
+  "scanners": [
+    "agile_bot.bots.base_bot.src.scanners.exhaustive_decomposition_scanner.ExhaustiveDecompositionScanner"
+  ],
+  "do": {
+    "description": "Cover all logic paths, use inheritance for variations. Example: Order -> Creates, Validates, Calculates, Submits (complete flow); ShippingCalculator base with InternationalShippingCalculator : ShippingCalculator subclass (inheritance)",
+    "guidance": [
+      {
+        "description": "Show complete flow including validation, calculation, and persistence steps",
+        "example": [
+          "Order",
+          "    Creates from cart: Order, Cart, Customer",
+          "    Validates before submission: Boolean, InventoryService, PaymentGateway",
+          "    Calculates total: Money, LineItem, TaxRate, ShippingMethod",
+          "    Submits for fulfillment: FulfillmentRequest",
+          "",
+          "(Complete flow: create → validate → calculate → submit - no steps skipped)"
+        ]
+      },
+      {
+        "description": "Use inheritance to handle variations instead of enumerating each permutation",
+        "example": [
+          "ShippingCalculator (base - handles core calculation)",
+          "    Calculates rate: Money, Weight, Distance",
+          "",
+          "InternationalShippingCalculator : ShippingCalculator",
+          "    Calculates rate: Money, Weight, Distance, Country, CustomsFees",
+          "",
+          "(Base handles domestic, subclass extends with Country and customs)"
+        ]
+      },
+      {
+        "description": "Cover edge cases and alternative paths explicitly",
+        "example": [
+          "Payment",
+          "    Authorizes transaction: AuthorizationResult, PaymentGateway",
+          "    Handles authorization failure: FailureResponse, AuthorizationResult",
+          "    Handles partial authorization: PartialResponse, RemainingBalance",
+          "",
+          "(Success, failure, partial paths all covered)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't enumerate permutations or skip logic steps. Example: ShippingCalculator with Calculates standard/express/overnight domestic/international (wrong - enumerate) vs base + subclass (right)",
+    "guidance": [
+      {
+        "description": "Don't enumerate every permutation as separate methods - use inheritance",
+        "example": [
+          "ShippingCalculator (WRONG: enumerates all permutations)",
+          "    Calculates standard domestic rate: Money, Weight, Distance",
+          "    Calculates express domestic rate: Money, Weight, Distance",
+          "    Calculates overnight domestic rate: Money, Weight, Distance",
+          "    Calculates standard international rate: Money, Weight, Distance, Country",
+          "    Calculates express international rate: Money, Weight, Distance, Country",
+          "",
+          "(Should use base class + InternationalShippingCalculator subclass)"
+        ]
+      },
+      {
+        "description": "Don't skip validation or intermediate steps",
+        "example": [
+          "Order (WRONG: skips validation and calculation)",
+          "    Creates from cart: Order, Cart",
+          "    Submits: FulfillmentRequest",
+          "",
+          "(Missing: validation, inventory check, total calculation)"
+        ]
+      },
+      {
+        "description": "Don't hide error handling and edge cases",
+        "example": [
+          "Payment (WRONG: only shows happy path)",
+          "    Authorizes transaction: AuthorizationResult, PaymentGateway",
+          "",
+          "(Missing: failure handling, partial authorization paths)"
+        ]
+      }
+    ]
+  }
+}

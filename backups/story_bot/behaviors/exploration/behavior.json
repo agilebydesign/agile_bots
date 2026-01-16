@@ -1,0 +1,61 @@
+{
+  "behaviorName": "exploration",
+  "order": 4,
+  "description": "Explore and document story implementation details with acceptance criteria and scenarios",
+  "goal": "Document detailed acceptance criteria and high-level scenarios for story implementation",
+  "inputs": "Elaborated stories from discovery phase",
+  "outputs": "Stories with detailed acceptance criteria and initial scenarios",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Explore story implementation details and document acceptance criteria with initial scenarios"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": []
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "build",
+        "instructions": []
+      },
+      {
+        "name": "build",
+        "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "exploration: document acceptance criteria and scenarios"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
+        "next_action": "render",
+        "instructions": [
+          "exploration: validate acceptance criteria completeness"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 5,
+        "instructions": [
+          "exploration: render acceptance criteria documentation"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to exploration behavior",
+    "patterns": [
+      "explore.*story",
+      "acceptance.*criteria",
+      "define.*criteria",
+      "document.*scenarios",
+      "story.*exploration"
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "description": "Instructions for building walkthrough realizations in story graph",
+  "workflow": [
+    "Select node from story graph (epic, sub-epic, story, or scenario)",
+    "Document Scope in dot notation: Epic.Sub-Epic.Story.Scenario (parent context)",
+    "Break scenario into multiple walks, each covering a logical subset",
+    "For each walk, document Covers: what specific part it traces (steps, stories, sub-epics)",
+    "Identify first domain concept and responsibility for each walk",
+    "Trace responsibilities and collaborations using Object.method(param: value) format",
+    "Show nested calls with -> indentation and return values as return var: value",
+    "When discovering missing responsibilities, collaborators, or concepts: immediately update story-graph.json domain model before continuing",
+    "Document all model updates in walkthrough realization document",
+    "Continue until walk is fully realized",
+    "Write out each walk in object flow format with its specific Covers",
+    "Update story-graph.json domain concepts with realization including scope and walks array"
+  ],
+  "output_format": {
+    "scope": "Epic.Sub-Epic.Story.Scenario",
+    "scenario": "Description of acceptance criteria being traced",
+    "walks": [
+      {
+        "covers": "Steps 1-3 (parse input, load context)",
+        "object_flow": [
+          "result: 'value' = Object.method(param: 'value')",
+          "  -> nested: True = Collaborator.check()",
+          "     return nested: True",
+          "return result: 'value'"
+        ]
+      }
+    ],
+    "model_updates": [
+      "Added responsibility X to concept Y",
+      "Added collaborator Z to responsibility W"
+    ]
+  },
+  "rules": [
+    "Use exact concept names from domain model",
+    "Use exact responsibility names from domain model",
+    "Use exact collaborators from domain model",
+    "Show actual data values, not placeholders",
+    "Trace complete delegation chains, don't stop at abstractions",
+    "Update domain model immediately when gaps discovered",
+    "Document Scope at scenario level",
+    "Document Covers for each walk",
+    "Use Object.method(param: value) format",
+    "Show nested calls with -> indentation",
+    "Show return values as return var: value"
+  ]
+}
+

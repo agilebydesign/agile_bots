@@ -1,0 +1,75 @@
+{
+  "_explanation": {
+    "purpose": "Discovery phase - identifies and adds users/actors to epics and stories in the story graph outline",
+    "users_field": "Adds users array to epics and stories. Users are actors/personas who interact with the feature (e.g., [\"Admin\", \"Customer\", \"API Consumer\"])",
+    "scope": "ONLY adds users arrays to existing structure. Does NOT add scenarios, steps, or acceptance criteria (those come in later phases)",
+    "structure": "Inherits story graph outline from shape phase (epics, sub_epics, story_groups, stories with sequential_order and connectors). ONLY adds users identification"
+  },
+  "epics": [
+    {
+      "name": "",
+      "users": [],
+      "sequential_order": 1,
+      "estimated_stories": null,
+      "sub_epics": [
+        {
+          "name": "",
+          "users": [],
+          "sequential_order": 1,
+          "domain_concepts": [
+            {
+              "name": "",
+              "responsibilities": [
+                {
+                  "name": "",
+                  "collaborators": []
+                }
+              ]
+            }
+          ],
+          "sub_epics": [
+            {
+              "name": "",
+              "users": [],
+              "sequential_order": 1,
+              "estimated_stories": null,
+              "stories": [
+                {
+                  "name": "",
+                  "users": [],
+                  "sequential_order": 1,
+                  "optional": false,
+                  "priority": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "",
+          "users": [],
+          "sequential_order": 1,
+          "estimated_stories": null,
+          "stories": [
+            {
+              "name": "",
+              "users": [],
+              "sequential_order": 1,
+              "optional": false,
+              "priority": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "increments": [
+    {
+      "name": "",
+      "priority": 1,
+      "stories": [
+        ""
+      ]
+    }
+  ]
+}

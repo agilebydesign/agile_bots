@@ -1,0 +1,71 @@
+{
+  "description": "How should parent domain concepts manage their child/subordinate concepts?",
+  "question": "What is your default approach for parent-child relationship management?",
+  "options": [
+    {
+      "id": "parent_manages_directly",
+      "name": "Parent Manages Directly",
+      "description": "Parent concept has all responsibilities for managing its children (add, remove, find, iterate). Children are accessed through parent.",
+      "when_to_use": "Simple hierarchies, few children, parent naturally owns all child lifecycle operations",
+      "example": [
+        "Order",
+        "    Has line items: LineItem",
+        "    Adds line item: LineItem, Product, Quantity",
+        "    Removes line item: LineItem",
+        "    Finds line item by product: LineItem, Product",
+        "    Calculates total: Money, LineItem"
+      ]
+    },
+    {
+      "id": "explicit_collection_class",
+      "name": "Explicit Collection Class",
+      "description": "Create a named collection class (e.g., Holdings, LineItems) that encapsulates all collection-level operations. Parent delegates to collection.",
+      "when_to_use": "Complex collection logic (filtering, sorting, aggregation), collection behavior is reusable, collection has its own domain meaning",
+      "example": [
+        "Portfolio",
+        "    Has holdings: Holdings",
+        "    Calculates total value: Money, Holdings",
+        "",
+        "Holdings (collection class)",
+        "    Finds by symbol: Holding, Symbol",
+        "    Filters by asset class: Holding, AssetClass",
+        "    Calculates total value: Money, Holding, MarketPrice",
+        "    Sorts by market value: Holding"
+      ]
+    },
+    {
+      "id": "aggregate_root_pattern",
+      "name": "Aggregate Root Pattern",
+      "description": "Parent is the aggregate root - all access and modifications to children go through parent. Children cannot be accessed directly from outside.",
+      "when_to_use": "Strong consistency requirements, transactional boundaries, children have no meaning outside parent context",
+      "example": [
+        "Order (aggregate root)",
+        "    Has line items: LineItem (only accessible through Order)",
+        "    Adds line item: LineItem, Product, Quantity",
+        "    Submits for fulfillment: FulfillmentRequest",
+        "",
+        "LineItem (entity within aggregate)",
+        "    Get product: Product",
+        "    Get quantity: Quantity",
+        "    (No independent repository - always accessed via Order)"
+      ]
+    },
+    {
+      "id": "repository_pattern",
+      "name": "Repository Pattern",
+      "description": "Separate repository concept handles persistence and retrieval of parent-child graphs. Domain objects don't manage their own persistence.",
+      "when_to_use": "Clean separation of domain and persistence concerns, complex querying requirements, multiple storage backends",
+      "example": [
+        "Order",
+        "    Has line items: LineItem",
+        "    Calculates total: Money, LineItem",
+        "",
+        "OrderRepository",
+        "    Finds by id: Order, OrderId",
+        "    Finds by customer: Order, Customer",
+        "    Saves order: Order (including all LineItems)",
+        "    Deletes order: OrderId"
+      ]
+    }
+  ]
+}

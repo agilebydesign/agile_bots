@@ -1,0 +1,81 @@
+{
+  "description": "How should domain state be persisted and retrieved?",
+  "question": "What is your default approach for persisting domain state?",
+  "options": [
+    {
+      "id": "repository_abstraction",
+      "name": "Repository Abstraction",
+      "description": "Repository pattern abstracts persistence. Domain objects are persistence-ignorant. Repository handles save/load.",
+      "when_to_use": "Clean domain model, testability priority, multiple storage backends possible, DDD approach",
+      "example": [
+        "Order (persistence-ignorant)",
+        "    Has line items: LineItem",
+        "    Calculates total: Money, LineItem",
+        "",
+        "OrderRepository",
+        "    Saves order: Order",
+        "    Finds by id: Order, OrderId",
+        "    Finds by customer: Order, Customer",
+        "    Deletes order: OrderId"
+      ]
+    },
+    {
+      "id": "active_record",
+      "name": "Active Record",
+      "description": "Domain objects know how to persist themselves. Save/load methods on the object itself.",
+      "when_to_use": "Simple CRUD, rapid development, object-relational mapping, framework support (Rails, Django)",
+      "example": [
+        "Order (knows how to persist itself)",
+        "    Has line items: LineItem",
+        "    Calculates total: Money, LineItem",
+        "    Saves to database: Order",
+        "    Loads by id: Order, OrderId",
+        "    Deletes from database: Boolean"
+      ]
+    },
+    {
+      "id": "event_sourcing",
+      "name": "Event Sourcing",
+      "description": "State stored as sequence of events. Current state derived by replaying events. Full audit trail.",
+      "when_to_use": "Audit requirements, temporal queries, complex domain logic, event-driven architecture",
+      "example": [
+        "Order (state from events)",
+        "    Applies OrderCreated event: Order",
+        "    Applies LineItemAdded event: Order, LineItem",
+        "    Applies PaymentReceived event: Order, Payment",
+        "    Applies OrderShipped event: Order, Shipment",
+        "",
+        "(Current state = replay all events in sequence)"
+      ]
+    },
+    {
+      "id": "unit_of_work",
+      "name": "Unit of Work",
+      "description": "Track changes to objects during business transaction. Commit all changes atomically at end.",
+      "when_to_use": "Complex transactions, multiple aggregates, optimistic concurrency, ORM integration",
+      "example": [
+        "UnitOfWork",
+        "    Tracks modified: Order, LineItem, Discount",
+        "    Commits all changes: Boolean",
+        "    Rolls back on failure: Boolean",
+        "",
+        "(All changes saved or rolled back together)"
+      ]
+    },
+    {
+      "id": "cqrs_separation",
+      "name": "CQRS Separation",
+      "description": "Separate models for commands (writes) and queries (reads). Optimized for each use case.",
+      "when_to_use": "Complex queries, read/write ratio skewed, different scaling needs, eventual consistency OK",
+      "example": [
+        "OrderCommandModel (for writes)",
+        "    Creates order: Order, Cart, Customer",
+        "    Adds line item: Order, Product, Quantity",
+        "",
+        "OrderQueryModel (for reads - denormalized)",
+        "    Gets order summary: OrderSummary, OrderId",
+        "    Gets order history: OrderSummary, Customer"
+      ]
+    }
+  ]
+}

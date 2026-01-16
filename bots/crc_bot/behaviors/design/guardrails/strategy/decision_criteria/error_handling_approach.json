@@ -1,0 +1,81 @@
+{
+  "description": "How should domain concepts handle and communicate errors and exceptional conditions?",
+  "question": "What is your default approach for error handling in the domain?",
+  "options": [
+    {
+      "id": "exception_based",
+      "name": "Exception-Based",
+      "description": "Throw domain exceptions for error conditions. Catch and handle at appropriate layer.",
+      "when_to_use": "Exceptional conditions are truly exceptional, framework supports exceptions, stack trace valuable",
+      "example": [
+        "Order",
+        "    Submits for fulfillment: FulfillmentRequest",
+        "    Throws InsufficientInventoryException: LineItem, AvailableQuantity",
+        "    Throws PaymentDeclinedException: Payment, DeclineReason",
+        "    Throws InvalidAddressException: ShippingAddress, ValidationErrors"
+      ]
+    },
+    {
+      "id": "result_objects",
+      "name": "Result Objects",
+      "description": "Return result objects that contain success/failure status and error details. No exceptions for domain errors.",
+      "when_to_use": "Errors are expected outcomes, functional style, explicit error handling, performance sensitive",
+      "example": [
+        "Order",
+        "    Submits for fulfillment: OrderResult",
+        "",
+        "OrderResult",
+        "    Get is success: Boolean",
+        "    Get order: Order (if successful)",
+        "    Get errors: Error (if failed)",
+        "    Get error code: ErrorCode"
+      ]
+    },
+    {
+      "id": "validation_collection",
+      "name": "Validation Collection",
+      "description": "Collect all validation errors before failing. Return complete list of issues, not just first one.",
+      "when_to_use": "Form validation, user input, batch processing, multiple independent validations",
+      "example": [
+        "Order",
+        "    Validates before submission: ValidationResult",
+        "",
+        "ValidationResult",
+        "    Get is valid: Boolean",
+        "    Get all errors: ValidationError",
+        "    Get errors for field: ValidationError, FieldName",
+        "    (Returns ALL errors: missing address, invalid card, out of stock)"
+      ]
+    },
+    {
+      "id": "domain_events_for_failures",
+      "name": "Domain Events for Failures",
+      "description": "Publish failure events that interested parties can subscribe to. Decoupled error handling.",
+      "when_to_use": "Event-driven architecture, multiple error handlers, audit/logging requirements",
+      "example": [
+        "Order",
+        "    Submits for fulfillment: publishes OrderSubmissionFailed event",
+        "",
+        "OrderSubmissionFailed event",
+        "    Get order id: OrderId",
+        "    Get failure reason: FailureReason",
+        "    Subscribed by: ErrorHandler, AuditLogger, NotificationService"
+      ]
+    },
+    {
+      "id": "null_object_fallback",
+      "name": "Null Object / Fallback",
+      "description": "Return null objects or fallback values instead of errors. Operations continue with sensible defaults.",
+      "when_to_use": "Optional data, graceful degradation, avoid null checks, chain of responsibility",
+      "example": [
+        "Customer",
+        "    Get loyalty tier: LoyaltyTier",
+        "",
+        "GuestTier (null object for missing tier)",
+        "    Get discount percent: Number (returns 0)",
+        "    Get tier name: String (returns 'Guest')",
+        "    (Calculations work without null checks)"
+      ]
+    }
+  ]
+}

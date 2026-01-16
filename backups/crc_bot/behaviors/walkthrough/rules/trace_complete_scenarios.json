@@ -1,0 +1,182 @@
+{
+  "priority": 3,
+  "description": "Trace scenarios from start to complete realization with all nested collaborations. Don't stop at abstractions - drill down until fully realized. Example: Order.calculate_total() must trace to get_line_items(), LineItem.calculate_subtotal() (nested), calculate_shipping() (nested), Money.add() - complete delegation chain",
+  "scanners": [],
+  "do": {
+    "description": "Trace completely showing all nested calls and discovering model gaps. Example: Order.calculate_total() -> get_line_items() -> LineItem.calculate_subtotal() -> calculate_line_total() for each item -> calculate_shipping() -> Money.add() (complete chain, not just top-level)",
+    "guidance": [
+      {
+        "description": "Start with story/AC/step and trace to completion through all collaborations. Example: Story 'User validates scope with node names' -> trace from CLIScope.view_scope() down to KnowledgeGraphFilter.find_node() for each node and back up through formatting",
+        "example": [
+          "Story: User validates scope with node names",
+          "AC: When scope='Story1, Story2' then CLI shows validation results",
+          "",
+          "Complete trace:",
+          "CLIBot",
+          "    display: 'Scope Filter: Story1 ✓, Story2 ✓' = CLIScope.view_scope()",
+          "        -> validation: [('Story1', True), ('Story2', True)] = Scope.validate_scope(story_graph)",
+          "            -> results: [('Story1', True), ('Story2', True)] = KnowledgeGraphFilter.check_nodes(nodes: ['Story1', 'Story2'], graph)",
+          "                -> story1_exists: True = KnowledgeGraphFilter.find_node(graph, 'Story1')",
+          "                -> story2_exists: True = KnowledgeGraphFilter.find_node(graph, 'Story2')",
+          "                return results: [('Story1', True), ('Story2', True)]",
+          "            return validation: [('Story1', True), ('Story2', True)]",
+          "        -> formatted: 'Scope Filter: Story1 ✓, Story2 ✓' = CLIScope._format_scope_display(scope, validation_results)",
+          "        return display: 'Scope Filter: Story1 ✓, Story2 ✓'",
+          "",
+          "(Traces from user action down to finding nodes in graph and formatting back up)"
+        ]
+      },
+      {
+        "description": "Nest calls to show complete delegation chain, not just top-level. Example: Order.calculate_total() must show -> get_line_items() -> LineItem.calculate_subtotal() -> calculate_line_total() for each -> calculate_shipping() -> Money.add() (complete nested chain)",
+        "example": [
+          "Don't stop here:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        return total: 112.50",
+          "",
+          "Trace completely:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> items: [<LineItem>, <LineItem>] = Order.get_line_items()",
+          "        -> subtotal: 100.00 = LineItem.calculate_subtotal(items)",
+          "            -> item1_total: 50.00 = LineItem.calculate_line_total(qty: 2, price: 25.00)",
+          "            -> item2_total: 50.00 = LineItem.calculate_line_total(qty: 1, price: 50.00)",
+          "            return subtotal: 100.00",
+          "        -> shipping: 12.50 = Order.calculate_shipping()",
+          "            -> method: <ShippingMethod> = Order.get_shipping_method()",
+          "            -> cost: 12.50 = ShippingMethod.calculate_cost(method, address)",
+          "            return shipping: 12.50",
+          "        -> total: 112.50 = Money.add(subtotal: 100.00, shipping: 12.50)",
+          "        return total: 112.50",
+          "",
+          "(Shows complete calculation chain, not just top-level)"
+        ]
+      },
+      {
+        "description": "Identify new concepts discovered during walkthrough. Example: Tracing Order.calculate_total() reveals LineItem needs 'Calculates subtotal from all items' responsibility -> add to domain model then continue",
+        "example": [
+          "While tracing 'Order calculates total', discover LineItem needs responsibility:",
+          "",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> items: [<LineItem>, <LineItem>] = Order.get_line_items()",
+          "        -> subtotal: 100.00 = LineItem.calculate_subtotal(items) [NEW RESPONSIBILITY NEEDED]",
+          "",
+          "Action: Update domain model with:",
+          "LineItem",
+          "    Calculates subtotal from all items: Money, LineItem",
+          "",
+          "Then continue walkthrough using new responsibility"
+        ]
+      },
+      {
+        "description": "Update domain model when flows expose gaps. Example: Walkthrough shows Scope.validate_scope() needed but missing from model -> identify gap, update model with 'Validates against story graph: ValidationResult, StoryGraph', then continue",
+        "example": [
+          "During walkthrough, discover Scope needs validation but it's missing:",
+          "",
+          "CLIScope",
+          "    display: '...' = CLIScope.view_scope()",
+          "        -> validation: [...] = Scope.validate_scope(story_graph) [MISSING FROM MODEL]",
+          "",
+          "Gap identified: Scope doesn't have 'Validates against story graph' responsibility",
+          "",
+          "Action: Update domain model:",
+          "Scope",
+          "    Validates against story graph: ValidationResult, StoryGraph",
+          "",
+          "Then continue walkthrough"
+        ]
+      },
+      {
+        "description": "Recommend changes when flows don't make sense. Example: Order.calculate_total() -> OrderCalculator.get_calculator() -> ItemProcessor.process_items() (convoluted) -> recommend simplifying to Order -> LineItem.calculate_subtotal() (direct)",
+        "example": [
+          "During walkthrough, flow seems convoluted:",
+          "",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> calculator: <OrderCalculator> = Order.get_calculator()",
+          "        -> items: [...] = calculator.get_items()",
+          "        -> processor: <ItemProcessor> = calculator.get_processor()",
+          "        -> subtotal: 100.00 = processor.process_items(items)",
+          "",
+          "Issue: Too many indirections (OrderCalculator, ItemProcessor)",
+          "",
+          "Recommendation: Simplify to:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> items: [...] = Order.get_line_items()",
+          "        -> subtotal: 100.00 = LineItem.calculate_subtotal(items)",
+          "",
+          "Remove OrderCalculator and ItemProcessor from model"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't stop at high-level abstractions or ignore model gaps. Example: Order.calculate_total() return total: 112.50 (wrong - no detail) vs drill down to show LineItem.calculate_subtotal(), shipping calculation, Money.add() (right - complete)",
+    "guidance": [
+      {
+        "description": "Don't stop at vague high-level operations. Example: Order.calculate_total() return 112.50 (wrong - no detail) vs show get_line_items(), LineItem.calculate_subtotal() nested, calculate_shipping() nested, Money.add() (right)",
+        "example": [
+          "BAD:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        return total: 112.50",
+          "",
+          "GOOD:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> items: [...] = Order.get_line_items()",
+          "        -> subtotal: 100.00 = LineItem.calculate_subtotal(items)",
+          "            -> item_totals: [50.00, 50.00] = LineItem.calculate_each(items)",
+          "            return subtotal: 100.00",
+          "        -> shipping: 12.50 = Order.calculate_shipping()",
+          "        -> total: 112.50 = Money.add(subtotal, shipping)",
+          "        return total: 112.50",
+          "",
+          "(Drill down to show how calculation actually works)"
+        ]
+      },
+      {
+        "description": "Don't ignore when responsibilities or collaborators are missing. Example: Portfolio.evaluate_risk_score() return 0.75 (wrong - how?) vs identify gap: missing RiskModel collaborator, update model, then trace with collaborators (right)",
+        "example": [
+          "BAD (ignore missing collaborator):",
+          "Portfolio",
+          "    risk: 0.75 = Portfolio.evaluate_risk_score()",
+          "        return risk: 0.75  [How does it calculate? What collaborators?]",
+          "",
+          "GOOD (identify gap and update model):",
+          "Portfolio",
+          "    risk: 0.75 = Portfolio.evaluate_risk_score() [MISSING: RiskModel collaborator]",
+          "",
+          "Update domain model:",
+          "Portfolio",
+          "    Evaluates risk score: RiskScore, RiskModel, Holding",
+          "",
+          "Then trace with collaborators:",
+          "Portfolio",
+          "    risk: 0.75 = Portfolio.evaluate_risk_score()",
+          "        -> holdings: [...] = Portfolio.get_holdings()",
+          "        -> model: <RiskModel> = RiskModel.get_default()",
+          "        -> risk: 0.75 = RiskModel.calculate_score(holdings)",
+          "        return risk: 0.75"
+        ]
+      },
+      {
+        "description": "Don't continue with contradictions in the model. Example: Model says Order uses ShippingMethod but walkthrough uses ShippingService (wrong - mismatch) vs resolve by updating model or fixing walkthrough (right)",
+        "example": [
+          "BAD (model says A, walkthrough uses B):",
+          "Model: Order 'Calculates shipping cost by method: Money, ShippingMethod'",
+          "Walkthrough: Order.calculate_shipping() -> ShippingService.calculate()",
+          "",
+          "GOOD (update model or fix walkthrough):",
+          "Either:",
+          "1. Update model to include ShippingService as collaborator",
+          "2. Fix walkthrough to use ShippingMethod directly",
+          "",
+          "Don't ignore the mismatch - resolve it!"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "description": "Relationship depth",
+  "question": "How deeply should relationships between domain concepts be modeled?",
+  "options": [
+    "No relationships - Just list concepts independently",
+    "Collaborators only - List which concepts work together",
+    "Basic relationships - Collaborators with relationship types (has-a, uses, contains)",
+    "Detailed relationships - Include cardinality, directionality, lifecycle dependencies",
+    "Full relationship model - Everything including invariants and business rules"
+  ],
+  "note": "Deeper relationship modeling helps with architecture but adds complexity to the model."
+}
+

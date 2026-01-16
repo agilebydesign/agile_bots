@@ -1,0 +1,12 @@
+{
+  "typical_assumptions": [
+    "Parent-child: Domain collection objects (explicit collection class encapsulates collection-level operations)",
+    "Object instantiation: Constructor injection (dependencies explicit and immutable at creation)",
+    "Integration: Direct in-process calls (module based, synchronous, simple)",
+    "Persistence: Repository abstraction (domain objects persistence-ignorant)",
+    "UI interaction: Direct domain binding (simple forms, domain matches UI)",
+    "Error handling: Throw domain exceptions (exceptional conditions with meaningful domain error types)",
+    "Concurrency: Optimistic locking (assume conflicts rare, check version at save)"
+  ],
+  "_note": "These are the simplest starting points. Consult decision_criteria files when complexity requires different approaches."
+}

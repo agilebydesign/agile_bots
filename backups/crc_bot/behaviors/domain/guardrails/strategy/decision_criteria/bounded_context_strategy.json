@@ -1,0 +1,14 @@
+{
+  "description": "Bounded context strategy",
+  "question": "How should domain concepts be grouped into bounded contexts?",
+  "options": [
+    "By sub-epic - Each sub-epic represents a bounded context",
+    "By epic - Each epic represents a bounded context",
+    "By business capability - Group concepts by business function",
+    "Explicit contexts - Manually define context boundaries",
+    "Single context - All concepts in one unified model",
+    "Discover naturally - Let contexts emerge from concept relationships"
+  ],
+  "note": "Bounded contexts define boundaries where domain concepts have specific meanings. Sub-epic alignment is the default."
+}
+

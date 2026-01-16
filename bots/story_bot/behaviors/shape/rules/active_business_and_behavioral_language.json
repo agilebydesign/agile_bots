@@ -1,0 +1,94 @@
+{
+    "priority":  2,
+    "description":  "Use active business language focused on user/system behavior. Describe what actors do with clear action verbs, not technical implementation or passive constructions.",
+    "do":  {
+               "description":  "Use active voice with business language. Example: \u0027User submits order\u0027 (active voice, business language describing what actor does)",
+               "guidance":  [
+                                {
+                                    "description":  "Use action verbs to describe what happens in active voice with business language focused on user/system behavior",
+                                    "example":  [
+                                                    "User --\u003e submits order",
+                                                    "System --\u003e validates payment",
+                                                    "Customer --\u003e places order",
+                                                    "Admin --\u003e approves request"
+                                                ]
+                                },
+                                {
+                                    "description":  "Action verbs that describe user/system behavior clearly - use verbs like submits, views, validates, sends, displays, places, edits, creates, loads, saves, invokes, processes, generates, updates",
+                                    "example":  [
+                                                    "User --\u003e submits form",
+                                                    "Customer --\u003e views product catalog",
+                                                    "System --\u003e validates input data",
+                                                    "Admin --\u003e sends notification",
+                                                    "System --\u003e displays results",
+                                                    "User --\u003e places order",
+                                                    "Developer --\u003e edits configuration",
+                                                    "System --\u003e creates report",
+                                                    "User --\u003e loads dashboard",
+                                                    "System --\u003e saves changes",
+                                                    "User --\u003e invokes command",
+                                                    "System --\u003e processes payment",
+                                                    "System --\u003e generates invoice",
+                                                    "Admin --\u003e updates settings"
+                                                ]
+                                },
+                                {
+                                    "description":  "Prefer user/system stories over technical stories - transform technical language into business behavior. Wrong: \u0027Set up database schema\u0027 (technical). Correct: \u0027System --\u003e stores user data\u0027 (business, user story).",
+                                    "example":  [
+                                                    "System --\u003e stores user data (not \u0027Set up database schema\u0027)",
+                                                    "System --\u003e exposes user data via API (not \u0027Create API endpoint\u0027)",
+                                                    "Developer --\u003e verifies story behavior (not \u0027Write unit tests\u0027)"
+                                                ]
+                                },
+                                {
+                                    "description":  "When technical stories are necessary, mark with story_type: \u0027technical\u0027 and keep minimal and focused",
+                                    "example":  [
+                                                    "System --\u003e migrates legacy data format (story_type: \u0027technical\u0027)",
+                                                    "Developer --\u003e refactors authentication module (story_type: \u0027technical\u0027)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t use passive voice or technical implementation language. Example: \u0027Order is submitted\u0027 (passive voice, unclear actor) → \u0027User submits order\u0027 (active voice, clear actor)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t describe behaviors passively or vaguely - always use active voice that clearly identifies who performs the action. Wrong: \u0027Order is submitted\u0027 (passive - by whom?). Correct: \u0027User --\u003e submits order\u0027 (active, clear actor).",
+                                      "example":  [
+                                                      "User --\u003e submits order (not \u0027Order is submitted\u0027)",
+                                                      "System --\u003e validates payment (not \u0027Payment gets validated\u0027)",
+                                                      "User --\u003e places order (not \u0027Order is placed by user\u0027)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use technical implementation details or development task language - focus on business behavior. Wrong: \u0027Developer --\u003e writes code\u0027, \u0027Developer --\u003e creates class\u0027. Correct: \u0027Developer --\u003e implements feature\u0027, \u0027System --\u003e stores data\u0027.",
+                                      "example":  [
+                                                      "Developer --\u003e writes code",
+                                                      "Developer --\u003e creates class",
+                                                      "Developer --\u003e adds method",
+                                                      "Developer --\u003e sets up CI/CD",
+                                                      "Developer --\u003e configures database",
+                                                      "Developer --\u003e installs package",
+                                                      "Developer --\u003e implements order system",
+                                                      "Developer --\u003e creates database schema",
+                                                      "System --\u003e queries database",
+                                                      "System --\u003e calls API",
+                                                      "System --\u003e updates table"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Development task verbs to avoid - these describe implementation, not business behavior. Use business language instead.",
+                                      "example":  [
+                                                      "Developer --\u003e implements feature (avoid)",
+                                                      "Developer --\u003e creates module (avoid)",
+                                                      "Developer --\u003e refactors code (avoid)",
+                                                      "Developer --\u003e optimizes performance (avoid)",
+                                                      "Developer --\u003e fixes bug (avoid)",
+                                                      "Developer --\u003e builds system (avoid)",
+                                                      "Developer --\u003e sets up infrastructure (avoid)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.active_language_scanner.ActiveLanguageScanner"
+}

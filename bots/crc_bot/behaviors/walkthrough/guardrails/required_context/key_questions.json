@@ -1,0 +1,35 @@
+{
+  "key_questions": [
+    {
+      "question": "What is the primary purpose of these walkthroughs?",
+      "rationale": "Focus walkthrough strategy on the main areas of complexity or uncertainty",
+      "guidance": "Choose primary focus: business complexity (complex rules/workflows), architecture complexity (new frameworks/patterns), integration complexity (external systems/data transformation), or new frameworks (learning new tech)"
+    },
+    {
+      "question": "Which epics, sub-epics, or stories should be walked through?",
+      "rationale": "Focus walkthrough effort on highest-value or highest-risk scenarios",
+      "guidance": "List specific nodes from story graph to trace, or indicate 'all sub-epics' or 'all stories within Epic X'"
+    },
+    {
+      "question": "What areas have architectural uncertainty or risk?",
+      "rationale": "Prioritize walkthroughs for areas where the domain model is least proven",
+      "guidance": "Identify integrations, complex calculations, unclear workflows, or novel patterns"
+    },
+    {
+      "question": "What areas have poor understanding of object interactions?",
+      "rationale": "Trace scenarios where collaborations between concepts are unclear",
+      "guidance": "Identify responsibilities where it's unclear which objects collaborate or how data flows"
+    },
+    {
+      "question": "Are there specific acceptance criteria or scenarios that need tracing?",
+      "rationale": "Walk through the most critical or complex scenarios first",
+      "guidance": "List specific scenarios from stories, or indicate criteria like 'all error handling' or 'all integration points'"
+    },
+    {
+      "question": "What depth of walkthrough is needed?",
+      "rationale": "Determine granularity: epic-level flows, story-level flows, or AC/step-level traces",
+      "guidance": "Choose depth based on complexity: high-level for well-understood areas, detailed for uncertain areas"
+    }
+  ]
+}
+

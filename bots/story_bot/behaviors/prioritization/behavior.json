@@ -1,0 +1,53 @@
+{
+  "behaviorName": "prioritization",
+  "order": 2,
+  "description": "Organize stories into delivery increments based on business value, dependencies, and risk",
+  "goal": "Prioritize and sequence stories into actionable delivery increments",
+  "inputs": "Story map from shape phase",
+  "outputs": "Prioritized story map with delivery increments defined",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Organize stories into delivery increments based on business value, dependencies, and risk"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": []
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "validate",
+        "instructions": []
+      },
+      {
+        "name": "validate",
+        "order": 3,
+        "next_action": "render",
+        "instructions": [
+          "prioritization: validate increment organization and dependencies"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 4,
+        "instructions": [
+          "prioritization: render increment documentation"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to prioritization behavior",
+    "patterns": [
+      "prioritize.*stories",
+      "organize.*increments",
+      "sequence.*delivery",
+      "plan.*increments",
+      "rank.*stories"
+    ]
+  }
+}

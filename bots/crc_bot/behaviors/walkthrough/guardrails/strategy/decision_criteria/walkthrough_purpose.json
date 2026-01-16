@@ -1,0 +1,32 @@
+{
+  "decision": "walkthrough_purpose",
+  "question": "What is the primary purpose of these walkthroughs?",
+  "options": [
+    {
+      "value": "business_complexity",
+      "description": "Validate model handles complex business rules, workflows, and domain logic",
+      "when_to_use": "Complex business rules, multi-step workflows, regulatory requirements, intricate domain calculations"
+    },
+    {
+      "value": "architecture_complexity",
+      "description": "Validate model supports new frameworks, libraries, or architectural patterns",
+      "when_to_use": "New frameworks being introduced, unfamiliar libraries, novel architectural patterns, design pattern uncertainty"
+    },
+    {
+      "value": "integration_complexity",
+      "description": "Validate model handles integration points, data transformation, and external systems",
+      "when_to_use": "Multiple system integrations, complex data transformations, API boundaries, event-driven flows"
+    },
+    {
+      "value": "new_frameworks",
+      "description": "Validate model works with specific new frameworks or technologies being adopted",
+      "when_to_use": "Team learning new technology stack, migrating to new framework, adopting unfamiliar libraries"
+    },
+    {
+      "value": "mixed",
+      "description": "Multiple purposes - business complexity, architecture, and integrations",
+      "when_to_use": "Complex system with multiple areas of uncertainty across business, architecture, and integrations"
+    }
+  ]
+}
+

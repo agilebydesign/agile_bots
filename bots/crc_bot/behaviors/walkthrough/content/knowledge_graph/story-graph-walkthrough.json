@@ -1,0 +1,72 @@
+{
+  "_explanation": {
+    "purpose": "Walkthrough phase - adds realization walkthroughs to domain concepts showing object flows and interactions",
+    "scope": "ONLY adds/updates realization arrays in domain_concepts. NEVER modifies story structure or domain model",
+    "realization_structure": "Each realization has: scope (identifies epic/sub-epic/story/scenario), scenario (description of what's being traced), walks (array of object flows)",
+    "scope_format": "Identifies what this walkthrough realizes using dot notation with exact names from story-graph.json. Can be at any level: 'Epic Name' OR 'Epic Name.Sub-Epic Name' OR 'Epic Name.Sub-Epic Name.Story Name' OR 'Epic Name.Sub-Epic Name.Story Name.Scenario Name'",
+    "walk_structure": "Each walk has: covers (which steps/ACs this walk traces, e.g., 'Steps 1-3' or 'Complete flow'), object_flow (step-by-step interaction with actual values)",
+    "object_flow_format": "Use Object.method(param: value) format with -> for nested calls and return values",
+    "alignment": "Must use exact concept names, responsibilities, and collaborators from domain model"
+  },
+  "epics": [
+    {
+      "name": "EXISTING_EPIC_NAME",
+      "domain_concepts": [
+        {
+          "name": "EXISTING_CONCEPT_NAME",
+          "realization": [
+            {
+              "scope": "Execute In Headless Mode.Direct Message Pass-Through.Sends Direct Message.Complete headless execution flow",
+              "scenario": "User sends direct message via CLI with --headless flag, system executes in background and reports outcome",
+              "walks": [
+                {
+                  "covers": "Steps 1-4 (CLI invocation through instruction preparation)",
+                  "object_flow": [
+                    "result: value = Object.method(param: value)",
+                    "  -> nested: value = Collaborator.nested_method()",
+                    "     return nested: value",
+                    "return result: value"
+                  ]
+                },
+                {
+                  "covers": "Steps 5-8 (API execution, monitoring, and reporting)",
+                  "object_flow": [
+                    "result: value = Object.another_method()",
+                    "return result: value"
+                  ]
+                }
+              ],
+              "model_updates": [
+                "Description of any domain model updates discovered during walkthrough"
+              ]
+            }
+          ]
+        }
+      ],
+      "sub_epics": [
+        {
+          "name": "EXISTING_SUB_EPIC_NAME",
+          "domain_concepts": [
+            {
+              "name": "EXISTING_CONCEPT_NAME",
+              "realization": [
+                {
+                  "scope": "Execute In Headless Mode.Execute Operations.Executes Single Operation.Operation completes successfully",
+                  "scenario": "User executes single operation (e.g., 'instructions') in headless mode",
+                  "walks": [
+                    {
+                      "covers": "Steps 1-5 (Operation execution and reporting)",
+                      "object_flow": []
+                    }
+                  ],
+                  "model_updates": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

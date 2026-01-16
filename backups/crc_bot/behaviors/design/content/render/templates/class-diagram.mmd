@@ -1,0 +1,21 @@
+classDiagram
+
+{{#epics}}
+{{#domain_concepts}}
+    class {{name}} {
+        {{#responsibilities}}
+        +{{name}}()
+        {{/responsibilities}}
+    }
+    {{#inherits_from}}
+    {{inherits_from}} <|-- {{../name}}
+    {{/inherits_from}}
+    {{#ownership.has}}
+    {{../name}} "1" *-- "many" {{.}}
+    {{/ownership.has}}
+    {{#ownership.references}}
+    {{../name}} ..> {{.}}
+    {{/ownership.references}}
+{{/domain_concepts}}
+{{/epics}}
+

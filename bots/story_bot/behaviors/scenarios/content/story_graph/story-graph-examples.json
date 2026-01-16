@@ -1,0 +1,144 @@
+{
+  "_explanation": {
+    "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios and scenario_outlines with placeholders",
+    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), background (common setup), steps (Given/When/Then)",
+    "scenario_outline_structure": "scenario_outlines array: same as scenarios but steps use <variable_name> placeholders. Examples object has columns array (all variable names) and rows array (data values)",
+    "variable_matching": "Every <variable_name> in steps MUST appear in examples.columns. Include both input variables and expected output/result variables",
+    "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure"
+  },
+  "epics": [
+    {
+      "name": "",
+      "sequential_order": 1,
+      "estimated_stories": null,
+      "sub_epics": [
+        {
+          "name": "",
+          "sequential_order": 1,
+          "estimated_stories": null,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "sequential_order": 1,
+              "stories": [
+                {
+                  "name": "",
+                  "sequential_order": 1,
+                  "connector": null,
+                  "users": [],
+                  "story_type": "user",
+                  "test_file": "",
+                  "test_class": "",
+                  "test_line": null,
+                  "scenarios": [
+                    {
+                      "name": "",
+                      "type": "happy_path|edge_case|error_case",
+                      "test_method": "",
+                      "test_line": null,
+                      "background": [
+                        "Given <common_setup_step>",
+                        "And <another_common_setup>"
+                      ],
+                      "steps": [
+                        "Given <scenario_specific_state>",
+                        "And <scenario_specific_setup>",
+                        "When <user_action_or_system_event>",
+                        "Then <expected_outcome>",
+                        "And <another_expected_outcome>"
+                      ]
+                    }
+                  ],
+                  "scenario_outlines": [
+                    {
+                      "name": "",
+                      "type": "happy_path|edge_case|error_case",
+                      "test_method": "",
+                      "test_line": null,
+                      "background": [
+                        "Given <common_setup_step>",
+                        "And <another_common_setup>"
+                      ],
+                      "steps": [
+                        "Given <scenario_specific_state> at \"<variable_path>\"",
+                        "And <entity> exists at \"<variable_file_path>\"",
+                        "When <action> with <variable_parameter>=\"<variable_value>\"",
+                        "Then <expected_outcome> equals \"<variable_expected_result>\"",
+                        "And <another_outcome> is \"<variable_result>\""
+                      ],
+                      "examples": {
+                        "columns": [
+                          "variable_path",
+                          "variable_file_path",
+                          "variable_parameter",
+                          "variable_value",
+                          "variable_expected_result",
+                          "variable_result"
+                        ],
+                        "rows": [
+                          [
+                            "value1",
+                            "value2",
+                            "value3",
+                            "value4",
+                            "result1",
+                            "result2"
+                          ],
+                          [
+                            "value5",
+                            "value6",
+                            "value7",
+                            "value8",
+                            "result3",
+                            "result4"
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "stories": []
+    }
+  ],
+  "increments": [
+    {
+      "name": "",
+      "priority": 1,
+      "stories": [
+        ""
+      ]
+    }
+  ],
+  "generated_artifacts": {
+    "story_documents": {
+      "description": "Story documents with scenarios section added",
+      "location": "docs/stories/{epic_name}/{sub_epic_name}/{story_name}.md",
+      "content": [
+        "Story description",
+        "Acceptance criteria",
+        "Background (common setup steps)",
+        "Scenarios (happy path, edge cases, error cases)",
+        "Scenario Outlines with Examples tables (when decision criteria chosen)"
+      ]
+    },
+    "structured_data": {
+      "description": "JSON representation of story graph with scenarios added",
+      "location": "docs/stories/story-graph.json",
+      "content": [
+        "Epic/sub_epic/story_group/story hierarchy",
+        "Scenario definitions with steps",
+        "Scenario Outline definitions with Examples tables (when decision criteria chosen)",
+        "Background steps per story",
+        "Scenario types (happy_path, edge_case, error_case)",
+        "Connectors for story groups and stories"
+      ]
+    }
+  }
+}

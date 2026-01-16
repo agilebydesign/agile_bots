@@ -1,0 +1,93 @@
+{
+  "behaviorName": "domain",
+  "order": 2,
+  "description": "Model the business domain by extracting and refining CRC concepts from stories in the story-graph. Organize concepts into modules matching source code folder structure.",
+  "goal": "Create a comprehensive CRC model from domain concepts captured in story-graph.json - define responsibilities, collaborators, relationships, and modules",
+  "inputs": "story-graph.json domain concepts, domain expert interviews, existing domain documentation, source code folder structure",
+  "outputs": "crc-model-outline.md, crc-model-description.md, crc-model-diagram.mmd (grouped by modules)",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Synthesize context into CRC cards and build a CRC model that connects business and solution language"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": [
+          "Gather context for CRC modeling - understand business language and domain boundaries"
+        ]
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "build",
+        "instructions": [
+          "Make strategic decisions about CRC modeling approach and scope"
+        ]
+      },
+      {
+        "name": "build",
+        "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "Extract context from story-graph.json",
+          "Refine CRC card definitions, responsibilities, and collaborators",
+          "Assign each domain concept to a module matching its source code folder structure (use dot notation for nesting)",
+          "Apply CRC rules when defining responsibilities and collaborators",
+          "Use CRC rules to guide the creation of the CRC model",
+          "Update story-graph.json with the new / updated domain concepts, responsibilities, collaborators, and modules"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
+        "next_action": "render",
+        "instructions": [
+          "validate CRC model against CRC rules",
+          "Ensure CRC cards use ubiquitous language",
+          "Verify collaborators and responsibilities are clear",
+          "Verify every domain concept has a module field matching source folder structure"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 5,
+        "instructions": [
+          "render CRC model documents from story-graph.json"
+        ]
+      },
+      {
+        "name": "rules",
+        "instructions": [
+          "Display CRC rules for this behavior as AI context"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to CRC modeling",
+    "patterns": [
+      "shape.*crc",
+      "model.*crc",
+      "create.*crc.*cards",
+      "define.*crc",
+      "discover.*responsibilities",
+      "identify.*collaborators",
+      "start.*crc.*modeling",
+      "begin.*crc",
+      "explore.*crc",
+      "crc.*cards",
+      "refine.*crc",
+      "update.*crc.*model",
+      "crc.*concepts",
+      "class.*responsibility",
+      "responsibility.*collaborator",
+      "object.*responsibilities",
+      "object.*collaborators",
+      "domain.*concepts"
+    ]
+  }
+}
+

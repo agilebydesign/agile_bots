@@ -1,0 +1,88 @@
+{
+  "behaviorName": "design",
+  "order": 4,
+  "description": "Design detailed object-oriented architecture and refine CRC cards with implementation patterns. Preserve modules from domain phase.",
+  "goal": "Refine CRC model with proper encapsulation, delegation, dependency injection, and design patterns. Verify module accuracy.",
+  "inputs": "story-graph.json (with stories, domain concepts, and modules), architecture diagrams, technical requirements",
+  "outputs": "story-graph.json (with detailed design patterns and verified modules), crc-design-model.md, crc-class-diagrams.mmd",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Apply OOP design principles to refine CRC cards and define clear object responsibilities"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": [
+          "Gather context for technical design - understand architecture patterns and implementation constraints"
+        ]
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "build",
+        "instructions": [
+          "Make strategic decisions about design patterns, object responsibilities, and dependency management"
+        ]
+      },
+      {
+        "name": "build",
+        "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "design: refine CRC cards with OOP design patterns and detailed responsibilities",
+          "Apply encapsulation, delegation, and dependency injection patterns to CRC cards",
+          "Define clear object responsibilities and collaborations on each CRC card",
+          "Preserve module field from domain phase, update only if class location changed",
+          "Update story-graph.json domain_concepts with detailed design patterns and object interactions"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
+        "next_action": "render",
+        "instructions": [
+          "design: validate OOP design against design principles",
+          "Ensure proper encapsulation, delegation, and dependency management",
+          "Verify object responsibilities follow SOLID principles",
+          "Verify module field preserved from domain phase and matches current source location"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 5,
+        "instructions": [
+          "design: render design model documents and class diagrams"
+        ]
+      },
+      {
+        "name": "rules",
+        "instructions": [
+          "Display design rules for this behavior as AI context"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to technical design",
+    "patterns": [
+      "design.*architecture",
+      "apply.*oop",
+      "design.*patterns",
+      "refine.*design",
+      "object.*responsibilities",
+      "dependency.*injection",
+      "encapsulation",
+      "delegation.*patterns",
+      "solid.*principles",
+      "technical.*design",
+      "class.*design",
+      "object.*design",
+      "design.*model",
+      "architecture.*patterns"
+    ]
+  }
+}
+

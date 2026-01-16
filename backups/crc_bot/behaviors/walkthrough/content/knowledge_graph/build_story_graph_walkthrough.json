@@ -1,0 +1,7 @@
+{
+  "output": "story-graph.json",
+  "path": "docs/stories/",
+  "template": "story-graph-walkthrough.json",
+  "behavior": "walkthrough",
+  "phase": "realization"
+}

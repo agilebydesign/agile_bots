@@ -1,0 +1,76 @@
+{
+  "description": "How should domain concepts handle concurrent access and modifications?",
+  "question": "What is your default approach for handling concurrency in the domain?",
+  "options": [
+    {
+      "id": "optimistic_locking",
+      "name": "Optimistic Locking",
+      "description": "Assume conflicts are rare. Check version/timestamp at save time. Fail if modified by another.",
+      "when_to_use": "Read-heavy workloads, conflicts rare, user can retry, web applications",
+      "example": [
+        "Order",
+        "    Get version: Version",
+        "    Saves with version check: Order, Version",
+        "    Throws ConcurrencyException: Version, CurrentVersion",
+        "",
+        "(Save fails if version changed since load)"
+      ]
+    },
+    {
+      "id": "pessimistic_locking",
+      "name": "Pessimistic Locking",
+      "description": "Lock resources when accessed. Other requests wait or fail. Guarantees exclusive access.",
+      "when_to_use": "High-conflict scenarios, critical resources, short transactions, database support",
+      "example": [
+        "Order",
+        "    Locks for processing: Lock",
+        "    Processes payment: PaymentResult, Payment",
+        "    Releases lock: Boolean",
+        "",
+        "(Other processes wait until lock released)"
+      ]
+    },
+    {
+      "id": "aggregate_boundaries",
+      "name": "Aggregate Boundaries",
+      "description": "Consistency enforced within aggregate boundary. Different aggregates are eventually consistent.",
+      "when_to_use": "DDD approach, scalability priority, distributed systems, clear ownership boundaries",
+      "example": [
+        "Order (aggregate - internally consistent)",
+        "    Adds line item: LineItem (consistent within Order)",
+        "    Submits: OrderPlaced event",
+        "",
+        "Inventory (separate aggregate - eventually consistent)",
+        "    Reserves stock: Reservation (updated via event)"
+      ]
+    },
+    {
+      "id": "immutable_objects",
+      "name": "Immutable Objects",
+      "description": "Objects don't change after creation. New versions created instead. No concurrent modification possible.",
+      "when_to_use": "Functional approach, audit trail, temporal queries, thread safety, event sourcing",
+      "example": [
+        "Order (immutable)",
+        "    With new line item: Order, LineItem (returns new Order)",
+        "    With updated quantity: Order, LineItem, Quantity (returns new Order)",
+        "",
+        "(Original Order unchanged, new version created)"
+      ]
+    },
+    {
+      "id": "command_serialization",
+      "name": "Command Serialization",
+      "description": "Serialize commands for same aggregate. Process one at a time. Queue ensures order.",
+      "when_to_use": "Event sourcing, actor model, strict ordering required, high contention",
+      "example": [
+        "OrderActor",
+        "    Processes commands sequentially: Command",
+        "    Queues incoming commands: Command",
+        "",
+        "AddLineItemCommand -> queued",
+        "UpdateQuantityCommand -> queued",
+        "(Processed one at a time, no concurrent modification)"
+      ]
+    }
+  ]
+}

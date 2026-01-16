@@ -1,0 +1,322 @@
+{
+  "_explanation": {
+    "purpose": "Walkthrough phase - traces object flows for Panel display architecture",
+    "architecture": "Client-side JavaScript views wrap JSON data + have CLI reference for operations",
+    "pattern": "View wraps JSON → render() uses JSON → operation() calls CLI with JSON data → Python subprocess → JSON response → re-render",
+    "scope": "Panel display for 'Invoke Bot Through Panel' sub-epic with 4 feature epics"
+  },
+  "epics": [
+    {
+      "name": "Build Agile Bots",
+      "sub_epics": [
+        {
+          "name": "Invoke Bot",
+          "sub_epics": [
+            {
+              "name": "Invoke Bot Through Panel",
+              "domain_concepts": [
+                {
+                  "name": "Panel",
+                  "realization": [
+                    {
+                      "scope": "Invoke Bot Through Panel.Manage Bot Information.Open Panel",
+                      "scenario": "User activates panel command, extension creates panel and displays bot information by calling Python CLI, wrapping JSON response, and rendering all sections",
+                      "walks": [
+                        {
+                          "covers": "Extension activation and panel creation",
+                          "object_flow": [
+                            "// VS Code Extension activated",
+                            "panelData: JSON = CLI.execute('status')",
+                            "  -> pythonProcess: Process = spawn('python', ['repl_main.py'])",
+                            "  -> stdin.write('status')",
+                            "  -> cliOutput: String = Bot.get_status_text()",
+                            "     -> botData: JSON = {name: 'story_bot', workspace: 'base_bot', behaviors: [...], paths: {...}}",
+                            "  return panelData: botData",
+                            "panel: Panel = new Panel(panelData, cli)",
+                            "return panel"
+                          ]
+                        },
+                        {
+                          "covers": "Panel constructor and section rendering",
+                          "object_flow": [
+                            "// Panel constructor",
+                            "this.botJSON = panelData",
+                            "this.cli = cli",
+                            "headerView: BotHeaderView = new BotHeaderView(this.botJSON, this.cli)",
+                            "pathsSection: PathsSection = new PathsSection(this.botJSON.paths, this.cli)",
+                            "behaviorsSection: BehaviorsSection = new PathsSection(this.botJSON.behaviors, this.cli)",
+                            "scopeSection: ScopeSection = new ScopeSection(this.botJSON.scope, this.cli)",
+                            "instructionsSection: InstructionsSection = new InstructionsSection(this.botJSON.instructions, this.cli)",
+                            "html: String = this.render()",
+                            "  -> headerHTML: String = headerView.render()",
+                            "     return `<div>${this.botJSON.name} v${this.botJSON.version}</div>`",
+                            "  -> pathsHTML: String = pathsSection.render()",
+                            "     return `<div>${this.botJSON.paths.workspace}</div>`",
+                            "  -> behaviorsHTML: String = behaviorsSection.render()",
+                            "  -> scopeHTML: String = scopeSection.render()",
+                            "  -> instructionsHTML: String = instructionsSection.render()",
+                            "  return `<div>${headerHTML}${pathsHTML}${behaviorsHTML}${scopeHTML}${instructionsHTML}</div>`",
+                            "webview.html = html"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    },
+                    {
+                      "scope": "Invoke Bot Through Panel.Manage Bot Information.Refresh Panel",
+                      "scenario": "User clicks refresh button, panel calls CLI to get updated status, wraps new JSON, and re-renders all sections",
+                      "walks": [
+                        {
+                          "covers": "User refresh action and CLI round-trip",
+                          "object_flow": [
+                            "// User clicks refresh button",
+                            "BotHeaderView.onRefreshClick()",
+                            "  -> newData: JSON = this.cli.execute('status')",
+                            "     -> pythonProcess: Process = spawn('python', ['repl_main.py'])",
+                            "     -> stdin.write('status')",
+                            "     -> botData: JSON = Bot.get_status_text()",
+                            "     return botData",
+                            "  -> this.botJSON = newData",
+                            "  -> panel.update(newData)",
+                            "     -> this.botJSON = newData",
+                            "     -> html: String = this.render()",
+                            "        // All sections re-render with new JSON",
+                            "     -> webview.html = html",
+                            "  return success"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    }
+                  ]
+                },
+                {
+                  "name": "BehaviorsSection",
+                  "realization": [
+                    {
+                      "scope": "Invoke Bot Through Panel.Navigate Behavior Action Status.Display Hierarchy",
+                      "scenario": "Panel displays behavior hierarchy with actions, user expands/collapses behaviors (instant), completion status from JSON",
+                      "walks": [
+                        {
+                          "covers": "Rendering behavior hierarchy from JSON",
+                          "object_flow": [
+                            "// BehaviorsSection constructor",
+                            "this.behaviorsJSON = behaviorsJSON",
+                            "this.cli = cli",
+                            "html: String = this.render()",
+                            "  -> behaviorsHTML: String = ''",
+                            "  -> for behavior in this.behaviorsJSON:",
+                            "     behaviorView: BehaviorView = new BehaviorView(behavior, this.cli)",
+                            "     behaviorHTML: String = behaviorView.render()",
+                            "       -> name: String = this.behaviorJSON.name",
+                            "       -> status: String = this.behaviorJSON.status // 'current', 'completed', 'pending'",
+                            "       -> actionsView: ActionsView = new ActionsView(this.behaviorJSON.actions, this.cli)",
+                            "       -> actionsHTML: String = actionsView.render()",
+                            "          -> for action in this.actionsJSON:",
+                            "             actionHTML: String = `<div>${action.name} [${action.status}]</div>`",
+                            "          return actionsHTML",
+                            "       return `<div class='behavior ${status}'>${name}${actionsHTML}</div>`",
+                            "     behaviorsHTML += behaviorHTML",
+                            "  return behaviorsHTML"
+                          ]
+                        },
+                        {
+                          "covers": "User expands behavior (client-side toggle)",
+                          "object_flow": [
+                            "// User clicks collapsed behavior",
+                            "BehaviorView.onToggleClick()",
+                            "  -> this.expanded = !this.expanded // Local state change",
+                            "  -> elementHTML: String = this.render()",
+                            "  -> document.getElementById(this.elementId).innerHTML = elementHTML",
+                            "  return // No CLI call - instant UI update"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    },
+                    {
+                      "scope": "Invoke Bot Through Panel.Navigate Behavior Action Status.Execute Behavior Action",
+                      "scenario": "User clicks behavior to execute, system navigates to behavior and executes first action via CLI",
+                      "walks": [
+                        {
+                          "covers": "User executes behavior via CLI",
+                          "object_flow": [
+                            "// User clicks behavior name",
+                            "BehaviorView.onExecuteClick()",
+                            "  -> behaviorName: String = this.behaviorJSON.name",
+                            "  -> result: JSON = this.cli.execute(behaviorName)",
+                            "     -> pythonProcess: Process = spawn('python', ['repl_main.py'])",
+                            "     -> stdin.write(behaviorName)",
+                            "     -> Bot.execute_behavior(behaviorName)",
+                            "        -> behavior: Behavior = behaviors.get(behaviorName)",
+                            "        -> action: Action = behavior.get_first_action()",
+                            "        -> action.execute()",
+                            "        -> BehaviorActionState.update_current(behavior, action)",
+                            "        return {behavior: behaviorName, action: action.name, status: 'in_progress'}",
+                            "     return statusJSON",
+                            "  -> panel.update(result)",
+                            "     -> this.behaviorsJSON = result.behaviors",
+                            "     -> html: String = behaviorsSection.render()",
+                            "     -> webview.postMessage({update: 'behaviors', html: html})",
+                            "  return"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    }
+                  ]
+                },
+                {
+                  "name": "StoryGraphTabView",
+                  "realization": [
+                    {
+                      "scope": "Invoke Bot Through Panel.Filter And Navigate Scope.Display Story Scope Hierarchy",
+                      "scenario": "Panel displays nested epic/sub-epic/story/scenario hierarchy from story graph JSON, user can expand/collapse and navigate",
+                      "walks": [
+                        {
+                          "covers": "Rendering 4-level nested hierarchy from JSON",
+                          "object_flow": [
+                            "// StoryGraphTabView constructor",
+                            "this.storyMapJSON = storyMapJSON",
+                            "this.cli = cli",
+                            "html: String = this.render()",
+                            "  -> epicsHTML: String = ''",
+                            "  -> for epic in this.storyMapJSON.epics:",
+                            "     epicView: EpicView = new EpicView(epic, this.cli)",
+                            "     epicHTML: String = epicView.render()",
+                            "       -> name: String = this.epicJSON.name",
+                            "       -> icon: String = this.epicJSON.icon",
+                            "       -> subEpicsHTML: String = ''",
+                            "       -> for subEpic in this.epicJSON.sub_epics:",
+                            "          subEpicView: SubEpicView = new SubEpicView(subEpic, this.cli)",
+                            "          subEpicHTML: String = subEpicView.render()",
+                            "            -> storiesHTML: String = ''",
+                            "            -> for story in this.subEpicJSON.stories:",
+                            "               storyView: StoryView = new StoryView(story, this.cli)",
+                            "               storyHTML: String = storyView.render()",
+                            "                 -> scenariosHTML: String = ''",
+                            "                 -> for scenario in this.storyJSON.scenarios:",
+                            "                    scenarioView: ScenarioView = new ScenarioView(scenario, this.cli)",
+                            "                    scenarioHTML: String = scenarioView.render()",
+                            "                      return `<div>${this.scenarioJSON.name}</div>`",
+                            "                    scenariosHTML += scenarioHTML",
+                            "                 return `<div>${this.storyJSON.name}${scenariosHTML}</div>`",
+                            "               storiesHTML += storyHTML",
+                            "            return `<div>${this.subEpicJSON.name}${storiesHTML}</div>`",
+                            "          subEpicsHTML += subEpicHTML",
+                            "       return `<div>${name}${subEpicsHTML}</div>`",
+                            "     epicsHTML += epicHTML",
+                            "  return epicsHTML"
+                          ]
+                        },
+                        {
+                          "covers": "User opens epic folder via CLI",
+                          "object_flow": [
+                            "// User clicks epic folder link",
+                            "EpicView.onFolderClick()",
+                            "  -> folderPath: String = this.epicJSON.folder_path",
+                            "  -> this.cli.sendMessage({command: 'openScope', filePath: folderPath})",
+                            "     -> vscode.commands.executeCommand('vscode.open', fileUri)",
+                            "  return // No panel re-render needed"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    },
+                    {
+                      "scope": "Invoke Bot Through Panel.Filter And Navigate Scope.Filter Story Scope",
+                      "scenario": "User types story name in filter, system calls CLI to update scope filter, returns filtered JSON, view re-renders with filtered hierarchy",
+                      "walks": [
+                        {
+                          "covers": "User filters scope via CLI",
+                          "object_flow": [
+                            "// User types 'Open Panel' in filter",
+                            "ScopeSection.onFilterInput('Open Panel')",
+                            "  -> filteredData: JSON = this.cli.execute('scope \"Open Panel\"')",
+                            "     -> pythonProcess: Process = spawn('python', ['repl_main.py'])",
+                            "     -> stdin.write('scope \"Open Panel\"')",
+                            "     -> Bot.update_scope_filter('Open Panel')",
+                            "        -> scope: Scope = Scope.filter_by_story('Open Panel')",
+                            "        -> filteredStoryMap: JSON = scope.get_filtered_story_map()",
+                            "        return {scope: {filter: 'Open Panel', storyMap: filteredStoryMap}}",
+                            "     return scopeJSON",
+                            "  -> this.scopeJSON = filteredData.scope",
+                            "  -> storyGraphView: StoryGraphTabView = new StoryGraphTabView(filteredData.scope.storyMap, this.cli)",
+                            "  -> html: String = storyGraphView.render()",
+                            "     // Renders only matching epic/sub-epic/story",
+                            "  -> document.getElementById('scope-display').innerHTML = html",
+                            "  return"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    }
+                  ]
+                },
+                {
+                  "name": "ClarifyInstructionsSection",
+                  "realization": [
+                    {
+                      "scope": "Invoke Bot Through Panel.Display Instructions.Display Clarify Instructions",
+                      "scenario": "When current action is clarify, panel displays ClarifyInstructionsSection with key questions in editable textareas, user edits answer, system saves via CLI",
+                      "walks": [
+                        {
+                          "covers": "Rendering clarify-specific instructions from JSON",
+                          "object_flow": [
+                            "// InstructionsSection determines which subclass to use",
+                            "InstructionsSection.create(instructionsJSON, actionJSON, cli)",
+                            "  -> actionType: String = actionJSON.type // 'clarify'",
+                            "  -> if actionType == 'clarify':",
+                            "     section: ClarifyInstructionsSection = new ClarifyInstructionsSection(instructionsJSON, actionJSON, cli)",
+                            "       -> this.keyQuestionsJSON = instructionsJSON.clarify.key_questions",
+                            "       -> this.cli = cli",
+                            "     return section",
+                            "html: String = section.render()",
+                            "  -> baseHTML: String = this.renderBase()",
+                            "     return `<div>${this.instructionsJSON.behavior_name}.${this.actionJSON.name}</div>`",
+                            "  -> questionsHTML: String = ''",
+                            "  -> for question in this.keyQuestionsJSON:",
+                            "     questionHTML: String = `",
+                            "       <div class='question'>",
+                            "         <label>${question.question}</label>",
+                            "         <textarea id='answer-${question.id}' ",
+                            "                   onchange='updateAnswer(${question.id})'>${question.answer}</textarea>",
+                            "       </div>`",
+                            "     questionsHTML += questionHTML",
+                            "  return `${baseHTML}${questionsHTML}`"
+                          ]
+                        },
+                        {
+                          "covers": "User edits answer and saves via CLI",
+                          "object_flow": [
+                            "// User edits answer in textarea and blur triggers save",
+                            "ClarifyInstructionsSection.onAnswerChange(questionId, newAnswer)",
+                            "  -> question: Object = this.keyQuestionsJSON.find(q => q.id == questionId)",
+                            "  -> result: JSON = this.cli.execute(`update_answer \"${question.question}\" \"${newAnswer}\"`)",
+                            "     -> pythonProcess: Process = spawn('python', ['repl_main.py'])",
+                            "     -> stdin.write('update_answer ...')",
+                            "     -> Bot.update_question_answer(question, newAnswer)",
+                            "        -> clarificationFile: Path = behavior.get_clarification_file()",
+                            "        -> clarificationData: JSON = load_json(clarificationFile)",
+                            "        -> clarificationData.answers[question] = newAnswer",
+                            "        -> save_json(clarificationFile, clarificationData)",
+                            "        return {status: 'saved', question: question, answer: newAnswer}",
+                            "     return resultJSON",
+                            "  -> question.answer = newAnswer",
+                            "  -> // Local update complete, no re-render needed",
+                            "  return"
+                          ]
+                        }
+                      ],
+                      "model_updates": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

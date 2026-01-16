@@ -1,0 +1,8 @@
+{
+  "behaviorName": "domain",
+  "instructions": [
+    "Extract domain_concepts from story-graph.json epics/sub_epics and render to domain model documentation (outline, description, diagram).",
+    "When rendering domain outline, use 'Concept : BaseClass' notation for concepts with inherits_from field.",
+    "Preserve inheritance relationships from story-graph.json in all rendered outputs."
+  ]
+}

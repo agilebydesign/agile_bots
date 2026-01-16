@@ -1,0 +1,32 @@
+{
+  "behaviorName": "walkthrough",
+  "instructions": [
+    "**COMBINED GUARDRAILS INSTRUCTIONS - REQUIRED CONTEXT + STRATEGY:**",
+    "",
+    "Execute both context gathering and strategy decision steps in sequence.",
+    "",
+    "**STEP 1: GATHER REQUIRED CONTEXT**",
+    "",
+    "Ask key questions from: agile_bot/bots/story_bot/behaviors/walkthrough/guardrails/required_context/key_questions.json",
+    "",
+    "**Summary:** Identify which scenarios to walkthrough, areas of risk/uncertainty, and desired depth. Present questions in chat, get user responses, store clarification data to project area docs/context/walkthrough-clarification.json.",
+    "",
+    "**STEP 2: DECIDE WALKTHROUGH STRATEGY**",
+    "",
+    "Present strategy decisions from: agile_bot/bots/story_bot/behaviors/walkthrough/guardrails/strategy/decision_criteria/",
+    "",
+    "**Summary:** Present walkthrough depth options and any other strategic decisions. Ask user to review and select preferred options. Store strategy data to project area docs/context/walkthrough-strategy.json.",
+    "",
+    "**Key Strategy Decisions:**",
+    "- Walkthrough purpose (business complexity, architecture complexity, integration complexity, new frameworks, or mixed)",
+    "- Walkthrough depth (high-level, story-level, detailed, or mixed)",
+    "- Which scenarios to prioritize (risk, uncertainty, integration, complexity)",
+    "- Stopping criteria (when to stop tracing redundant flows)",
+    "",
+    "**WORKFLOW:**",
+    "1. Execute STEP 1 (required context) - wait for completion",
+    "2. Execute STEP 2 (strategy decisions) - wait for completion",
+    "3. Proceed to build action to create walkthrough realizations"
+  ]
+}
+

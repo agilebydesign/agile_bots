@@ -1,0 +1,40 @@
+{
+    "priority":  2,
+    "description":  "Use Background for repeated Given steps across 3+ scenarios. Background contains only Given/And steps (no When/Then). Example: Background: Given user is logged in And character sheet exists (used by 5 scenarios).",
+    "do":  {
+               "description":  "Background for shared context across multiple scenarios. Example: Given user is logged in (common to all), not scenario-specific setup",
+               "guidance":  [
+                                {
+                                    "description":  "Use Background when 3+ scenarios share same Given steps",
+                                    "example":  [
+                                                    "Background: Given user is logged in And character sheet exists (used by 5 scenarios)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Background contains only Given/And - state setup, no actions",
+                                    "example":  [
+                                                    "Background: Given Agent is initialized with agent_name=\u0027story_bot\u0027 And Project is finished initializing"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t use Background for unique setup or include When/Then. Example: Background with action verbs (wrong), Background for 1 scenario (wrong)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t include actions or When/Then in Background",
+                                      "example":  [
+                                                      "Background: Given user logs in (WRONG - action)",
+                                                      "Background: When user clicks button (WRONG - When in Background)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t put scenario-specific setup in Background",
+                                      "example":  [
+                                                      "Background: Given test project at path/to/specific/test (WRONG - scenario-specific)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.background_common_setup_scanner.BackgroundCommonSetupScanner"
+}

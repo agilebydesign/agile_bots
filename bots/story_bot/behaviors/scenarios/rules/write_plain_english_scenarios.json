@@ -1,0 +1,43 @@
+{
+    "priority":  6,
+    "description":  "Write scenarios in plain English. NO variables, NO placeholders, NO Scenario Outlines, NO Examples tables at initial scenario writing stage. Example: \u0027Given user has typed request message start shaping\u0027 not \u0027Given user has typed \u003crequest_message\u003e\u0027.",
+    "do":  {
+               "description":  "Plain English scenarios without variables. Example: \u0027Given user has attached documents\u0027 not \u0027Given user has attached \u003cdocuments\u003e\u0027",
+               "guidance":  [
+                                {
+                                    "description":  "Use concrete values, not placeholders",
+                                    "example":  [
+                                                    "Given user has typed request message \u0027start shaping\u0027",
+                                                    "When AI Chat processes request",
+                                                    "Then AI Chat identifies story shaping keywords"
+                                                ]
+                                },
+                                {
+                                    "description":  "Write readable, human-understandable steps",
+                                    "example":  [
+                                                    "Given user has attached documents to chat window",
+                                                    "And user has typed request message \u0027start shaping\u0027"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t use variables or placeholders initially. Example: \u0027\u003crequest_message\u003e\u0027 variable (wrong at this stage), Scenario Outline (wrong at this stage)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t use angle-bracket variables",
+                                      "example":  [
+                                                      "Given user has typed request message \u0027\u003crequest_message\u003e\u0027 (WRONG - has variable)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use Scenario Outline at initial stage",
+                                      "example":  [
+                                                      "Scenario Outline: AI Chat detects keywords (WRONG - Outline at this stage)",
+                                                      "Examples: | request_message | (WRONG)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.plain_english_scenarios_scanner.PlainEnglishScenariosScanner"
+}

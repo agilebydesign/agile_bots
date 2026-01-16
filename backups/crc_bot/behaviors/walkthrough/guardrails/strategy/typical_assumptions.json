@@ -1,0 +1,13 @@
+{
+  "typical_assumptions": [
+    "Walkthrough 1-2 stories per domain concept to validate model",
+    "Step through selected scenarios, not necessarily all scenarios in a story",
+    "Focus on understanding architecture and proving model works",
+    "Go step-by-step through complex flows to expose collaborations",
+    "Stop when patterns become repetitive and no new insights emerge",
+    "Prioritize business complexity (complex rules, workflows) and architectural complexity (new frameworks, libraries, integrations)",
+    "Break walks into logical chunks showing different object collaborations",
+    "Update domain model when gaps or contradictions discovered"
+  ]
+}
+

@@ -1,0 +1,13 @@
+{
+  "description": "Concept discovery source",
+  "question": "Where should domain concepts be discovered from?",
+  "options": [
+    "Story map only - Extract concepts from stories and epics",
+    "Story map + interviews - Add concepts from domain expert conversations",
+    "Story map + existing docs - Include concepts from current documentation",
+    "Story map + code - Extract concepts from existing codebase",
+    "Comprehensive - All sources including story map, interviews, docs, and code"
+  ],
+  "note": "Multiple sources provide more complete domain coverage but require more effort."
+}
+

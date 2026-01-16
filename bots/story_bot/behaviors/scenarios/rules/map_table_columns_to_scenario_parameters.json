@@ -1,0 +1,52 @@
+{
+    "priority":  8,
+    "description":  "Map all table columns to scenario parameters bidirectionally. Every column header maps to a Background/When/Then parameter, and every parameter appears as a column. Example: \u0027{payment_system}\u0027 parameter → \u0027Payment System\u0027 column.",
+    "do":  {
+               "description":  "Bidirectional mapping: column ↔ parameter. Example: \u0027Payment System\u0027 column maps to \u0027{payment_system}\u0027 parameter in Background",
+               "guidance":  [
+                                {
+                                    "description":  "Every parameter in Background/When/Then appears as table column",
+                                    "example":  [
+                                                    "Given Payment system is \u0027{payment_system}\u0027 → Table has \u0027Payment System\u0027 column"
+                                                ]
+                                },
+                                {
+                                    "description":  "Every table column maps to a parameter",
+                                    "example":  [
+                                                    "| Payment System | Rule File Paths | → Background has \u0027{payment_system}\u0027 and \u0027{rule_file_paths}\u0027"
+                                                ]
+                                },
+                                {
+                                    "description":  "Column names clearly match parameter names",
+                                    "example":  [
+                                                    "\u0027{violations_data}\u0027 → \u0027Violations Data\u0027 column",
+                                                    "\u0027{report_format}\u0027 → \u0027Report Format\u0027 column"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t omit parameters from table or add columns without parameters. Example: \u0027{payment_system}\u0027 in Background but no column (wrong)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t have parameters without matching columns",
+                                      "example":  [
+                                                      "Given Payment system is \u0027{payment_system}\u0027 but no \u0027Payment System\u0027 column (WRONG)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t have columns without matching parameters",
+                                      "example":  [
+                                                      "\u0027Test Type\u0027 column but no \u0027{test_type}\u0027 parameter in steps (WRONG)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use vague column names that don\u0027t map to parameters",
+                                      "example":  [
+                                                      "\u0027Input\u0027 column instead of \u0027Payment Data\u0027 matching \u0027{payment_data}\u0027 (WRONG)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.table_column_parameter_scanner.TableColumnParameterScanner"
+}

@@ -1,0 +1,30 @@
+{
+  "priority": 7,
+  "description": "Stories should capture both user and system behavior. User-facing stories show user actions with system responses. System stories capture system-to-system interactions and should be marked with story_type: 'system'. NOTE: This rule only applies when strategy decisions in planning.json specify flow_scope_and_granularity as 'Integration boundary level' or 'Intra-system level', OR drill_down_approach includes 'Dig deep on system interactions' or 'Dig deep on architectural pieces'. Check {project_area}/docs/stories/planning.json for these decisions.",
+  "do": {
+    "description": "Show both user and system behavior, mark system-to-system stories. Example: 'User submits order, System validates payment'",
+    "guidance": [
+      {
+        "description": "User-facing stories show user actions with system responses - mark system-to-system interactions with story_type: 'system'. System stories represent behavior between systems/components (not visible to end users).",
+        "example": ["User --> submits order, System --> validates payment", "Customer --> views products, System --> displays inventory", "Developer --> edits epic, System --> updates diagram", "User --> invokes render, System --> generates DrawIO file"]
+      },
+      {
+        "description": "SYSTEM stories capture system-to-system interactions and must be marked with story_type: 'system'",
+        "example": ["Storage Microservice --> validates payload from Local Mgmt System (story_type: 'system')", "API Gateway --> routes request to Authentication Service (story_type: 'system')", "Message Queue --> delivers event to Notification Service (story_type: 'system')"]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't show incomplete stories 'User enters order data' (WRONG - missing: what does system do in response?)",
+    "guidance": [
+      {
+        "description": "Don't show only user or only system in user-facing stories - don't mark user-facing stories as system stories - don't confuse system stories with technical stories (System stories = system-to-system behavior | Technical stories = implementation tasks). Wrong: 'User --> submits order' (incomplete). Correct: 'User --> submits order, System --> validates payment' (complete).",
+        "example": ["User --> submits order (missing: what does system do?)", "User --> views products (missing: what does system display?)", "System --> validates payment (missing: what triggered this?)", "System --> generates file (missing: who requested this?)"]
+      },
+      {
+        "description": "Don't misclassify user-facing stories as system stories - system stories are only for system-to-system interactions",
+        "example": ["User --> clicks button (NOT a system story or a user story", "User --> views dashboard (NOT a system story - user-facing)", "User --> submits form (NOT a system story - user-facing)"]
+      }
+    ]
+  }
+}

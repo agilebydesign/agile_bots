@@ -1,0 +1,27 @@
+{
+  "decision": "walkthrough_depth",
+  "question": "What depth should walkthroughs trace to?",
+  "options": [
+    {
+      "value": "high_level",
+      "description": "Epic/sub-epic level - trace major object flows without deep nesting",
+      "when_to_use": "Well-understood domain, proven patterns, low risk"
+    },
+    {
+      "value": "story_level",
+      "description": "Story/AC level - trace complete scenarios through all collaborations",
+      "when_to_use": "Moderate complexity, some uncertainty, standard integration"
+    },
+    {
+      "value": "detailed",
+      "description": "Step/Given level - trace every nested call, parameter, and return value",
+      "when_to_use": "High uncertainty, complex algorithms, critical integrations, novel patterns"
+    },
+    {
+      "value": "mixed",
+      "description": "Variable depth - detailed for risky areas, high-level for proven areas",
+      "when_to_use": "Mixed complexity across system, focus effort where it matters"
+    }
+  ]
+}
+

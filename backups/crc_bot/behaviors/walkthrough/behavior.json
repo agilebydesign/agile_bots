@@ -1,0 +1,97 @@
+{
+  "behaviorName": "walkthrough",
+  "order": 7,
+  "description": "Walk through the CRC model by tracing object flows and responsibilities to validate the model supports key scenarios",
+  "goal": "Create CRC realization scenarios that trace object responsibilities and collaborations through the model, validating it can fulfill story requirements, discovering and adding missing responsibilities/collaborators/concepts to story-graph.json, and identifying improvements",
+  "inputs": "story-graph.json with CRC model and stories, crc-model diagrams, story scenarios/acceptance criteria",
+  "outputs": "story-graph.json updated with realization scenarios and refined domain concepts (added responsibilities/collaborators/concepts discovered), walkthrough-realizations.md documenting traces and model updates",
+  "baseActionsPath": "agile_bot/base_actions",
+  "instructions": [
+    "Trace CRC object flows through scenarios to validate and refine the CRC model"
+  ],
+  "actions_workflow": {
+    "actions": [
+      {
+        "name": "clarify",
+        "order": 1,
+        "next_action": "strategy",
+        "instructions": [
+          "Gather context for CRC walkthrough - identify key scenarios, architectural risks, and integration points to trace"
+        ]
+      },
+      {
+        "name": "strategy",
+        "order": 2,
+        "next_action": "build",
+        "instructions": [
+          "Determine walkthrough purpose: business complexity, architecture complexity, integration complexity, or new frameworks",
+          "Make strategic decisions about walkthrough scope and depth"
+        ]
+      },
+      {
+        "name": "build",
+        "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "Select node from story graph (epic, sub-epic, story, or scenario)",
+          "Document Scope in dot notation: Epic.Sub-Epic.Story.Scenario (parent context)",
+          "Break scenario into multiple walks, each covering a logical subset",
+          "For each walk, document Covers: what specific part it traces (steps, stories, sub-epics)",
+          "Identify first domain concept and responsibility for each walk",
+          "Trace responsibilities and collaborations using Object.method(param: value) format",
+          "Show nested calls with -> indentation and return values as return var: value",
+          "When discovering missing responsibilities, collaborators, or concepts: immediately update story-graph.json domain model before continuing",
+          "Document all model updates in walkthrough realization document",
+          "Continue until walk is fully realized",
+          "Write out each walk in object flow format with its specific Covers",
+          "Update story-graph.json domain concepts with realization including scope and walks array"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
+        "next_action": "render",
+        "instructions": [
+          "Validate walkthrough scenarios against domain model",
+          "Verify object flows align to domain language in stories/epics",
+          "Confirm all discovered responsibilities, collaborators, and concepts have been added to story-graph.json",
+          "Verify walkthrough document includes 'Model Updates Discovered' section documenting changes"
+        ]
+      },
+      {
+        "name": "render",
+        "order": 5,
+        "instructions": [
+          "Render walkthrough realization documents from story-graph.json",
+          "Include 'Model Updates Discovered' section showing all added/modified responsibilities, collaborators, and concepts"
+        ]
+      },
+      {
+        "name": "rules",
+        "instructions": [
+          "Display walkthrough rules for this behavior as AI context"
+        ]
+      }
+    ]
+  },
+  "trigger_words": {
+    "description": "Behavior-level trigger words - specific to domain walkthrough/realization",
+    "patterns": [
+      "walkthrough.*domain",
+      "trace.*object.*flow",
+      "realize.*scenario",
+      "test.*domain.*model",
+      "validate.*model.*through.*scenarios",
+      "domain.*realization",
+      "object.*flow.*analysis",
+      "trace.*responsibilities",
+      "verify.*model.*supports",
+      "crc.*scenario",
+      "responsibility.*trace",
+      "collaboration.*walkthrough",
+      "scenario.*realization",
+      "model.*verification"
+    ]
+  }
+}
+

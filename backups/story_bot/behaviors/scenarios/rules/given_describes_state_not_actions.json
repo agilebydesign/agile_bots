@@ -1,0 +1,62 @@
+{
+    "priority":  1,
+    "description":  "Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).",
+    "do":  {
+               "description":  "Given describes state/preconditions only. Example: \u0027Given user is logged in\u0027 (state), \u0027Given character sheet exists\u0027 (precondition)",
+               "guidance":  [
+                                {
+                                    "description":  "Use state language - what EXISTS, not what HAPPENS",
+                                    "example":  [
+                                                    "Given user is logged in",
+                                                    "Given character sheet exists",
+                                                    "Given workflow state is persisted",
+                                                    "Given bot has behavior configured as \u0027shape\u0027"
+                                                ]
+                                },
+                                {
+                                    "description":  "First action is always When, never Given",
+                                    "example":  [
+                                                    "Given bot is configured (STATE)",
+                                                    "When Tool invokes method (ACTION)",
+                                                    "Then Action loads instructions (OUTCOME)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Preconditions describe what\u0027s true BEFORE the action",
+                                    "example":  [
+                                                    "Given activity log is initialized (precondition)",
+                                                    "When action completes (trigger)",
+                                                    "Then activity log captures data (functionality being tested)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t describe actions or functionality in Given. Example: \u0027Given user logs in\u0027 (action - wrong), \u0027Given system validates input\u0027 (functionality - wrong)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t use action verbs in Given - clicking, sending, calling are When actions",
+                                      "example":  [
+                                                      "Given user clicks button (WRONG)",
+                                                      "Given system sends message (WRONG)",
+                                                      "Given API is called (WRONG)",
+                                                      "Given tool executes (WRONG)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t describe functionality being tested in Given - that\u0027s what Then is for",
+                                      "example":  [
+                                                      "Given activity log tracks: timestamp, action_state (WRONG - this is functionality to test in Then)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use past tense actions in Given",
+                                      "example":  [
+                                                      "Given Tool has invoked method (WRONG - \u0027invoked\u0027 is action)",
+                                                      "Given user has clicked (WRONG - \u0027clicked\u0027 is action)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
+}

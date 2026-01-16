@@ -1,0 +1,81 @@
+{
+  "description": "How should domain concepts communicate with each other and external systems?",
+  "question": "What is your default integration approach between components and systems?",
+  "options": [
+    {
+      "id": "direct_in_process",
+      "name": "Direct In-Process",
+      "description": "Components communicate through direct method calls within the same process. Tight coupling, simple, synchronous.",
+      "when_to_use": "Monolithic architecture, single deployment unit, strong consistency required, low latency critical",
+      "example": [
+        "Order",
+        "    Validates inventory: Boolean, InventoryService (direct call)",
+        "    Authorizes payment: AuthorizationResult, PaymentService (direct call)",
+        "    Reserves stock: ReservationId, InventoryService (direct call)",
+        "",
+        "(All services in same process, immediate synchronous response)"
+      ]
+    },
+    {
+      "id": "service_rpc",
+      "name": "Service/RPC Calls",
+      "description": "Components communicate through remote procedure calls (REST, gRPC, SOAP). Request-response pattern over network.",
+      "when_to_use": "Microservices, distributed systems, independent deployment, team autonomy",
+      "example": [
+        "Order",
+        "    Validates inventory: Boolean, InventoryClient (REST call to /inventory/{sku})",
+        "    Authorizes payment: AuthorizationResult, PaymentClient (gRPC call)",
+        "",
+        "InventoryClient",
+        "    Checks availability: Boolean, SKU, Quantity (GET /inventory/{sku}/availability)"
+      ]
+    },
+    {
+      "id": "event_driven",
+      "name": "Event-Driven/Messaging",
+      "description": "Components communicate by publishing and subscribing to domain events. Asynchronous, loosely coupled.",
+      "when_to_use": "Eventual consistency acceptable, scalability priority, decoupled evolution, audit trail needed",
+      "example": [
+        "Order",
+        "    Submits: publishes OrderPlaced event",
+        "",
+        "InventoryService (subscribes to OrderPlaced)",
+        "    Reserves stock for order: Reservation, OrderPlaced event",
+        "",
+        "NotificationService (subscribes to OrderPlaced)",
+        "    Sends confirmation email: OrderPlaced event"
+      ]
+    },
+    {
+      "id": "data_driven",
+      "name": "Data/Shared Database",
+      "description": "Components communicate through shared data store. One writes, others read. Polling or change detection.",
+      "when_to_use": "Legacy integration, batch processing, reporting systems, data warehouse patterns",
+      "example": [
+        "Order",
+        "    Saves to orders table: Order (writes to shared database)",
+        "",
+        "WarehouseSystem (polls orders table)",
+        "    Processes new orders: Order (reads pending orders)",
+        "    Updates order status: OrderId, Status (writes back)"
+      ]
+    },
+    {
+      "id": "hybrid_per_boundary",
+      "name": "Hybrid Per Boundary",
+      "description": "Different integration approaches for different boundaries. Direct within bounded context, events across contexts.",
+      "when_to_use": "Complex systems, varying consistency requirements, mixed legacy and modern",
+      "example": [
+        "Within Order Context (direct calls):",
+        "Order",
+        "    Calculates total: Money, LineItem, TaxCalculator (direct)",
+        "",
+        "Across Contexts (events):",
+        "Order publishes OrderPlaced -> ShippingContext subscribes",
+        "",
+        "External Systems (RPC):",
+        "Order calls PaymentGateway via REST API"
+      ]
+    }
+  ]
+}

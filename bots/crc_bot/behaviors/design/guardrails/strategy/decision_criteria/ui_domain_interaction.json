@@ -1,0 +1,80 @@
+{
+  "description": "How should the user interface interact with domain concepts?",
+  "question": "What is your default approach for UI-domain interaction?",
+  "options": [
+    {
+      "id": "direct_domain_binding",
+      "name": "Direct Domain Binding",
+      "description": "UI binds directly to domain objects. Changes to domain reflected in UI and vice versa.",
+      "when_to_use": "Simple forms, domain model matches UI closely, rapid prototyping, desktop apps",
+      "example": [
+        "OrderForm (binds directly to Order)",
+        "    Binds to Order.line_items: LineItemGrid",
+        "    Binds to Order.shipping_address: AddressForm",
+        "    Binds to Order.total: TotalDisplay",
+        "",
+        "(UI controls directly read/write domain properties)"
+      ]
+    },
+    {
+      "id": "view_model_layer",
+      "name": "View Model / Presenter Layer",
+      "description": "Separate view models tailored for UI needs. Translate between domain and UI representation.",
+      "when_to_use": "Complex UI logic, domain doesn't match UI, multiple views of same data, MVVM/MVP patterns",
+      "example": [
+        "OrderViewModel",
+        "    Get formatted total: String (formats Money for display)",
+        "    Get validation errors: ValidationErrors",
+        "    Submit order command: SubmitOrderCommand",
+        "    Maps to Order: Order",
+        "",
+        "(ViewModel adapts Order for UI consumption)"
+      ]
+    },
+    {
+      "id": "dto_transfer",
+      "name": "DTO Transfer Objects",
+      "description": "Data Transfer Objects carry data between UI and domain layers. Explicit mapping at boundaries.",
+      "when_to_use": "API-first design, serialization concerns, versioning, cross-platform clients",
+      "example": [
+        "OrderDTO",
+        "    Get order id: String",
+        "    Get line items: LineItemDTO",
+        "    Get total: Decimal",
+        "",
+        "OrderMapper",
+        "    Maps to DTO: OrderDTO, Order",
+        "    Maps from DTO: Order, OrderDTO"
+      ]
+    },
+    {
+      "id": "application_service",
+      "name": "Application Service Layer",
+      "description": "Application services orchestrate use cases. UI calls services, services coordinate domain objects.",
+      "when_to_use": "Complex workflows, transaction management, authorization, multiple UI channels",
+      "example": [
+        "OrderService",
+        "    Places order: OrderResult, Cart, Customer",
+        "    Cancels order: CancelResult, OrderId",
+        "    Gets order history: OrderSummary, Customer",
+        "",
+        "(UI calls service methods, service coordinates domain)"
+      ]
+    },
+    {
+      "id": "command_query_handlers",
+      "name": "Command/Query Handlers",
+      "description": "Separate handlers for commands (actions) and queries (reads). UI sends commands, receives query results.",
+      "when_to_use": "CQRS architecture, complex authorization, audit logging, mediator pattern",
+      "example": [
+        "PlaceOrderCommand",
+        "    Handled by: PlaceOrderHandler",
+        "    Returns: OrderResult",
+        "",
+        "GetOrderHistoryQuery",
+        "    Handled by: GetOrderHistoryHandler",
+        "    Returns: OrderSummary"
+      ]
+    }
+  ]
+}

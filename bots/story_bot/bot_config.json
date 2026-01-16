@@ -1,0 +1,17 @@
+{
+  "name": "story_bot",
+  "behaviors": [
+    "code",
+    "discovery",
+    "exploration",
+    "prioritization",
+    "scenarios",
+    "shape",
+    "tests"
+  ],
+  "mcp": {
+    "env": {
+      "WORKING_AREA": "C:\\dev\\augmented-teams\\agile_bot"
+    }
+  }
+}

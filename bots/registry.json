@@ -1,0 +1,14 @@
+{
+  "crc_bot": {
+    "cli_path": "agile_bot/bots/crc_bot/src/crc_bot_cli.py",
+    "repl_path": "agile_bot/bots/base_bot/src/repl_cli/repl_main.py",
+    "trigger_patterns": [],
+    "icon": "🗂️"
+  },
+  "story_bot": {
+    "cli_path": "agile_bot/bots/story_bot/src/story_bot_cli.py",
+    "repl_path": "agile_bot/bots/base_bot/src/repl_cli/repl_main.py",
+    "trigger_patterns": [],
+    "icon": "📖"
+  }
+}

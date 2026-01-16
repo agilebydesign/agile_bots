@@ -1,0 +1,76 @@
+{
+  "description": "How should domain objects obtain their dependencies and create their subordinates?",
+  "question": "What is your default approach for object instantiation and dependency management?",
+  "options": [
+    {
+      "id": "constructor_injection",
+      "name": "Constructor Injection",
+      "description": "Objects receive all dependencies through their constructor at creation time. Dependencies are explicit and immutable.",
+      "when_to_use": "Dependencies are known at creation, immutability preferred, clear dependency graph, testability important",
+      "example": [
+        "Order",
+        "    Instantiated with: Customer, ShippingAddress, PaymentMethod",
+        "    Get customer: Customer",
+        "    Calculates shipping: Money, ShippingAddress, ShippingMethod",
+        "    Authorizes payment: AuthorizationResult, PaymentMethod"
+      ]
+    },
+    {
+      "id": "self_creating_objects",
+      "name": "Self-Creating Objects",
+      "description": "Objects know how to create themselves from context. Creation logic lives in the object being created, not external factory.",
+      "when_to_use": "Domain logic determines creation, multiple creation paths, object owns its invariants",
+      "example": [
+        "Order",
+        "    Creates from shopping cart: Order, Cart, Customer",
+        "    Creates from quote: Order, Quote, Customer",
+        "    Creates from subscription renewal: Order, Subscription",
+        "",
+        "(Order knows how to create itself from different contexts)"
+      ]
+    },
+    {
+      "id": "factory_assembly",
+      "name": "Factory Assembly",
+      "description": "Dedicated factory objects assemble complex object graphs. Factory knows how to wire dependencies together.",
+      "when_to_use": "Complex object graphs, many dependencies, assembly logic is reusable, framework integration",
+      "example": [
+        "OrderFactory",
+        "    Assembles order from cart: Order, Cart, Customer",
+        "    Assembles order with services: Order, Cart, InventoryService, PaymentGateway",
+        "",
+        "Order",
+        "    Get line items: LineItem",
+        "    Calculates total: Money, LineItem",
+        "(Order is simple, factory handles complex wiring)"
+      ]
+    },
+    {
+      "id": "container_managed",
+      "name": "Container/Framework Managed",
+      "description": "Dependency injection container or framework handles object creation and wiring. Configuration-driven.",
+      "when_to_use": "Enterprise frameworks, cross-cutting concerns, infrastructure integration, team familiarity",
+      "example": [
+        "Order (registered in container)",
+        "    Injected: CustomerRepository, PaymentGateway, InventoryService",
+        "    Get customer: Customer, CustomerRepository",
+        "    Authorizes payment: AuthorizationResult, PaymentGateway",
+        "",
+        "(Container resolves Order with all dependencies wired)"
+      ]
+    },
+    {
+      "id": "lazy_resolution",
+      "name": "Lazy Resolution",
+      "description": "Dependencies resolved when first needed, not at construction. May use service locator or lazy injection.",
+      "when_to_use": "Expensive dependencies, optional dependencies, circular dependency resolution",
+      "example": [
+        "Portfolio",
+        "    Get holdings: Holding (resolves HoldingsRepository on first access)",
+        "    Calculates total value: Money, Holding, MarketPrice",
+        "",
+        "(HoldingsRepository not loaded until holdings actually needed)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "description": "Evidence or artifacts that must be present or validated before this behavior can proceed",
+  "evidence": [
+    "Domain model from domain stage",
+    "Story graph with domain concepts",
+    "Architecture diagrams or technical specifications",
+    "Integration contracts or API specifications",
+    "Design patterns documentation"
+  ]
+}
+

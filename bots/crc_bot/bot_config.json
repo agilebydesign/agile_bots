@@ -1,0 +1,60 @@
+{
+  "name": "crc_bot",
+  "behaviors": [
+    "domain",
+    "design",
+    "walkthrough"
+  ],
+  "WORKING_AREA": "C:\\dev\\augmented-teams\\agile_bot",
+  "description": "Helps teams model the solution domain using CRC (Class-Responsibility-Collaborator) cards to define object responsibilities and collaborations",
+  "command description": "Execute the current action and current behavior in the crc_bot workflow.",
+  "goal": "Transform domain understanding into well-structured CRC models showing object responsibilities, collaborators, and interactions",
+  "baseActionsPath": "agile_bot/base_actions",
+  "verbose_mode": false,
+  "instructions": [
+    "**CRC BOT PURPOSE:** Help users create and refine CRC (Class-Responsibility-Collaborator) models from domain understanding.",
+    "",
+    "**UNDERSTANDING USER REQUESTS:**",
+    "When a user asks to model the domain, create CRC cards, design object responsibilities, or validate object flows, interpret their request and convert it to the appropriate crc_bot CLI command.",
+    "",
+    "**BEHAVIOR WORKFLOW AND CLI COMMANDS (execute behaviors in order):**",
+    "When user requests CRC modeling work, convert their request to CLI commands:",
+    "1. domain: Use when user wants to model business domain, extract CRC concepts from stories, or define responsibilities. CLI: crc_bot_cli --behavior domain.",
+    "2. design: Use when user wants to apply OOP design principles, refine CRC cards with patterns, or improve object design. CLI: crc_bot_cli --behavior design.",
+    "3. walkthrough: Use when user wants to validate CRC model by tracing object flows, test scenarios, or verify responsibilities. CLI: crc_bot_cli --behavior walkthrough.",
+    "",
+    "**GENERAL CLI COMMAND RULES:**",
+    "- If user mentions a specific behavior name (domain, design, walkthrough), use: crc_bot_cli --behavior <name>",
+    "- If user mentions a specific action (clarify, strategy, build, render, validate), use: crc_bot_cli --behavior <behavior> --action <action>",
+    "- If user provides context files, pass as positional arguments: crc_bot_cli --behavior <name> file1.txt file2.txt",
+    "- If user wants to continue where they left off, use: crc_bot_cli (no arguments, reads from behavior_action_state.json)",
+    "",
+    "**COMMON ACTIONS (available in most behaviors):**",
+    "- clarify: Gather context and clarify requirements (first action in workflow)",
+    "- strategy: Determine planning approach and criteria",
+    "- build: Build story graph and content",
+    "- render: Generate output documents",
+    "- validate: Validate against behavior-specific rules",
+    "",
+    "**BEHAVIOR ACTION STATE:**",
+    "The CLI automatically tracks current behavior and action in behavior_action_state.json (saved in workspace directory). When user says 'continue' or 'next', use crc_bot_cli --close to advance to next action, or run crc_bot_cli without arguments to continue from current state."
+  ],
+  "trigger_words": [
+    "crc",
+    "crc cards",
+    "crc model",
+    "class responsibility",
+    "responsibility collaborator",
+    "object design",
+    "domain model",
+    "design model",
+    "object flow",
+    "walkthrough",
+    "trace object",
+    "validate model",
+    "object responsibilities",
+    "object collaborations"
+  ]
+}
+
+

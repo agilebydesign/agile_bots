@@ -1,0 +1,125 @@
+{
+  "priority": 3,
+  "description": "Scope domain concepts correctly - place at the most specific level where relevant and ensure they represent complete functional capabilities. Use 'local' scope for single sub-epic concepts, 'global' for shared concepts. Concepts should be complete functional units, not fragments.",
+  "scanners": [
+    "agile_bot.bots.base_bot.src.scanners.concept_placement_scanner.ConceptPlacementScanner"
+  ],
+  "do": {
+    "description": "Place concepts at correct scope level and ensure functional completeness",
+    "guidance": [
+      {
+        "description": "Place concepts locally when they're only relevant to one sub-epic",
+        "example": [
+          "Sub-Epic: Assign Character Ability",
+          "  domain_concepts (local scope):",
+          "    AbilityScore",
+          "        Get value: Number",
+          "        Calculates modifier from score: Number, AbilityScore",
+          "    PointBuyCalculator",
+          "        Calculates remaining points: Number, AbilityScore, PointBuyLimit",
+          "        Validates point distribution: Boolean, AbilityScore, PointBuyRules",
+          "",
+          "(Only used within this sub-epic, so placed locally)"
+        ]
+      },
+      {
+        "description": "Elevate concepts to parent when shared across multiple sub-epics",
+        "example": [
+          "Epic: Manage Characters",
+          "  domain_concepts (global scope):",
+          "    Character",
+          "        Get name: Name",
+          "        Get abilities: AbilityScore",
+          "        Calculates total level: Number, ExperiencePoints",
+          "        Advances to next level: Character, ExperiencePoints, LevelRequirements",
+          "",
+          "Sub-Epic: Character Creation (uses global Character)",
+          "Sub-Epic: Character Advancement (uses global Character)",
+          "Sub-Epic: Character Display (uses global Character)",
+          "",
+          "(Character shared by multiple sub-epics, so placed at epic level)"
+        ]
+      },
+      {
+        "description": "Define concepts that represent complete functional capabilities with all necessary responsibilities",
+        "example": [
+          "RebalanceRecommendation (complete functional unit)",
+          "    Generates trades to achieve target: Trade, Portfolio, TargetAllocation",
+          "    Compares current to target allocation: AllocationDifference, Portfolio, TargetAllocation",
+          "    Explains rebalance rationale: Rationale, AllocationDifference, MarketConditions",
+          "    Minimizes transaction costs: Money, Trade, TradingFees",
+          "",
+          "(Complete: can produce recommendation with all supporting data and rationale)"
+        ]
+      },
+      {
+        "description": "Scope concepts to meaningful business capabilities that can accomplish something alone",
+        "example": [
+          "Order (complete business capability)",
+          "    Creates from shopping cart: Cart, Customer",
+          "    Get line items: LineItem",
+          "    Calculates subtotal from items: Money, LineItem",
+          "    Calculates tax based on location: Money, LineItem, TaxRate, ShippingAddress",
+          "    Calculates total with shipping: Money, LineItem, TaxRate, ShippingMethod",
+          "    Validates inventory availability: Boolean, LineItem, InventoryService",
+          "",
+          "(Complete: represents full order capability with validation and calculations)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't place concepts at wrong scope level or create incomplete fragments",
+    "guidance": [
+      {
+        "description": "Don't place all concepts globally by default",
+        "example": [
+          "Epic: Manage Orders",
+          "  domain_concepts (global):",
+          "    Order, LineItem, ShippingAddress, BillingAddress, PaymentMethod, TaxCalculator, DiscountCalculator, ShippingCalculator (WRONG: all global)",
+          "",
+          "(TaxCalculator, DiscountCalculator only used in 'Calculate Totals' sub-epic - should be local)"
+        ]
+      },
+      {
+        "description": "Don't keep concepts local when they're used by multiple sub-epics",
+        "example": [
+          "Sub-Epic: Create Order",
+          "  domain_concepts (local):",
+          "    Order",
+          "        Get line items: LineItem",
+          "",
+          "Sub-Epic: Display Order (WRONG: also defines Order locally)",
+          "  domain_concepts (local):",
+          "    Order",
+          "        Get line items: LineItem",
+          "",
+          "(Order duplicated - should be elevated to epic level)"
+        ]
+      },
+      {
+        "description": "Don't split concepts into fragments that can't accomplish anything alone",
+        "example": [
+          "TradeData (WRONG: fragment)",
+          "    Get symbol: Symbol",
+          "    Get shares: Shares",
+          "",
+          "TradeCalculator (WRONG: fragment)",
+          "    Get price: Money",
+          "",
+          "(Fragments - should be combined into Trade with complete responsibilities)"
+        ]
+      },
+      {
+        "description": "Don't create concepts that are just implementation details without functional purpose",
+        "example": [
+          "OrderValidator (WRONG: implementation detail)",
+          "    Validates data: Boolean",
+          "",
+          "(Should be part of Order: Order validates itself during creation)"
+        ]
+      }
+    ]
+  }
+}
+

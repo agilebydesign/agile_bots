@@ -1,0 +1,53 @@
+{
+    "priority":  10,
+    "description":  "Specify constants where known, use actual values instead of placeholders. Describe stub return values in Givens. Don\u0027t parameterize stubbed inputs. Example: \u0027payment_rules/common/\u0027 (constant) not \u0027{rules_path}\u0027 (placeholder).",
+    "do":  {
+               "description":  "Use actual constants, describe stubs explicitly. Example: \u0027Given Payment validators are stubbed to return {...}\u0027 with actual JSON",
+               "guidance":  [
+                                {
+                                    "description":  "Use actual constants for fixed paths and structures",
+                                    "example":  [
+                                                    "Given Common payment rules at \u0027payment_rules/common/\u0027",
+                                                    "Given Payment config at \u0027payment_configs/{payment_system}/config.json\u0027"
+                                                ]
+                                },
+                                {
+                                    "description":  "Describe stub return values explicitly in Givens",
+                                    "example":  [
+                                                    "Given Payment validators are stubbed to return \u0027{\"violations\": [...], \"validators_executed\": 1}\u0027"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use actual class names and file paths",
+                                    "example":  [
+                                                    "Payment Validators: PositiveAmountValidator, CardExpiryValidator",
+                                                    "Rule File: payment_rules/validate_positive_amount.json"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t parameterize constants or stubbed inputs. Example: \u0027{common_rules_path}\u0027 when always \u0027payment_rules/common/\u0027 (wrong)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t parameterize fixed values",
+                                      "example":  [
+                                                      "Given Common rules at \u0027{common_rules_path}\u0027 (WRONG - always \u0027payment_rules/common/\u0027)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t parameterize inputs that are stubbed",
+                                      "example":  [
+                                                      "Given Payment data \u0027{payment_data}\u0027 And validators are stubbed (WRONG - data doesn\u0027t matter if stubbed)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t hide stub behavior",
+                                      "example":  [
+                                                      "Given Payment validators are configured (WRONG - doesn\u0027t show what stubs return)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.bots.base_bot.src.scanners.constants_and_stubs_scanner.ConstantsAndStubsScanner"
+}

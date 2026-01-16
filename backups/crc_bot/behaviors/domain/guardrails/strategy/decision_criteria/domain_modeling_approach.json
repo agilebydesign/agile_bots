@@ -1,0 +1,14 @@
+{
+  "description": "Domain modeling approach",
+  "question": "What approach should be used for domain modeling?",
+  "options": [
+    "Domain-Driven Design (DDD) - Rich domain model with entities, value objects, aggregates",
+    "Resource-Oriented - Focus on nouns and resources from the business domain",
+    "Event-Driven - Model domain events and event flows",
+    "Service-Oriented - Model domain services and their interactions",
+    "Lightweight - Simple concept identification with responsibilities",
+    "Hybrid - Mix of approaches based on subdomain complexity"
+  ],
+  "note": "This determines how concepts are identified, structured, and related in the domain model."
+}
+

@@ -1,0 +1,226 @@
+{
+  "priority": 5,
+  "description": "When walkthrough reveals missing responsibilities, collaborators, or concepts, immediately update story-graph.json domain model before continuing. Example: Tracing Order.calculate_total() reveals LineItem needs 'Calculates subtotal: Money, LineItem' -> update LineItem concept in story-graph.json with new responsibility, then continue walkthrough",
+  "scanners": [],
+  "do": {
+    "description": "Update domain model concepts in story-graph.json when gaps discovered. Example: During walkthrough discover Scope missing 'Validates against story graph: ValidationResult, StoryGraph' -> add responsibility to Scope concept in story-graph.json, note in walkthrough doc, continue tracing",
+    "guidance": [
+      {
+        "description": "When discovering missing responsibility, update concept in story-graph.json. Example: Tracing shows Order.calculate_shipping() but model lacks responsibility -> add 'Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod' to Order concept in story-graph.json",
+        "example": [
+          "During walkthrough:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> shipping: 12.50 = Order.calculate_shipping() [MISSING FROM MODEL]",
+          "",
+          "Action: Update story-graph.json:",
+          "{",
+          "  \"concept_name\": \"Order\",",
+          "  \"responsibilities\": [",
+          "    \"Calculates total: Money, LineItem, ShippingMethod\",",
+          "    \"Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod\"  // ADDED",
+          "  ]",
+          "}",
+          "",
+          "Document in walkthrough:",
+          "**Model Updates Discovered**",
+          "- Order: Added 'Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod'",
+          "",
+          "(Update model, document change, continue walkthrough)"
+        ]
+      },
+      {
+        "description": "When discovering missing collaborator, add to responsibility in story-graph.json. Example: Responsibility says 'Calculates total: Money, LineItem' but walkthrough needs TaxRate -> update to 'Calculates total: Money, LineItem, TaxRate' in story-graph.json",
+        "example": [
+          "During walkthrough:",
+          "Order",
+          "    total: 115.00 = Order.calculate_total()",
+          "        -> subtotal: 100.00 = LineItem.calculate_subtotal(items)",
+          "        -> tax: 15.00 = TaxRate.calculate(subtotal) [TaxRate NOT IN COLLABORATORS]",
+          "",
+          "Action: Update story-graph.json:",
+          "{",
+          "  \"concept_name\": \"Order\",",
+          "  \"responsibilities\": [",
+          "    \"Calculates total: Money, LineItem, TaxRate\"  // ADDED TaxRate",
+          "  ]",
+          "}",
+          "",
+          "Document in walkthrough:",
+          "**Model Updates Discovered**",
+          "- Order 'Calculates total': Added TaxRate collaborator",
+          "",
+          "(Add collaborator to existing responsibility in model)"
+        ]
+      },
+      {
+        "description": "When discovering new concept, create in story-graph.json with responsibilities and collaborators. Example: Walkthrough reveals need for ValidationResult concept -> create new concept in story-graph.json with 'Shows valid nodes: List[str]' and 'Shows invalid nodes: List[str]' responsibilities",
+        "example": [
+          "During walkthrough:",
+          "Scope",
+          "    validation: [('Story1', True), ('Story2', False)] = Scope.validate_scope(graph)",
+          "        -> results: <ValidationResult> = KnowledgeGraphFilter.check_nodes(...) [NEW CONCEPT NEEDED]",
+          "",
+          "Action: Add to story-graph.json:",
+          "{",
+          "  \"concept_name\": \"ValidationResult\",",
+          "  \"description\": \"Results of validating scope nodes against story graph\",",
+          "  \"responsibilities\": [",
+          "    \"Shows valid nodes: List[NodeName]\",",
+          "    \"Shows invalid nodes: List[NodeName]\",",
+          "    \"Formats as display string: str\"",
+          "  ],",
+          "  \"collaborators\": []",
+          "}",
+          "",
+          "Document in walkthrough:",
+          "**New Concepts Discovered**",
+          "- ValidationResult: Results of validating scope nodes",
+          "",
+          "(Create new concept, document discovery, continue)"
+        ]
+      },
+      {
+        "description": "Document all model updates in walkthrough realization document. Example: In 'Model Updates Discovered' section list all added responsibilities, modified collaborators, and new concepts with rationale",
+        "example": [
+          "In walkthrough-realizations.md:",
+          "",
+          "## Model Updates Discovered",
+          "",
+          "### New Responsibilities Added",
+          "",
+          "**Scope**",
+          "- Added: 'Validates against story graph: ValidationResults, StoryGraph, KnowledgeGraphFilter'",
+          "- Rationale: Walkthrough showed validation needed but wasn't in model",
+          "",
+          "**Order**",
+          "- Added: 'Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod'",
+          "- Rationale: Shipping calculation flow required this responsibility",
+          "",
+          "### Responsibilities Modified",
+          "",
+          "**Order**",
+          "- Changed: 'Calculates total: Money, LineItem' → 'Calculates total: Money, LineItem, TaxRate'",
+          "- Rationale: Tax calculation discovered as necessary collaborator",
+          "",
+          "### New Concepts Discovered",
+          "",
+          "**ValidationResult**",
+          "- Description: Results of validating scope nodes",
+          "- Responsibilities: Shows valid/invalid nodes, Formats display",
+          "- Rationale: Needed structured validation data",
+          "",
+          "(Complete documentation of all model changes)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't continue walkthrough with model gaps or skip updating story-graph.json. Example: Finding Order.calculate_shipping() missing but continuing without updating model (wrong) vs stopping to add responsibility to story-graph.json then continuing (right)",
+    "guidance": [
+      {
+        "description": "Don't continue with missing responsibilities without updating model. Example: Discover Order.calculate_shipping() not in model but keep tracing (wrong) vs add 'Calculates shipping: Money, ShippingMethod' to Order in story-graph.json then continue (right)",
+        "example": [
+          "BAD:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> shipping: 12.50 = Order.calculate_shipping() [MISSING]",
+          "    return total: 112.50",
+          "",
+          "(Continues without updating model - leaves gap)",
+          "",
+          "GOOD:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> shipping: 12.50 = Order.calculate_shipping() [MISSING FROM MODEL]",
+          "",
+          "Action: Update story-graph.json Order concept with:",
+          "'Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod'",
+          "",
+          "Then continue walkthrough:",
+          "Order",
+          "    total: 112.50 = Order.calculate_total()",
+          "        -> shipping: 12.50 = Order.calculate_shipping()",
+          "            -> method: <ShippingMethod> = Order.get_shipping_method()",
+          "    return total: 112.50",
+          "",
+          "(Updates model first, then continues with complete trace)"
+        ]
+      },
+      {
+        "description": "Don't invent concepts without adding to story-graph.json. Example: Using ValidationResult in walkthrough but not creating concept in story-graph.json (wrong) vs creating concept in story-graph.json with full definition (right)",
+        "example": [
+          "BAD:",
+          "-> validation: <ValidationResult> = Scope.validate_scope(graph)",
+          "",
+          "(Uses new concept but doesn't add to model)",
+          "",
+          "GOOD:",
+          "-> validation: <ValidationResult> = Scope.validate_scope(graph) [NEW CONCEPT]",
+          "",
+          "Add to story-graph.json:",
+          "{",
+          "  \"concept_name\": \"ValidationResult\",",
+          "  \"responsibilities\": [",
+          "    \"Shows valid nodes: List[NodeName]\",",
+          "    \"Shows invalid nodes: List[NodeName]\"",
+          "  ]",
+          "}",
+          "",
+          "Document: ValidationResult added as new concept",
+          "",
+          "(Creates concept in model before using)"
+        ]
+      },
+      {
+        "description": "Don't forget to document model updates in walkthrough. Example: Updating story-graph.json but not documenting in 'Model Updates Discovered' section (wrong) vs updating both story-graph.json and walkthrough doc (right)",
+        "example": [
+          "BAD:",
+          "Updates story-graph.json with new responsibility",
+          "But walkthrough document has no 'Model Updates Discovered' section",
+          "",
+          "(Model updated but changes not documented)",
+          "",
+          "GOOD:",
+          "1. Update story-graph.json:",
+          "   Order adds 'Calculates shipping: Money, ShippingMethod'",
+          "",
+          "2. Document in walkthrough:",
+          "   ## Model Updates Discovered",
+          "   ### New Responsibilities Added",
+          "   **Order**",
+          "   - Added: 'Calculates shipping: Money, ShippingMethod'",
+          "   - Rationale: Shipping calculation required in Order.calculate_total() flow",
+          "",
+          "(Both model and documentation updated)"
+        ]
+      },
+      {
+        "description": "Don't add collaborators without updating story-graph.json responsibility. Example: Walkthrough uses TaxRate but responsibility in model doesn't list it (wrong) vs updating responsibility to include TaxRate collaborator (right)",
+        "example": [
+          "BAD:",
+          "story-graph.json has:",
+          "Order 'Calculates total: Money, LineItem'",
+          "",
+          "But walkthrough uses:",
+          "-> tax: 15.00 = TaxRate.calculate(subtotal)",
+          "",
+          "(TaxRate used but not in collaborators list)",
+          "",
+          "GOOD:",
+          "Update story-graph.json:",
+          "Order 'Calculates total: Money, LineItem, TaxRate'",
+          "",
+          "Then walkthrough:",
+          "-> tax: 15.00 = TaxRate.calculate(subtotal)",
+          "",
+          "Document:",
+          "Order 'Calculates total': Added TaxRate collaborator",
+          "",
+          "(Collaborator added to model before use)"
+        ]
+      }
+    ]
+  }
+}
+

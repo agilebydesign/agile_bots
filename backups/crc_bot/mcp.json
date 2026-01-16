@@ -1,0 +1,16 @@
+{
+  "mcp": {
+    "server_name": "crc_bot",
+    "command": "python",
+    "args": [
+      "agile_bot/bots/crc_bot/src/crc_bot_mcp_server.py"
+    ],
+    "cwd": "C:\\dev\\augmented-teams",
+    "env": {
+      "AGENT_NAME": "crc_bot",
+      "PYTHONPATH": "C:\\dev\\augmented-teams",
+      "WORKING_AREA": "C:\\dev\\augmented-teams\\agile_bot"
+    }
+  }
+}
+

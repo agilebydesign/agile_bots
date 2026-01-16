@@ -1,0 +1,53 @@
+{
+    "priority":  18,
+    "description":  "Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.",
+    "do":  {
+               "description":  "Compare entire objects/dicts/dataclasses against standard data fixtures.",
+               "guidance":  [
+                                {
+                                    "description":  "Assert whole state/log/graph objects",
+                                    "example":  [
+                                                    "def test_state_is_saved(self, tmp_path):",
+                                                    "    helper = BotTestHelper(tmp_path)",
+                                                    "    helper.set_state('shape', 'clarify', completed_actions=['story_bot.shape.strategy'])",
+                                                    "    assert helper.get_state() == {",
+                                                    "        'current': 'story_bot.shape.clarify',",
+                                                    "        'completed_actions': ['story_bot.shape.strategy']",
+                                                    "    }"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use dataclass equality or full dict equality for results",
+                                    "example":  [
+                                                    "def test_activity_log_complete(self, tmp_path):",
+                                                    "    log = helper.get_activity_log()",
+                                                    "    assert log == {",
+                                                    "        'events': [{'action': 'clarify', 'event': 'completed'}]",
+                                                    "    }"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Do not assert single fields or lengths when validating complex results.",
+                 "guidance":  [
+                                  {
+                                      "description":  "Avoid cherry-picking individual fields from state/log objects",
+                                      "example":  [
+                                                      "def test_partial_state(self, tmp_path):",
+                                                      "    state = helper.get_state()",
+                                                      "    assert state['current'] == 'story_bot.shape.clarify'  # WRONG - assert full state"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Avoid len-only assertions on complex results",
+                                      "example":  [
+                                                      "def test_log_length(self, tmp_path):",
+                                                      "    log = helper.get_activity_log()",
+                                                      "    assert len(log['events']) == 1  # WRONG - assert full log content"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "agile_bot.src.scanners.full_result_assertions_scanner.FullResultAssertionsScanner"
+}

@@ -1,0 +1,154 @@
+{
+  "priority": 4,
+  "description": "Document Scope in dot notation (Epic.Sub-Epic.Story.Scenario) and individual Walk covers (what each traces). Example: Scope: Run REPL.Execute Operations.Execute Action.Execute Instructions -> Walk 1 - Covers: Steps 1-3 (parse, navigate), Walk 2 - Covers: Step 4 (execute)",
+  "scanners": [],
+  "do": {
+    "description": "Document Scope at scenario level and Covers for each walk. Example: Scope: Run REPL.Execute Operations.Execute Action.Execute Instructions (parent context) with Walk 1 - Covers: Steps 1-3, Walk 2 - Covers: Step 4 (granular coverage per walk)",
+    "guidance": [
+      {
+        "description": "Use dot notation for Scope showing full hierarchy. Example: Scope: Run Interactive REPL.Execute Operations.Execute Action Operation.Execute Instructions NOT bullet list with Epic:, Sub-Epic:, Story:",
+        "example": [
+          "Scope: Run Interactive REPL.Execute Operations.Execute Action Operation Through CLI.Execute Instructions Operation",
+          "",
+          "Not:",
+          "Covers:",
+          "- Epic: Run Interactive REPL",
+          "- Sub-Epic: Execute Operations",
+          "...",
+          "",
+          "(Use compact dot notation, not bullet list)"
+        ]
+      },
+      {
+        "description": "Each walk specifies granular coverage. Example: Walk 1 - Covers: Steps 1-3 (parse, navigate); Walk 2 - Covers: Step 4 (execute); or Walk 1 - Covers: Sub-epics: Execute, Manage; or Walk 1 - Covers: Stories: Story1, Story2",
+        "example": [
+          "Walk 1 - Covers: Steps 1-3 (parse and navigate)",
+          "Walk 2 - Covers: Step 4 (execute operation)",
+          "Walk 3 - Covers: Step 5 (display)",
+          "",
+          "Or for epic-level:",
+          "Walk 1 - Covers: Sub-epics: Execute Operations, Manage Scope",
+          "Walk 2 - Covers: Sub-epic: Navigate Behaviors",
+          "",
+          "Or for sub-epic-level:",
+          "Walk 1 - Covers: Stories: Story1, Story2",
+          "Walk 2 - Covers: Story: Story3 (error case)",
+          "",
+          "(Each walk covers a specific subset)"
+        ]
+      },
+      {
+        "description": "Scope can be at any story graph level. Example: Epic scope with sub-epic walks: Scope: Run REPL, Walk 1 - Covers: Sub-epics: Execute, Manage; Story scope with step walks: Scope: Run REPL.Execute.Action.Instructions, Walk 1 - Covers: Steps 1-3",
+        "example": [
+          "Epic-level scope:",
+          "Scope: Run Interactive REPL",
+          "Walk 1 - Covers: Sub-epics: Execute Operations, Manage Scope",
+          "",
+          "Sub-epic-level scope:",
+          "Scope: Run Interactive REPL.Execute Operations",
+          "Walk 1 - Covers: Stories: Execute Action, Execute Command",
+          "",
+          "Story-level scope:",
+          "Scope: Run Interactive REPL.Execute Operations.Execute Action.Execute Instructions",
+          "Walk 1 - Covers: Steps 1-3",
+          "",
+          "(Scope shows parent context, walks show granular coverage)"
+        ]
+      },
+      {
+        "description": "Store scope and walks in story graph. Example: 'scope': 'Run REPL.Execute.Action.Instructions', 'walks': [{'walk_number': 1, 'covers': 'Steps 1-3', 'object_flow': '...'}, {'walk_number': 2, 'covers': 'Step 4', 'object_flow': '...'}]",
+        "example": [
+          "{",
+          "  \"concept_name\": \"REPLSession\",",
+          "  \"realizations\": [",
+          "    {",
+          "      \"name\": \"Execute Build Instructions\",",
+          "      \"scope\": \"Run Interactive REPL.Execute Operations.Execute Action.Execute Instructions\",",
+          "      \"walks\": [",
+          "        {",
+          "          \"walk_number\": 1,",
+          "          \"covers\": \"Steps 1-3 (parse and navigate)\",",
+          "          \"object_flow\": \"REPLSession\\n    command: {...}\\n        ...\"",
+          "        },",
+          "        {",
+          "          \"walk_number\": 2,",
+          "          \"covers\": \"Step 4 (execute)\",",
+          "          \"object_flow\": \"CLIAction\\n    result: \\\"...\\\"\\n        ...\"",
+          "        }",
+          "      ]",
+          "    }",
+          "  ]",
+          "}",
+          "",
+          "(Scope shows parent context, walks array shows granular traces)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't use vague coverage or incomplete dot notation. Example: Scope: Execute Action (wrong - incomplete) vs Scope: Run REPL.Execute Operations.Execute Action.Execute Instructions (right); Walk - Covers: Main steps (wrong - vague) vs Walk - Covers: Steps 1-3 (parse, navigate) (right)",
+    "guidance": [
+      {
+        "description": "Don't use incomplete dot notation for Scope. Example: Scope: Execute Action Operation (wrong - missing epic/sub-epic) vs Scope: Run REPL.Execute Operations.Execute Action.Execute Instructions (right - full path)",
+        "example": [
+          "BAD:",
+          "Scope: Execute Action Operation",
+          "Scope: Story",
+          "",
+          "GOOD:",
+          "Scope: Run Interactive REPL.Execute Operations.Execute Action Operation Through CLI.Execute Instructions",
+          "",
+          "(Include full path from epic to scenario)"
+        ]
+      },
+      {
+        "description": "Don't use vague walk coverage. Example: Walk - Covers: Main steps (wrong) vs Walk 1 - Covers: Steps 1-3 (parse, navigate) (right); Walk - Covers: Happy path (wrong) vs Walk 2 - Covers: Step 4 (execute) (right)",
+        "example": [
+          "BAD:",
+          "Walk 1 - Covers: Main steps",
+          "Walk 2 - Covers: Most of the flow",
+          "Walk 3 - Covers: Happy path",
+          "",
+          "GOOD:",
+          "Walk 1 - Covers: Steps 1-3 (parse and navigate)",
+          "Walk 2 - Covers: Step 4 (execute operation)",
+          "Walk 3 - Covers: Step 5 (display status)",
+          "",
+          "(Be specific and explicit about what each walk covers)"
+        ]
+      },
+      {
+        "description": "Don't put all steps in one walk. Example: Walk 1 - Covers: Steps 1-10 (entire scenario) (wrong) vs Walk 1 - Covers: Steps 1-3 (setup), Walk 2 - Covers: Steps 4-6 (execute), Walk 3 - Covers: Steps 7-10 (display) (right)",
+        "example": [
+          "BAD (everything in one walk):",
+          "Walk 1 - Covers: Steps 1-10 (entire scenario)",
+          "",
+          "GOOD (break into logical walks):",
+          "Walk 1 - Covers: Steps 1-3 (setup and validation)",
+          "Walk 2 - Covers: Steps 4-6 (execute operation)",
+          "Walk 3 - Covers: Steps 7-10 (format and display)",
+          "",
+          "(Break complex flows into multiple walks to show collaborations)"
+        ]
+      },
+      {
+        "description": "Don't mix scope levels in one realization. Example: Scope: Run REPL (epic) with Walk - Covers: Steps 1-3 (wrong - mismatch) vs Scope: Run REPL with Walk - Covers: Sub-epics: Execute, Manage (right - match level)",
+        "example": [
+          "BAD:",
+          "Scope: Run Interactive REPL",
+          "Walk 1 - Covers: Steps 1-3",
+          "",
+          "GOOD (epic scope, sub-epic walks):",
+          "Scope: Run Interactive REPL",
+          "Walk 1 - Covers: Sub-epics: Execute Operations, Manage Scope",
+          "",
+          "Or (scenario scope, step walks):",
+          "Scope: Run Interactive REPL.Execute Operations.Execute Action.Execute Instructions",
+          "Walk 1 - Covers: Steps 1-3",
+          "",
+          "(Match walk granularity to scope level)"
+        ]
+      }
+    ]
+  }
+}
