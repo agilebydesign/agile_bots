@@ -925,7 +925,7 @@ class TestTrackActivityForWorkspace:
         AND: action 'gather_context' executes
         WHEN: Activity logger creates entry
         THEN: Activity log file is at: workspace_area/activity_log.json
-        AND: Activity log is NOT at: agile_bot/bots/story_bot/activity_log.json
+        AND: Activity log is NOT at: agile_bots/bots/story_bot/activity_log.json
         AND: Activity log location matches workspace_area from WORKING_AREA environment variable
         """
         # Given: Bot using production story_bot

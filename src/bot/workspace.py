@@ -3,7 +3,7 @@ import os
 from ..utils import read_json_file
 
 def get_python_workspace_root() -> Path:
-    return Path(__file__).parent.parent.parent.parent
+    return Path(__file__).parent.parent.parent
 
 def get_bot_directory() -> Path:
     bot_dir = os.environ.get('BOT_DIRECTORY')
@@ -43,7 +43,7 @@ def get_base_actions_directory(bot_directory: Path=None) -> Path:
             except Exception:
                 pass
     
-    return python_workspace_root / 'agile_bots' / 'base_actions'
+    return python_workspace_root / 'base_actions'
 
 def get_behavior_folder(bot_name: str, behavior: str) -> Path:
     bot_directory = get_bot_directory()

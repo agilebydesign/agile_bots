@@ -50,7 +50,7 @@ class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
         lines.append("**status | back | current | next | path [dir] | scope [filter] | bot [name] | help | exit**")
         lines.append("")
         lines.append("```powershell")
-        lines.append("echo '[command]' | python -m agile_bot.src.cli.cli_main")
+        lines.append("echo '[command]' | python -m agile_bots.src.cli.cli_main")
         lines.append("```")
         lines.append("")
         lines.append("---")

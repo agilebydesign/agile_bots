@@ -86,7 +86,7 @@ class ScopeHelp:
     def correct_examples(self) -> List[tuple[str, str]]:
         return [
             ('scope "Enter Password, Authenticate User"', 'Story scope'),
-            ('scope "file:C:/dev/augmented-teams/agile_bot/src/**/*.py"', 'File scope with glob'),
+            ('scope "file:C:/dev/augmented-teams/agile_bots/src/**/*.py"', 'File scope with glob'),
         ]
     
     @property

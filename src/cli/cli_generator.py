@@ -17,7 +17,7 @@ class CliGenerator:
         powershell_script_path = self._create_powershell_script()
         results['cli_powershell'] = str(powershell_script_path)
         
-        results['cli_python'] = 'agile_bot.src.cli.cli_main'
+        results['cli_python'] = 'agile_bots.src.cli.cli_main'
         
         return results
     
@@ -33,7 +33,7 @@ WORKSPACE_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 export PYTHONPATH="$WORKSPACE_ROOT"
 export BOT_DIRECTORY="$WORKSPACE_ROOT/{self.bot_location}"
 
-python -m agile_bot.src.cli.cli_main
+python -m agile_bots.src.cli.cli_main
 """
         script_file.write_text(script_content, encoding='utf-8')
         script_file.chmod(0o755)
@@ -52,7 +52,7 @@ $WORKSPACE_ROOT = Split-Path -Parent $SCRIPT_DIR
 $env:PYTHONPATH = $WORKSPACE_ROOT
 $env:BOT_DIRECTORY = Join-Path $WORKSPACE_ROOT "{self.bot_location}"
 
-python -m agile_bot.src.cli.cli_main
+python -m agile_bots.src.cli.cli_main
 """
         script_file.write_text(script_content, encoding='utf-8')
         

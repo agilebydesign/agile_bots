@@ -419,7 +419,7 @@ def print_tree(story_structure, test_mapping, stories_dir, test_dir, file_to_epi
                         print(f"        SCENARIO: {scenario_formatted}  --  x")
 
 def main():
-    story_graph_path = Path('agile_bot/bots/base_bot/docs/stories/story-graph.json')
+    story_graph_path = Path('agile_bots/bots/base_bot/docs/stories/story-graph.json')
     with open(story_graph_path, 'r', encoding='utf-8') as f:
         story_graph = json.load(f)
     
@@ -455,8 +455,8 @@ def main():
     for epic_node in story_structure.values():
         collect_stories(epic_node)
     
-    test_dir = Path('agile_bot/bots/base_bot/test')
-    stories_dir = Path('agile_bot/bots/base_bot/docs/stories')
+    test_dir = Path('agile_bots/bots/base_bot/test')
+    stories_dir = Path('agile_bots/bots/base_bot/docs/stories')
     test_files = list(test_dir.glob('test_*.py'))
     
     test_mapping = defaultdict(lambda: defaultdict(list))

@@ -28,11 +28,11 @@ class ScannerLoader:
             
             paths_to_try = [
                 module_path,
-                f'agile_bot.src.scanners.{scanner_name}_scanner'
+                f'agile_bots.src.scanners.{scanner_name}_scanner'
             ]
             
             if self.bot_name:
-                paths_to_try.append(f'agile_bot.bots.{self.bot_name}.src.scanners.{scanner_name}_scanner')
+                paths_to_try.append(f'agile_bots.bots.{self.bot_name}.src.scanners.{scanner_name}_scanner')
             
             for path in paths_to_try:
                 try:

@@ -27,7 +27,7 @@ class ActionFactory:
         if not mapping:
             return None
         module_name, module_file, class_name = mapping
-        module_path = f'agile_bot.src.actions.{module_name}.{module_file}'
+        module_path = f'agile_bots.src.actions.{module_name}.{module_file}'
         try:
             module = importlib.import_module(module_path)
             return getattr(module, class_name)
@@ -53,15 +53,15 @@ class ActionFactory:
 
     def _get_default_action_class_path(self, action_name: str) -> str:
         if action_name == 'rules':
-            return 'agile_bot.src.rules.rules_action.RulesAction'
+            return 'agile_bots.src.rules.rules_action.RulesAction'
         
         action_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'decide_strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'build_knowledge': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'render_output': ('render', 'render_action', 'RenderOutputAction')}
         mapping = action_module_mapping.get(action_name)
         if mapping:
             module_name, module_file, class_name = mapping
-            return f'agile_bot.src.actions.{module_name}.{module_file}.{class_name}'
+            return f'agile_bots.src.actions.{module_name}.{module_file}.{class_name}'
         class_name = action_name.title().replace('_', '') + 'Action'
-        return f'agile_bot.src.actions.{action_name}.{action_name}_action.{class_name}'
+        return f'agile_bots.src.actions.{action_name}.{action_name}_action.{class_name}'
 
     def _load_action_class(self, action_name: str, action_class_path: str):
         module_path, class_name = action_class_path.rsplit('.', 1)

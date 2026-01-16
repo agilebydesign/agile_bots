@@ -28,6 +28,16 @@ dependencies = [
     "nltk>=3.8.0",     # Natural language processing for code scanners
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agile_bots*"]
+namespaces = false
+
+[tool.setuptools.package-dir]
+"agile_bots.src" = "src"
+"agile_bots.test" = "test"
+"agile_bots.bots" = "bots"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",

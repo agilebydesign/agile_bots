@@ -48,8 +48,8 @@ class ValidateTestHelper(BaseHelper):
         assert len(rules) > 0, "rules list must not be empty"
         assert all(isinstance(r, str) for r in rules), "All rules must be strings"
         assert all(r.endswith('.json') for r in rules), "All rules must be .json file paths"
-        assert all('/agile_bot/bots/' in r or '\\agile_bot\\bots\\' in r for r in rules), \
-            "Rules must be absolute paths in agile_bot/bots/"
+        assert all('/agile_bots/bots/' in r or '\\agile_bots\\bots\\' in r for r in rules), \
+            "Rules must be absolute paths in agile_bots/bots/"
         
         # REQUIRED: Load each rule file and verify content appears in instructions (validate_action.py lines 179-209)
         for rule_path in rules:

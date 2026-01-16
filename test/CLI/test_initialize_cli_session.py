@@ -64,7 +64,7 @@ class TestResolveBotPathUsingCLI:
         SCENARIO: Base actions directory accessible via CLI session
         GIVEN: CLI session initialized
         WHEN: base_actions_directory accessed via CLI
-        THEN: Returns real agile_bot/base_actions path
+        THEN: Returns real agile_bots/base_actions path
         
         Domain: test_bot_paths_base_actions_directory_property
         """

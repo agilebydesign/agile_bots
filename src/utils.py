@@ -102,7 +102,7 @@ def build_test_file_link(test_file: str, workspace_directory: Path, story_file_p
     try:
         from agile_bots.src.bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
-        test_file_path = workspace_root / 'agile_bots' / 'test' / test_file
+        test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
             return ""
         
@@ -130,7 +130,7 @@ def build_test_class_link(test_file: str, test_class: str, workspace_directory: 
     try:
         from agile_bots.src.bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
-        test_file_path = workspace_root / 'agile_bots' / 'test' / test_file
+        test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
             return ""
         
@@ -176,7 +176,7 @@ def build_test_method_link(test_file: str, test_method: str, workspace_directory
     try:
         from agile_bots.src.bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
-        test_file_path = workspace_root / 'agile_bots' / 'test' / test_file
+        test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
             return ""
         

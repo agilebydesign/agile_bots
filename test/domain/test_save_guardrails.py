@@ -263,7 +263,7 @@ class TestSaveFileIsolation:
         SCENARIO: Save uses test workspace not production
         GIVEN: Bot initialized with tmp_path workspace
         WHEN: Saving any data
-        THEN: Data saved to tmp_path workspace, NOT production agile_bot/docs/stories
+        THEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/stories
         """
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')

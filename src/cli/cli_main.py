@@ -9,21 +9,22 @@ from pathlib import Path
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-# Setup paths before importing agile_bot modules
+# Minimal bootstrapping: Calculate workspace root and add to sys.path
+# This MUST match get_python_workspace_root() in agile_bots.src.bot.workspace
 script_path = Path(__file__).resolve()
-workspace_root = script_path.parent.parent.parent.parent
+workspace_root = script_path.parent.parent.parent  # src/cli/cli_main.py -> src/cli -> src -> agile_bots
 
 if str(workspace_root) not in sys.path:
     sys.path.insert(0, str(workspace_root))
 
-if 'BOT_DIRECTORY' in os.environ:
-    bot_directory = Path(os.environ['BOT_DIRECTORY'])
-else:
-    bot_directory = workspace_root / 'agile_bots' / 'bots' / 'story_bot'
-os.environ['BOT_DIRECTORY'] = str(bot_directory)
+# Bootstrap BOT_DIRECTORY if not set
+if 'BOT_DIRECTORY' not in os.environ:
+    os.environ['BOT_DIRECTORY'] = str(workspace_root / 'bots' / 'story_bot')
 
+# Bootstrap WORKING_AREA if not set
 if 'WORKING_AREA' not in os.environ:
-    config_path = bot_directory / 'bot_config.json'
+    bot_dir = Path(os.environ['BOT_DIRECTORY'])
+    config_path = bot_dir / 'bot_config.json'
     if config_path.exists():
         try:
             bot_config = json.loads(config_path.read_text(encoding='utf-8'))
@@ -39,14 +40,18 @@ if 'WORKING_AREA' not in os.environ:
     if 'WORKING_AREA' not in os.environ:
         os.environ['WORKING_AREA'] = str(workspace_root)
 
-# import agile_bots modules after environment setup
+# Now import agile_bots modules - they will use the environment variables we just set
 from agile_bots.src.bot.bot import Bot
-from agile_bots.src.bot.workspace import get_workspace_directory
+from agile_bots.src.bot.workspace import get_workspace_directory, get_bot_directory, get_python_workspace_root
 from agile_bots.src.cli.cli_session import CLISession
 
 def main():
-    bot_name = bot_directory.name
+    # Use workspace helper functions - don't calculate paths directly
+    bot_directory = get_bot_directory()
     workspace_directory = get_workspace_directory()
+    python_workspace_root = get_python_workspace_root()
+    
+    bot_name = bot_directory.name
     bot_config_path = bot_directory / 'bot_config.json'
     
     if not bot_config_path.exists():
@@ -108,7 +113,7 @@ def main():
         print("")
         print("```powershell")
         workspace_root_str = str(workspace_directory).replace('\\', '\\')
-        cli_script_str = "python -m agile_bot.src.cli.cli_main"
+        cli_script_str = "python -m agile_bots.src.cli.cli_main"
         print(f"# Interactive mode (environment set automatically by script):")
         print(cli_script_str)
         print("")
@@ -117,7 +122,7 @@ def main():
         print("")
         print("# Optional: Override environment variables if needed:")
         print(f"$env:PYTHONPATH = '{workspace_root_str}'")
-        print(f"$env:BOT_DIRECTORY = '{bot_directory}'")
+        print(f"$env:BOT_DIRECTORY = '{str(bot_directory).replace(chr(92), chr(92)*2)}'")
         print("$env:WORKING_AREA = '<project_path>'  # e.g. demo\\mob_minion")
         print("```")
         print("")

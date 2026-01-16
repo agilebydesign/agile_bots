@@ -39,9 +39,9 @@ class TestResolveBotPath:
         SCENARIO: BotPath.base_actions_directory returns real agile_bot base_actions
         GIVEN: BotPath instantiated
         WHEN: base_actions_directory property accessed
-        THEN: Returns real agile_bot/base_actions path (not test directory)
+        THEN: Returns real agile_bots/base_actions path (not test directory)
         
-        Note: base_actions_directory always returns the real agile_bot/base_actions path,
+        Note: base_actions_directory always returns the real agile_bots/base_actions path,
         not the test directory. This is by design - see get_base_actions_directory() in workspace.py.
         """
         helper = BotTestHelper(tmp_path)

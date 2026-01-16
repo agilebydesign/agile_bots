@@ -56,7 +56,7 @@ class RenderConfigLoader:
 
     def verify_synchronizer_class(self, synchronizer_class_path: str) -> None:
         module_path, class_name = synchronizer_class_path.rsplit('.', 1)
-        possible_paths = [module_path, f'agile_bot.bots.{self.behavior.bot_name}.src.{module_path}', f'agile_bot.bots.{self.behavior.bot_name}.src.synchronizers.{module_path}']
+        possible_paths = [module_path, f'agile_bots.bots.{self.behavior.bot_name}.src.{module_path}', f'agile_bots.bots.{self.behavior.bot_name}.src.synchronizers.{module_path}']
         module = None
         for path in possible_paths:
             try:
