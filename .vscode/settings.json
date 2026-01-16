@@ -1,0 +1,58 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\thoma\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe",
+  "python.languageServer": "None",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "off",
+  
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "agile_bot/test"
+  ],
+  "python.testing.cwd": "${workspaceFolder}",
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
+  
+  // Continuous test running settings
+  "testExplorer.onStart": null,
+  "testExplorer.onReload": null,
+  
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  
+  "testExplorer.useNativeTesting": true,
+  "testing.automaticallyOpenPeekView": "failureInVisibleDocument",
+  "testing.openTesting": "neverOpen",
+  
+  "workbench.colorTheme": "Cursor Dark High Contrast",
+  "workbench.colorCustomizations": {
+    "editorCursor.foreground": "#000000",
+    "editorCursor.background": "#ffffff",
+    "editor.selectionBackground": "#264f78",
+    "editor.lineHighlightBackground": "#2b2b2b"
+  },
+  "editor.tokenColorCustomizations": {
+    "textMateRules": []
+  },
+  
+  "files.associations": {
+    "*.mdc": "markdown"
+  },
+  
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/.pytest_cache": true,
+    "**/node_modules": true
+  },
+  
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/agile_bot/legacy": true,
+    "**/agile_bot/backups": true
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "python-envs.pythonProjects": [],
+  "testing.automaticallyOpenTestResults": "neverOpen"
+}

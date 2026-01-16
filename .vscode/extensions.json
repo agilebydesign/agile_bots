@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "MadakaHeri.vsce-node-test-runner",
+    "ms-python.python",
+    "ms-python.vscode-pylance"
+  ]
+}
