@@ -1,0 +1,1 @@
+This software is available under a commercial license for organizations that wish to use it without the copyleft requirements of the AGPL v3 license. Contact Agile By Design for pricing and terms.
