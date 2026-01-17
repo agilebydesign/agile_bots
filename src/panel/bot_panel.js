@@ -66,18 +66,18 @@ class BotPanel {
       }
       console.log(`[BotPanel] Bot directory: ${botDirectory}`);
       
-      // Initialize singleton CLI (only initializes once, safe to call multiple times)
-      console.log("[BotPanel] Initializing singleton CLI");
+      // Create shared PanelView instance for CLI operations
+      console.log("[BotPanel] Creating shared PanelView instance");
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'Before initializeCLI',data:{workspaceRoot,botDirectory},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'Before PanelView creation',data:{workspaceRoot,botDirectory},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
       // #endregion
-      PanelView.initializeCLI(workspaceRoot, botDirectory, this.logFilePath);
+      this._sharedCLI = new PanelView(botDirectory);
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'After initializeCLI',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'After PanelView creation',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
       // #endregion
-      console.log("[BotPanel] CLI initialized successfully");
+      console.log("[BotPanel] Shared PanelView instance created successfully");
       
-      // Initialize BotView (uses singleton CLI)
+      // Initialize BotView (uses shared CLI)
       this._botView = null;
       
       // Set initial loading HTML
@@ -599,9 +599,12 @@ class BotPanel {
     // Clean up BotView
       this._botView = null;
 
-    // Clean up singleton CLI (safe since BotPanel is singleton)
-    console.log("[BotPanel] Cleaning up singleton CLI");
-    PanelView.cleanupSharedCLI();
+    // Clean up shared CLI
+    console.log("[BotPanel] Cleaning up shared PanelView CLI");
+    if (this._sharedCLI) {
+      this._sharedCLI.cleanup();
+      this._sharedCLI = null;
+    }
 
     // Clean up resources
     this._panel.dispose();
@@ -627,7 +630,7 @@ class BotPanel {
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
       
-      // Initialize BotView if needed (uses singleton CLI)
+      // Initialize BotView if needed (uses shared CLI)
       if (!this._botView) {
         console.log("[BotPanel] Creating BotView");
         this._log('[BotPanel] Creating BotView');
@@ -635,7 +638,7 @@ class BotPanel {
         fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:394',message:'Before new BotView()',data:{panelVersion:this._panelVersion,hasWebview:!!webview,hasExtensionUri:!!this._extensionUri},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
         // #endregion
         try {
-          this._botView = new BotView(this._panelVersion, webview, this._extensionUri);
+          this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
           // #region agent log
           fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:394',message:'After new BotView()',data:{botViewCreated:!!this._botView},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
           // #endregion

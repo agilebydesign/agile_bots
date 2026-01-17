@@ -1,4 +1,4 @@
-﻿
+
 import json
 from pathlib import Path
 from cli.adapters import JSONAdapter
@@ -56,8 +56,9 @@ class JSONScope(JSONAdapter):
                 
                 if self.scope.bot_paths:
                     from pathlib import Path
-                    docs_stories = self.scope.workspace_directory / 'docs' / 'stories'
-                    story_map_file = docs_stories / 'story-map.md'
+                    docs_path = self.scope.bot_paths.documentation_path
+                    docs_stories = self.scope.workspace_directory / docs_path
+                    story_map_file = docs_stories / 'story-map' / 'story-map.md'
                     if story_map_file.exists():
                         result['graphLinks'].append({
                             'text': 'map',
@@ -74,10 +75,11 @@ class JSONScope(JSONAdapter):
             return
         
         test_dir = self.scope.workspace_directory / self.scope.bot_paths.test_path
-        docs_stories_map = self.scope.workspace_directory / 'docs' / 'stories' / 'map'
+        docs_path = self.scope.bot_paths.documentation_path
+        docs_stories_map = self.scope.workspace_directory / docs_path / 'map'
         
         for epic in epics:
-            epic_folder = docs_stories_map / f"ðŸŽ¯ {epic['name']}"
+            epic_folder = docs_stories_map / f"🎯 {epic['name']}"
             if epic_folder.exists() and epic_folder.is_dir():
                 if 'links' not in epic:
                     epic['links'] = []
@@ -93,9 +95,9 @@ class JSONScope(JSONAdapter):
     
     def _enrich_sub_epic_with_links(self, sub_epic: dict, test_dir: Path, docs_stories_map: Path, epic_name: str, parent_path: str = None):
         if parent_path:
-            sub_epic_doc_folder = Path(parent_path) / f"âš™ï¸ {sub_epic['name']}"
+            sub_epic_doc_folder = Path(parent_path) / f"⚙️ {sub_epic['name']}"
         else:
-            sub_epic_doc_folder = docs_stories_map / f"ðŸŽ¯ {epic_name}" / f"âš™ï¸ {sub_epic['name']}"
+            sub_epic_doc_folder = docs_stories_map / f"🎯 {epic_name}" / f"⚙️ {sub_epic['name']}"
         
         if 'links' not in sub_epic:
             sub_epic['links'] = []
@@ -130,7 +132,7 @@ class JSONScope(JSONAdapter):
         if 'links' not in story:
             story['links'] = []
         
-        story_doc_file = parent_doc_folder / f"📝 {story['name']}.md"
+        story_doc_file = parent_doc_folder / f"📝 {story['name']}.md"
         if story_doc_file.exists():
             story['links'].append({
                 'text': 'story',

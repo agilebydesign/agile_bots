@@ -140,8 +140,8 @@ class ScopeSection extends PanelView {
         
         // Always show story-graph.json and story-map.md links
         const workspaceDir = botData.workspace_directory || '';
-        const storyGraphPath = workspaceDir ? `${workspaceDir}/agile_bot/docs/stories/story-graph.json` : '';
-        const storyMapPath = workspaceDir ? `${workspaceDir}/agile_bot/docs/stories/story-map/story-map.md` : '';
+        const storyGraphPath = workspaceDir ? `${workspaceDir}/docs/stories/story-graph.json` : '';
+        const storyMapPath = workspaceDir ? `${workspaceDir}/docs/stories/story-map/story-map.md` : '';
         
         const permanentLinksHtml = `
             <span onclick="openFile('${this.escapeForJs(storyGraphPath)}')" style="color: var(--vscode-foreground); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
