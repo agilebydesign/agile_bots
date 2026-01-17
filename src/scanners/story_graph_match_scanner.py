@@ -4,7 +4,7 @@ from typing import List, Dict, Any, Optional, TYPE_CHECKING
 from pathlib import Path
 import ast
 import logging
-from test_scanner import TestScanner
+from scanners.test_scanner import TestScanner
 from scanners.violation import Violation
 
 if TYPE_CHECKING:

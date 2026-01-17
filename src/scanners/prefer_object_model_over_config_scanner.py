@@ -6,10 +6,9 @@ from scanners.violation import Violation
 
 class PreferObjectModelOverConfigScanner(CodeScanner):
     
-    def __init__(self, self.rule=None):
-        super().__init__()
+    def __init__(self, rule=None):
+        super().__init__(rule)
         self.rule_name = "prefer_object_model_over_config"
-        self.self.rule = self.rule
         
         self.config_access_patterns = [
             (r'(?<!self)\._config\[', 'Direct access to _config dictionary'),
@@ -30,9 +29,7 @@ class PreferObjectModelOverConfigScanner(CodeScanner):
     def scan_file(self, file_path: Path = None, story_graph: Dict[str, Any] = None) -> List[Violation]:
         violations = []
         
-        # Use injected self.rule if provided, otherwise fall back to self.self.rule
-        effective_rule = self.rule if self.rule is not None else self.self.rule
-        if not effective_rule:
+        if not self.rule:
             return violations
         
         self.current_file_path = file_path
@@ -62,7 +59,7 @@ class PreferObjectModelOverConfigScanner(CodeScanner):
                     violations.append(self._create_violation(
                         line_num,
                         f"{description}. Use object properties instead of accessing _config directly.",
-                        effective_rule
+                        self.rule
                     ))
             
             if re.search(self.config_file_pattern, line):
@@ -70,7 +67,7 @@ class PreferObjectModelOverConfigScanner(CodeScanner):
                     violations.append(self._create_violation(
                         line_num,
                         "Reading config file directly when object model may exist. Use object properties instead.",
-                        effective_rule
+                        self.rule
                     ))
         
         return violations
@@ -120,10 +117,9 @@ class PreferObjectModelOverConfigScanner(CodeScanner):
         
         return any(re.search(pattern, context) for pattern in object_patterns)
     
-    def _create_violation(self, line_num: int, message: str, effective_rule: Any = None) -> Violation:
-        rule_to_use = effective_rule if effective_rule is not None else self.self.rule
+    def _create_violation(self, line_num: int, message: str, rule: Any = None) -> Violation:
         return Violation(
-            rule=rule_to_use,
+            rule=rule or self.rule,
             violation_message=message,
             location=str(self.current_file_path),
             line_number=line_num,

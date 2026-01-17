@@ -57,5 +57,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.encapsulation_scanner.EncapsulationScanner"
+  "scanner": "scanners.property_encapsulation_scanner.PropertyEncapsulationScanner"
 }

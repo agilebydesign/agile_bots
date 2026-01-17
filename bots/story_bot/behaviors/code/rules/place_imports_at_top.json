@@ -60,7 +60,7 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.import_placement_scanner.ImportPlacementScanner"
+  "scanner": "scanners.import_placement_scanner.ImportPlacementScanner"
 }
 
 

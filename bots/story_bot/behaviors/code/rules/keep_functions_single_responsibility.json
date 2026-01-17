@@ -49,5 +49,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.single_responsibility_scanner.SingleResponsibilityScanner"
+  "scanner": "scanners.single_responsibility_scanner.SingleResponsibilityScanner"
 }

@@ -58,13 +58,13 @@ class DomainLanguageCodeScanner(CodeScanner):
         
         classes = Classes(tree)
         for cls in classes.get_many_classes:
-            class_violations = self._check_domain_language(cls.node, file_path, self.rule, domain_terms, generic_names)
+            class_violations = self._check_domain_language(cls.node, file_path, domain_terms, generic_names)
             violations.extend(class_violations)
             
             for child in cls.node.body:
                 if isinstance(child, ast.FunctionDef):
                     func_violations = self._check_function_domain_language(
-                        child, file_path, self.rule, domain_terms, generic_names,
+                        child, file_path, domain_terms, generic_names,
                         enclosing_class=cls.node.name
                     )
                     violations.extend(func_violations)
@@ -72,7 +72,7 @@ class DomainLanguageCodeScanner(CodeScanner):
         for node in ast.iter_child_nodes(tree):
             if isinstance(node, ast.FunctionDef):
                 func_violations = self._check_function_domain_language(
-                    node, file_path, self.rule, domain_terms, generic_names,
+                    node, file_path, domain_terms, generic_names,
                     enclosing_class=None
                 )
                 violations.extend(func_violations)

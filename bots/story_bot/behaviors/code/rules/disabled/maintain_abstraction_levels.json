@@ -56,5 +56,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.abstraction_levels_scanner.AbstractionLevelsScanner"
+  "scanner": "scanners.abstraction_levels_scanner.AbstractionLevelsScanner"
 }

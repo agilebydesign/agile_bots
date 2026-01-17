@@ -83,5 +83,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.test_boundary_behavior_scanner.TestBoundaryBehaviorScanner"
+  "scanner": "scanners.test_boundary_behavior_scanner.TestBoundaryBehaviorScanner"
 }

@@ -47,7 +47,7 @@ class UselessCommentsScanner(CodeScanner):
                 line_number = content[:match.start()].count('\n') + 1
                 end_line = content[:match.end()].count('\n') + 1
                 violation = self._create_violation_with_snippet(
-                                        violation_message=f'Useless docstring that repeats function/class name - delete it or explain WHY, not WHAT',
+                    violation_message=f'Useless docstring that repeats function/class name - delete it or explain WHY, not WHAT',
                     file_path=file_path,
                     line_number=line_number,
                     severity='error',

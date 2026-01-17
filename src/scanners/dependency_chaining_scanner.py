@@ -1,7 +1,7 @@
 
 from typing import List, Dict, Any, Optional
-from domain_scanner import DomainScanner
-from domain_concept_node import DomainConceptNode
+from scanners.domain_scanner import DomainScanner
+from scanners.domain_concept_node import DomainConceptNode
 from scanners.violation import Violation
 
 class DependencyChainingScanner(DomainScanner):

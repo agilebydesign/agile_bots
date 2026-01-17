@@ -28,26 +28,23 @@ class ScannerLoader:
             
             paths_to_try = [
                 module_path,
-                f'scanners.{scanner_name}_scanner',
-                f'agile_bots.src.scanners.{scanner_name}_scanner'
+                f'scanners.{scanner_name}_scanner'
             ]
             
-            if self.bot_name:
-                paths_to_try.append(f'agile_bots.bots.{self.bot_name}.src.scanners.{scanner_name}_scanner')
-            
+            last_error = None
             for path in paths_to_try:
                 try:
                     module = importlib.import_module(path)
                     if hasattr(module, class_name):
                         scanner_class = getattr(module, class_name)
                         
-                        if isinstance(scanner_class, type) and hasattr(scanner_class, 'scan'):
-                            if issubclass(scanner_class, Scanner):
-                                return scanner_class, None
-                except (ImportError, AttributeError):
+                        if isinstance(scanner_class, type) and issubclass(scanner_class, Scanner):
+                            return scanner_class, None
+                except (ImportError, AttributeError) as e:
+                    last_error = e
                     continue
             
-            return None, f"Scanner class not found: {scanner_module_path}"
+            return None, f"Scanner class not found: {scanner_module_path}\nLast error: {last_error}"
         except Exception as e:
             return None, f"Error loading scanner {scanner_module_path}: {e}"
 

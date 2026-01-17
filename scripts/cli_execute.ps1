@@ -20,10 +20,10 @@
 #   
 #   Step 1: Set environment and pipe command:
 #     cd C:\dev\agile_bots
-#     $env:PYTHONPATH = "C:\dev\agile_bots"
+#     $env:PYTHONPATH = "C:\dev\agile_bots\src"
 #     $env:BOT_DIRECTORY = "C:\dev\agile_bots\bots\story_bot"
 #     $env:WORKING_AREA = "<project_path>"  # e.g. demo\mob_minion
-#     echo "status" | python agile_bots/src/cli/cli_main.py
+#     echo "status" | python src/cli/cli_main.py
 #   
 #   Step 2: Read output, do work (create files, etc.)
 #   Step 3: Pipe next command: echo "next" | python cli_main.py
@@ -33,10 +33,9 @@
 
 $SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
 $AGILE_BOT_DIR = Split-Path -Parent $SCRIPT_DIR
-$WORKSPACE_ROOT = Split-Path -Parent $AGILE_BOT_DIR
 
-# Set environment variables using relative paths
-$env:PYTHONPATH = $WORKSPACE_ROOT
+# Set environment variables - PYTHONPATH must point to src for scanner imports
+$env:PYTHONPATH = Join-Path $AGILE_BOT_DIR "src"
 
 # BOT_DIRECTORY should be set by the calling script (bot-specific wrapper)
 # If not set, default to story_bot for backward compatibility

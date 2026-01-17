@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must encapsulate state and behavior through properties. Properties control access to object state, hide internal representation, and allow objects to manage their own data. Objects expose properties representing what they are or contain, not raw data access methods.",
-  "scanner": "agile_bot.scanners.property_encapsulation_code_scanner.PropertyEncapsulationCodeScanner",
+  "scanner": "scanners.property_encapsulation_code_scanner.PropertyEncapsulationCodeScanner",
   "examples": [
     {
       "do": {

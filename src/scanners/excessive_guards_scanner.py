@@ -56,7 +56,7 @@ class ExcessiveGuardsScanner(CodeScanner):
             if function.name.startswith('_') and function.name != '__init__':
                 continue
             
-            func_violations = self._check_function_guards(function.node, file_path, self.rule, lines, content)
+            func_violations = self._check_function_guards(function.node, file_path, lines, content)
             violations.extend(func_violations)
         
         return violations
@@ -70,7 +70,7 @@ class ExcessiveGuardsScanner(CodeScanner):
         if_statements = IfStatements(func_node)
         for if_stmt in if_statements.get_many_if_statements:
             if self._is_guard_clause(if_stmt.node, source_lines):
-                violation = self._check_guard_pattern(if_stmt.node, file_path, self.rule, source_lines, content, func_node, optional_params)
+                violation = self._check_guard_pattern(if_stmt.node, file_path, source_lines, content, func_node, optional_params)
                 if violation:
                     violations.append(violation)
         
@@ -379,7 +379,7 @@ class ExcessiveGuardsScanner(CodeScanner):
                     for comparator in test.comparators:
                         if isinstance(comparator, ast.Constant) and comparator.value is None:
                             return self._create_violation_with_snippet(
-                                                                violation_message=self._get_violation_message(self.rule, 'none_check_guard', guard_node.lineno),
+                                violation_message=self._get_violation_message('none_check_guard', guard_node.lineno),
                                 file_path=file_path,
                                 line_number=guard_node.lineno,
                                 severity='warning',
@@ -388,7 +388,7 @@ class ExcessiveGuardsScanner(CodeScanner):
                             )
                         if isinstance(comparator, ast.NameConstant) and comparator.value is None:
                             return self._create_violation_with_snippet(
-                                                                violation_message=self._get_violation_message(self.rule, 'none_check_guard', guard_node.lineno),
+                                violation_message=self._get_violation_message('none_check_guard', guard_node.lineno),
                                 file_path=file_path,
                                 line_number=guard_node.lineno,
                                 severity='warning',
@@ -406,7 +406,7 @@ class ExcessiveGuardsScanner(CodeScanner):
             if func_node and self._variable_could_be_empty(var_name, func_node, guard_node):
                 return None
             return self._create_violation_with_snippet(
-                                violation_message=self._get_violation_message(self.rule, 'truthiness_check_guard', guard_node.lineno, var=var_name),
+                violation_message=self._get_violation_message('truthiness_check_guard', guard_node.lineno, var=var_name),
                 file_path=file_path,
                 line_number=guard_node.lineno,
                 severity='warning',
@@ -424,7 +424,7 @@ class ExcessiveGuardsScanner(CodeScanner):
                 if func_node and self._variable_could_be_empty(var_name, func_node, guard_node):
                     return None
                 return self._create_violation_with_snippet(
-                                        violation_message=self._get_violation_message(self.rule, 'truthiness_check_guard_not', guard_node.lineno, var=var_name),
+                    violation_message=self._get_violation_message('truthiness_check_guard_not', guard_node.lineno, var=var_name),
                     file_path=file_path,
                     line_number=guard_node.lineno,
                     severity='warning',

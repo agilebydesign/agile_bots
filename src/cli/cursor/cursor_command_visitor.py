@@ -26,6 +26,10 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
         self._data_collector: Optional[ActionDataCollector] = None
     
     @property
+    def python_path(self) -> Path:
+        return self.workspace_root / 'src'
+    
+    @property
     def formatter(self) -> CliTerminalFormatter:
         if self._formatter is None:
             self._formatter = CliTerminalFormatter()

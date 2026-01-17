@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Names should clearly communicate purpose and usage. Use names that answer 'why does this exist?' and make them searchable and pronounceable.",
-  "scanner": "agile_bot.scanners.intention_revealing_names_scanner.IntentionRevealingNamesScanner",
+  "scanner": "scanners.intention_revealing_names_scanner.IntentionRevealingNamesScanner",
   "examples": [
     {
       "do": {

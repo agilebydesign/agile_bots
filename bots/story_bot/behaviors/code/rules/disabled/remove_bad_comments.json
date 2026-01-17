@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Some comments actively harm readability. Delete commented-out code (it's in git), remove misleading or outdated comments, and eliminate redundant noise.",
-  "scanner": "agile_bot.scanners.bad_comments_scanner.BadCommentsScanner",
+  "scanner": "scanners.bad_comments_scanner.BadCommentsScanner",
   "examples": [
     {
       "do": {

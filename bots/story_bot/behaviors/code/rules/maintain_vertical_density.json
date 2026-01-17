@@ -63,5 +63,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.vertical_density_scanner.VerticalDensityScanner"
+  "scanner": "scanners.vertical_density_scanner.VerticalDensityScanner"
 }

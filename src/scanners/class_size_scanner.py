@@ -29,7 +29,7 @@ class ClassSizeScanner(CodeScanner):
         
         classes = Classes(tree)
         for cls in classes.get_many_classes:
-            violation = self._check_class_size(cls.node, file_path, self.rule, content)
+            violation = self._check_class_size(cls.node, file_path, content)
             if violation:
                 violations.append(violation)
         

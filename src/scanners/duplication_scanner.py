@@ -145,7 +145,7 @@ class DuplicationScanner(CodeScanner):
             for node in tree.body:
                 extract_functions_from_node(node, None)
             
-            func_violations = self._check_duplicate_functions(functions, file_path, self.rule, lines)
+            func_violations = self._check_duplicate_functions(functions, file_path, lines)
             violations.extend(func_violations)
             
             elapsed = (datetime.now() - file_start_time).total_seconds()

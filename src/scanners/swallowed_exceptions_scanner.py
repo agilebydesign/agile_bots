@@ -23,7 +23,7 @@ class SwallowedExceptionsScanner(CodeScanner):
         
         content, lines, tree = parsed
         
-        violations.extend(self._check_swallowed_exceptions(tree, file_path, self.rule, content))
+        violations.extend(self._check_swallowed_exceptions(tree, file_path, content))
         
         return violations
     
@@ -37,7 +37,7 @@ class SwallowedExceptionsScanner(CodeScanner):
                 if len(handler_body) == 0:
                     line_number = handler.lineno if hasattr(handler, 'lineno') else None
                     violation = self._create_violation_with_snippet(
-                                                violation_message=f'Empty except block at line {line_number} - exceptions must be logged or rethrown, never swallowed',
+                        violation_message=f'Empty except block at line {line_number} - exceptions must be logged or rethrown, never swallowed',
                         file_path=file_path,
                         line_number=line_number,
                         severity='error',
@@ -49,7 +49,7 @@ class SwallowedExceptionsScanner(CodeScanner):
                     if isinstance(handler_body[0], ast.Pass):
                         line_number = handler.lineno if hasattr(handler, 'lineno') else None
                         violation = self._create_violation_with_snippet(
-                                                        violation_message=f'Except block only contains pass at line {line_number} - exceptions must be logged or rethrown, never swallowed',
+                            violation_message=f'Except block only contains pass at line {line_number} - exceptions must be logged or rethrown, never swallowed',
                             file_path=file_path,
                             line_number=line_number,
                             severity='error',

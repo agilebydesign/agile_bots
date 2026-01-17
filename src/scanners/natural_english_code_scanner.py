@@ -34,13 +34,13 @@ class NaturalEnglishCodeScanner(CodeScanner):
         
         functions = Functions(tree)
         for function in functions.get_many_functions:
-            violation = self._check_natural_english(function.node, file_path, self.rule, content)
+            violation = self._check_natural_english(function.node, file_path, content)
             if violation:
                 violations.append(violation)
         
         for node in ast.walk(tree):
             if isinstance(node, ast.Name):
-                violation = self._check_variable_name(node, file_path, self.rule, content)
+                violation = self._check_variable_name(node, file_path, content)
                 if violation:
                     violations.append(violation)
         
@@ -52,7 +52,7 @@ class NaturalEnglishCodeScanner(CodeScanner):
         for pattern in self.TECHNICAL_NOTATION_PATTERNS:
             if re.search(pattern, func_name):
                 return self._create_violation_with_snippet(
-                                        violation_message=f'Function "{func_name}" uses technical notation. Use natural English instead (e.g., "may_find" not "find_optional").',
+                    violation_message=f'Function "{func_name}" uses technical notation. Use natural English instead (e.g., "may_find" not "find_optional").',
                     file_path=file_path,
                     line_number=func_node.lineno,
                     severity='warning',
@@ -68,7 +68,7 @@ class NaturalEnglishCodeScanner(CodeScanner):
         for pattern in self.TECHNICAL_NOTATION_PATTERNS:
             if re.search(pattern, var_name):
                 return self._create_violation_with_snippet(
-                                        violation_message=f'Variable "{var_name}" uses technical notation. Use natural English instead.',
+                    violation_message=f'Variable "{var_name}" uses technical notation. Use natural English instead.',
                     file_path=file_path,
                     line_number=name_node.lineno if hasattr(name_node, 'lineno') else None,
                     severity='info',

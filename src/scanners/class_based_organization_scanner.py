@@ -3,8 +3,8 @@ from typing import List, Dict, Any, Optional, TYPE_CHECKING
 from pathlib import Path
 import ast
 import re
-from test_scanner import TestScanner
-from story_map import StoryNode
+from scanners.test_scanner import TestScanner
+from scanners.story_map import StoryNode
 from scanners.violation import Violation
 
 if TYPE_CHECKING:

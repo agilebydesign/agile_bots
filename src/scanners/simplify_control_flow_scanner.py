@@ -25,7 +25,7 @@ class SimplifyControlFlowScanner(CodeScanner):
         
         functions = Functions(tree)
         for function in functions.get_many_functions:
-            violation = self._check_nesting_depth(function.node, file_path, self.rule, content)
+            violation = self._check_nesting_depth(function.node, file_path, content)
             if violation:
                 violations.append(violation)
         
@@ -37,7 +37,7 @@ class SimplifyControlFlowScanner(CodeScanner):
         if max_depth > 3:
             line_number = func_node.lineno if hasattr(func_node, 'lineno') else None
             return self._create_violation_with_snippet(
-                                violation_message=f'Function "{func_node.name}" has nesting depth of {max_depth} - use guard clauses and extract nested blocks to reduce nesting',
+                violation_message=f'Function "{func_node.name}" has nesting depth of {max_depth} - use guard clauses and extract nested blocks to reduce nesting',
                 file_path=file_path,
                 line_number=line_number,
                 severity='warning',

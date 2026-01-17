@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional, Set, Tuple, TYPE_CHECKING
 from pathlib import Path
 import ast
 import re
-from test_scanner import TestScanner
+from scanners.test_scanner import TestScanner
 from scanners.violation import Violation
 
 if TYPE_CHECKING:

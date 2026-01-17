@@ -51,7 +51,7 @@ class ClearParametersScanner(CodeScanner):
         
         functions = Functions(tree)
         for function in functions.get_many_functions:
-            violation = self._check_parameters(function.node, file_path, self.rule, domain_terms, content)
+            violation = self._check_parameters(function.node, file_path, domain_terms, content)
             if violation:
                 violations.append(violation)
         

@@ -76,5 +76,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.third_party_isolation_scanner.ThirdPartyIsolationScanner"
+  "scanner": "scanners.third_party_isolation_scanner.ThirdPartyIsolationScanner"
 }

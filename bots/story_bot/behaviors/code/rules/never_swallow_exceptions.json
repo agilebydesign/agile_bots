@@ -82,5 +82,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
+  "scanner": "scanners.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
 }

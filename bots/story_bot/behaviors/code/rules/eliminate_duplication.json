@@ -64,5 +64,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.duplication_scanner.DuplicationScanner"
+  "scanner": "scanners.duplication_scanner.DuplicationScanner"
 }

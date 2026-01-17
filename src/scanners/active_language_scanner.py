@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 import logging
 import re
 from story_scanner import StoryScanner
-from story_map import StoryNode, Epic, SubEpic, Story
+from scanners.story_map import StoryNode, Epic, SubEpic, Story
 from scanners.violation import Violation
 from .vocabulary_helper import VocabularyHelper
 

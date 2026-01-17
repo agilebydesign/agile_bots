@@ -64,6 +64,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.excessive_guards_scanner.ExcessiveGuardsScanner"
+  "scanner": "scanners.excessive_guards_scanner.ExcessiveGuardsScanner"
 }
 

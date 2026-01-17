@@ -67,7 +67,7 @@ class MeaningfulContextScanner(CodeScanner):
                             continue
                     
                     violation = self._create_violation_with_snippet(
-                                                violation_message=f'Line {line_num} contains magic number - replace with named constant',
+                        violation_message=f'Line {line_num} contains magic number - replace with named constant',
                         file_path=file_path,
                         line_number=line_num,
                         severity='warning',
@@ -108,10 +108,10 @@ class NumberedVariableChecker:
         re.compile(r'^(version|v)\d+$'),
     ]
     
-    def __init__(self, content: str, file_path: Path, create_violation_fn):
+    def __init__(self, content: str, file_path: Path, rule, create_violation_fn):
         self.content = content
         self.file_path = file_path
-        self.self.rule = self.rule
+        self.rule = rule
         self.create_violation_fn = create_violation_fn
         self.violations = []
     
@@ -165,7 +165,7 @@ class NumberedVariableChecker:
             return
         
         self.violations.append(self.create_violation_fn(
-            self.rule=self.self.rule,
+            rule=self.rule,
             violation_message=f'Line {lineno} uses numbered variable "{var_name}" - use meaningful descriptive name',
             file_path=self.file_path,
             line_number=lineno,

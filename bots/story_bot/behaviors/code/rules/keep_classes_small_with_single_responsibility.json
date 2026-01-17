@@ -55,6 +55,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.scanners.class_size_scanner.ClassSizeScanner"
+  "scanner": "scanners.class_size_scanner.ClassSizeScanner"
 }
 

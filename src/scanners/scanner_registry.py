@@ -38,12 +38,8 @@ class ScannerRegistry:
             
             paths_to_try = [
                 module_path,
-                f'scanners.{scanner_name}_scanner',
-                f'agile_bots.src.scanners.{scanner_name}_scanner'
+                f'scanners.{scanner_name}_scanner'
             ]
-            
-            if self._bot_name:
-                paths_to_try.append(f'agile_bots.bots.{self._bot_name}.src.scanners.{scanner_name}_scanner')
             
             for path in paths_to_try:
                 try:
@@ -51,9 +47,8 @@ class ScannerRegistry:
                     if hasattr(module, class_name):
                         scanner_class = getattr(module, class_name)
                         
-                        if isinstance(scanner_class, type) and hasattr(scanner_class, 'scan'):
-                            if issubclass(scanner_class, Scanner):
-                                return scanner_class, None
+                        if isinstance(scanner_class, type) and issubclass(scanner_class, Scanner):
+                            return scanner_class, None
                 except (ImportError, AttributeError):
                     continue
             
