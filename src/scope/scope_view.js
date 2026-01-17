@@ -111,7 +111,7 @@ class ScopeSection extends PanelView {
         
         let contentHtml = '';
         let contentSummary = '';
-        if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
+        if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content && Array.isArray(scopeData.content)) {
             contentHtml = this.renderStoryTree(scopeData.content, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath);
             contentSummary = `${scopeData.content.length} epic${scopeData.content.length !== 1 ? 's' : ''}`;
         } else if (scopeData.type === 'files' && scopeData.content) {

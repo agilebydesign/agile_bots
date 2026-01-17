@@ -239,61 +239,80 @@ class DuplicationScanner(CodeScanner):
             return True
         
         executable_body = [stmt for stmt in func_node.body if not self._is_docstring_or_comment(stmt, func_node)]
-        if len(executable_body) == 1:
-            stmt = executable_body[0]
-            if isinstance(stmt, ast.Return) and stmt.value:
-                if isinstance(stmt.value, (ast.Call, ast.Subscript)):
-                    if isinstance(stmt.value, ast.Call):
-                        if isinstance(stmt.value.func, ast.Attribute):
-                            if isinstance(stmt.value.func.value, ast.Name) and stmt.value.func.value.id == 'self':
-                                return True
-                            elif isinstance(stmt.value.func.value, ast.Attribute):
-                                if isinstance(stmt.value.func.value.value, ast.Name) and stmt.value.func.value.value.id == 'self':
-                                    return True
-                            elif isinstance(stmt.value.func.value, ast.Name):
-                                return True
-                    elif isinstance(stmt.value, ast.Subscript):
-                        if isinstance(stmt.value.value, ast.Attribute):
-                            if isinstance(stmt.value.value.value, ast.Name) and stmt.value.value.value.id == 'self':
-                                return True
-                elif isinstance(stmt.value, ast.Attribute):
-                    if isinstance(stmt.value.value, ast.Name) and stmt.value.value.id == 'self':
-                        return True
+        if len(executable_body) != 1:
+            return False
         
+        stmt = executable_body[0]
+        if not isinstance(stmt, ast.Return) or not stmt.value:
+            return False
+        
+        return self._is_delegation_return_value(stmt.value)
+    
+    def _is_delegation_return_value(self, value: ast.expr) -> bool:
+        if isinstance(value, ast.Call):
+            return self._is_self_method_call(value)
+        if isinstance(value, ast.Subscript):
+            return self._is_self_attribute_subscript(value)
+        if isinstance(value, ast.Attribute):
+            return self._is_self_name(value.value)
         return False
     
+    def _is_self_method_call(self, call: ast.Call) -> bool:
+        if not isinstance(call.func, ast.Attribute):
+            return False
+        func_value = call.func.value
+        if self._is_self_name(func_value):
+            return True
+        if isinstance(func_value, ast.Attribute) and self._is_self_name(func_value.value):
+            return True
+        if isinstance(func_value, ast.Name):
+            return True
+        return False
+    
+    def _is_self_attribute_subscript(self, subscript: ast.Subscript) -> bool:
+        if not isinstance(subscript.value, ast.Attribute):
+            return False
+        return self._is_self_name(subscript.value.value)
+    
+    def _is_self_name(self, node: ast.expr) -> bool:
+        return isinstance(node, ast.Name) and node.id == 'self'
+    
     def _is_simple_property_getter(self, func_node: ast.FunctionDef) -> bool:
-        is_property = False
-        for decorator in func_node.decorator_list:
-            if isinstance(decorator, ast.Name) and decorator.id == 'property':
-                is_property = True
-                break
-            elif isinstance(decorator, ast.Attribute):
-                if decorator.attr in ('setter', 'deleter'):
-                    pass
-                elif hasattr(decorator, 'value') and isinstance(decorator.value, ast.Name):
-                    if decorator.value.id == 'property':
-                        is_property = True
-                        break
-        
-        if not is_property:
-            if len(func_node.body) <= 2:
-                for stmt in func_node.body:
-                    if isinstance(stmt, ast.Return):
-                        if isinstance(stmt.value, ast.Attribute):
-                            if isinstance(stmt.value.value, ast.Name) and stmt.value.value.id == 'self':
-                                return True
+        if not self._has_property_decorator(func_node):
+            return self._is_simple_self_return(func_node)
         
         executable_body = [stmt for stmt in func_node.body if not self._is_docstring_or_comment(stmt, func_node)]
-        if len(executable_body) == 1:
-            stmt = executable_body[0]
-            if isinstance(stmt, ast.Return):
-                if isinstance(stmt.value, ast.Attribute):
-                    if isinstance(stmt.value.value, ast.Name) and stmt.value.value.id == 'self':
-                        return True
-                if isinstance(stmt.value, ast.Name):
-                    return True
+        if len(executable_body) != 1:
+            return False
         
+        stmt = executable_body[0]
+        if not isinstance(stmt, ast.Return):
+            return False
+        
+        if isinstance(stmt.value, ast.Attribute) and self._is_self_name(stmt.value.value):
+            return True
+        if isinstance(stmt.value, ast.Name):
+            return True
+        return False
+    
+    def _has_property_decorator(self, func_node: ast.FunctionDef) -> bool:
+        for decorator in func_node.decorator_list:
+            if isinstance(decorator, ast.Name) and decorator.id == 'property':
+                return True
+            if isinstance(decorator, ast.Attribute):
+                if decorator.attr not in ('setter', 'deleter'):
+                    if hasattr(decorator, 'value') and isinstance(decorator.value, ast.Name):
+                        if decorator.value.id == 'property':
+                            return True
+        return False
+    
+    def _is_simple_self_return(self, func_node: ast.FunctionDef) -> bool:
+        if len(func_node.body) > 2:
+            return False
+        for stmt in func_node.body:
+            if isinstance(stmt, ast.Return) and isinstance(stmt.value, ast.Attribute):
+                if self._is_self_name(stmt.value.value):
+                    return True
         return False
     
     def _check_duplicate_code_blocks(self, functions: List[tuple], lines: List[str], file_path: Path, rule_obj: Any) -> List[Dict[str, Any]]:
@@ -1445,34 +1464,37 @@ class DuplicationScanner(CodeScanner):
         try:
             normalized_parts = []
             for stmt in statements:
-                stmt_type = type(stmt).__name__
-                
-                if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Constant):
-                    if isinstance(stmt.value.value, str) and stmt.value.value.strip().startswith('"""'):
-                        continue
-                
-                if isinstance(stmt, ast.Assign):
-                    normalized_parts.append(f"ASSIGN({len(stmt.targets)}_targets)")
-                
-                elif isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
-                    normalized_parts.append("CALL")
-                
-                elif isinstance(stmt, ast.Assert):
-                    normalized_parts.append("ASSERT")
-                
-                elif isinstance(stmt, ast.For):
-                    normalized_parts.append("FOR_LOOP")
-                
-                elif isinstance(stmt, ast.With):
-                    normalized_parts.append("WITH")
-                
-                else:
-                    normalized_parts.append(stmt_type)
-            
+                normalized = self._normalize_statement(stmt)
+                if normalized:
+                    normalized_parts.append(normalized)
             return "|".join(normalized_parts) if normalized_parts else None
         except Exception as e:
             _safe_print(f"Error normalizing block: {e}")
             return None
+    
+    def _normalize_statement(self, stmt: ast.stmt) -> Optional[str]:
+        if self._is_docstring_stmt(stmt):
+            return None
+        if isinstance(stmt, ast.Assign):
+            return f"ASSIGN({len(stmt.targets)}_targets)"
+        if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
+            return "CALL"
+        if isinstance(stmt, ast.Assert):
+            return "ASSERT"
+        if isinstance(stmt, ast.For):
+            return "FOR_LOOP"
+        if isinstance(stmt, ast.With):
+            return "WITH"
+        return type(stmt).__name__
+    
+    def _is_docstring_stmt(self, stmt: ast.stmt) -> bool:
+        if not isinstance(stmt, ast.Expr):
+            return False
+        if not isinstance(stmt.value, ast.Constant):
+            return False
+        if not isinstance(stmt.value.value, str):
+            return False
+        return stmt.value.value.strip().startswith('"""')
     
     def _get_block_preview(self, statements: List[ast.stmt]) -> str:
         try:
@@ -1528,32 +1550,29 @@ class DuplicationScanner(CodeScanner):
         if type(node1) != type(node2):
             return 0.0
         
-        if isinstance(node1, ast.Assign):
-            return self._compare_assign_nodes(node1, node2)
-        elif isinstance(node1, ast.AugAssign):
-            return self._compare_augassign_nodes(node1, node2)
-        elif isinstance(node1, ast.Expr) and isinstance(node1.value, ast.Call):
+        comparators = {
+            ast.Assign: self._compare_assign_nodes,
+            ast.AugAssign: self._compare_augassign_nodes,
+            ast.Assert: self._compare_assert_nodes,
+            ast.Return: self._compare_return_nodes,
+            ast.If: self._compare_if_nodes,
+            ast.For: self._compare_for_nodes,
+            ast.While: self._compare_while_nodes,
+            ast.With: self._compare_with_nodes,
+            ast.Try: self._compare_try_nodes,
+            ast.Raise: self._compare_raise_nodes,
+        }
+        
+        node_type = type(node1)
+        if node_type in comparators:
+            return comparators[node_type](node1, node2)
+        
+        if isinstance(node1, ast.Expr) and isinstance(node1.value, ast.Call):
             if isinstance(node2, ast.Expr) and isinstance(node2.value, ast.Call):
                 return self._compare_call_nodes(node1.value, node2.value)
             return 0.0
-        elif isinstance(node1, ast.Assert):
-            return self._compare_assert_nodes(node1, node2)
-        elif isinstance(node1, ast.Return):
-            return self._compare_return_nodes(node1, node2)
-        elif isinstance(node1, ast.If):
-            return self._compare_if_nodes(node1, node2)
-        elif isinstance(node1, ast.For):
-            return self._compare_for_nodes(node1, node2)
-        elif isinstance(node1, ast.While):
-            return self._compare_while_nodes(node1, node2)
-        elif isinstance(node1, ast.With):
-            return self._compare_with_nodes(node1, node2)
-        elif isinstance(node1, ast.Try):
-            return self._compare_try_nodes(node1, node2)
-        elif isinstance(node1, ast.Raise):
-            return self._compare_raise_nodes(node1, node2)
-        else:
-            return 0.8
+        
+        return 0.8
     
     def _compare_assign_nodes(self, node1: ast.Assign, node2: ast.Assign) -> float:
         if len(node1.targets) != len(node2.targets):
@@ -1637,31 +1656,37 @@ class DuplicationScanner(CodeScanner):
         
         if isinstance(expr1, ast.Call):
             return self._compare_call_nodes(expr1, expr2)
-        elif isinstance(expr1, ast.Attribute):
+        if isinstance(expr1, ast.Attribute):
             return 0.8 + 0.2 * self._compare_expr_structure(expr1.value, expr2.value)
-        elif isinstance(expr1, ast.Name):
+        if isinstance(expr1, ast.Name):
             return 0.9
-        elif isinstance(expr1, ast.Constant):
-            if type(expr1.value) == type(expr2.value):
-                return 0.8
-            return 0.5
-        elif isinstance(expr1, ast.BinOp):
-            if type(expr1.op) == type(expr2.op):
-                left_sim = self._compare_expr_structure(expr1.left, expr2.left)
-                right_sim = self._compare_expr_structure(expr1.right, expr2.right)
-                return 0.5 + 0.25 * left_sim + 0.25 * right_sim
+        if isinstance(expr1, ast.Constant):
+            return 0.8 if type(expr1.value) == type(expr2.value) else 0.5
+        if isinstance(expr1, ast.BinOp):
+            return self._compare_binop_expr(expr1, expr2)
+        if isinstance(expr1, ast.UnaryOp):
+            return self._compare_unaryop_expr(expr1, expr2)
+        if isinstance(expr1, ast.Compare):
+            return self._compare_compare_expr(expr1, expr2)
+        return 0.7
+    
+    def _compare_binop_expr(self, expr1: ast.BinOp, expr2: ast.BinOp) -> float:
+        if type(expr1.op) != type(expr2.op):
             return 0.3
-        elif isinstance(expr1, ast.UnaryOp):
-            if type(expr1.op) == type(expr2.op):
-                return 0.7 + 0.3 * self._compare_expr_structure(expr1.operand, expr2.operand)
+        left_sim = self._compare_expr_structure(expr1.left, expr2.left)
+        right_sim = self._compare_expr_structure(expr1.right, expr2.right)
+        return 0.5 + 0.25 * left_sim + 0.25 * right_sim
+    
+    def _compare_unaryop_expr(self, expr1: ast.UnaryOp, expr2: ast.UnaryOp) -> float:
+        if type(expr1.op) != type(expr2.op):
             return 0.3
-        elif isinstance(expr1, ast.Compare):
-            if len(expr1.ops) == len(expr2.ops) and len(expr1.comparators) == len(expr2.comparators):
-                left_sim = self._compare_expr_structure(expr1.left, expr2.left)
-                return 0.6 + 0.4 * left_sim
+        return 0.7 + 0.3 * self._compare_expr_structure(expr1.operand, expr2.operand)
+    
+    def _compare_compare_expr(self, expr1: ast.Compare, expr2: ast.Compare) -> float:
+        if len(expr1.ops) != len(expr2.ops) or len(expr1.comparators) != len(expr2.comparators):
             return 0.4
-        else:
-            return 0.7
+        left_sim = self._compare_expr_structure(expr1.left, expr2.left)
+        return 0.6 + 0.4 * left_sim
     
     def _log_violation_details(self, file_path: Path, violations: List[Dict[str, Any]], lines: List[str]) -> None:
         if not violations:

@@ -1,4 +1,4 @@
-﻿
+
 import sys
 import logging
 from pathlib import Path
@@ -16,335 +16,299 @@ class CLISession:
     
     def execute_command(self, command: str) -> CLICommandResponse:
         verb, args = self._parse_command(command)
+        args = self._extract_format_mode(args)
         
-        if args and ('--format json' in args or '--format=json' in args):
-            self.mode = 'json'
-            args = args.replace('--format json', '').replace('--format=json', '').strip()
+        handler = self._get_command_handler(verb)
+        if handler:
+            response = handler(verb, args)
+            if response:
+                return response
         
+        result, is_navigation_command = self._execute_verb(verb, args, command)
         cli_terminated = verb == 'exit'
         
+        return self._build_response(result, is_navigation_command, cli_terminated)
+    
+    def _extract_format_mode(self, args: str) -> str:
+        if not args:
+            return args
+        if '--format json' in args or '--format=json' in args:
+            self.mode = 'json'
+            return args.replace('--format json', '').replace('--format=json', '').strip()
+        return args
+    
+    def _get_command_handler(self, verb: str):
+        handlers = {
+            'save': self._handle_save,
+            'submit': self._handle_submit,
+        }
+        if verb.startswith('submitrules:') or verb.startswith('submitrules '):
+            return self._handle_submitrules
+        return handlers.get(verb)
+    
+    def _handle_save(self, verb: str, args: str) -> CLICommandResponse:
+        params = self._parse_save_params(args)
+        result = self.bot.save(**params)
+        if self.mode == 'json':
+            import json
+            return CLICommandResponse(
+                output=json.dumps(result, indent=2),
+                status=result.get('status', 'success'),
+                cli_terminated=False
+            )
+        return None
+    
+    def _handle_submit(self, verb: str, args: str) -> CLICommandResponse:
+        result = self.bot.submit_current_action()
+        return self._format_submit_response(result, "Instructions copied to clipboard!")
+    
+    def _handle_submitrules(self, verb: str, args: str) -> CLICommandResponse:
+        behavior_name = verb.split(':', 1)[1] if ':' in verb else verb.split(' ', 1)[1]
+        behavior_name = behavior_name.strip()
+        result = self.bot.submit_behavior_rules(behavior_name)
+        return self._format_submit_response(result, f"{behavior_name} rules submitted to chat!")
+    
+    def _format_submit_response(self, result: dict, success_message: str) -> CLICommandResponse:
+        if self.mode == 'json':
+            import json
+            return CLICommandResponse(
+                output=json.dumps(result, indent=2),
+                status=result.get('status', 'success'),
+                cli_terminated=False
+            )
+        
+        if result.get('status') != 'success':
+            return CLICommandResponse(
+                output=f"Error: {result.get('message', 'Unknown error')}",
+                status='error',
+                cli_terminated=False
+            )
+        
+        output_lines = self._build_submit_success_lines(result, success_message)
+        return CLICommandResponse(
+            output='\n'.join(output_lines),
+            status='success',
+            cli_terminated=False
+        )
+    
+    def _build_submit_success_lines(self, result: dict, header: str) -> list:
+        lines = [
+            f"[OK] {header}",
+            f"  Behavior: {result.get('behavior')}",
+            f"  Action: {result.get('action')}",
+            f"  Length: {result.get('instructions_length', 0)} characters"
+        ]
+        cursor_status = result.get('cursor_status', '')
+        if cursor_status == 'opened':
+            lines.append("  [OK] Cursor chat opened")
+        elif cursor_status.startswith('failed'):
+            lines.append("  [!] Could not open Cursor chat automatically")
+            lines.append("  [!] Open Cursor chat manually and paste (Ctrl+V)")
+        elif cursor_status:
+            lines.append("  [!] Paste into Cursor chat (Ctrl+V)")
+        return lines
+    
+    def _execute_verb(self, verb: str, args: str, command: str) -> tuple:
         is_navigation_command = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')
         
         if verb == 'status':
-            result = self.bot
-        elif verb == 'bot':
-            if not args:
-                result = {
-                    'status': 'info',
-                    'current_bot': self.bot.bot_name,
-                    'registered_bots': self.bot.bots,
-                    'message': f"Current bot: {self.bot.bot_name}. Available bots: {', '.join(self.bot.bots)}. Usage: bot <name>"
-                }
-            else:
-                target_bot_name = args.strip()
-                try:
-                    self.bot.active_bot = target_bot_name
-                    self.bot = self.bot.active_bot
-                    result = {
-                        'status': 'success',
-                        'message': f'Switched to bot: {target_bot_name}',
-                        'bot_name': target_bot_name
-                    }
-                except ValueError as e:
-                    result = {
-                        'status': 'error',
-                        'message': str(e)
-                    }
-        elif verb == 'save':
-            params = self._parse_save_params(args)
-            result = self.bot.save(**params)
-            if self.mode == 'json':
-                import json
-                output = json.dumps(result, indent=2)
-                return CLICommandResponse(
-                    output=output,
-                    status=result.get('status', 'success'),
-                    cli_terminated=False
-                )
-        # Special case: "submitrules:behavior" calls bot.submit_behavior_rules()
-        elif verb.startswith('submitrules:') or verb.startswith('submitrules '):
-            behavior_name = verb.split(':', 1)[1] if ':' in verb else verb.split(' ', 1)[1]
-            behavior_name = behavior_name.strip()
-            result = self.bot.submit_behavior_rules(behavior_name)
-            # Submit returns a dict - serialize based on mode
-            if self.mode == 'json':
-                import json
-                output = json.dumps(result, indent=2)
-                return CLICommandResponse(
-                    output=output,
-                    status=result.get('status', 'success'),
-                    cli_terminated=False
-                )
-            else:
-                if result.get('status') == 'success':
-                    output_lines = [
-                        f"✓ {behavior_name} rules submitted to chat!",
-                        f"  Behavior: {result.get('behavior')}",
-                        f"  Action: {result.get('action')}",
-                        f"  Length: {result.get('instructions_length', 0)} characters"
-                    ]
-                    
-                    if result.get('cursor_status') == 'opened':
-                        output_lines.append("  ✓ Cursor chat opened")
-                    
-                    return CLICommandResponse(
-                        output='\n'.join(output_lines),
-                        status='success',
-                        cli_terminated=False
-                    )
-                else:
-                    return CLICommandResponse(
-                        output=f"Error: {result.get('message', 'Unknown error')}",
-                        status='error',
-                        cli_terminated=False
-                    )
-        # Special case: "submit" calls bot.submit_current_action() and returns result with instructions
-        elif verb == 'submit':
-            result = self.bot.submit_current_action()
-            # Submit returns a dict - serialize based on mode
-            if self.mode == 'json':
-                import json
-                output = json.dumps(result, indent=2)
-                return CLICommandResponse(
-                    output=output,
-                    status=result.get('status', 'success'),
-                    cli_terminated=False
-                )
-            else:
-                if result.get('status') == 'success':
-                    output_lines = [
-                        f"✓ Instructions copied to clipboard!",
-                        f"  Behavior: {result.get('behavior')}",
-                        f"  Action: {result.get('action')}",
-                        f"  Length: {result.get('instructions_length', 0)} characters"
-                    ]
-                    
-                    if result.get('cursor_status') == 'opened':
-                        output_lines.append("  ✓ Cursor chat opened")
-                    elif result.get('cursor_status', '').startswith('failed'):
-                        output_lines.append(f" ⚙ Could not open Cursor chat automatically")
-                        output_lines.append(" ⚙ Open Cursor chat manually and paste (Ctrl+V)")
-                    else:
-                        output_lines.append(" ⚙ Paste into Cursor chat (Ctrl+V)")
-                    
-                    output = '\n'.join(output_lines)
-                else:
-                    output = f"âœ— {result.get('message', 'Submit failed')}"
-                
-                return CLICommandResponse(
-                    output=output,
-                    status=result.get('status', 'success'),
-                    cli_terminated=False
-                )
-        elif hasattr(self.bot, verb):
-            attr = getattr(self.bot, verb)
-            if callable(attr):
-                result = attr(args) if args else attr()
-            else:
-                result = attr
-                
-                from behaviors.behavior import Behavior
-                is_behavior = isinstance(result, Behavior)
-                
-                if is_behavior:
-                    result = self.bot.execute(result.name, None)
-                    is_navigation_command = True
+            return self.bot, is_navigation_command
+        
+        if verb == 'bot':
+            return self._handle_bot_command(args), is_navigation_command
+        
+        if hasattr(self.bot, verb):
+            return self._execute_bot_attribute(verb, args)
+        
+        return self._execute_action_or_route(verb, args, command)
+    
+    def _handle_bot_command(self, args: str) -> dict:
+        if not args:
+            return {
+                'status': 'info',
+                'current_bot': self.bot.bot_name,
+                'registered_bots': self.bot.bots,
+                'message': f"Current bot: {self.bot.bot_name}. Available bots: {', '.join(self.bot.bots)}. Usage: bot <name>"
+            }
+        
+        target_bot_name = args.strip()
+        try:
+            self.bot.active_bot = target_bot_name
+            self.bot = self.bot.active_bot
+            return {'status': 'success', 'message': f'Switched to bot: {target_bot_name}', 'bot_name': target_bot_name}
+        except ValueError as e:
+            return {'status': 'error', 'message': str(e)}
+    
+    def _execute_bot_attribute(self, verb: str, args: str) -> tuple:
+        attr = getattr(self.bot, verb)
+        if callable(attr):
+            result = attr(args) if args else attr()
+            return result, False
+        
+        from behaviors.behavior import Behavior
+        if isinstance(attr, Behavior):
+            result = self.bot.execute(attr.name, None)
+            return result, True
+        
+        return attr, False
+    
+    def _execute_action_or_route(self, verb: str, args: str, command: str) -> tuple:
+        result = self._handle_action_shortcut(verb, args)
+        
+        rules_response = self._check_rules_auto_submit(verb, result)
+        if rules_response:
+            return rules_response, False
+        
+        if result is not None:
+            return self._wrap_instructions_result(result)
+        
+        return self._try_route_to_behavior(verb, command)
+    
+    def _check_rules_auto_submit(self, verb: str, result) -> CLICommandResponse:
+        if verb != 'rules' or result is None:
+            return None
+        
+        from instructions.instructions import Instructions
+        if not isinstance(result, Instructions):
+            return None
+        
+        submit_result = self._submit_rules_to_chat()
+        if submit_result.get('status') == 'success' and self.mode != 'json':
+            return self._format_rules_submit_response(submit_result)
+        return None
+    
+    def _submit_rules_to_chat(self) -> dict:
+        if self.bot.behaviors.current:
+            return self.bot.behaviors.current.submitRules()
+        return {'status': 'error', 'message': 'No current behavior set'}
+    
+    def _format_rules_submit_response(self, submit_result: dict) -> CLICommandResponse:
+        output_lines = self._build_submit_success_lines(submit_result, "Rules submitted to chat!")
+        return CLICommandResponse(output='\n'.join(output_lines), status='success', cli_terminated=False)
+    
+    def _wrap_instructions_result(self, result) -> tuple:
+        from instructions.instructions import Instructions
+        if isinstance(result, Instructions):
+            adapter = self._get_adapter_for_domain(result)
+            output = adapter.serialize()
+            status_adapter = self._get_adapter_for_domain(self.bot)
+            output = '\n'.join([output, "", status_adapter.serialize()])
+            return CLICommandResponse(output=output, cli_terminated=False), False
+        return result, True
+    
+    def _try_route_to_behavior(self, verb: str, command: str) -> tuple:
+        try:
+            result = self._route_to_behavior_action(command)
+            rules_response = self._check_routed_rules_submit(command, result)
+            if rules_response:
+                return rules_response, False
+            return result, False
+        except ValueError:
+            return self._build_error_response(verb), False
+    
+    def _check_routed_rules_submit(self, command: str, result) -> CLICommandResponse:
+        if '.rules' not in command.lower():
+            return None
+        
+        from instructions.instructions import Instructions
+        if not isinstance(result, Instructions):
+            return None
+        
+        submit_result = self._submit_rules_to_chat()
+        if submit_result.get('status') == 'success' and self.mode != 'json':
+            return self._format_rules_submit_response(submit_result)
+        return None
+    
+    def _build_error_response(self, verb: str) -> CLICommandResponse:
+        error_message = f"Unknown command '{verb}'"
+        if self.mode == 'json':
+            import json
+            output = json.dumps({'status': 'error', 'message': error_message, 'command': verb}, indent=2)
         else:
-            result = self._handle_action_shortcut(verb, args)
-            
-            # Special case: if action is 'rules', automatically submit to chat
-            if verb == 'rules' and result is not None:
-                from instructions.instructions import Instructions
-                if isinstance(result, Instructions):
-                    # Submit the RULES instructions using behavior.submitRules()
-                    if self.bot.behaviors.current:
-                        submit_result = self.bot.behaviors.current.submitRules()
-                    else:
-                        submit_result = {
-                            'status': 'error',
-                            'message': 'No current behavior set'
-                        }
-                    
-                    if submit_result.get('status') == 'success' and self.mode != 'json':
-                        output_lines = [
-                            f"✓ Rules submitted to chat!",
-                            f"  Behavior: {submit_result.get('behavior')}",
-                            f"  Action: {submit_result.get('action')}",
-                            f"  Length: {submit_result.get('instructions_length', 0)} characters"
-                        ]
-                        
-                        if submit_result.get('cursor_status') == 'opened':
-                            output_lines.append("  ✓ Cursor chat opened")
-                        
-                        # Return submit result instead of instructions
-                        return CLICommandResponse(
-                            output='\n'.join(output_lines),
-                            status='success',
-                            cli_terminated=False
-                        )
-            
-            if result is None:
-                try:
-                    result = self._route_to_behavior_action(command)
-                    is_navigation_command = False
-                    
-                    # Special case: if action is 'rules', automatically submit to chat
-                    if '.rules' in command.lower():
-                        from instructions.instructions import Instructions
-                        if isinstance(result, Instructions):
-                            # Submit the RULES instructions using behavior.submitRules()
-                            if self.bot.behaviors.current:
-                                submit_result = self.bot.behaviors.current.submitRules()
-                            else:
-                                submit_result = {
-                                    'status': 'error',
-                                    'message': 'No current behavior set'
-                                }
-                            
-                            if submit_result.get('status') == 'success' and self.mode != 'json':
-                                output_lines = [
-                                    f"✓ Rules submitted to chat!",
-                                    f"  Behavior: {submit_result.get('behavior')}",
-                                    f"  Action: {submit_result.get('action')}",
-                                    f"  Length: {submit_result.get('instructions_length', 0)} characters"
-                                ]
-                                
-                                if submit_result.get('cursor_status') == 'opened':
-                                    output_lines.append("  ✓ Cursor chat opened")
-                                
-                                # Return submit result instead of instructions
-                                return CLICommandResponse(
-                                    output='\n'.join(output_lines),
-                                    status='success',
-                                    cli_terminated=False
-                                )
-                except ValueError:
-                    error_message = f"Unknown command '{verb}'"
-                    if self.mode == 'json':
-                        import json
-                        error_dict = {
-                            'status': 'error',
-                            'message': error_message,
-                            'command': verb
-                        }
-                        output = json.dumps(error_dict, indent=2)
-                    else:
-                        output = f"ERROR: {error_message}"
-                    return CLICommandResponse(
-                        output=output,
-                        status='error',
-                        cli_terminated=False
-                    )
-            else:
-                from instructions.instructions import Instructions
-                if isinstance(result, Instructions):
-                    adapter = self._get_adapter_for_domain(result)
-                    output = adapter.serialize()
-                    status_adapter = self._get_adapter_for_domain(self.bot)
-                    status_output = status_adapter.serialize()
-                    output = '\n'.join([
-                        output,
-                        "",
-                        status_output
-                    ])
-                    return CLICommandResponse(
-                        output=output,
-                        cli_terminated=False
-                    )
-                else:
-                    is_navigation_command = True
+            output = f"ERROR: {error_message}"
+        return CLICommandResponse(output=output, status='error', cli_terminated=False)
+    
+    def _build_response(self, result, is_navigation_command: bool, cli_terminated: bool) -> CLICommandResponse:
+        if isinstance(result, CLICommandResponse):
+            return result
         
         adapter = self._get_adapter_for_domain(result)
         output = adapter.serialize()
         
         from instructions.instructions import Instructions
         if isinstance(result, Instructions) and self.mode == 'json':
-            import json
-            instructions_data = json.loads(output) if isinstance(output, str) else output
-            status_adapter = self._get_adapter_for_domain(self.bot)
-            status_json = status_adapter.serialize()
-            status_data = json.loads(status_json) if isinstance(status_json, str) else status_json
-            
-            unified_response = {
-                'instructions': instructions_data,
-                'bot': status_data
-            }
-            output = json.dumps(unified_response, indent=2)
-            return CLICommandResponse(
-                output=output,
-                cli_terminated=False
-            )
+            return self._build_json_instructions_response(output)
         
         if is_navigation_command and not cli_terminated:
-            if self.mode == 'json':
-                import json
-                result_data = json.loads(output) if isinstance(output, str) else output
-                unified_response = {}
-                
-                if isinstance(result_data, dict):
-                    unified_response.update(result_data)
-                
-                navigation_succeeded = True
-                if isinstance(result, dict) and 'status' in result:
-                    navigation_succeeded = result['status'] not in ['error', 'at_start', 'at_end']
-                
-                from instructions.instructions import Instructions
-                result_is_instructions = isinstance(result, Instructions)
-                
-                if navigation_succeeded and not result_is_instructions:
-                    instructions_result = self.bot.current()
-                    
-                    if isinstance(instructions_result, dict) and 'status' in instructions_result and instructions_result['status'] == 'error':
-                        unified_response['instructions_error'] = instructions_result.get('message', 'Unknown error')
-                    else:
-                        instructions_adapter = self._get_adapter_for_domain(instructions_result)
-                        instructions_json = instructions_adapter.serialize()
-                        instructions_data = json.loads(instructions_json) if isinstance(instructions_json, str) else instructions_json
-                        unified_response['instructions'] = instructions_data
-                
-                status_adapter = self._get_adapter_for_domain(self.bot)
-                status_json = status_adapter.serialize()
-                status_data = json.loads(status_json) if isinstance(status_json, str) else status_json
-                unified_response['bot'] = status_data
-                
-                output = json.dumps(unified_response, indent=2)
-            else:
-                output_parts = [output]
-                
-                navigation_succeeded = True
-                if isinstance(result, dict) and 'status' in result:
-                    navigation_succeeded = result['status'] not in ['error', 'at_start', 'at_end']
-                
-                from instructions.instructions import Instructions
-                result_is_instructions = isinstance(result, Instructions)
-                
-                if navigation_succeeded and not result_is_instructions:
-                    instructions_result = self.bot.current()
-                    
-                    if isinstance(instructions_result, dict) and 'status' in instructions_result and instructions_result['status'] == 'error':
-                        error_message = instructions_result.get('message', 'Unknown error')
-                        output_parts.append("")
-                        output_parts.append(f"ERROR: {error_message}")
-                    else:
-                        output_parts.append("")
-                        output_parts.append("=" * 100)
-                        output_parts.append("INSTRUCTIONS")
-                        output_parts.append("=" * 100)
-                        
-                        instructions_adapter = self._get_adapter_for_domain(instructions_result)
-                        output_parts.append(instructions_adapter.serialize())
-                
-                status_adapter = self._get_adapter_for_domain(self.bot)
-                status_output = status_adapter.serialize()
-                output_parts.append("")
-                output_parts.append(status_output)
-                
-                output = '\n'.join(output_parts)
+            output = self._append_navigation_context(result, output)
         
-        return CLICommandResponse(
-            output=output,
-            cli_terminated=cli_terminated
-        )
+        return CLICommandResponse(output=output, cli_terminated=cli_terminated)
+    
+    def _build_json_instructions_response(self, output: str) -> CLICommandResponse:
+        import json
+        instructions_data = json.loads(output) if isinstance(output, str) else output
+        status_adapter = self._get_adapter_for_domain(self.bot)
+        status_data = json.loads(status_adapter.serialize())
+        unified = {'instructions': instructions_data, 'bot': status_data}
+        return CLICommandResponse(output=json.dumps(unified, indent=2), cli_terminated=False)
+    
+    def _append_navigation_context(self, result, output: str) -> str:
+        if self.mode == 'json':
+            return self._append_json_navigation_context(result, output)
+        return self._append_tty_navigation_context(result, output)
+    
+    def _append_json_navigation_context(self, result, output: str) -> str:
+        import json
+        from instructions.instructions import Instructions
+        
+        result_data = json.loads(output) if isinstance(output, str) else output
+        unified = dict(result_data) if isinstance(result_data, dict) else {}
+        
+        if self._navigation_succeeded(result) and not isinstance(result, Instructions):
+            self._add_instructions_to_unified(unified)
+        
+        status_adapter = self._get_adapter_for_domain(self.bot)
+        unified['bot'] = json.loads(status_adapter.serialize())
+        return json.dumps(unified, indent=2)
+    
+    def _append_tty_navigation_context(self, result, output: str) -> str:
+        from instructions.instructions import Instructions
+        
+        parts = [output]
+        
+        if self._navigation_succeeded(result) and not isinstance(result, Instructions):
+            self._add_instructions_to_parts(parts)
+        
+        status_adapter = self._get_adapter_for_domain(self.bot)
+        parts.extend(["", status_adapter.serialize()])
+        return '\n'.join(parts)
+    
+    def _navigation_succeeded(self, result) -> bool:
+        if not isinstance(result, dict) or 'status' not in result:
+            return True
+        return result['status'] not in ['error', 'at_start', 'at_end']
+    
+    def _add_instructions_to_unified(self, unified: dict) -> None:
+        import json
+        instructions_result = self.bot.current()
+        
+        if isinstance(instructions_result, dict) and instructions_result.get('status') == 'error':
+            unified['instructions_error'] = instructions_result.get('message', 'Unknown error')
+            return
+        
+        adapter = self._get_adapter_for_domain(instructions_result)
+        unified['instructions'] = json.loads(adapter.serialize())
+    
+    def _add_instructions_to_parts(self, parts: list) -> None:
+        instructions_result = self.bot.current()
+        
+        if isinstance(instructions_result, dict) and instructions_result.get('status') == 'error':
+            parts.extend(["", f"ERROR: {instructions_result.get('message', 'Unknown error')}"])
+            return
+        
+        parts.extend(["", "=" * 100, "INSTRUCTIONS", "=" * 100])
+        adapter = self._get_adapter_for_domain(instructions_result)
+        parts.append(adapter.serialize())
     
     def _parse_command(self, command: str) -> tuple[str, str]:
         parts = command.split(maxsplit=1)

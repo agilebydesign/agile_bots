@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import re
 import logging
 import dataclasses
@@ -13,39 +13,36 @@ logger = logging.getLogger(__name__)
 
 class TypeHintConverter:
     
-    @staticmethod
-    def to_cli_type(python_type) -> str:
+    TYPE_MAP = {
+        str: "string",
+        Path: "path",
+        int: "int",
+        float: "float",
+        bool: "bool",
+        dict: "dict",
+        list: "list",
+        tuple: "tuple",
+        set: "set",
+    }
+    
+    ORIGIN_MAP = {
+        dict: "dict",
+        list: "list",
+        tuple: "tuple",
+        set: "set",
+    }
+    
+    @classmethod
+    def to_cli_type(cls, python_type) -> str:
         if python_type is type(None):
             return "none"
         
-        if python_type == str:
-            return "string"
-        elif python_type == Path:
-            return "path"
-        elif python_type == int:
-            return "int"
-        elif python_type == float:
-            return "float"
-        elif python_type == bool:
-            return "bool"
-        elif python_type == dict:
-            return "dict"
-        elif python_type == list:
-            return "list"
-        elif python_type == tuple:
-            return "tuple"
-        elif python_type == set:
-            return "set"
+        if python_type in cls.TYPE_MAP:
+            return cls.TYPE_MAP[python_type]
         
         origin = get_origin(python_type)
-        if origin is dict:
-            return "dict"
-        elif origin is list:
-            return "list"
-        elif origin is tuple:
-            return "tuple"
-        elif origin is set:
-            return "set"
+        if origin in cls.ORIGIN_MAP:
+            return cls.ORIGIN_MAP[origin]
         
         return "value"
 

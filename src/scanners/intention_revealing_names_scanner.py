@@ -154,27 +154,28 @@ class IntentionRevealingNamesScanner(CodeScanner):
         acceptable_names = set()
         
         for node in ast.walk(tree):
-            if isinstance(node, ast.For):
-                self._add_target_var_names(node.target, acceptable_names)
-            
-            elif isinstance(node, ast.ExceptHandler):
-                if node.name:
-                    acceptable_names.add(node.name)
-            
-            elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
-                for generator in node.generators:
-                    self._add_target_var_names(generator.target, acceptable_names)
-            
-            elif isinstance(node, ast.Lambda):
-                for arg in node.args.args:
-                    acceptable_names.add(arg.arg)
-            
-            elif isinstance(node, ast.With):
-                for item in node.items:
-                    if item.optional_vars:
-                        self._add_target_var_names(item.optional_vars, acceptable_names)
+            self._collect_var_names_from_node(node, acceptable_names)
         
         return acceptable_names
+    
+    def _collect_var_names_from_node(self, node: ast.AST, acceptable_names: set) -> None:
+        if isinstance(node, ast.For):
+            self._add_target_var_names(node.target, acceptable_names)
+        elif isinstance(node, ast.ExceptHandler) and node.name:
+            acceptable_names.add(node.name)
+        elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            for generator in node.generators:
+                self._add_target_var_names(generator.target, acceptable_names)
+        elif isinstance(node, ast.Lambda):
+            for arg in node.args.args:
+                acceptable_names.add(arg.arg)
+        elif isinstance(node, ast.With):
+            self._collect_with_var_names(node, acceptable_names)
+    
+    def _collect_with_var_names(self, node: ast.With, acceptable_names: set) -> None:
+        for item in node.items:
+            if item.optional_vars:
+                self._add_target_var_names(item.optional_vars, acceptable_names)
     
     def _add_target_var_names(self, target: ast.AST, acceptable_names: set):
         if isinstance(target, ast.Name):

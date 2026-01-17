@@ -135,37 +135,41 @@ class FunctionSizeScanner(CodeScanner):
     def _get_multi_line_expression_line_numbers(self, func_node: ast.FunctionDef) -> set:
         multi_line_lines = set()
         
-        def visit_statement(stmt_node):
-            if hasattr(stmt_node, 'end_lineno') and hasattr(stmt_node, 'lineno') and stmt_node.end_lineno and stmt_node.lineno:
-                if stmt_node.end_lineno > stmt_node.lineno:
-                    if isinstance(stmt_node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
-                        if hasattr(stmt_node, 'value') and stmt_node.value:
-                            value = stmt_node.value
-                            if hasattr(value, 'end_lineno') and hasattr(value, 'lineno') and value.end_lineno and value.lineno:
-                                if value.end_lineno > value.lineno:
-                                    for line_num in range(value.lineno + 1, value.end_lineno + 1):
-                                        multi_line_lines.add(line_num)
-                    
-                    elif isinstance(stmt_node, ast.Expr):
-                        if hasattr(stmt_node, 'value') and stmt_node.value:
-                            value = stmt_node.value
-                            if isinstance(value, ast.Call):
-                                if hasattr(value, 'end_lineno') and hasattr(value, 'lineno') and value.end_lineno and value.lineno:
-                                    if value.end_lineno > value.lineno:
-                                        for line_num in range(value.lineno + 1, value.end_lineno + 1):
-                                            multi_line_lines.add(line_num)
-                    
-                    elif isinstance(stmt_node, ast.Return):
-                        if stmt_node.value:
-                            if hasattr(stmt_node.value, 'end_lineno') and hasattr(stmt_node.value, 'lineno') and stmt_node.value.end_lineno and stmt_node.value.lineno:
-                                if stmt_node.value.end_lineno > stmt_node.value.lineno:
-                                    for line_num in range(stmt_node.value.lineno + 1, stmt_node.value.end_lineno + 1):
-                                        multi_line_lines.add(line_num)
-        
         for stmt in func_node.body:
-            visit_statement(stmt)
+            lines = self._get_continuation_lines(stmt)
+            multi_line_lines.update(lines)
         
         return multi_line_lines
+    
+    def _get_continuation_lines(self, stmt_node: ast.stmt) -> set:
+        if not self._is_multi_line_statement(stmt_node):
+            return set()
+        
+        value = self._get_multi_line_value(stmt_node)
+        if not value or not self._is_multi_line_node(value):
+            return set()
+        
+        return set(range(value.lineno + 1, value.end_lineno + 1))
+    
+    def _is_multi_line_statement(self, node: ast.AST) -> bool:
+        if not hasattr(node, 'end_lineno') or not hasattr(node, 'lineno'):
+            return False
+        return node.end_lineno and node.lineno and node.end_lineno > node.lineno
+    
+    def _is_multi_line_node(self, node: ast.AST) -> bool:
+        if not hasattr(node, 'end_lineno') or not hasattr(node, 'lineno'):
+            return False
+        return node.end_lineno and node.lineno and node.end_lineno > node.lineno
+    
+    def _get_multi_line_value(self, stmt_node: ast.stmt) -> Optional[ast.expr]:
+        if isinstance(stmt_node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
+            return getattr(stmt_node, 'value', None)
+        if isinstance(stmt_node, ast.Expr):
+            value = getattr(stmt_node, 'value', None)
+            return value if isinstance(value, ast.Call) else None
+        if isinstance(stmt_node, ast.Return):
+            return stmt_node.value
+        return None
     
     def _get_data_structure_line_numbers(self, func_node: ast.FunctionDef) -> set:
         data_structure_lines = set()

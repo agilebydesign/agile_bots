@@ -29,45 +29,71 @@ class DelegationCodeScanner(CodeScanner):
     
     def _check_delegation(self, class_node: ast.ClassDef, content: str, file_path: Path, rule_obj: Any) -> List[Dict[str, Any]]:
         violations = []
-        
         is_collection_class = self._is_collection_class(class_node.name)
         
-        for node in ast.walk(class_node):
-            if isinstance(node, ast.FunctionDef):
-                if node.name == '__init__':
-                    continue
-                
-                for stmt in ast.walk(node):
-                    if isinstance(stmt, ast.For):
-                        if isinstance(stmt.iter, ast.Attribute):
-                            if isinstance(stmt.iter.value, ast.Name) and stmt.iter.value.id == 'self':
-                                collection_name = stmt.iter.attr
-                                
-                                if is_collection_class:
-                                    class_name_lower = class_node.name.lower()
-                                    attr_name_lower = collection_name.lower()
-                                    attr_without_underscore = attr_name_lower.lstrip('_')
-                                    if attr_name_lower == f"_{class_name_lower}" or attr_name_lower == class_name_lower or attr_without_underscore == class_name_lower:
-                                        continue
-                                
-                                if self._is_plain_collection(class_node, collection_name, content):
-                                    continue
-                                
-                                if self._is_class_constant(class_node, collection_name):
-                                    continue
-                                
-                                if self._is_collection_name(collection_name):
-                                    violations.append(
-                                        Violation(
-                                            rule=rule_obj,
-                                            violation_message=f'Method "{node.name}" in class "{class_node.name}" iterates through "{collection_name}" instead of delegating to collection class. Delegate to collection class instead.',
-                                            location=str(file_path),
-                                            line_number=stmt.lineno,
-                                            severity='info'
-                                        ).to_dict()
-                                    )
+        for method in self._get_methods(class_node):
+            method_violations = self._check_method_for_loops(
+                method, class_node, is_collection_class, content, file_path, rule_obj
+            )
+            violations.extend(method_violations)
         
         return violations
+    
+    def _get_methods(self, class_node: ast.ClassDef):
+        for node in ast.walk(class_node):
+            if isinstance(node, ast.FunctionDef) and node.name != '__init__':
+                yield node
+    
+    def _check_method_for_loops(self, method: ast.FunctionDef, class_node: ast.ClassDef,
+                                is_collection_class: bool, content: str, 
+                                file_path: Path, rule_obj: Any) -> List[Dict[str, Any]]:
+        violations = []
+        for stmt in ast.walk(method):
+            if not self._is_self_attribute_loop(stmt):
+                continue
+            
+            collection_name = stmt.iter.attr
+            if self._should_skip_collection(class_node, collection_name, is_collection_class, content):
+                continue
+            
+            if self._is_collection_name(collection_name):
+                violations.append(self._create_delegation_violation(
+                    method.name, class_node.name, collection_name, stmt.lineno, file_path, rule_obj
+                ))
+        return violations
+    
+    def _is_self_attribute_loop(self, stmt: ast.stmt) -> bool:
+        if not isinstance(stmt, ast.For):
+            return False
+        if not isinstance(stmt.iter, ast.Attribute):
+            return False
+        return isinstance(stmt.iter.value, ast.Name) and stmt.iter.value.id == 'self'
+    
+    def _should_skip_collection(self, class_node: ast.ClassDef, collection_name: str,
+                                is_collection_class: bool, content: str) -> bool:
+        if is_collection_class and self._is_same_name_collection(class_node.name, collection_name):
+            return True
+        if self._is_plain_collection(class_node, collection_name, content):
+            return True
+        if self._is_class_constant(class_node, collection_name):
+            return True
+        return False
+    
+    def _is_same_name_collection(self, class_name: str, collection_name: str) -> bool:
+        class_lower = class_name.lower()
+        attr_lower = collection_name.lower()
+        attr_stripped = attr_lower.lstrip('_')
+        return attr_lower == f"_{class_lower}" or attr_lower == class_lower or attr_stripped == class_lower
+    
+    def _create_delegation_violation(self, method_name: str, class_name: str, collection_name: str,
+                                     line_number: int, file_path: Path, rule_obj: Any) -> Dict[str, Any]:
+        return Violation(
+            rule=rule_obj,
+            violation_message=f'Method "{method_name}" in class "{class_name}" iterates through "{collection_name}" instead of delegating to collection class. Delegate to collection class instead.',
+            location=str(file_path),
+            line_number=line_number,
+            severity='info'
+        ).to_dict()
     
     def _is_collection_class(self, class_name: str) -> bool:
         name_lower = class_name.lower()

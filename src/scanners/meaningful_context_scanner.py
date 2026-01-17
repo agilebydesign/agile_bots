@@ -78,105 +78,108 @@ class MeaningfulContextScanner(CodeScanner):
         return violations
     
     def _check_numbered_variables(self, content: str, file_path: Path, rule_obj: Any) -> List[Dict[str, Any]]:
-        violations = []
-        
         try:
             tree = ast.parse(content, filename=str(file_path))
-            
-            numbered_var_pattern = re.compile(r'^\w+\d+$')
-            
-            # Meaningful patterns that should NOT be flagged as violations
-            meaningful_patterns = [
-                # Indexing schemes (0-indexed, 1-indexed)
-                re.compile(r'^.+_(0|1)$'),  # e.g., start_line_0, end_line_1
-                # ANY variable ending in 1 or 2 (comparison/pairing pattern)
-                # This is a common idiom for comparing two similar things
-                re.compile(r'^[a-z_]+[12]$'),  # e.g., func1, func2, preview1, preview2
-                # Compound comparison variables (with underscores)
-                re.compile(r'^[a-z_]+[12]_[a-z_]+$'),  # e.g., func1_lower, block1_nodes
-                # Coordinate/dimension names
-                re.compile(r'^[xy]\d+$'),  # e.g., x1, y2
-                # Version numbers
-                re.compile(r'^(version|v)\d+$'),
-            ]
-            
-            def check_name(var_name: str, lineno: int):
-                if not numbered_var_pattern.match(var_name):
-                    return
-                
-                # Skip test-related variables
-                if var_name.startswith('test') or var_name in ['test1', 'test2']:
-                    return
-                
-                # Skip meaningful patterns
-                for pattern in meaningful_patterns:
-                    if pattern.match(var_name):
-                        return
-                
-                # Skip very short numbered variables (likely loop counters)
-                if len(var_name) <= 2:  # e.g., i1, j2, n1, n2
-                    return
-                
-                violations.append(self._create_violation_with_snippet(
-                    rule_obj=rule_obj,
-                    violation_message=f'Line {lineno} uses numbered variable "{var_name}" - use meaningful descriptive name',
-                    file_path=file_path,
-                    line_number=lineno,
-                    severity='warning',
-                    content=content,
-                    start_line=lineno,
-                    end_line=lineno,
-                    context_before=1,
-                    max_lines=3
-                ))
-            
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Assign):
-                    for target in node.targets:
-                        if isinstance(target, ast.Name):
-                            check_name(target.id, target.lineno)
-                        elif isinstance(target, ast.Tuple):
-                            for elt in target.elts:
-                                if isinstance(elt, ast.Name):
-                                    check_name(elt.id, elt.lineno)
-                        elif isinstance(target, ast.Attribute):
-                            if isinstance(target.attr, str) and numbered_var_pattern.match(target.attr):
-                                check_name(target.attr, target.lineno)
-                
-                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    for arg in node.args.args:
-                        check_name(arg.arg, arg.lineno)
-                    for arg in node.args.kwonlyargs:
-                        check_name(arg.arg, arg.lineno)
-                
-                elif isinstance(node, (ast.For, ast.AsyncFor)):
-                    if isinstance(node.target, ast.Name):
-                        check_name(node.target.id, node.target.lineno)
-                    elif isinstance(node.target, ast.Tuple):
-                        for elt in node.target.elts:
-                            if isinstance(elt, ast.Name):
-                                check_name(elt.id, elt.lineno)
-                
-                elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
-                    for generator in node.generators:
-                        if isinstance(generator.target, ast.Name):
-                            check_name(generator.target.id, generator.target.lineno)
-                        elif isinstance(generator.target, ast.Tuple):
-                            for elt in generator.target.elts:
-                                if isinstance(elt, ast.Name):
-                                    check_name(elt.id, elt.lineno)
-                
-                elif isinstance(node, ast.ClassDef):
-                    for item in node.body:
-                        if isinstance(item, ast.Assign):
-                            for target in item.targets:
-                                if isinstance(target, ast.Name):
-                                    check_name(target.id, target.lineno)
-                                elif isinstance(target, ast.Attribute):
-                                    if isinstance(target.attr, str) and numbered_var_pattern.match(target.attr):
-                                        check_name(target.attr, target.lineno)
-        
         except (SyntaxError, ValueError) as e:
             logger.debug(f'AST parsing failed for {file_path}, skipping numbered variable check: {type(e).__name__}: {e}')
+            return []
         
-        return violations
+        checker = NumberedVariableChecker(content, file_path, rule_obj, self._create_violation_with_snippet)
+        
+        for node in ast.walk(tree):
+            checker.check_node(node)
+        
+        return checker.violations
+
+
+class NumberedVariableChecker:
+    
+    NUMBERED_VAR_PATTERN = re.compile(r'^\w+\d+$')
+    MEANINGFUL_PATTERNS = [
+        re.compile(r'^.+_(0|1)$'),
+        re.compile(r'^[a-z_]+[12]$'),
+        re.compile(r'^[a-z_]+[12]_[a-z_]+$'),
+        re.compile(r'^[xy]\d+$'),
+        re.compile(r'^(version|v)\d+$'),
+    ]
+    
+    def __init__(self, content: str, file_path: Path, rule_obj: Any, create_violation_fn):
+        self.content = content
+        self.file_path = file_path
+        self.rule_obj = rule_obj
+        self.create_violation_fn = create_violation_fn
+        self.violations = []
+    
+    def check_node(self, node: ast.AST) -> None:
+        if isinstance(node, ast.Assign):
+            self._check_assign_targets(node.targets)
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            self._check_function_args(node)
+        elif isinstance(node, (ast.For, ast.AsyncFor)):
+            self._check_loop_target(node.target)
+        elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            self._check_comprehension_targets(node.generators)
+        elif isinstance(node, ast.ClassDef):
+            self._check_class_assigns(node.body)
+    
+    def _check_assign_targets(self, targets: list) -> None:
+        for target in targets:
+            self._check_target(target)
+    
+    def _check_target(self, target: ast.AST) -> None:
+        if isinstance(target, ast.Name):
+            self._check_name(target.id, target.lineno)
+        elif isinstance(target, ast.Tuple):
+            for elt in target.elts:
+                if isinstance(elt, ast.Name):
+                    self._check_name(elt.id, elt.lineno)
+        elif isinstance(target, ast.Attribute):
+            if isinstance(target.attr, str) and self.NUMBERED_VAR_PATTERN.match(target.attr):
+                self._check_name(target.attr, target.lineno)
+    
+    def _check_function_args(self, node) -> None:
+        for arg in node.args.args:
+            self._check_name(arg.arg, arg.lineno)
+        for arg in node.args.kwonlyargs:
+            self._check_name(arg.arg, arg.lineno)
+    
+    def _check_loop_target(self, target: ast.AST) -> None:
+        self._check_target(target)
+    
+    def _check_comprehension_targets(self, generators: list) -> None:
+        for generator in generators:
+            self._check_target(generator.target)
+    
+    def _check_class_assigns(self, body: list) -> None:
+        for item in body:
+            if isinstance(item, ast.Assign):
+                self._check_assign_targets(item.targets)
+    
+    def _check_name(self, var_name: str, lineno: int) -> None:
+        if not self._is_violation(var_name):
+            return
+        
+        self.violations.append(self.create_violation_fn(
+            rule_obj=self.rule_obj,
+            violation_message=f'Line {lineno} uses numbered variable "{var_name}" - use meaningful descriptive name',
+            file_path=self.file_path,
+            line_number=lineno,
+            severity='warning',
+            content=self.content,
+            start_line=lineno,
+            end_line=lineno,
+            context_before=1,
+            max_lines=3
+        ))
+    
+    def _is_violation(self, var_name: str) -> bool:
+        if not self.NUMBERED_VAR_PATTERN.match(var_name):
+            return False
+        if var_name.startswith('test') or var_name in ['test1', 'test2']:
+            return False
+        if len(var_name) <= 2:
+            return False
+        for pattern in self.MEANINGFUL_PATTERNS:
+            if pattern.match(var_name):
+                return False
+        return True

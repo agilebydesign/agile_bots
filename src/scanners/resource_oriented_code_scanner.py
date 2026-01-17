@@ -151,51 +151,73 @@ class ResourceOrientedCodeScanner(CodeScanner):
         return False
     
     def _class_uses_as_attribute(self, class_node: ast.ClassDef, loader_class_name: str, file_path: Path) -> bool:
-        try:
-            content = file_path.read_text(encoding='utf-8')
-            if loader_class_name not in content:
-                return False
-        except (UnicodeDecodeError, IOError):
+        if not self._file_contains_name(file_path, loader_class_name):
             return False
         
         for node in class_node.body:
-            if isinstance(node, ast.FunctionDef) and node.name == '__init__':
-                for stmt in ast.walk(node):
-                    if isinstance(stmt, ast.Assign):
-                        for target in stmt.targets:
-                            if isinstance(target, ast.Attribute):
-                                if isinstance(target.value, ast.Name) and target.value.id == 'self':
-                                    if isinstance(stmt.value, ast.Call):
-                                        if isinstance(stmt.value.func, ast.Name) and stmt.value.func.id == loader_class_name:
-                                            return True
-                                        if isinstance(stmt.value.func, ast.Attribute):
-                                            if isinstance(stmt.value.func.attr, str) and stmt.value.func.attr == loader_class_name:
-                                                return True
-                                    if isinstance(stmt.value, ast.Name) and stmt.value.id == loader_class_name:
-                                        return True
-            
-            if isinstance(node, ast.AnnAssign):
-                if isinstance(node.annotation, ast.Name) and node.annotation.id == loader_class_name:
-                    return True
-                if isinstance(node.target, ast.Attribute):
-                    if isinstance(node.target.value, ast.Name) and node.target.value.id == 'self':
-                        if isinstance(node.annotation, ast.Name) and node.annotation.id == loader_class_name:
-                            return True
-                        if isinstance(node.annotation, ast.Attribute):
-                            if node.annotation.attr == loader_class_name:
-                                return True
-            
-            if isinstance(node, ast.FunctionDef):
-                is_property = any(
-                    isinstance(dec, ast.Name) and dec.id == 'property'
-                    for dec in node.decorator_list
-                )
-                if is_property:
-                    if node.returns:
-                        if isinstance(node.returns, ast.Name) and node.returns.id == loader_class_name:
-                            return True
-                        if isinstance(node.returns, ast.Attribute):
-                            if node.returns.attr == loader_class_name:
-                                return True
-        
+            if self._node_uses_class(node, loader_class_name):
+                return True
         return False
+    
+    def _file_contains_name(self, file_path: Path, name: str) -> bool:
+        try:
+            content = file_path.read_text(encoding='utf-8')
+            return name in content
+        except (UnicodeDecodeError, IOError):
+            return False
+    
+    def _node_uses_class(self, node: ast.stmt, loader_class_name: str) -> bool:
+        if isinstance(node, ast.FunctionDef) and node.name == '__init__':
+            return self._init_uses_class(node, loader_class_name)
+        if isinstance(node, ast.AnnAssign):
+            return self._annotation_uses_class(node, loader_class_name)
+        if isinstance(node, ast.FunctionDef):
+            return self._property_returns_class(node, loader_class_name)
+        return False
+    
+    def _init_uses_class(self, init_node: ast.FunctionDef, loader_class_name: str) -> bool:
+        for stmt in ast.walk(init_node):
+            if isinstance(stmt, ast.Assign) and self._assignment_uses_class(stmt, loader_class_name):
+                return True
+        return False
+    
+    def _assignment_uses_class(self, stmt: ast.Assign, loader_class_name: str) -> bool:
+        for target in stmt.targets:
+            if not self._is_self_attribute(target):
+                continue
+            if self._value_instantiates_class(stmt.value, loader_class_name):
+                return True
+        return False
+    
+    def _is_self_attribute(self, target: ast.expr) -> bool:
+        return isinstance(target, ast.Attribute) and isinstance(target.value, ast.Name) and target.value.id == 'self'
+    
+    def _value_instantiates_class(self, value: ast.expr, loader_class_name: str) -> bool:
+        if isinstance(value, ast.Call):
+            if isinstance(value.func, ast.Name) and value.func.id == loader_class_name:
+                return True
+            if isinstance(value.func, ast.Attribute) and value.func.attr == loader_class_name:
+                return True
+        if isinstance(value, ast.Name) and value.id == loader_class_name:
+            return True
+        return False
+    
+    def _annotation_uses_class(self, node: ast.AnnAssign, loader_class_name: str) -> bool:
+        if isinstance(node.annotation, ast.Name) and node.annotation.id == loader_class_name:
+            return True
+        if self._is_self_attribute(node.target) and self._annotation_matches_class(node.annotation, loader_class_name):
+            return True
+        return False
+    
+    def _annotation_matches_class(self, annotation: ast.expr, loader_class_name: str) -> bool:
+        if isinstance(annotation, ast.Name) and annotation.id == loader_class_name:
+            return True
+        if isinstance(annotation, ast.Attribute) and annotation.attr == loader_class_name:
+            return True
+        return False
+    
+    def _property_returns_class(self, node: ast.FunctionDef, loader_class_name: str) -> bool:
+        is_property = any(isinstance(dec, ast.Name) and dec.id == 'property' for dec in node.decorator_list)
+        if not is_property or not node.returns:
+            return False
+        return self._annotation_matches_class(node.returns, loader_class_name)

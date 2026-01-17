@@ -32,7 +32,7 @@ class BotViewTestHelper {
         const PanelView = require('../../../src/panel/panel_view');
         
         // Initialize shared CLI if not already initialized
-        if (!PanelView.getCLI()) {
+        if (!PanelView.getWorkspaceDir()) {
             PanelView.initializeCLI(this.workspaceDir, this.botDir);
         }
         

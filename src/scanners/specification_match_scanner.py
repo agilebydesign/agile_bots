@@ -211,92 +211,78 @@ class SpecificationMatchScanner(TestScanner):
         if not story_graph:
             return domain_terms
         
-        epics = story_graph.get('epics', [])
-        for epic in epics:
+        for epic in story_graph.get('epics', []):
             if isinstance(epic, dict):
-                epic_name = epic.get('name', '')
-                if epic_name:
-                    domain_terms.update(self._extract_words_from_text(epic_name))
-                
-                domain_concepts = epic.get('domain_concepts', [])
-                for concept in domain_concepts:
-                    if isinstance(concept, dict):
-                        concept_name = concept.get('name', '')
-                        if concept_name:
-                            domain_terms.add(concept_name.lower())
-                            domain_terms.add(concept_name.lower().replace(' ', '_'))
-                            domain_terms.update(self._extract_words_from_text(concept_name))
-                            
-                            responsibilities = concept.get('responsibilities', [])
-                            for resp in responsibilities:
-                                if isinstance(resp, dict):
-                                    resp_name = resp.get('name', '')
-                                    if resp_name:
-                                        domain_terms.update(self._extract_words_from_text(resp_name))
-                            
-                            collaborators = concept.get('collaborators', [])
-                            for collab in collaborators:
-                                if isinstance(collab, str):
-                                    domain_terms.add(collab.lower())
-                                    domain_terms.update(self._extract_words_from_text(collab))
-                
-                sub_epics = epic.get('sub_epics', [])
-                for sub_epic in sub_epics:
-                    if isinstance(sub_epic, dict):
-                        sub_epic_name = sub_epic.get('name', '')
-                        if sub_epic_name:
-                            domain_terms.update(self._extract_words_from_text(sub_epic_name))
-                        
-                        sub_epic_concepts = sub_epic.get('domain_concepts', [])
-                        for concept in sub_epic_concepts:
-                            if isinstance(concept, dict):
-                                concept_name = concept.get('name', '')
-                                if concept_name:
-                                    domain_terms.add(concept_name.lower())
-                                    domain_terms.add(concept_name.lower().replace(' ', '_'))
-                                    domain_terms.update(self._extract_words_from_text(concept_name))
-                                    
-                                    responsibilities = concept.get('responsibilities', [])
-                                    for resp in responsibilities:
-                                        if isinstance(resp, dict):
-                                            resp_name = resp.get('name', '')
-                                            if resp_name:
-                                                domain_terms.update(self._extract_words_from_text(resp_name))
-                                    
-                                    collaborators = concept.get('collaborators', [])
-                                    for collab in collaborators:
-                                        if isinstance(collab, str):
-                                            domain_terms.add(collab.lower())
-                                            domain_terms.update(self._extract_words_from_text(collab))
-                        
-                        story_groups = sub_epic.get('story_groups', [])
-                        for story_group in story_groups:
-                            if isinstance(story_group, dict):
-                                stories = story_group.get('stories', [])
-                                for story in stories:
-                                    if isinstance(story, dict):
-                                        story_name = story.get('name', '')
-                                        if story_name:
-                                            domain_terms.update(self._extract_words_from_text(story_name))
-                                        
-                                        acceptance_criteria = story.get('acceptance_criteria', [])
-                                        for ac in acceptance_criteria:
-                                            if isinstance(ac, dict):
-                                                ac_text = ac.get('criterion', '')
-                                                if ac_text:
-                                                    domain_terms.update(self._extract_words_from_text(ac_text))
-                                            elif isinstance(ac, str):
-                                                domain_terms.update(self._extract_words_from_text(ac))
-                                        
-                                        scenarios = story.get('scenarios', [])
-                                        for scenario in scenarios:
-                                            if isinstance(scenario, dict):
-                                                steps = scenario.get('steps', [])
-                                                for step in steps:
-                                                    if isinstance(step, str):
-                                                        domain_terms.update(self._extract_words_from_text(step))
+                self._extract_terms_from_epic(epic, domain_terms)
         
         return domain_terms
+    
+    def _extract_terms_from_epic(self, epic: dict, domain_terms: set) -> None:
+        self._add_name_terms(epic.get('name', ''), domain_terms)
+        self._extract_terms_from_concepts(epic.get('domain_concepts', []), domain_terms)
+        
+        for sub_epic in epic.get('sub_epics', []):
+            if isinstance(sub_epic, dict):
+                self._extract_terms_from_sub_epic(sub_epic, domain_terms)
+    
+    def _extract_terms_from_sub_epic(self, sub_epic: dict, domain_terms: set) -> None:
+        self._add_name_terms(sub_epic.get('name', ''), domain_terms)
+        self._extract_terms_from_concepts(sub_epic.get('domain_concepts', []), domain_terms)
+        
+        for story_group in sub_epic.get('story_groups', []):
+            if isinstance(story_group, dict):
+                for story in story_group.get('stories', []):
+                    if isinstance(story, dict):
+                        self._extract_terms_from_story(story, domain_terms)
+    
+    def _extract_terms_from_concepts(self, concepts: list, domain_terms: set) -> None:
+        for concept in concepts:
+            if not isinstance(concept, dict):
+                continue
+            
+            concept_name = concept.get('name', '')
+            if concept_name:
+                domain_terms.add(concept_name.lower())
+                domain_terms.add(concept_name.lower().replace(' ', '_'))
+                domain_terms.update(self._extract_words_from_text(concept_name))
+            
+            self._extract_responsibility_terms(concept.get('responsibilities', []), domain_terms)
+            self._extract_collaborator_terms(concept.get('collaborators', []), domain_terms)
+    
+    def _extract_responsibility_terms(self, responsibilities: list, domain_terms: set) -> None:
+        for resp in responsibilities:
+            if isinstance(resp, dict) and resp.get('name'):
+                domain_terms.update(self._extract_words_from_text(resp['name']))
+    
+    def _extract_collaborator_terms(self, collaborators: list, domain_terms: set) -> None:
+        for collab in collaborators:
+            if isinstance(collab, str):
+                domain_terms.add(collab.lower())
+                domain_terms.update(self._extract_words_from_text(collab))
+    
+    def _extract_terms_from_story(self, story: dict, domain_terms: set) -> None:
+        self._add_name_terms(story.get('name', ''), domain_terms)
+        self._extract_acceptance_criteria_terms(story.get('acceptance_criteria', []), domain_terms)
+        self._extract_scenario_terms(story.get('scenarios', []), domain_terms)
+    
+    def _extract_acceptance_criteria_terms(self, criteria: list, domain_terms: set) -> None:
+        for ac in criteria:
+            if isinstance(ac, dict) and ac.get('criterion'):
+                domain_terms.update(self._extract_words_from_text(ac['criterion']))
+            elif isinstance(ac, str):
+                domain_terms.update(self._extract_words_from_text(ac))
+    
+    def _extract_scenario_terms(self, scenarios: list, domain_terms: set) -> None:
+        for scenario in scenarios:
+            if not isinstance(scenario, dict):
+                continue
+            for step in scenario.get('steps', []):
+                if isinstance(step, str):
+                    domain_terms.update(self._extract_words_from_text(step))
+    
+    def _add_name_terms(self, name: str, domain_terms: set) -> None:
+        if name:
+            domain_terms.update(self._extract_words_from_text(name))
     
     def _extract_words_from_text(self, text: str) -> set:
         import re
@@ -322,37 +308,49 @@ class SpecificationMatchScanner(TestScanner):
         if not story_graph:
             return None
         
-        scenario_name = None
-        if scenario:
-            scenario_match = re.search(r'SCENARIO:\s*(.+?)(?:\n|$)', scenario, re.IGNORECASE)
-            if scenario_match:
-                scenario_name = scenario_match.group(1).strip()
+        scenario_name = self._extract_scenario_name(scenario)
         
-        test_keywords = set(self._extract_words_from_text(test_name))
-        
-        epics = story_graph.get('epics', [])
-        for epic in epics:
-            if isinstance(epic, dict):
-                sub_epics = epic.get('sub_epics', [])
-                for sub_epic in sub_epics:
-                    if isinstance(sub_epic, dict):
-                        story_groups = sub_epic.get('story_groups', [])
-                        for story_group in story_groups:
-                            if isinstance(story_group, dict):
-                                stories = story_group.get('stories', [])
-                                for story in stories:
-                                    if isinstance(story, dict):
-                                        if scenario_name:
-                                            story_scenarios = story.get('scenarios', [])
-                                            for story_scenario in story_scenarios:
-                                                if isinstance(story_scenario, dict):
-                                                    story_scenario_name = story_scenario.get('name', '')
-                                                    normalized_test_scenario = re.sub(r'\s+', ' ', scenario_name.lower().strip())
-                                                    normalized_story_scenario = re.sub(r'\s+', ' ', story_scenario_name.lower().strip())
-                                                    if normalized_test_scenario == normalized_story_scenario:
-                                                        return story
+        for story in self._iterate_all_stories(story_graph):
+            if self._story_matches_scenario(story, scenario_name):
+                return story
         
         return None
+    
+    def _extract_scenario_name(self, scenario: Optional[str]) -> Optional[str]:
+        if not scenario:
+            return None
+        scenario_match = re.search(r'SCENARIO:\s*(.+?)(?:\n|$)', scenario, re.IGNORECASE)
+        return scenario_match.group(1).strip() if scenario_match else None
+    
+    def _iterate_all_stories(self, story_graph: Dict[str, Any]):
+        for epic in story_graph.get('epics', []):
+            if not isinstance(epic, dict):
+                continue
+            for sub_epic in epic.get('sub_epics', []):
+                if not isinstance(sub_epic, dict):
+                    continue
+                for story_group in sub_epic.get('story_groups', []):
+                    if not isinstance(story_group, dict):
+                        continue
+                    for story in story_group.get('stories', []):
+                        if isinstance(story, dict):
+                            yield story
+    
+    def _story_matches_scenario(self, story: dict, scenario_name: Optional[str]) -> bool:
+        if not scenario_name:
+            return False
+        
+        normalized_test = re.sub(r'\s+', ' ', scenario_name.lower().strip())
+        
+        for story_scenario in story.get('scenarios', []):
+            if not isinstance(story_scenario, dict):
+                continue
+            story_scenario_name = story_scenario.get('name', '')
+            normalized_story = re.sub(r'\s+', ' ', story_scenario_name.lower().strip())
+            if normalized_test == normalized_story:
+                return True
+        
+        return False
     
     def _check_variable_matches(self, test_method: ast.FunctionDef, story: Dict[str, Any], 
                                 domain_terms: set, rule_obj: Any, file_path: Path) -> List[Dict[str, Any]]:

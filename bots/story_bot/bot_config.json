@@ -10,6 +10,8 @@
     "tests"
   ],
   "mcp": {
-    "env": {}
+    "env": {
+      "WORKING_AREA": "C:\\dev\\agile_bots"
+    }
   }
 }

@@ -113,45 +113,73 @@ class UnnecessaryParameterPassingScanner(CodeScanner):
     
     def _check_property_extraction(self, method_node: ast.FunctionDef, instance_attrs: set,
                                   file_path: Path, rule_obj: Any, lines: List[str], content: str) -> List[Dict[str, Any]]:
-        violations = []
-        
+        assignments = self._collect_self_attribute_assignments(method_node)
+        return self._find_extraction_violations(method_node, assignments, file_path, rule_obj)
+    
+    def _collect_self_attribute_assignments(self, method_node: ast.FunctionDef) -> List[dict]:
         assignments = []
-        for i, stmt in enumerate(method_node.body):
-            if isinstance(stmt, ast.Assign):
-                for target in stmt.targets:
-                    if isinstance(target, ast.Name):
-                        attr_path = self._extract_self_attribute_path(stmt.value)
-                        if attr_path:
-                            assignments.append({
-                                'var_name': target.id,
-                                'attr_path': attr_path,
-                                'line': stmt.lineno if hasattr(stmt, 'lineno') else None
-                            })
-        
-        for i, stmt in enumerate(method_node.body):
-            if isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call):
-                call = stmt.value
-                if isinstance(call.func, ast.Attribute):
-                    if isinstance(call.func.value, ast.Name) and call.func.value.id == 'self':
-                        method_name = call.func.attr
-                        if method_name.startswith('_'):
-                            for arg in call.args:
-                                if isinstance(arg, ast.Name):
-                                    for assignment in assignments:
-                                        if arg.id == assignment['var_name']:
-                                            if assignment['line'] and hasattr(stmt, 'lineno'):
-                                                if assignment['line'] < stmt.lineno:
-                                                    line_number = stmt.lineno if hasattr(stmt, 'lineno') else None
-                                                    violation = Violation(
-                                                        rule=rule_obj,
-                                                        violation_message=f'Instance property "self.{assignment["attr_path"]}" is extracted to variable "{assignment["var_name"]}" and passed to internal method "{method_name}". Access via self.{assignment["attr_path"]} directly instead.',
-                                                        location=str(file_path),
-                                                        line_number=line_number,
-                                                        severity='warning'
-                                                    ).to_dict()
-                                                    violations.append(violation)
-        
+        for stmt in method_node.body:
+            if not isinstance(stmt, ast.Assign):
+                continue
+            for target in stmt.targets:
+                if not isinstance(target, ast.Name):
+                    continue
+                attr_path = self._extract_self_attribute_path(stmt.value)
+                if attr_path:
+                    assignments.append({
+                        'var_name': target.id,
+                        'attr_path': attr_path,
+                        'line': stmt.lineno if hasattr(stmt, 'lineno') else None
+                    })
+        return assignments
+    
+    def _find_extraction_violations(self, method_node: ast.FunctionDef, assignments: List[dict],
+                                   file_path: Path, rule_obj: Any) -> List[Dict[str, Any]]:
+        violations = []
+        for stmt in method_node.body:
+            violation = self._check_call_for_extraction(stmt, assignments, file_path, rule_obj)
+            if violation:
+                violations.append(violation)
         return violations
+    
+    def _check_call_for_extraction(self, stmt: ast.stmt, assignments: List[dict],
+                                   file_path: Path, rule_obj: Any) -> Optional[Dict[str, Any]]:
+        if not isinstance(stmt, ast.Expr) or not isinstance(stmt.value, ast.Call):
+            return None
+        
+        call = stmt.value
+        if not self._is_private_self_method_call(call):
+            return None
+        
+        method_name = call.func.attr
+        for arg in call.args:
+            if not isinstance(arg, ast.Name):
+                continue
+            for assignment in assignments:
+                if arg.id == assignment['var_name'] and self._is_before_call(assignment, stmt):
+                    return self._create_extraction_violation(assignment, method_name, stmt, file_path, rule_obj)
+        return None
+    
+    def _is_private_self_method_call(self, call: ast.Call) -> bool:
+        if not isinstance(call.func, ast.Attribute):
+            return False
+        if not isinstance(call.func.value, ast.Name) or call.func.value.id != 'self':
+            return False
+        return call.func.attr.startswith('_')
+    
+    def _is_before_call(self, assignment: dict, stmt: ast.stmt) -> bool:
+        return assignment['line'] and hasattr(stmt, 'lineno') and assignment['line'] < stmt.lineno
+    
+    def _create_extraction_violation(self, assignment: dict, method_name: str, 
+                                     stmt: ast.stmt, file_path: Path, rule_obj: Any) -> Dict[str, Any]:
+        line_number = stmt.lineno if hasattr(stmt, 'lineno') else None
+        return Violation(
+            rule=rule_obj,
+            violation_message=f'Instance property "self.{assignment["attr_path"]}" is extracted to variable "{assignment["var_name"]}" and passed to internal method "{method_name}". Access via self.{assignment["attr_path"]} directly instead.',
+            location=str(file_path),
+            line_number=line_number,
+            severity='warning'
+        ).to_dict()
     
     def _extract_self_attribute_path(self, node: ast.AST) -> Optional[str]:
         if isinstance(node, ast.Attribute):

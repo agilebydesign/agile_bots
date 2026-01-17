@@ -285,40 +285,55 @@ class ExcessiveGuardsScanner(CodeScanner):
         return optional_params
     
     def _is_lazy_initialization(self, guard_node: ast.If, func_node: ast.FunctionDef) -> bool:
-        """Check if this is a lazy initialization pattern in a property."""
-        # Check if function is a property
-        is_property = False
-        if func_node.decorator_list:
-            for decorator in func_node.decorator_list:
-                if isinstance(decorator, ast.Name) and decorator.id == 'property':
-                    is_property = True
-                    break
-                if isinstance(decorator, ast.Attribute) and decorator.attr in ('getter', 'setter'):
-                    is_property = True
-                    break
-        
-        if not is_property:
+        if not self._is_property_function(func_node):
             return False
         
-        # Check if it's a None check followed by assignment
-        test = guard_node.test
-        if isinstance(test, ast.Compare):
-            for op in test.ops:
-                if isinstance(op, (ast.Is, ast.IsNot)):
-                    for comparator in test.comparators:
-                        if (isinstance(comparator, ast.Constant) and comparator.value is None) or \
-                           (isinstance(comparator, ast.NameConstant) and comparator.value is None):
-                            # Check if the body contains an assignment to self._variable (anywhere in body)
-                            for stmt in guard_node.body:
-                                if isinstance(stmt, ast.Assign):
-                                    for target in stmt.targets:
-                                        if isinstance(target, ast.Attribute) and \
-                                           isinstance(target.value, ast.Name) and \
-                                           target.value.id == 'self' and \
-                                           target.attr.startswith('_'):
-                                            return True
+        if not self._is_none_comparison(guard_node.test):
+            return False
         
+        return self._body_has_private_self_assignment(guard_node.body)
+    
+    def _is_property_function(self, func_node: ast.FunctionDef) -> bool:
+        for decorator in func_node.decorator_list:
+            if isinstance(decorator, ast.Name) and decorator.id == 'property':
+                return True
+            if isinstance(decorator, ast.Attribute) and decorator.attr in ('getter', 'setter'):
+                return True
         return False
+    
+    def _is_none_comparison(self, test: ast.expr) -> bool:
+        if not isinstance(test, ast.Compare):
+            return False
+        for op in test.ops:
+            if not isinstance(op, (ast.Is, ast.IsNot)):
+                continue
+            for comparator in test.comparators:
+                if self._is_none_constant(comparator):
+                    return True
+        return False
+    
+    def _is_none_constant(self, node: ast.expr) -> bool:
+        if isinstance(node, ast.Constant) and node.value is None:
+            return True
+        if isinstance(node, ast.NameConstant) and node.value is None:
+            return True
+        return False
+    
+    def _body_has_private_self_assignment(self, body: List[ast.stmt]) -> bool:
+        for stmt in body:
+            if not isinstance(stmt, ast.Assign):
+                continue
+            for target in stmt.targets:
+                if self._is_private_self_attribute(target):
+                    return True
+        return False
+    
+    def _is_private_self_attribute(self, target: ast.expr) -> bool:
+        if not isinstance(target, ast.Attribute):
+            return False
+        if not isinstance(target.value, ast.Name) or target.value.id != 'self':
+            return False
+        return target.attr.startswith('_')
     
     def _check_guard_pattern(self, guard_node: ast.If, file_path: Path, rule_obj: Any, source_lines: List[str], content: str, func_node: ast.FunctionDef = None, optional_params: set = None) -> Optional[Dict[str, Any]]:
         test = guard_node.test
