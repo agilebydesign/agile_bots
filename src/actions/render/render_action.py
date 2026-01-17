@@ -1,14 +1,14 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, List, Optional, Type
 import json
 import importlib
 import logging
-from ...utils import read_json_file
-from ..action import Action
-from ..action_context import ActionContext, ScopeActionContext
-from .render_spec import RenderSpec
-from .render_config_loader import RenderConfigLoader
-from .render_instruction_builder import RenderInstructionBuilder
+from utils import read_json_file
+from actions.action import Action
+from actions.action_context import ActionContext, ScopeActionContext
+from actions.render.render_spec import RenderSpec
+from actions.render.render_config_loader import RenderConfigLoader
+from actions.render.render_instruction_builder import RenderInstructionBuilder
 logger = logging.getLogger(__name__)
 
 class RenderOutputAction(Action):

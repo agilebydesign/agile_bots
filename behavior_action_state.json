@@ -2,38 +2,11 @@
   "scope": {
     "type": "story",
     "value": [
-      "Invoke Bot"
-    ],
-    "exclude": [],
-    "skiprule": []
+      "Manage Behaviors"
+    ]
   },
-  "completed_actions": [
-    {
-      "action_state": "story_bot.shape.clarify",
-      "timestamp": "2026-01-09T02:28:00.175160"
-    },
-    {
-      "action_state": "story_bot.shape.strategy",
-      "timestamp": "2026-01-09T02:28:00.175160"
-    },
-    {
-      "action_state": "story_bot.shape.validate",
-      "timestamp": "2026-01-09T02:28:00.175160"
-    },
-    {
-      "action_state": "story_bot.shape.render",
-      "timestamp": "2026-01-09T02:28:00.175160"
-    },
-    {
-      "action_state": "story_bot.shape.build",
-      "timestamp": "2026-01-10T10:01:14.930274"
-    },
-    {
-      "action_state": "story_bot.scenarios.render",
-      "timestamp": "2026-01-15T19:37:36.244913"
-    }
-  ],
-  "current_behavior": "story_bot.code",
-  "current_action": "story_bot.code.validate",
-  "timestamp": "2026-01-16T14:38:30.775156"
+  "current_behavior": "story_bot.shape",
+  "current_action": "story_bot.shape.clarify",
+  "timestamp": "2026-01-16T19:33:41.365532",
+  "completed_actions": []
 }

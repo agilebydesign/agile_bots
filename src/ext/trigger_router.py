@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Optional
-from ..bot.bot_paths import BotPath
-from .bot_matcher import BotMatcher
-from .behavior_matcher import BehaviorMatcher
-from .trigger_domain import BotTriggers
+from bot.bot_paths import BotPath
+from bot_matcher import BotMatcher
+from behavior_matcher import BehaviorMatcher
+from trigger_domain import BotTriggers
 
 class TriggerRouter:
 

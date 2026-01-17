@@ -1,0 +1,214 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\behavior_action_status_builder.py",
+  "cached_at": "2026-01-16T16:49:45.145549",
+  "blocks": [
+    {
+      "hash": "e3184aaad4e7d00769be701b6baa562c",
+      "start_line": 43,
+      "end_line": 48,
+      "func_name": "_load_state_file",
+      "preview": "if not state_file.exists():\n    return ([], None)\nstate_data = json.loads(state_file.read_text(encoding='utf-8'))\ncompleted_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "9b5e66915e0291773760c4bf0dc81e13",
+      "start_line": 45,
+      "end_line": 52,
+      "func_name": "_load_state_file",
+      "preview": "state_data = json.loads(state_file.read_text(encoding='utf-8'))\ncompleted_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None\nif current_action_path:\n    parts = current_action_path.split('.')\n    if len(parts) >= 3:\n        current_action_from_state = parts[2]",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "4c8367eaab3a3c080a2d8fee1cf47996",
+      "start_line": 46,
+      "end_line": 53,
+      "func_name": "_load_state_file",
+      "preview": "completed_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None\nif current_action_path:\n    parts = current_action_path.split('.')\n    if len(parts) >= 3:\n        current_action_from_state = parts[2]\nreturn (completed_actions, current_action_from_state)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "48b2a4b6c75440d8ba0fc6a7b5fa9e6c",
+      "start_line": 43,
+      "end_line": 52,
+      "func_name": "_load_state_file",
+      "preview": "if not state_file.exists():\n    return ([], None)\nstate_data = json.loads(state_file.read_text(encoding='utf-8'))\ncompleted_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None\nif current_action_path:\n    parts = current_action_path.split('.')\n    if len(parts) >= 3:\n        current_action_from_state = parts[2]",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "ff25dbab0124d0b5fdabcfcf6d4718dd",
+      "start_line": 45,
+      "end_line": 53,
+      "func_name": "_load_state_file",
+      "preview": "state_data = json.loads(state_file.read_text(encoding='utf-8'))\ncompleted_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None\nif current_action_path:\n    parts = current_action_path.split('.')\n    if len(parts) >= 3:\n        current_action_from_state = parts[2]\nreturn (completed_actions, current_action_from_state)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "e0405819f538f77e3c5d3d3907f4791e",
+      "start_line": 43,
+      "end_line": 53,
+      "func_name": "_load_state_file",
+      "preview": "if not state_file.exists():\n    return ([], None)\nstate_data = json.loads(state_file.read_text(encoding='utf-8'))\ncompleted_actions = state_data.get('completed_actions', [])\ncurrent_action_path = state_data.get('current_action', '')\ncurrent_action_from_state = None\nif current_action_path:\n    parts = current_action_path.split('.')\n    if len(parts) >= 3:\n        current_action_from_state = parts[2]\nreturn (completed_actions, current_action_from_state)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 56,
+      "end_line": 60,
+      "func_name": "_categorize_behaviors",
+      "preview": "all_behaviors = behaviors.names\ncurrent_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 57,
+      "end_line": 61,
+      "func_name": "_categorize_behaviors",
+      "preview": "current_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 58,
+      "end_line": 62,
+      "func_name": "_categorize_behaviors",
+      "preview": "completed_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 59,
+      "end_line": 63,
+      "func_name": "_categorize_behaviors",
+      "preview": "remaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []\ncurrent_behavior_completed = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 56,
+      "end_line": 61,
+      "func_name": "_categorize_behaviors",
+      "preview": "all_behaviors = behaviors.names\ncurrent_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 57,
+      "end_line": 62,
+      "func_name": "_categorize_behaviors",
+      "preview": "current_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 58,
+      "end_line": 63,
+      "func_name": "_categorize_behaviors",
+      "preview": "completed_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []\ncurrent_behavior_completed = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "22545341409905b2d52b47072708c0c8",
+      "start_line": 56,
+      "end_line": 62,
+      "func_name": "_categorize_behaviors",
+      "preview": "all_behaviors = behaviors.names\ncurrent_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "22545341409905b2d52b47072708c0c8",
+      "start_line": 57,
+      "end_line": 63,
+      "func_name": "_categorize_behaviors",
+      "preview": "current_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []\ncurrent_behavior_completed = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "a3c90a70181af28f307e8b41b51cc59f",
+      "start_line": 56,
+      "end_line": 63,
+      "func_name": "_categorize_behaviors",
+      "preview": "all_behaviors = behaviors.names\ncurrent_behavior_name = current_behavior.name\ncompleted_behaviors = []\nremaining_behaviors = []\ncurrent_action_name = None\nremaining_actions_in_current = []\ncurrent_behavior_actions = []\ncurrent_behavior_completed = []",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "c030ddf69eb58499dcf1e4d1b11686a1",
+      "start_line": 89,
+      "end_line": 100,
+      "func_name": "_build_behavior_action_table",
+      "preview": "lines = ['', '## Behavior/Action Status', '', '| Setting | Value |', '|---------|-------|', f'| **Working Directory** | {workspace_dir} |', f'| **Bot Path** | {self.behavior.bot_paths.bot_directory} |']\ncurrent_behavior_name = categorization['current_behavior_name']\ncurrent_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8388e3bcdf1a6075ca4e97ba80a57651",
+      "start_line": 96,
+      "end_line": 102,
+      "func_name": "_build_behavior_action_table",
+      "preview": "current_behavior_name = categorization['current_behavior_name']\ncurrent_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)\nif next_step:\n    lines.append(next_step)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e75f9fe84bedad02db73ca3b3869b176",
+      "start_line": 97,
+      "end_line": 103,
+      "func_name": "_build_behavior_action_table",
+      "preview": "current_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)\nif next_step:\n    lines.append(next_step)\nreturn lines",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "e412b3933d44cd11dc8db64737a51b8a",
+      "start_line": 89,
+      "end_line": 102,
+      "func_name": "_build_behavior_action_table",
+      "preview": "lines = ['', '## Behavior/Action Status', '', '| Setting | Value |', '|---------|-------|', f'| **Working Directory** | {workspace_dir} |', f'| **Bot Path** | {self.behavior.bot_paths.bot_directory} |']\ncurrent_behavior_name = categorization['current_behavior_name']\ncurrent_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)\nif next_step:\n    lines.append(next_step)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "b172b2a677d6be5d384d86dc29ef27ef",
+      "start_line": 96,
+      "end_line": 103,
+      "func_name": "_build_behavior_action_table",
+      "preview": "current_behavior_name = categorization['current_behavior_name']\ncurrent_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)\nif next_step:\n    lines.append(next_step)\nreturn lines",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "638cc2e2c8f209a52b5867964031a4d2",
+      "start_line": 89,
+      "end_line": 103,
+      "func_name": "_build_behavior_action_table",
+      "preview": "lines = ['', '## Behavior/Action Status', '', '| Setting | Value |', '|---------|-------|', f'| **Working Directory** | {workspace_dir} |', f'| **Bot Path** | {self.behavior.bot_paths.bot_directory} |']\ncurrent_behavior_name = categorization['current_behavior_name']\ncurrent_action_name = categorization['current_action_name']\nif current_behavior_name and current_action_name:\n    lines.append(f'| **Current State** | {current_behavior_name}.{current_action_name} |')\nnext_step = self._build_next_step_row(self.behavior.bot.behaviors)\nif next_step:\n    lines.append(next_step)\nreturn lines",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 112,
+      "end_line": 116,
+      "func_name": "_build_behavior_action_progress",
+      "preview": "lines = ['', '## Behavior/Action Progress', '']\nDONE, CURRENT, PENDING = ('\u2713', '\u27a4', '\u2610')\ncompleted_behaviors = categorization['completed_behaviors']\ncurrent_behavior_name = categorization['current_behavior_name']\nordered_behaviors = self._get_ordered_behaviors(all_behaviors)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "7085eeaa59aa5eb35936d2facbfb0abe",
+      "start_line": 113,
+      "end_line": 130,
+      "func_name": "_build_behavior_action_progress",
+      "preview": "DONE, CURRENT, PENDING = ('\u2713', '\u27a4', '\u2610')\ncompleted_behaviors = categorization['completed_behaviors']\ncurrent_behavior_name = categorization['current_behavior_name']\nordered_behaviors = self._get_ordered_behaviors(all_behaviors)\nfor behavior_name in ordered_behaviors:\n    if behavior_name in completed_behaviors:\n        lines.append(f'### {DONE} **{behavior_name}**')\n    elif behavior_name == current_behavior_name:\n        ctx = CurrentBehaviorContext(name=behavior_name, icon=CURRENT, actions=categorization['current_behavior_actions'], current_action=categorization['current_action_name'], completed=categorization['current_behavior_completed'])\n        lines.extend(self._build_current_behavior_section(ctx))\n    else:\n        lines.append(f'### {PENDING} **{behavior_name}**')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "29a9ce1c6fda54b744ec2a1713b06662",
+      "start_line": 112,
+      "end_line": 130,
+      "func_name": "_build_behavior_action_progress",
+      "preview": "lines = ['', '## Behavior/Action Progress', '']\nDONE, CURRENT, PENDING = ('\u2713', '\u27a4', '\u2610')\ncompleted_behaviors = categorization['completed_behaviors']\ncurrent_behavior_name = categorization['current_behavior_name']\nordered_behaviors = self._get_ordered_behaviors(all_behaviors)\nfor behavior_name in ordered_behaviors:\n    if behavior_name in completed_behaviors:\n        lines.append(f'### {DONE} **{behavior_name}**')\n    elif behavior_name == current_behavior_name:\n        ctx = CurrentBehaviorContext(name=behavior_name, icon=CURRENT, actions=categorization['current_behavior_actions'], current_action=categorization['current_action_name'], completed=categorization['current_behavior_completed'])\n        lines.extend(self._build_current_behavior_section(ctx))\n    else:\n        lines.append(f'### {PENDING} **{behavior_name}**')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "dd601dc03006fb6b7274abd6075ab7b2",
+      "start_line": 151,
+      "end_line": 157,
+      "func_name": "_get_ordered_behaviors",
+      "preview": "bot_directory = self.behavior.bot_paths.bot_directory\nbehaviors_with_order = [(self._get_behavior_order(bot_directory, name), name) for name in all_behaviors]\nbehaviors_with_order.sort(key=lambda x: x[0])\nreturn [name for _, name in behaviors_with_order]",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|Return"
+    }
+  ]
+}

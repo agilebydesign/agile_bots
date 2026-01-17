@@ -1,12 +1,12 @@
-"""Scanner for validating boundary behavior is tested."""
+﻿"""Scanner for validating boundary behavior is tested."""
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
 import logging
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 
 logger = logging.getLogger(__name__)
 

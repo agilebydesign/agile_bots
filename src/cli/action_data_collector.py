@@ -1,9 +1,9 @@
-import dataclasses
+﻿import dataclasses
 from typing import List, Dict
 from .description_extractor import DescriptionExtractor
-from agile_bots.bots.base_bot.src.actions.help_action import TypeHintConverter
-from agile_bots.bots.base_bot.src.actions.action_factory import ActionFactory
-from agile_bots.bots.base_bot.src.utils import read_json_file
+from actions.help_action import TypeHintConverter
+from actions.action_factory import ActionFactory
+from utils import read_json_file
 
 class ActionDataCollector:
     

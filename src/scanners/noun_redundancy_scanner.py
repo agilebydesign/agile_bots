@@ -1,8 +1,8 @@
-
+﻿
 from typing import List, Dict, Any
-from .story_scanner import StoryScanner
-from .story_map import StoryNode
-from .violation import Violation
+from story_scanner import StoryScanner
+from story_map import StoryNode
+from scanners.violation import Violation
 import re
 
 class NounRedundancyScanner(StoryScanner):

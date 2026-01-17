@@ -90,5 +90,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.active_language_scanner.ActiveLanguageScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.active_language_scanner.ActiveLanguageScanner"
 }

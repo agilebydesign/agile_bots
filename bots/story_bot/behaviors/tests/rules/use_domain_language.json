@@ -78,7 +78,7 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.ubiquitous_language_scanner.UbiquitousLanguageScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.ubiquitous_language_scanner.UbiquitousLanguageScanner"
 }
 
 

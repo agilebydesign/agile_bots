@@ -1,8 +1,8 @@
-from typing import Dict, Any, Type
-from ..actions.action import Action
-from ..actions.action_context import ActionContext, RulesActionContext
-from .rules import Rules
-from .rules_digest_guidance import RulesDigestGuidance
+﻿from typing import Dict, Any, Type
+from actions.action import Action
+from actions.action_context import ActionContext, RulesActionContext
+from rules.rules import Rules
+from rules.rules_digest_guidance import RulesDigestGuidance
 
 class RulesAction(Action):
     context_class: Type[ActionContext] = RulesActionContext
@@ -29,7 +29,7 @@ class RulesAction(Action):
         self._add_user_message(instructions, context.message)
         self._add_rules_context(instructions, rules_digest, rule_names)
         
-        return {'instructions': instructions.to_dict()}
+        return instructions
     
     def _get_rule_names(self, rules: Rules) -> list:
         return [rule.name for rule in rules]

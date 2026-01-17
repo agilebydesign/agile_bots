@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.actions.validate.validate_action import ValidateRulesAction
+from cli.adapters import JSONAdapter
+from actions.validate.validate_action import ValidateRulesAction
 
 class JSONValidateAction(JSONAdapter):
     

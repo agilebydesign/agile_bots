@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, TYPE_CHECKING
-from .story_graph_spec import StoryGraphSpec
+from actions.build.story_graph_spec import StoryGraphSpec
 if TYPE_CHECKING:
-    from ...bot_path import BotPath
-    from ...bot.behavior import Behavior
+    from bot_path import BotPath
+    from bot.behavior import Behavior
 
 class StoryGraphData:
 

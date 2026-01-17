@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
-from agile_bots.src.cli.base_hierarchical_adapter import BaseActionsAdapter
+﻿
+from cli.adapters import TTYAdapter
+from cli.base_hierarchical_adapter import BaseActionsAdapter
 
 class TTYActions(BaseActionsAdapter, TTYAdapter):
     
@@ -11,7 +11,7 @@ class TTYActions(BaseActionsAdapter, TTYAdapter):
     @property
     def current(self):
         if self.actions.current:
-            from agile_bots.src.actions.tty_action import TTYAction
+            from actions.tty_action import TTYAction
             action_adapter = TTYAction(self.actions.current, is_current=True)
             return action_adapter.serialize()
         return ""
@@ -43,5 +43,5 @@ class TTYActions(BaseActionsAdapter, TTYAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

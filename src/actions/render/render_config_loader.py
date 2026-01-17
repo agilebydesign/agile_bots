@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, List
-from ...utils import read_json_file
-from .render_spec import RenderSpec
+from utils import read_json_file
+from actions.render.render_spec import RenderSpec
 import importlib
 
 class RenderConfigLoader:

@@ -1,18 +1,18 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Iterator, Dict, Any, TYPE_CHECKING, Callable
 from pathlib import Path
-from .rule import Rule
-from .rule_loader import RuleLoader
-from .rule_filter import RuleFilter
-from ..actions.build.story_graph_data import StoryGraphData
-from ..story_graph.story_graph import StoryGraph
-from ..actions.validate.validation_scope import ValidationScope
+from rules.rule import Rule
+from rules.rule_loader import RuleLoader
+from rules.rule_filter import RuleFilter
+from actions.build.story_graph_data import StoryGraphData
+from story_graph.story_graph import StoryGraph
+from actions.validate.validation_scope import ValidationScope
 if TYPE_CHECKING:
-    from ..actions.action_context import ValidateActionContext
+    from actions.action_context import ValidateActionContext
 
 @dataclass
 class ValidationCallbacks:
@@ -66,9 +66,9 @@ class ValidationContext:
     
     @classmethod
     def _get_files_for_validation(cls, behavior, context: 'ValidateActionContext') -> Dict[str, List[Path]]:
-        from agile_bots.src.actions.validate.file_discovery import FileDiscovery
-        from agile_bots.src.scope import ScopeType
-        from agile_bots.src.actions.validate.validation_type import ValidationType
+        from actions.validate.file_discovery import FileDiscovery
+        from scope import ScopeType
+        from actions.validate.validation_type import ValidationType
         
         validation_type = behavior.validation_type
         if validation_type == ValidationType.STORY_GRAPH:
@@ -121,8 +121,8 @@ class ValidationContext:
     
     @classmethod
     def from_parameters(cls, parameters: Dict[str, Any], behavior, bot_paths, callbacks: Optional[ValidationCallbacks] = None) -> 'ValidationContext':
-        from agile_bots.src.actions.action_context import ValidateActionContext, Scope, ScopeType, FileFilter
-        from agile_bots.src.bot.behavior import Behavior
+        from actions.action_context import ValidateActionContext, Scope, ScopeType, FileFilter
+        from bot.behavior import Behavior
         
         if isinstance(behavior, str):
             behavior = Behavior(name=behavior, bot_paths=bot_paths)
@@ -392,7 +392,7 @@ class Rules:
             context.callbacks.on_scanner_start(rule.rule_file, scanner_path)
         try:
             max_cross_file = getattr(context, 'max_cross_file_comparisons', 20)
-            from agile_bots.src.rules.scan_config import ScanConfig
+            from rules.scan_config import ScanConfig
             scan_config = ScanConfig(
                 story_graph=context.story_graph,
                 files=all_files or files,

@@ -1,8 +1,8 @@
-from pathlib import Path
+﻿from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
-from ..bot_path import BotPath
+from bot_path import BotPath
 
 try:
     from tinydb import TinyDB
@@ -12,7 +12,7 @@ except ImportError:
     TinyDB = None
 
 def make_json_serializable(obj: Any) -> Any:
-    from agile_bots.src.instructions.instructions import Instructions
+    from instructions.instructions import Instructions
     
     if isinstance(obj, Instructions):
         return obj.to_dict()

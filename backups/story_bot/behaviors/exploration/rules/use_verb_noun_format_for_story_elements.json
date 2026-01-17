@@ -62,5 +62,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.verb_noun_scanner.VerbNounScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.verb_noun_scanner.VerbNounScanner"
 }

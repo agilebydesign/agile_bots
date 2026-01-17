@@ -212,10 +212,10 @@ Review the CLI STATUS section below to understand both current state and availab
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ## 🤖 Bot: story_bot
 **Bot Path:**
-C:\dev\augmented-teams\agile_bot\bots\story_bot
+C:\dev\agile_bot\bots\story_bot
 
 📂 **Workspace:** base_bot
-C:\dev\augmented-teams\agile_bot\bots\base_bot
+C:\dev\agile_bot\bots\base_bot
 
 To change path:
 path demo/mob_minion              # Change to specific project
@@ -236,7 +236,7 @@ Headless Mode:
   Active Session:
     Session ID: 2025-12-30-01-31-17
     Status: running
-    Log: C:\dev\augmented-teams\agile_bot\bots\base_bot\logs\headless-2025-12-30-01-31-17.log
+    Log: C:\dev\agile_bot\bots\base_bot\logs\headless-2025-12-30-01-31-17.log
 ────────────────────────────────────────────────────────────
 🎯 Scope
 🎯 Current Scope: all (entire project)
@@ -332,10 +332,10 @@ Review the CLI STATUS section below to understand both current state and availab
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  
 ## 🤖 Bot: story_bot  
 **Bot Path:**  
-C:\dev\augmented-teams\agile_bot\bots\story_bot  
+C:\dev\agile_bot\bots\story_bot  
 
 📂 **Workspace:** base_bot  
-C:\dev\augmented-teams\agile_bot\bots\base_bot  
+C:\dev\agile_bot\bots\base_bot  
 
 To change path:  
 path demo/mob_minion              # Change to specific project  
@@ -355,7 +355,7 @@ path ../another_bot               # Change to relative path
 
 ## 🤖 Bot: story_bot  
 **Bot Path:**  
-C:\dev\augmented-teams\agile_bot\bots\story_bot  
+C:\dev\agile_bot\bots\story_bot  
 
 ### WorkspaceInfoComponent : DisplayInfoComponent
 
@@ -369,7 +369,7 @@ C:\dev\augmented-teams\agile_bot\bots\story_bot
 **Screen Example:**
 
 📂 **Workspace:** base_bot  
-C:\dev\augmented-teams\agile_bot\bots\base_bot  
+C:\dev\agile_bot\bots\base_bot  
 
 To change path:  
 path demo/mob_minion              # Change to specific project  
@@ -403,7 +403,7 @@ Headless Mode:
   Active Session:  
     Session ID: 2025-12-30-01-31-17  
     Status: running  
-    Log: C:\dev\augmented-teams\agile_bot\bots\base_bot\logs\headless-2025-12-30-01-31-17.log  
+    Log: C:\dev\agile_bot\bots\base_bot\logs\headless-2025-12-30-01-31-17.log  
 ────────────────────────────────────────────────────────────  
 
 ### ScopeDisplayComponent : DisplayInfoComponent
@@ -722,7 +722,7 @@ Core Commands:
 
 ## 🤖 Bot: story_bot  
 **Bot Path:**  
-C:\dev\augmented-teams\agile_bot\bots\story_bot  
+C:\dev\agile_bot\bots\story_bot  
 
 ### CLIBehaviors : CLIBase
 
@@ -814,7 +814,7 @@ C:\dev\augmented-teams\agile_bot\bots\story_bot
 **Screen Example:**
 
 📂 **Workspace:** base_bot  
-C:\dev\augmented-teams\agile_bot\bots\base_bot  
+C:\dev\agile_bot\bots\base_bot  
 
 To change path:  
 path demo/mob_minion              # Change to specific project  

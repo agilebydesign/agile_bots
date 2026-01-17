@@ -1,3 +1,3 @@
-from .help import Help
+﻿from .help import Help
 
 __all__ = ['Help']

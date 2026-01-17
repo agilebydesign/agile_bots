@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must chain dependencies properly with constructor injection. Map dependencies in a chain: highest-level object → collaborator → sub-collaborator. Inject collaborators at construction time so methods can use them without passing them as parameters. Access sub-collaborators through their owning objects.",
-  "scanner": "agile_bot.bots.base_bot.src.scanners.dependency_chaining_code_scanner.DependencyChainingCodeScanner",
+  "scanner": "agile_bot.bots.base_bot.scanners.dependency_chaining_code_scanner.DependencyChainingCodeScanner",
   "examples": [
     {
       "do": {

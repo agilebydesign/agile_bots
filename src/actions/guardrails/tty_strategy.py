@@ -1,5 +1,5 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
+﻿
+from cli.adapters import TTYAdapter
 
 class TTYStrategy(TTYAdapter):
     

@@ -1,0 +1,270 @@
+﻿## ≡ƒÄ» Scope
+**≡ƒÄ» Current Scope:** Generate Bot Tools## Story Graph
+**Path:** `C:\dev\agile_bots\docs\stories\story-graph.json`**Epic Count:** 1**Features:** Domain Concepts### Epics
+- ≡ƒÄ»  **Build Agile Bots**    - ΓÜÖ∩╕Å  Generate MCP Tools      - ├â┬░├à┬╕├óΓé¼┼ô├é┬¥  Generate Bot ToolsTo change scope (pick ONE - setting a new scope replaces the previous):- `scope all` - Clear scope, work on entire project
+- `scope "Story Name"` - Filter by story (replaces any file scope)
+- `scope "file:C:/path/to/**/*.py"` - Filter by files (replaces any story scope)
+---
+
+====================================================================================================
+INSTRUCTIONS
+====================================================================================================
+## Scope
+
+**Story Scope:** Generate Bot Tools
+
+## Story Graph
+**Path:** `C:\dev\agile_bots\docs\stories\story-graph.json`**Epic Count:** 1**Features:** Domain Concepts### Epics
+- ≡ƒÄ»  **Build Agile Bots**    - ΓÜÖ∩╕Å  Generate MCP Tools      - ├â┬░├à┬╕├óΓé¼┼ô├é┬¥  Generate Bot Tools
+
+---
+
+# Behavior: shape
+
+## Behavior Instructions - shape
+
+The purpose of this behavior is to create a story map that captures the user's journey through epics, features, and stories
+
+Create a story map that captures the user's journey through epics, features, and stories
+
+## Action Instructions - clarify
+
+The purpose of this action is to gather context by asking required questions and collecting evidence in order to increase understanding
+
+Gather context for story mapping
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- in `C:/dev/agile_bots/docs/context/`
+- generated files in `C:/dev/agile_bots/docs/stories/`
+  clarification.json, strategy.json
+
+Review all provided context, then for each required question below, thoughtfully answer it by thoroughly examining the context provided. Present your answers to the user for review and final confirmation.
+
+**Answer format:**
+**Question:** [question text]
+**Answer:** [your answer based on context]
+
+If you can't answer from context, state: "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT"
+If a choice is needed, list available options and ask user to choose.
+Don't guess or infer - be explicit when information is missing.
+
+After presenting all answers, ask the user to review and confirm or provide corrections.
+
+**To save answers:** When user confirms, pass answers as parameters to the next action you run.
+Example: `shape.strategy --answers '{"question1": "answer1", "question2": "answer2"}'`
+The system will automatically save the answers to clarification.json and proceed with the next action.
+Gather context for story mapping
+
+### Key Questions
+
+- **What is the scope of this work?**: The Generate Bot Tools (from Increment 1: User Manually Drops Config In to AI Chat). This story creates the foundational MCP bot tool that routes AI chat requests to bot behaviors and actions, enabling all subsequent MCP-based interactions.
+- **Who are the target users?**: The Three primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.
+- **What is the first priority action?**: Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.
+- **Workspace**: THREE primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.
+- **Filter**: Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.
+
+### Evidence
+
+Requirements doc, User interviews, Product roadmap
+
+### Decisions
+
+**Your Decisions:**
+
+**flow_scope_and_granularity:**
+  Intra-system level
+
+**drill_down_approach:**
+  Dig deep on behavioral complexity
+
+**depth_of_shaping:**
+  Decompose -> Discover all stories listed
+
+**drill_down_limits:**
+  Approximate story limit: 10-15 stories
+
+**structure_exploration_depth:**
+  Behavioral
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- this is an assumption
+
+## Scope
+
+**Story Scope:** Generate Bot Tools
+
+## Story Graph
+**Path:** `C:\dev\agile_bots\docs\stories\story-graph.json`**Epic Count:** 1**Features:** Domain Concepts### Epics
+- ≡ƒÄ»  **Build Agile Bots**    - ΓÜÖ∩╕Å  Generate MCP Tools      - ├â┬░├à┬╕├óΓé¼┼ô├é┬¥  Generate Bot Tools
+
+---
+
+# Behavior: shape
+
+## Behavior Instructions - shape
+
+The purpose of this behavior is to create a story map that captures the user's journey through epics, features, and stories
+
+Create a story map that captures the user's journey through epics, features, and stories
+
+## Action Instructions - clarify
+
+The purpose of this action is to gather context by asking required questions and collecting evidence in order to increase understanding
+
+Gather context for story mapping
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- in `C:/dev/agile_bots/docs/context/`
+- generated files in `C:/dev/agile_bots/docs/stories/`
+  clarification.json, strategy.json
+
+Review all provided context, then for each required question below, thoughtfully answer it by thoroughly examining the context provided. Present your answers to the user for review and final confirmation.
+
+**Answer format:**
+**Question:** [question text]
+**Answer:** [your answer based on context]
+
+If you can't answer from context, state: "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT"
+If a choice is needed, list available options and ask user to choose.
+Don't guess or infer - be explicit when information is missing.
+
+After presenting all answers, ask the user to review and confirm or provide corrections.
+
+**To save answers:** When user confirms, pass answers as parameters to the next action you run.
+Example: `shape.strategy --answers '{"question1": "answer1", "question2": "answer2"}'`
+The system will automatically save the answers to clarification.json and proceed with the next action.
+Gather context for story mapping
+
+### Key Questions
+
+- **What is the scope of this work?**: The Generate Bot Tools (from Increment 1: User Manually Drops Config In to AI Chat). This story creates the foundational MCP bot tool that routes AI chat requests to bot behaviors and actions, enabling all subsequent MCP-based interactions.
+- **Who are the target users?**: The Three primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.
+- **What is the first priority action?**: Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.
+- **Workspace**: THREE primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.
+- **Filter**: Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.
+
+### Evidence
+
+Requirements doc, User interviews, Product roadmap
+
+### Decisions
+
+**Your Decisions:**
+
+**flow_scope_and_granularity:**
+  Intra-system level
+
+**drill_down_approach:**
+  Dig deep on behavioral complexity
+
+**depth_of_shaping:**
+  Decompose -> Discover all stories listed
+
+**drill_down_limits:**
+  Approximate story limit: 10-15 stories
+
+**structure_exploration_depth:**
+  Behavioral
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- this is an assumption
+
+
+---
+## CLI STATUS section
+
+
+This section contains current scope filter (if set), current progress in workflow, and available commands
+
+Review the CLI STATUS section below to understand both current state and available commands.
+
+**Γÿó∩╕Å  You MUST DISPLAY this entire section in your response to the user exactly as you see it. Γÿó∩╕Å**
+
+---
+## ≡ƒñû Bot: story_bot
+
+**Registered:** crc_bot | story_bot
+**To change bots:** `bot <name>`
+
+## Bot Paths
+**Workspace:** `C:\dev\agile_bots`**Bot Directory:** `c:\dev\agile_bots\bots\story_bot`**Base Actions:** `C:\dev\agile_bots\base_actions`**Documentation:** `docs\stories`**Python Root:** `C:\dev\agile_bots`
+## ≡ƒÄ» Scope
+**≡ƒÄ» Current Scope:** Generate Bot Tools## Story Graph
+**Path:** `C:\dev\agile_bots\docs\stories\story-graph.json`**Epic Count:** 1**Features:** Domain Concepts### Epics
+- ≡ƒÄ»  **Build Agile Bots**    - ΓÜÖ∩╕Å  Generate MCP Tools      - ├â┬░├à┬╕├óΓé¼┼ô├é┬¥  Generate Bot ToolsTo change scope (pick ONE - setting a new scope replaces the previous):- `scope all` - Clear scope, work on entire project
+- `scope "Story Name"` - Filter by story (replaces any file scope)
+- `scope "file:C:/path/to/**/*.py"` - Filter by files (replaces any story scope)
+---
+
+## ≡ƒù║∩╕Å┬╕Progress
+
+
+**Current Position:** shape.clarify
+
+- ├â┬ó├óΓé¼┬á├óΓé¼Γäó shape
+
+      Γ₧ñ **clarify** - Gather context by asking required questions and collecting evidence in order to increase understanding
+      [ ] strategy
+      [ ] build
+      [ ] validate
+      [ ] render
+-   prioritization
+
+-   discovery
+
+-   exploration
+
+-   scenarios
+
+-   tests
+
+-   code
+
+
+## ≡ƒÆ╗ Commands
+
+
+**status | back | current | next | path [dir] | scope [filter] | bot [name] | help | exit**
+
+```powershell
+echo '[command]' | python -m cli.cli_main
+```
+
+---
+
+- ├â┬ó├óΓé¼┬á├óΓé¼Γäó shape
+
+      Γ₧ñ **clarify** - Gather context by asking required questions and collecting evidence in order to increase understanding
+      [ ] strategy
+      [ ] build
+      [ ] validate
+      [ ] render
+-   prioritization
+
+-   discovery
+
+-   exploration
+
+-   scenarios
+
+-   tests
+
+-   code
+
+**Behaviors:** **shape** | prioritization | discovery | exploration | scenarios | tests | code
+**Actions:** **clarify** | strategy | build | validate | render | rules
+

@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
-from agile_bots.src.instructions.instructions import Instructions
+﻿
+from cli.adapters import TTYAdapter
+from instructions.instructions import Instructions
 
 class TTYInstructions(TTYAdapter):
     
@@ -71,7 +71,7 @@ class TTYInstructions(TTYAdapter):
                 output_lines.append(f"- {self.add_bold(f'{question}:')} {answer}")
         elif guardrails_dict:
             if hasattr(self.instructions, '_guardrails') and self.instructions._guardrails:
-                from agile_bots.src.cli.adapter_factory import AdapterFactory
+                from cli.adapter_factory import AdapterFactory
                 guardrails_adapter = AdapterFactory.create(self.instructions._guardrails, 'tty')
                 output_lines.append(guardrails_adapter.serialize())
             else:
@@ -128,7 +128,7 @@ class TTYInstructions(TTYAdapter):
             saved_assumptions = assumptions
         
         if hasattr(self.instructions, '_strategy') and self.instructions._strategy:
-            from agile_bots.src.cli.adapter_factory import AdapterFactory
+            from cli.adapter_factory import AdapterFactory
             strategy_adapter = AdapterFactory.create(self.instructions._strategy, 'tty')
             output_lines.append(strategy_adapter.serialize())
         elif saved_decisions or saved_assumptions or strategy_criteria or assumptions:
@@ -196,21 +196,21 @@ class TTYInstructions(TTYAdapter):
             if isinstance(selected_value, list):
                 is_selected = option_text in selected_value
             else:
-                is_selected = option_text == selected_value or option_text.startswith(selected_value.split(' – ')[0])
+                is_selected = option_text == selected_value or option_text.startswith(selected_value.split(' Ã¢â‚¬â€œ ')[0])
         
         if isinstance(option, dict):
             name = option.get('name', '')
             description = option.get('description', '')
             if name:
-                marker = "  ✓ " if is_selected else "  - "
+                marker = "  Ã¢Å“â€œ " if is_selected else "  - "
                 lines.append(f"{marker}{self.add_bold(name) if is_selected else name}")
                 if description:
                     lines.append(f"    {description}")
             elif description:
-                marker = "  ✓ " if is_selected else "  - "
+                marker = "  Ã¢Å“â€œ " if is_selected else "  - "
                 lines.append(f"{marker}{self.add_bold(description) if is_selected else description}")
         elif isinstance(option, str):
-            marker = "  ✓ " if is_selected else "  - "
+            marker = "  Ã¢Å“â€œ " if is_selected else "  - "
             lines.append(f"{marker}{self.add_bold(option) if is_selected else option}")
         return lines
     

@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Optional
 import json
-from .trigger_domain import BotTriggers
+from trigger_domain import BotTriggers
 
 class BotMatcher:
 

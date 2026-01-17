@@ -1,4 +1,4 @@
-"""Configuration object for rule scanning operations."""
+﻿"""Configuration object for rule scanning operations."""
 from typing import Dict, List, Optional, Any, Callable
 from pathlib import Path
 from dataclasses import dataclass, field

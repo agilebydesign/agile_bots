@@ -1,9 +1,9 @@
-
+﻿
 from abc import abstractmethod
 from typing import List, Dict, Any, Optional
-from .scanner import Scanner
-from .story_map import StoryMap
-from .domain_concept_node import DomainConceptNode
+from scanners.scanner import Scanner
+from story_map import StoryMap
+from domain_concept_node import DomainConceptNode
 
 class DomainScanner(Scanner):
     

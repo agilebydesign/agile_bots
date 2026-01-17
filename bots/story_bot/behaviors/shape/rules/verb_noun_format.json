@@ -1,7 +1,7 @@
 {
   "priority": 1,
   "description": "Use verb-noun format consistently across all hierarchy levels. Actor --> verb noun [qualifiers]. Actor is documented separately, NOT in the name. Focus on specific actions with context.",
-  "scanner": "agile_bot.bots.base_bot.src.scanners.verb_noun_scanner.VerbNounScanner",
+  "scanner": "agile_bot.bots.base_bot.scanners.verb_noun_scanner.VerbNounScanner",
   "do": {
     "description": "Use specific verb-noun format with actor documented separately. Example: 'Places Order' with actor=Customer",
     "guidance": [

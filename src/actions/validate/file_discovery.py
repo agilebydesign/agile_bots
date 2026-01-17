@@ -1,7 +1,7 @@
-import logging
+﻿import logging
 from pathlib import Path
 from typing import List, Optional
-from ...bot_path import BotPath
+from bot_path import BotPath
 
 class FileDiscovery:
     EXCLUDED_FILES = {'__init__.py'}

@@ -53,5 +53,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.minimize_mutable_state_scanner.MinimizeMutableStateScanner"
+  "scanner": "agile_bot.scanners.minimize_mutable_state_scanner.MinimizeMutableStateScanner"
 }

@@ -67,5 +67,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.enumerate_stories_scanner.EnumerateStoriesScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.enumerate_stories_scanner.EnumerateStoriesScanner"
 }

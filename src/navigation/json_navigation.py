@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.navigation.navigation import NavigationResult
+from cli.adapters import JSONAdapter
+from navigation.navigation import NavigationResult
 
 class JSONNavigation(JSONAdapter):
     

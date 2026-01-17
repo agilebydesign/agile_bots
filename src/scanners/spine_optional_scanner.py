@@ -1,7 +1,7 @@
-from typing import List, Dict, Any, Optional
-from .story_scanner import StoryScanner
-from .story_map import StoryNode, Story, StoryGroup
-from .violation import Violation
+﻿from typing import List, Dict, Any, Optional
+from story_scanner import StoryScanner
+from story_map import StoryNode, Story, StoryGroup
+from scanners.violation import Violation
 
 class SpineOptionalScanner(StoryScanner):
     
@@ -17,7 +17,7 @@ class SpineOptionalScanner(StoryScanner):
             raise ValueError("rule_obj parameter is required for SpineOptionalScanner")
         
         violations = []
-        from .story_map import StoryMap
+        from story_map import StoryMap
         story_map = StoryMap(story_graph)
         
         for epic in story_map.epics():

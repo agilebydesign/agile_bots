@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict
-from ...utils import read_json_file
-from .strategy_criteria import StrategyCriteria
+from utils import read_json_file
+from actions.strategy.strategy_criteria import StrategyCriteria
 
 class StrategyCriterias:
 

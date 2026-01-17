@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
-from agile_bots.src.navigation.navigation import NavigationResult
+﻿
+from cli.adapters import TTYAdapter
+from navigation.navigation import NavigationResult
 
 class TTYNavigation(TTYAdapter):
     
@@ -23,9 +23,9 @@ class TTYNavigation(TTYAdapter):
         lines = []
         
         if self.nav_result.success:
-            lines.append(self.add_color("✓ Navigation successful", 'green'))
+            lines.append(self.add_color("Ã¢Å“â€œ Navigation successful", 'green'))
         else:
-            lines.append(self.add_color("✗ Navigation failed", 'red'))
+            lines.append(self.add_color("Ã¢Å“â€” Navigation failed", 'red'))
         
         if self.nav_result.message:
             lines.append(self.nav_result.message)
@@ -37,5 +37,5 @@ class TTYNavigation(TTYAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

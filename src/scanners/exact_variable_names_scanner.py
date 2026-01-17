@@ -1,10 +1,10 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 from .resources.ast_elements import Functions
 
 class ExactVariableNamesScanner(TestScanner):
@@ -52,7 +52,7 @@ class ExactVariableNamesScanner(TestScanner):
                             line_number = target.lineno if hasattr(target, 'lineno') else None
                             violation = Violation(
                                 rule=rule_obj,
-                                violation_message=f'Variable "{target.id}" uses generic name - use exact domain concept name from scenario/AC',
+                                violation_message=f'Variable "{target.id}" uses generic name - use exact domain concept name from scenario.AC',
                                 location=str(file_path),
                                 line_number=line_number,
                                 severity='warning'

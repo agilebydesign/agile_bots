@@ -1,4 +1,4 @@
-class ExitResult:
+﻿class ExitResult:
     def __init__(self, should_exit: bool, message: str = ''):
         self._should_exit = should_exit
         self._message = message

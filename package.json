@@ -1,0 +1,28 @@
+{
+  "name": "agile_bots",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agilebydesign/agile_bots.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/agilebydesign/agile_bots/issues"
+  },
+  "homepage": "https://github.com/agilebydesign/agile_bots#readme",
+  "devDependencies": {
+    "jsdom": "^27.4.0"
+  }
+}

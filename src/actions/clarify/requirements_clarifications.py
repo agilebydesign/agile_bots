@@ -1,7 +1,7 @@
-from typing import Dict, Any, Optional, List, Union
-from ...bot_path import BotPath
-from ..strategy.json_persistent import JsonPersistent
-from .required_context import RequiredContext
+﻿from typing import Dict, Any, Optional, List, Union
+from bot_path import BotPath
+from actions.strategy.json_persistent import JsonPersistent
+from actions.clarify.required_context import RequiredContext
 
 class RequirementsClarifications(JsonPersistent):
     

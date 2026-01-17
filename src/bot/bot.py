@@ -2,13 +2,13 @@ from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 import json
 from datetime import datetime
-from ..behaviors import Behaviors, Behavior
-from ..bot_path import BotPath
-from ..scope import Scope
-from ..help import Help
-from ..navigation import NavigationResult
-from ..exit_result import ExitResult
-from ..utils import read_json_file
+from behaviors import Behaviors, Behavior
+from bot_path import BotPath
+from scope.scope import Scope
+from help import Help
+from navigation import NavigationResult
+from exit_result import ExitResult
+from utils import read_json_file
 import logging
 logger = logging.getLogger(__name__)
 __all__ = ['Bot', 'BotResult', 'Behavior']
@@ -169,7 +169,7 @@ class Bot:
         )
 
     def help(self, topic: Optional[str] = None):
-        from agile_bots.src.help.help import Help
+        from help.help import Help
         
         return Help(bot=self)
     
@@ -197,7 +197,7 @@ class Bot:
         action = behavior.actions.current
         
         try:
-            from ..actions.action_context import ActionContext
+            from actions.action_context import ActionContext
             context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
             instructions = action.get_instructions(context)
             
@@ -219,7 +219,7 @@ class Bot:
         """
         self._scope.clear()
         self._scope.save()
-        from ..scope.scope_command_result import ScopeCommandResult
+        from scope.scope_command_result import ScopeCommandResult
         return ScopeCommandResult(
             status='success',
             message=message,
@@ -241,7 +241,7 @@ class Bot:
     
     def _determine_scope_type(self, prefix: str):
         """Determine ScopeType from prefix string."""
-        from ..scope.scope import ScopeType
+        from scope.scope import ScopeType
         
         if prefix in ('file', 'files'):
             return ScopeType.FILES
@@ -304,7 +304,7 @@ class Bot:
     
     def scope(self, scope_filter: Optional[str] = None):
         """Set or get scope filter for the bot."""
-        from ..scope.scope import ScopeType
+        from scope.scope import ScopeType
         
         if scope_filter is None:
             return self._scope
@@ -322,7 +322,7 @@ class Bot:
         if scope_filter_lower == 'showall':
             self._scope.filter(ScopeType.SHOW_ALL, [])
             self._scope.save()
-            from ..scope.scope_command_result import ScopeCommandResult
+            from scope.scope_command_result import ScopeCommandResult
             return ScopeCommandResult(
                 status='success',
                 message='Scope set to show all',
@@ -340,7 +340,7 @@ class Bot:
         self._scope.filter(scope_type, scope_values)
         self._scope.save()
         
-        from ..scope.scope_command_result import ScopeCommandResult
+        from scope.scope_command_result import ScopeCommandResult
         return ScopeCommandResult(
             status='success',
             message=f'Scope set to {prefix}: {", ".join(scope_values)}',
@@ -510,7 +510,7 @@ class Bot:
         self.behaviors.save_state()
         
         try:
-            from ..actions.action_context import ActionContext
+            from actions.action_context import ActionContext
             context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
             
             if params:
@@ -530,10 +530,10 @@ class Bot:
              evidence_provided: Optional[Dict[str, str]] = None,
              decisions: Optional[Dict[str, str]] = None,
              assumptions: Optional[List[str]] = None) -> Dict[str, Any]:
-        from ..actions.clarify.requirements_clarifications import RequirementsClarifications
-        from ..actions.clarify.required_context import RequiredContext
-        from ..actions.strategy.strategy_decision import StrategyDecision
-        from ..actions.strategy.strategy import Strategy
+        from actions.clarify.requirements_clarifications import RequirementsClarifications
+        from actions.clarify.required_context import RequiredContext
+        from actions.strategy.strategy_decision import StrategyDecision
+        from actions.strategy.strategy import Strategy
         
         current_behavior = self.behaviors.current
         if not current_behavior:
@@ -758,7 +758,7 @@ class Bot:
         
         for i, behavior in enumerate(behaviors_list):
             is_last_behavior = (i == len(behaviors_list) - 1)
-            behavior_prefix = "└──" if is_last_behavior else "├──"
+            behavior_prefix = "Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬" if is_last_behavior else "Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬"
             is_current_behavior = (self.behaviors.current and behavior.name == self.behaviors.current.name)
             behavior_marker = "➤ " if is_current_behavior else ""
             lines.append(f"{behavior_prefix} {behavior_marker}{behavior.name}")
@@ -766,9 +766,9 @@ class Bot:
             action_names = behavior.action_names
             for j, action in enumerate(action_names):
                 is_last_action = (j == len(action_names) - 1)
-                action_prefix = "    └──" if is_last_behavior else "│   └──" if is_last_action else "│   ├──"
+                action_prefix = "    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬" if is_last_behavior else "Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬" if is_last_action else "Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬"
                 if not is_last_behavior and not is_last_action:
-                    action_prefix = "│   ├──"
+                    action_prefix = "Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬"
                 is_current_action = (is_current_behavior and 
                                    behavior.actions.current_action_name == action)
                 action_marker = "➤ " if is_current_action else ""

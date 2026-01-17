@@ -2,7 +2,7 @@
   "name": "rules",
   "description": "Load behavior-specific rules into AI context for guidance on writing compliant content",
   "workflow": false,
-  "action_class": "agile_bots.src.rules.rules_action.RulesAction",
+  "action_class": "rules.rules_action.RulesAction",
   "instructions": [
     "CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.",
     "CRITICAL: You MUST systematically read each rule file listed below using the read_file tool BEFORE acting on the user's message.",

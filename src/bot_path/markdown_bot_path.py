@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import MarkdownAdapter
-from agile_bots.src.bot_path.bot_path import BotPath
+﻿
+from cli.adapters import MarkdownAdapter
+from bot_path.bot_path import BotPath
 
 class MarkdownBotPath(MarkdownAdapter):
     
@@ -27,5 +27,5 @@ class MarkdownBotPath(MarkdownAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

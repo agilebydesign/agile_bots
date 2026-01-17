@@ -29,14 +29,9 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["agile_bots*"]
+where = ["src"]
+include = ["*"]
 namespaces = false
-
-[tool.setuptools.package-dir]
-"agile_bots.src" = "src"
-"agile_bots.test" = "test"
-"agile_bots.bots" = "bots"
 
 [project.optional-dependencies]
 dev = [
@@ -58,6 +53,7 @@ testpaths = ["test"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+pythonpath = ["src", "test"]
 addopts = "-v --tb=short"
 
 [tool.coverage.run]

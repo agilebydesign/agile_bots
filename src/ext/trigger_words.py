@@ -1,4 +1,4 @@
-import re
+﻿import re
 from typing import List, Dict, Any
 
 class TriggerWords:

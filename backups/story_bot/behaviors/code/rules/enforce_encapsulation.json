@@ -57,5 +57,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.src.scanners.encapsulation_scanner.EncapsulationScanner"
+  "scanner": "agile_bot.bots.base_bot.scanners.encapsulation_scanner.EncapsulationScanner"
 }

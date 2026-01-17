@@ -1,10 +1,10 @@
-
+﻿
 from typing import List, Dict, Any, Optional, Set, Tuple
 from pathlib import Path
 import ast
 import logging
-from .code_scanner import CodeScanner
-from .violation import Violation
+from code_scanner import CodeScanner
+from scanners.violation import Violation
 
 logger = logging.getLogger(__name__)
 

@@ -35,7 +35,7 @@ parser.add_argument('structured_path', nargs='?', help='Optional path to structu
 args = parser.parse_args()
 
 # Resolve workspace from environment (WORKING_AREA preferred)
-from agile_bots.bots.base_bot.src.state.workspace import get_workspace_directory
+from bots.base_bot.src.state.workspace import get_workspace_directory
 workspace_root = get_workspace_directory()
 
 # If a structured_path positional arg was provided, use that instead of workspace-derived path
@@ -81,9 +81,9 @@ output_path = structured_path.parent / "story-map-outline.drawio"
 print(f"\nRendering outline to: {output_path}")
 result = diagram.render_outline(output_path=str(output_path))
 
-print(f"\n✓ Rendered: {result['output_path']}")
-print(f"✓ Epics rendered: {result['summary'].get('epics', 0)}")
-print(f"✓ Features rendered: {result['summary'].get('features', 0)}")
+print(f"\nâœ“ Rendered: {result['output_path']}")
+print(f"âœ“ Epics rendered: {result['summary'].get('epics', 0)}")
+print(f"âœ“ Features rendered: {result['summary'].get('features', 0)}")
 
 
 # Option 2: Render directly from graph (simpler)

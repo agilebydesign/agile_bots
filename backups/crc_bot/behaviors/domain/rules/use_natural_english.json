@@ -2,7 +2,7 @@
   "priority": 6,
   "description": "Use natural English for responsibility names. Responsibilities should read like natural language method calls, using proper grammar and clear intent.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.natural_english_scanner.NaturalEnglishScanner"
+    "agile_bot.bots.base_bot.scanners.natural_english_scanner.NaturalEnglishScanner"
   ],
   "do": {
     "description": "Write responsibilities in natural English that clearly express intent",

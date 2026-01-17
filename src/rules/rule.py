@@ -1,10 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, List, Optional
-from ..scanners.code_scanner import CodeScanner
-from ..scanners.scanner_registry import ScannerRegistry
-from ..scanners.test_scanner import TestScanner
-from ..utils import read_json_file
-from .scan_config import ScanConfig
+from scanners.code_scanner import CodeScanner
+from scanners.scanner_registry import ScannerRegistry
+from scanners.test_scanner import TestScanner
+from utils import read_json_file
+from rules.scan_config import ScanConfig
 
 class Rule:
 

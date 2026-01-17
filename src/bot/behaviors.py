@@ -1,16 +1,16 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import json
 import logging
 import traceback
 from pathlib import Path
 from typing import List, Optional, Iterator, Tuple, Dict, Any, TYPE_CHECKING
 from datetime import datetime
-from ..bot_path import BotPath
-from ..utils import read_json_file
-from ..instructions.reminders import inject_reminder_to_instructions
-from .behavior import Behavior
+from bot_path import BotPath
+from utils import read_json_file
+from instructions.reminders import inject_reminder_to_instructions
+from behaviors.behavior import Behavior
 if TYPE_CHECKING:
-    from .bot import BotResult
+    from bot import BotResult
 logger = logging.getLogger(__name__)
 
 class Behaviors:

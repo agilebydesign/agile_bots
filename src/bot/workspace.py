@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 import os
-from ..utils import read_json_file
+from utils import read_json_file
 
 def get_python_workspace_root() -> Path:
     return Path(__file__).parent.parent.parent
@@ -18,7 +18,7 @@ def get_workspace_directory() -> Path:
     return Path(workspace.strip())
 
 def get_base_actions_directory(bot_directory: Path=None) -> Path:
-    from ..utils import read_json_file
+    from utils import read_json_file
     
     if bot_directory is None:
         bot_directory = get_bot_directory()

@@ -53,5 +53,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.actor_alternation_scanner.ActorAlternationScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.actor_alternation_scanner.ActorAlternationScanner"
 }

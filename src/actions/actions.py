@@ -1,14 +1,14 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 import json
 import logging
 from pathlib import Path
 from typing import List, Optional, Iterator, Dict, Any, TYPE_CHECKING
 from datetime import datetime
-from .action_state_manager import ActionStateManager
-from .action_factory import ActionFactory
+from actions.action_state_manager import ActionStateManager
+from actions.action_factory import ActionFactory
 if TYPE_CHECKING:
-    from .action import Action
-    from agile_bots.src.bot.behavior import Behavior
+    from action import Action
+    from bot.behavior import Behavior
 
 class Actions:
 

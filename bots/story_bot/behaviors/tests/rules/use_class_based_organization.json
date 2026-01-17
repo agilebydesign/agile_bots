@@ -63,5 +63,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
 }

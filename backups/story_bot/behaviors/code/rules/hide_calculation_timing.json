@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must hide calculations. Properties hide logic that occurs—it may be computed on-demand, cached, pre-computed, or loaded from storage. The caller shouldn't know or care when the values are calculated / determined.",
-  "scanner": "agile_bot.bots.base_bot.src.scanners.calculation_timing_code_scanner.CalculationTimingCodeScanner",
+  "scanner": "agile_bot.bots.base_bot.scanners.calculation_timing_code_scanner.CalculationTimingCodeScanner",
   "examples": [
     {
       "do": {

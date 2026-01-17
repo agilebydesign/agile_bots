@@ -1,11 +1,11 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, Any
-from ..utils import read_json_file
-from ..bot_path import BotPath
-from ..actions.validate.validation_type import ValidationType
+from utils import read_json_file
+from bot_path import BotPath
+from actions.validate.validation_type import ValidationType
 if TYPE_CHECKING:
-    from .bot import BotResult
+    from bot import BotResult
 
 class Behavior:
 
@@ -83,35 +83,35 @@ class Behavior:
     @property
     def guardrails(self):
         if self._guardrails is None:
-            from ..actions.guardrails import Guardrails
+            from actions.guardrails import Guardrails
             self._guardrails = Guardrails(self)
         return self._guardrails
 
     @property
     def content(self):
         if self._content is None:
-            from ..actions.content import Content
+            from actions.content import Content
             self._content = Content(self)
         return self._content
 
     @property
     def rules(self):
         if self._rules is None:
-            from ..actions.rules.rules import Rules
+            from actions.rules.rules import Rules
             self._rules = Rules(behavior=self, bot_paths=self.bot_paths)
         return self._rules
 
     @property
     def actions(self):
         if self._actions is None:
-            from ..actions.actions import Actions
+            from actions.actions import Actions
             self._actions = Actions(self)
         return self._actions
 
     @property
     def trigger_words_obj(self):
         if self._trigger_words_obj is None:
-            from ..ext.trigger_words import TriggerWords
+            from ext.trigger_words import TriggerWords
             self._trigger_words_obj = TriggerWords(self)
         return self._trigger_words_obj
 
@@ -149,7 +149,7 @@ class Behavior:
                     'message': 'Rules action not found'
                 }
             
-            from ..actions.action_context import ActionContext
+            from actions.action_context import ActionContext
             context = rules_action.context_class() if hasattr(rules_action, 'context_class') else ActionContext()
             instructions = rules_action.get_instructions(context)
             

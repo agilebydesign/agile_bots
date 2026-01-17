@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.actions.clarify.clarify_action import ClarifyContextAction
+from cli.adapters import JSONAdapter
+from actions.clarify.clarify_action import ClarifyContextAction
 
 class JSONClarifyAction(JSONAdapter):
     

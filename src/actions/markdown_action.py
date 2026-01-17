@@ -1,5 +1,5 @@
-
-from agile_bots.src.cli.adapters import MarkdownAdapter
+﻿
+from cli.adapters import MarkdownAdapter
 
 class MarkdownAction(MarkdownAdapter):
     

@@ -1,3 +1,3 @@
-from .navigation import NavigationResult
+﻿from .navigation import NavigationResult
 
 __all__ = ['NavigationResult']

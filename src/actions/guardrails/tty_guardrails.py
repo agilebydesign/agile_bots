@@ -1,5 +1,5 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
+﻿
+from cli.adapters import TTYAdapter
 
 class TTYGuardrails(TTYAdapter):
     
@@ -7,7 +7,7 @@ class TTYGuardrails(TTYAdapter):
         self.guardrails = guardrails
     
     def serialize(self) -> str:
-        from agile_bots.src.cli.adapter_factory import AdapterFactory
+        from cli.adapter_factory import AdapterFactory
         
         lines = []
         

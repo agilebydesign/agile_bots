@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any
-from .strategy_criterias import StrategyCriterias
-from .assumptions import Assumptions
+from actions.strategy.strategy_criterias import StrategyCriterias
+from actions.strategy.assumptions import Assumptions
 
 class Strategy:
 

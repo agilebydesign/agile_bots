@@ -52,5 +52,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.reaction_chaining_scanner.ReactionChainingScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.reaction_chaining_scanner.ReactionChainingScanner"
 }

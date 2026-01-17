@@ -1,11 +1,11 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
-from .test_scanner import TestScanner
-from .story_map import StoryNode
-from .violation import Violation
+from test_scanner import TestScanner
+from story_map import StoryNode
+from scanners.violation import Violation
 
 class ClassBasedOrganizationScanner(TestScanner):
     

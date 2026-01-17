@@ -1,10 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Optional
 import importlib
-from .template import Template
-from .synchronizer import Synchronizer
-from ...bot_path import BotPath
-from ...utils import read_json_file
+from actions.render.template import Template
+from actions.render.synchronizer import Synchronizer
+from bot_path import BotPath
+from utils import read_json_file
 
 class RenderSpec:
 

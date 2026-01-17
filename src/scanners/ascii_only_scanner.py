@@ -1,8 +1,8 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 import re
 
 class AsciiOnlyScanner(TestScanner):

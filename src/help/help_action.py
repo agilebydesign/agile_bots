@@ -1,13 +1,13 @@
-import sys
+﻿import sys
 import re
 import logging
 import dataclasses
 from pathlib import Path
 from typing import Dict, Any, Type, get_origin
-from .action import Action
-from .action_context import ActionContext
-from .action_factory import ActionFactory
-from ..bot.workspace import get_python_workspace_root, get_base_actions_directory
+from actions.action import Action
+from actions.action_context import ActionContext
+from actions.action_factory import ActionFactory
+from bot.workspace import get_python_workspace_root, get_base_actions_directory
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class HelpAction(Action):
             self._add_command_help(cmd_file, instructions)
     
     def _sort_commands_by_behavior_order(self, command_files):
-        from agile_bots.src.utils import read_json_file
+        from utils import read_json_file
         bot_name = self.behavior.bot_name
         bot_directory = self.behavior.bot_paths.bot_directory
         
@@ -100,7 +100,7 @@ class HelpAction(Action):
         return sorted(command_files, key=get_command_order)
     
     def _get_behavior_order(self, bot_directory: Path, behavior_name: str) -> int:
-        from agile_bots.src.utils import read_json_file
+        from utils import read_json_file
         behavior_json_path = bot_directory / 'behaviors' / behavior_name / 'behavior.json'
         if not behavior_json_path.exists():
             return 999
@@ -220,8 +220,8 @@ class HelpAction(Action):
     
     def _get_parameter_description(self, action_name: str, param_name: str) -> str:
         """Get parameter description by delegating to domain objects."""
-        from ..actions.clarify.requirements_clarifications import RequirementsClarifications
-        from ..actions.strategy.strategy_decision import StrategyDecision
+        from actions.clarify.requirements_clarifications import RequirementsClarifications
+        from actions.strategy.strategy_decision import StrategyDecision
         
         # Registry mapping parameter name patterns to domain object description methods
         description_registry = [
@@ -253,7 +253,7 @@ class HelpAction(Action):
         if not action_config_file.exists():
             return
         try:
-            from agile_bots.src.utils import read_json_file
+            from utils import read_json_file
             action_config = read_json_file(action_config_file)
             description = action_config.get('description', f'{action_name} action')
             instructions.add_display(f'### {action_name}')

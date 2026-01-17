@@ -61,5 +61,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
 }

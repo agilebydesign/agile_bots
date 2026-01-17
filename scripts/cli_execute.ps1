@@ -19,11 +19,11 @@
 #     [OK] echo 'instructions' | python cli_main.py
 #   
 #   Step 1: Set environment and pipe command:
-#     cd C:\dev\augmented-teams
-#     $env:PYTHONPATH = "C:\dev\augmented-teams"
-#     $env:BOT_DIRECTORY = "C:\dev\augmented-teams\agile_bot\bots\base_bot"
+#     cd C:\dev\agile_bots
+#     $env:PYTHONPATH = "C:\dev\agile_bots"
+#     $env:BOT_DIRECTORY = "C:\dev\agile_bots\bots\story_bot"
 #     $env:WORKING_AREA = "<project_path>"  # e.g. demo\mob_minion
-#     echo "status" | python agile_bot/src/cli/cli_main.py
+#     echo "status" | python agile_bots/src/cli/cli_main.py
 #   
 #   Step 2: Read output, do work (create files, etc.)
 #   Step 3: Pipe next command: echo "next" | python cli_main.py

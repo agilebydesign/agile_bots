@@ -16722,5 +16722,5 @@ The following validation steps were performed:
 ## Report Location
 
 This report was automatically generated and saved to:
-`C:\dev\augmented-teams\agile_bot\docs\stories\reports\code-validation-report-2026-01-16_14-29-24.md`
+`C:\dev\agile_bot\docs\stories\reports\code-validation-report-2026-01-16_14-29-24.md`
 

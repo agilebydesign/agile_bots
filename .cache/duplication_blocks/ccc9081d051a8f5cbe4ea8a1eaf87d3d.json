@@ -1,0 +1,62 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\action_factory.py",
+  "cached_at": "2026-01-16T16:49:45.073248",
+  "blocks": [
+    {
+      "hash": "28698b33c4266b9066f6d2c5f4a42cee",
+      "start_line": 18,
+      "end_line": 30,
+      "func_name": "get_action_class",
+      "preview": "action_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'rules': ('rules', 'rules_action', 'RulesAction')}\nmapping = action_module_mapping.get(action_name)\nif not mapping:\n    return None\nmodule_name, module_file, class_name = mapping\nmodule_path = f'agile_bots.src.actions.{module_name}.{module_file}'",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "04256dea5edd8ab8d5f77491e2e61423",
+      "start_line": 26,
+      "end_line": 35,
+      "func_name": "get_action_class",
+      "preview": "mapping = action_module_mapping.get(action_name)\nif not mapping:\n    return None\nmodule_name, module_file, class_name = mapping\nmodule_path = f'agile_bots.src.actions.{module_name}.{module_file}'\ntry:\n    module = importlib.import_module(module_path)\n    return getattr(module, class_name)\nexcept (ModuleNotFoundError, AttributeError):\n    return None",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|Try"
+    },
+    {
+      "hash": "6cc005510776f501b388c83e5883dcc1",
+      "start_line": 18,
+      "end_line": 35,
+      "func_name": "get_action_class",
+      "preview": "action_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'rules': ('rules', 'rules_action', 'RulesAction')}\nmapping = action_module_mapping.get(action_name)\nif not mapping:\n    return None\nmodule_name, module_file, class_name = mapping\nmodule_path = f'agile_bots.src.actions.{module_name}.{module_file}'\ntry:\n    module = importlib.import_module(module_path)\n    return getattr(module, class_name)\nexcept (ModuleNotFoundError, AttributeError):\n    return None",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|Try"
+    },
+    {
+      "hash": "d0eee5dbddf70c3efeac33dd3db731b3",
+      "start_line": 43,
+      "end_line": 52,
+      "func_name": "_resolve_action_class_path",
+      "preview": "custom_class = None\nif action_config:\n    custom_class = action_config.get('action_class') or action_config.get('custom_class')\nif not custom_class:\n    normalized = 'render' if action_name == 'render_output' else action_name\n    base_config = read_json_file(get_base_actions_directory() / normalized / 'action_config.json')\n    custom_class = base_config.get('action_class') or base_config.get('custom_class')\nif custom_class:\n    return custom_class\nreturn self._get_default_action_class_path(action_name)",
+      "normalized": "ASSIGN(1_targets)|If|If|If|Return"
+    },
+    {
+      "hash": "320a45a9a4b3169a1d83416b1569e3bf",
+      "start_line": 55,
+      "end_line": 63,
+      "func_name": "_get_default_action_class_path",
+      "preview": "if action_name == 'rules':\n    return 'agile_bots.src.rules.rules_action.RulesAction'\naction_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'decide_strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'build_knowledge': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'render_output': ('render', 'render_action', 'RenderOutputAction')}\nmapping = action_module_mapping.get(action_name)\nif mapping:\n    module_name, module_file, class_name = mapping\n    return f'agile_bots.src.actions.{module_name}.{module_file}.{class_name}'\nclass_name = action_name.title().replace('_', '') + 'Action'",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0be1cfc12498a45f711a813e23d03a0e",
+      "start_line": 58,
+      "end_line": 64,
+      "func_name": "_get_default_action_class_path",
+      "preview": "action_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'decide_strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'build_knowledge': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'render_output': ('render', 'render_action', 'RenderOutputAction')}\nmapping = action_module_mapping.get(action_name)\nif mapping:\n    module_name, module_file, class_name = mapping\n    return f'agile_bots.src.actions.{module_name}.{module_file}.{class_name}'\nclass_name = action_name.title().replace('_', '') + 'Action'\nreturn f'agile_bots.src.actions.{action_name}.{action_name}_action.{class_name}'",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "a1f5d1e8f8296e2c8c5dd2fff9cac9e5",
+      "start_line": 55,
+      "end_line": 64,
+      "func_name": "_get_default_action_class_path",
+      "preview": "if action_name == 'rules':\n    return 'agile_bots.src.rules.rules_action.RulesAction'\naction_module_mapping = {'clarify': ('clarify', 'clarify_action', 'ClarifyContextAction'), 'strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'decide_strategy': ('strategy', 'strategy_action', 'StrategyAction'), 'build': ('build', 'build_action', 'BuildStoryGraphAction'), 'build_knowledge': ('build', 'build_action', 'BuildStoryGraphAction'), 'validate': ('validate', 'validate_action', 'ValidateRulesAction'), 'render': ('render', 'render_action', 'RenderOutputAction'), 'render_output': ('render', 'render_action', 'RenderOutputAction')}\nmapping = action_module_mapping.get(action_name)\nif mapping:\n    module_name, module_file, class_name = mapping\n    return f'agile_bots.src.actions.{module_name}.{module_file}.{class_name}'\nclass_name = action_name.title().replace('_', '') + 'Action'\nreturn f'agile_bots.src.actions.{action_name}.{action_name}_action.{class_name}'",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|Return"
+    }
+  ]
+}

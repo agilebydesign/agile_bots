@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner"
 }

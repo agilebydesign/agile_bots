@@ -62,5 +62,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.helper_extraction_scanner.HelperExtractionScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.helper_extraction_scanner.HelperExtractionScanner"
 }

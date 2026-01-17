@@ -1,6 +1,8 @@
 {
-  "type": "all",
-  "value": [],
+  "type": "story",
+  "value": [
+    "Generate Bot Tools"
+  ],
   "exclude": [],
   "skiprule": []
 }

@@ -1,6 +1,6 @@
 {
   "description": "Express intent in code first, comments second. Rename variables/functions instead of commenting, extract methods to make intent clear, and use comments only when code can't express intent.",
-  "scanner": "agile_bot.src.scanners.useless_comments_scanner.UselessCommentsScanner",
+  "scanner": "agile_bot.scanners.useless_comments_scanner.UselessCommentsScanner",
   "examples": [
     {
       "do": {

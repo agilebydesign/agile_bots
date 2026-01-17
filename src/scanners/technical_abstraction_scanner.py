@@ -1,10 +1,10 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 import re
-from .domain_scanner import DomainScanner
-from .domain_concept_node import DomainConceptNode
-from .violation import Violation
-from .vocabulary_helper import VocabularyHelper
+from domain_scanner import DomainScanner
+from domain_concept_node import DomainConceptNode
+from scanners.violation import Violation
+from vocabulary_helper import VocabularyHelper
 
 class TechnicalAbstractionScanner(DomainScanner):
     

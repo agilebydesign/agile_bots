@@ -1,10 +1,10 @@
-
+﻿
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict, Any
 from pathlib import Path
 from enum import Enum
 
-from ..scope import Scope, ScopeType, StoryGraphFilter, FileFilter
+from scope.scope import Scope, ScopeType, StoryGraphFilter, FileFilter
 
 @dataclass
 class ActionContext:

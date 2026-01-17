@@ -1,17 +1,17 @@
-
+﻿
 from typing import List, TYPE_CHECKING
 from pathlib import Path
 
 if TYPE_CHECKING:
-    from .scan import Scan
-    from .scope import Scope
-    from agile_bots.src.actions.rules.rule import Rule
-    from .scanner import Scanner
-    from .scanner_registry import ScannerRegistry
+    from scan import Scan
+    from scope import Scope
+    from actions.rules.rule import Rule
+    from scanner import Scanner
+    from scanner_registry import ScannerRegistry
 
 from .resources.scope import Scope
 from .resources.scan import Scan
-from .scanner_registry import ScannerRegistry
+from scanner_registry import ScannerRegistry
 
 class ScannerOrchestrator:
     

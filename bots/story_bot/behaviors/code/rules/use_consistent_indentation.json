@@ -64,5 +64,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.consistent_indentation_scanner.ConsistentIndentationScanner"
+  "scanner": "agile_bot.scanners.consistent_indentation_scanner.ConsistentIndentationScanner"
 }

@@ -1,4 +1,4 @@
-
+﻿
 class CliTerminalFormatter:
 
     def _format_header_style(self, text: str) -> str:

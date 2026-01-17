@@ -1,23 +1,23 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Optional, TYPE_CHECKING, List, Type
 import json
 import logging
 import re
 import sys
 import traceback
-from .activity_tracker import ActivityTracker, ActionState
-from .behavior_action_status_builder import BehaviorActionStatusBuilder
-from ..instructions.context_data_injector import ContextDataInjector
-from ..instructions.instructions import Instructions
-from .action_context import ActionContext
-from ..scope import Scope
-from ..instructions.reminders import inject_reminder_to_instructions
-from ..bot.workspace import get_base_actions_directory
-from ..utils import read_json_file
+from actions.activity_tracker import ActivityTracker, ActionState
+from actions.behavior_action_status_builder import BehaviorActionStatusBuilder
+from instructions.context_data_injector import ContextDataInjector
+from instructions.instructions import Instructions
+from actions.action_context import ActionContext
+from scope.scope import Scope
+from instructions.reminders import inject_reminder_to_instructions
+from bot.workspace import get_base_actions_directory
+from utils import read_json_file
 if TYPE_CHECKING:
-    from ..bot.bot import Bot
-    from ..bot.behavior import Behavior
-    from ..bot.behaviors import Behaviors
+    from bot.bot import Bot
+    from bot.behavior import Behavior
+    from bot.behaviors import Behaviors
 logger = logging.getLogger(__name__)
 
 class Action:
@@ -148,7 +148,7 @@ class Action:
         """Get meaningful description for a parameter by delegating to domain objects."""
         from .clarify.requirements_clarifications import RequirementsClarifications
         from .strategy.strategy_decision import StrategyDecision
-        from ..scope import Scope
+        from scope import Scope
         
         # Registry mapping parameter name patterns to domain object description methods
         description_registry = [
@@ -549,7 +549,7 @@ class Action:
         instructions.set('action_instructions', action_data)
     
     def _build_display_content(self, instructions: Instructions):
-        from agile_bots.src.instructions.markdown_instructions import MarkdownInstructions
+        from instructions.markdown_instructions import MarkdownInstructions
 
         temp_instructions = instructions.copy()
         temp_instructions._display_content = []

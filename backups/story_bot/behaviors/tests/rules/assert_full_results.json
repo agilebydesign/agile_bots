@@ -49,5 +49,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.src.scanners.full_result_assertions_scanner.FullResultAssertionsScanner"
+    "scanner":  "agile_bot.scanners.full_result_assertions_scanner.FullResultAssertionsScanner"
 }

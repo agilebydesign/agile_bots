@@ -62,5 +62,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.orchestrator_pattern_scanner.OrchestratorPatternScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.orchestrator_pattern_scanner.OrchestratorPatternScanner"
 }

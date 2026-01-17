@@ -1,13 +1,13 @@
-import logging
+﻿import logging
 import threading
 import traceback
 from pathlib import Path
 from typing import Dict, Any, TYPE_CHECKING
 from datetime import datetime
-from .validation_scope import ValidationScope
+from actions.validate.validation_scope import ValidationScope
 
 if TYPE_CHECKING:
-    from ..action_context import ValidateActionContext
+    from action_context import ValidateActionContext
 
 class BackgroundValidationHandler:
 

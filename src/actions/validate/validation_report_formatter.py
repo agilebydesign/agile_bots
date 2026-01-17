@@ -1,9 +1,9 @@
-import re
+﻿import re
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from urllib.parse import quote
-from ...bot_path import BotPath
+from bot_path import BotPath
 logger = logging.getLogger(__name__)
 
 class ValidationReportFormatter:

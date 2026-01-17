@@ -1,8 +1,8 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.cli.base_hierarchical_adapter import BaseBotAdapter
-from agile_bots.src.bot.bot import Bot
+from cli.adapters import JSONAdapter
+from cli.base_hierarchical_adapter import BaseBotAdapter
+from bot.bot import Bot
 
 class JSONBot(BaseBotAdapter, JSONAdapter):
     
@@ -61,7 +61,7 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
             result['behaviors'] = self._behaviors_adapter.to_dict() if hasattr(self._behaviors_adapter, 'to_dict') else {}
         
         if hasattr(self.bot, '_scope') and self.bot._scope:
-            from agile_bots.src.cli.adapter_factory import AdapterFactory
+            from cli.adapter_factory import AdapterFactory
             scope_adapter = AdapterFactory.create(self.bot._scope, 'json')
             result['scope'] = scope_adapter.to_dict()
         

@@ -41,5 +41,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner"
 }

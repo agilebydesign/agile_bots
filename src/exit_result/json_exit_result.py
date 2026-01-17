@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.exit_result.exit_result import ExitResult
+from cli.adapters import JSONAdapter
+from exit_result.exit_result import ExitResult
 
 class JSONExitResult(JSONAdapter):
     

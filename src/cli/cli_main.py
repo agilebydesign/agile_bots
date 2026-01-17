@@ -1,4 +1,4 @@
-
+﻿
 import sys
 import os
 import json
@@ -9,13 +9,14 @@ from pathlib import Path
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-# Minimal bootstrapping: Calculate workspace root and add to sys.path
-# This MUST match get_python_workspace_root() in agile_bots.src.bot.workspace
+# Minimal bootstrapping: Calculate src directory and add to sys.path
+# This MUST match get_python_workspace_root() in bot.workspace
 script_path = Path(__file__).resolve()
-workspace_root = script_path.parent.parent.parent  # src/cli/cli_main.py -> src/cli -> src -> agile_bots
+src_root = script_path.parent.parent  # src/cli/cli_main.py -> src/cli -> src
+workspace_root = src_root.parent  # src -> agile_bots
 
-if str(workspace_root) not in sys.path:
-    sys.path.insert(0, str(workspace_root))
+if str(src_root) not in sys.path:
+    sys.path.insert(0, str(src_root))
 
 # Bootstrap BOT_DIRECTORY if not set
 if 'BOT_DIRECTORY' not in os.environ:
@@ -40,10 +41,10 @@ if 'WORKING_AREA' not in os.environ:
     if 'WORKING_AREA' not in os.environ:
         os.environ['WORKING_AREA'] = str(workspace_root)
 
-# Now import agile_bots modules - they will use the environment variables we just set
-from agile_bots.src.bot.bot import Bot
-from agile_bots.src.bot.workspace import get_workspace_directory, get_bot_directory, get_python_workspace_root
-from agile_bots.src.cli.cli_session import CLISession
+# Now import src modules - they will use the environment variables we just set
+from bot.bot import Bot
+from bot.workspace import get_workspace_directory, get_bot_directory, get_python_workspace_root
+from cli.cli_session import CLISession
 
 def main():
     # Use workspace helper functions - don't calculate paths directly
@@ -113,7 +114,7 @@ def main():
         print("")
         print("```powershell")
         workspace_root_str = str(workspace_directory).replace('\\', '\\')
-        cli_script_str = "python -m agile_bots.src.cli.cli_main"
+        cli_script_str = "python -m cli.cli_main"
         print(f"# Interactive mode (environment set automatically by script):")
         print(cli_script_str)
         print("")

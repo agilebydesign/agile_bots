@@ -1,10 +1,10 @@
-import logging
+﻿import logging
 import traceback
 import sys
 from pathlib import Path
 from typing import Optional
-from agile_bots.bots.base_bot.src.bot.workspace import get_base_actions_directory
-from agile_bots.src.utils import read_json_file
+from bot.workspace import get_base_actions_directory
+from utils import read_json_file
 import json
 
 class DescriptionExtractor:

@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Any, List, Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from agile_bots.src.bot_path import BotPath
-    from agile_bots.src.actions.action_context import Scope
+    from bot_path import BotPath
+    from actions.action_context import Scope
 
 class Instructions:
     

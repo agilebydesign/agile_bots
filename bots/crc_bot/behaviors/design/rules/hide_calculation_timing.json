@@ -2,7 +2,7 @@
   "priority": 6,
   "description": "Use properties where resource-oriented access makes more sense than explicit operations. Properties hide calculation timing. Explicit operations when action is meaningful. Example: Get total value: Money (property); Submits for fulfillment: FulfillmentRequest (operation).",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.calculation_timing_scanner.CalculationTimingScanner"
+    "agile_bot.bots.base_bot.scanners.calculation_timing_scanner.CalculationTimingScanner"
   ],
   "do": {
     "description": "Use properties for resource access, explicit operations when action is meaningful. Example: Get total value: Money (property); Submits for fulfillment: FulfillmentRequest (operation)",

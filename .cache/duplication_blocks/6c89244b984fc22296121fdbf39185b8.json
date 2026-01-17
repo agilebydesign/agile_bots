@@ -1,0 +1,14 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\activity_tracker.py",
+  "cached_at": "2026-01-16T16:49:45.136028",
+  "blocks": [
+    {
+      "hash": "8341badaf436d1d729083ff99cb16804",
+      "start_line": 63,
+      "end_line": 69,
+      "func_name": "track_completion",
+      "preview": "entry = {'action_state': state.state_key, 'status': 'completed', 'timestamp': datetime.now().isoformat()}\nif state.outputs:\n    entry['outputs'] = make_json_serializable(state.outputs)\nif state.duration:\n    entry['duration'] = state.duration\ndb.insert(entry)",
+      "normalized": "ASSIGN(1_targets)|If|If|CALL"
+    }
+  ]
+}

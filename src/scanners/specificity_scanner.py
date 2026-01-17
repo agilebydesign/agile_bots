@@ -1,8 +1,8 @@
-from typing import List, Dict, Any, Optional
+﻿from typing import List, Dict, Any, Optional
 import re
-from .story_scanner import StoryScanner
-from .story_map import StoryNode, Epic, SubEpic, Story
-from .violation import Violation
+from story_scanner import StoryScanner
+from story_map import StoryNode, Epic, SubEpic, Story
+from scanners.violation import Violation
 
 class SpecificityScanner(StoryScanner):
     

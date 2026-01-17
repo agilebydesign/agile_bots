@@ -1,7 +1,7 @@
 {
   "priority": 3,
   "description": "Use outcome-oriented language over mechanism-oriented language. Focus on what is created or achieved, not how it's shown or communicated.",
-  "scanner": "agile_bot.bots.base_bot.src.scanners.communication_verb_scanner.CommunicationVerbScanner",
+  "scanner": "agile_bot.bots.base_bot.scanners.communication_verb_scanner.CommunicationVerbScanner",
   "do": {
     "description": "Focus on outcomes and artifacts, not mechanisms. Example: 'Power Activation Animation' not 'Visualizing Power Activation'",
     "guidance": [

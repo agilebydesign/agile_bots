@@ -1,10 +1,10 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import logging
-from .code_scanner import CodeScanner
-from .complexity_metrics import ComplexityMetrics
+from code_scanner import CodeScanner
+from complexity_metrics import ComplexityMetrics
 from .resources.ast_elements import Functions
 
 logger = logging.getLogger(__name__)

@@ -1,0 +1,294 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\actions.py",
+  "cached_at": "2026-01-16T16:49:45.064733",
+  "blocks": [
+    {
+      "hash": "fd9391e5de341d48eb74b854262620bf",
+      "start_line": 70,
+      "end_line": 76,
+      "func_name": "remaining_actions",
+      "preview": "if not self.current:\n    return self.names\ncurrent_name = self.current.action_name\nif current_name not in self.names:\n    return self.names\ncurrent_idx = self.names.index(current_name)\nremaining = self.names[current_idx + 1:]",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3b97ed5a42edf78ee9b9b305cccd35fe",
+      "start_line": 72,
+      "end_line": 77,
+      "func_name": "remaining_actions",
+      "preview": "current_name = self.current.action_name\nif current_name not in self.names:\n    return self.names\ncurrent_idx = self.names.index(current_name)\nremaining = self.names[current_idx + 1:]\nreturn [name for name in remaining if not self.is_action_completed(name)]",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "4397636d268c9cd8f33102a0c3fb2893",
+      "start_line": 70,
+      "end_line": 77,
+      "func_name": "remaining_actions",
+      "preview": "if not self.current:\n    return self.names\ncurrent_name = self.current.action_name\nif current_name not in self.names:\n    return self.names\ncurrent_idx = self.names.index(current_name)\nremaining = self.names[current_idx + 1:]\nreturn [name for name in remaining if not self.is_action_completed(name)]",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "637f6b5dbc2303550e442dfa5bfd81d9",
+      "start_line": 111,
+      "end_line": 122,
+      "func_name": "navigate_to",
+      "preview": "action = self.find_by_name(action_name)\nif action is None:\n    raise ValueError(f\"Action '{action_name}' not found\")\nis_non_workflow = action in self._non_workflow_actions\nif is_non_workflow:\n    return\nfor i, a in enumerate(self._actions):\n    if a.action_name == action_name:\n        self._current_index = i\n        break",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|FOR_LOOP"
+    },
+    {
+      "hash": "fe072c3c58f33ee357b7fccdbfdc66d1",
+      "start_line": 112,
+      "end_line": 124,
+      "func_name": "navigate_to",
+      "preview": "if action is None:\n    raise ValueError(f\"Action '{action_name}' not found\")\nis_non_workflow = action in self._non_workflow_actions\nif is_non_workflow:\n    return\nfor i, a in enumerate(self._actions):\n    if a.action_name == action_name:\n        self._current_index = i\n        break\nself.save_state()",
+      "normalized": "If|ASSIGN(1_targets)|If|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "c514068636254bfd0ba3e9221d49c287",
+      "start_line": 111,
+      "end_line": 124,
+      "func_name": "navigate_to",
+      "preview": "action = self.find_by_name(action_name)\nif action is None:\n    raise ValueError(f\"Action '{action_name}' not found\")\nis_non_workflow = action in self._non_workflow_actions\nif is_non_workflow:\n    return\nfor i, a in enumerate(self._actions):\n    if a.action_name == action_name:\n        self._current_index = i\n        break\nself.save_state()",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "fd9391e5de341d48eb74b854262620bf",
+      "start_line": 127,
+      "end_line": 138,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "55a1ec7d49c68d8febb2c7d664068041",
+      "start_line": 133,
+      "end_line": 139,
+      "func_name": "close_current",
+      "preview": "current_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "5afdb227526a456e0f6b330201494031",
+      "start_line": 134,
+      "end_line": 140,
+      "func_name": "close_current",
+      "preview": "if current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "5c640e4db7e375a6ba1d8352a046f3bc",
+      "start_line": 137,
+      "end_line": 141,
+      "func_name": "close_current",
+      "preview": "state_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "a534ebd563ac2ce58206f5b6f289d5d3",
+      "start_line": 138,
+      "end_line": 142,
+      "func_name": "close_current",
+      "preview": "state_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "22a0a96da816bfd72470d5509e520d3a",
+      "start_line": 139,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "self._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "ee9ddecc5f42d6c05d78bb162ed8b69b",
+      "start_line": 127,
+      "end_line": 139,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "a92c8d3b5371d298ca84fe13ce66204f",
+      "start_line": 133,
+      "end_line": 140,
+      "func_name": "close_current",
+      "preview": "current_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "2e5096193dcf107a52fcfe249506b835",
+      "start_line": 134,
+      "end_line": 141,
+      "func_name": "close_current",
+      "preview": "if current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "a5bf48f1f313f515d3996b4ea8959672",
+      "start_line": 137,
+      "end_line": 142,
+      "func_name": "close_current",
+      "preview": "state_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "41da7e2ce67045f1f3c89ac9a7700028",
+      "start_line": 138,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "state_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "f17e728fa5e2c5516b39c7ce7a0a557e",
+      "start_line": 127,
+      "end_line": 140,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "329fea8f9abd0f43b3e81a83af3039c3",
+      "start_line": 133,
+      "end_line": 141,
+      "func_name": "close_current",
+      "preview": "current_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "0dc55b02b3d1eb7e423b1da5291ae577",
+      "start_line": 134,
+      "end_line": 142,
+      "func_name": "close_current",
+      "preview": "if current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "615d3f52404d573130f8288c0e2d7fac",
+      "start_line": 137,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "state_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "ac3102261154d5866249e28231260a4e",
+      "start_line": 127,
+      "end_line": 141,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "e906e882ee9d7b9f93f2c5f401284da1",
+      "start_line": 133,
+      "end_line": 142,
+      "func_name": "close_current",
+      "preview": "current_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "139ea845a1c13fd0a7ce520271b8fd1f",
+      "start_line": 134,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "if current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "04d2dd37dc5877928bb2392003495be2",
+      "start_line": 127,
+      "end_line": 142,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "9702bb302f909be0cf843b6931e2d704",
+      "start_line": 133,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "current_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "c58a5525af827033188fe24ea3f5f677",
+      "start_line": 127,
+      "end_line": 143,
+      "func_name": "close_current",
+      "preview": "if self.current is None:\n    if self._actions:\n        self._current_index = 0\n    else:\n        return\ncurrent_action = self.current\nif current_action is None:\n    return\nstate_file = self._state_manager.get_state_file_path()\nstate_data = self._state_manager.load_or_create_state(state_file)\nself._ensure_current_behavior_in_state(state_data)\nself._mark_action_completed(state_data)\nself._advance_to_next_action()\nself._update_current_action_in_state(state_data)\nself._save_state_file(state_file, state_data)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "fd9391e5de341d48eb74b854262620bf",
+      "start_line": 150,
+      "end_line": 156,
+      "func_name": "_mark_action_completed",
+      "preview": "if 'completed_actions' not in state_data:\n    state_data['completed_actions'] = []\ncompleted_actions_list = state_data.get('completed_actions', [])\nif self.current is None:\n    return\naction_state = f'{self.behavior.bot_name}.{self.behavior.name}.{self.current.action_name}'\nis_already_completed = any((a.get('action_state') == action_state for a in completed_actions_list))",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3da815e5b6de395cc0ca43011775542c",
+      "start_line": 152,
+      "end_line": 161,
+      "func_name": "_mark_action_completed",
+      "preview": "completed_actions_list = state_data.get('completed_actions', [])\nif self.current is None:\n    return\naction_state = f'{self.behavior.bot_name}.{self.behavior.name}.{self.current.action_name}'\nis_already_completed = any((a.get('action_state') == action_state for a in completed_actions_list))\nif not is_already_completed:\n    new_completed_action_entry = {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n    state_data['completed_actions'] = completed_actions_list + [new_completed_action_entry]\nelse:\n    state_data['completed_actions'] = completed_actions_list",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "35125edfce8061be7510613f2d022eaa",
+      "start_line": 150,
+      "end_line": 161,
+      "func_name": "_mark_action_completed",
+      "preview": "if 'completed_actions' not in state_data:\n    state_data['completed_actions'] = []\ncompleted_actions_list = state_data.get('completed_actions', [])\nif self.current is None:\n    return\naction_state = f'{self.behavior.bot_name}.{self.behavior.name}.{self.current.action_name}'\nis_already_completed = any((a.get('action_state') == action_state for a in completed_actions_list))\nif not is_already_completed:\n    new_completed_action_entry = {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n    state_data['completed_actions'] = completed_actions_list + [new_completed_action_entry]\nelse:\n    state_data['completed_actions'] = completed_actions_list",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "4fd0949250e487c8912646fa8fc0eb2a",
+      "start_line": 210,
+      "end_line": 219,
+      "func_name": "_build_behavior_reminder",
+      "preview": "try:\n    current_index = behavior_names.index(self.behavior.name)\nexcept (ValueError, IndexError) as e:\n    logging.getLogger(__name__).debug(f'Failed to get next behavior reminder (ValueError/IndexError): {e}')\n    raise\nif current_index + 1 >= len(behavior_names):\n    return ''\nnext_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)",
+      "normalized": "Try|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "367cf2fca86f48167dc402a1c8fa0f79",
+      "start_line": 215,
+      "end_line": 221,
+      "func_name": "_build_behavior_reminder",
+      "preview": "if current_index + 1 >= len(behavior_names):\n    return ''\nnext_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)\nif first_action_name:\n    return f\"After completing this action, the next behavior in sequence is `{next_behavior_name}`. The first action in `{next_behavior_name}` is `{first_action_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "4c8367eaab3a3c080a2d8fee1cf47996",
+      "start_line": 217,
+      "end_line": 222,
+      "func_name": "_build_behavior_reminder",
+      "preview": "next_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)\nif first_action_name:\n    return f\"After completing this action, the next behavior in sequence is `{next_behavior_name}`. The first action in `{next_behavior_name}` is `{first_action_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"\nreturn f\"After completing this behavior, the next behavior in sequence is `{next_behavior_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "e0398d7df4058dd3104de69ba8fc0d2f",
+      "start_line": 210,
+      "end_line": 221,
+      "func_name": "_build_behavior_reminder",
+      "preview": "try:\n    current_index = behavior_names.index(self.behavior.name)\nexcept (ValueError, IndexError) as e:\n    logging.getLogger(__name__).debug(f'Failed to get next behavior reminder (ValueError/IndexError): {e}')\n    raise\nif current_index + 1 >= len(behavior_names):\n    return ''\nnext_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)\nif first_action_name:\n    return f\"After completing this action, the next behavior in sequence is `{next_behavior_name}`. The first action in `{next_behavior_name}` is `{first_action_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"",
+      "normalized": "Try|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "414a1e1a2d07e33bdc6cacb75e0593e9",
+      "start_line": 215,
+      "end_line": 222,
+      "func_name": "_build_behavior_reminder",
+      "preview": "if current_index + 1 >= len(behavior_names):\n    return ''\nnext_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)\nif first_action_name:\n    return f\"After completing this action, the next behavior in sequence is `{next_behavior_name}`. The first action in `{next_behavior_name}` is `{first_action_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"\nreturn f\"After completing this behavior, the next behavior in sequence is `{next_behavior_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "4a8973707aeec0adf383a5936f9e2f3f",
+      "start_line": 210,
+      "end_line": 222,
+      "func_name": "_build_behavior_reminder",
+      "preview": "try:\n    current_index = behavior_names.index(self.behavior.name)\nexcept (ValueError, IndexError) as e:\n    logging.getLogger(__name__).debug(f'Failed to get next behavior reminder (ValueError/IndexError): {e}')\n    raise\nif current_index + 1 >= len(behavior_names):\n    return ''\nnext_behavior_name = behavior_names[current_index + 1]\nnext_behavior = self.behavior.bot.behaviors.find_by_name(next_behavior_name)\nfirst_action_name = self._get_first_action_name(next_behavior)\nif first_action_name:\n    return f\"After completing this action, the next behavior in sequence is `{next_behavior_name}`. The first action in `{next_behavior_name}` is `{first_action_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"\nreturn f\"After completing this behavior, the next behavior in sequence is `{next_behavior_name}`. When the user is ready to continue, remind them: 'The next behavior in sequence is `{next_behavior_name}`. Would you like to continue with `{next_behavior_name}` or work on a different behavior?'\"",
+      "normalized": "Try|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    }
+  ]
+}

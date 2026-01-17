@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any
-from ..clarify.required_context import RequiredContext
-from ..strategy.strategy import Strategy
+from actions.clarify.required_context import RequiredContext
+from actions.strategy.strategy import Strategy
 
 class Guardrails:
 

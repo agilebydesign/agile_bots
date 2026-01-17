@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 from pathlib import Path
 from typing import Optional
 from urllib.parse import quote

@@ -1,7 +1,7 @@
-from typing import Dict, Any
-from ...bot_path import BotPath
-from .json_persistent import JsonPersistent
-from .strategy import Strategy
+﻿from typing import Dict, Any
+from bot_path import BotPath
+from actions.strategy.json_persistent import JsonPersistent
+from actions.strategy.strategy import Strategy
 
 class StrategyDecision(JsonPersistent):
     

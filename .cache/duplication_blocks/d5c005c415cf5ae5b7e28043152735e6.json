@@ -1,0 +1,542 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\behaviors\\behaviors.py",
+  "cached_at": "2026-01-16T16:49:45.194198",
+  "blocks": [
+    {
+      "hash": "f3657e7baddc7fb60c236849b68fe438",
+      "start_line": 36,
+      "end_line": 44,
+      "func_name": "_load_behavior_from_dir",
+      "preview": "config = read_json_file(behavior_json_path)\norder = config.get('order', 999)\nbehavior = Behavior(name=item.name, bot_paths=self.bot_paths, bot_instance=None)\nreturn (order, behavior)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "66fbfec203690972f91597ffb5fa2e35",
+      "start_line": 47,
+      "end_line": 59,
+      "func_name": "_discover_behaviors",
+      "preview": "behaviors_dir = self.bot_paths.bot_directory / 'behaviors'\nif not behaviors_dir.exists():\n    return\nbehavior_orders = []\nfor item in behaviors_dir.iterdir():\n    if not item.is_dir() or item.name.startswith('_') or item.name.startswith('.'):\n        continue\n    if self._allowed_behaviors is not None and item.name not in self._allowed_behaviors:\n        continue\n    result = self._load_behavior_from_dir(item)\n    if result:\n        behavior_orders.append(result)\nbehavior_orders.sort(key=lambda x: x[0])",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "50913c3080d1333d6b6a208f8d11cfbb",
+      "start_line": 48,
+      "end_line": 60,
+      "func_name": "_discover_behaviors",
+      "preview": "if not behaviors_dir.exists():\n    return\nbehavior_orders = []\nfor item in behaviors_dir.iterdir():\n    if not item.is_dir() or item.name.startswith('_') or item.name.startswith('.'):\n        continue\n    if self._allowed_behaviors is not None and item.name not in self._allowed_behaviors:\n        continue\n    result = self._load_behavior_from_dir(item)\n    if result:\n        behavior_orders.append(result)\nbehavior_orders.sort(key=lambda x: x[0])\nself._behaviors = [behavior for _, behavior in behavior_orders]",
+      "normalized": "If|ASSIGN(1_targets)|FOR_LOOP|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "58f918dfda3f9fc805b7cdd52c3e54c9",
+      "start_line": 47,
+      "end_line": 60,
+      "func_name": "_discover_behaviors",
+      "preview": "behaviors_dir = self.bot_paths.bot_directory / 'behaviors'\nif not behaviors_dir.exists():\n    return\nbehavior_orders = []\nfor item in behaviors_dir.iterdir():\n    if not item.is_dir() or item.name.startswith('_') or item.name.startswith('.'):\n        continue\n    if self._allowed_behaviors is not None and item.name not in self._allowed_behaviors:\n        continue\n    result = self._load_behavior_from_dir(item)\n    if result:\n        behavior_orders.append(result)\nbehavior_orders.sort(key=lambda x: x[0])\nself._behaviors = [behavior for _, behavior in behavior_orders]",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "a8b221a9ee05d0afffb06ed76cb7e1f0",
+      "start_line": 86,
+      "end_line": 92,
+      "func_name": "next_step_command",
+      "preview": "current = self.current\nif not current:\n    return None\nremaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "5b04939f4e23ed837a16eb8bc236d176",
+      "start_line": 87,
+      "end_line": 94,
+      "func_name": "next_step_command",
+      "preview": "if not current:\n    return None\nremaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()\nif next_behavior and next_behavior.actions.names:\n    return f'/{self.bot_name}-{next_behavior.name} {next_behavior.actions.names[0]}'",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e75f9fe84bedad02db73ca3b3869b176",
+      "start_line": 89,
+      "end_line": 95,
+      "func_name": "next_step_command",
+      "preview": "remaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()\nif next_behavior and next_behavior.actions.names:\n    return f'/{self.bot_name}-{next_behavior.name} {next_behavior.actions.names[0]}'\nreturn None",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "55bb4a78d6c2e3c117522c70a4896df1",
+      "start_line": 86,
+      "end_line": 94,
+      "func_name": "next_step_command",
+      "preview": "current = self.current\nif not current:\n    return None\nremaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()\nif next_behavior and next_behavior.actions.names:\n    return f'/{self.bot_name}-{next_behavior.name} {next_behavior.actions.names[0]}'",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "dc9bf550aace19a06daee91f1a78388e",
+      "start_line": 87,
+      "end_line": 95,
+      "func_name": "next_step_command",
+      "preview": "if not current:\n    return None\nremaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()\nif next_behavior and next_behavior.actions.names:\n    return f'/{self.bot_name}-{next_behavior.name} {next_behavior.actions.names[0]}'\nreturn None",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "fa3c7c451bd2258a1258f14903bc5b48",
+      "start_line": 86,
+      "end_line": 95,
+      "func_name": "next_step_command",
+      "preview": "current = self.current\nif not current:\n    return None\nremaining_actions = current.actions.remaining_actions\nif remaining_actions:\n    return f'/{self.bot_name}-{current.name} {remaining_actions[0]}'\nnext_behavior = self.next()\nif next_behavior and next_behavior.actions.names:\n    return f'/{self.bot_name}-{next_behavior.name} {next_behavior.actions.names[0]}'\nreturn None",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "661dc1a63d90858f3dc53c49fd8e5cf2",
+      "start_line": 139,
+      "end_line": 149,
+      "func_name": "advance",
+      "preview": "self._current_index += 1\nself.save_state()\nif next_behavior.actions.names:\n    next_behavior.actions.navigate_to(next_behavior.actions.names[0])\nreturn {'status': 'success', 'message': f'Advanced to behavior: {next_behavior.name}', 'behavior': next_behavior.name, 'action': next_behavior.actions.current.action_name if next_behavior.actions.current else None}",
+      "normalized": "AugAssign|CALL|If|Return"
+    },
+    {
+      "hash": "320a45a9a4b3169a1d83416b1569e3bf",
+      "start_line": 164,
+      "end_line": 176,
+      "func_name": "go_back",
+      "preview": "if not self.current:\n    return {'status': 'error', 'message': 'No current behavior set'}\ncurrent_behavior = self.current\nback_result = current_behavior.actions.go_back()\nif back_result['status'] == 'success':\n    return back_result\nprev_behavior = self.previous()",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8388e3bcdf1a6075ca4e97ba80a57651",
+      "start_line": 170,
+      "end_line": 188,
+      "func_name": "go_back",
+      "preview": "current_behavior = self.current\nback_result = current_behavior.actions.go_back()\nif back_result['status'] == 'success':\n    return back_result\nprev_behavior = self.previous()\nif prev_behavior:\n    self._current_index -= 1\n    self.save_state()\n    if prev_behavior.actions._actions:\n        last_action_name = prev_behavior.actions.names[-1]\n        prev_behavior.actions.navigate_to(last_action_name)\n    return {'status': 'success', 'message': f'Went back to behavior: {prev_behavior.name}', 'behavior': prev_behavior.name, 'action': prev_behavior.actions.current.action_name if prev_behavior.actions.current else None}",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e75f9fe84bedad02db73ca3b3869b176",
+      "start_line": 171,
+      "end_line": 190,
+      "func_name": "go_back",
+      "preview": "back_result = current_behavior.actions.go_back()\nif back_result['status'] == 'success':\n    return back_result\nprev_behavior = self.previous()\nif prev_behavior:\n    self._current_index -= 1\n    self.save_state()\n    if prev_behavior.actions._actions:\n        last_action_name = prev_behavior.actions.names[-1]\n        prev_behavior.actions.navigate_to(last_action_name)\n    return {'status': 'success', 'message': f'Went back to behavior: {prev_behavior.name}', 'behavior': prev_behavior.name, 'action': prev_behavior.actions.current.action_name if prev_behavior.actions.current else None}\nreturn back_result",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "ddbb6f2a67af3e931ad60a133f315419",
+      "start_line": 200,
+      "end_line": 212,
+      "func_name": "navigate_to",
+      "preview": "behavior = self.find_by_name(behavior_name)\nif behavior is None:\n    raise ValueError(f\"Behavior '{behavior_name}' not found\")\nfor i, b in enumerate(self._behaviors):\n    if b.name == behavior.name:\n        self._current_index = i\n        break\nif self.current and self.current.actions:\n    self.current.actions.load_state()\nself.save_state()",
+      "normalized": "ASSIGN(1_targets)|If|FOR_LOOP|If|CALL"
+    },
+    {
+      "hash": "3fc4817b7812cdf9bacaed13b56785aa",
+      "start_line": 215,
+      "end_line": 221,
+      "func_name": "close_current",
+      "preview": "if self.current.actions and self.current.actions.current:\n    self.current.actions.close_current()\nnext_behavior = self.next()\nif next_behavior:\n    self._current_index += 1\n    self.save_state()",
+      "normalized": "If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "eead05a01ff69770e90ba2a541988cab",
+      "start_line": 239,
+      "end_line": 244,
+      "func_name": "save_state",
+      "preview": "try:\n    state_data = json.loads(state_file.read_text(encoding='utf-8'))\nexcept Exception as e:\n    logger.debug(f'Failed to load state file {state_file}: {e}')\n    raise",
+      "normalized": "Try"
+    },
+    {
+      "hash": "367cf2fca86f48167dc402a1c8fa0f79",
+      "start_line": 234,
+      "end_line": 244,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "c030ddf69eb58499dcf1e4d1b11686a1",
+      "start_line": 236,
+      "end_line": 245,
+      "func_name": "save_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8388e3bcdf1a6075ca4e97ba80a57651",
+      "start_line": 237,
+      "end_line": 247,
+      "func_name": "save_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "a8b221a9ee05d0afffb06ed76cb7e1f0",
+      "start_line": 238,
+      "end_line": 248,
+      "func_name": "save_state",
+      "preview": "state_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "d1a3b01ff0066b9c7afe6fb05a2f2398",
+      "start_line": 239,
+      "end_line": 249,
+      "func_name": "save_state",
+      "preview": "if state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "126ff6adcbaa1cc8553ac580c73334b5",
+      "start_line": 245,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "state_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "aa0fd01ef84f672e4d3e0d1aa5d4c320",
+      "start_line": 234,
+      "end_line": 245,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e412b3933d44cd11dc8db64737a51b8a",
+      "start_line": 236,
+      "end_line": 247,
+      "func_name": "save_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e8a73529786a561b11b9fa0ee5feff6e",
+      "start_line": 237,
+      "end_line": 248,
+      "func_name": "save_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "02e1ef548c60a18bd81a7f28e1111551",
+      "start_line": 238,
+      "end_line": 249,
+      "func_name": "save_state",
+      "preview": "state_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "81842f5a112319a867ca6ac9e9a773f4",
+      "start_line": 239,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "if state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "fcd779c45f57e66cd2fc65f038627fb1",
+      "start_line": 234,
+      "end_line": 247,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "6a7f59862dc35590f48615d1c4c6bd99",
+      "start_line": 236,
+      "end_line": 248,
+      "func_name": "save_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "b656c57b04426ce715cf8de99c1605e3",
+      "start_line": 237,
+      "end_line": 249,
+      "func_name": "save_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "5973cec36b11275fa97aa59ffcfc2745",
+      "start_line": 238,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "state_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "095c771d6cc3e804e36dabf7c92955af",
+      "start_line": 234,
+      "end_line": 248,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "7a7d2dcb2193d520f93c35861676f274",
+      "start_line": 236,
+      "end_line": 249,
+      "func_name": "save_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "3f9748a92a39b0e6d08939b5f89696bd",
+      "start_line": 237,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "866a8b0de5dd41fe10482c31a647f163",
+      "start_line": 234,
+      "end_line": 249,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "fcb6c3d54dc9900073c470840182b29e",
+      "start_line": 236,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "72f1aead4ac1b3525eb57adfa0dbb2da",
+      "start_line": 234,
+      "end_line": 250,
+      "func_name": "save_state",
+      "preview": "if self.current is None or self.bot_paths is None:\n    return\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\nstate_data = {}\nif state_file.exists():\n    try:\n        state_data = json.loads(state_file.read_text(encoding='utf-8'))\n    except Exception as e:\n        logger.debug(f'Failed to load state file {state_file}: {e}')\n        raise\nstate_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'\nif self.current.actions and self.current.actions.current:\n    state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'\nstate_data['timestamp'] = datetime.now().isoformat()\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "9b30b9ecb7dca597f46b7d7c5cf0fc78",
+      "start_line": 282,
+      "end_line": 288,
+      "func_name": "load_state",
+      "preview": "idx = self._find_behavior_index(behavior_name)\nif idx >= 0:\n    self._current_index = idx\n    if self.current:\n        self.current.actions.load_state()\n    return",
+      "normalized": "ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "1165f6e26ab45e2727badf74ea68bae4",
+      "start_line": 284,
+      "end_line": 288,
+      "func_name": "load_state",
+      "preview": "self._current_index = idx\nif self.current:\n    self.current.actions.load_state()\nreturn",
+      "normalized": "ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "fd9391e5de341d48eb74b854262620bf",
+      "start_line": 294,
+      "end_line": 300,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8dc9f364a6b2b452981e2cd702b20c1f",
+      "start_line": 296,
+      "end_line": 301,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e3184aaad4e7d00769be701b6baa562c",
+      "start_line": 297,
+      "end_line": 302,
+      "func_name": "initialize_state",
+      "preview": "if behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "789a81accd7b909a5cf1573191613a3a",
+      "start_line": 299,
+      "end_line": 303,
+      "func_name": "initialize_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "ce74638acee6af04ba09b3be6b57cb93",
+      "start_line": 300,
+      "end_line": 304,
+      "func_name": "initialize_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "20c593e853875be590e8fb64403420bd",
+      "start_line": 301,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "action_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "401e9ee4e8c0033ff21155cf65a41d82",
+      "start_line": 302,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "first_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "e64291dee6d52fe6ba30fa4e4d71c67c",
+      "start_line": 294,
+      "end_line": 301,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "fca5e4d7503038ff584f62666709f890",
+      "start_line": 296,
+      "end_line": 302,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3add63eb91372b64a1bdda70b0e177ac",
+      "start_line": 297,
+      "end_line": 303,
+      "func_name": "initialize_state",
+      "preview": "if behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "70d42a3fd0fe1ad6242213553ac56a2a",
+      "start_line": 299,
+      "end_line": 304,
+      "func_name": "initialize_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "daf66d3d27fd002c728adde773991a7f",
+      "start_line": 300,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "cf26ec9e626259a1d0a3636d0542c4a4",
+      "start_line": 301,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "action_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "0c6b0a4a2db04165923409d3abbebada",
+      "start_line": 294,
+      "end_line": 302,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "cab58c29f91426f7b58b2c67e1a5759f",
+      "start_line": 296,
+      "end_line": 303,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "09744a8b8db2a9bad4a87aec2b415586",
+      "start_line": 297,
+      "end_line": 304,
+      "func_name": "initialize_state",
+      "preview": "if behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "59736a51b4a773a5dbfba3d254573631",
+      "start_line": 299,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "c3596656cec4f883fc20487a8711528f",
+      "start_line": 300,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "state_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "b1414d441b1d4af969291f920fff9bb8",
+      "start_line": 294,
+      "end_line": 303,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "6f6eac44c9dd5c96bc6a3f79b2f74b9d",
+      "start_line": 296,
+      "end_line": 304,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "f33423d27043e9987bab37c427f78b33",
+      "start_line": 297,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "if behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "93e75702f59b0262e80918f4f6413cba",
+      "start_line": 299,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "workspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "c3a8c77bb7ff26fd5c4a0284fc7ab6d1",
+      "start_line": 294,
+      "end_line": 304,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8851348052f64b7c783e9f7490f503ba",
+      "start_line": 296,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "7b8e4878b0c155e4fe52222ecae5868b",
+      "start_line": 297,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "if behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "7270921c4b9ffb73cddb4ad82d792385",
+      "start_line": 294,
+      "end_line": 305,
+      "func_name": "initialize_state",
+      "preview": "if self.bot_paths is None:\n    raise ValueError('Cannot initialize state without bot_paths')\nbehavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "48d0b3eecba6c674496e49835cf24635",
+      "start_line": 296,
+      "end_line": 306,
+      "func_name": "initialize_state",
+      "preview": "behavior_obj = self.find_by_name(confirmed_behavior)\nif behavior_obj is None:\n    raise ValueError(f\"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.\")\nworkspace_dir = self.bot_paths.workspace_directory\nstate_file = workspace_dir / 'behavior_action_state.json'\naction_names = behavior_obj.actions.names\nfirst_action = action_names[0] if action_names else 'clarify'\nself.navigate_to(confirmed_behavior)\nstate_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}\nstate_file.parent.mkdir(parents=True, exist_ok=True)\nstate_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|CALL"
+    }
+  ]
+}

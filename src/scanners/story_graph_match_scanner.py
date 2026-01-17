@@ -1,11 +1,11 @@
-"""Scanner for validating test structure matches story graph exactly."""
+﻿"""Scanner for validating test structure matches story graph exactly."""
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import logging
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 from .resources.ast_elements import Classes
 
 logger = logging.getLogger(__name__)
@@ -89,11 +89,11 @@ class StoryGraphMatchScanner(TestScanner):
 
 ## Behavior Instructions - tests
 
-The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 
 **BEHAVIOR PURPOSE:**
 This behavior WRITES TEST FILES. The primary output is executable test code files that validate story behavior.
-Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+Write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 The secondary output is to make sure that the story_graph.json scenarios, stories, and sub-epics have test fields added for the test methods, test classes, and test files respectively.
 After creating test files, classes, and methods, you MUST map them to the story-graph.json:
 
@@ -180,7 +180,7 @@ Rules to follow:
   DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
 
 - **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
-  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bots.bots... import X
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from bots... import X
   DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
 
 - **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
@@ -268,11 +268,11 @@ When analyzing code, focus on finding violations and cite the specific rule name
 
 ## Behavior Instructions - tests
 
-The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 
 **BEHAVIOR PURPOSE:**
 This behavior WRITES TEST FILES. The primary output is executable test code files that validate story behavior.
-Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+Write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 The secondary output is to make sure that the story_graph.json scenarios, stories, and sub-epics have test fields added for the test methods, test classes, and test files respectively.
 After creating test files, classes, and methods, you MUST map them to the story-graph.json:
 
@@ -359,7 +359,7 @@ Rules to follow:
   DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
 
 - **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
-  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bots.bots... import X
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from bots... import X
   DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
 
 - **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
@@ -447,11 +447,11 @@ When analyzing code, focus on finding violations and cite the specific rule name
 
 ## Behavior Instructions - tests
 
-The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 
 **BEHAVIOR PURPOSE:**
 This behavior WRITES TEST FILES. The primary output is executable test code files that validate story behavior.
-Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+Write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 The secondary output is to make sure that the story_graph.json scenarios, stories, and sub-epics have test fields added for the test methods, test classes, and test files respectively.
 After creating test files, classes, and methods, you MUST map them to the story-graph.json:
 
@@ -538,7 +538,7 @@ Rules to follow:
   DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
 
 - **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
-  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bots.bots... import X
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from bots... import X
   DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
 
 - **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
@@ -626,11 +626,11 @@ When analyzing code, focus on finding violations and cite the specific rule name
 
 ## Behavior Instructions - tests
 
-The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 
 **BEHAVIOR PURPOSE:**
 This behavior WRITES TEST FILES. The primary output is executable test code files that validate story behavior.
-Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+Write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 The secondary output is to make sure that the story_graph.json scenarios, stories, and sub-epics have test fields added for the test methods, test classes, and test files respectively.
 After creating test files, classes, and methods, you MUST map them to the story-graph.json:
 
@@ -717,7 +717,7 @@ Rules to follow:
   DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
 
 - **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
-  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bots.bots... import X
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from bots... import X
   DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
 
 - **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
@@ -795,11 +795,11 @@ WORKFLOW:
 
 ## Behavior Instructions - tests
 
-The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+The purpose of this behavior is to write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 
 **BEHAVIOR PURPOSE:**
 This behavior WRITES TEST FILES. The primary output is executable test code files that validate story behavior.
-Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior
+Write test files (.py, .js, etc.) with executable test code from scenarios.examples that validate story behavior
 The secondary output is to make sure that the story_graph.json scenarios, stories, and sub-epics have test fields added for the test methods, test classes, and test files respectively.
 After creating test files, classes, and methods, you MUST map them to the story-graph.json:
 
@@ -886,7 +886,7 @@ Rules to follow:
   DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
 
 - **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
-  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bots.bots... import X
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from bots... import X
   DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
 
 - **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.

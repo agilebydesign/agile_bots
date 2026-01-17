@@ -2,7 +2,7 @@
   "priority": 3,
   "description": "Decompose large domain objects into focused assistants to maintain single responsibility and smaller surface area. Use Doer patterns (Helper, Calculator, Analyzer) when a concept has too many distinct responsibility areas. Assistants must be subordinate to and owned by the domain concept they serve. Example: Portfolio delegates to RiskAnalyzer, RebalanceCalculator, PerformanceAnalyzer.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.helper_ownership_scanner.HelperOwnershipScanner"
+    "agile_bot.bots.base_bot.scanners.helper_ownership_scanner.HelperOwnershipScanner"
   ],
   "do": {
     "description": "Decompose large domain objects into assistants to maintain single responsibility. Example: Portfolio delegates to RiskAnalyzer, RebalanceCalculator, PerformanceAnalyzer (focused assistants)",

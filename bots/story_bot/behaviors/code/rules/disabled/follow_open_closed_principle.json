@@ -63,5 +63,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.open_closed_principle_scanner.OpenClosedPrincipleScanner"
+  "scanner": "agile_bot.scanners.open_closed_principle_scanner.OpenClosedPrincipleScanner"
 }

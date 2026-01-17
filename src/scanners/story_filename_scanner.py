@@ -1,9 +1,9 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
-from .story_scanner import StoryScanner
-from .story_map import StoryNode, Story
-from .violation import Violation
+from story_scanner import StoryScanner
+from story_map import StoryNode, Story
+from scanners.violation import Violation
 import re
 
 class StoryFilenameScanner(StoryScanner):

@@ -1,8 +1,8 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, List
 from datetime import datetime
-from ...bot_path import BotPath
-from .validation_stats import ValidationStats
+from bot_path import BotPath
+from actions.validate.validation_stats import ValidationStats
 
 class ValidationReportBuilder:
 

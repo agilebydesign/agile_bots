@@ -54,5 +54,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.meaningful_context_scanner.MeaningfulContextScanner"
+  "scanner": "agile_bot.scanners.meaningful_context_scanner.MeaningfulContextScanner"
 }

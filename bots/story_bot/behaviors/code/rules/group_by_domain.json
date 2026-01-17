@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must be organized by domain area and relationships, not by technical layers, object types, or architectural concerns.",
-  "scanner": "agile_bot.src.scanners.domain_grouping_code_scanner.DomainGroupingCodeScanner",
+  "scanner": "agile_bot.scanners.domain_grouping_code_scanner.DomainGroupingCodeScanner",
   "examples": [
     {
       "do": {

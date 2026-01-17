@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.actions.build.build_action import BuildStoryGraphAction
+from cli.adapters import JSONAdapter
+from actions.build.build_action import BuildStoryGraphAction
 
 class JSONBuildAction(JSONAdapter):
     

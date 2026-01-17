@@ -1,4 +1,4 @@
-import logging
+﻿import logging
 import re
 import sys
 import traceback
@@ -6,13 +6,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from urllib.parse import quote
-from ...bot_path import BotPath
-from .validation_report_builder import ValidationReportBuilder
-from .validation_report_formatter import ValidationReportFormatter
-from ...scanners.scanner_status_formatter import ScannerStatusFormatter
-from ...scanners.validation_scanner_status_builder import ValidationScannerStatusBuilder
-from .file_link_builder import FileLinkBuilder
-from .violation_formatter import ViolationFormatter
+from bot_path import BotPath
+from actions.validate.validation_report_builder import ValidationReportBuilder
+from actions.validate.validation_report_formatter import ValidationReportFormatter
+from scanners.scanner_status_formatter import ScannerStatusFormatter
+from scanners.validation_scanner_status_builder import ValidationScannerStatusBuilder
+from actions.validate.file_link_builder import FileLinkBuilder
+from actions.validate.violation_formatter import ViolationFormatter
 logger = logging.getLogger(__name__)
 
 def ensure_reports_directory(bot_paths: BotPath, workspace_directory: Path) -> Path:

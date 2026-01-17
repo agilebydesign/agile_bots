@@ -1,11 +1,11 @@
-import json
+﻿import json
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, TYPE_CHECKING, NamedTuple
-from ..utils import read_json_file
+from utils import read_json_file
 if TYPE_CHECKING:
-    from ..behaviors.behavior import Behavior
-    from ..behaviors.behaviors import Behaviors
+    from behaviors.behavior import Behavior
+    from behaviors.behaviors import Behaviors
 logger = logging.getLogger(__name__)
 
 class CurrentBehaviorContext(NamedTuple):

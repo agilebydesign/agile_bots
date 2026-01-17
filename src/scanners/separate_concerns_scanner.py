@@ -1,10 +1,10 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
 import logging
-from .code_scanner import CodeScanner
+from code_scanner import CodeScanner
 from .resources.ast_elements import Functions
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class SeparateConcernsScanner(CodeScanner):
         return violations
     
     def _check_mixed_concerns(self, func_node: ast.FunctionDef, content: str, file_path: Path, rule_obj: Any) -> Optional[Dict[str, Any]]:
-        from .complexity_metrics import ComplexityMetrics
+        from complexity_metrics import ComplexityMetrics
         
         responsibilities = ComplexityMetrics.detect_responsibilities(func_node)
         

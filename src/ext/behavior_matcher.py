@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, List, Optional
 import json
-from .trigger_domain import BehaviorTriggers, ActionTriggers
+from trigger_domain import BehaviorTriggers, ActionTriggers
 
 class BehaviorMatcher:
 

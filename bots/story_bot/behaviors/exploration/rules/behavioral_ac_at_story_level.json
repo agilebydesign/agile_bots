@@ -52,5 +52,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.behavioral_ac_scanner.BehavioralACScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.behavioral_ac_scanner.BehavioralACScanner"
 }

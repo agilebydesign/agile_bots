@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Type
-from ..action import Action
-from ..action_context import ActionContext, StrategyActionContext
-from .strategy import Strategy
-from .strategy_decision import StrategyDecision
+from actions.action import Action
+from actions.action_context import ActionContext, StrategyActionContext
+from actions.strategy.strategy import Strategy
+from actions.strategy.strategy_decision import StrategyDecision
 
 class StrategyAction(Action):
     context_class: Type[ActionContext] = StrategyActionContext
@@ -68,8 +68,8 @@ class StrategyAction(Action):
             instructions.set('assumptions', combined_assumptions)
     
         try:
-            from ..clarify.requirements_clarifications import RequirementsClarifications
-            from ..clarify.required_context import RequiredContext
+            from actions.clarify.requirements_clarifications import RequirementsClarifications
+            from actions.clarify.required_context import RequiredContext
             
             required_context = RequiredContext(self.behavior.folder)
             clarifications = RequirementsClarifications(

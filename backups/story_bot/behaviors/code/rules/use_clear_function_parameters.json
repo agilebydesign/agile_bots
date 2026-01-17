@@ -49,5 +49,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.src.scanners.clear_parameters_scanner.ClearParametersScanner"
+  "scanner": "agile_bot.bots.base_bot.scanners.clear_parameters_scanner.ClearParametersScanner"
 }

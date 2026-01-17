@@ -1,0 +1,1182 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\action.py",
+  "cached_at": "2026-01-16T16:49:45.051703",
+  "blocks": [
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 40,
+      "end_line": 44,
+      "func_name": "_load_base_config",
+      "preview": "final_action_name = self.action_name\nbase_actions_dir = get_base_actions_directory()\nbase_config_path = base_actions_dir / final_action_name / 'action_config.json'\nbase_config = read_json_file(base_config_path)\nbase_config['name'] = final_action_name",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "81e8bf0a85699936e2fc1f0c79ac3f33",
+      "start_line": 41,
+      "end_line": 45,
+      "func_name": "_load_base_config",
+      "preview": "base_actions_dir = get_base_actions_directory()\nbase_config_path = base_actions_dir / final_action_name / 'action_config.json'\nbase_config = read_json_file(base_config_path)\nbase_config['name'] = final_action_name\nreturn base_config",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "d5f3d4aa22f902d521e1cf30bb3fb829",
+      "start_line": 40,
+      "end_line": 45,
+      "func_name": "_load_base_config",
+      "preview": "final_action_name = self.action_name\nbase_actions_dir = get_base_actions_directory()\nbase_config_path = base_actions_dir / final_action_name / 'action_config.json'\nbase_config = read_json_file(base_config_path)\nbase_config['name'] = final_action_name\nreturn base_config",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "9c4ef335ee4c997f0acc505a6c5e43ad",
+      "start_line": 48,
+      "end_line": 55,
+      "func_name": "_apply_action_config",
+      "preview": "action_config = self.action_config\nif 'order' in action_config:\n    self._base_config['order'] = action_config['order']\nself._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|If"
+    },
+    {
+      "hash": "4d3c1ab439881ef47bd462cf48184007",
+      "start_line": 49,
+      "end_line": 57,
+      "func_name": "_apply_action_config",
+      "preview": "if 'order' in action_config:\n    self._base_config['order'] = action_config['order']\nself._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']",
+      "normalized": "If|ASSIGN(1_targets)|If|If|If"
+    },
+    {
+      "hash": "4d592d0525040374aa8678ceb97c0d59",
+      "start_line": 51,
+      "end_line": 59,
+      "func_name": "_apply_action_config",
+      "preview": "self._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']",
+      "normalized": "ASSIGN(1_targets)|If|If|If|If"
+    },
+    {
+      "hash": "f0c6ecf04dd48630dff2219c722891e3",
+      "start_line": 48,
+      "end_line": 57,
+      "func_name": "_apply_action_config",
+      "preview": "action_config = self.action_config\nif 'order' in action_config:\n    self._base_config['order'] = action_config['order']\nself._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|If|If"
+    },
+    {
+      "hash": "a6300cd3dbf8eb6158e1bdf440141b20",
+      "start_line": 49,
+      "end_line": 59,
+      "func_name": "_apply_action_config",
+      "preview": "if 'order' in action_config:\n    self._base_config['order'] = action_config['order']\nself._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']",
+      "normalized": "If|ASSIGN(1_targets)|If|If|If|If"
+    },
+    {
+      "hash": "8e87cfdb116ccb218d0726aff83d4eef",
+      "start_line": 48,
+      "end_line": 59,
+      "func_name": "_apply_action_config",
+      "preview": "action_config = self.action_config\nif 'order' in action_config:\n    self._base_config['order'] = action_config['order']\nself._base_config['custom_class'] = action_config.get('action_class') or action_config.get('custom_class')\nif 'next_action' in action_config:\n    self._base_config['next_action'] = action_config['next_action']\nif 'auto_confirm' in action_config:\n    self._base_config['auto_confirm'] = action_config['auto_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']\nif 'skip_confirm' in action_config:\n    self._base_config['skip_confirm'] = action_config['skip_confirm']",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|If|If|If"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 62,
+      "end_line": 66,
+      "func_name": "_initialize_properties",
+      "preview": "self.order = self._base_config.get('order', 0)\nself.next_action = self._base_config.get('next_action')\nself.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 63,
+      "end_line": 67,
+      "func_name": "_initialize_properties",
+      "preview": "self.next_action = self._base_config.get('next_action')\nself.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 64,
+      "end_line": 68,
+      "func_name": "_initialize_properties",
+      "preview": "self.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 62,
+      "end_line": 67,
+      "func_name": "_initialize_properties",
+      "preview": "self.order = self._base_config.get('order', 0)\nself.next_action = self._base_config.get('next_action')\nself.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 63,
+      "end_line": 68,
+      "func_name": "_initialize_properties",
+      "preview": "self.next_action = self._base_config.get('next_action')\nself.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "22545341409905b2d52b47072708c0c8",
+      "start_line": 62,
+      "end_line": 68,
+      "func_name": "_initialize_properties",
+      "preview": "self.order = self._base_config.get('order', 0)\nself.next_action = self._base_config.get('next_action')\nself.action_class = self._base_config.get('action_class') or self._base_config.get('custom_class')\nself.workflow = self._base_config.get('workflow', True)\nself.auto_confirm = self._base_config.get('auto_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)\nself.skip_confirm = self._base_config.get('skip_confirm', False)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3b97ed5a42edf78ee9b9b305cccd35fe",
+      "start_line": 71,
+      "end_line": 78,
+      "func_name": "_derive_action_name_from_class",
+      "preview": "class_name = self.__class__.__name__\nif class_name.endswith('Action'):\n    base_name = class_name[:-6]\nelse:\n    base_name = class_name\nsnake_case = re.sub('(?<!^)(?=[A-Z])', '_', base_name).lower()\nnormalization_map = {'render_output': 'render', 'build_knowledge': 'build', 'validate_rules': 'validate', 'clarify_context': 'clarify'}\nreturn normalization_map.get(snake_case, snake_case)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|Return"
+    },
+    {
+      "hash": "2725c694251a01e58b8aa600e77b96ab",
+      "start_line": 149,
+      "end_line": 165,
+      "func_name": "_get_parameter_description",
+      "preview": "from .clarify.requirements_clarifications import RequirementsClarifications\nfrom .strategy.strategy_decision import StrategyDecision\nfrom ..scope import Scope\ndescription_registry = [(['answers', 'key_questions_answered'], RequirementsClarifications.get_answers_parameter_description), (['evidence_provided', 'evidence'], RequirementsClarifications.get_evidence_parameter_description), (['choices', 'decisions_made', 'decisions'], StrategyDecision.get_decisions_parameter_description), (['assumptions', 'assumptions_made'], StrategyDecision.get_assumptions_parameter_description), (['scope'], Scope.get_parameter_description)]\nfor patterns, description_method in description_registry:\n    if any((pattern in param_name for pattern in patterns)):\n        return description_method()",
+      "normalized": "ImportFrom|ImportFrom|ImportFrom|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "3f98ad197299d3a03bee1705eb839b05",
+      "start_line": 150,
+      "end_line": 169,
+      "func_name": "_get_parameter_description",
+      "preview": "from .strategy.strategy_decision import StrategyDecision\nfrom ..scope import Scope\ndescription_registry = [(['answers', 'key_questions_answered'], RequirementsClarifications.get_answers_parameter_description), (['evidence_provided', 'evidence'], RequirementsClarifications.get_evidence_parameter_description), (['choices', 'decisions_made', 'decisions'], StrategyDecision.get_decisions_parameter_description), (['assumptions', 'assumptions_made'], StrategyDecision.get_assumptions_parameter_description), (['scope'], Scope.get_parameter_description)]\nfor patterns, description_method in description_registry:\n    if any((pattern in param_name for pattern in patterns)):\n        return description_method()\nif 'path' in param_name or 'directory' in param_name:\n    return 'Path to working directory or file'",
+      "normalized": "ImportFrom|ImportFrom|ASSIGN(1_targets)|FOR_LOOP|If"
+    },
+    {
+      "hash": "b94f63d20154082868ad0e113fba27dc",
+      "start_line": 193,
+      "end_line": 197,
+      "func_name": "_replace_context_placeholders",
+      "preview": "replaced = instruction\nfor placeholder, value in replacements.items():\n    replaced = replaced.replace(placeholder, value)\nresult.append(replaced)",
+      "normalized": "ASSIGN(1_targets)|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "8dc9f364a6b2b452981e2cd702b20c1f",
+      "start_line": 207,
+      "end_line": 220,
+      "func_name": "instructions",
+      "preview": "base_instructions = self._base_config.get('instructions', [])\nif isinstance(base_instructions, list):\n    base_instructions = self._replace_context_placeholders(base_instructions)\nscope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e3184aaad4e7d00769be701b6baa562c",
+      "start_line": 209,
+      "end_line": 221,
+      "func_name": "instructions",
+      "preview": "if isinstance(base_instructions, list):\n    base_instructions = self._replace_context_placeholders(base_instructions)\nscope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "beaffe28e3c5ef12624656a287360cf7",
+      "start_line": 212,
+      "end_line": 227,
+      "func_name": "instructions",
+      "preview": "scope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try"
+    },
+    {
+      "hash": "d697956b1f10c7032a10ccab8cd14f52",
+      "start_line": 214,
+      "end_line": 228,
+      "func_name": "instructions",
+      "preview": "inst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL"
+    },
+    {
+      "hash": "80d7186757488fc4c2b40607f9633f28",
+      "start_line": 220,
+      "end_line": 231,
+      "func_name": "instructions",
+      "preview": "context_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "0924d4f1d8d65e288a48e103cc5f8a59",
+      "start_line": 221,
+      "end_line": 234,
+      "func_name": "instructions",
+      "preview": "injected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)",
+      "normalized": "ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP"
+    },
+    {
+      "hash": "0b3b80de9382158b94fda2f5a4ac96ec",
+      "start_line": 222,
+      "end_line": 235,
+      "func_name": "instructions",
+      "preview": "try:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')",
+      "normalized": "Try|CALL|FOR_LOOP|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "9d9a8065990f3ec54ea2f42f6f9bd9fa",
+      "start_line": 228,
+      "end_line": 238,
+      "func_name": "instructions",
+      "preview": "context_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)",
+      "normalized": "CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "b628b7ddfc47fc400fc1c8d737b5d583",
+      "start_line": 230,
+      "end_line": 241,
+      "func_name": "instructions",
+      "preview": "for key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)\nreturn inst",
+      "normalized": "FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP|Return"
+    },
+    {
+      "hash": "fca5e4d7503038ff584f62666709f890",
+      "start_line": 207,
+      "end_line": 221,
+      "func_name": "instructions",
+      "preview": "base_instructions = self._base_config.get('instructions', [])\nif isinstance(base_instructions, list):\n    base_instructions = self._replace_context_placeholders(base_instructions)\nscope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e969016d8cddccec0119e6e69ed03960",
+      "start_line": 209,
+      "end_line": 227,
+      "func_name": "instructions",
+      "preview": "if isinstance(base_instructions, list):\n    base_instructions = self._replace_context_placeholders(base_instructions)\nscope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try"
+    },
+    {
+      "hash": "82e0ff04a9a8104d081a2ec9b25b0d21",
+      "start_line": 212,
+      "end_line": 228,
+      "func_name": "instructions",
+      "preview": "scope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL"
+    },
+    {
+      "hash": "649e6ece356c1f8e7580494ec89c33e1",
+      "start_line": 214,
+      "end_line": 231,
+      "func_name": "instructions",
+      "preview": "inst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "a9f66e9654b9f0d77e3bb211f83cd0e7",
+      "start_line": 220,
+      "end_line": 234,
+      "func_name": "instructions",
+      "preview": "context_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP"
+    },
+    {
+      "hash": "4cc76ab1bf8777c453f5574efd137e77",
+      "start_line": 221,
+      "end_line": 235,
+      "func_name": "instructions",
+      "preview": "injected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')",
+      "normalized": "ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "38d06cb81fd96d8fa0a584fa7ce48dc5",
+      "start_line": 222,
+      "end_line": 238,
+      "func_name": "instructions",
+      "preview": "try:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)",
+      "normalized": "Try|CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "b063dfed6d515fbbc1b67818f33b74c4",
+      "start_line": 228,
+      "end_line": 241,
+      "func_name": "instructions",
+      "preview": "context_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)\nreturn inst",
+      "normalized": "CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP|Return"
+    },
+    {
+      "hash": "dd5c25919818cce7cdf567a40f7ac71f",
+      "start_line": 209,
+      "end_line": 228,
+      "func_name": "instructions",
+      "preview": "if isinstance(base_instructions, list):\n    base_instructions = self._replace_context_placeholders(base_instructions)\nscope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL"
+    },
+    {
+      "hash": "a85cef9a6648e06933aefbea9b13aa59",
+      "start_line": 212,
+      "end_line": 231,
+      "func_name": "instructions",
+      "preview": "scope = self._load_scope_from_state()\ninst = Instructions(base_instructions if isinstance(base_instructions, list) else [], bot_paths=self.behavior.bot_paths, scope=scope)\ncontext_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "86c8e50723f7bc57b86f400165241899",
+      "start_line": 220,
+      "end_line": 235,
+      "func_name": "instructions",
+      "preview": "context_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP|CALL"
+    },
+    {
+      "hash": "3f6ec3baf472bf992fe7b24fadc45499",
+      "start_line": 221,
+      "end_line": 238,
+      "func_name": "instructions",
+      "preview": "injected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)",
+      "normalized": "ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "5da0f2ef4bd642df18a94dea81a76786",
+      "start_line": 222,
+      "end_line": 241,
+      "func_name": "instructions",
+      "preview": "try:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)\nreturn inst",
+      "normalized": "Try|CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP|Return"
+    },
+    {
+      "hash": "10239f035873b0f42fffda3879daadaf",
+      "start_line": 220,
+      "end_line": 238,
+      "func_name": "instructions",
+      "preview": "context_instructions = []\ninjected_data = {}\ntry:\n    context_instructions.extend(self._inject_clarification_data(injected_data))\n    context_instructions.extend(self._inject_strategy_data(injected_data))\nexcept FileNotFoundError as e:\n    logger.debug(f'Clarification or strategy data files not found: {e}')\n    raise\ncontext_instructions.extend(self._inject_context_files(injected_data))\nfor key, value in injected_data.items():\n    inst._data[key] = value\nfor line in reversed(inst.context_sources_text):\n    inst._data['base_instructions'].insert(0, line)\ninst._data['base_instructions'].insert(len(inst.context_sources_text), '')\nfor line in reversed(context_instructions):\n    inst._data['base_instructions'].insert(len(inst.context_sources_text) + 1, line)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|Try|CALL|FOR_LOOP|FOR_LOOP|CALL|FOR_LOOP"
+    },
+    {
+      "hash": "ca59fc7a5b7470a5825e5e6794e99c2f",
+      "start_line": 271,
+      "end_line": 281,
+      "func_name": "execute",
+      "preview": "result = self.do_execute(context)\nresult = self._finalize_display_content(result)\nif not result.get('_background_execution', False):\n    self.track_activity_on_completion(outputs=result)\nreturn self._inject_reminders_if_final(result)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "320a45a9a4b3169a1d83416b1569e3bf",
+      "start_line": 284,
+      "end_line": 293,
+      "func_name": "_finalize_display_content",
+      "preview": "if 'instructions' not in result or not isinstance(result['instructions'], dict):\n    return result\ninstructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e6c5cc0e13e8dcc002bca3d96e9dfebd",
+      "start_line": 287,
+      "end_line": 295,
+      "func_name": "_finalize_display_content",
+      "preview": "instructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "d076efbb8d605033d71f127c7e111f27",
+      "start_line": 289,
+      "end_line": 297,
+      "func_name": "_finalize_display_content",
+      "preview": "display_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "1ce78037d4f3b981907ccaee49a8323e",
+      "start_line": 290,
+      "end_line": 304,
+      "func_name": "_finalize_display_content",
+      "preview": "if not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')",
+      "normalized": "If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "142f6e89907a8aba064683a9e2c7c9de",
+      "start_line": 293,
+      "end_line": 306,
+      "func_name": "_finalize_display_content",
+      "preview": "inst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')\nreturn result",
+      "normalized": "ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "1a029e49fb0994802a1fc12acf81e215",
+      "start_line": 284,
+      "end_line": 295,
+      "func_name": "_finalize_display_content",
+      "preview": "if 'instructions' not in result or not isinstance(result['instructions'], dict):\n    return result\ninstructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "9ec7691c1f3e972fe46f98120b4cc58f",
+      "start_line": 287,
+      "end_line": 297,
+      "func_name": "_finalize_display_content",
+      "preview": "instructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "49b1a1a285ff8611c2fddae9ce285050",
+      "start_line": 289,
+      "end_line": 304,
+      "func_name": "_finalize_display_content",
+      "preview": "display_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "586a0fb5b68614fac054ef8d821d8576",
+      "start_line": 290,
+      "end_line": 306,
+      "func_name": "_finalize_display_content",
+      "preview": "if not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')\nreturn result",
+      "normalized": "If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "40abe3232ab4fb09a3b2fe39a1e0285a",
+      "start_line": 284,
+      "end_line": 297,
+      "func_name": "_finalize_display_content",
+      "preview": "if 'instructions' not in result or not isinstance(result['instructions'], dict):\n    return result\ninstructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "558cd5e14915b8aca1059bdcd7243434",
+      "start_line": 287,
+      "end_line": 304,
+      "func_name": "_finalize_display_content",
+      "preview": "instructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "db4bc485ffb34e92c8d62062c1692fbc",
+      "start_line": 289,
+      "end_line": 306,
+      "func_name": "_finalize_display_content",
+      "preview": "display_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')\nreturn result",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "00b80c595424dabaa819acd9bc642d07",
+      "start_line": 287,
+      "end_line": 306,
+      "func_name": "_finalize_display_content",
+      "preview": "instructions_dict = result['instructions']\ndisplay_content_list = instructions_dict.get('display_content', [])\nif not display_content_list:\n    return result\ninst = Instructions(bot_paths=self.behavior.bot_paths)\nfor line in display_content_list:\n    inst.add_display(line)\ndisplay_file = inst.write_display_to_file('status.md')\nif display_file:\n    if 'base_instructions' not in instructions_dict:\n        instructions_dict['base_instructions'] = []\n    instructions_dict['base_instructions'].append('')\n    instructions_dict['base_instructions'].append(f'CRITICAL: You MUST read the file `{display_file}` and display its ENTIRE contents in a markdown code fence to the user.')\n    instructions_dict['base_instructions'].append(f'Use the read_file tool to read `{display_file}` and then display the full contents.')\n    instructions_dict['base_instructions'].append(f'DO NOT just reference the file - actually READ it and SHOW its contents to the user.')\nreturn result",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|FOR_LOOP|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "789a81accd7b909a5cf1573191613a3a",
+      "start_line": 309,
+      "end_line": 313,
+      "func_name": "_handle_execution_error",
+      "preview": "error_type = type(e).__name__\nerror_message = str(e)\nfull_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "cb1bf13a67e0fc8dc10874a50c081aa3",
+      "start_line": 310,
+      "end_line": 314,
+      "func_name": "_handle_execution_error",
+      "preview": "error_message = str(e)\nfull_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})\nprint('\\n'.join(error_instructions), file=sys.stdout)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "5c640e4db7e375a6ba1d8352a046f3bc",
+      "start_line": 311,
+      "end_line": 315,
+      "func_name": "_handle_execution_error",
+      "preview": "full_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})\nprint('\\n'.join(error_instructions), file=sys.stdout)\nsys.stdout.flush()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "846c85937b32a2b98c6dbaaaa711e6ca",
+      "start_line": 309,
+      "end_line": 314,
+      "func_name": "_handle_execution_error",
+      "preview": "error_type = type(e).__name__\nerror_message = str(e)\nfull_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})\nprint('\\n'.join(error_instructions), file=sys.stdout)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "8e0eadff9c3ab460064a4bf387737d10",
+      "start_line": 310,
+      "end_line": 315,
+      "func_name": "_handle_execution_error",
+      "preview": "error_message = str(e)\nfull_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})\nprint('\\n'.join(error_instructions), file=sys.stdout)\nsys.stdout.flush()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "af7a86785688d6562316f3aeb270d93f",
+      "start_line": 309,
+      "end_line": 315,
+      "func_name": "_handle_execution_error",
+      "preview": "error_type = type(e).__name__\nerror_message = str(e)\nfull_traceback = traceback.format_exc()\nerror_instructions = self._build_error_instructions(error_type, error_message, full_traceback, parameters)\nself.track_activity_on_completion(outputs={'error': error_message})\nprint('\\n'.join(error_instructions), file=sys.stdout)\nsys.stdout.flush()",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "786887572f6ef1c20f2d8177cb2f1639",
+      "start_line": 326,
+      "end_line": 331,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n    behavior_from_actions = self.behavior.actions.behavior\n    if hasattr(behavior_from_actions, 'bot_paths'):\n        logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n    return result",
+      "normalized": "If"
+    },
+    {
+      "hash": "1165f6e26ab45e2727badf74ea68bae4",
+      "start_line": 327,
+      "end_line": 331,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "behavior_from_actions = self.behavior.actions.behavior\nif hasattr(behavior_from_actions, 'bot_paths'):\n    logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\nreturn result",
+      "normalized": "ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "9b30b9ecb7dca597f46b7d7c5cf0fc78",
+      "start_line": 339,
+      "end_line": 343,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "base_instructions = instructions.get('base_instructions', [])\nif not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n    instructions['base_instructions'] = list(self.instructions['base_instructions'])\n    result['instructions'] = instructions",
+      "normalized": "ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "0beb2843e3afc34fa62a5995639e33eb",
+      "start_line": 321,
+      "end_line": 332,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior or not self.behavior.actions:\n    return result\naction_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "7740905ce09811b93f97246c34dfc988",
+      "start_line": 323,
+      "end_line": 335,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "action_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result",
+      "normalized": "ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "23d3a4d6ecb6fbd58e14cae66baaba7b",
+      "start_line": 324,
+      "end_line": 337,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}",
+      "normalized": "If|If|ASSIGN(1_targets)|If|If"
+    },
+    {
+      "hash": "0beb2843e3afc34fa62a5995639e33eb",
+      "start_line": 326,
+      "end_line": 338,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "7740905ce09811b93f97246c34dfc988",
+      "start_line": 332,
+      "end_line": 343,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "reminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions",
+      "normalized": "ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "46765843407e2fa6af679ce66b2fa1bf",
+      "start_line": 333,
+      "end_line": 344,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions\nreturn inject_reminder_to_instructions(result, reminder)",
+      "normalized": "If|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "490fcda5f2b0a1f9da2e6666fbe943f9",
+      "start_line": 321,
+      "end_line": 335,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior or not self.behavior.actions:\n    return result\naction_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "4a3a3137f61b583aaadfaaa5e1440f93",
+      "start_line": 323,
+      "end_line": 337,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "action_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}",
+      "normalized": "ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|If"
+    },
+    {
+      "hash": "2795c755c1ee4fb87fb889056725360f",
+      "start_line": 324,
+      "end_line": 338,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']",
+      "normalized": "If|If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "490fcda5f2b0a1f9da2e6666fbe943f9",
+      "start_line": 326,
+      "end_line": 343,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "38aad524977c65eb2f0501c8ce814838",
+      "start_line": 332,
+      "end_line": 344,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "reminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions\nreturn inject_reminder_to_instructions(result, reminder)",
+      "normalized": "ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "46e17bd29186cb062f834564f0614bc8",
+      "start_line": 321,
+      "end_line": 337,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior or not self.behavior.actions:\n    return result\naction_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|If"
+    },
+    {
+      "hash": "5a773a0ec554f61ba12cc16877601d28",
+      "start_line": 323,
+      "end_line": 338,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "action_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']",
+      "normalized": "ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3d7c7f225fc93dae1d4344bbd9d698d5",
+      "start_line": 324,
+      "end_line": 343,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions",
+      "normalized": "If|If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "76786a7710f0aefcd5c3d4ed8b6c6f9b",
+      "start_line": 326,
+      "end_line": 344,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']\nif isinstance(instructions, dict):\n    base_instructions = instructions.get('base_instructions', [])\n    if not base_instructions and isinstance(self.instructions, dict) and ('base_instructions' in self.instructions):\n        instructions['base_instructions'] = list(self.instructions['base_instructions'])\n        result['instructions'] = instructions\nreturn inject_reminder_to_instructions(result, reminder)",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "3190b0ae2e4f4a2d4b0bd035f38fe1b8",
+      "start_line": 321,
+      "end_line": 338,
+      "func_name": "_inject_reminders_if_final",
+      "preview": "if not self.behavior or not self.behavior.actions:\n    return result\naction_names = self.behavior.actions.names\nif not action_names or self.action_name != action_names[-1]:\n    return result\nif not self.behavior.bot:\n    if hasattr(self.behavior, 'actions') and hasattr(self.behavior.actions, 'behavior'):\n        behavior_from_actions = self.behavior.actions.behavior\n        if hasattr(behavior_from_actions, 'bot_paths'):\n            logger.debug(f'Behavior {self.behavior.name} has no bot reference - reminder will be skipped. This may indicate the behavior was not created through Bot.__init__')\n        return result\nreminder = self.behavior.actions._get_next_behavior_reminder()\nif not reminder:\n    logger.debug(f'Reminder is empty for action {self.action_name} in behavior {(self.behavior.name if self.behavior else None)}. behavior.bot={(self.behavior.bot if self.behavior else None)}, behavior.bot.behaviors.names={(self.behavior.bot.behaviors.names if self.behavior and self.behavior.bot else None)}')\n    return result\nif 'instructions' not in result:\n    result['instructions'] = {}\ninstructions = result['instructions']",
+      "normalized": "If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)|If|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "6b716ba423b957bfced04c750678ce95",
+      "start_line": 347,
+      "end_line": 363,
+      "func_name": "get_instructions",
+      "preview": "if context is None:\n    context = self.context_class()\nself._save_guardrails_if_provided(context)\nif hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)",
+      "normalized": "If|CALL|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e0f7e66f09e494cbcfb37a77d6434be7",
+      "start_line": 350,
+      "end_line": 365,
+      "func_name": "get_instructions",
+      "preview": "self._save_guardrails_if_provided(context)\nif hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)",
+      "normalized": "CALL|If|ASSIGN(1_targets)|If|CALL"
+    },
+    {
+      "hash": "259362338d53796f17412676b7d285ae",
+      "start_line": 352,
+      "end_line": 367,
+      "func_name": "get_instructions",
+      "preview": "if hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)",
+      "normalized": "If|ASSIGN(1_targets)|If|CALL|CALL"
+    },
+    {
+      "hash": "941536ed90f16419fe0e4c53634cc2d5",
+      "start_line": 355,
+      "end_line": 369,
+      "func_name": "get_instructions",
+      "preview": "instructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)",
+      "normalized": "ASSIGN(1_targets)|If|CALL|CALL|CALL"
+    },
+    {
+      "hash": "35c21c1dc15e60c7a63266a6272c8ff2",
+      "start_line": 357,
+      "end_line": 371,
+      "func_name": "get_instructions",
+      "preview": "if self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)",
+      "normalized": "If|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "d04cf34780f9e6c0249f973a29a6b79b",
+      "start_line": 365,
+      "end_line": 373,
+      "func_name": "get_instructions",
+      "preview": "self._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)\nreturn instructions",
+      "normalized": "CALL|CALL|CALL|CALL|Return"
+    },
+    {
+      "hash": "c4bf931bc80db11f218119fab1850d6d",
+      "start_line": 347,
+      "end_line": 365,
+      "func_name": "get_instructions",
+      "preview": "if context is None:\n    context = self.context_class()\nself._save_guardrails_if_provided(context)\nif hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)",
+      "normalized": "If|CALL|If|ASSIGN(1_targets)|If|CALL"
+    },
+    {
+      "hash": "e2fee0af3cf0ba97c6d3b17194f00548",
+      "start_line": 350,
+      "end_line": 367,
+      "func_name": "get_instructions",
+      "preview": "self._save_guardrails_if_provided(context)\nif hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)",
+      "normalized": "CALL|If|ASSIGN(1_targets)|If|CALL|CALL"
+    },
+    {
+      "hash": "a7d3c9c0d7029a6f96696244cac54c58",
+      "start_line": 352,
+      "end_line": 369,
+      "func_name": "get_instructions",
+      "preview": "if hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)",
+      "normalized": "If|ASSIGN(1_targets)|If|CALL|CALL|CALL"
+    },
+    {
+      "hash": "743c697f960c70d07c0ac4d51fc09101",
+      "start_line": 355,
+      "end_line": 371,
+      "func_name": "get_instructions",
+      "preview": "instructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)",
+      "normalized": "ASSIGN(1_targets)|If|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "4ff277dd0b42151426c18deb65f78099",
+      "start_line": 357,
+      "end_line": 373,
+      "func_name": "get_instructions",
+      "preview": "if self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)\nreturn instructions",
+      "normalized": "If|CALL|CALL|CALL|CALL|Return"
+    },
+    {
+      "hash": "bdd16cef30877b304fb2904c9d302efe",
+      "start_line": 350,
+      "end_line": 369,
+      "func_name": "get_instructions",
+      "preview": "self._save_guardrails_if_provided(context)\nif hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)",
+      "normalized": "CALL|If|ASSIGN(1_targets)|If|CALL|CALL|CALL"
+    },
+    {
+      "hash": "4fab7f27fd6f4d271ec37ee03254d943",
+      "start_line": 352,
+      "end_line": 371,
+      "func_name": "get_instructions",
+      "preview": "if hasattr(context, 'scope') and context.scope:\n    context.scope.apply_to_bot()\ninstructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)",
+      "normalized": "If|ASSIGN(1_targets)|If|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "7918f102ce355e5b302d88ba4b6cd155",
+      "start_line": 355,
+      "end_line": 373,
+      "func_name": "get_instructions",
+      "preview": "instructions = self.instructions.copy()\nif self.action_config and 'instructions' in self.action_config:\n    behavior_instructions = self.action_config.get('instructions', [])\n    if behavior_instructions:\n        if isinstance(behavior_instructions, list):\n            instructions._data['base_instructions'].extend(behavior_instructions)\n        elif isinstance(behavior_instructions, str):\n            instructions._data['base_instructions'].append(behavior_instructions)\nself._load_behavior_guardrails(instructions)\nself._prepare_instructions(instructions, context)\nself._add_behavior_action_metadata(instructions)\nself._build_display_content(instructions)\nreturn instructions",
+      "normalized": "ASSIGN(1_targets)|If|CALL|CALL|CALL|CALL|Return"
+    },
+    {
+      "hash": "3fc4817b7812cdf9bacaed13b56785aa",
+      "start_line": 426,
+      "end_line": 437,
+      "func_name": "_load_behavior_guardrails",
+      "preview": "if not self.behavior or not hasattr(self.behavior, 'guardrails'):\n    return\nguardrails_obj = self.behavior.guardrails\nif hasattr(guardrails_obj, 'required_context'):\n    required_context = guardrails_obj.required_context\n    if hasattr(required_context, 'instructions'):\n        if 'guardrails' not in instructions._data:\n            instructions.set('guardrails', {'required_context': required_context.instructions})",
+      "normalized": "If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "9b30b9ecb7dca597f46b7d7c5cf0fc78",
+      "start_line": 524,
+      "end_line": 529,
+      "func_name": "_add_behavior_action_metadata",
+      "preview": "behavior_instructions = self.behavior.instructions\nif isinstance(behavior_instructions, list):\n    behavior_data['instructions'] = list(behavior_instructions)\nelif isinstance(behavior_instructions, str):\n    behavior_data['instructions'] = [behavior_instructions]",
+      "normalized": "ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "9b30b9ecb7dca597f46b7d7c5cf0fc78",
+      "start_line": 540,
+      "end_line": 546,
+      "func_name": "_add_behavior_action_metadata",
+      "preview": "behavior_action_instructions = self.action_config.get('instructions', [])\nif behavior_action_instructions:\n    if isinstance(behavior_action_instructions, list):\n        action_data['instructions'] = list(behavior_action_instructions)\n    elif isinstance(behavior_action_instructions, str):\n        action_data['instructions'] = [behavior_action_instructions]",
+      "normalized": "ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "06cc2d9144b100b02c2fefe1c5f4258b",
+      "start_line": 552,
+      "end_line": 558,
+      "func_name": "_build_display_content",
+      "preview": "from agile_bots.src.instructions.markdown_instructions import MarkdownInstructions\ntemp_instructions = instructions.copy()\ntemp_instructions._display_content = []\nmarkdown_adapter = MarkdownInstructions(temp_instructions)\nmarkdown_output = markdown_adapter.serialize()",
+      "normalized": "ImportFrom|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "7085eeaa59aa5eb35936d2facbfb0abe",
+      "start_line": 554,
+      "end_line": 561,
+      "func_name": "_build_display_content",
+      "preview": "temp_instructions = instructions.copy()\ntemp_instructions._display_content = []\nmarkdown_adapter = MarkdownInstructions(temp_instructions)\nmarkdown_output = markdown_adapter.serialize()\nfor line in markdown_output.split('\\n'):\n    instructions.add_display(line)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "deb4c86b6b0187572c2c657513a5e136",
+      "start_line": 552,
+      "end_line": 561,
+      "func_name": "_build_display_content",
+      "preview": "from agile_bots.src.instructions.markdown_instructions import MarkdownInstructions\ntemp_instructions = instructions.copy()\ntemp_instructions._display_content = []\nmarkdown_adapter = MarkdownInstructions(temp_instructions)\nmarkdown_output = markdown_adapter.serialize()\nfor line in markdown_output.split('\\n'):\n    instructions.add_display(line)",
+      "normalized": "ImportFrom|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|FOR_LOOP"
+    },
+    {
+      "hash": "ff2450f842ae468c61249bee61d5413e",
+      "start_line": 568,
+      "end_line": 584,
+      "func_name": "_format_behavior_section",
+      "preview": "if not self.behavior:\n    return\nbehavior_name = self.behavior.name if hasattr(self.behavior, 'name') else 'unknown'\noutput_lines.append(f'**Behavior Instructions - {behavior_name}**')\nif hasattr(self.behavior, 'description') and self.behavior.description:\n    output_lines.append(f'The purpose of this behavior is to {self.behavior.description.lower()}')\n    output_lines.append('')\nif hasattr(self.behavior, 'instructions') and self.behavior.instructions:\n    behavior_instructions = self.behavior.instructions\n    if isinstance(behavior_instructions, list):\n        output_lines.extend(behavior_instructions)\n    elif isinstance(behavior_instructions, str):\n        output_lines.append(behavior_instructions)\n    output_lines.append('')",
+      "normalized": "If|ASSIGN(1_targets)|CALL|If|If"
+    },
+    {
+      "hash": "fd9391e5de341d48eb74b854262620bf",
+      "start_line": 632,
+      "end_line": 640,
+      "func_name": "_format_guardrails_section",
+      "preview": "if not guardrails_dict:\n    return\nrequired_context = guardrails_dict.get('required_context', {})\nif not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "55a1ec7d49c68d8febb2c7d664068041",
+      "start_line": 635,
+      "end_line": 642,
+      "func_name": "_format_guardrails_section",
+      "preview": "required_context = guardrails_dict.get('required_context', {})\nif not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])\nself._format_key_questions(key_questions, output_lines)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "5afdb227526a456e0f6b330201494031",
+      "start_line": 636,
+      "end_line": 643,
+      "func_name": "_format_guardrails_section",
+      "preview": "if not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])\nself._format_key_questions(key_questions, output_lines)\nself._format_evidence(evidence, output_lines)",
+      "normalized": "If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "ee9ddecc5f42d6c05d78bb162ed8b69b",
+      "start_line": 632,
+      "end_line": 642,
+      "func_name": "_format_guardrails_section",
+      "preview": "if not guardrails_dict:\n    return\nrequired_context = guardrails_dict.get('required_context', {})\nif not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])\nself._format_key_questions(key_questions, output_lines)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "a92c8d3b5371d298ca84fe13ce66204f",
+      "start_line": 635,
+      "end_line": 643,
+      "func_name": "_format_guardrails_section",
+      "preview": "required_context = guardrails_dict.get('required_context', {})\nif not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])\nself._format_key_questions(key_questions, output_lines)\nself._format_evidence(evidence, output_lines)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "f17e728fa5e2c5516b39c7ce7a0a557e",
+      "start_line": 632,
+      "end_line": 643,
+      "func_name": "_format_guardrails_section",
+      "preview": "if not guardrails_dict:\n    return\nrequired_context = guardrails_dict.get('required_context', {})\nif not required_context:\n    return\nkey_questions = required_context.get('key_questions', [])\nevidence = required_context.get('evidence', [])\nself._format_key_questions(key_questions, output_lines)\nself._format_evidence(evidence, output_lines)",
+      "normalized": "If|ASSIGN(1_targets)|If|ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL"
+    },
+    {
+      "hash": "5c640e4db7e375a6ba1d8352a046f3bc",
+      "start_line": 647,
+      "end_line": 653,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL"
+    },
+    {
+      "hash": "a534ebd563ac2ce58206f5b6f289d5d3",
+      "start_line": 648,
+      "end_line": 654,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "6f4e7a33cf109ffb812f68c0629d634e",
+      "start_line": 650,
+      "end_line": 656,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "34897fa015f36da664eb178b994f57a2",
+      "start_line": 651,
+      "end_line": 657,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "3948d808e06b4e776133ef53fb2bce9c",
+      "start_line": 653,
+      "end_line": 659,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})",
+      "normalized": "CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "c11833979949da99bd0dd6720038bade",
+      "start_line": 654,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "d5914f53766ebbd727f8b4f86226706e",
+      "start_line": 656,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "base_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "eea10b721928fe903aeac54c00af40c7",
+      "start_line": 657,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "0b2bb68e83408fe5a51ba95c0792b6b5",
+      "start_line": 659,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "guardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "a5bf48f1f313f515d3996b4ea8959672",
+      "start_line": 647,
+      "end_line": 654,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL"
+    },
+    {
+      "hash": "ac13422a6d485304f49d29d3ad40722b",
+      "start_line": 648,
+      "end_line": 656,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "e66f2caef625af897433b03469e53ba8",
+      "start_line": 650,
+      "end_line": 657,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "b9fb3266caeda778dfb0fd1074172c6f",
+      "start_line": 651,
+      "end_line": 659,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "afda6613520dc3bf396c89744ccc229c",
+      "start_line": 653,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "87a99bf6efe21558aaa296d7d590bc63",
+      "start_line": 654,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "3e27cf45ccad971cf50fbe1ab9f0e311",
+      "start_line": 656,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "base_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "35355b03e787d2869e16ae16f6ed5ea4",
+      "start_line": 657,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "4ded5db3675d7aabf88bd081146d36b7",
+      "start_line": 647,
+      "end_line": 656,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0d9109d9a93b0fe8cc0e45ea54a4b0d1",
+      "start_line": 648,
+      "end_line": 657,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "75739b5810adf1ab1c47f9ba289e8c88",
+      "start_line": 650,
+      "end_line": 659,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "ecf361350ca49d1db9953c4bbcf6f190",
+      "start_line": 651,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "dfc892e595ea38f85e81e5f6a241916b",
+      "start_line": 653,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "a8cd8a86ab1fc765813a731745dbd08b",
+      "start_line": 654,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "314c9753ac5c35befd4150bd0362180d",
+      "start_line": 656,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "base_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "4352267272e8ad6a21c320f5cc73473a",
+      "start_line": 647,
+      "end_line": 657,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "bdce8bcc2ec9e184befe3fcbb36aae44",
+      "start_line": 648,
+      "end_line": 659,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "71911f515de6fa2efa7dce1a1d2d7164",
+      "start_line": 650,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "a0da4195d4171c0dc9fe42ddafe60852",
+      "start_line": 651,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "78ea92cad0da0915d04aff9ae0ff86d1",
+      "start_line": 653,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "d876d19ad8244147b4629e245beae73a",
+      "start_line": 654,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "f09a87f506538b15eb8fb39aa1f5e240",
+      "start_line": 647,
+      "end_line": 659,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "378949950a822027c58d3b732fc26d91",
+      "start_line": 648,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "a73f9de37454e68faf867a6e90a237be",
+      "start_line": 650,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "eb78ec80b290238c66d59616e04c9a61",
+      "start_line": 651,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "6c9247626d63774f5b5050207f36805e",
+      "start_line": 653,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "047c742a6066e2982509d5b8fc10e172",
+      "start_line": 647,
+      "end_line": 660,
+      "func_name": "_format_instructions_for_display",
+      "preview": "instructions_dict = instructions.to_dict()\noutput_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL"
+    },
+    {
+      "hash": "dc8a453681eb714e1054307cf67c6600",
+      "start_line": 648,
+      "end_line": 662,
+      "func_name": "_format_instructions_for_display",
+      "preview": "output_lines = []\nself._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])",
+      "normalized": "ASSIGN(1_targets)|CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "a442b8408b604482c41d0a45b02ca8e5",
+      "start_line": 650,
+      "end_line": 665,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_behavior_section(output_lines)\nself._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)",
+      "normalized": "CALL|CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "4bf6bf0c3fe3c20d219d4e4eec7bcb80",
+      "start_line": 651,
+      "end_line": 667,
+      "func_name": "_format_instructions_for_display",
+      "preview": "self._format_action_section(output_lines)\noutput_lines.append('---')\noutput_lines.append('')\nbase_instructions = instructions_dict.get('base_instructions', [])\noutput_lines.extend(base_instructions)\nguardrails_dict = instructions_dict.get('guardrails', {})\nself._format_guardrails_section(guardrails_dict, output_lines)\ndisplay_content = instructions_dict.get('display_content', [])\nif display_content:\n    output_lines.append('')\n    output_lines.extend(display_content)\nreturn '\\n'.join(output_lines)",
+      "normalized": "CALL|CALL|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|CALL|ASSIGN(1_targets)|If|Return"
+    }
+  ]
+}

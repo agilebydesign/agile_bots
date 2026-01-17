@@ -4,7 +4,7 @@
   "severity": "error",
   "category": "architecture",
   "context": "when writing code",
-  "scanner": "agile_bot.bots.base_bot.src.scanners.prefer_object_model_over_config_scanner.PreferObjectModelOverConfigScanner",
+  "scanner": "agile_bot.bots.base_bot.scanners.prefer_object_model_over_config_scanner.PreferObjectModelOverConfigScanner",
   "rationale": "Objects provide encapsulation and abstraction. Accessing configuration files directly bypasses the object model, creates tight coupling, and makes code harder to maintain and test.",
   "examples": {
     "bad": [

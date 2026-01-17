@@ -1,10 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Optional, TYPE_CHECKING
-from .story_graph_template import StoryGraphTemplate
-from ...story_graph.story_graph import StoryGraph
-from ...utils import read_json_file
+from actions.build.story_graph_template import StoryGraphTemplate
+from story_graph.story_graph import StoryGraph
+from utils import read_json_file
 if TYPE_CHECKING:
-    from ...bot_path import BotPath
+    from bot_path import BotPath
 
 class StoryGraphSpec:
 

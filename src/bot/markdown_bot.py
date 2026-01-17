@@ -1,7 +1,7 @@
 
-from agile_bots.src.cli.adapters import MarkdownAdapter
-from agile_bots.src.cli.base_hierarchical_adapter import BaseBotAdapter
-from agile_bots.src.bot.bot import Bot
+from cli.adapters import MarkdownAdapter
+from cli.base_hierarchical_adapter import BaseBotAdapter
+from bot.bot import Bot
 
 class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
     
@@ -24,19 +24,19 @@ class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
     
     @property
     def bot_paths(self):
-        from agile_bots.src.cli.adapter_factory import AdapterFactory
+        from cli.adapter_factory import AdapterFactory
         markdown_bot_paths = AdapterFactory.create(self.bot.bot_paths, 'markdown')
         return markdown_bot_paths.serialize()
     
     @property
     def progress(self):
         lines = []
-        lines.append(MarkdownAdapter.format_header(self, 2, "🗺️ Progress"))
+        lines.append(MarkdownAdapter.format_header(self, 2, "🗺️¸Progress"))
         lines.append("")
         lines.append(f"**Current Position:** {self.bot.progress_path}")
         lines.append("")
         
-        from agile_bots.src.cli.adapter_factory import AdapterFactory
+        from cli.adapter_factory import AdapterFactory
         markdown_behaviors = AdapterFactory.create(self.bot.behaviors, 'markdown')
         lines.append(markdown_behaviors.serialize())
         
@@ -50,7 +50,7 @@ class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
         lines.append("**status | back | current | next | path [dir] | scope [filter] | bot [name] | help | exit**")
         lines.append("")
         lines.append("```powershell")
-        lines.append("echo '[command]' | python -m agile_bots.src.cli.cli_main")
+        lines.append("echo '[command]' | python -m cli.cli_main")
         lines.append("```")
         lines.append("")
         lines.append("---")
@@ -108,7 +108,7 @@ class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
         lines.append(self.bot_paths)
         
         if hasattr(self.bot, '_scope') and self.bot._scope and hasattr(self.bot._scope, 'type'):
-            from agile_bots.src.cli.adapter_factory import AdapterFactory
+            from cli.adapter_factory import AdapterFactory
             try:
                 markdown_scope = AdapterFactory.create(self.bot._scope, 'markdown')
                 lines.append(markdown_scope.serialize())
@@ -134,5 +134,5 @@ class MarkdownBot(BaseBotAdapter, MarkdownAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

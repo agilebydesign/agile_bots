@@ -1,14 +1,14 @@
-import os
+﻿import os
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional, TYPE_CHECKING
-from ...bot_path import BotPath
-from ...scope.action_scope import ActionScope
-from .file_discovery import FileDiscovery
-from ...bot_path.path_resolver import PathResolver
+from bot_path import BotPath
+from scope.action_scope import ActionScope
+from actions.validate.file_discovery import FileDiscovery
+from bot_path.path_resolver import PathResolver
 
 if TYPE_CHECKING:
-    from ..action_context import ValidateActionContext
+    from action_context import ValidateActionContext
 
 class ValidationScope(ActionScope):
     EXCLUDED_FILES = {'__init__.py'}

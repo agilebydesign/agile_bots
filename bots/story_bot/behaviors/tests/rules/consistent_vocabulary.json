@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
 }

@@ -52,5 +52,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.consistent_naming_scanner.ConsistentNamingScanner"
+  "scanner": "agile_bot.scanners.consistent_naming_scanner.ConsistentNamingScanner"
 }

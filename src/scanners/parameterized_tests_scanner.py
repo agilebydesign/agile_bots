@@ -1,7 +1,7 @@
-from typing import List, Dict, Any, Optional
-from .scanner import Scanner
-from .violation import Violation
-from .story_map import StoryMap, StoryNode, Story
+﻿from typing import List, Dict, Any, Optional
+from scanners.scanner import Scanner
+from scanners.violation import Violation
+from story_map import StoryMap, StoryNode, Story
 
 class ParameterizedTestsScanner(Scanner):
     

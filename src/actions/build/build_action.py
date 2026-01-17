@@ -1,13 +1,13 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Optional, Type
 import logging
-from ..action import Action
-from ..action_context import ActionContext, ScopeActionContext
-from .story_graph_data import StoryGraphData
-from .story_graph_spec import StoryGraphSpec
-from .story_graph_template import StoryGraphTemplate
-from ...scope.action_scope import ActionScope
-from ..validate.validate_action import ValidateRulesAction
+from actions.action import Action
+from actions.action_context import ActionContext, ScopeActionContext
+from actions.build.story_graph_data import StoryGraphData
+from actions.build.story_graph_spec import StoryGraphSpec
+from actions.build.story_graph_template import StoryGraphTemplate
+from scope.action_scope import ActionScope
+from actions.validate.validate_action import ValidateRulesAction
 logger = logging.getLogger(__name__)
 
 class BuildStoryGraphAction(Action):
@@ -80,8 +80,7 @@ class BuildStoryGraphAction(Action):
         self._replace_content_with_file_references(instructions)
     
     def do_execute(self, context: ScopeActionContext = None):
-        result = self.get_instructions(context)
-        return result
+        return self.get_instructions(context)
 
     def _add_update_instructions(self, instructions) -> None:
         file_exists = self.story_graph_spec.story_graph.path.exists()

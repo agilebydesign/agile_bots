@@ -2,9 +2,9 @@
   "priority": 2,
   "description": "Use domain-specific language rooted in core business concepts. Avoid generic terms, technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains). Name concepts and responsibilities using the ubiquitous language of the business domain.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.domain_language_scanner.DomainLanguageScanner",
-    "agile_bot.bots.base_bot.src.scanners.technical_abstraction_scanner.TechnicalAbstractionScanner",
-    "agile_bot.bots.base_bot.src.scanners.generic_capability_scanner.GenericCapabilityScanner"
+    "agile_bot.bots.base_bot.scanners.domain_language_scanner.DomainLanguageScanner",
+    "agile_bot.bots.base_bot.scanners.technical_abstraction_scanner.TechnicalAbstractionScanner",
+    "agile_bot.bots.base_bot.scanners.generic_capability_scanner.GenericCapabilityScanner"
   ],
   "do": {
     "description": "Use concrete domain language with specific behaviors and actions",

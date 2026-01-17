@@ -62,5 +62,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.error_handling_isolation_scanner.ErrorHandlingIsolationScanner"
+  "scanner": "agile_bot.scanners.error_handling_isolation_scanner.ErrorHandlingIsolationScanner"
 }

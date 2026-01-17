@@ -1,4 +1,4 @@
-from pathlib import Path
+﻿from pathlib import Path
 import json
 import sys
 import ast
@@ -100,7 +100,7 @@ def build_test_file_link(test_file: str, workspace_directory: Path, story_file_p
     if not test_file:
         return ""
     try:
-        from agile_bots.src.bot.workspace import get_python_workspace_root
+        from bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
         test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
@@ -118,7 +118,7 @@ def build_test_file_link(test_file: str, workspace_directory: Path, story_file_p
         test_file_path = workspace_directory / 'test' / test_file
         if not test_file_path.exists():
             return ""
-        from agile_bots.src.actions.validate.file_link_builder import FileLinkBuilder
+        from actions.validate.file_link_builder import FileLinkBuilder
         link_builder = FileLinkBuilder(workspace_directory)
         file_uri = link_builder.get_file_uri(str(test_file_path))
         return f" | [Test]({file_uri})"
@@ -128,7 +128,7 @@ def build_test_class_link(test_file: str, test_class: str, workspace_directory: 
         return ""
     
     try:
-        from agile_bots.src.bot.workspace import get_python_workspace_root
+        from bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
         test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
@@ -158,13 +158,13 @@ def build_test_class_link(test_file: str, test_class: str, workspace_directory: 
             return ""
         
         try:
-            from agile_bots.src.bot.workspace import get_python_workspace_root
+            from bot.workspace import get_python_workspace_root
             workspace_root = get_python_workspace_root()
             rel_path = test_file_path.relative_to(workspace_root)
             rel_path_str = str(rel_path).replace('\\', '/')
             return f" | [Test]({rel_path_str}#L{line_number})"
         except (ValueError, AttributeError):
-            from agile_bots.src.actions.validate.file_link_builder import FileLinkBuilder
+            from actions.validate.file_link_builder import FileLinkBuilder
             link_builder = FileLinkBuilder(workspace_directory)
             file_uri = link_builder.get_file_uri(str(test_file_path), line_number)
             return f" | [Test]({file_uri})"
@@ -174,7 +174,7 @@ def build_test_method_link(test_file: str, test_method: str, workspace_directory
         return ""
     
     try:
-        from agile_bots.src.bot.workspace import get_python_workspace_root
+        from bot.workspace import get_python_workspace_root
         workspace_root = get_python_workspace_root()
         test_file_path = workspace_root / 'test' / test_file
         if not test_file_path.exists():
@@ -204,13 +204,13 @@ def build_test_method_link(test_file: str, test_method: str, workspace_directory
             return ""
         
         try:
-            from agile_bots.src.bot.workspace import get_python_workspace_root
+            from bot.workspace import get_python_workspace_root
             workspace_root = get_python_workspace_root()
             rel_path = test_file_path.relative_to(workspace_root)
             rel_path_str = str(rel_path).replace('\\', '/')
             return f" | [Test]({rel_path_str}#L{line_number})"
         except (ValueError, AttributeError):
-            from agile_bots.src.actions.validate.file_link_builder import FileLinkBuilder
+            from actions.validate.file_link_builder import FileLinkBuilder
             link_builder = FileLinkBuilder(workspace_directory)
             file_uri = link_builder.get_file_uri(str(test_file_path), line_number)
             return f" | [Test]({file_uri})"

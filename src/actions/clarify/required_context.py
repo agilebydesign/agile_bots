@@ -1,7 +1,7 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any
-from .key_questions import KeyQuestions
-from .evidence import Evidence
+from actions.clarify.key_questions import KeyQuestions
+from actions.clarify.evidence import Evidence
 
 class RequiredContext:
 

@@ -1,11 +1,11 @@
-from typing import Dict, Any, List, Type
+﻿from typing import Dict, Any, List, Type
 import logging
-from ..action import Action
-from ..action_context import ActionContext, ValidateActionContext
-from ...rules.rules import Rules
-from .validation_executor import ValidationExecutor
-from ...utils import read_json_file
-from ...scanners.scanner_execution_error import ScannerExecutionError
+from actions.action import Action
+from actions.action_context import ActionContext, ValidateActionContext
+from rules.rules import Rules
+from actions.validate.validation_executor import ValidationExecutor
+from utils import read_json_file
+from scanners.scanner_execution_error import ScannerExecutionError
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +113,7 @@ class ValidateRulesAction(Action):
             if violation_summary:
                 return '\n'.join(['**Scanner Violations Found:**', ''] + violation_summary)
             
-            return '✅ **No scanner violations detected.**\n\nAll automated rule scanners passed successfully.'
+            return 'âœ… **No scanner violations detected.**\n\nAll automated rule scanners passed successfully.'
             
         except Exception as e:
             logger.error(f'Error running scanners: {e}')

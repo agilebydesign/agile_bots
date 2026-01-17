@@ -1,8 +1,8 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Optional
 import json
 import logging
-from ...bot_path import BotPath
+from bot_path import BotPath
 logger = logging.getLogger(__name__)
 
 class JsonPersistent:

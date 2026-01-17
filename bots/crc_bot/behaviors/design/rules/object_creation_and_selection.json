@@ -2,8 +2,8 @@
   "priority": 8,
   "description": "Objects create themselves from their context. Factory/registry selects which implementation to use, but creation logic belongs to the object being created. Example: Order Creates from shopping cart: Order, Cart, Customer; ScannerRegistry Finds scanner for rule: Scanner, Rule.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.self_creating_objects_scanner.SelfCreatingObjectsScanner",
-    "agile_bot.bots.base_bot.src.scanners.factory_selection_scanner.FactorySelectionScanner"
+    "agile_bot.bots.base_bot.scanners.self_creating_objects_scanner.SelfCreatingObjectsScanner",
+    "agile_bot.bots.base_bot.scanners.factory_selection_scanner.FactorySelectionScanner"
   ],
   "do": {
     "description": "Objects create themselves, factory/registry selects implementations. Example: Order Creates from cart: Order, Cart, Customer (self-creation); ScannerRegistry Finds scanner: Scanner, Rule (selection)",

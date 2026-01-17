@@ -1,7 +1,7 @@
-
+﻿
 import json
-from agile_bots.src.cli.adapters import JSONAdapter
-from agile_bots.src.cli.base_hierarchical_adapter import BaseActionsAdapter
+from cli.adapters import JSONAdapter
+from cli.base_hierarchical_adapter import BaseActionsAdapter
 
 class JSONActions(BaseActionsAdapter, JSONAdapter):
     

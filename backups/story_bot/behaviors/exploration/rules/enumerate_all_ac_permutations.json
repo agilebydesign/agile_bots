@@ -53,5 +53,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.enumerate_ac_permutations_scanner.EnumerateACPermutationsScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.enumerate_ac_permutations_scanner.EnumerateACPermutationsScanner"
 }

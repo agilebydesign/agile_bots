@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import MarkdownAdapter
-from agile_bots.src.exit_result.exit_result import ExitResult
+﻿
+from cli.adapters import MarkdownAdapter
+from exit_result.exit_result import ExitResult
 
 class MarkdownExitResult(MarkdownAdapter):
     
@@ -22,5 +22,5 @@ class MarkdownExitResult(MarkdownAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

@@ -1,14 +1,14 @@
-import logging
+﻿import logging
 import traceback
 from pathlib import Path
 from typing import Dict, Any, List, TYPE_CHECKING
-from ...rules.rules import Rules, ValidationContext, ValidationCallbacks
-from .validation_report_writer import ValidationReportWriter, StreamingValidationReportWriter
-from ...bot.workspace import get_base_actions_directory
-from ...utils import read_json_file
+from rules.rules import Rules, ValidationContext, ValidationCallbacks
+from actions.validate.validation_report_writer import ValidationReportWriter, StreamingValidationReportWriter
+from bot.workspace import get_base_actions_directory
+from utils import read_json_file
 
 if TYPE_CHECKING:
-    from ..action_context import ValidateActionContext
+    from action_context import ValidateActionContext
 
 class ValidationExecutor:
 

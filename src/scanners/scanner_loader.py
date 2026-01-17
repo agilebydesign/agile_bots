@@ -1,6 +1,6 @@
-from typing import Optional, Tuple
+﻿from typing import Optional, Tuple
 import importlib
-from .scanner import Scanner
+from scanners.scanner import Scanner
 
 class ScannerLoader:
     def __init__(self, bot_name: str = None):

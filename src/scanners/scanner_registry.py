@@ -1,8 +1,8 @@
-
+﻿
 from typing import Optional, Dict, Type
 import importlib
 import re
-from .scanner import Scanner
+from scanners.scanner import Scanner
 
 class ScannerRegistry:
     

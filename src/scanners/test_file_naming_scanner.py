@@ -1,13 +1,13 @@
-"""Scanner for validating test file naming matches sub-epic names."""
+﻿"""Scanner for validating test file naming matches sub-epic names."""
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
 import logging
-from .test_scanner import TestScanner
-from .story_map import StoryMap, SubEpic
-from .violation import Violation
+from test_scanner import TestScanner
+from story_map import StoryMap, SubEpic
+from scanners.violation import Violation
 
 logger = logging.getLogger(__name__)
 

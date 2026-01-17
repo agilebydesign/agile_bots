@@ -1,0 +1,102 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\behaviors\\behavior.py",
+  "cached_at": "2026-01-16T16:49:45.174646",
+  "blocks": [
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 36,
+      "end_line": 40,
+      "func_name": "_initialize_from_config",
+      "preview": "self.description = self._config.get('description', '')\nself.goal = self._config.get('goal', '')\nself.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 37,
+      "end_line": 41,
+      "func_name": "_initialize_from_config",
+      "preview": "self.goal = self._config.get('goal', '')\nself.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})\nself.trigger_words = self._config.get('trigger_words', [])",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "0906a6535eab77242e95180d30e30c81",
+      "start_line": 38,
+      "end_line": 42,
+      "func_name": "_initialize_from_config",
+      "preview": "self.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})\nself.trigger_words = self._config.get('trigger_words', [])\nself.order = self._config.get('order', 999)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 36,
+      "end_line": 41,
+      "func_name": "_initialize_from_config",
+      "preview": "self.description = self._config.get('description', '')\nself.goal = self._config.get('goal', '')\nself.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})\nself.trigger_words = self._config.get('trigger_words', [])",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "2e310dc9fdb90a26fd96a17fa16bfae4",
+      "start_line": 37,
+      "end_line": 42,
+      "func_name": "_initialize_from_config",
+      "preview": "self.goal = self._config.get('goal', '')\nself.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})\nself.trigger_words = self._config.get('trigger_words', [])\nself.order = self._config.get('order', 999)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "22545341409905b2d52b47072708c0c8",
+      "start_line": 36,
+      "end_line": 42,
+      "func_name": "_initialize_from_config",
+      "preview": "self.description = self._config.get('description', '')\nself.goal = self._config.get('goal', '')\nself.inputs = self._config.get('inputs', [])\nself.outputs = self._config.get('outputs', [])\nself.instructions = self._config.get('instructions', {})\nself.trigger_words = self._config.get('trigger_words', [])\nself.order = self._config.get('order', 999)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "6c57ef5c44e0e5415cdfc85c03070d9d",
+      "start_line": 71,
+      "end_line": 76,
+      "func_name": "does_requested_action_match_current",
+      "preview": "self.actions.load_state()\ncurrent_action = self.actions.current\ncurrent_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None",
+      "normalized": "CALL|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)"
+    },
+    {
+      "hash": "8388e3bcdf1a6075ca4e97ba80a57651",
+      "start_line": 72,
+      "end_line": 80,
+      "func_name": "does_requested_action_match_current",
+      "preview": "current_action = self.actions.current\ncurrent_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None\nif current_action:\n    next_action = self.actions.next()\n    if next_action:\n        expected_next = next_action.action_name",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "e75f9fe84bedad02db73ca3b3869b176",
+      "start_line": 73,
+      "end_line": 81,
+      "func_name": "does_requested_action_match_current",
+      "preview": "current_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None\nif current_action:\n    next_action = self.actions.next()\n    if next_action:\n        expected_next = next_action.action_name\nreturn (False, current_action_name, expected_next)",
+      "normalized": "ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "6ffba4a88e9e9cb970169417d0ce8107",
+      "start_line": 71,
+      "end_line": 80,
+      "func_name": "does_requested_action_match_current",
+      "preview": "self.actions.load_state()\ncurrent_action = self.actions.current\ncurrent_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None\nif current_action:\n    next_action = self.actions.next()\n    if next_action:\n        expected_next = next_action.action_name",
+      "normalized": "CALL|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If"
+    },
+    {
+      "hash": "b172b2a677d6be5d384d86dc29ef27ef",
+      "start_line": 72,
+      "end_line": 81,
+      "func_name": "does_requested_action_match_current",
+      "preview": "current_action = self.actions.current\ncurrent_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None\nif current_action:\n    next_action = self.actions.next()\n    if next_action:\n        expected_next = next_action.action_name\nreturn (False, current_action_name, expected_next)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    },
+    {
+      "hash": "80c0bef6ab8a40b7a5880e71e1e8ea40",
+      "start_line": 71,
+      "end_line": 81,
+      "func_name": "does_requested_action_match_current",
+      "preview": "self.actions.load_state()\ncurrent_action = self.actions.current\ncurrent_action_name = current_action.action_name if current_action else None\nif current_action_name == requested_action:\n    return (True, current_action_name, None)\nexpected_next = None\nif current_action:\n    next_action = self.actions.next()\n    if next_action:\n        expected_next = next_action.action_name\nreturn (False, current_action_name, expected_next)",
+      "normalized": "CALL|ASSIGN(1_targets)|ASSIGN(1_targets)|If|ASSIGN(1_targets)|If|Return"
+    }
+  ]
+}

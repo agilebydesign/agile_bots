@@ -1,83 +1,83 @@
-
+﻿
 from typing import Any
 
 class AdapterFactory:
     
     _registry = {
-        ('Instructions', 'json'): ('agile_bots.src.instructions.json_instructions', 'JSONInstructions'),
-        ('Instructions', 'tty'): ('agile_bots.src.instructions.tty_instructions', 'TTYInstructions'),
-        ('Instructions', 'markdown'): ('agile_bots.src.instructions.markdown_instructions', 'MarkdownInstructions'),
+        ('Instructions', 'json'): ('instructions.json_instructions', 'JSONInstructions'),
+        ('Instructions', 'tty'): ('instructions.tty_instructions', 'TTYInstructions'),
+        ('Instructions', 'markdown'): ('instructions.markdown_instructions', 'MarkdownInstructions'),
         
-        ('Guardrails', 'tty'): ('agile_bots.src.actions.guardrails.tty_guardrails', 'TTYGuardrails'),
-        ('RequiredContext', 'tty'): ('agile_bots.src.actions.guardrails.tty_required_context', 'TTYRequiredContext'),
-        ('Strategy', 'tty'): ('agile_bots.src.actions.guardrails.tty_strategy', 'TTYStrategy'),
+        ('Guardrails', 'tty'): ('actions.guardrails.tty_guardrails', 'TTYGuardrails'),
+        ('RequiredContext', 'tty'): ('actions.guardrails.tty_required_context', 'TTYRequiredContext'),
+        ('Strategy', 'tty'): ('actions.guardrails.tty_strategy', 'TTYStrategy'),
         
-        ('Scope', 'json'): ('agile_bots.src.scope.json_scope', 'JSONScope'),
-        ('Scope', 'tty'): ('agile_bots.src.scope.tty_scope', 'TTYScope'),
-        ('Scope', 'markdown'): ('agile_bots.src.scope.markdown_scope', 'MarkdownScope'),
+        ('Scope', 'json'): ('scope.json_scope', 'JSONScope'),
+        ('Scope', 'tty'): ('scope.tty_scope', 'TTYScope'),
+        ('Scope', 'markdown'): ('scope.markdown_scope', 'MarkdownScope'),
         
-        ('ScopeCommandResult', 'json'): ('agile_bots.src.scope.json_scope_command_result', 'JSONScopeCommandResult'),
-        ('ScopeCommandResult', 'tty'): ('agile_bots.src.scope.tty_scope_command_result', 'TTYScopeCommandResult'),
-        ('ScopeCommandResult', 'markdown'): ('agile_bots.src.scope.markdown_scope_command_result', 'MarkdownScopeCommandResult'),
+        ('ScopeCommandResult', 'json'): ('scope.json_scope_command_result', 'JSONScopeCommandResult'),
+        ('ScopeCommandResult', 'tty'): ('scope.tty_scope_command_result', 'TTYScopeCommandResult'),
+        ('ScopeCommandResult', 'markdown'): ('scope.markdown_scope_command_result', 'MarkdownScopeCommandResult'),
         
-        ('NavigationResult', 'json'): ('agile_bots.src.navigation.json_navigation', 'JSONNavigation'),
-        ('NavigationResult', 'tty'): ('agile_bots.src.navigation.tty_navigation', 'TTYNavigation'),
-        ('NavigationResult', 'markdown'): ('agile_bots.src.navigation.markdown_navigation', 'MarkdownNavigation'),
+        ('NavigationResult', 'json'): ('navigation.json_navigation', 'JSONNavigation'),
+        ('NavigationResult', 'tty'): ('navigation.tty_navigation', 'TTYNavigation'),
+        ('NavigationResult', 'markdown'): ('navigation.markdown_navigation', 'MarkdownNavigation'),
         
-        ('BotPath', 'json'): ('agile_bots.src.bot_path.json_bot_path', 'JSONBotPath'),
-        ('BotPath', 'tty'): ('agile_bots.src.bot_path.tty_bot_path', 'TTYBotPath'),
-        ('BotPath', 'markdown'): ('agile_bots.src.bot_path.markdown_bot_path', 'MarkdownBotPath'),
-        ('BotPaths', 'json'): ('agile_bots.src.bot_path.json_bot_path', 'JSONBotPath'),
-        ('BotPaths', 'tty'): ('agile_bots.src.bot_path.tty_bot_path', 'TTYBotPath'),
-        ('BotPaths', 'markdown'): ('agile_bots.src.bot_path.markdown_bot_path', 'MarkdownBotPath'),
+        ('BotPath', 'json'): ('bot_path.json_bot_path', 'JSONBotPath'),
+        ('BotPath', 'tty'): ('bot_path.tty_bot_path', 'TTYBotPath'),
+        ('BotPath', 'markdown'): ('bot_path.markdown_bot_path', 'MarkdownBotPath'),
+        ('BotPaths', 'json'): ('bot_path.json_bot_path', 'JSONBotPath'),
+        ('BotPaths', 'tty'): ('bot_path.tty_bot_path', 'TTYBotPath'),
+        ('BotPaths', 'markdown'): ('bot_path.markdown_bot_path', 'MarkdownBotPath'),
         
-        ('Help', 'json'): ('agile_bots.src.help.json_help', 'JSONHelp'),
-        ('Help', 'tty'): ('agile_bots.src.help.tty_help', 'TTYHelp'),
-        ('Help', 'markdown'): ('agile_bots.src.help.markdown_help', 'MarkdownHelp'),
+        ('Help', 'json'): ('help.json_help', 'JSONHelp'),
+        ('Help', 'tty'): ('help.tty_help', 'TTYHelp'),
+        ('Help', 'markdown'): ('help.markdown_help', 'MarkdownHelp'),
         
-        ('ExitResult', 'json'): ('agile_bots.src.exit_result.json_exit_result', 'JSONExitResult'),
-        ('ExitResult', 'tty'): ('agile_bots.src.exit_result.tty_exit_result', 'TTYExitResult'),
-        ('ExitResult', 'markdown'): ('agile_bots.src.exit_result.markdown_exit_result', 'MarkdownExitResult'),
+        ('ExitResult', 'json'): ('exit_result.json_exit_result', 'JSONExitResult'),
+        ('ExitResult', 'tty'): ('exit_result.tty_exit_result', 'TTYExitResult'),
+        ('ExitResult', 'markdown'): ('exit_result.markdown_exit_result', 'MarkdownExitResult'),
         
-        ('Bot', 'json'): ('agile_bots.src.bot.json_bot', 'JSONBot'),
-        ('Bot', 'tty'): ('agile_bots.src.bot.tty_bot', 'TTYBot'),
-        ('Bot', 'markdown'): ('agile_bots.src.bot.markdown_bot', 'MarkdownBot'),
+        ('Bot', 'json'): ('bot.json_bot', 'JSONBot'),
+        ('Bot', 'tty'): ('bot.tty_bot', 'TTYBot'),
+        ('Bot', 'markdown'): ('bot.markdown_bot', 'MarkdownBot'),
         
-        ('Behavior', 'json'): ('agile_bots.src.behaviors.json_behavior', 'JSONBehavior'),
-        ('Behavior', 'tty'): ('agile_bots.src.behaviors.tty_behavior', 'TTYBehavior'),
-        ('Behavior', 'markdown'): ('agile_bots.src.behaviors.markdown_behavior', 'MarkdownBehavior'),
+        ('Behavior', 'json'): ('behaviors.json_behavior', 'JSONBehavior'),
+        ('Behavior', 'tty'): ('behaviors.tty_behavior', 'TTYBehavior'),
+        ('Behavior', 'markdown'): ('behaviors.markdown_behavior', 'MarkdownBehavior'),
         
-        ('Behaviors', 'json'): ('agile_bots.src.behaviors.json_behavior', 'JSONBehaviors'),
-        ('Behaviors', 'tty'): ('agile_bots.src.behaviors.tty_behavior', 'TTYBehaviors'),
-        ('Behaviors', 'markdown'): ('agile_bots.src.behaviors.markdown_behavior', 'MarkdownBehaviors'),
+        ('Behaviors', 'json'): ('behaviors.json_behavior', 'JSONBehaviors'),
+        ('Behaviors', 'tty'): ('behaviors.tty_behavior', 'TTYBehaviors'),
+        ('Behaviors', 'markdown'): ('behaviors.markdown_behavior', 'MarkdownBehaviors'),
         
-        ('Actions', 'json'): ('agile_bots.src.actions.json_actions', 'JSONActions'),
-        ('Actions', 'tty'): ('agile_bots.src.actions.tty_actions', 'TTYActions'),
-        ('Actions', 'markdown'): ('agile_bots.src.actions.markdown_actions', 'MarkdownActions'),
+        ('Actions', 'json'): ('actions.json_actions', 'JSONActions'),
+        ('Actions', 'tty'): ('actions.tty_actions', 'TTYActions'),
+        ('Actions', 'markdown'): ('actions.markdown_actions', 'MarkdownActions'),
         
-        ('ValidateRulesAction', 'json'): ('agile_bots.src.actions.validate.json_validate_action', 'JSONValidateAction'),
-        ('ValidateRulesAction', 'tty'): ('agile_bots.src.actions.validate.tty_validate_action', 'TTYValidateAction'),
-        ('ValidateRulesAction', 'markdown'): ('agile_bots.src.actions.validate.markdown_validate_action', 'MarkdownValidateAction'),
+        ('ValidateRulesAction', 'json'): ('actions.validate.json_validate_action', 'JSONValidateAction'),
+        ('ValidateRulesAction', 'tty'): ('actions.validate.tty_validate_action', 'TTYValidateAction'),
+        ('ValidateRulesAction', 'markdown'): ('actions.validate.markdown_validate_action', 'MarkdownValidateAction'),
         
-        ('BuildStoryGraphAction', 'json'): ('agile_bots.src.actions.build.json_build_action', 'JSONBuildAction'),
-        ('BuildStoryGraphAction', 'tty'): ('agile_bots.src.actions.build.tty_build_action', 'TTYBuildAction'),
-        ('BuildStoryGraphAction', 'markdown'): ('agile_bots.src.actions.build.markdown_build_action', 'MarkdownBuildAction'),
+        ('BuildStoryGraphAction', 'json'): ('actions.build.json_build_action', 'JSONBuildAction'),
+        ('BuildStoryGraphAction', 'tty'): ('actions.build.tty_build_action', 'TTYBuildAction'),
+        ('BuildStoryGraphAction', 'markdown'): ('actions.build.markdown_build_action', 'MarkdownBuildAction'),
         
-        ('ClarifyContextAction', 'json'): ('agile_bots.src.actions.clarify.json_clarify_action', 'JSONClarifyAction'),
-        ('ClarifyContextAction', 'tty'): ('agile_bots.src.actions.clarify.tty_clarify_action', 'TTYClarifyAction'),
-        ('ClarifyContextAction', 'markdown'): ('agile_bots.src.actions.clarify.markdown_clarify_action', 'MarkdownClarifyAction'),
+        ('ClarifyContextAction', 'json'): ('actions.clarify.json_clarify_action', 'JSONClarifyAction'),
+        ('ClarifyContextAction', 'tty'): ('actions.clarify.tty_clarify_action', 'TTYClarifyAction'),
+        ('ClarifyContextAction', 'markdown'): ('actions.clarify.markdown_clarify_action', 'MarkdownClarifyAction'),
         
-        ('StrategyAction', 'json'): ('agile_bots.src.actions.strategy.json_strategy_action', 'JSONStrategyAction'),
-        ('StrategyAction', 'tty'): ('agile_bots.src.actions.strategy.tty_strategy_action', 'TTYStrategyAction'),
-        ('StrategyAction', 'markdown'): ('agile_bots.src.actions.strategy.markdown_strategy_action', 'MarkdownStrategyAction'),
+        ('StrategyAction', 'json'): ('actions.strategy.json_strategy_action', 'JSONStrategyAction'),
+        ('StrategyAction', 'tty'): ('actions.strategy.tty_strategy_action', 'TTYStrategyAction'),
+        ('StrategyAction', 'markdown'): ('actions.strategy.markdown_strategy_action', 'MarkdownStrategyAction'),
         
-        ('RenderOutputAction', 'json'): ('agile_bots.src.actions.render.json_render_action', 'JSONRenderAction'),
-        ('RenderOutputAction', 'tty'): ('agile_bots.src.actions.render.tty_render_action', 'TTYRenderAction'),
-        ('RenderOutputAction', 'markdown'): ('agile_bots.src.actions.render.markdown_render_action', 'MarkdownRenderAction'),
+        ('RenderOutputAction', 'json'): ('actions.render.json_render_action', 'JSONRenderAction'),
+        ('RenderOutputAction', 'tty'): ('actions.render.tty_render_action', 'TTYRenderAction'),
+        ('RenderOutputAction', 'markdown'): ('actions.render.markdown_render_action', 'MarkdownRenderAction'),
         
-        ('StoryGraph', 'json'): ('agile_bots.src.story_graph.json_story_graph', 'JSONStoryGraph'),
-        ('StoryGraph', 'tty'): ('agile_bots.src.story_graph.tty_story_graph', 'TTYStoryGraph'),
-        ('StoryGraph', 'markdown'): ('agile_bots.src.story_graph.markdown_story_graph', 'MarkdownStoryGraph'),
+        ('StoryGraph', 'json'): ('story_graph.json_story_graph', 'JSONStoryGraph'),
+        ('StoryGraph', 'tty'): ('story_graph.tty_story_graph', 'TTYStoryGraph'),
+        ('StoryGraph', 'markdown'): ('story_graph.markdown_story_graph', 'MarkdownStoryGraph'),
     }
     
     @classmethod
@@ -86,16 +86,16 @@ class AdapterFactory:
         
         if domain_type in ('dict', 'list', 'str'):
             if channel == 'json':
-                from agile_bots.src.cli.adapters import GenericJSONAdapter
+                from cli.adapters import GenericJSONAdapter
                 return GenericJSONAdapter(domain_object)
             elif channel == 'tty':
-                from agile_bots.src.cli.adapters import GenericTTYAdapter
+                from cli.adapters import GenericTTYAdapter
                 return GenericTTYAdapter(domain_object)
             elif channel == 'markdown':
-                from agile_bots.src.cli.adapters import GenericMarkdownAdapter
+                from cli.adapters import GenericMarkdownAdapter
                 return GenericMarkdownAdapter(domain_object)
             else:
-                from agile_bots.src.cli.adapters import GenericJSONAdapter
+                from cli.adapters import GenericJSONAdapter
                 return GenericJSONAdapter(domain_object)
         
         key = (domain_type, channel)

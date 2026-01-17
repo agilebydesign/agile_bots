@@ -1,8 +1,8 @@
-
+﻿
 from typing import List, Dict, Any, Optional
-from .domain_scanner import DomainScanner
-from .domain_concept_node import DomainConceptNode
-from .violation import Violation
+from domain_scanner import DomainScanner
+from domain_concept_node import DomainConceptNode
+from scanners.violation import Violation
 
 class CodeRepresentationScanner(DomainScanner):
     

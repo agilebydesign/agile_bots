@@ -54,5 +54,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.failing_test_api_scanner.FailingTestApiScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.failing_test_api_scanner.FailingTestApiScanner"
 }

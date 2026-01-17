@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import TTYAdapter
-from agile_bots.src.bot_path.bot_path import BotPath
+﻿
+from cli.adapters import TTYAdapter
+from bot_path.bot_path import BotPath
 
 class TTYBotPath(TTYAdapter):
     
@@ -35,7 +35,7 @@ class TTYBotPath(TTYAdapter):
         lines.append("")
         
         workspace_name = self.bot_path.workspace_directory.name
-        lines.append(f"📂 {self.add_bold('Workspace:')} {workspace_name}")
+        lines.append(f"📝‚ {self.add_bold('Workspace:')} {workspace_name}")
         lines.append(str(self.bot_path.workspace_directory))
         lines.append("")
         lines.append("To change path:")
@@ -47,5 +47,5 @@ class TTYBotPath(TTYAdapter):
     
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

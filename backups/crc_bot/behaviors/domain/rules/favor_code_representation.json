@@ -2,7 +2,7 @@
   "priority": 3,
   "description": "Keep domain model tightly aligned to code it represents, use actual class names and method signatures, not prose descriptions. Show collaborators as types, not descriptions. Avoid over conceptualization.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.code_representation_scanner.CodeRepresentationScanner"
+    "agile_bot.bots.base_bot.scanners.code_representation_scanner.CodeRepresentationScanner"
   ],
   "do": {
     "description": "Keep code and domain model tightly aligned",

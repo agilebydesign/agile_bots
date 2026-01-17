@@ -69,7 +69,7 @@ Given CLI is initialized with story_bot at path C:/dev/augmented-teams/agile_bot
 When CLI renders the dashboard header
 Then output contains '**Bot Path:**' label
 And output shows code block with three backticks
-And output shows the full bot directory path: 'C:\dev\augmented-teams\agile_bot\bots\story_bot'
+And output shows the full bot directory path: 'C:\dev\agile_bot\bots\story_bot'
 And output closes code block with three backticks
 ```
 
@@ -80,11 +80,11 @@ And output closes code block with three backticks
 **Steps:**
 ```gherkin
 Given CLI is initialized with workspace base_bot
-And workspace path is C:/dev/augmented-teams/agile_bot/bots/base_bot
+And workspace path is C:/dev/agile_bot/bots/base_bot
 When CLI renders the dashboard header
 Then output contains 'Ã°Å¸â€œâ€š **Workspace:** base_bot' with folder emoji
 And output shows code block with three backticks
-And output shows full workspace path: 'C:\dev\augmented-teams\agile_bot\bots\base_bot'
+And output shows full workspace path: 'C:\dev\agile_bot\bots\base_bot'
 And output closes code block with three backticks
 ```
 

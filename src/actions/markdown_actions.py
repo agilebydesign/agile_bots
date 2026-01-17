@@ -1,6 +1,6 @@
-
-from agile_bots.src.cli.adapters import MarkdownAdapter
-from agile_bots.src.cli.base_hierarchical_adapter import BaseActionsAdapter
+﻿
+from cli.adapters import MarkdownAdapter
+from cli.base_hierarchical_adapter import BaseActionsAdapter
 
 class MarkdownActions(BaseActionsAdapter, MarkdownAdapter):
     
@@ -12,5 +12,5 @@ class MarkdownActions(BaseActionsAdapter, MarkdownAdapter):
         return super().serialize()
     
     def parse_command_text(self, text: str) -> tuple[str, str]:
-        from agile_bots.src.utils import parse_command_text
+        from utils import parse_command_text
         return parse_command_text(text)

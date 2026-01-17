@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code should represent domain concepts directly. Domain models should match code. If code doesn't match domain concepts, refactor the code rather than creating abstract domain models.",
-  "scanner": "agile_bot.src.scanners.code_representation_code_scanner.CodeRepresentationCodeScanner",
+  "scanner": "agile_bot.scanners.code_representation_code_scanner.CodeRepresentationCodeScanner",
   "examples": [
     {
       "do": {

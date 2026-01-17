@@ -1,11 +1,11 @@
-
+﻿
 from typing import List, Dict, Any, Optional, Tuple, Set
 from pathlib import Path
 import ast
 from datetime import datetime
 import logging
-from .code_scanner import CodeScanner
-from .violation import Violation
+from code_scanner import CodeScanner
+from scanners.violation import Violation
 import hashlib
 from difflib import SequenceMatcher
 import json

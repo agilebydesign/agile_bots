@@ -53,6 +53,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.src.scanners.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
+  "scanner": "agile_bot.bots.base_bot.scanners.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
 }
 

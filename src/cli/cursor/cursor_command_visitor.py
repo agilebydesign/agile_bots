@@ -1,11 +1,11 @@
 from pathlib import Path
 from typing import Dict, Set, Optional
 import json
-from ..base_hierarchical_adapter import BaseBehaviorsAdapter, BaseBehaviorAdapter
-from ..action_data_collector import ActionDataCollector
-from ..description_extractor import DescriptionExtractor
-from ..formatter import CliTerminalFormatter
-from ...utils import read_json_file
+from cli.base_hierarchical_adapter import BaseBehaviorsAdapter, BaseBehaviorAdapter
+from cli.action_data_collector import ActionDataCollector
+from cli.description_extractor import DescriptionExtractor
+from cli.formatter import CliTerminalFormatter
+from utils import read_json_file
 
 class CursorCommandGenerator(BaseBehaviorsAdapter):
     
@@ -97,7 +97,7 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
             "Display current position in workflow, active scope, and available commands.",
             "",
             "## Show Status",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'status' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'status' | python -m agile_bot.src.cli.cli_main",
         ]
         return "\n".join(lines)
     
@@ -109,27 +109,27 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
             f"# {self.bot_name} - CLI Status and Navigation",
             "",
             "## Status",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'status' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'status' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Help",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'help' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'help' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Navigation",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'next' | python -m agile_bots.src.cli.cli_main",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'back' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'next' | python -m agile_bot.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'back' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Scope",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'scope all' | python -m agile_bots.src.cli.cli_main",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'scope \"${{1:story_name}}\"' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'scope all' | python -m agile_bot.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'scope \"${{1:story_name}}\"' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Path",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'path ${{1:project_path}}' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'path ${{1:project_path}}' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Change Bot",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'bot ${{1:bot_name}}' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'bot ${{1:bot_name}}' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Exit",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'exit' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo 'exit' | python -m agile_bot.src.cli.cli_main",
         ]
         return "\n".join(lines)
     
@@ -152,10 +152,10 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
             f"# {self.bot_name}_{behavior_name_underscore} - Navigate to {behavior_name.capitalize()} Behavior",
             "",
             "## Navigate to Behavior",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}' | python -m agile_bot.src.cli.cli_main",
             "",
             "## Navigate to Specific Action",
-            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.${{1|{action_options}|}}' | python -m agile_bots.src.cli.cli_main",
+            f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.${{1|{action_options}|}}' | python -m agile_bot.src.cli.cli_main",
             "",
         ]
         
@@ -219,7 +219,7 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
         return registry_path
     
     def _get_registry_path(self) -> Path:
-        registry_path = self.workspace_root / 'agile_bots' / 'bots' / 'registry.json'
+        registry_path = self.workspace_root / 'agile_bot' / 'bots' / 'registry.json'
         registry_path.parent.mkdir(parents=True, exist_ok=True)
         return registry_path
     

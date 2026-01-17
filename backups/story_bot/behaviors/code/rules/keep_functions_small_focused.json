@@ -51,5 +51,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.src.scanners.function_size_scanner.FunctionSizeScanner"
+  "scanner": "agile_bot.bots.base_bot.scanners.function_size_scanner.FunctionSizeScanner"
 }

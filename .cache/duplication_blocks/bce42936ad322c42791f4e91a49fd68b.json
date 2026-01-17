@@ -1,0 +1,14 @@
+{
+  "file_path": "C:\\dev\\agile_bots\\src\\actions\\tty_actions.py",
+  "cached_at": "2026-01-16T16:49:45.158998",
+  "blocks": [
+    {
+      "hash": "f104c1866e9687d1ab1a05e9693e3190",
+      "start_line": 21,
+      "end_line": 35,
+      "func_name": "names",
+      "preview": "current_action_name = self.actions.current.action_name if self.actions.current else None\nnames_list = []\nfor name in self.actions.names:\n    if name == current_action_name:\n        names_list.append(self.add_bold(name))\n    else:\n        names_list.append(name)\nif hasattr(self.actions, '_non_workflow_actions'):\n    for action in self.actions._non_workflow_actions:\n        name = action.action_name\n        names_list.append(name)\nreturn ' | '.join(names_list)",
+      "normalized": "ASSIGN(1_targets)|ASSIGN(1_targets)|FOR_LOOP|If|Return"
+    }
+  ]
+}

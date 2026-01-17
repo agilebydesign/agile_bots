@@ -1,9 +1,9 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import Dict, Any, Type
-from ..action import Action
-from ..action_context import ActionContext, ClarifyActionContext
-from .required_context import RequiredContext
-from .requirements_clarifications import RequirementsClarifications
+from actions.action import Action
+from actions.action_context import ActionContext, ClarifyActionContext
+from actions.clarify.required_context import RequiredContext
+from actions.clarify.requirements_clarifications import RequirementsClarifications
 
 class ClarifyContextAction(Action):
     context_class: Type[ActionContext] = ClarifyActionContext

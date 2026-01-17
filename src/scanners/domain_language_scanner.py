@@ -1,9 +1,9 @@
-
+﻿
 from typing import List, Dict, Any, Optional
 import re
-from .domain_scanner import DomainScanner
-from .domain_concept_node import DomainConceptNode
-from .violation import Violation
+from domain_scanner import DomainScanner
+from domain_concept_node import DomainConceptNode
+from scanners.violation import Violation
 
 class DomainLanguageScanner(DomainScanner):
     
@@ -29,7 +29,7 @@ class DomainLanguageScanner(DomainScanner):
                 violations.append(
                     Violation(
                         rule=rule_obj,
-                        violation_message=f'Domain concept "{node.name}" uses generic term "{term}". Use domain-specific language instead (e.g., "PortfolioData" → "Portfolio", "TargetConfig" → "TargetAllocation").',
+                        violation_message=f'Domain concept "{node.name}" uses generic term "{term}". Use domain-specific language instead (e.g., "PortfolioData" â†’ "Portfolio", "TargetConfig" â†’ "TargetAllocation").',
                         location=node.map_location('name'),
                         line_number=None,
                         severity='warning'

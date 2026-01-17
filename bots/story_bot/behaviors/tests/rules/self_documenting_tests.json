@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.self_documenting_scanner.SelfDocumentingScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.self_documenting_scanner.SelfDocumentingScanner"
 }

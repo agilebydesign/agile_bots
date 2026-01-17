@@ -59,5 +59,5 @@
       }
     }
   ],
-  "scanner": "agile_bot.src.scanners.exception_classification_scanner.ExceptionClassificationScanner"
+  "scanner": "agile_bot.scanners.exception_classification_scanner.ExceptionClassificationScanner"
 }

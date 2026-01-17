@@ -58,5 +58,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
 }

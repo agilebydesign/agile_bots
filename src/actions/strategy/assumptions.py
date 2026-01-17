@@ -1,6 +1,6 @@
-from pathlib import Path
+﻿from pathlib import Path
 from typing import List
-from ...utils import read_json_file
+from utils import read_json_file
 
 class Assumptions:
 

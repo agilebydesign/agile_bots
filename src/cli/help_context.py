@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional, Any
+﻿from typing import List, Dict, Optional, Any
 from dataclasses import dataclass
 
 @dataclass

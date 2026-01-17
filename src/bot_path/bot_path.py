@@ -1,10 +1,10 @@
-from pathlib import Path
+﻿from pathlib import Path
 import os
 import json
 import logging
 from typing import Dict, Any
-from ..bot.workspace import get_workspace_directory, get_bot_directory, get_base_actions_directory, get_python_workspace_root
-from ..utils import read_json_file
+from bot.workspace import get_workspace_directory, get_bot_directory, get_base_actions_directory, get_python_workspace_root
+from utils import read_json_file
 
 logger = logging.getLogger(__name__)
 

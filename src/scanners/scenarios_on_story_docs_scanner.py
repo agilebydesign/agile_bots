@@ -1,8 +1,8 @@
-
+﻿
 from typing import List, Dict, Any, Optional, Set
-from .story_scanner import StoryScanner
-from .story_map import StoryNode, Story, StoryMap
-from .violation import Violation
+from story_scanner import StoryScanner
+from story_map import StoryNode, Story, StoryMap
+from scanners.violation import Violation
 
 def _get_story_names_from_scope(story_graph: Dict[str, Any]) -> Set[str]:
     scope_config = story_graph.get('_validation_scope', {})

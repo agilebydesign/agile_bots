@@ -47,5 +47,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.src.scanners.story_sizing_scanner.StorySizingScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.story_sizing_scanner.StorySizingScanner"
 }

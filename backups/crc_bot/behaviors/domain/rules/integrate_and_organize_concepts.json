@@ -2,8 +2,8 @@
   "priority": 1,
   "description": "Integrate related capabilities under parent concepts and organize by business domain. Avoid noun redundancy by nesting related capabilities together, group by business capabilities not technical layers.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.noun_redundancy_scanner.NounRedundancyScanner",
-    "agile_bot.bots.base_bot.src.scanners.domain_grouping_scanner.DomainGroupingScanner"
+    "agile_bot.bots.base_bot.scanners.noun_redundancy_scanner.NounRedundancyScanner",
+    "agile_bot.bots.base_bot.scanners.domain_grouping_scanner.DomainGroupingScanner"
   ],
   "do": {
     "description": "Integrate related capabilities under parent concepts, organize by business domain",

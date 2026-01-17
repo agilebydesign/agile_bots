@@ -1,36 +1,4 @@
-# Domain Walkthrough Realizations: Base Bot
-
-**Date**: 2026-01-06
-**Status**: In Progress
-**Domain Model Version**: 1.0
-
-## Purpose
-
-This document validates the domain model by tracing object flows through key scenarios. Each walkthrough proves the model can fulfill story requirements by showing explicit method calls, parameters, nested collaborations, and return values.
-
-**Coverage Tracking**: Each walkthrough explicitly maps to story graph nodes (Epic > Sub-Epic > Story > AC > Scenario > Steps). This "Covers" information is also stored in story-graph.json domain concepts as realization scenarios.
-
----
-
-## Walkthrough Strategy
-
-**Purpose**: Validate the domain model across all epics can correctly support all required scenarios
-**Depth**: Full object flow from initial trigger through all collaborations to final result
-**Focus Areas**: Object interactions, data flow, method calls, return values
-**Stopping Criteria**: All key scenarios have at least one walkthrough covering core flows
-
-**Scenarios Selected**:
-1. Invoke Bot Through Panel.Manage Bot Information.Open Panel
-2. Invoke Bot Through Panel.Manage Bot Information.Refresh Panel
-3. Invoke Bot Through Panel.Navigate Behavior Action Status.Display Hierarchy
-4. Invoke Bot Through Panel.Navigate Behavior Action Status.Execute Behavior Action
-5. Invoke Bot Through Panel.Filter And Navigate Scope.Display Story Scope Hierarchy
-... and 2 more
-
-**Rationale**:
-These scenarios cover the complete lifecycle of features in scope, from initialization through execution to completion.
-
----
+# Domain Walkthrough Realizations: Panel
 
 ## Realization Scenarios
 
@@ -48,7 +16,7 @@ These scenarios cover the complete lifecycle of features in scope, from initiali
 
 ```
 panelData: JSON = CLI.execute('status')
-  -> pythonProcess: Process = spawn('python', ['repl_main.py'])
+  -> cli:  = spawn('python', ['repl_main.py'])
   -> main()
      -> bot: Bot = load_bot()
      -> session: REPLSession = REPLSession(bot)
@@ -66,7 +34,7 @@ panelData: JSON = CLI.execute('status')
            return jsonString: "{name: 'story_bot', workspace: 'base_bot', behaviors: [...], paths: {...}}"
         return output: "{...json...}"
      -> print(output)
-  -> stdout: String = pythonProcess.stdout.read()
+  -> stdout: String = cli.stdout.read()
   -> panelData: JSON = JSON.parse(stdout)
   return panelData
 panel: Panel = new Panel(panelData, cliClient)
@@ -116,12 +84,12 @@ webview.html = html
 ```
 BotHeaderView.onRefreshClick()
   -> newData: JSON = this.cliClient.execute('status')
-     -> pythonProcess.stdin.write('status')
+     -> cli.stdin.write('status')
      -> REPLSession.handle_command('status')
         -> output: String = this.adapter.serialize()
            return jsonString: "{...}"
         -> print(output)
-     -> stdout: String = pythonProcess.stdout.read()
+     -> stdout: String = cli.stdout.read()
      -> newData: JSON = JSON.parse(stdout)
      return newData
   -> this.botJSON = newData
@@ -198,7 +166,7 @@ BehaviorView.onToggleClick()
 BehaviorView.onExecuteClick()
   -> behaviorName: String = this.behaviorJSON.name
   -> result: JSON = this.cliClient.execute(behaviorName)
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
+     -> cli:  = spawn('python', ['repl_main.py'])
      -> stdin.write(behaviorName)
      -> REPLSession.handle_command(behaviorName)
         -> botResult: BotResult = this.bot.execute_behavior(behaviorName)
@@ -294,7 +262,7 @@ EpicView.onFolderClick()
 ```
 ScopeSection.onFilterInput('Open Panel')
   -> filteredData: JSON = this.cliClient.execute('scope "Open Panel"')
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
+     -> cli:  = spawn('python', ['repl_main.py'])
      -> stdin.write('scope "Open Panel"')
      -> Bot.update_scope_filter('Open Panel')
         -> scope: Scope = Scope.filter_by_story('Open Panel')
@@ -348,7 +316,7 @@ html: String = section.render()
 ClarifyInstructionsSection.onAnswerChange(questionId, newAnswer)
   -> question: Object = this.get_question_by_id(questionId)
   -> result: JSON = this.cliClient.execute(`update_answer "${question.question}" "${newAnswer}"`)
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
+     -> cli:  = spawn('python', ['repl_main.py'])
      -> stdin.write('update_answer ...')
      -> Bot.update_question_answer(question, newAnswer)
         -> clarificationFile: Path = behavior.get_clarification_file()

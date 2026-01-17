@@ -1,12 +1,12 @@
-"""Scanner for validating test quality (FIRST principles)."""
+﻿"""Scanner for validating test quality (FIRST principles)."""
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import ast
 import re
 import logging
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 from .resources.ast_elements import Functions
 
 logger = logging.getLogger(__name__)

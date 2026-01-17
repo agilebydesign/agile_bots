@@ -1,11 +1,11 @@
-
+﻿
 from typing import List, Dict, Any, Optional, Tuple, Set
 from pathlib import Path
 import ast
 from collections import defaultdict
 
-from .test_scanner import TestScanner
-from .violation import Violation
+from test_scanner import TestScanner
+from scanners.violation import Violation
 
 class SetupSimilarityScanner(TestScanner):
 

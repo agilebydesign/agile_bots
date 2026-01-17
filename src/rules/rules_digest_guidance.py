@@ -1,4 +1,4 @@
-from typing import List
+﻿from typing import List
 
 class GuidanceLineCollection:
     def __init__(self, lines: List[str]):

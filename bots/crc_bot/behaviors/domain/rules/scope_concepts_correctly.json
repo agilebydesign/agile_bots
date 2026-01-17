@@ -2,7 +2,7 @@
   "priority": 3,
   "description": "Scope domain concepts correctly - place at the most specific level where relevant and ensure they represent complete functional capabilities. Use 'local' scope for single sub-epic concepts, 'global' for shared concepts. Concepts should be complete functional units, not fragments.",
   "scanners": [
-    "agile_bot.bots.base_bot.src.scanners.concept_placement_scanner.ConceptPlacementScanner"
+    "agile_bot.bots.base_bot.scanners.concept_placement_scanner.ConceptPlacementScanner"
   ],
   "do": {
     "description": "Place concepts at correct scope level and ensure functional completeness",
