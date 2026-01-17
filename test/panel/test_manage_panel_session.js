@@ -112,6 +112,29 @@ test('TestSwitchBot', { concurrency: false }, async (t) => {
         assert.ok(html.includes('story_bot') || html.includes('bot'), 
             'Should show bot name');
     });
+    
+    await t.test('test_switch_bot_functionality', async () => {
+        // Get initial bot
+        const initialStatus = await cli.execute('status');
+        const initialBot = initialStatus.name || initialStatus.bot_name;
+        
+        // Create BotView and get header view
+        const botView = new BotView(cli);
+        
+        // Try to switch to crc_bot
+        const targetBot = initialBot === 'story_bot' ? 'crc_bot' : 'story_bot';
+        
+        // This should actually call the handleEvent method that uses PanelView._log
+        const result = await botView.handleEvent('switchBot', { botName: targetBot });
+        
+        // Verify switch occurred
+        assert.ok(result, 'Should get result from bot switch');
+        
+        // Verify new bot is active
+        const newStatus = await cli.execute('status');
+        const newBot = newStatus.name || newStatus.bot_name;
+        assert.strictEqual(newBot, targetBot, `Should have switched to ${targetBot}`);
+    });
 });
 
 test('TestTogglePanelSection', { concurrency: false }, async (t) => {

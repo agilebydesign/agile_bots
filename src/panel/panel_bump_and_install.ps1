@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Stop'
 
 # Navigate to panel directory using relative paths
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$agileDir = Split-Path -Parent $scriptDir
+$agileDir = Split-Path -Parent (Split-Path -Parent $scriptDir)  # Get workspace root (two levels up from src\panel)
 $panelDir = Join-Path (Join-Path $agileDir "src") "panel"
 Set-Location $panelDir
 

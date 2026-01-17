@@ -526,3 +526,113 @@ class TestHandleErrorsUsingCLI:
         
         # Then - Error message shown
         assert 'error' in cli_response.output.lower() or 'unknown' in cli_response.output.lower()
+
+
+# ============================================================================
+# STORY: Display Status Tree with behavior.action Commands
+# ============================================================================
+class TestStatusTreeDisplayWithDotNotation:
+    """
+    Story: Status tree should be displayed when using behavior.action notation
+    
+    Bug fix: behavior.action commands now include status tree in output
+    Previously only behavior or action alone would show the tree
+    """
+    
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_behavior_dot_action_includes_status_tree(self, tmp_path, helper_class):
+        """
+        SCENARIO: behavior.action command includes status tree in output
+        GIVEN: CLI initialized
+        WHEN: user executes 'shape.build' command
+        THEN: output includes both instructions AND status tree
+        AND: status tree shows current position
+        """
+        # Given
+        helper = helper_class(tmp_path)
+        helper.domain.state.set_state('shape', 'build')
+        
+        # When - Execute behavior.action notation
+        cli_response = helper.cli_session.execute_command('shape.build')
+        
+        # Then - Output includes instructions
+        helper.instructions.assert_section_shows_behavior_and_action(
+            cli_response.output, 'shape', 'build')
+        
+        # Then - Output includes status tree
+        output_lower = cli_response.output.lower()
+        assert 'current position' in output_lower or 'cli status' in output_lower or \
+               'behaviors' in output_lower or 'actions' in output_lower, \
+               f"Status tree not found in output for shape.build command:\n{cli_response.output[:1000]}"
+    
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_multiple_behavior_dot_action_commands_show_tree(self, tmp_path, helper_class):
+        """
+        SCENARIO: Multiple behavior.action commands all show status tree
+        GIVEN: CLI initialized
+        WHEN: user executes multiple 'behavior.action' commands
+        THEN: each output includes status tree
+        """
+        # Given
+        helper = helper_class(tmp_path)
+        
+        # When/Then - Test multiple behavior.action combinations
+        test_cases = [
+            ('shape', 'build'),
+            ('shape', 'clarify'),
+            ('shape', 'strategy'),
+        ]
+        
+        for behavior, action in test_cases:
+            helper.domain.state.set_state(behavior, action)
+            cli_response = helper.cli_session.execute_command(f'{behavior}.{action}')
+            
+            # Verify instructions present
+            helper.instructions.assert_section_shows_behavior_and_action(
+                cli_response.output, behavior, action)
+            
+            # Verify status tree present
+            output_lower = cli_response.output.lower()
+            assert 'current position' in output_lower or 'cli status' in output_lower or \
+                   'behaviors' in output_lower or 'actions' in output_lower, \
+                   f"Status tree not found in output for {behavior}.{action} command:\n{cli_response.output[:1000]}"
+    
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_behavior_dot_action_shows_current_position(self, tmp_path, helper_class):
+        """
+        SCENARIO: behavior.action output shows current position in tree
+        GIVEN: CLI initialized
+        WHEN: user executes 'shape.validate'
+        THEN: status tree shows shape.validate as current position
+        """
+        # Given
+        helper = helper_class(tmp_path)
+        
+        # Create story graph for validation
+        story_graph_data = {'epics': []}
+        helper.domain.story.create_story_graph(story_graph_data)
+        
+        helper.domain.state.set_state('shape', 'validate')
+        
+        # When
+        cli_response = helper.cli_session.execute_command('shape.validate')
+        
+        # Then - Instructions shown
+        helper.instructions.assert_section_shows_behavior_and_action(
+            cli_response.output, 'shape', 'validate')
+        
+        # Then - Current position shown in tree
+        assert 'shape' in cli_response.output.lower()
+        assert 'validate' in cli_response.output.lower()

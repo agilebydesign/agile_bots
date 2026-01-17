@@ -194,7 +194,10 @@ class CLISession:
             rules_response = self._check_routed_rules_submit(command, result)
             if rules_response:
                 return rules_response, False
-            return result, False
+            
+            # Return as Instructions with navigation flag to trigger status tree display
+            # This ensures behavior.action commands show the status tree just like individual commands
+            return result, True
         except ValueError:
             return self._build_error_response(verb), False
     

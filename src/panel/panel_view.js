@@ -12,6 +12,14 @@ const END_MARKER = '<<<END_OF_RESPONSE>>>';
 
 class PanelView {
     /**
+     * Static logging method for panel views
+     * @param {string} message - Message to log
+     */
+    static _log(message) {
+        console.log(message);
+    }
+    
+    /**
      * Create a PanelView.
      * @param {string|PanelView} botPathOrCli - Full path to bot directory, or CLI instance to reuse
      */
