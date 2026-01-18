@@ -38,5 +38,11 @@
       "Output/expected result variables must be included in Examples tables when used",
       "Examples drive both design and test \u2014 not written after implementation"
     ]
+  },
+  "walkthrough": {
+    "decisions": {
+      "walkthrough_depth": "{\"value\":\"mixed\",\"description\":\"Variable depth - detailed for risky areas, high-level for proven areas\",\"when_to_use\":\"Mixed complexity across system, focus effort where it matters\"}"
+    },
+    "assumptions": []
   }
 }

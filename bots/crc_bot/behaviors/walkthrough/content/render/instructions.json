@@ -1,0 +1,8 @@
+{
+  "behaviorName": "walkthrough",
+  "instructions": [
+    "Extract realization scenarios from story-graph.json domain_concepts and render walkthrough realization documents.",
+    "Include 'Model Updates Discovered' section showing all added/modified responsibilities, collaborators, and concepts during the walkthrough.",
+    "Document each walk with its specific Covers mapping and object flow traces using Object.method(param: value) format."
+  ]
+}

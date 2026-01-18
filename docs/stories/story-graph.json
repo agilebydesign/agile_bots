@@ -3316,6 +3316,146 @@
                           "collaborators": [
                             "Bot"
                           ]
+                        },
+                        {
+                          "name": "Create child node with name and position",
+                          "collaborators": [
+                            "StoryNodeChildren",
+                            "NodeValidator"
+                          ]
+                        },
+                        {
+                          "name": "Delete self and handle children",
+                          "collaborators": [
+                            "Parent",
+                            "StoryNodeChildren"
+                          ]
+                        },
+                        {
+                          "name": "Validate child name unique among siblings",
+                          "collaborators": [
+                            "StoryNodeChildren"
+                          ]
+                        },
+                        {
+                          "name": "Adjust position to valid range",
+                          "collaborators": [
+                            "StoryNodeChildren"
+                          ]
+                        },
+                        {
+                          "name": "Resequence children after insert or delete",
+                          "collaborators": [
+                            "StoryNodeChildren"
+                          ]
+                        }
+                      ],
+                      "realization": [
+                        {
+                          "scope": "Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.Create child node with specified position",
+                          "scenario": "Parent node creates new child at specific position, shifting existing children and maintaining sequential order",
+                          "walks": [
+                            {
+                              "covers": "Steps 1-2 (Initialize parent, validate position)",
+                              "object_flow": [
+                                "parent_node: Epic = StoryGraph.get_epic(name: 'User Management')",
+                                "existing_children: ['SubEpic A', 'SubEpic B'] = parent_node.get_children()",
+                                "target_position: 1 = request.position",
+                                "is_valid: True = parent_node.validate_position(position: 1, child_count: 2)",
+                                "  -> max_position: 2 = StoryNodeChildren.get_max_position(children: ['SubEpic A', 'SubEpic B'])",
+                                "  -> is_in_range: True = (position: 1 <= max_position: 2)",
+                                "     return is_in_range: True",
+                                "return is_valid: True"
+                              ]
+                            },
+                            {
+                              "covers": "Step 3 (Create child and insert at position)",
+                              "object_flow": [
+                                "new_child: SubEpic = parent_node.create_child(name: 'SubEpic C', position: 1)",
+                                "  -> is_duplicate: False = parent_node.validate_child_name_unique(name: 'SubEpic C')",
+                                "     -> existing_names: ['SubEpic A', 'SubEpic B'] = StoryNodeChildren.get_child_names()",
+                                "     -> is_unique: True = ('SubEpic C' not in existing_names)",
+                                "        return is_unique: True",
+                                "     return is_duplicate: False",
+                                "  -> child: SubEpic = SubEpic.create(name: 'SubEpic C', parent: Epic)",
+                                "  -> parent_node.resequence_children(insert_at: 1, new_child: child)",
+                                "     -> children_to_shift: ['SubEpic B'] = StoryNodeChildren.get_children_from_position(position: 1)",
+                                "     -> StoryNodeChildren.shift_positions(children: ['SubEpic B'], offset: 1)",
+                                "        SubEpic B.position = 1 + 1 = 2",
+                                "     -> StoryNodeChildren.insert(child: SubEpic C, position: 1)",
+                                "        SubEpic C.position = 1",
+                                "  -> final_order: ['SubEpic A', 'SubEpic C', 'SubEpic B'] = parent_node.get_children()",
+                                "     return final_order",
+                                "return new_child: SubEpic"
+                              ]
+                            }
+                          ],
+                          "model_updates": [
+                            "Added 'Create child node with name and position' responsibility to StoryNode",
+                            "Added 'Validate child name unique among siblings' responsibility to StoryNode",
+                            "Added 'Adjust position to valid range' responsibility to StoryNode",
+                            "Added 'Resequence children after insert or delete' responsibility to StoryNode",
+                            "Added NodeValidator as collaborator for validation operations",
+                            "Added Parent as collaborator for delete operations"
+                          ]
+                        },
+                        {
+                          "scope": "Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Delete Story Node.Delete node including children (cascade delete)",
+                          "scenario": "Node with descendants is deleted using cascade option, removing entire subtree and resequencing siblings",
+                          "walks": [
+                            {
+                              "covers": "Steps 1-3 (Locate node, count descendants, initiate cascade delete)",
+                              "object_flow": [
+                                "parent_node: Epic = StoryGraph.get_epic(name: 'User Management')",
+                                "target_node: SubEpic = parent_node.get_child(name: 'SubEpic B')",
+                                "child_count: 2 = target_node.count_children()",
+                                "  -> direct_children: ['Story A', 'Story B'] = StoryNodeChildren.get_children()",
+                                "     return len(direct_children): 2",
+                                "total_descendants: 5 = target_node.count_all_descendants()",
+                                "  -> count: 2 = child_count",
+                                "  -> for each child in direct_children:",
+                                "     -> child_descendants: 3 = child.count_all_descendants()",
+                                "        count = count + 1 + child_descendants = 2 + 1 + 2 = 5",
+                                "     return count: 5",
+                                "cascade_flag: True = request.cascade",
+                                "return {node: target_node, descendants: 5, cascade: True}"
+                              ]
+                            },
+                            {
+                              "covers": "Steps 4-5 (Recursively delete descendants, remove from parent)",
+                              "object_flow": [
+                                "target_node.delete(cascade: True)",
+                                "  -> target_node.delete_all_descendants()",
+                                "     -> children: ['Story A', 'Story B'] = target_node.get_children()",
+                                "     -> for each child in children:",
+                                "        -> child.delete(cascade: True)",
+                                "           -> nested_children = child.get_children()",
+                                "           -> for each nested in nested_children:",
+                                "              -> nested.delete(cascade: True)",
+                                "                 # Recursively deletes scenarios under stories",
+                                "           -> child.remove_from_parent()",
+                                "        # Stories A and B and their scenarios deleted",
+                                "  -> target_node.remove_from_parent()",
+                                "     -> parent: Epic = target_node.parent",
+                                "     -> position: 1 = target_node.position",
+                                "     -> parent.remove_child(child: target_node)",
+                                "        -> StoryNodeChildren.remove(child: target_node)",
+                                "        -> parent.resequence_children(deleted_position: 1)",
+                                "           -> siblings_after: ['SubEpic C', 'SubEpic D'] = StoryNodeChildren.get_children_from_position(position: 2)",
+                                "           -> StoryNodeChildren.shift_positions(children: siblings_after, offset: -1)",
+                                "              SubEpic C.position = 2 - 1 = 1",
+                                "              SubEpic D.position = 3 - 1 = 2",
+                                "           -> final_children: ['SubEpic A', 'SubEpic C', 'SubEpic D'] = parent.get_children()",
+                                "              return final_children",
+                                "return deleted: True"
+                              ]
+                            }
+                          ],
+                          "model_updates": [
+                            "Added 'Delete self and handle children' responsibility to StoryNode",
+                            "Confirmed 'Resequence children after insert or delete' handles both insert and delete cases",
+                            "Added recursive deletion pattern for cascade deletes"
+                          ]
                         }
                       ]
                     },
@@ -3328,6 +3468,51 @@
                           "collaborators": [
                             "StoryNodeChildren"
                           ]
+                        },
+                        {
+                          "name": "Create StoryGroup when first Story added",
+                          "collaborators": [
+                            "StoryGroup"
+                          ]
+                        },
+                        {
+                          "name": "Check child type compatibility before add",
+                          "collaborators": [
+                            "StoryNodeChildren"
+                          ]
+                        }
+                      ],
+                      "realization": [
+                        {
+                          "scope": "Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.SubEpic with SubEpics cannot create Story child",
+                          "scenario": "SubEpic that already contains SubEpic children rejects attempt to add Story child, maintaining hierarchy rules",
+                          "walks": [
+                            {
+                              "covers": "Steps 1-4 (Attempt Story creation, validate hierarchy, reject with error)",
+                              "object_flow": [
+                                "subepic_node: SubEpic = StoryGraph.get_subepic(name: 'User Management')",
+                                "existing_subepic: SubEpic = subepic_node.get_child(name: 'Authentication')",
+                                "requested_child_type: 'Story' = request.child_type",
+                                "can_add: False = subepic_node.check_child_type_compatibility(child_type: 'Story')",
+                                "  -> has_subepics: True = subepic_node.has_children_of_type(type: 'SubEpic')",
+                                "     -> children: [Authentication] = StoryNodeChildren.get_children()",
+                                "     -> subepic_count: 1 = len([c for c in children if c.type == 'SubEpic'])",
+                                "     -> has_subepics: True = (subepic_count: 1 > 0)",
+                                "        return has_subepics: True",
+                                "  -> is_compatible: False = SubEpic.validate_cannot_mix_subepics_and_stories(has_subepics: True, adding_type: 'Story')",
+                                "     -> if has_subepics: True and adding_type: 'Story':",
+                                "        return is_compatible: False",
+                                "  return can_add: False",
+                                "error: ValidationError = SubEpic.create_hierarchy_error(message: 'Cannot create Story under SubEpic with SubEpics')",
+                                "return error: ValidationError"
+                              ]
+                            }
+                          ],
+                          "model_updates": [
+                            "Added 'Create StoryGroup when first Story added' responsibility to SubEpic",
+                            "Added 'Check child type compatibility before add' responsibility to SubEpic",
+                            "Clarified that 'Validate cannot mix Sub-Epics and Stories' is used during create_child operations"
+                          ]
                         }
                       ]
                     },
@@ -3339,6 +3524,69 @@
                           "name": "Maintain separate sequential ordering for scenarios and acceptance criteria",
                           "collaborators": [
                             "StoryNodeChildren"
+                          ]
+                        },
+                        {
+                          "name": "Route child to correct collection by type",
+                          "collaborators": [
+                            "ScenarioCollection",
+                            "AcceptanceCriteriaCollection"
+                          ]
+                        }
+                      ],
+                      "realization": [
+                        {
+                          "scope": "Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.Story creates child and adds to correct collection",
+                          "scenario": "Story creates Scenario and AcceptanceCriteria children, routing each to separate collections with independent ordering",
+                          "walks": [
+                            {
+                              "covers": "Steps 1-3 (Create Scenario child, route to scenarios collection)",
+                              "object_flow": [
+                                "story_node: Story = StoryGraph.get_story(name: 'Validate Password')",
+                                "child_type: 'Scenario' = request.child_type",
+                                "child_name: 'Valid Password Entered' = request.child_name",
+                                "new_scenario: Scenario = story_node.create_child(name: child_name, type: child_type)",
+                                "  -> target_collection: 'scenarios' = story_node.route_child_to_correct_collection(child_type: 'Scenario')",
+                                "     -> if child_type in ['Scenario', 'ScenarioOutline']:",
+                                "        return collection: 'scenarios'",
+                                "     -> elif child_type == 'AcceptanceCriteria':",
+                                "        return collection: 'acceptance_criteria'",
+                                "  -> scenario: Scenario = Scenario.create(name: 'Valid Password Entered', parent: story_node)",
+                                "  -> position: 0 = ScenarioCollection.get_next_position()",
+                                "  -> ScenarioCollection.add(child: scenario, position: 0)",
+                                "     scenario.position = 0",
+                                "  -> scenarios: ['Valid Password Entered'] = ScenarioCollection.get_all()",
+                                "  -> acceptance_criteria: [] = AcceptanceCriteriaCollection.get_all()",
+                                "     # Verify scenario NOT added to acceptance_criteria collection",
+                                "     return {scenarios: scenarios, acceptance_criteria: acceptance_criteria}",
+                                "return new_scenario: Scenario"
+                              ]
+                            },
+                            {
+                              "covers": "Steps 4-6 (Create AcceptanceCriteria child, route to separate collection with independent ordering)",
+                              "object_flow": [
+                                "ac_child_type: 'AcceptanceCriteria' = request.child_type",
+                                "ac_name: 'Password Must Not Be Empty' = request.child_name",
+                                "new_ac: AcceptanceCriteria = story_node.create_child(name: ac_name, type: ac_child_type)",
+                                "  -> target_collection: 'acceptance_criteria' = story_node.route_child_to_correct_collection(child_type: 'AcceptanceCriteria')",
+                                "     return collection: 'acceptance_criteria'",
+                                "  -> ac: AcceptanceCriteria = AcceptanceCriteria.create(name: 'Password Must Not Be Empty', parent: story_node)",
+                                "  -> ac_position: 0 = AcceptanceCriteriaCollection.get_next_position()",
+                                "     # Independent ordering from scenarios - both start at 0",
+                                "  -> AcceptanceCriteriaCollection.add(child: ac, position: 0)",
+                                "     ac.position = 0",
+                                "  -> scenarios: ['Valid Password Entered'] = ScenarioCollection.get_all()",
+                                "     # Verify AC NOT added to scenarios collection",
+                                "  -> acceptance_criteria: ['Password Must Not Be Empty'] = AcceptanceCriteriaCollection.get_all()",
+                                "     return {scenarios: scenarios, acceptance_criteria: acceptance_criteria}",
+                                "return new_ac: AcceptanceCriteria"
+                              ]
+                            }
+                          ],
+                          "model_updates": [
+                            "Added 'Route child to correct collection by type' responsibility to Story",
+                            "Added ScenarioCollection and AcceptanceCriteriaCollection as collaborators",
+                            "Clarified that 'Maintain separate sequential ordering' means independent position counters per collection"
                           ]
                         }
                       ]

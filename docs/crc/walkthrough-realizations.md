@@ -1,428 +1,276 @@
-# Domain Walkthrough Realizations: Base Bot
+# Domain Walkthrough Realizations: Agile Bots Story Graph Editor
 
-**Date**: 2026-01-07
-**Status**: In Progress
+**Date**: 2026-01-18  
+**Status**: Active - Initial Realizations Complete  
 **Domain Model Version**: 1.0
 
 ## Purpose
 
-This document validates the domain model by tracing object flows through key scenarios. Each walkthrough proves the model can fulfill story requirements by showing explicit method calls, parameters, nested collaborations, and return values.
+This document validates the domain model by tracing object flows through key scenarios for the Story Graph editing features. Each walkthrough proves the model can fulfill story requirements by showing explicit method calls, parameters, nested collaborations, and return values.
 
-**Coverage Tracking**: Each walkthrough explicitly maps to story graph nodes (Epic > Sub-Epic > Story > AC > Scenario > Steps). This "Covers" information is also stored in story-graph.json domain concepts as realization scenarios.
+**Coverage Tracking**: Each walkthrough explicitly maps to story graph nodes (Epic → Sub-Epic → Story → AC → Scenario → Steps). This "Covers" information is also stored in story-graph.json domain concepts as realization scenarios.
 
 ---
 
 ## Walkthrough Strategy
 
-**Purpose**: Validate the domain model across all epics can correctly support all required scenarios
-**Depth**: Full object flow from initial trigger through all collaborations to final result
-**Focus Areas**: Object interactions, data flow, method calls, return values
-**Stopping Criteria**: All key scenarios have at least one walkthrough covering core flows
+**Purpose**: Validate hierarchy management, node creation/deletion, and type compatibility enforcement in Story Graph  
+**Depth**: Mixed - detailed for hierarchy rules (risky), high-level for standard CRUD  
+**Focus Areas**: Node creation with position management, cascade deletion, SubEpic type mixing validation, Story collection routing  
+**Stopping Criteria**: Stop when hierarchy management patterns proven and no new collaborations discovered
 
 **Scenarios Selected**:
-1. Invoke Bot Through Panel.Manage Bot Information.Open Panel
-2. Invoke Bot Through Panel.Manage Bot Information.Refresh Panel
-3. Invoke Bot Through Panel.Navigate Behavior Action Status.Display Hierarchy
-4. Invoke Bot Through Panel.Navigate Behavior Action Status.Execute Behavior Action
-5. Invoke Bot Through Panel.Filter And Navigate Scope.Display Story Scope Hierarchy
-... and 2 more
+1. Create Child Story Node - Create child node with specified position
+2. Delete Story Node - Delete node including children (cascade delete)
+3. Create Child Story Node - SubEpic with SubEpics cannot create Story child
+4. Create Child Story Node - Story creates child and adds to correct collection
 
 **Rationale**:
-These scenarios cover the complete lifecycle of features in scope, from initialization through execution to completion.
+These scenarios focus on the complex weak conditions mentioned by the user:
+- **Position management**: How nodes maintain sequential order when inserting at specific positions
+- **Hierarchy rules**: How SubEpic enforces "cannot mix SubEpics and Stories" constraint
+- **Cascade deletion**: How recursive deletion works and siblings resequence
+- **Collection routing**: How Story maintains separate scenario and acceptance criteria collections
 
 ---
 
 ## Realization Scenarios
 
-### Scenario 1: Open Panel
+### Scenario 1: Create Child Node with Specified Position
 
-**Purpose**: User activates panel command, extension creates panel and displays bot information by calling Python CLI, wrapping JSON response, and rendering all sections
-**Concepts Traced**: Panel
+**Purpose**: Validate StoryNode can insert child at specific position, shift existing children, and maintain sequential order  
+**Concepts Traced**: StoryNode, StoryNodeChildren, NodeValidator
 
-**Scope**: Invoke Bot Through Panel.Manage Bot Information.Open Panel
-
+**Scope**: Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.Create child node with specified position
 
 #### Walk Throughs
 
-**Walk 1 - Covers**: Extension activation and panel creation
+**Walk 1 - Covers**: Steps 1-2 (Initialize parent, validate position)
 
 ```
-// VS Code Extension activated
-panelData: JSON = CLI.execute('status')
-  -> pythonProcess: Process = spawn('python', ['repl_main.py'])
-  -> // Python process initialization
-  -> main()
-     -> bot: Bot = load_bot()
-     -> session: REPLSession = REPLSession(bot)
-        -> this.bot = bot
-        -> // Detect output context and select adapter
-        -> isTTY: bool = sys.stdout.isatty()
-        -> isPiped: bool = not isTTY
-        -> if isPiped: // Panel subprocess
-           this.adapter = JSONBotAdapter(bot)
-        -> elif isTTY: // Interactive terminal
-           this.adapter = TTYBotAdapter(bot)
-        -> // Store adapter for session lifecycle
-     -> session.run()
-  -> stdin.write('status')
-  -> REPLSession.handle_command('status')
-     -> // Use session's pre-initialized adapter
-     -> output: String = this.adapter.serialize()
-        -> // JSONBotAdapter.serialize() [piped mode]
-        -> jsonDict: Dict = {}
-        -> jsonDict['name'] = this.bot.name
-        -> jsonDict['behaviors'] = []
-        -> for behavior in this.bot.behaviors:
-           behaviorAdapter: JSONBehaviorAdapter = JSONBehaviorAdapter(behavior)
-           behaviorDict: Dict = behaviorAdapter.serialize()
-              -> actions: Array = []
-              -> for action in this.behavior.actions:
-                 actionAdapter: JSONActionAdapter = JSONActionAdapter(action)
-                 actionDict: Dict = actionAdapter.serialize()
-                    return {name: action.name, is_completed: action.is_completed, is_current: ...}
-                 actions.append(actionDict)
-              return {name: behavior.name, actions: actions, is_completed: ..., is_current: ...}
-           jsonDict['behaviors'].append(behaviorDict)
-        return json.dumps(jsonDict)
-     -> print(output) // stdout
-  -> stdout: String = pythonProcess.stdout.read()
-  -> panelData: JSON = JSON.parse(stdout)
-  return panelData
-panel: Panel = new Panel(panelData, cli)
-return panel
+StoryNode
+    parent_node: Epic = StoryGraph.get_epic(name: 'User Management')
+    existing_children: ['SubEpic A', 'SubEpic B'] = parent_node.get_children()
+    target_position: 1 = request.position
+    is_valid: True = parent_node.validate_position(position: 1, child_count: 2)
+        -> max_position: 2 = StoryNodeChildren.get_max_position(children: ['SubEpic A', 'SubEpic B'])
+        -> is_in_range: True = (position: 1 <= max_position: 2)
+           return is_in_range: True
+    return is_valid: True
 ```
 
-**Walk 2 - Covers**: Panel constructor and section rendering
+**Walk 2 - Covers**: Step 3 (Create child and insert at position)
 
 ```
-// Panel constructor
-this.botJSON = panelData
-this.cli = cli
-headerView: BotHeaderView = new BotHeaderView(this.botJSON, this.cli)
-pathsSection: PathsSection = new PathsSection(this.botJSON.paths, this.cli)
-behaviorsSection: BehaviorsSection = new PathsSection(this.botJSON.behaviors, this.cli)
-scopeSection: ScopeSection = new ScopeSection(this.botJSON.scope, this.cli)
-instructionsSection: InstructionsSection = new InstructionsSection(this.botJSON.instructions, this.cli)
-html: String = this.render()
-  -> headerHTML: String = headerView.render()
-     return `<div>${this.botJSON.name} v${this.botJSON.version}</div>`
-  -> pathsHTML: String = pathsSection.render()
-     return `<div>${this.botJSON.paths.workspace}</div>`
-  -> behaviorsHTML: String = behaviorsSection.render()
-  -> scopeHTML: String = scopeSection.render()
-  -> instructionsHTML: String = instructionsSection.render()
-  return `<div>${headerHTML}${pathsHTML}${behaviorsHTML}${scopeHTML}${instructionsHTML}</div>`
-webview.html = html
+StoryNode
+    new_child: SubEpic = parent_node.create_child(name: 'SubEpic C', position: 1)
+        -> is_duplicate: False = parent_node.validate_child_name_unique(name: 'SubEpic C')
+           -> existing_names: ['SubEpic A', 'SubEpic B'] = StoryNodeChildren.get_child_names()
+           -> is_unique: True = ('SubEpic C' not in existing_names)
+              return is_unique: True
+           return is_duplicate: False
+        -> child: SubEpic = SubEpic.create(name: 'SubEpic C', parent: Epic)
+        -> parent_node.resequence_children(insert_at: 1, new_child: child)
+           -> children_to_shift: ['SubEpic B'] = StoryNodeChildren.get_children_from_position(position: 1)
+           -> StoryNodeChildren.shift_positions(children: ['SubEpic B'], offset: 1)
+              SubEpic B.position = 1 + 1 = 2
+           -> StoryNodeChildren.insert(child: SubEpic C, position: 1)
+              SubEpic C.position = 1
+        -> final_order: ['SubEpic A', 'SubEpic C', 'SubEpic B'] = parent_node.get_children()
+           return final_order
+    return new_child: SubEpic
 ```
 
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
+**Validation Result**: ✅ Model supports this scenario  
+**Gaps Found**: None  
 **Recommendations**: None
 
 ---
 
-### Scenario 2: Refresh Panel
+### Scenario 2: Delete Node Including Children (Cascade Delete)
 
-**Purpose**: User clicks refresh button, panel calls CLI to get updated status, wraps new JSON, and re-renders all sections
-**Concepts Traced**: Panel
+**Purpose**: Validate StoryNode can recursively delete all descendants and resequence remaining siblings  
+**Concepts Traced**: StoryNode, StoryNodeChildren, Parent
 
-**Scope**: Invoke Bot Through Panel.Manage Bot Information.Refresh Panel
-
+**Scope**: Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Delete Story Node.Delete node including children (cascade delete)
 
 #### Walk Throughs
 
-**Walk 1 - Covers**: User refresh action and CLI round-trip
+**Walk 1 - Covers**: Steps 1-3 (Locate node, count descendants, initiate cascade delete)
 
 ```
-// User clicks refresh button
-BotHeaderView.onRefreshClick()
-  -> newData: JSON = this.cli.execute('status')
-     -> pythonProcess.stdin.write('status')
-     -> REPLSession.handle_command('status', format='json')
-        -> adapter: JSONBotAdapter = JSONBotAdapter(bot)
-        -> jsonDict: Dict = adapter.serialize() // Delegates to JSONBehaviorAdapter, JSONActionAdapter
-        -> jsonString: String = json.dumps(jsonDict)
-        -> print(jsonString)
-     -> stdout: String = pythonProcess.stdout.read()
-     -> newData: JSON = JSON.parse(stdout)
-     return newData
-  -> this.botJSON = newData
-  -> panel.update(newData)
-     -> this.botJSON = newData
-     -> html: String = this.render()
-        // All sections re-render with new JSON
-     -> webview.html = html
-  return success
+StoryNode
+    parent_node: Epic = StoryGraph.get_epic(name: 'User Management')
+    target_node: SubEpic = parent_node.get_child(name: 'SubEpic B')
+    child_count: 2 = target_node.count_children()
+        -> direct_children: ['Story A', 'Story B'] = StoryNodeChildren.get_children()
+           return len(direct_children): 2
+    total_descendants: 5 = target_node.count_all_descendants()
+        -> count: 2 = child_count
+        -> for each child in direct_children:
+           -> child_descendants: 3 = child.count_all_descendants()
+              count = count + 1 + child_descendants = 2 + 1 + 2 = 5
+           return count: 5
+    cascade_flag: True = request.cascade
+    return {node: target_node, descendants: 5, cascade: True}
 ```
 
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
+**Walk 2 - Covers**: Steps 4-5 (Recursively delete descendants, remove from parent)
+
+```
+StoryNode
+    target_node.delete(cascade: True)
+        -> target_node.delete_all_descendants()
+           -> children: ['Story A', 'Story B'] = target_node.get_children()
+           -> for each child in children:
+              -> child.delete(cascade: True)
+                 -> nested_children = child.get_children()
+                 -> for each nested in nested_children:
+                    -> nested.delete(cascade: True)
+                       # Recursively deletes scenarios under stories
+                 -> child.remove_from_parent()
+              # Stories A and B and their scenarios deleted
+        -> target_node.remove_from_parent()
+           -> parent: Epic = target_node.parent
+           -> position: 1 = target_node.position
+           -> parent.remove_child(child: target_node)
+              -> StoryNodeChildren.remove(child: target_node)
+              -> parent.resequence_children(deleted_position: 1)
+                 -> siblings_after: ['SubEpic C', 'SubEpic D'] = StoryNodeChildren.get_children_from_position(position: 2)
+                 -> StoryNodeChildren.shift_positions(children: siblings_after, offset: -1)
+                    SubEpic C.position = 2 - 1 = 1
+                    SubEpic D.position = 3 - 1 = 2
+                 -> final_children: ['SubEpic A', 'SubEpic C', 'SubEpic D'] = parent.get_children()
+                    return final_children
+    return deleted: True
+```
+
+**Validation Result**: ✅ Model supports this scenario  
+**Gaps Found**: None - recursive deletion pattern proven  
 **Recommendations**: None
 
 ---
 
-### Scenario 3: Display Hierarchy
+### Scenario 3: SubEpic with SubEpics Cannot Create Story Child
 
-**Purpose**: Panel displays behavior hierarchy with actions, user expands/collapses behaviors (instant), completion status from JSON
-**Concepts Traced**: BehaviorsSection
+**Purpose**: Validate SubEpic enforces hierarchy rule preventing mixing of SubEpic and Story children  
+**Concepts Traced**: SubEpic, StoryNodeChildren
 
-**Scope**: Invoke Bot Through Panel.Navigate Behavior Action Status.Display Hierarchy
-
-
-#### Walk Throughs
-
-**Walk 1 - Covers**: Rendering behavior hierarchy from JSON
-
-```
-// BehaviorsSection constructor
-this.behaviorsJSON = behaviorsJSON
-this.cli = cli
-html: String = this.render()
-  -> behaviorsHTML: String = ''
-  -> for behavior in this.behaviorsJSON:
-     behaviorView: BehaviorView = new BehaviorView(behavior, this.cli)
-     behaviorHTML: String = behaviorView.render()
-       -> name: String = this.behaviorJSON.name
-       -> status: String = this.behaviorJSON.status // 'current', 'completed', 'pending'
-       -> actionsView: ActionsView = new ActionsView(this.behaviorJSON.actions, this.cli)
-       -> actionsHTML: String = actionsView.render()
-          -> for action in this.actionsJSON:
-             actionHTML: String = `<div>${action.name} [${action.status}]</div>`
-          return actionsHTML
-       return `<div class='behavior ${status}'>${name}${actionsHTML}</div>`
-     behaviorsHTML += behaviorHTML
-  return behaviorsHTML
-```
-
-**Walk 2 - Covers**: User expands behavior (client-side toggle)
-
-```
-// User clicks collapsed behavior
-BehaviorView.onToggleClick()
-  -> this.expanded = !this.expanded // Local state change
-  -> elementHTML: String = this.render()
-  -> document.getElementById(this.elementId).innerHTML = elementHTML
-  return // No CLI call - instant UI update
-```
-
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
-**Recommendations**: None
-
----
-
-### Scenario 4: Execute Behavior Action
-
-**Purpose**: User clicks behavior to execute, system navigates to behavior and executes first action via CLI
-**Concepts Traced**: BehaviorsSection
-
-**Scope**: Invoke Bot Through Panel.Navigate Behavior Action Status.Execute Behavior Action
-
+**Scope**: Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.SubEpic with SubEpics cannot create Story child
 
 #### Walk Throughs
 
-**Walk 1 - Covers**: User executes behavior via CLI
+**Walk 1 - Covers**: Steps 1-4 (Attempt Story creation, validate hierarchy, reject with error)
 
 ```
-// User clicks behavior name
-BehaviorView.onExecuteClick()
-  -> behaviorName: String = this.behaviorJSON.name
-  -> result: JSON = this.cli.execute(behaviorName)
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
-     -> stdin.write(behaviorName)
-     -> Bot.execute_behavior(behaviorName)
-        -> behavior: Behavior = behaviors.get(behaviorName)
-        -> action: Action = behavior.get_first_action()
-        -> action.execute()
-        -> BehaviorActionState.update_current(behavior, action)
-        return {behavior: behaviorName, action: action.name, status: 'in_progress'}
-     return statusJSON
-  -> panel.update(result)
-     -> this.behaviorsJSON = result.behaviors
-     -> html: String = behaviorsSection.render()
-     -> webview.postMessage({update: 'behaviors', html: html})
-  return
+SubEpic
+    subepic_node: SubEpic = StoryGraph.get_subepic(name: 'User Management')
+    existing_subepic: SubEpic = subepic_node.get_child(name: 'Authentication')
+    requested_child_type: 'Story' = request.child_type
+    can_add: False = subepic_node.check_child_type_compatibility(child_type: 'Story')
+        -> has_subepics: True = subepic_node.has_children_of_type(type: 'SubEpic')
+           -> children: [Authentication] = StoryNodeChildren.get_children()
+           -> subepic_count: 1 = len([c for c in children if c.type == 'SubEpic'])
+           -> has_subepics: True = (subepic_count: 1 > 0)
+              return has_subepics: True
+        -> is_compatible: False = SubEpic.validate_cannot_mix_subepics_and_stories(has_subepics: True, adding_type: 'Story')
+           -> if has_subepics: True and adding_type: 'Story':
+              return is_compatible: False
+        return can_add: False
+    error: ValidationError = SubEpic.create_hierarchy_error(message: 'Cannot create Story under SubEpic with SubEpics')
+    return error: ValidationError
 ```
 
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
-**Recommendations**: None
+**Validation Result**: ✅ Model supports this scenario  
+**Gaps Found**: None - hierarchy validation proven  
+**Recommendations**: Consider adding similar validation for preventing SubEpic creation when Stories exist
 
 ---
 
-### Scenario 5: Display Story Scope Hierarchy
+### Scenario 4: Story Creates Child and Adds to Correct Collection
 
-**Purpose**: Panel displays nested epic/sub-epic/story/scenario hierarchy from story graph JSON, user can expand/collapse and navigate
-**Concepts Traced**: StoryGraphTabView
+**Purpose**: Validate Story routes Scenario and AcceptanceCriteria to separate collections with independent ordering  
+**Concepts Traced**: Story, ScenarioCollection, AcceptanceCriteriaCollection, StoryNodeChildren
 
-**Scope**: Invoke Bot Through Panel.Filter And Navigate Scope.Display Story Scope Hierarchy
-
+**Scope**: Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.Story creates child and adds to correct collection
 
 #### Walk Throughs
 
-**Walk 1 - Covers**: Rendering 4-level nested hierarchy from JSON
+**Walk 1 - Covers**: Steps 1-3 (Create Scenario child, route to scenarios collection)
 
 ```
-// StoryGraphTabView constructor
-this.storyMapJSON = storyMapJSON
-this.cli = cli
-html: String = this.render()
-  -> epicsHTML: String = ''
-  -> for epic in this.storyMapJSON.epics:
-     epicView: EpicView = new EpicView(epic, this.cli)
-     epicHTML: String = epicView.render()
-       -> name: String = this.epicJSON.name
-       -> icon: String = this.epicJSON.icon
-       -> subEpicsHTML: String = ''
-       -> for subEpic in this.epicJSON.sub_epics:
-          subEpicView: SubEpicView = new SubEpicView(subEpic, this.cli)
-          subEpicHTML: String = subEpicView.render()
-            -> storiesHTML: String = ''
-            -> for story in this.subEpicJSON.stories:
-               storyView: StoryView = new StoryView(story, this.cli)
-               storyHTML: String = storyView.render()
-                 -> scenariosHTML: String = ''
-                 -> for scenario in this.storyJSON.scenarios:
-                    scenarioView: ScenarioView = new ScenarioView(scenario, this.cli)
-                    scenarioHTML: String = scenarioView.render()
-                      return `<div>${this.scenarioJSON.name}</div>`
-                    scenariosHTML += scenarioHTML
-                 return `<div>${this.storyJSON.name}${scenariosHTML}</div>`
-               storiesHTML += storyHTML
-            return `<div>${this.subEpicJSON.name}${storiesHTML}</div>`
-          subEpicsHTML += subEpicHTML
-       return `<div>${name}${subEpicsHTML}</div>`
-     epicsHTML += epicHTML
-  return epicsHTML
+Story
+    story_node: Story = StoryGraph.get_story(name: 'Validate Password')
+    child_type: 'Scenario' = request.child_type
+    child_name: 'Valid Password Entered' = request.child_name
+    new_scenario: Scenario = story_node.create_child(name: child_name, type: child_type)
+        -> target_collection: 'scenarios' = story_node.route_child_to_correct_collection(child_type: 'Scenario')
+           -> if child_type in ['Scenario', 'ScenarioOutline']:
+              return collection: 'scenarios'
+           -> elif child_type == 'AcceptanceCriteria':
+              return collection: 'acceptance_criteria'
+        -> scenario: Scenario = Scenario.create(name: 'Valid Password Entered', parent: story_node)
+        -> position: 0 = ScenarioCollection.get_next_position()
+        -> ScenarioCollection.add(child: scenario, position: 0)
+           scenario.position = 0
+        -> scenarios: ['Valid Password Entered'] = ScenarioCollection.get_all()
+        -> acceptance_criteria: [] = AcceptanceCriteriaCollection.get_all()
+           # Verify scenario NOT added to acceptance_criteria collection
+           return {scenarios: scenarios, acceptance_criteria: acceptance_criteria}
+    return new_scenario: Scenario
 ```
 
-**Walk 2 - Covers**: User opens epic folder via CLI
+**Walk 2 - Covers**: Steps 4-6 (Create AcceptanceCriteria child, route to separate collection with independent ordering)
 
 ```
-// User clicks epic folder link
-EpicView.onFolderClick()
-  -> folderPath: String = this.epicJSON.folder_path
-  -> this.cli.sendMessage({command: 'openScope', filePath: folderPath})
-     -> vscode.commands.executeCommand('vscode.open', fileUri)
-  return // No panel re-render needed
+Story
+    ac_child_type: 'AcceptanceCriteria' = request.child_type
+    ac_name: 'Password Must Not Be Empty' = request.child_name
+    new_ac: AcceptanceCriteria = story_node.create_child(name: ac_name, type: ac_child_type)
+        -> target_collection: 'acceptance_criteria' = story_node.route_child_to_correct_collection(child_type: 'AcceptanceCriteria')
+           return collection: 'acceptance_criteria'
+        -> ac: AcceptanceCriteria = AcceptanceCriteria.create(name: 'Password Must Not Be Empty', parent: story_node)
+        -> ac_position: 0 = AcceptanceCriteriaCollection.get_next_position()
+           # Independent ordering from scenarios - both start at 0
+        -> AcceptanceCriteriaCollection.add(child: ac, position: 0)
+           ac.position = 0
+        -> scenarios: ['Valid Password Entered'] = ScenarioCollection.get_all()
+           # Verify AC NOT added to scenarios collection
+        -> acceptance_criteria: ['Password Must Not Be Empty'] = AcceptanceCriteriaCollection.get_all()
+           return {scenarios: scenarios, acceptance_criteria: acceptance_criteria}
+    return new_ac: AcceptanceCriteria
 ```
 
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
+**Validation Result**: ✅ Model supports this scenario  
+**Gaps Found**: None - collection routing and independent ordering proven  
 **Recommendations**: None
 
 ---
-
-### Scenario 6: Filter Story Scope
-
-**Purpose**: User types story name in filter, system calls CLI to update scope filter, returns filtered JSON, view re-renders with filtered hierarchy
-**Concepts Traced**: StoryGraphTabView
-
-**Scope**: Invoke Bot Through Panel.Filter And Navigate Scope.Filter Story Scope
-
-
-#### Walk Throughs
-
-**Walk 1 - Covers**: User filters scope via CLI
-
-```
-// User types 'Open Panel' in filter
-ScopeSection.onFilterInput('Open Panel')
-  -> filteredData: JSON = this.cli.execute('scope "Open Panel"')
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
-     -> stdin.write('scope "Open Panel"')
-     -> Bot.update_scope_filter('Open Panel')
-        -> scope: Scope = Scope.filter_by_story('Open Panel')
-        -> filteredStoryMap: JSON = scope.get_filtered_story_map()
-        return {scope: {filter: 'Open Panel', storyMap: filteredStoryMap}}
-     return scopeJSON
-  -> this.scopeJSON = filteredData.scope
-  -> storyGraphView: StoryGraphTabView = new StoryGraphTabView(filteredData.scope.storyMap, this.cli)
-  -> html: String = storyGraphView.render()
-     // Renders only matching epic/sub-epic/story
-  -> document.getElementById('scope-display').innerHTML = html
-  return
-```
-
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
-**Recommendations**: None
-
----
-
-### Scenario 7: Display Clarify Instructions
-
-**Purpose**: When current action is clarify, panel displays ClarifyInstructionsSection with key questions in editable textareas, user edits answer, system saves via CLI
-**Concepts Traced**: ClarifyInstructionsSection
-
-**Scope**: Invoke Bot Through Panel.Display Instructions.Display Clarify Instructions
-
-
-#### Walk Throughs
-
-**Walk 1 - Covers**: Rendering clarify-specific instructions from JSON
-
-```
-// InstructionsSection determines which subclass to use
-InstructionsSection.create(instructionsJSON, actionJSON, cli)
-  -> actionType: String = actionJSON.type // 'clarify'
-  -> if actionType == 'clarify':
-     section: ClarifyInstructionsSection = new ClarifyInstructionsSection(instructionsJSON, actionJSON, cli)
-       -> this.keyQuestionsJSON = instructionsJSON.clarify.key_questions
-       -> this.cli = cli
-     return section
-html: String = section.render()
-  -> baseHTML: String = this.renderBase()
-     return `<div>${this.instructionsJSON.behavior_name}.${this.actionJSON.name}</div>`
-  -> questionsHTML: String = ''
-  -> for question in this.keyQuestionsJSON:
-     questionHTML: String = `
-       <div class='question'>
-         <label>${question.question}</label>
-         <textarea id='answer-${question.id}' 
-                   onchange='updateAnswer(${question.id})'>${question.answer}</textarea>
-       </div>`
-     questionsHTML += questionHTML
-  return `${baseHTML}${questionsHTML}`
-```
-
-**Walk 2 - Covers**: User edits answer and saves via CLI
-
-```
-// User edits answer in textarea and blur triggers save
-ClarifyInstructionsSection.onAnswerChange(questionId, newAnswer)
-  -> question: Object = this.keyQuestionsJSON.find(q => q.id == questionId)
-  -> result: JSON = this.cli.execute(`update_answer "${question.question}" "${newAnswer}"`)
-     -> pythonProcess: Process = spawn('python', ['repl_main.py'])
-     -> stdin.write('update_answer ...')
-     -> Bot.update_question_answer(question, newAnswer)
-        -> clarificationFile: Path = behavior.get_clarification_file()
-        -> clarificationData: JSON = load_json(clarificationFile)
-        -> clarificationData.answers[question] = newAnswer
-        -> save_json(clarificationFile, clarificationData)
-        return {status: 'saved', question: question, answer: newAnswer}
-     return resultJSON
-  -> question.answer = newAnswer
-  -> // Local update complete, no re-render needed
-  return
-```
-
-**Validation Result**: Model supports this scenario
-**Gaps Found**: None
-**Recommendations**: None
-
----
-
 
 ## Model Updates Discovered
 
 ### New Responsibilities Added
 
-No new responsibilities identified during walkthrough. All interactions are supported by existing domain model.
+**StoryNode (Base)**
+- Added: "Create child node with name and position: StoryNodeChildren, NodeValidator"
+- Added: "Delete self and handle children: Parent, StoryNodeChildren"
+- Added: "Validate child name unique among siblings: StoryNodeChildren"
+- Added: "Adjust position to valid range: StoryNodeChildren"
+- Added: "Resequence children after insert or delete: StoryNodeChildren"
+- Rationale: Walkthroughs revealed these core node manipulation responsibilities were missing
+
+**SubEpic**
+- Added: "Create StoryGroup when first Story added: StoryGroup"
+- Added: "Check child type compatibility before add: StoryNodeChildren"
+- Rationale: Hierarchy validation requires checking compatibility before attempting creation
+
+**Story**
+- Added: "Route child to correct collection by type: ScenarioCollection, AcceptanceCriteriaCollection"
+- Rationale: Story must route different child types to appropriate collections
 
 ### New Concepts Discovered
 
-No new concepts discovered. The domain model is complete for the current scope.
+None - all concepts already existed in domain model
 
 ### Responsibilities Removed
 
@@ -430,56 +278,64 @@ None
 
 ### Responsibilities Modified
 
-None
+**StoryNode (Base)** - Clarified: "Resequence children after insert or delete" handles both insert AND delete cases
+- Rationale: Walkthrough showed same responsibility used for both operations with different offsets
+
+**SubEpic** - Clarified: "Validate cannot mix Sub-Epics and Stories" is invoked during create_child operations
+- Rationale: Walkthrough showed this validation is part of child creation flow
+
+**Story** - Clarified: "Maintain separate sequential ordering for scenarios and acceptance criteria" means independent position counters per collection
+- Rationale: Walkthrough proved both collections can have position 0 simultaneously
 
 ---
 
 ## Model Validation Summary
 
-**Total Scenarios Traced**: 7
-**Scenarios Validated**: 7
-**Scenarios with Gaps**: 0
-**New Concepts Discovered**: 0
-**Responsibilities Added**: 0
-**Responsibilities Modified**: 0
+**Total Scenarios Traced**: 4  
+**Scenarios Validated**: 4 ✅  
+**Scenarios with Gaps**: 0 ⚠️  
+**New Concepts Discovered**: 0  
+**Responsibilities Added**: 8  
+**Responsibilities Modified**: 3 (clarifications)
 
-**Model Confidence**: High - All scenarios are fully supported by the domain model
+**Model Confidence**: High - all hierarchy management scenarios validated
 
 ---
 
 ## Recommended Next Steps
 
-1. Implement code following the object flows documented here
-2. Write integration tests that verify the object flows match these realizations
-3. Create detailed design specifications based on these walkthroughs
-4. Review walkthroughs with domain experts for accuracy
+1. **Walkthrough node movement scenarios** - Validate "Move Story Node To Parent" to prove parent transfer logic
+2. **Walkthrough position adjustment edge cases** - Validate invalid position handling (position > child_count)
+3. **Walkthrough duplicate name handling** - Validate error cases when duplicate names attempted
+4. **Consider adding integration tests** - These walkthroughs reveal the complexity of hierarchy management; integration tests would catch regression issues
 
 ---
 
 ## Source Material
 
-- **Story Graph**: `docs/stories/story-graph.json`
-- **Domain Model**: From story-graph.json domain_concepts
+- **Story Graph**: `story-graph.json`
+- **Domain Model**: From story-graph.json domain_concepts (Invoke Bot > Invoke Bot Directly > Manage Story Graph > Edit Story Graph)
 - **Realization Scenarios**: Stored in story-graph.json domain_concepts with "Covers" mapping
-- **Stories Traced**: 7 scenarios across all epics
-- **Domain Concepts Covered**: 84
-- **Story Graph Coverage**: All scenarios have realization walkthroughs
+- **Stories Traced**: Create Child Story Node, Delete Story Node
+- **ACs/Scenarios Traced**: 4 scenarios across 2 stories
+- **Story Graph Coverage**: 2 of 5 stories in Edit Story Graph sub-epic (40%)
 
 ---
 
 ## Walkthrough Notes
 
-The walkthroughs follow a consistent pattern of showing method calls with parameters and return values, nested collaborations indicated by indentation, and complete data flows from start to finish.
-
 **Patterns Observed**:
-- Clear separation of concerns across domain concepts
-- Well-defined collaboration boundaries
-- Consistent data flow patterns
+- **Resequencing pattern**: Used consistently for both inserts (shift +1) and deletes (shift -1)
+- **Position validation pattern**: Always check position <= max before attempting insertion
+- **Duplicate name pattern**: Always validate name unique among siblings before creating child
+- **Hierarchy validation pattern**: Check type compatibility before allowing child creation
+- **Collection routing pattern**: Story uses type-based routing to direct children to correct collection
 
 **Areas Needing More Detail**:
-- Error handling scenarios
-- Edge cases and boundary conditions
-- Performance considerations for high-volume scenarios
+- **Parent transfer logic**: Move scenarios not yet walked through - how does node change parent while maintaining position?
+- **StoryGroup creation**: First story creation auto-creates StoryGroup - when exactly does this happen?
+- **Error propagation**: How do validation errors bubble up to user interface?
+- **Transaction boundaries**: What happens if resequencing partially fails?
 
 ---
 
@@ -489,25 +345,31 @@ Each walkthrough realization is stored in `story-graph.json` under the relevant 
 
 ```json
 {
-  "concept_name": "ConceptName",
-  "realizations": [
+  "name": "StoryNode (Base)",
+  "realization": [
     {
-      "scope": "Epic.Sub-Epic.Story.Scenario",
-      "scenario": "Description of what is being validated",
+      "scope": "Invoke Bot.Invoke Bot Directly.Manage Story Graph.Edit Story Graph.Create Child Story Node.Create child node with specified position",
+      "scenario": "Parent node creates new child at specific position, shifting existing children and maintaining sequential order",
       "walks": [
         {
-          "covers": "Steps 1-3 (description)",
-          "object_flow": [
-            "// Comment",
-            "result: value = Object.method(param: value)",
-            "..."
-          ]
+          "covers": "Steps 1-2 (Initialize parent, validate position)",
+          "object_flow": ["parent_node: Epic = StoryGraph.get_epic(name: 'User Management')", "..."]
+        },
+        {
+          "covers": "Step 3 (Create child and insert at position)",
+          "object_flow": ["new_child: SubEpic = parent_node.create_child(name: 'SubEpic C', position: 1)", "..."]
         }
       ],
-      "model_updates": []
+      "model_updates": ["Added 'Create child node with name and position' responsibility to StoryNode", "..."]
     }
   ]
 }
 ```
+
+**Coverage by Node Type**:
+- Epic-level: Not traced (standard behavior)
+- SubEpic-level: 2 walks (hierarchy validation, compatibility checking)
+- Story-level: 2 walks (collection routing, independent ordering)
+- Scenario-level: Implicitly traced through cascade deletion
 
 This allows traceability from domain concepts to the stories they support, with granular coverage tracking per walk.
