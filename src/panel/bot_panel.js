@@ -349,6 +349,21 @@ class BotPanel {
                 });
             }
             return;
+          case "executeCommand":
+            if (message.commandText) {
+              this._log(`[BotPanel] executeCommand -> ${message.commandText}`);
+              this._botView?.execute(message.commandText)
+                .then((result) => {
+                  this._log(`[BotPanel] executeCommand success: ${message.commandText} | result: ${JSON.stringify(result).substring(0, 500)}`);
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] executeCommand ERROR: ${error.message}`);
+                  this._log(`[BotPanel] executeCommand STACK: ${error.stack}`);
+                  vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
+                });
+            }
+            return;
           case "navigateToBehavior":
             if (message.behaviorName) {
               const cmd = `${message.behaviorName}.clarify`;
@@ -1269,6 +1284,158 @@ class BotPanel {
                 behaviorName: behaviorName
             });
         }
+        
+        // Story Graph Edit functions
+        function createEpic() {
+            console.log('[WebView] createEpic called');
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: 'story_graph.create_epic'
+            });
+        }
+        
+        function createSubEpic(parentName) {
+            console.log('[WebView] createSubEpic called for:', parentName);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`story_graph."\${parentName}".create\`
+            });
+        }
+        
+        function createStory(parentName) {
+            console.log('[WebView] createStory called for:', parentName);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`story_graph."\${parentName}".create_story\`
+            });
+        }
+        
+        function createScenario(storyName) {
+            console.log('[WebView] createScenario called for:', storyName);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`story_graph."\${storyName}".create_scenario\`
+            });
+        }
+        
+        function createScenarioOutline(storyName) {
+            console.log('[WebView] createScenarioOutline called for:', storyName);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`story_graph."\${storyName}".create_scenario_outline\`
+            });
+        }
+        
+        function createAcceptanceCriteria(storyName) {
+            console.log('[WebView] createAcceptanceCriteria called for:', storyName);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`story_graph."\${storyName}".create_acceptance_criteria\`
+            });
+        }
+        
+        function deleteNode(nodePath) {
+            console.log('[WebView] deleteNode called for:', nodePath);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`\${nodePath}.delete\`
+            });
+        }
+        
+        function deleteNodeIncludingChildren(nodePath) {
+            console.log('[WebView] deleteNodeIncludingChildren called for:', nodePath);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`\${nodePath}.delete_including_children\`
+            });
+        }
+        
+        function enableEditMode(nodePath) {
+            console.log('[WebView] enableEditMode called for:', nodePath);
+            // TODO: Implement inline editing for node names
+            // For now, just log that double-click was detected
+            console.log('[WebView] Double-click detected on node:', nodePath);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: \`\${nodePath}.rename\`
+            });
+        }
+        
+        // Track selected node for contextual actions
+        let selectedNode = {
+            type: 'root', // root, epic, sub-epic, story
+            name: null,
+            canHaveSubEpic: false,
+            canHaveStory: false,
+            canHaveTests: false
+        };
+        
+        // Update contextual action buttons based on selection
+        function updateContextualButtons() {
+            const btnCreateEpic = document.getElementById('btn-create-epic');
+            const btnCreateSubEpic = document.getElementById('btn-create-sub-epic');
+            const btnCreateStory = document.getElementById('btn-create-story');
+            const btnCreateTests = document.getElementById('btn-create-tests');
+            
+            // Hide all buttons first
+            if (btnCreateEpic) btnCreateEpic.style.display = 'none';
+            if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'none';
+            if (btnCreateStory) btnCreateStory.style.display = 'none';
+            if (btnCreateTests) btnCreateTests.style.display = 'none';
+            
+            // Show buttons based on selection
+            if (selectedNode.type === 'root') {
+                if (btnCreateEpic) btnCreateEpic.style.display = 'block';
+            } else if (selectedNode.type === 'epic') {
+                if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
+            } else if (selectedNode.type === 'sub-epic') {
+                if (selectedNode.canHaveSubEpic && btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
+                if (selectedNode.canHaveStory && btnCreateStory) btnCreateStory.style.display = 'block';
+            } else if (selectedNode.type === 'story') {
+                if (btnCreateTests) btnCreateTests.style.display = 'block';
+            }
+        }
+        
+        // Select a node (called when clicking on node name/icon)
+        function selectNode(type, name, options = {}) {
+            console.log('[WebView] selectNode:', type, name, options);
+            selectedNode = {
+                type: type,
+                name: name,
+                canHaveSubEpic: options.canHaveSubEpic || false,
+                canHaveStory: options.canHaveStory || false,
+                canHaveTests: options.canHaveTests || false
+            };
+            updateContextualButtons();
+        }
+        
+        // Handle contextual create actions
+        function handleContextualCreate(actionType) {
+            console.log('[WebView] handleContextualCreate:', actionType, 'for node:', selectedNode);
+            
+            if (!selectedNode.name) {
+                console.error('[WebView] No node selected for contextual create');
+                return;
+            }
+            
+            switch(actionType) {
+                case 'sub-epic':
+                    createSubEpic(selectedNode.name);
+                    break;
+                case 'story':
+                    createStory(selectedNode.name);
+                    break;
+                case 'tests':
+                    // Show test options menu
+                    createScenario(selectedNode.name);
+                    break;
+            }
+        }
+        
+        // Initialize: show Create Epic button by default
+        setTimeout(() => {
+            selectNode('root', null);
+        }, 100);
         
         // Save functions for guardrails
         function saveClarifyAnswers() {

@@ -153,6 +153,10 @@ class CLISession:
             result = self.bot.execute(attr.name, None)
             return result, True
         
+        # Special handling for story_graph property - return the dict, not the object
+        if verb == 'story_graph' and hasattr(attr, 'story_graph'):
+            return {'status': 'success', 'result': attr.story_graph}, False
+        
         return attr, False
     
     def _execute_domain_object_command(self, command: str) -> tuple:

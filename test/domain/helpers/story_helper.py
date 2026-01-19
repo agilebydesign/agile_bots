@@ -1202,4 +1202,3 @@ class StoryTestHelper(BaseHelper):
         }
         self.create_story_graph(story_graph_data)
 
-

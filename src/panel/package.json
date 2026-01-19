@@ -2,7 +2,7 @@
     "name": "bot-panel",
     "displayName": "Bot Panel",
     "description": "Visual dashboard for bot status showing workflow, scope, behaviors, and instructions",
-    "version": "0.1.212",
+    "version": "0.1.227",
     "publisher": "agilebot",
     "repository": {
         "type": "git",
@@ -15,7 +15,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:agilebot.viewPanel"
+        "*"
     ],
     "main": "./extension.js",
     "contributes": {
@@ -39,10 +39,12 @@
         "bot_header_view.js",
         "paths_section.js",
         "behaviors_view.js",
-        "scope_view.js",
+        "story_map_view.js",
         "instructions_view.js",
         "panel_view.js",
-        "img/**/*.png"
+        "img/**/*.png",
+        "img/**/*.jpg",
+        "img/**/*.jpeg"
     ],
     "devDependencies": {
         "jsdom": "^27.4.0"

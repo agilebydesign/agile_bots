@@ -100,6 +100,10 @@ class StoryMapView extends PanelView {
         let pageIconPath = '';
         let testTubeIconPath = '';
         let documentIconPath = '';
+        let addEpicIconPath = '';
+        let addSubEpicIconPath = '';
+        let addStoryIconPath = '';
+        let addTestsIconPath = '';
         if (this.webview && this.extensionUri) {
             try {
                 const magnifyingGlassUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'magnifying_glass.png');
@@ -131,10 +135,40 @@ class StoryMapView extends PanelView {
                 
                 const documentUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'document.png');
                 documentIconPath = this.webview.asWebviewUri(documentUri).toString();
+                
+                const addEpicUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_epic.png');
+                addEpicIconPath = this.webview.asWebviewUri(addEpicUri).toString();
+                
+                const addSubEpicUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_sub_epic.jpg');
+                addSubEpicIconPath = this.webview.asWebviewUri(addSubEpicUri).toString();
+                
+                const addStoryUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_story.png');
+                addStoryIconPath = this.webview.asWebviewUri(addStoryUri).toString();
+                
+                const addTestsUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_tests.png');
+                addTestsIconPath = this.webview.asWebviewUri(addTestsUri).toString();
             } catch (err) {
                 console.error('Failed to create icon URIs:', err);
             }
         }
+        
+        // Create contextual action buttons toolbar (Create Epic shown by default for root state)
+        const actionButtonsHtml = `
+            <div id="contextual-actions" style="display: flex; align-items: center; gap: 8px; margin-left: 12px;">
+                <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
+                    <img src="${addEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Epic" />
+                </button>
+                <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
+                    <img src="${addSubEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Sub-Epic" />
+                </button>
+                <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
+                    <img src="${addStoryIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Story" />
+                </button>
+                <button id="btn-create-tests" onclick="event.stopPropagation(); handleContextualCreate('tests');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Tests">
+                    <img src="${addTestsIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Tests" />
+                </button>
+            </div>
+        `;
         
         const linksHtml = scopeData.graphLinks && scopeData.graphLinks.length > 0
             ? scopeData.graphLinks.map(link =>
@@ -157,7 +191,7 @@ class StoryMapView extends PanelView {
         if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
             // content is an object with 'epics' property, not directly an array
             const epics = scopeData.content.epics || [];
-            const rootNode = this.renderRootNode(plusIconPath);
+            const rootNode = this.renderRootNode(actionButtonsHtml);
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath);
             contentHtml = rootNode + treeHtml;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
@@ -186,10 +220,11 @@ class StoryMapView extends PanelView {
                 justify-content: space-between;
                 user-select: none;
             ">
-                <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px;">Story Map</span>
+                    <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;
                         border: none;
@@ -258,26 +293,15 @@ class StoryMapView extends PanelView {
     }
     
     /**
-     * Render root "Story Map" node with Create Epic button.
+     * Render root "Story Map" node with contextual action buttons.
      * 
-     * @param {string} plusIconPath - Path to plus icon
+     * @param {string} actionButtonsHtml - HTML for contextual action buttons
      * @returns {string} HTML string
      */
-    renderRootNode(plusIconPath) {
-        const plusIcon = plusIconPath ? `<img src="${plusIconPath}" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 4px;" alt="Create" />` : '+';
-        
-        return `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600;">
-            <span style="display: inline-block;">Story Map</span>
-            <button onclick="createEpic()" style="
-                margin-left: 12px;
-                padding: 2px 8px;
-                background: transparent;
-                border: 1px solid currentColor;
-                border-radius: 3px;
-                cursor: pointer;
-                font-size: 11px;
-                font-weight: normal;
-            " title="Create Epic at root level">${plusIcon}Create Epic</button>
+    renderRootNode(actionButtonsHtml) {
+        return `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600; display: flex; align-items: center;">
+            <span style="display: inline-block; cursor: pointer;" onclick="selectNode('root', null)">Story Map</span>
+            ${actionButtonsHtml}
         </div>`;
     }
     
@@ -296,21 +320,50 @@ class StoryMapView extends PanelView {
             const epicDocLink = epic.links && epic.links.find(l => l.icon === 'document');
             const epicTestLink = epic.links && epic.links.find(l => l.icon === 'test_tube');
             
-            // Make epic name a hyperlink if document exists
+            // Make epic name a hyperlink if document exists, clickable to select, double-click to edit
+            const epicPath = `story_graph."${this.escapeForJs(epic.name)}"`;
             const epicNameHtml = epicDocLink
-                ? `<span onclick="openFile('${this.escapeForJs(epicDocLink.url)}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
-                : this.escapeHtml(epic.name);
+                ? `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}'); openFile('${this.escapeForJs(epicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
+                : `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}')" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
             
             // Render test tube icon for epic test link
             const epicTestIcon = (epicTestLink && testTubeIconPath)
                 ? ` <span onclick="openFile('${this.escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
                 : '';
             
-            let html = `<div style="margin-top: 8px; font-size: 12px;">
-        <span class="collapsible-header" onclick="toggleCollapse('${epicId}')" style="cursor: pointer; user-select: none;">
-          <span id="${epicId}-icon" style="display: inline-block; min-width: 9px;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}
-        </span>
-      </div>`;
+            // Epic nodes - no inline buttons, just delete buttons
+            const minusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
+            const hasEpicChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
+            
+            let epicActionButtons = `<button onclick="event.stopPropagation(); deleteNode('story_graph.\\"${this.escapeForJs(epic.name)}\\"');" style="
+                display: inline-block;
+                margin-left: 8px;
+                padding: 1px 6px;
+                font-size: 10px;
+                border: 1px solid var(--vscode-button-border, #555);
+                background: var(--vscode-button-secondaryBackground, transparent);
+                color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                cursor: pointer;
+                border-radius: 2px;
+                vertical-align: middle;
+            " title="Delete ${this.escapeForJs(epic.name)}">${minusIcon}Delete</button>`;
+            
+            if (hasEpicChildren) {
+                epicActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('story_graph.\\"${this.escapeForJs(epic.name)}\\"');" style="
+                    display: inline-block;
+                    margin-left: 4px;
+                    padding: 1px 6px;
+                    font-size: 10px;
+                    border: 1px solid var(--vscode-button-border, #555);
+                    background: var(--vscode-button-secondaryBackground, transparent);
+                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                    cursor: pointer;
+                    border-radius: 2px;
+                    vertical-align: middle;
+                " title="Delete ${this.escapeForJs(epic.name)} including all children">${minusIcon}Delete All</button>`;
+            }
+            
+            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}${epicActionButtons}</div>`;
             
             html += `<div id="${epicId}" class="collapsible-content" style="display: none;">`;
             // Helper function to recursively render a sub-epic (can be nested any number of levels)
@@ -322,24 +375,65 @@ class StoryMapView extends PanelView {
                 const subEpicDocLink = subEpic.links && subEpic.links.find(l => l.icon === 'document');
                 const subEpicTestLink = subEpic.links && subEpic.links.find(l => l.icon === 'test_tube');
                 
-                // Make sub-epic name a hyperlink if document exists
+                // Build the full path to this SubEpic (story_graph."Epic"."SubEpic")
+                const subEpicPath = `story_graph."${this.escapeForJs(epic.name)}"."${this.escapeForJs(subEpic.name)}"`;
+                
+                // Determine which buttons to show for SubEpic based on children
+                const nestedSubEpics = subEpic.sub_epics || [];
+                const hasStories = subEpic.story_groups && subEpic.story_groups.some(sg => sg.stories && sg.stories.length > 0);
+                const hasNestedSubEpics = nestedSubEpics.length > 0;
+                const hasNoChildren = !hasStories && !hasNestedSubEpics;
+                
+                // Make sub-epic name a hyperlink if document exists, clickable to select, double-click to edit
                 const subEpicNameHtml = subEpicDocLink
-                    ? `<span onclick="openFile('${this.escapeForJs(subEpicDocLink.url)}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
-                    : this.escapeHtml(subEpic.name);
+                    ? `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}', {canHaveSubEpic: ${hasNoChildren || hasNestedSubEpics}, canHaveStory: ${hasNoChildren || hasStories}}); openFile('${this.escapeForJs(subEpicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
+                    : `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}', {canHaveSubEpic: ${hasNoChildren || hasNestedSubEpics}, canHaveStory: ${hasNoChildren || hasStories}})" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
                 
                 // Only render test tube icon for test links
                 const subEpicTestIcon = (subEpicTestLink && testTubeIconPath)
                     ? ` <span onclick="openFile('${this.escapeForJs(subEpicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
                     : '';
                 
+                // Delete buttons only (no create buttons - those are in header now)
+                let subEpicActionButtons = '';
+                const minusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
+                const hasSubEpicChildren = hasStories || hasNestedSubEpics;
+                
+                subEpicActionButtons += `<button onclick="event.stopPropagation(); deleteNode('${subEpicPath}');" style="
+                    display: inline-block;
+                    margin-left: 8px;
+                    padding: 1px 6px;
+                    font-size: 10px;
+                    border: 1px solid var(--vscode-button-border, #555);
+                    background: var(--vscode-button-secondaryBackground, transparent);
+                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                    cursor: pointer;
+                    border-radius: 2px;
+                    vertical-align: middle;
+                " title="Delete ${this.escapeForJs(subEpic.name)}">${minusIcon}Delete</button>`;
+                
+                if (hasSubEpicChildren) {
+                    subEpicActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('${subEpicPath}');" style="
+                        display: inline-block;
+                        margin-left: 4px;
+                        padding: 1px 6px;
+                        font-size: 10px;
+                        border: 1px solid var(--vscode-button-border, #555);
+                        background: var(--vscode-button-secondaryBackground, transparent);
+                        color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                        cursor: pointer;
+                        border-radius: 2px;
+                        vertical-align: middle;
+                    " title="Delete ${this.escapeForJs(subEpic.name)} including all children">${minusIcon}Delete All</button>`;
+                }
+                
                 const marginLeft = 7 + (depth * 7); // Increase margin for nested sub-epics
                 
-                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span class="collapsible-header" onclick="toggleCollapse('${subEpicId}')" style="cursor: pointer; user-select: none;"><span id="${subEpicId}-icon" style="display: inline-block; min-width: 9px;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}</span></div>`;
+                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}${subEpicActionButtons}</div>`;
                 
                 html += `<div id="${subEpicId}" class="collapsible-content" style="display: none;">`;
                 
                 // Render nested sub_epics if they exist (recursive)
-                const nestedSubEpics = subEpic.sub_epics || [];
                 if (nestedSubEpics.length > 0) {
                     nestedSubEpics.forEach((nested, nestedIndex) => {
                         renderSubEpic(nested, nestedIndex, subEpicId, depth + 1);
@@ -357,21 +451,24 @@ class StoryMapView extends PanelView {
                                 // Check if story has scenarios - if so, make it collapsible
                                 const hasScenarios = story.scenarios && story.scenarios.length > 0;
                                 
+                                // Build story path for edit mode
+                                const storyPath = `story_graph."${this.escapeForJs(epic.name)}"."${this.escapeForJs(subEpic.name)}"."${this.escapeForJs(story.name)}"`;
+                                
                                 html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
                                 
                                 if (hasScenarios) {
-                                    // Collapsible story with scenarios
-                                    html += `<span class="collapsible-header" onclick="toggleCollapse('${storyId}')" style="cursor: pointer; user-select: none;">`;
-                                    html += `<span id="${storyId}-icon" style="display: inline-block; min-width: 9px;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> `;
+                                    // Collapsible story with scenarios - only icon is clickable
+                                    html += `<span id="${storyId}-icon" onclick="event.stopPropagation(); toggleCollapse('${storyId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> `;
                                 }
                                 
                                 // Find story doc link (if exists)
                                 const storyDocLink = story.links && story.links.find(l => l.text === 'story');
                                 
+                                // Story name with double-click to edit, clickable to select
                                 if (storyDocLink) {
-                                    html += `<span onclick="openFile('${this.escapeForJs(storyDocLink.url)}')" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true}); openFile('${this.escapeForJs(storyDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 } else {
-                                    html += `${storyIcon}${this.escapeHtml(story.name)}`;
+                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true})" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 }
                                 
                                 // Render test tube icon for test link
@@ -382,10 +479,39 @@ class StoryMapView extends PanelView {
                                     }
                                 }
                                 
-                                if (hasScenarios) {
-                                    html += `</span>`; // Close collapsible-header span
+                                // Story nodes - only delete buttons (create buttons in header now)
+                                const storyMinusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
+                                const storyHasScenarios = story.scenarios && story.scenarios.length > 0;
+                                
+                                let storyActionButtons = `<button onclick="event.stopPropagation(); deleteNode('${storyPath}');" style="
+                                    display: inline-block;
+                                    margin-left: 8px;
+                                    padding: 1px 6px;
+                                    font-size: 10px;
+                                    border: 1px solid var(--vscode-button-border, #555);
+                                    background: var(--vscode-button-secondaryBackground, transparent);
+                                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                                    cursor: pointer;
+                                    border-radius: 2px;
+                                    vertical-align: middle;
+                                " title="Delete ${this.escapeForJs(story.name)}">${storyMinusIcon}Delete</button>`;
+                                
+                                if (storyHasScenarios) {
+                                    storyActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('${storyPath}');" style="
+                                        display: inline-block;
+                                        margin-left: 4px;
+                                        padding: 1px 6px;
+                                        font-size: 10px;
+                                        border: 1px solid var(--vscode-button-border, #555);
+                                        background: var(--vscode-button-secondaryBackground, transparent);
+                                        color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+                                        cursor: pointer;
+                                        border-radius: 2px;
+                                        vertical-align: middle;
+                                    " title="Delete ${this.escapeForJs(story.name)} including all scenarios">${storyMinusIcon}Delete All</button>`;
                                 }
                                 
+                                html += storyActionButtons;
                                 html += '</div>';
                                 
                                 // Render scenarios if they exist
@@ -417,77 +543,6 @@ class StoryMapView extends PanelView {
                                     html += '</div>'; // Close scenario collapsible-content
                                 }
                             });
-                        }
-                    });
-                }
-                
-                // LEGACY: Also check for direct stories array (old format)
-                if (subEpic.stories && subEpic.stories.length > 0) {
-                    subEpic.stories.forEach((story, storyIndex) => {
-                        const storyId = `${subEpicId}-story-${storyIndex}`;
-                        const storyIcon = pageIconPath ? `<img src="${pageIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Story" />` : '';
-                        
-                        // Check if story has scenarios - if so, make it collapsible
-                        const hasScenarios = story.scenarios && story.scenarios.length > 0;
-                        
-                        html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
-                        
-                        if (hasScenarios) {
-                            // Collapsible story with scenarios
-                            html += `<span class="collapsible-header" onclick="toggleCollapse('${storyId}')" style="cursor: pointer; user-select: none;">`;
-                            html += `<span id="${storyId}-icon" style="display: inline-block; min-width: 9px;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> `;
-                        }
-                        
-                        // Find story doc link (if exists)
-                        const storyDocLink = story.links && story.links.find(l => l.text === 'story');
-                        
-                        if (storyDocLink) {
-                            html += `<span onclick="openFile('${this.escapeForJs(storyDocLink.url)}')" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
-                        } else {
-                            html += `${storyIcon}${this.escapeHtml(story.name)}`;
-                        }
-                        
-                        // Render test tube icon for test link
-                        if (story.links && story.links.length > 0) {
-                            const testLink = story.links.find(l => l.icon === 'test_tube');
-                            if (testLink && testTubeIconPath) {
-                                html += ` <span onclick="openFile('${this.escapeForJs(testLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                            }
-                        }
-                        
-                        if (hasScenarios) {
-                            html += `</span>`; // Close collapsible-header span
-                        }
-                        
-                        html += '</div>';
-                        
-                        // Render scenarios if they exist
-                        if (hasScenarios) {
-                            html += `<div id="${storyId}" class="collapsible-content" style="display: none;">`;
-                            story.scenarios.forEach((scenario, scenarioIndex) => {
-                                html += `<div style="margin-left: ${marginLeft + 21}px; margin-top: 2px; font-size: 12px;">`;
-                                
-                                // Create scenario anchor ID from scenario name (matches synchronizer format)
-                                const scenarioAnchor = this.createScenarioAnchor(scenario.name);
-                                
-                                // Link scenario name to story file with scenario anchor
-                                if (storyDocLink) {
-                                    const scenarioLink = `${storyDocLink.url}#${scenarioAnchor}`;
-                                    html += `<span onclick="openFile('${this.escapeForJs(scenarioLink)}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
-                                } else {
-                                    // No story doc link - just display scenario name
-                                    html += `${this.escapeHtml(scenario.name)}`;
-                                }
-                                
-                                // Render test tube icon for test link (separate from scenario name link)
-                                // Scenarios have test_method, backend sets test_file with full path + anchor when test_method exists
-                                if (scenario.test_file && testTubeIconPath) {
-                                    html += ` <span onclick="openFile('${this.escapeForJs(scenario.test_file)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                }
-                                
-                                html += '</div>';
-                            });
-                            html += '</div>'; // Close scenario collapsible-content
                         }
                     });
                 }
