@@ -1377,6 +1377,8 @@ class BotPanel {
             const btnCreateStory = document.getElementById('btn-create-story');
             const btnCreateScenario = document.getElementById('btn-create-scenario');
             const btnCreateAcceptanceCriteria = document.getElementById('btn-create-acceptance-criteria');
+            const btnDelete = document.getElementById('btn-delete');
+            const btnDeleteAll = document.getElementById('btn-delete-all');
             
             // Hide all buttons first
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';
@@ -1384,20 +1386,28 @@ class BotPanel {
             if (btnCreateStory) btnCreateStory.style.display = 'none';
             if (btnCreateScenario) btnCreateScenario.style.display = 'none';
             if (btnCreateAcceptanceCriteria) btnCreateAcceptanceCriteria.style.display = 'none';
+            if (btnDelete) btnDelete.style.display = 'none';
+            if (btnDeleteAll) btnDeleteAll.style.display = 'none';
             
             // Show buttons based on selection
             if (selectedNode.type === 'root') {
                 if (btnCreateEpic) btnCreateEpic.style.display = 'block';
             } else if (selectedNode.type === 'epic') {
                 if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
+                if (btnDelete) btnDelete.style.display = 'block';
+                if (selectedNode.hasChildren && btnDeleteAll) btnDeleteAll.style.display = 'block';
             } else if (selectedNode.type === 'sub-epic') {
                 // Sub-epics can have both sub-epics AND stories, always show both options
                 if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
                 if (btnCreateStory) btnCreateStory.style.display = 'block';
+                if (btnDelete) btnDelete.style.display = 'block';
+                if (selectedNode.hasChildren && btnDeleteAll) btnDeleteAll.style.display = 'block';
             } else if (selectedNode.type === 'story') {
                 // Stories can have both scenarios and acceptance criteria
                 if (btnCreateScenario) btnCreateScenario.style.display = 'block';
                 if (btnCreateAcceptanceCriteria) btnCreateAcceptanceCriteria.style.display = 'block';
+                if (btnDelete) btnDelete.style.display = 'block';
+                if (selectedNode.hasChildren && btnDeleteAll) btnDeleteAll.style.display = 'block';
             }
         }
         

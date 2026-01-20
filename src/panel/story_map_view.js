@@ -105,6 +105,8 @@ class StoryMapView extends PanelView {
         let addStoryIconPath = '';
         let addTestsIconPath = '';
         let addAcceptanceCriteriaIconPath = '';
+        let deleteIconPath = '';
+        let deleteChildrenIconPath = '';
         if (this.webview && this.extensionUri) {
             try {
                 const magnifyingGlassUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'magnifying_glass.png');
@@ -151,29 +153,52 @@ class StoryMapView extends PanelView {
                 
                 const addAcceptanceCriteriaUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'clipboard.png');
                 addAcceptanceCriteriaIconPath = this.webview.asWebviewUri(addAcceptanceCriteriaUri).toString();
+                
+                const deleteUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'delete.png');
+                deleteIconPath = this.webview.asWebviewUri(deleteUri).toString();
+                
+                const deleteChildrenUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'delete_children.png');
+                deleteChildrenIconPath = this.webview.asWebviewUri(deleteChildrenUri).toString();
             } catch (err) {
                 console.error('Failed to create icon URIs:', err);
             }
         }
         
-        // Create contextual action buttons toolbar (Create Epic shown by default for root state)
+        // Create contextual action buttons toolbar with fixed positioning for delete buttons
+        // Max create buttons = 3 at 36px each = 108px; Delete buttons = 2 at 36px each = 72px
         const actionButtonsHtml = `
-            <div id="contextual-actions" style="display: flex; align-items: center; gap: 8px; margin-left: 12px;">
-                <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
-                    <img src="${addEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Epic" />
-                </button>
-                <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
-                    <img src="${addSubEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Sub-Epic" />
-                </button>
-                <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
-                    <img src="${addStoryIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Story" />
-                </button>
-                <button id="btn-create-scenario" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Scenario">
-                    <img src="${addTestsIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Scenario" />
-                </button>
-                <button id="btn-create-acceptance-criteria" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Acceptance Criteria">
-                    <img src="${addAcceptanceCriteriaIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Acceptance Criteria" />
-                </button>
+            <div id="contextual-actions" style="display: flex; align-items: center; margin-left: 12px;">
+                <!-- Create buttons with tight spacing (max 3 buttons, reserved 120px) -->
+                <div style="display: flex; align-items: center; gap: 4px; min-width: 120px;">
+                    <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
+                        <img src="${addEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Epic" />
+                    </button>
+                    <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
+                        <img src="${addSubEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Sub-Epic" />
+                    </button>
+                    <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
+                        <img src="${addStoryIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Story" />
+                    </button>
+                    <button id="btn-create-scenario" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Scenario">
+                        <img src="${addTestsIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Scenario" />
+                    </button>
+                    <button id="btn-create-acceptance-criteria" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Acceptance Criteria">
+                        <img src="${addAcceptanceCriteriaIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Acceptance Criteria" />
+                    </button>
+                </div>
+                
+                <!-- Spacer to push delete buttons to the right -->
+                <div style="flex: 1; min-width: 20px;"></div>
+                
+                <!-- Delete buttons in fixed position (always in same spot, 80px reserved) -->
+                <div style="display: flex; align-items: center; gap: 4px; width: 80px; justify-content: flex-end;">
+                    <button id="btn-delete" onclick="event.stopPropagation(); handleDeleteNode();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Delete">
+                        <img src="${deleteIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Delete" />
+                    </button>
+                    <button id="btn-delete-all" onclick="event.stopPropagation(); handleDeleteAll();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Delete All">
+                        <img src="${deleteChildrenIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Delete All" />
+                    </button>
+                </div>
             </div>
         `;
         
@@ -327,50 +352,22 @@ class StoryMapView extends PanelView {
             const epicDocLink = epic.links && epic.links.find(l => l.icon === 'document');
             const epicTestLink = epic.links && epic.links.find(l => l.icon === 'test_tube');
             
+            // Check if epic has children
+            const epicHasChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
+            
             // Make epic name a hyperlink if document exists, clickable to select, double-click to edit
             const epicPath = `story_graph."${this.escapeForJs(epic.name)}"`;
             const epicNameHtml = epicDocLink
-                ? `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}'); openFile('${this.escapeForJs(epicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
-                : `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}')" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
+                ? `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}', {hasChildren: ${epicHasChildren}}); openFile('${this.escapeForJs(epicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
+                : `<span onclick="event.stopPropagation(); selectNode('epic', '${this.escapeForJs(epic.name)}', {hasChildren: ${epicHasChildren}})" ondblclick="event.stopPropagation(); enableEditMode('${epicPath}')" style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
             
             // Render test tube icon for epic test link
             const epicTestIcon = (epicTestLink && testTubeIconPath)
                 ? ` <span onclick="openFile('${this.escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
                 : '';
             
-            // Epic nodes - no inline buttons, just delete buttons
-            const minusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
-            const hasEpicChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
-            
-            let epicActionButtons = `<button onclick="event.stopPropagation(); deleteNode('story_graph.\\"${this.escapeForJs(epic.name)}\\"');" style="
-                display: inline-block;
-                margin-left: 8px;
-                padding: 1px 6px;
-                font-size: 10px;
-                border: 1px solid var(--vscode-button-border, #555);
-                background: var(--vscode-button-secondaryBackground, transparent);
-                color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                cursor: pointer;
-                border-radius: 2px;
-                vertical-align: middle;
-            " title="Delete ${this.escapeForJs(epic.name)}">${minusIcon}Delete</button>`;
-            
-            if (hasEpicChildren) {
-                epicActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('story_graph.\\"${this.escapeForJs(epic.name)}\\"');" style="
-                    display: inline-block;
-                    margin-left: 4px;
-                    padding: 1px 6px;
-                    font-size: 10px;
-                    border: 1px solid var(--vscode-button-border, #555);
-                    background: var(--vscode-button-secondaryBackground, transparent);
-                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                    cursor: pointer;
-                    border-radius: 2px;
-                    vertical-align: middle;
-                " title="Delete ${this.escapeForJs(epic.name)} including all children">${minusIcon}Delete All</button>`;
-            }
-            
-            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}${epicActionButtons}</div>`;
+            // Epic nodes - no inline action buttons (all actions are in the toolbar)
+            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}</div>`;
             
             html += `<div id="${epicId}" class="collapsible-content" style="display: none;">`;
             // Helper function to recursively render a sub-epic (can be nested any number of levels)
@@ -390,53 +387,22 @@ class StoryMapView extends PanelView {
                 const hasStories = subEpic.story_groups && subEpic.story_groups.some(sg => sg.stories && sg.stories.length > 0);
                 const hasNestedSubEpics = nestedSubEpics.length > 0;
                 const hasNoChildren = !hasStories && !hasNestedSubEpics;
+                const subEpicHasChildren = hasStories || hasNestedSubEpics;
                 
                 // Make sub-epic name a hyperlink if document exists, clickable to select, double-click to edit
                 const subEpicNameHtml = subEpicDocLink
-                    ? `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}'); openFile('${this.escapeForJs(subEpicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
-                    : `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}')" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
+                    ? `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}', {hasChildren: ${subEpicHasChildren}}); openFile('${this.escapeForJs(subEpicDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
+                    : `<span onclick="event.stopPropagation(); selectNode('sub-epic', '${this.escapeForJs(subEpic.name)}', {hasChildren: ${subEpicHasChildren}})" ondblclick="event.stopPropagation(); enableEditMode('${subEpicPath}')" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
                 
                 // Only render test tube icon for test links
                 const subEpicTestIcon = (subEpicTestLink && testTubeIconPath)
                     ? ` <span onclick="openFile('${this.escapeForJs(subEpicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
                     : '';
                 
-                // Delete buttons only (no create buttons - those are in header now)
-                let subEpicActionButtons = '';
-                const minusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
-                const hasSubEpicChildren = hasStories || hasNestedSubEpics;
-                
-                subEpicActionButtons += `<button onclick="event.stopPropagation(); deleteNode('${subEpicPath}');" style="
-                    display: inline-block;
-                    margin-left: 8px;
-                    padding: 1px 6px;
-                    font-size: 10px;
-                    border: 1px solid var(--vscode-button-border, #555);
-                    background: var(--vscode-button-secondaryBackground, transparent);
-                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                    cursor: pointer;
-                    border-radius: 2px;
-                    vertical-align: middle;
-                " title="Delete ${this.escapeForJs(subEpic.name)}">${minusIcon}Delete</button>`;
-                
-                if (hasSubEpicChildren) {
-                    subEpicActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('${subEpicPath}');" style="
-                        display: inline-block;
-                        margin-left: 4px;
-                        padding: 1px 6px;
-                        font-size: 10px;
-                        border: 1px solid var(--vscode-button-border, #555);
-                        background: var(--vscode-button-secondaryBackground, transparent);
-                        color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                        cursor: pointer;
-                        border-radius: 2px;
-                        vertical-align: middle;
-                    " title="Delete ${this.escapeForJs(subEpic.name)} including all children">${minusIcon}Delete All</button>`;
-                }
-                
+                // No inline action buttons (all actions are in the toolbar)
                 const marginLeft = 7 + (depth * 7); // Increase margin for nested sub-epics
                 
-                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}${subEpicActionButtons}</div>`;
+                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}</div>`;
                 
                 html += `<div id="${subEpicId}" class="collapsible-content" style="display: none;">`;
                 
@@ -453,7 +419,7 @@ class StoryMapView extends PanelView {
                         if (storyGroup.stories && storyGroup.stories.length > 0) {
                             storyGroup.stories.forEach((story, storyIndex) => {
                                 const storyId = `${subEpicId}-story-${storyIndex}`;
-                                const storyIcon = pageIconPath ? `<img src="${pageIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Story" />` : '';
+                                const storyIcon = documentIconPath ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Story" />` : '';
                                 
                                 // Check if story has scenarios - if so, make it collapsible
                                 const hasScenarios = story.scenarios && story.scenarios.length > 0;
@@ -473,9 +439,9 @@ class StoryMapView extends PanelView {
                                 
                                 // Story name with double-click to edit, clickable to select
                                 if (storyDocLink) {
-                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true}); openFile('${this.escapeForJs(storyDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true, hasChildren: ${hasScenarios}}); openFile('${this.escapeForJs(storyDocLink.url)}')" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 } else {
-                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true})" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                    html += `<span onclick="event.stopPropagation(); selectNode('story', '${this.escapeForJs(story.name)}', {canHaveTests: true, hasChildren: ${hasScenarios}})" ondblclick="event.stopPropagation(); enableEditMode('${storyPath}')" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 }
                                 
                                 // Render test tube icon for test link
@@ -486,39 +452,7 @@ class StoryMapView extends PanelView {
                                     }
                                 }
                                 
-                                // Story nodes - only delete buttons (create buttons in header now)
-                                const storyMinusIcon = subtractIconPath ? `<img src="${subtractIconPath}" style="width: 10px; height: 10px; vertical-align: middle; margin-right: 2px;" alt="-" />` : '-';
-                                const storyHasScenarios = story.scenarios && story.scenarios.length > 0;
-                                
-                                let storyActionButtons = `<button onclick="event.stopPropagation(); deleteNode('${storyPath}');" style="
-                                    display: inline-block;
-                                    margin-left: 8px;
-                                    padding: 1px 6px;
-                                    font-size: 10px;
-                                    border: 1px solid var(--vscode-button-border, #555);
-                                    background: var(--vscode-button-secondaryBackground, transparent);
-                                    color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                                    cursor: pointer;
-                                    border-radius: 2px;
-                                    vertical-align: middle;
-                                " title="Delete ${this.escapeForJs(story.name)}">${storyMinusIcon}Delete</button>`;
-                                
-                                if (storyHasScenarios) {
-                                    storyActionButtons += `<button onclick="event.stopPropagation(); deleteNodeIncludingChildren('${storyPath}');" style="
-                                        display: inline-block;
-                                        margin-left: 4px;
-                                        padding: 1px 6px;
-                                        font-size: 10px;
-                                        border: 1px solid var(--vscode-button-border, #555);
-                                        background: var(--vscode-button-secondaryBackground, transparent);
-                                        color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
-                                        cursor: pointer;
-                                        border-radius: 2px;
-                                        vertical-align: middle;
-                                    " title="Delete ${this.escapeForJs(story.name)} including all scenarios">${storyMinusIcon}Delete All</button>`;
-                                }
-                                
-                                html += storyActionButtons;
+                                // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
                                 
                                 // Render scenarios if they exist
