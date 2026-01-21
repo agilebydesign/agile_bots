@@ -2,7 +2,7 @@
   "priority": 9,
   "description": "Ownership relationships must be unidirectional. If A owns B, B should not own A. References can be bidirectional, but ownership is one-way. Example: File Has blocks: Block (ownership down); Block References file: File (reference up).",
   "scanners": [
-    "agile_bot.bots.base_bot.scanners.unidirectional_ownership_scanner.UnidirectionalOwnershipScanner"
+    "scanners.unidirectional_ownership_scanner.UnidirectionalOwnershipScanner"
   ],
   "do": {
     "description": "Ownership flows one-way down hierarchy, references can point any direction. Example: File Has blocks (ownership down); Block References file (reference up)",

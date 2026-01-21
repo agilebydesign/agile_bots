@@ -15,6 +15,6 @@ $WORKSPACE_ROOT = Split-Path -Parent $AGILE_BOT_DIR
 $env:BOT_DIRECTORY = $SCRIPT_DIR
 
 # Call common CLI executor
-$CLI_EXECUTE_PATH = Join-Path (Join-Path $AGILE_BOT_DIR "scripts") "cli_execute.ps1"
+$CLI_EXECUTE_PATH = Join-Path (Join-Path $AGILE_BOT_DIR "bots") "cli_execute.ps1"
 & $CLI_EXECUTE_PATH
     

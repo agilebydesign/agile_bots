@@ -1,6 +1,9 @@
 {
     "priority":  18,
     "description":  "Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.",
+    "scanners": [
+        "scanners.full_result_assertions_scanner.FullResultAssertionsScanner"
+    ],
     "do":  {
                "description":  "Compare entire objects/dicts/dataclasses against standard data fixtures.",
                "guidance":  [

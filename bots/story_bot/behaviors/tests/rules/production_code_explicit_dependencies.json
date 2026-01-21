@@ -60,5 +60,8 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner",
+    "scanners":  [
+                     "scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
+                 ]
 }

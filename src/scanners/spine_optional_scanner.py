@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from story_scanner import StoryScanner
+from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode, Story, StoryGroup
 from scanners.violation import Violation
 

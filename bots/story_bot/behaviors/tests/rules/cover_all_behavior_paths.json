@@ -65,5 +65,8 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.behavior_paths_scanner.BehaviorPathsScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.behavior_paths_scanner.BehaviorPathsScanner",
+    "scanners":  [
+                     "scanners.cover_all_paths_scanner.CoverAllPathsScanner"
+                 ]
 }

@@ -1,7 +1,7 @@
 
 from typing import List, Dict, Any, Optional
 from pathlib import Path
-from story_scanner import StoryScanner
+from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode, Story
 from scanners.violation import Violation
 import re

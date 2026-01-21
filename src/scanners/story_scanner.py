@@ -1,8 +1,8 @@
 from abc import abstractmethod
 from typing import List, Dict, Any, Optional, TYPE_CHECKING
 from scanners.scanner import Scanner
-from story_graph import StoryMap, StoryNode, StoryGroup
-from domain_concept_node import DomainConceptNode
+from scanners.story_map import StoryMap, StoryNode, StoryGroup
+from scanners.domain_concept_node import DomainConceptNode
 
 if TYPE_CHECKING:
     from scanners.resources.scan_context import ScanFilesContext

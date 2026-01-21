@@ -53,5 +53,9 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.observable_behavior_scanner.ObservableBehaviorScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.observable_behavior_scanner.ObservableBehaviorScanner",
+    "scanners":  [
+                     "scanners.observable_behavior_scanner.ObservableBehaviorScanner",
+                     "scanners.implementation_details_scanner.ImplementationDetailsScanner"
+                 ]
 }

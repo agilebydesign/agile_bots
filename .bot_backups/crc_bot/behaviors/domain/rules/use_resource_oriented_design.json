@@ -2,7 +2,7 @@
   "priority": 7,
   "description": "Use resource-oriented design where concepts represent resources with properties and behaviors. Focus on what the resource IS and HAS, not implementation operations.",
   "scanners": [
-    "agile_bot.bots.base_bot.scanners.resource_oriented_scanner.ResourceOrientedScanner"
+    "scanners.resource_oriented_design_scanner.ResourceOrientedDesignScanner"
   ],
   "do": {
     "description": "Model concepts as resources with properties and contained resources",

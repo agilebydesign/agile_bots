@@ -52,5 +52,8 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.ascii_only_scanner.AsciiOnlyScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.ascii_only_scanner.AsciiOnlyScanner",
+    "scanners":  [
+                     "scanners.ascii_only_scanner.AsciiOnlyScanner"
+                 ]
 }

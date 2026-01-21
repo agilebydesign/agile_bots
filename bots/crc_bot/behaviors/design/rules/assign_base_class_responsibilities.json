@@ -2,7 +2,7 @@
   "priority": 2,
   "description": "When classes share responsibilities and collaborators, lift them into a base class. Use ': BaseClass' notation for inheritance. Reference base type in relationships instead of enumerating subtypes. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds Validates import ordering.",
   "scanners": [
-    "agile_bot.bots.base_bot.scanners.base_class_responsibilities_scanner.BaseClassResponsibilitiesScanner"
+    "scanners.base_class_responsibilities_scanner.BaseClassResponsibilitiesScanner"
   ],
   "do": {
     "description": "Abstract shared responsibilities into base class, subclasses add specific ones. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds specific validation",

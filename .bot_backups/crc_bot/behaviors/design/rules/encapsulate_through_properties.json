@@ -2,7 +2,7 @@
   "priority": 5,
   "description": "Objects internalize their own state and functionality, accessed through properties. Avoid methods that receive external state the object should already own. Example: LineItem owns Product/Quantity, so Calculates extended price: Money, Discount (not Money, Product, Quantity, Discount).",
   "scanners": [
-    "agile_bot.bots.base_bot.scanners.property_encapsulation_scanner.PropertyEncapsulationScanner"
+    "scanners.property_encapsulation_scanner.PropertyEncapsulationScanner"
   ],
   "do": {
     "description": "Objects own their state and expose it through properties. Example: LineItem owns Product/Quantity, Calculates extended price: Money, Discount (uses internal state)",

@@ -2,9 +2,9 @@
   "priority": 4,
   "description": "Place state and responsibilities at the lowest-level object that owns them. Delegate to lowest-level objects, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates to them.",
   "scanners": [
-    "agile_bot.bots.base_bot.scanners.delegation_scanner.DelegationScanner",
-    "agile_bot.bots.base_bot.scanners.state_placement_scanner.StatePlacementScanner",
-    "agile_bot.bots.base_bot.scanners.dependency_chaining_scanner.DependencyChainingScanner"
+    "scanners.delegation_scanner.DelegationScanner",
+    "scanners.state_placement_scanner.StatePlacementScanner",
+    "scanners.dependency_chaining_scanner.DependencyChainingScanner"
   ],
   "do": {
     "description": "Place state and responsibilities at lowest owner, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates",

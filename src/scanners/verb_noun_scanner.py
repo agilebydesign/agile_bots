@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional, Tuple
 import logging
-from story_scanner import StoryScanner
+from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode, Epic, SubEpic, Story
 from scanners.violation import Violation
 from .vocabulary_helper import VocabularyHelper

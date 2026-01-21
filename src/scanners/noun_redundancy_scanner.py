@@ -1,6 +1,6 @@
 
 from typing import List, Dict, Any
-from story_scanner import StoryScanner
+from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode
 from scanners.violation import Violation
 import re

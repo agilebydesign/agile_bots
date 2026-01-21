@@ -58,5 +58,8 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.import_placement_scanner.ImportPlacementScanner"
+    "scanner":  "agile_bot.bots.base_bot.scanners.import_placement_scanner.ImportPlacementScanner",
+    "scanners":  [
+                     "scanners.import_placement_scanner.ImportPlacementScanner"
+                 ]
 }

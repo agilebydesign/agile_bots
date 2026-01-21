@@ -1,6 +1,6 @@
 
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
-from story_scanner import StoryScanner
+from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode, Story, StoryMap
 from scanners.violation import Violation
 
