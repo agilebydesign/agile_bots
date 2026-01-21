@@ -1,88 +1,86 @@
 {
-  "priority": 2,
-  "description": "When classes share responsibilities and collaborators, lift them into a base class. Use ': BaseClass' notation for inheritance. Reference base type in relationships instead of enumerating subtypes. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds Validates import ordering.",
-  "scanners": [
-    "scanners.base_class_responsibilities_scanner.BaseClassResponsibilitiesScanner"
-  ],
-  "do": {
-    "description": "Abstract shared responsibilities into base class, subclasses add specific ones. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds specific validation",
-    "guidance": [
-      {
-        "description": "Move repeated responsibilities and collaborators to base class",
-        "example": [
-          "Scanner (base class with shared responsibilities)",
-          "    Scans scope for violations: Violation, Scope, Rule",
-          "    Reports violations: Violation, ViolationReport",
-          "",
-          "ImportPlacementScanner : Scanner",
-          "    Validates import ordering: Boolean, Block, ImportRules",
-          "",
-          "NamingConventionScanner : Scanner",
-          "    Validates identifier names: Boolean, Block, NamingRules",
-          "",
-          "(Shared scan/report in base; specific validation in subclasses)"
-        ]
-      },
-      {
-        "description": "Reference base type in parent relationships",
-        "example": [
-          "ScanOrchestrator",
-          "    Coordinates scan: Scan, Scanner, Scope (uses base Scanner type)",
-          "",
-          "Scan",
-          "    Executes with scanner: Violation, Scanner, Rule (uses base Scanner type)",
-          "",
-          "(Parent objects reference Scanner, not ImportPlacementScanner, NamingScanner, etc.)"
-        ]
-      },
-      {
-        "description": "Show inheritance clearly with ': BaseClass' notation",
-        "example": [
-          "Payment (base class)",
-          "    Authorizes transaction: AuthorizationResult, PaymentGateway",
-          "    Get amount: Money",
-          "",
-          "CreditCardPayment : Payment",
-          "    Validates card number: Boolean, CardNumber",
-          "    Validates expiration: Boolean, ExpirationDate",
-          "",
-          "BankTransferPayment : Payment",
-          "    Validates routing number: Boolean, RoutingNumber",
-          "    Validates account number: Boolean, AccountNumber",
-          "",
-          "(Subclasses inherit authorization, add specific validation)"
-        ]
-      }
-    ]
-  },
-  "dont": {
-    "description": "Don't duplicate responsibilities or enumerate all subtypes. Example: Each scanner duplicating Scans/Reports (wrong) vs inheriting from Scanner base (right)",
-    "guidance": [
-      {
-        "description": "Don't repeat same responsibilities in every subclass",
-        "example": [
-          "ImportPlacementScanner (WRONG: duplicates base responsibilities)",
-          "    Scans scope for violations: Violation, Scope, Rule",
-          "    Reports violations: Violation, ViolationReport",
-          "    Validates import ordering: Boolean, Block",
-          "",
-          "NamingScanner (WRONG: duplicates base responsibilities)",
-          "    Scans scope for violations: Violation, Scope, Rule",
-          "    Reports violations: Violation, ViolationReport",
-          "    Validates names: Boolean, Block",
-          "",
-          "(Scan/report duplicated - should be in base Scanner)"
-        ]
-      },
-      {
-        "description": "Don't list every concrete subtype when base type exists",
-        "example": [
-          "ScanOrchestrator (WRONG: lists all concrete types)",
-          "    Coordinates scan: Scan, ImportPlacementScanner, NamingScanner, CommentScanner, ...",
-          "",
-          "(Should use base Scanner type, not enumerate all scanners)"
-        ]
-      }
-    ]
-  }
+    "priority":  2,
+    "description":  "When classes share responsibilities and collaborators, lift them into a base class. Use \u0027: BaseClass\u0027 notation for inheritance. Reference base type in relationships instead of enumerating subtypes. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds Validates import ordering.",
+    "do":  {
+               "description":  "Abstract shared responsibilities into base class, subclasses add specific ones. Example: Scanner base with Scans/Reports; ImportPlacementScanner : Scanner adds specific validation",
+               "guidance":  [
+                                {
+                                    "description":  "Move repeated responsibilities and collaborators to base class",
+                                    "example":  [
+                                                    "Scanner (base class with shared responsibilities)",
+                                                    "    Scans scope for violations: Violation, Scope, Rule",
+                                                    "    Reports violations: Violation, ViolationReport",
+                                                    "",
+                                                    "ImportPlacementScanner : Scanner",
+                                                    "    Validates import ordering: Boolean, Block, ImportRules",
+                                                    "",
+                                                    "NamingConventionScanner : Scanner",
+                                                    "    Validates identifier names: Boolean, Block, NamingRules",
+                                                    "",
+                                                    "(Shared scan/report in base; specific validation in subclasses)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Reference base type in parent relationships",
+                                    "example":  [
+                                                    "ScanOrchestrator",
+                                                    "    Coordinates scan: Scan, Scanner, Scope (uses base Scanner type)",
+                                                    "",
+                                                    "Scan",
+                                                    "    Executes with scanner: Violation, Scanner, Rule (uses base Scanner type)",
+                                                    "",
+                                                    "(Parent objects reference Scanner, not ImportPlacementScanner, NamingScanner, etc.)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Show inheritance clearly with \u0027: BaseClass\u0027 notation",
+                                    "example":  [
+                                                    "Payment (base class)",
+                                                    "    Authorizes transaction: AuthorizationResult, PaymentGateway",
+                                                    "    Get amount: Money",
+                                                    "",
+                                                    "CreditCardPayment : Payment",
+                                                    "    Validates card number: Boolean, CardNumber",
+                                                    "    Validates expiration: Boolean, ExpirationDate",
+                                                    "",
+                                                    "BankTransferPayment : Payment",
+                                                    "    Validates routing number: Boolean, RoutingNumber",
+                                                    "    Validates account number: Boolean, AccountNumber",
+                                                    "",
+                                                    "(Subclasses inherit authorization, add specific validation)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t duplicate responsibilities or enumerate all subtypes. Example: Each scanner duplicating Scans/Reports (wrong) vs inheriting from Scanner base (right)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t repeat same responsibilities in every subclass",
+                                      "example":  [
+                                                      "ImportPlacementScanner (WRONG: duplicates base responsibilities)",
+                                                      "    Scans scope for violations: Violation, Scope, Rule",
+                                                      "    Reports violations: Violation, ViolationReport",
+                                                      "    Validates import ordering: Boolean, Block",
+                                                      "",
+                                                      "NamingScanner (WRONG: duplicates base responsibilities)",
+                                                      "    Scans scope for violations: Violation, Scope, Rule",
+                                                      "    Reports violations: Violation, ViolationReport",
+                                                      "    Validates names: Boolean, Block",
+                                                      "",
+                                                      "(Scan/report duplicated - should be in base Scanner)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t list every concrete subtype when base type exists",
+                                      "example":  [
+                                                      "ScanOrchestrator (WRONG: lists all concrete types)",
+                                                      "    Coordinates scan: Scan, ImportPlacementScanner, NamingScanner, CommentScanner, ...",
+                                                      "",
+                                                      "(Should use base Scanner type, not enumerate all scanners)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "scanners.base_class_responsibilities_scanner.BaseClassResponsibilitiesScanner"
 }

@@ -73,8 +73,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.single_responsibility_scanner.SingleResponsibilityScanner",
-    "scanners":  [
-                     "scanners.function_size_scanner.FunctionSizeScanner"
-                 ]
+    "scanner":  "scanners.function_size_scanner.FunctionSizeScanner"
 }

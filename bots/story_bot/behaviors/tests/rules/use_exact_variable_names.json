@@ -55,8 +55,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.exact_variable_names_scanner.ExactVariableNamesScanner",
-    "scanners":  [
-                     "scanners.exact_variable_names_scanner.ExactVariableNamesScanner"
-                 ]
+    "scanner":  "scanners.exact_variable_names_scanner.ExactVariableNamesScanner"
 }

@@ -1,104 +1,102 @@
 {
-  "priority": 5,
-  "description": "Objects internalize their own state and functionality, accessed through properties. Avoid methods that receive external state the object should already own. Example: LineItem owns Product/Quantity, so Calculates extended price: Money, Discount (not Money, Product, Quantity, Discount).",
-  "scanners": [
-    "scanners.property_encapsulation_scanner.PropertyEncapsulationScanner"
-  ],
-  "do": {
-    "description": "Objects own their state and expose it through properties. Example: LineItem owns Product/Quantity, Calculates extended price: Money, Discount (uses internal state)",
-    "guidance": [
-      {
-        "description": "Objects internalize state they need and expose through properties - callers don't pass that state back",
-        "example": [
-          "LineItem (owns Product and Quantity as internal state)",
-          "    Get product: Product (property access)",
-          "    Get quantity: Quantity (property access)",
-          "    Calculates extended price: Money, Discount (uses internal state, only needs external Discount)",
-          "",
-          "Holding (owns Symbol and Quantity as internal state)",
-          "    Get symbol: Symbol (property access)",
-          "    Get quantity: Quantity (property access)",
-          "    Calculates market value: Money, MarketPrice (uses internal state, only needs external price)",
-          "",
-          "(Objects use their own internalized state, only receive what they don't own)"
-        ]
-      },
-      {
-        "description": "Hide internal representation behind clean property interface",
-        "example": [
-          "Portfolio",
-          "    Get holdings: Holding (hides how holdings are stored)",
-          "    Calculates total value: Money, MarketPrice (hides internal aggregation)",
-          "",
-          "Order",
-          "    Get line items: LineItem (hides collection type)",
-          "    Calculates subtotal: Money (hides iteration and calculation)",
-          "",
-          "(Callers don't know if holdings are List, Array, Dictionary internally)"
-        ]
-      },
-      {
-        "description": "Use properties where state access makes sense, methods for complex behaviors",
-        "example": [
-          "Trade",
-          "    Get symbol: Symbol (property - simple state)",
-          "    Get shares: Shares (property - simple state)",
-          "    Get execution price: Money (property - simple state)",
-          "    Executes through broker: ExecutionResult, Broker (method - complex behavior)",
-          "",
-          "(Properties for state access, methods for actions with side effects)"
-        ]
-      }
-    ]
-  },
-  "dont": {
-    "description": "Don't pass state to objects that should already own it. Example: LineItem Calculates: Money, Product, Quantity, Discount (wrong - passing owned state) vs Money, Discount (right)",
-    "guidance": [
-      {
-        "description": "Don't pass data to an object's method that the object should already have as properties",
-        "example": [
-          "LineItem (WRONG: receiving data it should own)",
-          "    Calculates extended price: Money, Product, Quantity, Discount",
-          "",
-          "Holding (WRONG: receiving data it should own)",
-          "    Calculates market value: Money, Symbol, Quantity, MarketPrice",
-          "",
-          "(LineItem should own Product and Quantity, Holding should own Symbol and Quantity - don't pass them in)"
-        ]
-      },
-      {
-        "description": "Don't expose internal collection types through properties",
-        "example": [
-          "Portfolio",
-          "    Get holdings list: List (WRONG: exposes internal type)",
-          "    Get holdings array: Array (WRONG: exposes internal type)",
-          "    Get holdings dictionary: Dictionary (WRONG: exposes internal structure)",
-          "",
-          "(Should be: Get holdings: Holding - hide how they're stored)"
-        ]
-      },
-      {
-        "description": "Don't use methods where simple property access makes sense",
-        "example": [
-          "Trade",
-          "    Retrieve symbol: Symbol (WRONG: method for simple property)",
-          "    Fetch shares count: Shares (WRONG: method for simple property)",
-          "    Compute execution price: Money (WRONG: method for property access)",
-          "",
-          "(Should be: Get symbol, Get shares, Get execution price - simple property access)"
-        ]
-      },
-      {
-        "description": "Don't allow external manipulation of internal state",
-        "example": [
-          "Portfolio",
-          "    Set holdings: List (WRONG: external manipulation)",
-          "    Modify positions: Position (WRONG: direct modification)",
-          "    Update holding list: List (WRONG: exposes internal structure)",
-          "",
-          "(Should be: Adds holding: Holding, Removes holding: Holding - controlled mutation)"
-        ]
-      }
-    ]
-  }
+    "priority":  5,
+    "description":  "Objects internalize their own state and functionality, accessed through properties. Avoid methods that receive external state the object should already own. Example: LineItem owns Product/Quantity, so Calculates extended price: Money, Discount (not Money, Product, Quantity, Discount).",
+    "do":  {
+               "description":  "Objects own their state and expose it through properties. Example: LineItem owns Product/Quantity, Calculates extended price: Money, Discount (uses internal state)",
+               "guidance":  [
+                                {
+                                    "description":  "Objects internalize state they need and expose through properties - callers don\u0027t pass that state back",
+                                    "example":  [
+                                                    "LineItem (owns Product and Quantity as internal state)",
+                                                    "    Get product: Product (property access)",
+                                                    "    Get quantity: Quantity (property access)",
+                                                    "    Calculates extended price: Money, Discount (uses internal state, only needs external Discount)",
+                                                    "",
+                                                    "Holding (owns Symbol and Quantity as internal state)",
+                                                    "    Get symbol: Symbol (property access)",
+                                                    "    Get quantity: Quantity (property access)",
+                                                    "    Calculates market value: Money, MarketPrice (uses internal state, only needs external price)",
+                                                    "",
+                                                    "(Objects use their own internalized state, only receive what they don\u0027t own)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Hide internal representation behind clean property interface",
+                                    "example":  [
+                                                    "Portfolio",
+                                                    "    Get holdings: Holding (hides how holdings are stored)",
+                                                    "    Calculates total value: Money, MarketPrice (hides internal aggregation)",
+                                                    "",
+                                                    "Order",
+                                                    "    Get line items: LineItem (hides collection type)",
+                                                    "    Calculates subtotal: Money (hides iteration and calculation)",
+                                                    "",
+                                                    "(Callers don\u0027t know if holdings are List, Array, Dictionary internally)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use properties where state access makes sense, methods for complex behaviors",
+                                    "example":  [
+                                                    "Trade",
+                                                    "    Get symbol: Symbol (property - simple state)",
+                                                    "    Get shares: Shares (property - simple state)",
+                                                    "    Get execution price: Money (property - simple state)",
+                                                    "    Executes through broker: ExecutionResult, Broker (method - complex behavior)",
+                                                    "",
+                                                    "(Properties for state access, methods for actions with side effects)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t pass state to objects that should already own it. Example: LineItem Calculates: Money, Product, Quantity, Discount (wrong - passing owned state) vs Money, Discount (right)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t pass data to an object\u0027s method that the object should already have as properties",
+                                      "example":  [
+                                                      "LineItem (WRONG: receiving data it should own)",
+                                                      "    Calculates extended price: Money, Product, Quantity, Discount",
+                                                      "",
+                                                      "Holding (WRONG: receiving data it should own)",
+                                                      "    Calculates market value: Money, Symbol, Quantity, MarketPrice",
+                                                      "",
+                                                      "(LineItem should own Product and Quantity, Holding should own Symbol and Quantity - don\u0027t pass them in)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t expose internal collection types through properties",
+                                      "example":  [
+                                                      "Portfolio",
+                                                      "    Get holdings list: List (WRONG: exposes internal type)",
+                                                      "    Get holdings array: Array (WRONG: exposes internal type)",
+                                                      "    Get holdings dictionary: Dictionary (WRONG: exposes internal structure)",
+                                                      "",
+                                                      "(Should be: Get holdings: Holding - hide how they\u0027re stored)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use methods where simple property access makes sense",
+                                      "example":  [
+                                                      "Trade",
+                                                      "    Retrieve symbol: Symbol (WRONG: method for simple property)",
+                                                      "    Fetch shares count: Shares (WRONG: method for simple property)",
+                                                      "    Compute execution price: Money (WRONG: method for property access)",
+                                                      "",
+                                                      "(Should be: Get symbol, Get shares, Get execution price - simple property access)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t allow external manipulation of internal state",
+                                      "example":  [
+                                                      "Portfolio",
+                                                      "    Set holdings: List (WRONG: external manipulation)",
+                                                      "    Modify positions: Position (WRONG: direct modification)",
+                                                      "    Update holding list: List (WRONG: exposes internal structure)",
+                                                      "",
+                                                      "(Should be: Adds holding: Holding, Removes holding: Holding - controlled mutation)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "scanners.property_encapsulation_scanner.PropertyEncapsulationScanner"
 }

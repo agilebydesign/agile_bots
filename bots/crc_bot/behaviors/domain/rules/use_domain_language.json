@@ -1,137 +1,133 @@
 {
-  "priority": 2,
-  "description": "Use domain-specific language rooted in core business concepts. Avoid generic terms, technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains). Name concepts and responsibilities using the ubiquitous language of the business domain.",
-  "scanners": [
-    "scanners.domain_language_scanner.DomainLanguageScanner",
-    "scanners.technical_abstraction_scanner.TechnicalAbstractionScanner",
-    "scanners.generic_capability_scanner.GenericCapabilityScanner"
-  ],
-  "do": {
-    "description": "Use concrete domain language with specific behaviors and actions",
-    "guidance": [
-      {
-        "description": "Name concepts after what they represent in the domain, not technical patterns",
-        "example": [
-          "Portfolio",
-          "    Get holdings: Holding",
-          "    Calculates total value with market prices: Money, Holding, MarketPrice",
-          "    Evaluates risk score: RiskScore, RiskModel, Holding, MarketData",
-          "",
-          "RebalanceRecommendation",
-          "    Generates trades to achieve target allocation: Trade, Portfolio, TargetAllocation",
-          "    Compares current allocation to target: AllocationDifference, Portfolio, TargetAllocation",
-          "",
-          "(Concrete business concepts: Portfolio, Holding, Trade, not PortfolioManager, HoldingService)"
-        ]
-      },
-      {
-        "description": "Use domain verbs for responsibilities, not generic technical verbs",
-        "example": [
-          "Order",
-          "    Get line items: LineItem",
-          "    Calculates subtotal from items: Money, LineItem",
-          "    Calculates shipping cost based on address: Money, ShippingAddress, ShippingMethod",
-          "",
-          "Payment",
-          "    Authorizes transaction with gateway: AuthorizationCode, PaymentGateway",
-          "    Retrieves transaction status: TransactionStatus, PaymentGateway",
-          "",
-          "(Business-meaningful verbs: calculates, authorizes, retrieves - not generic process, handle, manage)"
-        ]
-      },
-      {
-        "description": "Transform capability language into action language showing what happens and when",
-        "example": [
-          "Instead of 'Exposes portfolio data':",
-          "",
-          "Portfolio",
-          "    Get holdings: Holding",
-          "    Calculates total value across holdings: Money, Holding, MarketPrice",
-          "    Finds by account identifier: Portfolio, AccountId",
-          "",
-          "(Specific actions with clear intent, not generic 'exposes')"
-        ]
-      },
-      {
-        "description": "Use domain-specific collaborator types that have business meaning",
-        "example": [
-          "Order",
-          "    Get line items: LineItem",
-          "    Calculates subtotal from items: Money, LineItem",
-          "    Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod",
-          "",
-          "Payment",
-          "    Authorizes with payment gateway: AuthorizationCode, PaymentGateway",
-          "    Retrieves transaction status: TransactionStatus, PaymentGateway",
-          "",
-          "(Collaborators: Money, ShippingAddress, AuthorizationCode have domain meaning)"
-        ]
-      }
-    ]
-  },
-  "dont": {
-    "description": "Don't use generic terms, technical patterns, or capability verbs",
-    "guidance": [
-      {
-        "description": "Don't name concepts with suffixes like Manager, Service, Handler, Factory",
-        "example": [
-          "PortfolioManager (WRONG: xxxer abstraction)",
-          "    Manages portfolio: Portfolio",
-          "    Handles holdings: Holding",
-          "",
-          "HoldingService (WRONG: not a domain concept)",
-          "    Services holdings: Holding",
-          "    Processes updates: Update",
-          "",
-          "(Should be: Portfolio with clear responsibilities, not Manager/Service)"
-        ]
-      },
-      {
-        "description": "Don't use generic verbs like process, handle, manage when domain verbs exist",
-        "example": [
-          "Order",
-          "    Processes items: Item (WRONG: generic verb)",
-          "    Handles payment: Payment (WRONG: generic verb)",
-          "    Manages shipping: Shipping (WRONG: generic verb)",
-          "",
-          "(Should be: Get line items: LineItem, Authorizes payment: Payment, Calculates shipping: Money, ShippingMethod)"
-        ]
-      },
-      {
-        "description": "Don't use capability verbs like Exposes, Provides, Contains, Represents",
-        "example": [
-          "Portfolio",
-          "    Exposes holdings: Holding (WRONG: capability)",
-          "    Provides valuation: Money (WRONG: capability)",
-          "    Contains risk data: RiskData (WRONG: capability)",
-          "",
-          "(Should be: Get holdings, Calculates total value: Money, Evaluates risk score: RiskScore - specific actions)"
-        ]
-      },
-      {
-        "description": "Don't use generic terms like Data, Config, Parameter, Result without domain context",
-        "example": [
-          "RebalanceRecommendation",
-          "    Get result: ResultData (WRONG: generic)",
-          "    Get calculation: CalculationResult (WRONG: generic)",
-          "",
-          "Portfolio",
-          "    Get data: PortfolioData (WRONG: generic suffix)",
-          "    Get config: Configuration (WRONG: generic)",
-          "",
-          "(Should be: Generates trades: Trade, Get holdings: Holding)"
-        ]
-      },
-      {
-        "description": "Don't describe system structure instead of behavior",
-        "example": [
-          "PaymentSystem",
-          "    Contains payment gateway: PaymentGateway (WRONG: structure)",
-          "    Has authorization logic: Authorization (WRONG: structure)",
-          "",
-          "(Should be: Payment - Get authorization: AuthorizationCode, PaymentGateway)"
-        ]
-      }
-    ]
-  }
+    "priority":  2,
+    "description":  "Use domain-specific language rooted in core business concepts. Avoid generic terms, technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains). Name concepts and responsibilities using the ubiquitous language of the business domain.",
+    "do":  {
+               "description":  "Use concrete domain language with specific behaviors and actions",
+               "guidance":  [
+                                {
+                                    "description":  "Name concepts after what they represent in the domain, not technical patterns",
+                                    "example":  [
+                                                    "Portfolio",
+                                                    "    Get holdings: Holding",
+                                                    "    Calculates total value with market prices: Money, Holding, MarketPrice",
+                                                    "    Evaluates risk score: RiskScore, RiskModel, Holding, MarketData",
+                                                    "",
+                                                    "RebalanceRecommendation",
+                                                    "    Generates trades to achieve target allocation: Trade, Portfolio, TargetAllocation",
+                                                    "    Compares current allocation to target: AllocationDifference, Portfolio, TargetAllocation",
+                                                    "",
+                                                    "(Concrete business concepts: Portfolio, Holding, Trade, not PortfolioManager, HoldingService)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use domain verbs for responsibilities, not generic technical verbs",
+                                    "example":  [
+                                                    "Order",
+                                                    "    Get line items: LineItem",
+                                                    "    Calculates subtotal from items: Money, LineItem",
+                                                    "    Calculates shipping cost based on address: Money, ShippingAddress, ShippingMethod",
+                                                    "",
+                                                    "Payment",
+                                                    "    Authorizes transaction with gateway: AuthorizationCode, PaymentGateway",
+                                                    "    Retrieves transaction status: TransactionStatus, PaymentGateway",
+                                                    "",
+                                                    "(Business-meaningful verbs: calculates, authorizes, retrieves - not generic process, handle, manage)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Transform capability language into action language showing what happens and when",
+                                    "example":  [
+                                                    "Instead of \u0027Exposes portfolio data\u0027:",
+                                                    "",
+                                                    "Portfolio",
+                                                    "    Get holdings: Holding",
+                                                    "    Calculates total value across holdings: Money, Holding, MarketPrice",
+                                                    "    Finds by account identifier: Portfolio, AccountId",
+                                                    "",
+                                                    "(Specific actions with clear intent, not generic \u0027exposes\u0027)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use domain-specific collaborator types that have business meaning",
+                                    "example":  [
+                                                    "Order",
+                                                    "    Get line items: LineItem",
+                                                    "    Calculates subtotal from items: Money, LineItem",
+                                                    "    Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod",
+                                                    "",
+                                                    "Payment",
+                                                    "    Authorizes with payment gateway: AuthorizationCode, PaymentGateway",
+                                                    "    Retrieves transaction status: TransactionStatus, PaymentGateway",
+                                                    "",
+                                                    "(Collaborators: Money, ShippingAddress, AuthorizationCode have domain meaning)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t use generic terms, technical patterns, or capability verbs",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t name concepts with suffixes like Manager, Service, Handler, Factory",
+                                      "example":  [
+                                                      "PortfolioManager (WRONG: xxxer abstraction)",
+                                                      "    Manages portfolio: Portfolio",
+                                                      "    Handles holdings: Holding",
+                                                      "",
+                                                      "HoldingService (WRONG: not a domain concept)",
+                                                      "    Services holdings: Holding",
+                                                      "    Processes updates: Update",
+                                                      "",
+                                                      "(Should be: Portfolio with clear responsibilities, not Manager/Service)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use generic verbs like process, handle, manage when domain verbs exist",
+                                      "example":  [
+                                                      "Order",
+                                                      "    Processes items: Item (WRONG: generic verb)",
+                                                      "    Handles payment: Payment (WRONG: generic verb)",
+                                                      "    Manages shipping: Shipping (WRONG: generic verb)",
+                                                      "",
+                                                      "(Should be: Get line items: LineItem, Authorizes payment: Payment, Calculates shipping: Money, ShippingMethod)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use capability verbs like Exposes, Provides, Contains, Represents",
+                                      "example":  [
+                                                      "Portfolio",
+                                                      "    Exposes holdings: Holding (WRONG: capability)",
+                                                      "    Provides valuation: Money (WRONG: capability)",
+                                                      "    Contains risk data: RiskData (WRONG: capability)",
+                                                      "",
+                                                      "(Should be: Get holdings, Calculates total value: Money, Evaluates risk score: RiskScore - specific actions)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use generic terms like Data, Config, Parameter, Result without domain context",
+                                      "example":  [
+                                                      "RebalanceRecommendation",
+                                                      "    Get result: ResultData (WRONG: generic)",
+                                                      "    Get calculation: CalculationResult (WRONG: generic)",
+                                                      "",
+                                                      "Portfolio",
+                                                      "    Get data: PortfolioData (WRONG: generic suffix)",
+                                                      "    Get config: Configuration (WRONG: generic)",
+                                                      "",
+                                                      "(Should be: Generates trades: Trade, Get holdings: Holding)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t describe system structure instead of behavior",
+                                      "example":  [
+                                                      "PaymentSystem",
+                                                      "    Contains payment gateway: PaymentGateway (WRONG: structure)",
+                                                      "    Has authorization logic: Authorization (WRONG: structure)",
+                                                      "",
+                                                      "(Should be: Payment - Get authorization: AuthorizationCode, PaymentGateway)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "scanners.domain_language_scanner.DomainLanguageScanner"
 }

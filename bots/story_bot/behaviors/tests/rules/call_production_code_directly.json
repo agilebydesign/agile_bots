@@ -57,8 +57,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.real_implementations_scanner.RealImplementationsScanner",
-    "scanners":  [
-                     "scanners.real_implementations_scanner.RealImplementationsScanner"
-                 ]
+    "scanner":  "scanners.real_implementations_scanner.RealImplementationsScanner"
 }

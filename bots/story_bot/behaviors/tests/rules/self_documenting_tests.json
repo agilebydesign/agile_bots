@@ -60,8 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.self_documenting_scanner.SelfDocumentingScanner",
-    "scanners":  [
-                     "scanners.intention_revealing_names_scanner.IntentionRevealingNamesScanner"
-                 ]
+    "scanner":  "scanners.intention_revealing_names_scanner.IntentionRevealingNamesScanner"
 }

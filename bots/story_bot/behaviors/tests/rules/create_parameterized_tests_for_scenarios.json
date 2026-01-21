@@ -60,8 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.parameterized_tests_scanner.ParameterizedTestsScanner",
-    "scanners":  [
-                     "scanners.parameterized_tests_scanner.ParameterizedTestsScanner"
-                 ]
+    "scanner":  "scanners.parameterized_tests_scanner.ParameterizedTestsScanner"
 }

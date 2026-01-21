@@ -1,219 +1,217 @@
 {
-  "priority": 7,
-  "description": "Use resource-oriented design where concepts represent resources with properties and behaviors. Focus on what the resource IS and HAS, not implementation operations.",
-  "scanners": [
-    "scanners.resource_oriented_design_scanner.ResourceOrientedDesignScanner"
-  ],
-  "do": {
-    "description": "Model concepts as resources with properties and contained resources",
-    "guidance": [
-      {
-        "description": "Concepts represent resources that contain other resources and expose properties",
-        "example": [
-          "Portfolio (resource)",
-          "    Get holdings: Holding (contains resources)",
-          "    Calculates total value: Money, Holding, MarketPrice (computed property)",
-          "    Evaluates risk score: RiskScore, RiskModel, Holding (computed property)",
-          "",
-          "Order (resource)",
-          "    Get line items: LineItem (contains resources)",
-          "    Calculates subtotal: Money, LineItem (computed property)",
-          "    Get shipping address: ShippingAddress (contains resource)",
-          "",
-          "(Resources contain other resources and expose simple/computed properties)"
-        ]
-      },
-      {
-        "description": "Use Get/Find to access resource properties and contained resources",
-        "example": [
-          "Holding (resource)",
-          "    Get symbol: Symbol (simple property)",
-          "    Get quantity: Quantity (simple property)",
-          "    Calculates market value: Money, Symbol, MarketPrice (computed property)",
-          "",
-          "Trade (resource)",
-          "    Get symbol: Symbol (simple property)",
-          "    Get shares: Shares (simple property)",
-          "    Calculates execution price: Money, Symbol, MarketPrice, TradingFees (computed property)",
-          "",
-          "(Simple properties use Get; computed properties use business verbs)"
-        ]
-      },
-      {
-        "description": "Name concepts after resources (nouns), not actions (verbs). Concepts represent things that exist in the domain.",
-        "example": [
-          "Order (CORRECT: resource/noun - a thing that exists)",
-          "Instructions (CORRECT: resource/noun - a thing that exists)",
-          "HeadlessSession (CORRECT: resource/noun - a thing that exists)",
-          "ExecutionContext (CORRECT: resource/noun - a thing that exists)",
-          "",
-          "InstructionPreparer (WRONG: action/verb - describes what something does, not what it is)",
-          "SessionMonitor (WRONG: action/verb - describes what something does, not what it is)",
-          "",
-          "(Concept names must be RESOURCES/NOUNS that represent domain entities)"
-        ]
-      },
-      {
-        "description": "Name responsibilities based on their nature: use noun phrases for property access, verb phrases for behaviors that perform actions.",
-        "example": [
-          "Order (resource)",
-          "    Get order id: OrderId (property access - noun phrase)",
-          "    Get line items: LineItem (property access - noun phrase)",
-          "    Calculates total with taxes: Money, TaxRate (behavior/action - verb phrase)",
-          "    Validates inventory availability: LineItem, InventoryService (behavior/action - verb phrase)",
-          "",
-          "HeadlessSession (resource)",
-          "    Get configuration: HeadlessConfig (property access - noun phrase)",
-          "    Get execution context: ExecutionContext (property access - noun phrase)",
-          "    Prepares instructions with directive: Instructions (behavior/action - verb phrase)",
-          "    Executes via Cursor API: CursorHeadlessAPI (behavior/action - verb phrase)",
-          "",
-          "(Property access = noun phrases starting with Get/Find. Behaviors = verb phrases describing actions)"
-        ]
-      },
-      {
-        "description": "Use collaborators for complex resources with behavior/state. Use simple types for properties without sufficient complexity. Only create separate resource concepts when warranted.",
-        "example": [
-          "Order (resource)",
-          "    Get order id: OrderId (simple property, no collaborator needed)",
-          "    Get order date: Date (simple property, no collaborator needed)",
-          "    Get line items: LineItem (complex: LineItem is separate resource with behavior)",
-          "    Calculates total with taxes: Money, TaxRate (TaxRate has enough complexity to be collaborator)",
-          "    Calculates shipping cost: Money, ShippingMethod (ShippingMethod has behavior, separate resource)",
-          "",
-          "LineItem (separate resource - has sufficient complexity)",
-          "    Get product: Product",
-          "    Get quantity: Quantity (simple property)",
-          "    Calculates extended price: Money, Discount",
-          "",
-          "HeadlessSession (resource)",
-          "    Get session id: SessionId (simple property, no separate concept)",
-          "    Get execution context: ExecutionContext (complex: separate resource with multiple responsibilities)",
-          "",
-          "(OrderId, Date, Quantity, SessionId are simple - just properties. LineItem, Product, ShippingMethod, ExecutionContext have enough behavior/state to warrant separate resource concepts)"
-        ]
-      }
-    ]
-  },
-  "dont": {
-    "description": "Don't violate encapsulation - objects should own their data, hide implementation details, and handle their own responsibilities",
-    "guidance": [
-      {
-        "description": "Don't pass information to another object's methods that the other object should already have as properties",
-        "example": [
-          "LineItem (showing what LineItem receives)",
-          "    Calculates extended price: Money, Product, Quantity, Discount (WRONG: receiving Product and Quantity, but LineItem needs to owns these)",
-          "    Validates inventory: Boolean, Product, Quantity, InventoryService (WRONG: receiving Product and Quantity that it should already own)",
-          "",
-          "Holding (showing what Holding receives)",
-          "    Calculates market value: Money, Symbol, Quantity, MarketPrice (WRONG: receiving Symbol and Quantity that it already owns)",
-          "    Validates allocation: Boolean, Symbol, Quantity, AllocationRule (WRONG: receiving Symbol and Quantity that it already owns)",
-          "",
-          "(Should be: LineItem - Calculates extended price: Money, Discount; Holding - Calculates market value: Money, MarketPrice)"
-        ]
-      },
-      {
-        "description": "Don't expose inner workings of concept - hide implementation details behind clear interface",
-        "example": [
-          "Portfolio",
-          "    Get holdings list: List (WRONG: exposes internal collection type)",
-          "    Get holdings array: Array (WRONG: exposes internal structure)",
-          "    Get holdings dictionary by symbol: Dictionary (WRONG: exposes internal organization)",
-          "",
-          "Order",
-          "    Get line items as array: Array (WRONG: exposes implementation)",
-          "    Get payment transaction record: TransactionRecord (WRONG: exposes internal detail)",
-          "",
-          "(Should be: Get holdings: Holding, Get line items: LineItem - hide how they're stored internally)"
-        ]
-      },
-      {
-        "description": "Don't mix multiple concepts together where responsibilities belong to a related collaborator",
-        "example": [
-          "Order (WRONG: mixing Order and LineItem responsibilities)",
-          "    Get order id: OrderId",
-          "    Get line items: LineItem",
-          "    Calculates line item extended price: Money, Product, Quantity, Discount (WRONG: belongs to LineItem)",
-          "    Validates line item inventory: Boolean, Product, InventoryService (WRONG: belongs to LineItem)",
-          "",
-          "Portfolio (WRONG: mixing Portfolio and Holding responsibilities)",
-          "    Get holdings: Holding",
-          "    Calculates holding market value: Money, Symbol, MarketPrice (WRONG: belongs to Holding)",
-          "    Validates holding allocation limits: Boolean, Symbol, AllocationRule (WRONG: belongs to Holding)",
-          "",
-          "(Should be: LineItem calculates its own price, Holding calculates its own market value)"
-        ]
-      },
-      {
-        "description": "Don't use Manager/Service suffixes that imply operations rather than resources",
-        "example": [
-          "PortfolioManager",
-          "    Manages holdings: Holding (WRONG: operation-oriented)",
-          "    Handles trades: Trade (WRONG: operation-oriented)",
-          "",
-          "OrderService",
-          "    Services orders: Order (WRONG: operation-oriented)",
-          "",
-          "(Should be: Portfolio with Get holdings, Calculates total value; Trade with Creates from recommendation)"
-        ]
-      },
-      {
-        "description": "Don't describe domain concepts as only data carriers with getters that have no actual domain behavior",
-        "example": [
-          "Portfolio (WRONG: ONLY getters, no business behavior)",
-          "    Get account id: AccountId",
-          "    Get holdings: Holding",
-          "    Get creation date: Date",
-          "    Get last modified: Date",
-          "",
-          "Order (WRONG: ONLY getters, no business behavior)",
-          "    Get order id: OrderId",
-          "    Get line items: LineItem",
-          "    Get customer id: CustomerId",
-          "    Get order date: Date",
-          "",
-          "(Anemic domain models - simple getters are fine, but concepts need actual business behavior too: Calculates total value, Evaluates risk score, Validates inventory, Calculates shipping cost)"
-        ]
-      },
-      {
-        "description": "Don't name concepts after actions (Loader, Preparer, Builder, Monitor, Handler, Manager, Service). Name them after the resource itself.",
-        "example": [
-          "InstructionPreparer (WRONG: named after action)",
-          "    Prepares instructions: Instructions",
-          "",
-          "ContextLoader (WRONG: named after action)",
-          "    Loads context: ExecutionContext",
-          "",
-          "SessionMonitor (WRONG: named after action)",
-          "    Monitors session: HeadlessSession",
-          "",
-          "Instructions (CORRECT: resource name)",
-          "    Prepares for Cursor API: String",
-          "",
-          "ExecutionContext (CORRECT: resource name)",
-          "    Loads from file: Path",
-          "",
-          "HeadlessSession (CORRECT: resource name)",
-          "    Monitors execution status: SessionStatus",
-          "",
-          "(Concept = NOUN/RESOURCE, Responsibility = VERB/ACTION)"
-        ]
-      },
-      {
-        "description": "Don't create separate resource concepts for simple data that should just be properties. Don't create anemic resources with no behavior.",
-        "example": [
-          "OrderId (WRONG: separate concept with no behavior)",
-          "    Get value: String",
-          "",
-          "OrderDate (WRONG: separate concept with no behavior)",
-          "    Get value: Date",
-          "",
-          "SessionId (WRONG: separate concept with no behavior)",
-          "    Get value: String",
-          "",
-          "(These should just be simple properties on their parent resource, not separate concepts in the domain model)"
-        ]
-      }
-    ]
-  }
+    "priority":  7,
+    "description":  "Use resource-oriented design where concepts represent resources with properties and behaviors. Focus on what the resource IS and HAS, not implementation operations.",
+    "do":  {
+               "description":  "Model concepts as resources with properties and contained resources",
+               "guidance":  [
+                                {
+                                    "description":  "Concepts represent resources that contain other resources and expose properties",
+                                    "example":  [
+                                                    "Portfolio (resource)",
+                                                    "    Get holdings: Holding (contains resources)",
+                                                    "    Calculates total value: Money, Holding, MarketPrice (computed property)",
+                                                    "    Evaluates risk score: RiskScore, RiskModel, Holding (computed property)",
+                                                    "",
+                                                    "Order (resource)",
+                                                    "    Get line items: LineItem (contains resources)",
+                                                    "    Calculates subtotal: Money, LineItem (computed property)",
+                                                    "    Get shipping address: ShippingAddress (contains resource)",
+                                                    "",
+                                                    "(Resources contain other resources and expose simple/computed properties)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use Get/Find to access resource properties and contained resources",
+                                    "example":  [
+                                                    "Holding (resource)",
+                                                    "    Get symbol: Symbol (simple property)",
+                                                    "    Get quantity: Quantity (simple property)",
+                                                    "    Calculates market value: Money, Symbol, MarketPrice (computed property)",
+                                                    "",
+                                                    "Trade (resource)",
+                                                    "    Get symbol: Symbol (simple property)",
+                                                    "    Get shares: Shares (simple property)",
+                                                    "    Calculates execution price: Money, Symbol, MarketPrice, TradingFees (computed property)",
+                                                    "",
+                                                    "(Simple properties use Get; computed properties use business verbs)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Name concepts after resources (nouns), not actions (verbs). Concepts represent things that exist in the domain.",
+                                    "example":  [
+                                                    "Order (CORRECT: resource/noun - a thing that exists)",
+                                                    "Instructions (CORRECT: resource/noun - a thing that exists)",
+                                                    "HeadlessSession (CORRECT: resource/noun - a thing that exists)",
+                                                    "ExecutionContext (CORRECT: resource/noun - a thing that exists)",
+                                                    "",
+                                                    "InstructionPreparer (WRONG: action/verb - describes what something does, not what it is)",
+                                                    "SessionMonitor (WRONG: action/verb - describes what something does, not what it is)",
+                                                    "",
+                                                    "(Concept names must be RESOURCES/NOUNS that represent domain entities)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Name responsibilities based on their nature: use noun phrases for property access, verb phrases for behaviors that perform actions.",
+                                    "example":  [
+                                                    "Order (resource)",
+                                                    "    Get order id: OrderId (property access - noun phrase)",
+                                                    "    Get line items: LineItem (property access - noun phrase)",
+                                                    "    Calculates total with taxes: Money, TaxRate (behavior/action - verb phrase)",
+                                                    "    Validates inventory availability: LineItem, InventoryService (behavior/action - verb phrase)",
+                                                    "",
+                                                    "HeadlessSession (resource)",
+                                                    "    Get configuration: HeadlessConfig (property access - noun phrase)",
+                                                    "    Get execution context: ExecutionContext (property access - noun phrase)",
+                                                    "    Prepares instructions with directive: Instructions (behavior/action - verb phrase)",
+                                                    "    Executes via Cursor API: CursorHeadlessAPI (behavior/action - verb phrase)",
+                                                    "",
+                                                    "(Property access = noun phrases starting with Get/Find. Behaviors = verb phrases describing actions)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Use collaborators for complex resources with behavior/state. Use simple types for properties without sufficient complexity. Only create separate resource concepts when warranted.",
+                                    "example":  [
+                                                    "Order (resource)",
+                                                    "    Get order id: OrderId (simple property, no collaborator needed)",
+                                                    "    Get order date: Date (simple property, no collaborator needed)",
+                                                    "    Get line items: LineItem (complex: LineItem is separate resource with behavior)",
+                                                    "    Calculates total with taxes: Money, TaxRate (TaxRate has enough complexity to be collaborator)",
+                                                    "    Calculates shipping cost: Money, ShippingMethod (ShippingMethod has behavior, separate resource)",
+                                                    "",
+                                                    "LineItem (separate resource - has sufficient complexity)",
+                                                    "    Get product: Product",
+                                                    "    Get quantity: Quantity (simple property)",
+                                                    "    Calculates extended price: Money, Discount",
+                                                    "",
+                                                    "HeadlessSession (resource)",
+                                                    "    Get session id: SessionId (simple property, no separate concept)",
+                                                    "    Get execution context: ExecutionContext (complex: separate resource with multiple responsibilities)",
+                                                    "",
+                                                    "(OrderId, Date, Quantity, SessionId are simple - just properties. LineItem, Product, ShippingMethod, ExecutionContext have enough behavior/state to warrant separate resource concepts)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t violate encapsulation - objects should own their data, hide implementation details, and handle their own responsibilities",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t pass information to another object\u0027s methods that the other object should already have as properties",
+                                      "example":  [
+                                                      "LineItem (showing what LineItem receives)",
+                                                      "    Calculates extended price: Money, Product, Quantity, Discount (WRONG: receiving Product and Quantity, but LineItem needs to owns these)",
+                                                      "    Validates inventory: Boolean, Product, Quantity, InventoryService (WRONG: receiving Product and Quantity that it should already own)",
+                                                      "",
+                                                      "Holding (showing what Holding receives)",
+                                                      "    Calculates market value: Money, Symbol, Quantity, MarketPrice (WRONG: receiving Symbol and Quantity that it already owns)",
+                                                      "    Validates allocation: Boolean, Symbol, Quantity, AllocationRule (WRONG: receiving Symbol and Quantity that it already owns)",
+                                                      "",
+                                                      "(Should be: LineItem - Calculates extended price: Money, Discount; Holding - Calculates market value: Money, MarketPrice)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t expose inner workings of concept - hide implementation details behind clear interface",
+                                      "example":  [
+                                                      "Portfolio",
+                                                      "    Get holdings list: List (WRONG: exposes internal collection type)",
+                                                      "    Get holdings array: Array (WRONG: exposes internal structure)",
+                                                      "    Get holdings dictionary by symbol: Dictionary (WRONG: exposes internal organization)",
+                                                      "",
+                                                      "Order",
+                                                      "    Get line items as array: Array (WRONG: exposes implementation)",
+                                                      "    Get payment transaction record: TransactionRecord (WRONG: exposes internal detail)",
+                                                      "",
+                                                      "(Should be: Get holdings: Holding, Get line items: LineItem - hide how they\u0027re stored internally)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t mix multiple concepts together where responsibilities belong to a related collaborator",
+                                      "example":  [
+                                                      "Order (WRONG: mixing Order and LineItem responsibilities)",
+                                                      "    Get order id: OrderId",
+                                                      "    Get line items: LineItem",
+                                                      "    Calculates line item extended price: Money, Product, Quantity, Discount (WRONG: belongs to LineItem)",
+                                                      "    Validates line item inventory: Boolean, Product, InventoryService (WRONG: belongs to LineItem)",
+                                                      "",
+                                                      "Portfolio (WRONG: mixing Portfolio and Holding responsibilities)",
+                                                      "    Get holdings: Holding",
+                                                      "    Calculates holding market value: Money, Symbol, MarketPrice (WRONG: belongs to Holding)",
+                                                      "    Validates holding allocation limits: Boolean, Symbol, AllocationRule (WRONG: belongs to Holding)",
+                                                      "",
+                                                      "(Should be: LineItem calculates its own price, Holding calculates its own market value)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t use Manager/Service suffixes that imply operations rather than resources",
+                                      "example":  [
+                                                      "PortfolioManager",
+                                                      "    Manages holdings: Holding (WRONG: operation-oriented)",
+                                                      "    Handles trades: Trade (WRONG: operation-oriented)",
+                                                      "",
+                                                      "OrderService",
+                                                      "    Services orders: Order (WRONG: operation-oriented)",
+                                                      "",
+                                                      "(Should be: Portfolio with Get holdings, Calculates total value; Trade with Creates from recommendation)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t describe domain concepts as only data carriers with getters that have no actual domain behavior",
+                                      "example":  [
+                                                      "Portfolio (WRONG: ONLY getters, no business behavior)",
+                                                      "    Get account id: AccountId",
+                                                      "    Get holdings: Holding",
+                                                      "    Get creation date: Date",
+                                                      "    Get last modified: Date",
+                                                      "",
+                                                      "Order (WRONG: ONLY getters, no business behavior)",
+                                                      "    Get order id: OrderId",
+                                                      "    Get line items: LineItem",
+                                                      "    Get customer id: CustomerId",
+                                                      "    Get order date: Date",
+                                                      "",
+                                                      "(Anemic domain models - simple getters are fine, but concepts need actual business behavior too: Calculates total value, Evaluates risk score, Validates inventory, Calculates shipping cost)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t name concepts after actions (Loader, Preparer, Builder, Monitor, Handler, Manager, Service). Name them after the resource itself.",
+                                      "example":  [
+                                                      "InstructionPreparer (WRONG: named after action)",
+                                                      "    Prepares instructions: Instructions",
+                                                      "",
+                                                      "ContextLoader (WRONG: named after action)",
+                                                      "    Loads context: ExecutionContext",
+                                                      "",
+                                                      "SessionMonitor (WRONG: named after action)",
+                                                      "    Monitors session: HeadlessSession",
+                                                      "",
+                                                      "Instructions (CORRECT: resource name)",
+                                                      "    Prepares for Cursor API: String",
+                                                      "",
+                                                      "ExecutionContext (CORRECT: resource name)",
+                                                      "    Loads from file: Path",
+                                                      "",
+                                                      "HeadlessSession (CORRECT: resource name)",
+                                                      "    Monitors execution status: SessionStatus",
+                                                      "",
+                                                      "(Concept = NOUN/RESOURCE, Responsibility = VERB/ACTION)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t create separate resource concepts for simple data that should just be properties. Don\u0027t create anemic resources with no behavior.",
+                                      "example":  [
+                                                      "OrderId (WRONG: separate concept with no behavior)",
+                                                      "    Get value: String",
+                                                      "",
+                                                      "OrderDate (WRONG: separate concept with no behavior)",
+                                                      "    Get value: Date",
+                                                      "",
+                                                      "SessionId (WRONG: separate concept with no behavior)",
+                                                      "    Get value: String",
+                                                      "",
+                                                      "(These should just be simple properties on their parent resource, not separate concepts in the domain model)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "scanners.resource_oriented_design_scanner.ResourceOrientedDesignScanner"
 }

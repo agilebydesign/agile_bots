@@ -1,114 +1,109 @@
 {
-  "priority": 4,
-  "description": "Place state and responsibilities at the lowest-level object that owns them. Delegate to lowest-level objects, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates to them.",
-  "scanners": [
-    "scanners.delegation_scanner.DelegationScanner",
-    "scanners.state_placement_scanner.StatePlacementScanner",
-    "scanners.dependency_chaining_scanner.DependencyChainingScanner"
-  ],
-  "do": {
-    "description": "Place state and responsibilities at lowest owner, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates",
-    "guidance": [
-      {
-        "description": "Delegate responsibilities to the object that owns the data needed to fulfill them",
-        "example": [
-          "Order",
-          "    Calculates total: Money, LineItem (delegates calculation to LineItems)",
-          "",
-          "LineItem (owns Product and Quantity)",
-          "    Calculates extended price: Money, Discount (uses its own data)",
-          "",
-          "(Each object handles responsibilities using data it already owns)"
-        ]
-      },
-      {
-        "description": "Place state at the lowest component that logically owns it",
-        "example": [
-          "Holding (lowest - owns its state)",
-          "    Get symbol: Symbol",
-          "    Get quantity: Quantity",
-          "    Calculates market value: Money, MarketPrice",
-          "",
-          "Portfolio (higher - aggregates but doesn't own holding state)",
-          "    Has holdings: Holding",
-          "    Calculates total value: Money, Holding (delegates to holdings)",
-          "",
-          "(Symbol and Quantity belong to Holding, not Portfolio)"
-        ]
-      },
-      {
-        "description": "Chain dependencies - access sub-collaborators through their owning objects",
-        "example": [
-          "WealthAdvisor",
-          "    Instantiated with: Client",
-          "    Creates portfolio: Portfolio, Client (uses injected Client)",
-          "    Evaluates risk tolerance: RiskTolerance, Client (gets from Client)",
-          "",
-          "Client",
-          "    Instantiated with: AccountId, RiskProfile, InvestmentStrategy",
-          "    Get investment strategy: InvestmentStrategy",
-          "",
-          "(WealthAdvisor accesses RiskProfile through Client, not directly)"
-        ]
-      },
-      {
-        "description": "Only create collection classes when there is collection-level logic",
-        "example": [
-          "Holdings (collection class - has collection-level logic)",
-          "    Finds by symbol: Holding, Symbol",
-          "    Calculates total value: Money, Holding, MarketPrice",
-          "    Filters by asset class: Holding, AssetClass",
-          "",
-          "(Holdings exists because find, filter, aggregate operate on the collection)"
-        ]
-      }
-    ]
-  },
-  "dont": {
-    "description": "Don't place state/responsibilities too high, don't skip hierarchy levels. Example: Portfolio Calculates holding market value (wrong - doing Holding's work) vs Holding Calculates (right)",
-    "guidance": [
-      {
-        "description": "Don't have parent objects doing what child objects should do",
-        "example": [
-          "Order (WRONG: doing LineItem's work)",
-          "    Calculates line item extended price: Money, Product, Quantity, Discount",
-          "",
-          "Portfolio (WRONG: doing Holding's work)",
-          "    Calculates holding market value: Money, Symbol, Quantity, MarketPrice",
-          "",
-          "(Should be: LineItem calculates its own price, Holding calculates its own value)"
-        ]
-      },
-      {
-        "description": "Don't skip levels in dependency chain",
-        "example": [
-          "WealthAdvisor (WRONG: skips Client level)",
-          "    Instantiated with: Client",
-          "    Creates portfolio: Portfolio, AccountId, RiskProfile, InvestmentStrategy",
-          "",
-          "(Should access RiskProfile and InvestmentStrategy through Client)"
-        ]
-      },
-      {
-        "description": "Don't create wrapper methods that just delegate down",
-        "example": [
-          "Client (WRONG: wrapper methods)",
-          "    Gets portfolio holdings: Holding",
-          "    Gets portfolio total value: Money",
-          "",
-          "(Navigate Client -> Portfolio -> Holdings instead of wrappers)"
-        ]
-      },
-      {
-        "description": "Don't create collection classes without collection-level logic",
-        "example": [
-          "LineItems (WRONG: no collection logic)",
-          "    Get items: LineItem",
-          "",
-          "(No find/filter/sort/aggregate logic - just use List<LineItem>)"
-        ]
-      }
-    ]
-  }
+    "priority":  4,
+    "description":  "Place state and responsibilities at the lowest-level object that owns them. Delegate to lowest-level objects, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates to them.",
+    "do":  {
+               "description":  "Place state and responsibilities at lowest owner, chain dependencies through hierarchy. Example: Holding owns Symbol/Quantity and Calculates market value; Portfolio Has holdings and delegates",
+               "guidance":  [
+                                {
+                                    "description":  "Delegate responsibilities to the object that owns the data needed to fulfill them",
+                                    "example":  [
+                                                    "Order",
+                                                    "    Calculates total: Money, LineItem (delegates calculation to LineItems)",
+                                                    "",
+                                                    "LineItem (owns Product and Quantity)",
+                                                    "    Calculates extended price: Money, Discount (uses its own data)",
+                                                    "",
+                                                    "(Each object handles responsibilities using data it already owns)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Place state at the lowest component that logically owns it",
+                                    "example":  [
+                                                    "Holding (lowest - owns its state)",
+                                                    "    Get symbol: Symbol",
+                                                    "    Get quantity: Quantity",
+                                                    "    Calculates market value: Money, MarketPrice",
+                                                    "",
+                                                    "Portfolio (higher - aggregates but doesn\u0027t own holding state)",
+                                                    "    Has holdings: Holding",
+                                                    "    Calculates total value: Money, Holding (delegates to holdings)",
+                                                    "",
+                                                    "(Symbol and Quantity belong to Holding, not Portfolio)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Chain dependencies - access sub-collaborators through their owning objects",
+                                    "example":  [
+                                                    "WealthAdvisor",
+                                                    "    Instantiated with: Client",
+                                                    "    Creates portfolio: Portfolio, Client (uses injected Client)",
+                                                    "    Evaluates risk tolerance: RiskTolerance, Client (gets from Client)",
+                                                    "",
+                                                    "Client",
+                                                    "    Instantiated with: AccountId, RiskProfile, InvestmentStrategy",
+                                                    "    Get investment strategy: InvestmentStrategy",
+                                                    "",
+                                                    "(WealthAdvisor accesses RiskProfile through Client, not directly)"
+                                                ]
+                                },
+                                {
+                                    "description":  "Only create collection classes when there is collection-level logic",
+                                    "example":  [
+                                                    "Holdings (collection class - has collection-level logic)",
+                                                    "    Finds by symbol: Holding, Symbol",
+                                                    "    Calculates total value: Money, Holding, MarketPrice",
+                                                    "    Filters by asset class: Holding, AssetClass",
+                                                    "",
+                                                    "(Holdings exists because find, filter, aggregate operate on the collection)"
+                                                ]
+                                }
+                            ]
+           },
+    "dont":  {
+                 "description":  "Don\u0027t place state/responsibilities too high, don\u0027t skip hierarchy levels. Example: Portfolio Calculates holding market value (wrong - doing Holding\u0027s work) vs Holding Calculates (right)",
+                 "guidance":  [
+                                  {
+                                      "description":  "Don\u0027t have parent objects doing what child objects should do",
+                                      "example":  [
+                                                      "Order (WRONG: doing LineItem\u0027s work)",
+                                                      "    Calculates line item extended price: Money, Product, Quantity, Discount",
+                                                      "",
+                                                      "Portfolio (WRONG: doing Holding\u0027s work)",
+                                                      "    Calculates holding market value: Money, Symbol, Quantity, MarketPrice",
+                                                      "",
+                                                      "(Should be: LineItem calculates its own price, Holding calculates its own value)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t skip levels in dependency chain",
+                                      "example":  [
+                                                      "WealthAdvisor (WRONG: skips Client level)",
+                                                      "    Instantiated with: Client",
+                                                      "    Creates portfolio: Portfolio, AccountId, RiskProfile, InvestmentStrategy",
+                                                      "",
+                                                      "(Should access RiskProfile and InvestmentStrategy through Client)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t create wrapper methods that just delegate down",
+                                      "example":  [
+                                                      "Client (WRONG: wrapper methods)",
+                                                      "    Gets portfolio holdings: Holding",
+                                                      "    Gets portfolio total value: Money",
+                                                      "",
+                                                      "(Navigate Client -\u003e Portfolio -\u003e Holdings instead of wrappers)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t create collection classes without collection-level logic",
+                                      "example":  [
+                                                      "LineItems (WRONG: no collection logic)",
+                                                      "    Get items: LineItem",
+                                                      "",
+                                                      "(No find/filter/sort/aggregate logic - just use List\u003cLineItem\u003e)"
+                                                  ]
+                                  }
+                              ]
+             },
+    "scanner":  "scanners.delegation_scanner.DelegationScanner"
 }
-

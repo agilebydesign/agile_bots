@@ -53,7 +53,10 @@
     "validate model",
     "object responsibilities",
     "object collaborations"
-  ]
+  ],
+  "mcp": {
+    "env": {
+      "WORKING_AREA": "C:\\dev\\demo\\onboarding_credit"
+    }
+  }
 }
-
-

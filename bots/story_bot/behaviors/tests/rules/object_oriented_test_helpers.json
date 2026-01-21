@@ -72,8 +72,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner",
-    "scanners":  [
-                     "scanners.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner"
-                 ]
+    "scanner":  "scanners.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner"
 }

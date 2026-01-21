@@ -59,9 +59,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.mock_boundaries_scanner.MockBoundariesScanner",
-    "scanners":  [
-                     "scanners.mock_boundaries_scanner.MockBoundariesScanner",
-                     "scanners.real_implementations_scanner.RealImplementationsScanner"
-                 ]
+    "scanner":  "scanners.mock_boundaries_scanner.MockBoundariesScanner"
 }

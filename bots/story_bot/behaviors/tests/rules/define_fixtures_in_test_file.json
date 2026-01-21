@@ -48,8 +48,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.fixture_placement_scanner.FixturePlacementScanner",
-    "scanners":  [
-                     "scanners.fixture_placement_scanner.FixturePlacementScanner"
-                 ]
+    "scanner":  "scanners.fixture_placement_scanner.FixturePlacementScanner"
 }
