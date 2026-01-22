@@ -145,6 +145,7 @@ class JSONScope(JSONAdapter):
         test_file = story.get('test_file') or parent_test_file
         test_class = story.get('test_class')
         
+        # Only add test icon if we have both test_file and test_class with a valid file
         if test_file and test_class:
             test_file_path = test_dir / test_file
             if test_file_path.exists():

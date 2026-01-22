@@ -84,3 +84,29 @@ class ScopeTestHelper(BaseHelper):
         actual_count = len(filtered_graph.get('increments', []))
         assert actual_count == expected_count, \
             f"Expected {expected_count} increments, got {actual_count}"
+    
+    def assert_story_has_test_link(self, story: dict):
+        """Assert story has test_tube icon link."""
+        assert 'links' in story, "Story has no links array"
+        test_links = [l for l in story['links'] if l.get('icon') == 'test_tube']
+        assert len(test_links) > 0, f"Story '{story.get('name')}' has no test_tube link"
+        return test_links[0]
+    
+    def assert_story_has_no_test_link(self, story: dict):
+        """Assert story has no test_tube icon link."""
+        test_links = [l for l in story.get('links', []) if l.get('icon') == 'test_tube']
+        assert len(test_links) == 0, f"Story '{story.get('name')}' unexpectedly has test_tube link: {test_links}"
+    
+    def assert_sub_epic_has_test_link(self, sub_epic: dict):
+        """Assert sub-epic has test_tube icon link."""
+        assert 'links' in sub_epic, "Sub-epic has no links array"
+        test_links = [l for l in sub_epic['links'] if l.get('icon') == 'test_tube']
+        assert len(test_links) > 0, f"Sub-epic '{sub_epic.get('name')}' has no test_tube link"
+        return test_links[0]
+    
+    def assert_epic_has_document_link(self, epic: dict):
+        """Assert epic has document icon link."""
+        assert 'links' in epic, "Epic has no links array"
+        doc_links = [l for l in epic['links'] if l.get('icon') == 'document']
+        assert len(doc_links) > 0, f"Epic '{epic.get('name')}' has no document link"
+        return doc_links[0]

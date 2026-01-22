@@ -45,6 +45,7 @@ htmlcov/
 .tox/
 .hypothesis/
 pytest-debug.log
+test-resources/
 
 # Logs
 *.log

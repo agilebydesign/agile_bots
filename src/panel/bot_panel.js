@@ -1,4 +1,4 @@
-P/**
+/**
  * Bot Panel Controller
  * 
  * Manages webview panel lifecycle and coordinates data fetching,
@@ -321,38 +321,50 @@ class BotPanel {
           case "getBehaviorRules":
             if (message.behaviorName) {
               this._log(`[BotPanel] getBehaviorRules -> ${message.behaviorName}`);
-              // Execute behavior.rules command which automatically submits via CLI
-              this._botView?.execute(`${message.behaviorName}.rules`)
+              this._log(`[getBehaviorRules] STARTED for behavior: ${message.behaviorName}`);
+              
+              // Execute submitrules CLI command to submit rules to chat
+              this._botView?.execute(`submitrules:${message.behaviorName}`)
                 .then((result) => {
                   this._log('[BotPanel] Rules submitted:', result);
+                  this._log(`[getBehaviorRules] Result received: ${JSON.stringify(result, null, 2)}`);
                   
                   // Handle dictionary response from Python
                   if (result && typeof result === 'object') {
+                    this._log(`[getBehaviorRules] Result is object with status: ${result.status}`);
                     if (result.status === 'success') {
                       const msg = result.message || `${message.behaviorName} rules submitted to chat!`;
+                      this._log(`[getBehaviorRules] SUCCESS - showing message: ${msg}`);
                       vscode.window.showInformationMessage(msg);
                     } else if (result.status === 'error') {
                       const errorMsg = result.message || 'Unknown error';
+                      this._log(`[getBehaviorRules] ERROR status - showing error: ${errorMsg}`);
                       vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
                     } else {
                       // Legacy format: check output field
                       const outputStr = typeof result.output === 'string' ? result.output : '';
+                      this._log(`[getBehaviorRules] Legacy format - output: ${outputStr}`);
                       if (outputStr.includes('submitted')) {
+                        this._log(`[getBehaviorRules] Output includes 'submitted' - SUCCESS`);
                         vscode.window.showInformationMessage(`${message.behaviorName} rules submitted to chat!`);
                       } else {
                         const errorMsg = result.message || outputStr || 'Unknown error';
+                        this._log(`[getBehaviorRules] Output does NOT include 'submitted' - ERROR: ${errorMsg}`);
                         vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
                       }
                     }
                   } else {
+                    this._log(`[getBehaviorRules] Result is NOT an object - type: ${typeof result}, value: ${result}`);
                     vscode.window.showWarningMessage('Submit completed with unknown result');
                   }
                   
                   // Refresh panel to show current position
+                  this._log(`[getBehaviorRules] About to refresh panel`);
                   return this._update();
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] ERROR getting behavior rules: ${error.message}`);
+                  this._log(`[getBehaviorRules] CATCH BLOCK - Error: ${error.message}, Stack: ${error.stack}`);
                   vscode.window.showErrorMessage(`Failed to get rules: ${error.message}`);
                 });
             }
@@ -1816,6 +1828,10 @@ class BotPanel {
         
         window.getBehaviorRules = function(behaviorName) {
             console.log('[WebView] getBehaviorRules called with:', behaviorName);
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] getBehaviorRules BUTTON CLICKED for: ' + behaviorName
+            });
             vscode.postMessage({
                 command: 'getBehaviorRules',
                 behaviorName: behaviorName
