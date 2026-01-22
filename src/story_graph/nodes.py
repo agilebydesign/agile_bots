@@ -265,6 +265,87 @@ class StoryNode(ABC):
     def move_to_position(self, position: int) -> dict:
         """Alias for move_to with only position (moves within same parent)"""
         return self.move_to(position=position)
+    
+    def move_after(self, sibling: Union[str, 'StoryNode']) -> dict:
+        """Move this node to be positioned after the specified sibling.
+        
+        Args:
+            sibling: Either the name of a sibling node or a StoryNode instance
+            
+        Returns:
+            Dict with operation details including new position
+        """
+        # Handle Epic nodes (no _parent, managed by StoryMap)
+        if isinstance(self, Epic):
+            if not self._bot or not hasattr(self._bot, 'story_map'):
+                raise ValueError('Cannot move epic without bot context')
+            
+            story_map = self._bot.story_map
+            
+            # Resolve sibling if it's a string
+            if isinstance(sibling, str):
+                target_sibling = None
+                for epic in story_map._epics_list:
+                    if epic.name == sibling:
+                        target_sibling = epic
+                        break
+                if not target_sibling:
+                    raise ValueError(f"Epic '{sibling}' not found in story map")
+                sibling = target_sibling
+            
+            # Find current and target positions
+            current_position = story_map._epics_list.index(self)
+            sibling_position = story_map._epics_list.index(sibling)
+            
+            # Remove from current position
+            story_map._epics_list.remove(self)
+            
+            # Insert after sibling (adjust position if we removed before the sibling)
+            new_position = sibling_position if current_position > sibling_position else sibling_position
+            story_map._epics_list.insert(new_position, self)
+            
+            # Update sequential order
+            for idx, e in enumerate(story_map._epics_list):
+                e.sequential_order = idx
+            
+            # Rebuild epics collection and save
+            story_map._epics = EpicsCollection(story_map._epics_list)
+            story_map.story_graph['epics'] = [story_map._epic_to_dict(e) for e in story_map._epics_list]
+            story_map.save()
+            
+            return {
+                'node_type': 'Epic',
+                'node_name': self.name,
+                'operation': 'move_after',
+                'sibling': sibling.name,
+                'new_position': new_position
+            }
+        
+        # Handle other node types (SubEpic, Story, etc.)
+        if not hasattr(self, '_parent') or not self._parent:
+            raise ValueError('Cannot move node without parent')
+        
+        # Resolve sibling if it's a string
+        if isinstance(sibling, str):
+            target_sibling = None
+            for child in self._parent.children:
+                if child.name == sibling:
+                    target_sibling = child
+                    break
+            if not target_sibling:
+                raise ValueError(f"Sibling '{sibling}' not found under parent '{self._parent.name}'")
+            sibling = target_sibling
+        
+        # Verify sibling has same parent
+        if not hasattr(sibling, '_parent') or sibling._parent != self._parent:
+            raise ValueError(f"Node '{sibling.name}' is not a sibling of '{self.name}'")
+        
+        # Find position after the sibling
+        sibling_position = self._parent.children.index(sibling)
+        new_position = sibling_position + 1
+        
+        # Use move_to with the calculated position
+        return self.move_to(position=new_position)
 
     def _validate_hierarchy_rules(self, target_parent: 'StoryNode') -> None:
         if isinstance(self, SubEpic) and isinstance(target_parent, SubEpic):

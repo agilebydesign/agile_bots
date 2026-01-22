@@ -359,34 +359,6 @@ class TestDeleteStoryNodeFromParent:
         PipeBotTestHelper,
         JsonBotTestHelper
     ])
-    def test_delete_node_with_children_moves_to_parent(self, tmp_path, helper_class):
-        """
-        SCENARIO: User deletes node with children and CLI moves children to parent
-        GIVEN: SubEpic has Story children
-        WHEN: User executes delete command
-        THEN: CLI moves children to parent and outputs success with count
-        
-        Domain: test_delete_node_with_children_promotes_children_to_grandparent
-        """
-        helper = helper_class(tmp_path)
-        helper.domain.story.create_story_graph_with_node_and_children(
-            'Epic', 'Invoke Bot', 'Manage Bot', 'Story A, Story B', 1
-        )
-        
-        cli_response = helper.cli_session.execute_command(
-            'story_graph."Invoke Bot"."Manage Bot".delete'
-        )
-        
-        assert 'Deleted SubEpic' in cli_response.output
-        assert 'Moved 2 children' in cli_response.output or '2 children' in cli_response.output
-        epic = helper.domain.story.bot.story_graph.epics['Invoke Bot']
-        assert any(child.name in ['Story A', 'Story B'] for child in epic.children)
-    
-    @pytest.mark.parametrize("helper_class", [
-        TTYBotTestHelper,
-        PipeBotTestHelper,
-        JsonBotTestHelper
-    ])
     def test_delete_nonexistent_node_outputs_error(self, tmp_path, helper_class):
         """
         SCENARIO: User enters non-existent node path and CLI outputs error

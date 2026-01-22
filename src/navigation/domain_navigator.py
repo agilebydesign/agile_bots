@@ -154,14 +154,14 @@ class DomainNavigator:
             if param_name == 'at_position':
                 param_name = 'position'
             
-            # Check for quoted string (match[1]) - check if match exists (not None), not truthiness
-            # This correctly handles empty strings: name:"" should pass empty string, not skip parameter
-            if match[1] is not None:
-                params[param_name] = match[1]
-            elif match[2]:
+            # Check groups in precedence order: digits, words, then quoted strings
+            # This correctly handles: position:1 -> int, name:test -> str, name:"" -> empty str
+            if match[2]:  # Digits matched (e.g., position:1)
                 params[param_name] = int(match[2])
-            elif match[3]:
+            elif match[3]:  # Unquoted word matched (e.g., name:test)
                 params[param_name] = match[3]
+            else:  # Quoted string matched (e.g., name:"test" or name:"")
+                params[param_name] = match[1]
         
         return params
     

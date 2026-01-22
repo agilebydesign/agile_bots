@@ -1,4 +1,4 @@
-/**
+P/**
  * Bot Panel Controller
  * 
  * Manages webview panel lifecycle and coordinates data fetching,
@@ -1408,6 +1408,177 @@ class BotPanel {
                 e.preventDefault();
             }
         }, true); // Use capture phase to catch all double-clicks
+        
+        // Handle drag and drop for moving nodes
+        let draggedNode = null;
+        
+        document.addEventListener('dragstart', function(e) {
+            console.log('[WebView] DRAGSTART EVENT FIRED');
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] DRAGSTART EVENT - target classList: ' + (e.target.classList ? Array.from(e.target.classList).join(', ') : 'none')
+            });
+            
+            // Find the story-node element (might be dragging a child element)
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            
+            if (target && target.classList.contains('story-node')) {
+                draggedNode = {
+                    path: target.getAttribute('data-path'),
+                    name: target.getAttribute('data-node-name'),
+                    type: target.getAttribute('data-node-type')
+                };
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', draggedNode.path);
+                target.style.opacity = '0.5';
+                console.log('[WebView] Drag started:', draggedNode);
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DRAG STARTED: ' + JSON.stringify(draggedNode)
+                });
+            } else {
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DRAGSTART ignored - not a story-node'
+                });
+            }
+        }, true);
+        
+        document.addEventListener('dragend', function(e) {
+            console.log('[WebView] DRAGEND EVENT FIRED');
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] DRAGEND EVENT'
+            });
+            
+            // Find the story-node element
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            
+            if (target && target.classList.contains('story-node')) {
+                target.style.opacity = '1';
+                draggedNode = null;
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] Drag ended, cleared draggedNode'
+                });
+            }
+        }, true);
+        
+        document.addEventListener('dragover', function(e) {
+            // Find the story-node element
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            
+            if (target && target.classList.contains('story-node') && draggedNode) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                target.style.backgroundColor = 'var(--vscode-list-hoverBackground)';
+            }
+        }, true);
+        
+        document.addEventListener('dragleave', function(e) {
+            // Find the story-node element
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            
+            if (target && target.classList.contains('story-node')) {
+                target.style.backgroundColor = '';
+            }
+        }, true);
+        
+        document.addEventListener('drop', function(e) {
+            console.log('[WebView] DROP EVENT FIRED');
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] DROP EVENT - target classList: ' + (e.target.classList ? Array.from(e.target.classList).join(', ') : 'none') + ', draggedNode: ' + (draggedNode ? draggedNode.name : 'null')
+            });
+            
+            // Find the story-node element (might be dropping on a child element)
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            
+            if (target && target.classList.contains('story-node') && draggedNode) {
+                e.preventDefault();
+                e.stopPropagation();
+                target.style.backgroundColor = '';
+                
+                const targetPath = target.getAttribute('data-path');
+                const targetName = target.getAttribute('data-node-name');
+                const targetType = target.getAttribute('data-node-type');
+                
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DROP on story-node - dragged: ' + draggedNode.name + ' onto: ' + targetName
+                });
+                
+                if (draggedNode.path !== targetPath) {
+                    console.log('[WebView] Drop detected:', {
+                        dragged: draggedNode,
+                        target: { path: targetPath, name: targetName, type: targetType }
+                    });
+                    
+                    // Extract parent paths to check if reordering siblings
+                    const getParentPath = (path) => {
+                        // Remove last quoted segment: story_graph."Epic1"."SubEpic1" -> story_graph."Epic1"
+                        const lastQuoteIndex = path.lastIndexOf('."');
+                        return lastQuoteIndex > 0 ? path.substring(0, lastQuoteIndex) : 'story_graph';
+                    };
+                    
+                    const draggedParent = getParentPath(draggedNode.path);
+                    const targetParent = getParentPath(targetPath);
+                    
+                    let command;
+                    if (draggedParent === targetParent && draggedNode.type === targetType) {
+                        // Same parent and same type - use move_after to position after target
+                        command = \`\${draggedNode.path}.move_after sibling:"\${targetName}"\`;
+                        vscode.postMessage({
+                            command: 'logToFile',
+                            message: '[WebView] REORDER siblings - move after: ' + targetName
+                        });
+                    } else {
+                        // Different parent - move to new parent
+                        command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
+                        vscode.postMessage({
+                            command: 'logToFile',
+                            message: '[WebView] MOVE to different parent: ' + targetName
+                        });
+                    }
+                    
+                    console.log('[WebView] Move command:', command);
+                    vscode.postMessage({
+                        command: 'logToFile',
+                        message: '[WebView] SENDING MOVE COMMAND: ' + command
+                    });
+                    
+                    vscode.postMessage({
+                        command: 'executeCommand',
+                        commandText: command
+                    });
+                } else {
+                    vscode.postMessage({
+                        command: 'logToFile',
+                        message: '[WebView] DROP ignored - same node'
+                    });
+                }
+            } else {
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DROP ignored - not story-node or no draggedNode'
+                });
+            }
+        }, true);
         
         // Test if onclick handlers can access functions
         window.testFunction = function() {
