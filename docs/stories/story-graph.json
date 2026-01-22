@@ -2,7 +2,7 @@
   "epics": [
     {
       "name": "Build Agile Bots",
-      "sequential_order": 0,
+      "sequential_order": null,
       "domain_concepts": [],
       "sub_epics": [
         {
@@ -900,7 +900,7 @@
     },
     {
       "name": "Invoke Bot",
-      "sequential_order": 1,
+      "sequential_order": null,
       "domain_concepts": [],
       "sub_epics": [
         {
@@ -12993,6 +12993,13 @@
                   ]
                 }
               ],
+              "story_groups": [],
+              "stories": []
+            },
+            {
+              "name": "Set Scope To Story Filter",
+              "sequential_order": 3.0,
+              "sub_epics": [],
               "story_groups": [],
               "stories": []
             }
