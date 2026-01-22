@@ -8085,6 +8085,7 @@
             {
               "name": "Perform Action",
               "sequential_order": 5.0,
+              "test_file": "domain/test_perform_action.py",
               "sub_epics": [],
               "story_groups": [
                 {
