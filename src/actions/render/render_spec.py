@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, Optional
 import importlib
 from actions.render.template import Template
@@ -132,18 +132,27 @@ class RenderSpec:
 
     def _import_synchronizer_class(self, synchronizer_class_path: str):
         module_path, class_name = synchronizer_class_path.rsplit('.', 1)
-        possible_paths = [module_path, f'agile_bots.bots.{self._bot_paths.bot_directory.name}.src.{module_path}', f'agile_bots.bots.{self._bot_paths.bot_directory.name}.src.synchronizers.{module_path}']
+        # Try multiple import paths to handle different Python path configurations
+        # Try src.* paths first since they work most reliably
+        possible_paths = [
+            f'src.{module_path}',  # Import from src package (works when cwd is workspace root)
+            module_path,  # Direct import (works when src is in PYTHONPATH)
+            f'agile_bots.bots.{self._bot_paths.bot_directory.name}.src.{module_path}',
+            f'agile_bots.bots.{self._bot_paths.bot_directory.name}.src.synchronizers.{module_path}'
+        ]
         module = None
+        last_error = None
         for path in possible_paths:
             try:
                 module = importlib.import_module(path)
                 if hasattr(module, class_name):
                     break
                 module = None
-            except ImportError:
+            except ImportError as e:
+                last_error = e
                 continue
         if module is None:
-            raise ImportError(f'Could not import synchronizer module: {synchronizer_class_path}')
+            raise ImportError(f'Could not import synchronizer module: {synchronizer_class_path}. Last error: {last_error}')
         synchronizer_class = getattr(module, class_name)
         if not hasattr(synchronizer_class, 'render'):
             raise ValueError(f'Synchronizer class {synchronizer_class_path} does not have render method')

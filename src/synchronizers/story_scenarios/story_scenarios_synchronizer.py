@@ -35,8 +35,11 @@ def format_acceptance_criteria(ac_list):
     
     formatted = []
     for ac in ac_list:
+        # AC can be either a dict with 'text' field or a string
+        ac_text = ac['text'] if isinstance(ac, dict) and 'text' in ac else str(ac)
+        
         # Handle both formats: multi-line (WHEN/THEN/AND on separate lines) and single-line (WHEN...THEN...AND in one string)
-        parts = ac.split('\n')
+        parts = ac_text.split('\n')
         ac_lines = []
         for part in parts:
             part = part.strip()

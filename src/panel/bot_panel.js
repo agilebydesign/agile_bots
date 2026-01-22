@@ -1490,9 +1490,19 @@ class BotPanel {
             }
             
             if (target && target.classList.contains('story-node') && draggedNode) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                target.style.backgroundColor = 'var(--vscode-list-hoverBackground)';
+                // Check if this is a valid drop target
+                const targetType = target.getAttribute('data-node-type');
+                const canContain = (targetType === 'epic' && (draggedNode.type === 'sub-epic')) ||
+                                  (targetType === 'sub-epic' && (draggedNode.type === 'sub-epic' || draggedNode.type === 'story'));
+                
+                if (canContain || draggedNode.type === targetType) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    // Use different color for nesting vs reordering
+                    target.style.backgroundColor = canContain 
+                        ? 'rgba(255, 140, 0, 0.3)'  // Orange tint for nesting
+                        : 'var(--vscode-list-hoverBackground)';  // Default for reordering
+                }
             }
         }, true);
         
@@ -1552,7 +1562,41 @@ class BotPanel {
                     const targetParent = getParentPath(targetPath);
                     
                     let command;
-                    if (draggedParent === targetParent && draggedNode.type === targetType) {
+                    // Determine if target can contain dragged node
+                    const canContain = (targetType === 'epic' && (draggedNode.type === 'sub-epic')) ||
+                                      (targetType === 'sub-epic' && (draggedNode.type === 'sub-epic' || draggedNode.type === 'story'));
+                    
+                    // Check if node is already in the target (prevent moving into current parent)
+                    const isAlreadyInTarget = draggedParent === targetPath;
+                    
+                    const debugInfo = {
+                        draggedType: draggedNode.type,
+                        draggedName: draggedNode.name,
+                        draggedPath: draggedNode.path,
+                        targetType: targetType,
+                        targetName: targetName,
+                        targetPath: targetPath,
+                        canContain: canContain,
+                        sameParent: draggedParent === targetParent,
+                        sameType: draggedNode.type === targetType,
+                        draggedParent: draggedParent,
+                        targetParent: targetParent,
+                        isAlreadyInTarget: isAlreadyInTarget
+                    };
+                    
+                    vscode.postMessage({
+                        command: 'logToFile',
+                        message: '[WebView] DROP DEBUG: ' + JSON.stringify(debugInfo, null, 2)
+                    });
+                    
+                    if (canContain) {
+                        // Target can contain dragged node - nest it inside using move_to
+                        command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
+                        vscode.postMessage({
+                            command: 'logToFile',
+                            message: '[WebView] NEST inside container: ' + targetName
+                        });
+                    } else if (draggedParent === targetParent && draggedNode.type === targetType) {
                         // Same parent and same type - use move_after to position after target
                         command = \`\${draggedNode.path}.move_after sibling:"\${targetName}"\`;
                         vscode.postMessage({
@@ -1560,11 +1604,11 @@ class BotPanel {
                             message: '[WebView] REORDER siblings - move after: ' + targetName
                         });
                     } else {
-                        // Different parent - move to new parent
+                        // Fallback - try move_to
                         command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] MOVE to different parent: ' + targetName
+                            message: '[WebView] MOVE to target (fallback): ' + targetName
                         });
                     }
                     

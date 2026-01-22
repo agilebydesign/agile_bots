@@ -17,6 +17,10 @@ workspace_root = src_root.parent  # src -> agile_bots
 
 if str(src_root) not in sys.path:
     sys.path.insert(0, str(src_root))
+    
+# Also add workspace root for synchronizer imports (src.synchronizers.*)
+if str(workspace_root) not in sys.path:
+    sys.path.insert(0, str(workspace_root))
 
 # Bootstrap BOT_DIRECTORY if not set
 if 'BOT_DIRECTORY' not in os.environ:

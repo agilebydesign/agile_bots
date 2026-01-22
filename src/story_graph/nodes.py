@@ -207,15 +207,37 @@ class StoryNode(ABC):
                 raise ValueError(f"Node '{self.name}' already exists under parent '{target.name}'")
         
         self._validate_hierarchy_rules(target)
+        
+        # CRITICAL: Stories MUST be inside StoryGroups, not directly in SubEpic/Epic
+        actual_target = target
+        if isinstance(self, Story) and isinstance(target, (SubEpic, Epic)):
+            # Find or create a StoryGroup in the target
+            story_groups = [child for child in target._children if isinstance(child, StoryGroup)]
+            if story_groups:
+                # Use the first StoryGroup
+                actual_target = story_groups[0]
+            else:
+                # Create a new StoryGroup
+                story_group = StoryGroup(
+                    name='',
+                    sequential_order=0.0,
+                    group_type='and',
+                    connector=None,
+                    _parent=target,
+                    _bot=self._bot
+                )
+                target._children.append(story_group)
+                actual_target = story_group
+        
         self._parent._children.remove(self)
         self._parent._resequence_siblings()
-        self._parent = target
+        self._parent = actual_target
         if position is not None:
-            adjusted_position = min(position, len(target.children))
-            target._children.insert(adjusted_position, self)
+            adjusted_position = min(position, len(actual_target.children))
+            actual_target._children.insert(adjusted_position, self)
         else:
-            target._children.append(self)
-        target._resequence_children()
+            actual_target._children.append(self)
+        actual_target._resequence_children()
         
         # Save changes to disk
         self.save()

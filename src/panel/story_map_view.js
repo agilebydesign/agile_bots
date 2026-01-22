@@ -424,9 +424,9 @@ class StoryMapView extends PanelView {
                                 // Check if story has scenarios - if so, make it collapsible
                                 const hasScenarios = story.scenarios && story.scenarios.length > 0;
                                 
-                                // Build story path for edit mode
+                                // Build story path for edit mode - use full parent chain for nested sub-epics
                                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                const storyPath = this.escapeHtml(`story_graph."${epic.name}"."${subEpic.name}"."${story.name}"`);
+                                const storyPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"`);
                                 
                                 html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
                                 
