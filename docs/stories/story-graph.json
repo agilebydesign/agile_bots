@@ -9305,6 +9305,58 @@
                           "sequential_order": 2.0
                         }
                       ]
+                    },
+                    {
+                      "name": "Switch Bot panel",
+                      "sequential_order": 9.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSwitchBot",
+                      "scenarios": [
+                        {
+                          "name": "Panel shows story_bot and multiple bots available",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
+                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
+                        },
+                        {
+                          "name": "User switches to crc_bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_user_switches_to_crc_bot",
+                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User switches bot",
+                          "text": "WHEN User switches bot",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN System displays updated bot name",
+                          "text": "THEN System displays updated bot name",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND System displays behavior action section for new bot",
+                          "text": "AND System displays behavior action section for new bot",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "AND System displays behavior action stateof workspace for new bot",
+                          "text": "AND System displays behavior action stateof workspace for new bot",
+                          "sequential_order": 4.0
+                        }
+                      ]
                     }
                   ]
                 }
@@ -9795,6 +9847,58 @@
                       "name": "THEN System expands or collapses section",
                       "text": "THEN System expands or collapses section",
                       "sequential_order": 2.0
+                    }
+                  ]
+                },
+                {
+                  "name": "Switch Bot panel",
+                  "sequential_order": 9.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "User"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestSwitchBot",
+                  "scenarios": [
+                    {
+                      "name": "Panel shows story_bot and multiple bots available",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
+                      "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
+                    },
+                    {
+                      "name": "User switches to crc_bot",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_user_switches_to_crc_bot",
+                      "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN User switches bot",
+                      "text": "WHEN User switches bot",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "THEN System displays updated bot name",
+                      "text": "THEN System displays updated bot name",
+                      "sequential_order": 2.0
+                    },
+                    {
+                      "name": "AND System displays behavior action section for new bot",
+                      "text": "AND System displays behavior action section for new bot",
+                      "sequential_order": 3.0
+                    },
+                    {
+                      "name": "AND System displays behavior action stateof workspace for new bot",
+                      "text": "AND System displays behavior action stateof workspace for new bot",
+                      "sequential_order": 4.0
                     }
                   ]
                 }
@@ -10420,129 +10524,8 @@
               ]
             },
             {
-              "name": "Manage Panel Session",
-              "sequential_order": 2.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Switch Bot panel",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestSwitchBot",
-                      "scenarios": [
-                        {
-                          "name": "Panel shows story_bot and multiple bots available",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
-                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
-                        },
-                        {
-                          "name": "User switches to crc_bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_switches_to_crc_bot",
-                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User switches bot",
-                          "text": "WHEN User switches bot",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "THEN System displays updated bot name",
-                          "text": "THEN System displays updated bot name",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "AND System displays behavior action section for new bot",
-                          "text": "AND System displays behavior action section for new bot",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "AND System displays behavior action stateof workspace for new bot",
-                          "text": "AND System displays behavior action stateof workspace for new bot",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ],
-              "stories": [
-                {
-                  "name": "Switch Bot panel",
-                  "sequential_order": 4.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "User"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestSwitchBot",
-                  "scenarios": [
-                    {
-                      "name": "Panel shows story_bot and multiple bots available",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
-                      "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
-                    },
-                    {
-                      "name": "User switches to crc_bot",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_user_switches_to_crc_bot",
-                      "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN User switches bot",
-                      "text": "WHEN User switches bot",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN System displays updated bot name",
-                      "text": "THEN System displays updated bot name",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "AND System displays behavior action section for new bot",
-                      "text": "AND System displays behavior action section for new bot",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "AND System displays behavior action stateof workspace for new bot",
-                      "text": "AND System displays behavior action stateof workspace for new bot",
-                      "sequential_order": 4.0
-                    }
-                  ]
-                }
-              ]
-            },
-            {
               "name": "Display State Using REPL",
-              "sequential_order": 3.0,
+              "sequential_order": 2.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -11481,7 +11464,7 @@
             },
             {
               "name": "Track Activity",
-              "sequential_order": 4.0,
+              "sequential_order": 3.0,
               "sub_epics": [],
               "story_groups": [
                 {
