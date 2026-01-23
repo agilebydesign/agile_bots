@@ -3142,85 +3142,8 @@
                               "acceptance_criteria": []
                             },
                             {
-                              "name": "Filter Story Scope By Files",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestFilterScopeByFiles",
-                              "scenarios": [
-                                {
-                                  "name": "File Filter Includes Matching Files",
-                                  "sequential_order": 1.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_filter_includes_matching_files",
-                                  "steps": ""
-                                },
-                                {
-                                  "name": "FileFilter excludes files matching exclude patterns",
-                                  "sequential_order": 2.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_filter_excludes_matching_files",
-                                  "steps": "Given A list of files and a FileFilter with exclude patterns\nWhen filter_files() is called\nThen Files matching exclude patterns are removed"
-                                },
-                                {
-                                  "name": "FileFilter combines include and exclude patterns",
-                                  "sequential_order": 3.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_filter_combines_include_and_exclude",
-                                  "steps": "Given A list of files and a FileFilter with both include and exclude patterns\nWhen filter_files() is called\nThen Files must match include AND not match exclude"
-                                },
-                                {
-                                  "name": "FileFilter returns all files when no patterns specified",
-                                  "sequential_order": 4.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_filter_returns_all_when_no_patterns",
-                                  "steps": "Given A list of files and a FileFilter with no patterns\nWhen filter_files() is called\nThen All files are returned"
-                                },
-                                {
-                                  "name": "FileFilter handles specific file paths (not just globs)",
-                                  "sequential_order": 5.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_filter_handles_specific_file_paths",
-                                  "steps": "Given A list of files and a FileFilter with specific file path\nWhen filter_files() is called\nThen Only the specific file is included"
-                                },
-                                {
-                                  "name": "File discovery and filtering work together",
-                                  "sequential_order": 6.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_file_discovery_and_filtering_integration",
-                                  "steps": "Given A FileDiscovery component and a FileFilter\nWhen Files are discovered and then filtered\nThen Only matching files are returned\nThen This test verifies the integration between FileDiscovery and FileFilter,\nThen which was the core fix for the validation scope bug."
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Filter Story Scope By Increments",
-                              "sequential_order": 2.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestGetFilesFilteredByStoryScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
                               "name": "Filter Story Scope Panel",
-                              "sequential_order": 3.0,
+                              "sequential_order": 1.0,
                               "connector": null,
                               "story_type": "user",
                               "users": [
@@ -3353,6 +3276,147 @@
                                   "name": "THEN System restores previously set scope filter",
                                   "text": "THEN System restores previously set scope filter",
                                   "sequential_order": 17.0
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Filter Story Scope By Files",
+                              "sequential_order": 2.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestFilterScopeByFiles",
+                              "scenarios": [
+                                {
+                                  "name": "File Filter Includes Matching Files",
+                                  "sequential_order": 1.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_filter_includes_matching_files",
+                                  "steps": ""
+                                },
+                                {
+                                  "name": "FileFilter excludes files matching exclude patterns",
+                                  "sequential_order": 2.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_filter_excludes_matching_files",
+                                  "steps": "Given A list of files and a FileFilter with exclude patterns\nWhen filter_files() is called\nThen Files matching exclude patterns are removed"
+                                },
+                                {
+                                  "name": "FileFilter combines include and exclude patterns",
+                                  "sequential_order": 3.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_filter_combines_include_and_exclude",
+                                  "steps": "Given A list of files and a FileFilter with both include and exclude patterns\nWhen filter_files() is called\nThen Files must match include AND not match exclude"
+                                },
+                                {
+                                  "name": "FileFilter returns all files when no patterns specified",
+                                  "sequential_order": 4.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_filter_returns_all_when_no_patterns",
+                                  "steps": "Given A list of files and a FileFilter with no patterns\nWhen filter_files() is called\nThen All files are returned"
+                                },
+                                {
+                                  "name": "FileFilter handles specific file paths (not just globs)",
+                                  "sequential_order": 5.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_filter_handles_specific_file_paths",
+                                  "steps": "Given A list of files and a FileFilter with specific file path\nWhen filter_files() is called\nThen Only the specific file is included"
+                                },
+                                {
+                                  "name": "File discovery and filtering work together",
+                                  "sequential_order": 6.0,
+                                  "type": "happy_path",
+                                  "background": [],
+                                  "test_method": "test_file_discovery_and_filtering_integration",
+                                  "steps": "Given A FileDiscovery component and a FileFilter\nWhen Files are discovered and then filtered\nThen Only matching files are returned\nThen This test verifies the integration between FileDiscovery and FileFilter,\nThen which was the core fix for the validation scope bug."
+                                }
+                              ],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Open Story Files",
+                              "sequential_order": 3.0,
+                              "connector": "and",
+                              "story_type": "user",
+                              "users": [
+                                "User"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestOpenStoryFiles",
+                              "scenarios": [
+                                {
+                                  "name": "",
+                                  "sequential_order": 1.0,
+                                  "type": "",
+                                  "background": [],
+                                  "test_method": null,
+                                  "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
+                                },
+                                {
+                                  "name": "",
+                                  "sequential_order": 2.0,
+                                  "type": "",
+                                  "background": [],
+                                  "test_method": null,
+                                  "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
+                                },
+                                {
+                                  "name": "",
+                                  "sequential_order": 3.0,
+                                  "type": "",
+                                  "background": [],
+                                  "test_method": null,
+                                  "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
+                                },
+                                {
+                                  "name": "",
+                                  "sequential_order": 4.0,
+                                  "type": "",
+                                  "background": [],
+                                  "test_method": "test_story_graph_and_story_map_links_always_visible",
+                                  "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
+                                }
+                              ],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": [
+                                {
+                                  "name": "WHEN User clicks graph link",
+                                  "text": "WHEN User clicks graph link",
+                                  "sequential_order": 1.0
+                                },
+                                {
+                                  "name": "THEN System opens story-graph.json in editor",
+                                  "text": "THEN System opens story-graph.json in editor",
+                                  "sequential_order": 2.0
+                                },
+                                {
+                                  "name": "WHEN User clicks map link",
+                                  "text": "WHEN User clicks map link",
+                                  "sequential_order": 3.0
+                                },
+                                {
+                                  "name": "THEN System opens story-map.drawio in diagram viewer",
+                                  "text": "THEN System opens story-map.drawio in diagram viewer",
+                                  "sequential_order": 4.0
+                                },
+                                {
+                                  "name": "WHEN System cannot open file",
+                                  "text": "WHEN System cannot open file",
+                                  "sequential_order": 5.0
+                                },
+                                {
+                                  "name": "THEN System displays error message",
+                                  "text": "THEN System displays error message",
+                                  "sequential_order": 6.0
                                 }
                               ]
                             },
@@ -3661,6 +3725,20 @@
                                   "sequential_order": 42.0
                                 }
                               ]
+                            },
+                            {
+                              "name": "Filter Story Scope By Increments",
+                              "sequential_order": 5.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestGetFilesFilteredByStoryScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
                             }
                           ]
                         }
@@ -3730,85 +3808,8 @@
                           "acceptance_criteria": []
                         },
                         {
-                          "name": "Filter Story Scope By Files",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestFilterScopeByFiles",
-                          "scenarios": [
-                            {
-                              "name": "File Filter Includes Matching Files",
-                              "sequential_order": 1.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_filter_includes_matching_files",
-                              "steps": ""
-                            },
-                            {
-                              "name": "FileFilter excludes files matching exclude patterns",
-                              "sequential_order": 2.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_filter_excludes_matching_files",
-                              "steps": "Given A list of files and a FileFilter with exclude patterns\nWhen filter_files() is called\nThen Files matching exclude patterns are removed"
-                            },
-                            {
-                              "name": "FileFilter combines include and exclude patterns",
-                              "sequential_order": 3.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_filter_combines_include_and_exclude",
-                              "steps": "Given A list of files and a FileFilter with both include and exclude patterns\nWhen filter_files() is called\nThen Files must match include AND not match exclude"
-                            },
-                            {
-                              "name": "FileFilter returns all files when no patterns specified",
-                              "sequential_order": 4.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_filter_returns_all_when_no_patterns",
-                              "steps": "Given A list of files and a FileFilter with no patterns\nWhen filter_files() is called\nThen All files are returned"
-                            },
-                            {
-                              "name": "FileFilter handles specific file paths (not just globs)",
-                              "sequential_order": 5.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_filter_handles_specific_file_paths",
-                              "steps": "Given A list of files and a FileFilter with specific file path\nWhen filter_files() is called\nThen Only the specific file is included"
-                            },
-                            {
-                              "name": "File discovery and filtering work together",
-                              "sequential_order": 6.0,
-                              "type": "happy_path",
-                              "background": [],
-                              "test_method": "test_file_discovery_and_filtering_integration",
-                              "steps": "Given A FileDiscovery component and a FileFilter\nWhen Files are discovered and then filtered\nThen Only matching files are returned\nThen This test verifies the integration between FileDiscovery and FileFilter,\nThen which was the core fix for the validation scope bug."
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Filter Story Scope By Increments",
-                          "sequential_order": 2.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestGetFilesFilteredByStoryScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
                           "name": "Filter Story Scope Panel",
-                          "sequential_order": 3.0,
+                          "sequential_order": 1.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -3941,6 +3942,147 @@
                               "name": "THEN System restores previously set scope filter",
                               "text": "THEN System restores previously set scope filter",
                               "sequential_order": 17.0
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Filter Story Scope By Files",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestFilterScopeByFiles",
+                          "scenarios": [
+                            {
+                              "name": "File Filter Includes Matching Files",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_filter_includes_matching_files",
+                              "steps": ""
+                            },
+                            {
+                              "name": "FileFilter excludes files matching exclude patterns",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_filter_excludes_matching_files",
+                              "steps": "Given A list of files and a FileFilter with exclude patterns\nWhen filter_files() is called\nThen Files matching exclude patterns are removed"
+                            },
+                            {
+                              "name": "FileFilter combines include and exclude patterns",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_filter_combines_include_and_exclude",
+                              "steps": "Given A list of files and a FileFilter with both include and exclude patterns\nWhen filter_files() is called\nThen Files must match include AND not match exclude"
+                            },
+                            {
+                              "name": "FileFilter returns all files when no patterns specified",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_filter_returns_all_when_no_patterns",
+                              "steps": "Given A list of files and a FileFilter with no patterns\nWhen filter_files() is called\nThen All files are returned"
+                            },
+                            {
+                              "name": "FileFilter handles specific file paths (not just globs)",
+                              "sequential_order": 5.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_filter_handles_specific_file_paths",
+                              "steps": "Given A list of files and a FileFilter with specific file path\nWhen filter_files() is called\nThen Only the specific file is included"
+                            },
+                            {
+                              "name": "File discovery and filtering work together",
+                              "sequential_order": 6.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_discovery_and_filtering_integration",
+                              "steps": "Given A FileDiscovery component and a FileFilter\nWhen Files are discovered and then filtered\nThen Only matching files are returned\nThen This test verifies the integration between FileDiscovery and FileFilter,\nThen which was the core fix for the validation scope bug."
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Open Story Files",
+                          "sequential_order": 3.0,
+                          "connector": "and",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestOpenStoryFiles",
+                          "scenarios": [
+                            {
+                              "name": "",
+                              "sequential_order": 1.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
+                            },
+                            {
+                              "name": "",
+                              "sequential_order": 2.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
+                            },
+                            {
+                              "name": "",
+                              "sequential_order": 3.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
+                            },
+                            {
+                              "name": "",
+                              "sequential_order": 4.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": "test_story_graph_and_story_map_links_always_visible",
+                              "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN User clicks graph link",
+                              "text": "WHEN User clicks graph link",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "THEN System opens story-graph.json in editor",
+                              "text": "THEN System opens story-graph.json in editor",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "WHEN User clicks map link",
+                              "text": "WHEN User clicks map link",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "THEN System opens story-map.drawio in diagram viewer",
+                              "text": "THEN System opens story-map.drawio in diagram viewer",
+                              "sequential_order": 4.0
+                            },
+                            {
+                              "name": "WHEN System cannot open file",
+                              "text": "WHEN System cannot open file",
+                              "sequential_order": 5.0
+                            },
+                            {
+                              "name": "THEN System displays error message",
+                              "text": "THEN System displays error message",
+                              "sequential_order": 6.0
                             }
                           ]
                         },
@@ -4249,6 +4391,20 @@
                               "sequential_order": 42.0
                             }
                           ]
+                        },
+                        {
+                          "name": "Filter Story Scope By Increments",
+                          "sequential_order": 5.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestGetFilesFilteredByStoryScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     },
@@ -4390,12 +4546,12 @@
                               "acceptance_criteria": []
                             },
                             {
-                              "name": "Remove Increment Filter Part From Story Scope CLI",
+                              "name": "Remove Increment Filter Part From Story Scope",
                               "sequential_order": 9.0,
                               "connector": "or",
                               "story_type": "user",
                               "users": [
-                                "User"
+                                "Bot Behavior"
                               ],
                               "test_file": null,
                               "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
@@ -4404,7 +4560,7 @@
                               "acceptance_criteria": []
                             },
                             {
-                              "name": "Remove Increment Filter Part From Story Scope Panel",
+                              "name": "Remove Increment Filter Part From Story Scope CLI",
                               "sequential_order": 10.0,
                               "connector": "or",
                               "story_type": "user",
@@ -4418,12 +4574,12 @@
                               "acceptance_criteria": []
                             },
                             {
-                              "name": "Remove Increment Filter Part From Story Scope",
+                              "name": "Remove Increment Filter Part From Story Scope Panel",
                               "sequential_order": 11.0,
                               "connector": "or",
                               "story_type": "user",
                               "users": [
-                                "Bot Behavior"
+                                "User"
                               ],
                               "test_file": null,
                               "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
@@ -4562,12 +4718,12 @@
                           "acceptance_criteria": []
                         },
                         {
-                          "name": "Remove Increment Filter Part From Story Scope CLI",
+                          "name": "Remove Increment Filter Part From Story Scope",
                           "sequential_order": 9.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
-                            "User"
+                            "Bot Behavior"
                           ],
                           "test_file": null,
                           "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
@@ -4576,7 +4732,7 @@
                           "acceptance_criteria": []
                         },
                         {
-                          "name": "Remove Increment Filter Part From Story Scope Panel",
+                          "name": "Remove Increment Filter Part From Story Scope CLI",
                           "sequential_order": 10.0,
                           "connector": "or",
                           "story_type": "user",
@@ -4590,12 +4746,12 @@
                           "acceptance_criteria": []
                         },
                         {
-                          "name": "Remove Increment Filter Part From Story Scope",
+                          "name": "Remove Increment Filter Part From Story Scope Panel",
                           "sequential_order": 11.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
-                            "Bot Behavior"
+                            "User"
                           ],
                           "test_file": null,
                           "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
@@ -5361,207 +5517,6 @@
                           ]
                         }
                       ]
-                    },
-                    {
-                      "name": "Filter on Story Scope in Panel",
-                      "sequential_order": 3.0,
-                      "sub_epics": [],
-                      "story_groups": [
-                        {
-                          "name": "",
-                          "sequential_order": 0.0,
-                          "type": "and",
-                          "connector": null,
-                          "stories": [
-                            {
-                              "name": "Display Files Filtered By Story Scope Panel",
-                              "sequential_order": 2.5,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayFilesFilteredByStoryScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Open Story Files",
-                              "sequential_order": 9.0,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestOpenStoryFiles",
-                              "scenarios": [
-                                {
-                                  "name": "",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": null,
-                                  "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
-                                },
-                                {
-                                  "name": "",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": null,
-                                  "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
-                                },
-                                {
-                                  "name": "",
-                                  "sequential_order": 3.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": null,
-                                  "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
-                                },
-                                {
-                                  "name": "",
-                                  "sequential_order": 4.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_story_graph_and_story_map_links_always_visible",
-                                  "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": [
-                                {
-                                  "name": "WHEN User clicks graph link",
-                                  "text": "WHEN User clicks graph link",
-                                  "sequential_order": 1.0
-                                },
-                                {
-                                  "name": "THEN System opens story-graph.json in editor",
-                                  "text": "THEN System opens story-graph.json in editor",
-                                  "sequential_order": 2.0
-                                },
-                                {
-                                  "name": "WHEN User clicks map link",
-                                  "text": "WHEN User clicks map link",
-                                  "sequential_order": 3.0
-                                },
-                                {
-                                  "name": "THEN System opens story-map.drawio in diagram viewer",
-                                  "text": "THEN System opens story-map.drawio in diagram viewer",
-                                  "sequential_order": 4.0
-                                },
-                                {
-                                  "name": "WHEN System cannot open file",
-                                  "text": "WHEN System cannot open file",
-                                  "sequential_order": 5.0
-                                },
-                                {
-                                  "name": "THEN System displays error message",
-                                  "text": "THEN System displays error message",
-                                  "sequential_order": 6.0
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      ],
-                      "stories": [
-                        {
-                          "name": "Display Files Filtered By Story Scope Panel",
-                          "sequential_order": 2.5,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayFilesFilteredByStoryScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Open Story Files",
-                          "sequential_order": 9.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestOpenStoryFiles",
-                          "scenarios": [
-                            {
-                              "name": "",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": null,
-                              "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
-                            },
-                            {
-                              "name": "",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": null,
-                              "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
-                            },
-                            {
-                              "name": "",
-                              "sequential_order": 3.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": null,
-                              "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
-                            },
-                            {
-                              "name": "",
-                              "sequential_order": 4.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_story_graph_and_story_map_links_always_visible",
-                              "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": [
-                            {
-                              "name": "WHEN User clicks graph link",
-                              "text": "WHEN User clicks graph link",
-                              "sequential_order": 1.0
-                            },
-                            {
-                              "name": "THEN System opens story-graph.json in editor",
-                              "text": "THEN System opens story-graph.json in editor",
-                              "sequential_order": 2.0
-                            },
-                            {
-                              "name": "WHEN User clicks map link",
-                              "text": "WHEN User clicks map link",
-                              "sequential_order": 3.0
-                            },
-                            {
-                              "name": "THEN System opens story-map.drawio in diagram viewer",
-                              "text": "THEN System opens story-map.drawio in diagram viewer",
-                              "sequential_order": 4.0
-                            },
-                            {
-                              "name": "WHEN System cannot open file",
-                              "text": "WHEN System cannot open file",
-                              "sequential_order": 5.0
-                            },
-                            {
-                              "name": "THEN System displays error message",
-                              "text": "THEN System displays error message",
-                              "sequential_order": 6.0
-                            }
-                          ]
-                        }
-                      ]
                     }
                   ],
                   "story_groups": [],
@@ -5584,7 +5539,7 @@
                           "stories": [
                             {
                               "name": "Add Filter Part To File Scope",
-                              "sequential_order": 3.0,
+                              "sequential_order": 0.0,
                               "connector": "or",
                               "story_type": "user",
                               "users": [
@@ -5598,6 +5553,48 @@
                             },
                             {
                               "name": "Remove Filter Part From File Scope",
+                              "sequential_order": 1.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestRemoveFilterPartFromFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Add Filter Part To File Scope Panel",
+                              "sequential_order": 2.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestAddFilterPartToFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Add Filter Part To File Scope CLI",
+                              "sequential_order": 3.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestAddFilterPartToFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Remove Filter Part From File Scope Panel",
                               "sequential_order": 4.0,
                               "connector": "or",
                               "story_type": "user",
@@ -5616,7 +5613,7 @@
                       "stories": [
                         {
                           "name": "Add Filter Part To File Scope",
-                          "sequential_order": 3.0,
+                          "sequential_order": 0.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -5630,6 +5627,48 @@
                         },
                         {
                           "name": "Remove Filter Part From File Scope",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestRemoveFilterPartFromFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Add Filter Part To File Scope Panel",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestAddFilterPartToFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Add Filter Part To File Scope CLI",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestAddFilterPartToFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Remove Filter Part From File Scope Panel",
                           "sequential_order": 4.0,
                           "connector": "or",
                           "story_type": "user",
@@ -5692,72 +5731,73 @@
                     {
                       "name": "Filter File Scope",
                       "sequential_order": 2.0,
-                      "sub_epics": [
+                      "sub_epics": [],
+                      "story_groups": [
                         {
-                          "name": "Filter File Scope By Files",
+                          "name": "",
                           "sequential_order": 0.0,
-                          "sub_epics": [],
-                          "story_groups": [
-                            {
-                              "name": "",
-                              "sequential_order": 0.0,
-                              "type": "and",
-                              "connector": null,
-                              "stories": [
-                                {
-                                  "name": "Filter File Scope  By Files Panel",
-                                  "sequential_order": 0.0,
-                                  "connector": "and",
-                                  "story_type": "user",
-                                  "users": [
-                                    "User"
-                                  ],
-                                  "test_file": null,
-                                  "test_class": "TestFilterFileScope",
-                                  "scenarios": [
-                                    {
-                                      "name": "",
-                                      "sequential_order": 1.0,
-                                      "type": "",
-                                      "background": [],
-                                      "test_method": null,
-                                      "steps": "Given Panel displays scope section\nWhen User types file:src/**/*.py in scope filter\nThen Panel displays file scope mode\nAnd Panel displays list of Python files in src directory\nAnd File paths are displayed in monospace font"
-                                    },
-                                    {
-                                      "name": "",
-                                      "sequential_order": 2.0,
-                                      "type": "",
-                                      "background": [],
-                                      "test_method": null,
-                                      "steps": "Given Panel displays scope section\nWhen User types file:**/*.spec.js in scope filter\nThen Panel displays all JavaScript test files\nAnd Files are displayed with full relative paths"
-                                    }
-                                  ],
-                                  "scenario_outlines": [],
-                                  "acceptance_criteria": [
-                                    {
-                                      "name": "WHEN User types file pattern in filter",
-                                      "text": "WHEN User types file pattern in filter",
-                                      "sequential_order": 1.0
-                                    },
-                                    {
-                                      "name": "THEN System displays filtered file list",
-                                      "text": "THEN System displays filtered file list",
-                                      "sequential_order": 2.0
-                                    },
-                                    {
-                                      "name": "AND System displays file list with monospace paths",
-                                      "text": "AND System displays file list with monospace paths",
-                                      "sequential_order": 3.0
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ],
+                          "type": "and",
+                          "connector": null,
                           "stories": [
                             {
-                              "name": "Filter File Scope  By Files Panel",
+                              "name": "Display Files Filtered By Story Scope Panel CLI",
                               "sequential_order": 0.0,
+                              "connector": "and",
+                              "story_type": "user",
+                              "users": [
+                                "User"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestDisplayFilesFilteredByStoryScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Display All Files For Behavior CLI",
+                              "sequential_order": 1.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestDisplayAllFilesForBehavior",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Filter File Scope Panel",
+                              "sequential_order": 2.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestFilterFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Filter File Scope CLI",
+                              "sequential_order": 3.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestFilterFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Filter File Scope  By Files Panel",
+                              "sequential_order": 4.0,
                               "connector": "and",
                               "story_type": "user",
                               "users": [
@@ -5803,152 +5843,118 @@
                               ]
                             }
                           ]
-                        },
-                        {
-                          "name": "Filter Story Scope By Files",
-                          "sequential_order": 1.0,
-                          "sub_epics": [],
-                          "story_groups": [],
-                          "stories": []
                         }
                       ],
-                      "story_groups": [],
-                      "stories": []
+                      "stories": [
+                        {
+                          "name": "Display Files Filtered By Story Scope Panel CLI",
+                          "sequential_order": 0.0,
+                          "connector": "and",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayFilesFilteredByStoryScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Display All Files For Behavior CLI",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayAllFilesForBehavior",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Filter File Scope Panel",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestFilterFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Filter File Scope CLI",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestFilterFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Filter File Scope  By Files Panel",
+                          "sequential_order": 4.0,
+                          "connector": "and",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestFilterFileScope",
+                          "scenarios": [
+                            {
+                              "name": "",
+                              "sequential_order": 1.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Panel displays scope section\nWhen User types file:src/**/*.py in scope filter\nThen Panel displays file scope mode\nAnd Panel displays list of Python files in src directory\nAnd File paths are displayed in monospace font"
+                            },
+                            {
+                              "name": "",
+                              "sequential_order": 2.0,
+                              "type": "",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Panel displays scope section\nWhen User types file:**/*.spec.js in scope filter\nThen Panel displays all JavaScript test files\nAnd Files are displayed with full relative paths"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN User types file pattern in filter",
+                              "text": "WHEN User types file pattern in filter",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "THEN System displays filtered file list",
+                              "text": "THEN System displays filtered file list",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "AND System displays file list with monospace paths",
+                              "text": "AND System displays file list with monospace paths",
+                              "sequential_order": 3.0
+                            }
+                          ]
+                        }
+                      ]
                     },
                     {
                       "name": "Manage File Scope Using REPL",
                       "sequential_order": 3.0,
-                      "sub_epics": [
-                        {
-                          "name": "Filter on File Scope in CLI",
-                          "sequential_order": 1.0,
-                          "sub_epics": [],
-                          "story_groups": [
-                            {
-                              "name": "",
-                              "sequential_order": 0.0,
-                              "type": "and",
-                              "connector": null,
-                              "stories": [
-                                {
-                                  "name": "Filter File Scope",
-                                  "sequential_order": 1.0,
-                                  "connector": "or",
-                                  "story_type": "user",
-                                  "users": [
-                                    "Bot Behavior"
-                                  ],
-                                  "test_file": null,
-                                  "test_class": "TestFilterFileScope",
-                                  "scenarios": [],
-                                  "scenario_outlines": [],
-                                  "acceptance_criteria": []
-                                },
-                                {
-                                  "name": "Display All Files For Behavior",
-                                  "sequential_order": 2.0,
-                                  "connector": "or",
-                                  "story_type": "user",
-                                  "users": [
-                                    "Bot Behavior"
-                                  ],
-                                  "test_file": null,
-                                  "test_class": "TestDisplayAllFilesForBehavior",
-                                  "scenarios": [],
-                                  "scenario_outlines": [],
-                                  "acceptance_criteria": []
-                                },
-                                {
-                                  "name": "Add Filter Part To File Scope",
-                                  "sequential_order": 3.0,
-                                  "connector": "or",
-                                  "story_type": "user",
-                                  "users": [
-                                    "Bot Behavior"
-                                  ],
-                                  "test_file": null,
-                                  "test_class": "TestAddFilterPartToFileScope",
-                                  "scenarios": [],
-                                  "scenario_outlines": [],
-                                  "acceptance_criteria": []
-                                },
-                                {
-                                  "name": "Remove Filter Part From File Scope",
-                                  "sequential_order": 4.0,
-                                  "connector": "or",
-                                  "story_type": "user",
-                                  "users": [
-                                    "Bot Behavior"
-                                  ],
-                                  "test_file": null,
-                                  "test_class": "TestRemoveFilterPartFromFileScope",
-                                  "scenarios": [],
-                                  "scenario_outlines": [],
-                                  "acceptance_criteria": []
-                                }
-                              ]
-                            }
-                          ],
-                          "stories": [
-                            {
-                              "name": "Filter File Scope",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestFilterFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Display All Files For Behavior",
-                              "sequential_order": 2.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayAllFilesForBehavior",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Add Filter Part To File Scope",
-                              "sequential_order": 3.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestAddFilterPartToFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Remove Filter Part From File Scope",
-                              "sequential_order": 4.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestRemoveFilterPartFromFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            }
-                          ]
-                        }
-                      ],
+                      "sub_epics": [],
                       "story_groups": [],
                       "stories": []
                     },
@@ -5962,124 +5968,10 @@
                           "sequential_order": 0.0,
                           "type": "and",
                           "connector": null,
-                          "stories": [
-                            {
-                              "name": "Filter File Scope",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestFilterFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Display All Files For Behavior",
-                              "sequential_order": 2.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayAllFilesForBehavior",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Add Filter Part To File Scope",
-                              "sequential_order": 3.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestAddFilterPartToFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Remove Filter Part From File Scope",
-                              "sequential_order": 4.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestRemoveFilterPartFromFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            }
-                          ]
+                          "stories": []
                         }
                       ],
-                      "stories": [
-                        {
-                          "name": "Filter File Scope",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestFilterFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Display All Files For Behavior",
-                          "sequential_order": 2.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayAllFilesForBehavior",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Add Filter Part To File Scope",
-                          "sequential_order": 3.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestAddFilterPartToFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope",
-                          "sequential_order": 4.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestRemoveFilterPartFromFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        }
-                      ]
+                      "stories": []
                     }
                   ],
                   "story_groups": [],
