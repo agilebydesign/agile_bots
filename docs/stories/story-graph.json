@@ -6802,662 +6802,8 @@
               "sequential_order": 1.0,
               "sub_epics": [
                 {
-                  "name": "Manage Story Scope Using REPL",
-                  "sequential_order": 4.0,
-                  "sub_epics": [
-                    {
-                      "name": "Filter on Story Scope in CLI",
-                      "sequential_order": 1.0,
-                      "sub_epics": [],
-                      "story_groups": [
-                        {
-                          "name": "",
-                          "sequential_order": 0.0,
-                          "type": "and",
-                          "connector": null,
-                          "stories": [
-                            {
-                              "name": "Filter Story Scope Using Story Filter with CLI",
-                              "sequential_order": 1.0,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestSetStoryScope",
-                              "scenarios": [
-                                {
-                                  "name": "User sets knowledge graph scope filter",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_sets_knowledge_graph_scope_filter",
-                                  "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters 'scope <filter>'\nTHEN: CLI displays active scope filters"
-                                },
-                                {
-                                  "name": "User executes build with active knowledge graph scope",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_executes_build_with_active_knowledge_graph_scope",
-                                  "steps": "GIVEN: CLI is at shape.build.instructions\nAND: active scope filter is story=\"Story1\"\nWHEN: user enters 'shape.build.instructions'\nTHEN: CLIAction passes scope filter to action.get_instructions()\nAND: CLI displays instructions filtered to Story1"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": [
-                                {
-                                  "name": "WHEN user sets epic scope filter\nTHEN CLI displays active scope filters",
-                                  "text": "WHEN user sets epic scope filter\nTHEN CLI displays active scope filters",
-                                  "sequential_order": 1.0
-                                },
-                                {
-                                  "name": "WHEN user sets story scope filter\nTHEN CLI displays active scope filters",
-                                  "text": "WHEN user sets story scope filter\nTHEN CLI displays active scope filters",
-                                  "sequential_order": 2.0
-                                },
-                                {
-                                  "name": "WHEN user executes build with active knowledge graph scope\nTHEN CLI displays instructions filtered to specified stories",
-                                  "text": "WHEN user executes build with active knowledge graph scope\nTHEN CLI displays instructions filtered to specified stories",
-                                  "sequential_order": 3.0
-                                },
-                                {
-                                  "name": "WHEN user clears scope\nTHEN CLI removes all scope filters AND displays unfiltered content",
-                                  "text": "WHEN user clears scope\nTHEN CLI removes all scope filters AND displays unfiltered content",
-                                  "sequential_order": 4.0
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Display Files Filtered By Story Scope",
-                              "sequential_order": 1.7,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayFilesFilteredByStoryScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Filter Work Using Files Scope in CLI",
-                              "sequential_order": 2.0,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestSetFileScope",
-                              "scenarios": [
-                                {
-                                  "name": "User sets files scope filter",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_sets_files_scope_filter",
-                                  "steps": "GIVEN: CLI is at code.validate.instructions\nWHEN: user enters 'scope files=\"src/**/*.py\"'\nTHEN: CLIScope parses files scope string\nAND: REPLSession stores files filter in context\nAND: CLI displays active scope filters"
-                                },
-                                {
-                                  "name": "User executes validate with active files scope",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_executes_validate_with_active_files_scope",
-                                  "steps": "GIVEN: CLI is at code.validate.instructions\nAND: active scope filter is files=\"src/**/*.py\"\nWHEN: user enters 'code.validate.instructions'\nTHEN: CLIAction passes files filter to action.get_instructions()\nAND: CLI displays validation filtered to matched files"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": [
-                                {
-                                  "name": "WHEN user sets files scope filter\nTHEN CLI displays active scope filters",
-                                  "text": "WHEN user sets files scope filter\nTHEN CLI displays active scope filters",
-                                  "sequential_order": 1.0
-                                },
-                                {
-                                  "name": "WHEN user executes validate with active files scope\nTHEN CLI displays validation filtered to matched files",
-                                  "text": "WHEN user executes validate with active files scope\nTHEN CLI displays validation filtered to matched files",
-                                  "sequential_order": 2.0
-                                },
-                                {
-                                  "name": "WHEN user provides glob pattern for files\nTHEN CLI matches files using glob pattern",
-                                  "text": "WHEN user provides glob pattern for files\nTHEN CLI matches files using glob pattern",
-                                  "sequential_order": 3.0
-                                },
-                                {
-                                  "name": "WHEN user clears files scope\nTHEN CLI removes files filter AND displays unfiltered content",
-                                  "text": "WHEN user clears files scope\nTHEN CLI removes files filter AND displays unfiltered content",
-                                  "sequential_order": 4.0
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Enforce Mutually Exclusive Scope Types",
-                              "sequential_order": 3.0,
-                              "connector": "and",
-                              "story_type": "system",
-                              "users": [
-                                "CLI"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestScopeTypesMutuallyExclusive",
-                              "scenarios": [
-                                {
-                                  "name": "Setting file scope replaces existing story scope",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_setting_file_scope_replaces_story_scope",
-                                  "steps": "GIVEN: CLI has story scope set\nWHEN: user enters file scope\nTHEN: file scope replaces story scope (not combined)"
-                                },
-                                {
-                                  "name": "Setting story scope replaces existing file scope",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_setting_story_scope_replaces_file_scope",
-                                  "steps": "GIVEN: CLI has file scope set\nWHEN: user enters story scope\nTHEN: story scope replaces file scope (not combined)"
-                                },
-                                {
-                                  "name": "Scope object can only have one type at a time",
-                                  "sequential_order": 3.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_scope_only_has_one_type",
-                                  "steps": "GIVEN: Any scope is set\nWHEN: checking the stored scope\nTHEN: only one filter type is active (knowledge_graph_filter OR file_filter, never both)"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": [
-                                {
-                                  "name": "WHEN user sets file scope while story scope is active\nTHEN CLI replaces story scope with file scope",
-                                  "text": "WHEN user sets file scope while story scope is active\nTHEN CLI replaces story scope with file scope",
-                                  "sequential_order": 1.0
-                                },
-                                {
-                                  "name": "WHEN user sets story scope while file scope is active\nTHEN CLI replaces file scope with story scope",
-                                  "text": "WHEN user sets story scope while file scope is active\nTHEN CLI replaces file scope with story scope",
-                                  "sequential_order": 2.0
-                                },
-                                {
-                                  "name": "WHEN checking stored scope\nTHEN only one filter type is active",
-                                  "text": "WHEN checking stored scope\nTHEN only one filter type is active",
-                                  "sequential_order": 3.0
-                                },
-                                {
-                                  "name": "WHEN user clears scope\nTHEN CLI removes all scope filters",
-                                  "text": "WHEN user clears scope\nTHEN CLI removes all scope filters",
-                                  "sequential_order": 4.0
-                                }
-                              ]
-                            },
-                            {
-                              "name": "View Current Scope in CLI",
-                              "sequential_order": 4.0,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": "test_manage_scope_using_repl.py",
-                              "test_class": "TestViewCurrentScopeInCLI",
-                              "scenarios": [
-                                {
-                                  "name": "View scope with no filters set",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_view_scope_with_no_filters_set",
-                                  "steps": "GIVEN: CLI is initialized with no scope filters\nWHEN: user enters 'scope' command\nTHEN: CLI displays \"No scope filters active\""
-                                },
-                                {
-                                  "name": "View story scope filter",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_view_story_scope_filter",
-                                  "steps": "GIVEN: Story scope filter is set to \"Story1\"\nWHEN: user enters 'scope' command\nTHEN: CLI displays active story scope filter"
-                                },
-                                {
-                                  "name": "View file scope filter",
-                                  "sequential_order": 3.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_view_file_scope_filter",
-                                  "steps": "GIVEN: File scope filter is set to \"*.py\"\nWHEN: user enters 'scope' command\nTHEN: CLI displays active file scope filter"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": [
-                                {
-                                  "name": "WHEN user enters 'scope' command with no filters set\nTHEN CLI displays \"No scope filters active\"",
-                                  "text": "WHEN user enters 'scope' command with no filters set\nTHEN CLI displays \"No scope filters active\"",
-                                  "sequential_order": 1.0
-                                },
-                                {
-                                  "name": "WHEN user enters 'scope' command with story scope set\nTHEN CLI displays active story scope filter",
-                                  "text": "WHEN user enters 'scope' command with story scope set\nTHEN CLI displays active story scope filter",
-                                  "sequential_order": 2.0
-                                },
-                                {
-                                  "name": "WHEN user enters 'scope' command with file scope set\nTHEN CLI displays active file scope filter",
-                                  "text": "WHEN user enters 'scope' command with file scope set\nTHEN CLI displays active file scope filter",
-                                  "sequential_order": 3.0
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Clear Scope Through CLI",
-                              "sequential_order": 5.0,
-                              "connector": "and",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestClearScope",
-                              "scenarios": [
-                                {
-                                  "name": "User clears all scope filters",
-                                  "sequential_order": 1.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_clears_all_scope_filters",
-                                  "steps": "GIVEN: CLI is at shape.build.instructions\nAND: active scope filters are story=\"Story1\" AND files=\"docs/**/*.md\"\nWHEN: user enters 'scope clear'\nTHEN: REPLSession clears all scope filters from context\nAND: CLI displays 'All scope filters cleared'\nAND: StatusDisplay shows no active scope"
-                                },
-                                {
-                                  "name": "User executes build after clearing scope",
-                                  "sequential_order": 2.0,
-                                  "type": "",
-                                  "background": [],
-                                  "test_method": "test_user_executes_build_after_clearing_scope",
-                                  "steps": "GIVEN: CLI is at shape.build.instructions\nAND: user has cleared all scope filters\nWHEN: user enters 'shape.build.instructions'\nTHEN: CLIAction passes no scope filters to action\nAND: CLI displays unfiltered instructions"
-                                }
-                              ],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            }
-                          ]
-                        }
-                      ],
-                      "stories": [
-                        {
-                          "name": "Filter Story Scope Using Story Filter with CLI",
-                          "sequential_order": 1.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestSetStoryScope",
-                          "scenarios": [
-                            {
-                              "name": "User sets knowledge graph scope filter",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_sets_knowledge_graph_scope_filter",
-                              "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters 'scope <filter>'\nTHEN: CLI displays active scope filters"
-                            },
-                            {
-                              "name": "User executes build with active knowledge graph scope",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_executes_build_with_active_knowledge_graph_scope",
-                              "steps": "GIVEN: CLI is at shape.build.instructions\nAND: active scope filter is story=\"Story1\"\nWHEN: user enters 'shape.build.instructions'\nTHEN: CLIAction passes scope filter to action.get_instructions()\nAND: CLI displays instructions filtered to Story1"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": [
-                            {
-                              "name": "WHEN user sets epic scope filter\nTHEN CLI displays active scope filters",
-                              "text": "WHEN user sets epic scope filter\nTHEN CLI displays active scope filters",
-                              "sequential_order": 1.0
-                            },
-                            {
-                              "name": "WHEN user sets story scope filter\nTHEN CLI displays active scope filters",
-                              "text": "WHEN user sets story scope filter\nTHEN CLI displays active scope filters",
-                              "sequential_order": 2.0
-                            },
-                            {
-                              "name": "WHEN user executes build with active knowledge graph scope\nTHEN CLI displays instructions filtered to specified stories",
-                              "text": "WHEN user executes build with active knowledge graph scope\nTHEN CLI displays instructions filtered to specified stories",
-                              "sequential_order": 3.0
-                            },
-                            {
-                              "name": "WHEN user clears scope\nTHEN CLI removes all scope filters AND displays unfiltered content",
-                              "text": "WHEN user clears scope\nTHEN CLI removes all scope filters AND displays unfiltered content",
-                              "sequential_order": 4.0
-                            }
-                          ]
-                        },
-                        {
-                          "name": "Display Files Filtered By Story Scope",
-                          "sequential_order": 1.7,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayFilesFilteredByStoryScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Filter Work Using Files Scope in CLI",
-                          "sequential_order": 2.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestSetFileScope",
-                          "scenarios": [
-                            {
-                              "name": "User sets files scope filter",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_sets_files_scope_filter",
-                              "steps": "GIVEN: CLI is at code.validate.instructions\nWHEN: user enters 'scope files=\"src/**/*.py\"'\nTHEN: CLIScope parses files scope string\nAND: REPLSession stores files filter in context\nAND: CLI displays active scope filters"
-                            },
-                            {
-                              "name": "User executes validate with active files scope",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_executes_validate_with_active_files_scope",
-                              "steps": "GIVEN: CLI is at code.validate.instructions\nAND: active scope filter is files=\"src/**/*.py\"\nWHEN: user enters 'code.validate.instructions'\nTHEN: CLIAction passes files filter to action.get_instructions()\nAND: CLI displays validation filtered to matched files"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": [
-                            {
-                              "name": "WHEN user sets files scope filter\nTHEN CLI displays active scope filters",
-                              "text": "WHEN user sets files scope filter\nTHEN CLI displays active scope filters",
-                              "sequential_order": 1.0
-                            },
-                            {
-                              "name": "WHEN user executes validate with active files scope\nTHEN CLI displays validation filtered to matched files",
-                              "text": "WHEN user executes validate with active files scope\nTHEN CLI displays validation filtered to matched files",
-                              "sequential_order": 2.0
-                            },
-                            {
-                              "name": "WHEN user provides glob pattern for files\nTHEN CLI matches files using glob pattern",
-                              "text": "WHEN user provides glob pattern for files\nTHEN CLI matches files using glob pattern",
-                              "sequential_order": 3.0
-                            },
-                            {
-                              "name": "WHEN user clears files scope\nTHEN CLI removes files filter AND displays unfiltered content",
-                              "text": "WHEN user clears files scope\nTHEN CLI removes files filter AND displays unfiltered content",
-                              "sequential_order": 4.0
-                            }
-                          ]
-                        },
-                        {
-                          "name": "Enforce Mutually Exclusive Scope Types",
-                          "sequential_order": 3.0,
-                          "connector": "and",
-                          "story_type": "system",
-                          "users": [
-                            "CLI"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestScopeTypesMutuallyExclusive",
-                          "scenarios": [
-                            {
-                              "name": "Setting file scope replaces existing story scope",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_setting_file_scope_replaces_story_scope",
-                              "steps": "GIVEN: CLI has story scope set\nWHEN: user enters file scope\nTHEN: file scope replaces story scope (not combined)"
-                            },
-                            {
-                              "name": "Setting story scope replaces existing file scope",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_setting_story_scope_replaces_file_scope",
-                              "steps": "GIVEN: CLI has file scope set\nWHEN: user enters story scope\nTHEN: story scope replaces file scope (not combined)"
-                            },
-                            {
-                              "name": "Scope object can only have one type at a time",
-                              "sequential_order": 3.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_scope_only_has_one_type",
-                              "steps": "GIVEN: Any scope is set\nWHEN: checking the stored scope\nTHEN: only one filter type is active (knowledge_graph_filter OR file_filter, never both)"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": [
-                            {
-                              "name": "WHEN user sets file scope while story scope is active\nTHEN CLI replaces story scope with file scope",
-                              "text": "WHEN user sets file scope while story scope is active\nTHEN CLI replaces story scope with file scope",
-                              "sequential_order": 1.0
-                            },
-                            {
-                              "name": "WHEN user sets story scope while file scope is active\nTHEN CLI replaces file scope with story scope",
-                              "text": "WHEN user sets story scope while file scope is active\nTHEN CLI replaces file scope with story scope",
-                              "sequential_order": 2.0
-                            },
-                            {
-                              "name": "WHEN checking stored scope\nTHEN only one filter type is active",
-                              "text": "WHEN checking stored scope\nTHEN only one filter type is active",
-                              "sequential_order": 3.0
-                            },
-                            {
-                              "name": "WHEN user clears scope\nTHEN CLI removes all scope filters",
-                              "text": "WHEN user clears scope\nTHEN CLI removes all scope filters",
-                              "sequential_order": 4.0
-                            }
-                          ]
-                        },
-                        {
-                          "name": "View Current Scope in CLI",
-                          "sequential_order": 4.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": "test_manage_scope_using_repl.py",
-                          "test_class": "TestViewCurrentScopeInCLI",
-                          "scenarios": [
-                            {
-                              "name": "View scope with no filters set",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_view_scope_with_no_filters_set",
-                              "steps": "GIVEN: CLI is initialized with no scope filters\nWHEN: user enters 'scope' command\nTHEN: CLI displays \"No scope filters active\""
-                            },
-                            {
-                              "name": "View story scope filter",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_view_story_scope_filter",
-                              "steps": "GIVEN: Story scope filter is set to \"Story1\"\nWHEN: user enters 'scope' command\nTHEN: CLI displays active story scope filter"
-                            },
-                            {
-                              "name": "View file scope filter",
-                              "sequential_order": 3.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_view_file_scope_filter",
-                              "steps": "GIVEN: File scope filter is set to \"*.py\"\nWHEN: user enters 'scope' command\nTHEN: CLI displays active file scope filter"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": [
-                            {
-                              "name": "WHEN user enters 'scope' command with no filters set\nTHEN CLI displays \"No scope filters active\"",
-                              "text": "WHEN user enters 'scope' command with no filters set\nTHEN CLI displays \"No scope filters active\"",
-                              "sequential_order": 1.0
-                            },
-                            {
-                              "name": "WHEN user enters 'scope' command with story scope set\nTHEN CLI displays active story scope filter",
-                              "text": "WHEN user enters 'scope' command with story scope set\nTHEN CLI displays active story scope filter",
-                              "sequential_order": 2.0
-                            },
-                            {
-                              "name": "WHEN user enters 'scope' command with file scope set\nTHEN CLI displays active file scope filter",
-                              "text": "WHEN user enters 'scope' command with file scope set\nTHEN CLI displays active file scope filter",
-                              "sequential_order": 3.0
-                            }
-                          ]
-                        },
-                        {
-                          "name": "Clear Scope Through CLI",
-                          "sequential_order": 5.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestClearScope",
-                          "scenarios": [
-                            {
-                              "name": "User clears all scope filters",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_clears_all_scope_filters",
-                              "steps": "GIVEN: CLI is at shape.build.instructions\nAND: active scope filters are story=\"Story1\" AND files=\"docs/**/*.md\"\nWHEN: user enters 'scope clear'\nTHEN: REPLSession clears all scope filters from context\nAND: CLI displays 'All scope filters cleared'\nAND: StatusDisplay shows no active scope"
-                            },
-                            {
-                              "name": "User executes build after clearing scope",
-                              "sequential_order": 2.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_user_executes_build_after_clearing_scope",
-                              "steps": "GIVEN: CLI is at shape.build.instructions\nAND: user has cleared all scope filters\nWHEN: user enters 'shape.build.instructions'\nTHEN: CLIAction passes no scope filters to action\nAND: CLI displays unfiltered instructions"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Filter on Increment Scope in CLI",
-                      "sequential_order": 2.0,
-                      "sub_epics": [],
-                      "story_groups": [
-                        {
-                          "name": "",
-                          "sequential_order": 0.0,
-                          "type": "and",
-                          "connector": "null",
-                          "stories": [
-                            {
-                              "name": "Display Increment Scope View",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayIncrementScopeView",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Add Increment Filter Part To Story Scope",
-                              "sequential_order": 2.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestAddIncrementFilterPartToStoryScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Remove Increment Filter Part From Story Scope",
-                              "sequential_order": 3.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            }
-                          ]
-                        }
-                      ],
-                      "stories": [
-                        {
-                          "name": "Display Increment Scope View",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayIncrementScopeView",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Add Increment Filter Part To Story Scope",
-                          "sequential_order": 2.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestAddIncrementFilterPartToStoryScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Remove Increment Filter Part From Story Scope",
-                          "sequential_order": 3.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        }
-                      ]
-                    }
-                  ],
-                  "story_groups": [],
-                  "stories": []
-                },
-                {
                   "name": "Manage File Scope Using REPL",
-                  "sequential_order": 2.0,
+                  "sequential_order": 1.0,
                   "sub_epics": [
                     {
                       "name": "Filter on File Scope in CLI",
@@ -7594,7 +6940,7 @@
                 },
                 {
                   "name": "Edit Story Graph In CLI",
-                  "sequential_order": 3.0,
+                  "sequential_order": 2.0,
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -8543,7 +7889,7 @@
                 },
                 {
                   "name": "Edit Increments In CLI",
-                  "sequential_order": 4.0,
+                  "sequential_order": 3.0,
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -12757,6 +12103,114 @@
                           "acceptance_criteria": []
                         }
                       ]
+                    },
+                    {
+                      "name": "Filter on Increment Scope in CLI",
+                      "sequential_order": 3.0,
+                      "sub_epics": [],
+                      "story_groups": [
+                        {
+                          "name": "",
+                          "sequential_order": 0.0,
+                          "type": "and",
+                          "connector": "null",
+                          "stories": [
+                            {
+                              "name": "Display Increment Scope View",
+                              "sequential_order": 1.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "User"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestDisplayIncrementScopeView",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Add Increment Filter Part To Story Scope",
+                              "sequential_order": 2.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "User"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestAddIncrementFilterPartToStoryScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Remove Increment Filter Part From Story Scope",
+                              "sequential_order": 3.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "User"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            }
+                          ]
+                        }
+                      ],
+                      "stories": [
+                        {
+                          "name": "Display Increment Scope View",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayIncrementScopeView",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Add Increment Filter Part To Story Scope",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestAddIncrementFilterPartToStoryScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Remove Increment Filter Part From Story Scope",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Manage Story Scope Using CLI",
+                      "sequential_order": 4.0,
+                      "sub_epics": [],
+                      "story_groups": [],
+                      "stories": []
                     }
                   ],
                   "story_groups": [],
