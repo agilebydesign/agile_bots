@@ -660,7 +660,8 @@ class Bot:
             import pyautogui
             import time
             import platform
-            
+
+            pyperclip.copy(content_str)
             clipboard_status = 'success'
             time.sleep(0.2)
             
