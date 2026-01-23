@@ -6803,144 +6803,14 @@
               "sub_epics": [
                 {
                   "name": "Manage File Scope Using REPL",
-                  "sequential_order": 1.0,
-                  "sub_epics": [
-                    {
-                      "name": "Filter on File Scope in CLI",
-                      "sequential_order": 1.0,
-                      "sub_epics": [],
-                      "story_groups": [
-                        {
-                          "name": "",
-                          "sequential_order": 0.0,
-                          "type": "and",
-                          "connector": null,
-                          "stories": [
-                            {
-                              "name": "Filter File Scope",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestFilterFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Display All Files For Behavior",
-                              "sequential_order": 2.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayAllFilesForBehavior",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Add Filter Part To File Scope",
-                              "sequential_order": 3.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestAddFilterPartToFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Remove Filter Part From File Scope",
-                              "sequential_order": 4.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "Bot Behavior"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestRemoveFilterPartFromFileScope",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            }
-                          ]
-                        }
-                      ],
-                      "stories": [
-                        {
-                          "name": "Filter File Scope",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestFilterFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Display All Files For Behavior",
-                          "sequential_order": 2.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayAllFilesForBehavior",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Add Filter Part To File Scope",
-                          "sequential_order": 3.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestAddFilterPartToFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope",
-                          "sequential_order": 4.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestRemoveFilterPartFromFileScope",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        }
-                      ]
-                    }
-                  ],
+                  "sequential_order": 0.0,
+                  "sub_epics": [],
                   "story_groups": [],
                   "stories": []
                 },
                 {
                   "name": "Edit Story Graph In CLI",
-                  "sequential_order": 2.0,
+                  "sequential_order": 1.0,
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -7889,7 +7759,7 @@
                 },
                 {
                   "name": "Edit Increments In CLI",
-                  "sequential_order": 3.0,
+                  "sequential_order": 2.0,
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -12211,6 +12081,135 @@
                       "sub_epics": [],
                       "story_groups": [],
                       "stories": []
+                    },
+                    {
+                      "name": "Filter on File Scope in CLI",
+                      "sequential_order": 5.0,
+                      "sub_epics": [],
+                      "story_groups": [
+                        {
+                          "name": "",
+                          "sequential_order": 0.0,
+                          "type": "and",
+                          "connector": null,
+                          "stories": [
+                            {
+                              "name": "Filter File Scope",
+                              "sequential_order": 1.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestFilterFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Display All Files For Behavior",
+                              "sequential_order": 2.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestDisplayAllFilesForBehavior",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Add Filter Part To File Scope",
+                              "sequential_order": 3.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestAddFilterPartToFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            },
+                            {
+                              "name": "Remove Filter Part From File Scope",
+                              "sequential_order": 4.0,
+                              "connector": "or",
+                              "story_type": "user",
+                              "users": [
+                                "Bot Behavior"
+                              ],
+                              "test_file": null,
+                              "test_class": "TestRemoveFilterPartFromFileScope",
+                              "scenarios": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": []
+                            }
+                          ]
+                        }
+                      ],
+                      "stories": [
+                        {
+                          "name": "Filter File Scope",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestFilterFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Display All Files For Behavior",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayAllFilesForBehavior",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Add Filter Part To File Scope",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestAddFilterPartToFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Remove Filter Part From File Scope",
+                          "sequential_order": 4.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestRemoveFilterPartFromFileScope",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        }
+                      ]
                     }
                   ],
                   "story_groups": [],
