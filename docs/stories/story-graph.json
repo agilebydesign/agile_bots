@@ -3060,22 +3060,8 @@
           "sequential_order": 1.0,
           "sub_epics": [
             {
-              "name": "Manage Story Graph Using REPL",
-              "sequential_order": 0.0,
-              "sub_epics": [],
-              "story_groups": [],
-              "stories": []
-            },
-            {
-              "name": "Manage Story Graph Through Panel",
-              "sequential_order": 1.0,
-              "sub_epics": [],
-              "story_groups": [],
-              "stories": []
-            },
-            {
               "name": "Filter Scope",
-              "sequential_order": 2.0,
+              "sequential_order": 0.0,
               "sub_epics": [
                 {
                   "name": "Scope Stories",
@@ -4264,20 +4250,6 @@
                           "connector": "null",
                           "stories": [
                             {
-                              "name": "Display Increment Scope View",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayIncrementScopeView",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
                               "name": "Add Increment Filter Part To Story Scope",
                               "sequential_order": 2.0,
                               "connector": "or",
@@ -4309,20 +4281,6 @@
                         }
                       ],
                       "stories": [
-                        {
-                          "name": "Display Increment Scope View",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayIncrementScopeView",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
                         {
                           "name": "Add Increment Filter Part To Story Scope",
                           "sequential_order": 2.0,
@@ -4372,21 +4330,7 @@
                           "connector": null,
                           "stories": [
                             {
-                              "name": "Display Increment Scope View",
-                              "sequential_order": 1.0,
-                              "connector": "or",
-                              "story_type": "user",
-                              "users": [
-                                "User"
-                              ],
-                              "test_file": null,
-                              "test_class": "TestDisplayIncrementScopeView",
-                              "scenarios": [],
-                              "scenario_outlines": [],
-                              "acceptance_criteria": []
-                            },
-                            {
-                              "name": "Add Increment Filter Part To Story Scope",
+                              "name": "Add Increment Filter Part To Story Scope CLI",
                               "sequential_order": 2.0,
                               "connector": "or",
                               "story_type": "user",
@@ -4418,21 +4362,7 @@
                       ],
                       "stories": [
                         {
-                          "name": "Display Increment Scope View",
-                          "sequential_order": 1.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": null,
-                          "test_class": "TestDisplayIncrementScopeView",
-                          "scenarios": [],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Add Increment Filter Part To Story Scope",
+                          "name": "Add Increment Filter Part To Story Scope CLI",
                           "sequential_order": 2.0,
                           "connector": "or",
                           "story_type": "user",
@@ -6192,7 +6122,7 @@
             },
             {
               "name": "Edit Story Map",
-              "sequential_order": 3.0,
+              "sequential_order": 1.0,
               "sub_epics": [
                 {
                   "name": "Edit Story Graph In CLI",
@@ -8493,7 +8423,7 @@
             },
             {
               "name": "Edit Increments",
-              "sequential_order": 4.0,
+              "sequential_order": 2.0,
               "sub_epics": [
                 {
                   "name": "Edit Increments In CLI",
@@ -8508,7 +8438,7 @@
                       "stories": [
                         {
                           "name": "Add Increment",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -8522,7 +8452,7 @@
                         },
                         {
                           "name": "Delete Increment",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -8536,7 +8466,7 @@
                         },
                         {
                           "name": "Move Story to Increment",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -8550,7 +8480,7 @@
                         },
                         {
                           "name": "Show All Increment Scope Through CLI",
-                          "sequential_order": 4.0,
+                          "sequential_order": 3.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -8564,7 +8494,7 @@
                         },
                         {
                           "name": "Submit Action Scoped To Increment",
-                          "sequential_order": 5.0,
+                          "sequential_order": 4.0,
                           "connector": "or",
                           "story_type": "user",
                           "users": [
@@ -8575,6 +8505,20 @@
                           "scenarios": [],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Display Increment Scope View",
+                          "sequential_order": 5.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayIncrementScopeView",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -8582,7 +8526,7 @@
                   "stories": [
                     {
                       "name": "Add Increment",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": "or",
                       "story_type": "user",
                       "users": [
@@ -8596,7 +8540,7 @@
                     },
                     {
                       "name": "Delete Increment",
-                      "sequential_order": 2.0,
+                      "sequential_order": 1.0,
                       "connector": "or",
                       "story_type": "user",
                       "users": [
@@ -8610,7 +8554,7 @@
                     },
                     {
                       "name": "Move Story to Increment",
-                      "sequential_order": 3.0,
+                      "sequential_order": 2.0,
                       "connector": "or",
                       "story_type": "user",
                       "users": [
@@ -8624,7 +8568,7 @@
                     },
                     {
                       "name": "Show All Increment Scope Through CLI",
-                      "sequential_order": 4.0,
+                      "sequential_order": 3.0,
                       "connector": "or",
                       "story_type": "user",
                       "users": [
@@ -8638,7 +8582,7 @@
                     },
                     {
                       "name": "Submit Action Scoped To Increment",
-                      "sequential_order": 5.0,
+                      "sequential_order": 4.0,
                       "connector": "or",
                       "story_type": "user",
                       "users": [
@@ -8646,6 +8590,20 @@
                       ],
                       "test_file": null,
                       "test_class": "TestSubmitActionScopedToIncrement",
+                      "scenarios": [],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Display Increment Scope View",
+                      "sequential_order": 5.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
@@ -8879,6 +8837,20 @@
                           "scenarios": [],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Display Increment Scope View",
+                          "sequential_order": 5.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayIncrementScopeView",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -8940,6 +8912,20 @@
                       "users": [],
                       "test_file": null,
                       "test_class": null,
+                      "scenarios": [],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Display Increment Scope View",
+                      "sequential_order": 5.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
