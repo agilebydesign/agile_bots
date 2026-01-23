@@ -8819,342 +8819,6 @@
                   "connector": null,
                   "stories": [
                     {
-                      "name": "Load Bot",
-                      "sequential_order": 0.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestLoadBot",
-                      "scenarios": [
-                        {
-                          "name": "Bot can be instantiated with bot_name and workspace (BotConfig merged into Bot).",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_instantiation_with_bot_name_and_workspace",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Bot.name property returns bot name from config (BotConfig merged into Bot).",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_name_property",
-                          "steps": ""
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Load Bot Behaviors",
-                      "sequential_order": 1.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestLoadBotBehaviors",
-                      "scenarios": [
-                        {
-                          "name": "Bot behaviors are loaded from BotConfig.",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_load_behaviors_from_bot_config",
-                          "steps": ""
-                        },
-                        {
-                          "name": "When behaviors are loaded, first behavior is set as current.",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_load_behaviors_sets_first_as_current",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Loaded behavior provides access to all config properties",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_behavior_provides_access_to_all_config_properties",
-                          "steps": "Given Behavior loaded from production config\nWhen Config properties accessed\nThen All properties accessible with correct structure"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Resolve Bot Path",
-                      "sequential_order": 2.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestResolveBotPath",
-                      "scenarios": [
-                        {
-                          "name": "BotPath resolves directories from environment variables",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
-                          "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
-                        },
-                        {
-                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_base_actions_directory_property",
-                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
-                        },
-                        {
-                          "name": "BotPath.python_workspace_root property returns Python workspace root.",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_python_workspace_root_property",
-                          "steps": ""
-                        },
-                        {
-                          "name": "BotPath.find_repo_root() method returns repository root.",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_find_repo_root_method",
-                          "steps": ""
-                        },
-                        {
-                          "name": "BotPath raises error when environment variables not set",
-                          "sequential_order": 5.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
-                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Load Actions",
-                      "sequential_order": 3.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestLoadActions",
-                      "scenarios": [
-                        {
-                          "name": "Actions are loaded and available.",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_load_actions_from_behavior_config",
-                          "steps": ""
-                        },
-                        {
-                          "name": "When actions are loaded, first action is set as current.",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_load_actions_sets_first_as_current",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Action merges instructions from BaseActionConfig and Behavior config.",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_merges_instructions_from_base_and_behavior",
-                          "steps": ""
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Manage Bot Registry",
-                      "sequential_order": 4.0,
-                      "connector": "or",
-                      "story_type": "system",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestManageBotRegistry",
-                      "scenarios": [
-                        {
-                          "name": "Get List of Registered Bots",
-                          "sequential_order": 0.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_get_list_of_registered_bots",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Get Active Bot",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_get_active_bot",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Set Active Bot to Registered Bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_set_active_bot_to_registered_bot",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Attempt to Set Unregistered Bot",
-                          "sequential_order": 3.0,
-                          "type": "error_path",
-                          "background": [],
-                          "test_method": "test_attempt_to_set_unregistered_bot",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Set Active Bot to Current Bot",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_set_active_bot_to_current_bot",
-                          "steps": ""
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Switch Registered Bots in CLI",
-                      "sequential_order": 5.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "CLI"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestSwitchRegisteredBots",
-                      "scenarios": [
-                        {
-                          "name": "Display Registered Bots in CLI STATUS",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_display_registered_bots_in_cli_status",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Switch to Valid Registered Bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_switch_to_valid_registered_bot",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Attempt to Switch to Unregistered Bot",
-                          "sequential_order": 3.0,
-                          "type": "error_path",
-                          "background": [],
-                          "test_method": "test_attempt_to_switch_to_unregistered_bot",
-                          "steps": ""
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                          "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                          "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                          "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                          "sequential_order": 5.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Switch Bot panel",
-                      "sequential_order": 6.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestSwitchBot",
-                      "scenarios": [
-                        {
-                          "name": "Panel shows story_bot and multiple bots available",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
-                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
-                        },
-                        {
-                          "name": "User switches to crc_bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_switches_to_crc_bot",
-                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User switches bot",
-                          "text": "WHEN User switches bot",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "THEN System displays updated bot name",
-                          "text": "THEN System displays updated bot name",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "AND System displays behavior action section for new bot",
-                          "text": "AND System displays behavior action section for new bot",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "AND System displays behavior action stateof workspace for new bot",
-                          "text": "AND System displays behavior action stateof workspace for new bot",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    },
-                    {
                       "name": "Launch CLI in Interactive Mode",
                       "sequential_order": 7.0,
                       "connector": null,
@@ -9663,342 +9327,6 @@
                 }
               ],
               "stories": [
-                {
-                  "name": "Load Bot",
-                  "sequential_order": 0.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestLoadBot",
-                  "scenarios": [
-                    {
-                      "name": "Bot can be instantiated with bot_name and workspace (BotConfig merged into Bot).",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_instantiation_with_bot_name_and_workspace",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Bot.name property returns bot name from config (BotConfig merged into Bot).",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_name_property",
-                      "steps": ""
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Load Bot Behaviors",
-                  "sequential_order": 1.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestLoadBotBehaviors",
-                  "scenarios": [
-                    {
-                      "name": "Bot behaviors are loaded from BotConfig.",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_load_behaviors_from_bot_config",
-                      "steps": ""
-                    },
-                    {
-                      "name": "When behaviors are loaded, first behavior is set as current.",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_load_behaviors_sets_first_as_current",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Loaded behavior provides access to all config properties",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_behavior_provides_access_to_all_config_properties",
-                      "steps": "Given Behavior loaded from production config\nWhen Config properties accessed\nThen All properties accessible with correct structure"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Resolve Bot Path",
-                  "sequential_order": 2.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestResolveBotPath",
-                  "scenarios": [
-                    {
-                      "name": "BotPath resolves directories from environment variables",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
-                      "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
-                    },
-                    {
-                      "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_paths_base_actions_directory_property",
-                      "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
-                    },
-                    {
-                      "name": "BotPath.python_workspace_root property returns Python workspace root.",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_paths_python_workspace_root_property",
-                      "steps": ""
-                    },
-                    {
-                      "name": "BotPath.find_repo_root() method returns repository root.",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_paths_find_repo_root_method",
-                      "steps": ""
-                    },
-                    {
-                      "name": "BotPath raises error when environment variables not set",
-                      "sequential_order": 5.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
-                      "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Load Actions",
-                  "sequential_order": 3.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestLoadActions",
-                  "scenarios": [
-                    {
-                      "name": "Actions are loaded and available.",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_load_actions_from_behavior_config",
-                      "steps": ""
-                    },
-                    {
-                      "name": "When actions are loaded, first action is set as current.",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_load_actions_sets_first_as_current",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Action merges instructions from BaseActionConfig and Behavior config.",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_merges_instructions_from_base_and_behavior",
-                      "steps": ""
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Manage Bot Registry",
-                  "sequential_order": 4.0,
-                  "connector": "or",
-                  "story_type": "system",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestManageBotRegistry",
-                  "scenarios": [
-                    {
-                      "name": "Get List of Registered Bots",
-                      "sequential_order": 0.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_get_list_of_registered_bots",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Get Active Bot",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_get_active_bot",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Set Active Bot to Registered Bot",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_set_active_bot_to_registered_bot",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Attempt to Set Unregistered Bot",
-                      "sequential_order": 3.0,
-                      "type": "error_path",
-                      "background": [],
-                      "test_method": "test_attempt_to_set_unregistered_bot",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Set Active Bot to Current Bot",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_set_active_bot_to_current_bot",
-                      "steps": ""
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Switch Registered Bots in CLI",
-                  "sequential_order": 5.0,
-                  "connector": "and",
-                  "story_type": "system",
-                  "users": [
-                    "CLI"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestSwitchRegisteredBots",
-                  "scenarios": [
-                    {
-                      "name": "Display Registered Bots in CLI STATUS",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_display_registered_bots_in_cli_status",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Switch to Valid Registered Bot",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_switch_to_valid_registered_bot",
-                      "steps": ""
-                    },
-                    {
-                      "name": "Attempt to Switch to Unregistered Bot",
-                      "sequential_order": 3.0,
-                      "type": "error_path",
-                      "background": [],
-                      "test_method": "test_attempt_to_switch_to_unregistered_bot",
-                      "steps": ""
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                      "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                      "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                      "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                      "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                      "sequential_order": 4.0
-                    },
-                    {
-                      "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                      "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                      "sequential_order": 5.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Switch Bot panel",
-                  "sequential_order": 6.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "User"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestSwitchBot",
-                  "scenarios": [
-                    {
-                      "name": "Panel shows story_bot and multiple bots available",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
-                      "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
-                    },
-                    {
-                      "name": "User switches to crc_bot",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_user_switches_to_crc_bot",
-                      "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN User switches bot",
-                      "text": "WHEN User switches bot",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN System displays updated bot name",
-                      "text": "THEN System displays updated bot name",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "AND System displays behavior action section for new bot",
-                      "text": "AND System displays behavior action section for new bot",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "AND System displays behavior action stateof workspace for new bot",
-                      "text": "AND System displays behavior action stateof workspace for new bot",
-                      "sequential_order": 4.0
-                    }
-                  ]
-                },
                 {
                   "name": "Launch CLI in Interactive Mode",
                   "sequential_order": 7.0,
@@ -11687,6 +11015,641 @@
                   ]
                 }
               ]
+            },
+            {
+              "name": "Init Bot",
+              "sequential_order": 3.0,
+              "sub_epics": [
+                {
+                  "name": "Load Bot, Behavior, and Actions",
+                  "sequential_order": 0.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "name": "",
+                      "sequential_order": 0.0,
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Load Bot Behaviors",
+                          "sequential_order": 0.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestLoadBotBehaviors",
+                          "scenarios": [
+                            {
+                              "name": "Bot behaviors are loaded from BotConfig.",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_load_behaviors_from_bot_config",
+                              "steps": ""
+                            },
+                            {
+                              "name": "When behaviors are loaded, first behavior is set as current.",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_load_behaviors_sets_first_as_current",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Loaded behavior provides access to all config properties",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_behavior_provides_access_to_all_config_properties",
+                              "steps": "Given Behavior loaded from production config\nWhen Config properties accessed\nThen All properties accessible with correct structure"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Resolve Bot Path",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestResolveBotPath",
+                          "scenarios": [
+                            {
+                              "name": "BotPath resolves directories from environment variables",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
+                              "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
+                            },
+                            {
+                              "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_bot_paths_base_actions_directory_property",
+                              "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
+                            },
+                            {
+                              "name": "BotPath.python_workspace_root property returns Python workspace root.",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_bot_paths_python_workspace_root_property",
+                              "steps": ""
+                            },
+                            {
+                              "name": "BotPath.find_repo_root() method returns repository root.",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_bot_paths_find_repo_root_method",
+                              "steps": ""
+                            },
+                            {
+                              "name": "BotPath raises error when environment variables not set",
+                              "sequential_order": 5.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
+                              "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Load Actions",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestLoadActions",
+                          "scenarios": [
+                            {
+                              "name": "Actions are loaded and available.",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_load_actions_from_behavior_config",
+                              "steps": ""
+                            },
+                            {
+                              "name": "When actions are loaded, first action is set as current.",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_load_actions_sets_first_as_current",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Action merges instructions from BaseActionConfig and Behavior config.",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_merges_instructions_from_base_and_behavior",
+                              "steps": ""
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Manage Bot Registry",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "system",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestManageBotRegistry",
+                          "scenarios": [
+                            {
+                              "name": "Get List of Registered Bots",
+                              "sequential_order": 0.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_get_list_of_registered_bots",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Get Active Bot",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_get_active_bot",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Set Active Bot to Registered Bot",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_set_active_bot_to_registered_bot",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Attempt to Set Unregistered Bot",
+                              "sequential_order": 3.0,
+                              "type": "error_path",
+                              "background": [],
+                              "test_method": "test_attempt_to_set_unregistered_bot",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Set Active Bot to Current Bot",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_set_active_bot_to_current_bot",
+                              "steps": ""
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Switch Registered Bots in CLI",
+                          "sequential_order": 4.0,
+                          "connector": "and",
+                          "story_type": "system",
+                          "users": [
+                            "CLI"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestSwitchRegisteredBots",
+                          "scenarios": [
+                            {
+                              "name": "Display Registered Bots in CLI STATUS",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_display_registered_bots_in_cli_status",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Switch to Valid Registered Bot",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_switch_to_valid_registered_bot",
+                              "steps": ""
+                            },
+                            {
+                              "name": "Attempt to Switch to Unregistered Bot",
+                              "sequential_order": 3.0,
+                              "type": "error_path",
+                              "background": [],
+                              "test_method": "test_attempt_to_switch_to_unregistered_bot",
+                              "steps": ""
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                              "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                              "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                              "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                              "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                              "sequential_order": 4.0
+                            },
+                            {
+                              "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                              "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                              "sequential_order": 5.0
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Switch Bot panel",
+                          "sequential_order": 5.0,
+                          "connector": "and",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestSwitchBot",
+                          "scenarios": [
+                            {
+                              "name": "Panel shows story_bot and multiple bots available",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
+                              "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
+                            },
+                            {
+                              "name": "User switches to crc_bot",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_user_switches_to_crc_bot",
+                              "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN User switches bot",
+                              "text": "WHEN User switches bot",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "THEN System displays updated bot name",
+                              "text": "THEN System displays updated bot name",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "AND System displays behavior action section for new bot",
+                              "text": "AND System displays behavior action section for new bot",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "AND System displays behavior action stateof workspace for new bot",
+                              "text": "AND System displays behavior action stateof workspace for new bot",
+                              "sequential_order": 4.0
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "stories": [
+                    {
+                      "name": "Load Bot Behaviors",
+                      "sequential_order": 0.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestLoadBotBehaviors",
+                      "scenarios": [
+                        {
+                          "name": "Bot behaviors are loaded from BotConfig.",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_load_behaviors_from_bot_config",
+                          "steps": ""
+                        },
+                        {
+                          "name": "When behaviors are loaded, first behavior is set as current.",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_load_behaviors_sets_first_as_current",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Loaded behavior provides access to all config properties",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_behavior_provides_access_to_all_config_properties",
+                          "steps": "Given Behavior loaded from production config\nWhen Config properties accessed\nThen All properties accessible with correct structure"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Resolve Bot Path",
+                      "sequential_order": 1.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestResolveBotPath",
+                      "scenarios": [
+                        {
+                          "name": "BotPath resolves directories from environment variables",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
+                          "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
+                        },
+                        {
+                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_base_actions_directory_property",
+                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
+                        },
+                        {
+                          "name": "BotPath.python_workspace_root property returns Python workspace root.",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_python_workspace_root_property",
+                          "steps": ""
+                        },
+                        {
+                          "name": "BotPath.find_repo_root() method returns repository root.",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_find_repo_root_method",
+                          "steps": ""
+                        },
+                        {
+                          "name": "BotPath raises error when environment variables not set",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
+                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Load Actions",
+                      "sequential_order": 2.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestLoadActions",
+                      "scenarios": [
+                        {
+                          "name": "Actions are loaded and available.",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_load_actions_from_behavior_config",
+                          "steps": ""
+                        },
+                        {
+                          "name": "When actions are loaded, first action is set as current.",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_load_actions_sets_first_as_current",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Action merges instructions from BaseActionConfig and Behavior config.",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_merges_instructions_from_base_and_behavior",
+                          "steps": ""
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Manage Bot Registry",
+                      "sequential_order": 3.0,
+                      "connector": "or",
+                      "story_type": "system",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestManageBotRegistry",
+                      "scenarios": [
+                        {
+                          "name": "Get List of Registered Bots",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_get_list_of_registered_bots",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Get Active Bot",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_get_active_bot",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Set Active Bot to Registered Bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_set_active_bot_to_registered_bot",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Attempt to Set Unregistered Bot",
+                          "sequential_order": 3.0,
+                          "type": "error_path",
+                          "background": [],
+                          "test_method": "test_attempt_to_set_unregistered_bot",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Set Active Bot to Current Bot",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_set_active_bot_to_current_bot",
+                          "steps": ""
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Switch Registered Bots in CLI",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "CLI"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSwitchRegisteredBots",
+                      "scenarios": [
+                        {
+                          "name": "Display Registered Bots in CLI STATUS",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_display_registered_bots_in_cli_status",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Switch to Valid Registered Bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_switch_to_valid_registered_bot",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Attempt to Switch to Unregistered Bot",
+                          "sequential_order": 3.0,
+                          "type": "error_path",
+                          "background": [],
+                          "test_method": "test_attempt_to_switch_to_unregistered_bot",
+                          "steps": ""
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                          "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                          "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                          "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                          "sequential_order": 5.0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Switch Bot panel",
+                      "sequential_order": 5.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSwitchBot",
+                      "scenarios": [
+                        {
+                          "name": "Panel shows story_bot and multiple bots available",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
+                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
+                        },
+                        {
+                          "name": "User switches to crc_bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_user_switches_to_crc_bot",
+                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User switches bot",
+                          "text": "WHEN User switches bot",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN System displays updated bot name",
+                          "text": "THEN System displays updated bot name",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND System displays behavior action section for new bot",
+                          "text": "AND System displays behavior action section for new bot",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "AND System displays behavior action stateof workspace for new bot",
+                          "text": "AND System displays behavior action stateof workspace for new bot",
+                          "sequential_order": 4.0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "story_groups": [],
+              "stories": []
             }
           ],
           "story_groups": [],
@@ -16188,13 +16151,6 @@
               ]
             }
           ],
-          "story_groups": [],
-          "stories": []
-        },
-        {
-          "name": "Init Bot",
-          "sequential_order": -1.0,
-          "sub_epics": [],
           "story_groups": [],
           "stories": []
         }
