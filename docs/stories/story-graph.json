@@ -1034,6 +1034,52 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Advance Action And Persist State",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": null,
+                      "scenarios": [
+                        {
+                          "name": "Close current advances and persists state",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_close_current_advances_and_persists_state",
+                          "steps": "GIVEN: bot.behaviors.current is at clarify action\nWHEN: actions.close_current() is called\nTHEN: actions.current_action_name == 'strategy'\nAND: 'story_bot.shape.clarify' in completed_actions\nAND: state.current_action == 'story_bot.shape.strategy'"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Show Remaining Actions After Completion",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": null,
+                      "scenarios": [
+                        {
+                          "name": "Remaining actions respects completion",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_remaining_actions_respects_completion",
+                          "steps": "GIVEN: bot.behaviors.current is at clarify action\nWHEN: actions.close_current() is called\nTHEN: 'clarify' not in actions.remaining_actions\nAND: actions.remaining_actions == ['validate', 'render']"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
                     }
                   ]
                 }
@@ -1155,142 +1201,10 @@
                   ],
                   "scenario_outlines": [],
                   "acceptance_criteria": []
-                }
-              ]
-            },
-            {
-              "name": "Navigate Behaviors Using CLI Commands",
-              "sequential_order": 1.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Exit CLI REPL",
-                      "sequential_order": 0.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": "test_navigate_behaviors_using_repl_commands.py",
-                      "test_class": "TestExitREPL",
-                      "scenarios": [
-                        {
-                          "name": "User exits REPL with exit command",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_user_exits_repl_with_exit_command",
-                          "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    }
-                  ]
-                },
-                {
-                  "name": "",
-                  "sequential_order": 1.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": []
-                },
-                {
-                  "name": "",
-                  "sequential_order": 2.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Advance Action And Persist State",
-                      "sequential_order": 0.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "System"
-                      ],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [
-                        {
-                          "name": "Close current advances and persists state",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_close_current_advances_and_persists_state",
-                          "steps": "GIVEN: bot.behaviors.current is at clarify action\nWHEN: actions.close_current() is called\nTHEN: actions.current_action_name == 'strategy'\nAND: 'story_bot.shape.clarify' in completed_actions\nAND: state.current_action == 'story_bot.shape.strategy'"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    }
-                  ]
-                },
-                {
-                  "name": "",
-                  "sequential_order": 3.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Show Remaining Actions After Completion",
-                      "sequential_order": 0.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "System"
-                      ],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [
-                        {
-                          "name": "Remaining actions respects completion",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_remaining_actions_respects_completion",
-                          "steps": "GIVEN: bot.behaviors.current is at clarify action\nWHEN: actions.close_current() is called\nTHEN: 'clarify' not in actions.remaining_actions\nAND: actions.remaining_actions == ['validate', 'render']"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    }
-                  ]
-                }
-              ],
-              "stories": [
-                {
-                  "name": "Exit CLI REPL",
-                  "sequential_order": 0.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "User"
-                  ],
-                  "test_file": "test_navigate_behaviors_using_repl_commands.py",
-                  "test_class": "TestExitREPL",
-                  "scenarios": [
-                    {
-                      "name": "User exits REPL with exit command",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_user_exits_repl_with_exit_command",
-                      "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
                 },
                 {
                   "name": "Advance Action And Persist State",
-                  "sequential_order": 0.0,
+                  "sequential_order": 3.0,
                   "connector": "and",
                   "story_type": "system",
                   "users": [
@@ -1313,7 +1227,7 @@
                 },
                 {
                   "name": "Show Remaining Actions After Completion",
-                  "sequential_order": 0.0,
+                  "sequential_order": 4.0,
                   "connector": "and",
                   "story_type": "system",
                   "users": [
@@ -1338,7 +1252,7 @@
             },
             {
               "name": "Navigate And Execute Behaviors Through Panel",
-              "sequential_order": 2.0,
+              "sequential_order": 1.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -1867,7 +1781,7 @@
             },
             {
               "name": "Display State Using REPL",
-              "sequential_order": 3.0,
+              "sequential_order": 2.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -2310,7 +2224,7 @@
             },
             {
               "name": "Track Activity",
-              "sequential_order": 4.0,
+              "sequential_order": 3.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -2553,7 +2467,7 @@
             },
             {
               "name": "Navigate Behavior And Actions",
-              "sequential_order": 5.0,
+              "sequential_order": 4.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -3662,7 +3576,7 @@
             },
             {
               "name": "Execute Behavior Action",
-              "sequential_order": 6.0,
+              "sequential_order": 5.0,
               "sub_epics": [],
               "story_groups": [
                 {
@@ -14887,6 +14801,29 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Exit CLI REPL",
+                      "sequential_order": 5.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                      "test_class": "TestExitREPL",
+                      "scenarios": [
+                        {
+                          "name": "User exits REPL with exit command",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_user_exits_repl_with_exit_command",
+                          "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
                     }
                   ]
                 }
@@ -15149,6 +15086,29 @@
                       "background": [],
                       "test_method": "test_cli_displays_bot_section_in_json",
                       "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays bot section with JSON structure\nAND: JSON includes bot name and directory fields"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": []
+                },
+                {
+                  "name": "Exit CLI REPL",
+                  "sequential_order": 5.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "User"
+                  ],
+                  "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                  "test_class": "TestExitREPL",
+                  "scenarios": [
+                    {
+                      "name": "User exits REPL with exit command",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_user_exits_repl_with_exit_command",
+                      "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
                     }
                   ],
                   "scenario_outlines": [],
