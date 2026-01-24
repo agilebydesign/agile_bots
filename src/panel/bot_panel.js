@@ -1586,7 +1586,7 @@ class BotPanel {
                         target.style.backgroundColor = '';
                         indicator.style.display = 'block';
                         indicator.style.left = rect.left + 'px';
-                        indicator.style.top = (rect.top + rect.height) + 'px'; // Line at BOTTOM of node
+                        indicator.style.top = (rect.top + rect.height) + 'px';
                         indicator.style.width = rect.width + 'px';
                         // Log indicator positioning
                         if (dragoverLogCounter % 20 === 0) {
@@ -1667,17 +1667,19 @@ class BotPanel {
                     
                     if (dropZone === 'inside') {
                         // ON: Nest inside the target container
-                        command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
+                        command = draggedNode.path + '.move_to target:"' + targetName + '"';
                         vscode.postMessage({
                             command: 'logToFile',
                             message: '[WebView] ON - NEST inside container: ' + targetName
                         });
                     } else if (dropZone === 'after') {
-                        // AFTER: Insert after the target sibling
-                        command = \`\${draggedNode.path}.move_after sibling:"\${targetName}"\`;
+                        var targetPos = parseInt(target.getAttribute('data-position') || '0') + 1;
+                        var parentMatch = targetPath.match(/(.*)\."[^"]+"/);
+                        var parentName = parentMatch ? parentMatch[1].match(/\."([^"]+)"$/)[1] : 'story_graph';
+                        command = draggedNode.path + '.move_to target:"' + parentName + '" at_position:' + targetPos;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] AFTER - INSERT AFTER: ' + targetName
+                            message: '[WebView] AFTER - at_position: ' + targetPos + ' in ' + parentName
                         });
                     }
                     

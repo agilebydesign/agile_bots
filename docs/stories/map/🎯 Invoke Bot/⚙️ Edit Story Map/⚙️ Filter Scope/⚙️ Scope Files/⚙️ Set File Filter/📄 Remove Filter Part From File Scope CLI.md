@@ -1,0 +1,29 @@
+# 📄 Remove Filter Part From File Scope CLI
+
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
+
+**User:** System
+**Path:** [🎯 Invoke Bot](../..) / [⚙️ Edit Story Map](..) / [⚙️ Filter Scope](../..) / [⚙️ Scope Files](..) / [⚙️ Set File Filter](.)  
+**Sequential Order:** 4.0
+**Story Type:** user
+
+## Story Description
+
+Remove Filter Part From File Scope CLI functionality for the mob minion system.
+
+## Acceptance Criteria
+
+### Behavioral Acceptance Criteria
+
+- **When** action executes, **then** action completes successfully
+
+## Scenarios
+
+### Scenario: Remove Filter Part From File Scope CLI (happy_path)
+
+**Steps:**
+```gherkin
+Given system is ready
+When action executes
+Then action completes successfully
+```
