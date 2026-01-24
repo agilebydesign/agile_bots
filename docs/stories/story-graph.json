@@ -904,7 +904,7 @@
       "domain_concepts": [],
       "sub_epics": [
         {
-          "name": "Init Bot",
+          "name": "Initiialize Bot",
           "sequential_order": 0.0,
           "sub_epics": [
             {
@@ -1658,8 +1658,56 @@
                       "acceptance_criteria": []
                     },
                     {
-                      "name": "Open Panel",
+                      "name": "Launch CLI in JSON Mode",
                       "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "Web View",
+                        "API Client"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestStartCLISessionInJSONMode",
+                      "scenarios": [
+                        {
+                          "name": "CLI launches in JSON mode",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_launches_in_json_mode",
+                          "steps": "GIVEN: CLISession is configured for JSON mode (mode='json' set explicitly)\nWHEN: commands are executed\nTHEN: CLISession creates session\nAND: CLI can execute commands in JSON mode\nAND: CLI uses JSON adapters for output"
+                        },
+                        {
+                          "name": "CLI displays status in JSON format",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_status_in_json_format",
+                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays complete status output in JSON format\nAND: Output is valid JSON with required fields (name, bot_directory, workspace_directory, behavior_names, current_behavior)"
+                        },
+                        {
+                          "name": "CLI displays header section in JSON",
+                          "sequential_order": 3.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_header_section_in_json",
+                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays header section with JSON structure\nAND: Output is valid JSON dictionary"
+                        },
+                        {
+                          "name": "CLI displays bot section in JSON",
+                          "sequential_order": 4.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_bot_section_in_json",
+                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays bot section with JSON structure\nAND: JSON includes bot name and directory fields"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Open Panel",
+                      "sequential_order": 4.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -1736,54 +1784,6 @@
                           "sequential_order": 8.0
                         }
                       ]
-                    },
-                    {
-                      "name": "Launch CLI in JSON Mode",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "Web View",
-                        "API Client"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestStartCLISessionInJSONMode",
-                      "scenarios": [
-                        {
-                          "name": "CLI launches in JSON mode",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_launches_in_json_mode",
-                          "steps": "GIVEN: CLISession is configured for JSON mode (mode='json' set explicitly)\nWHEN: commands are executed\nTHEN: CLISession creates session\nAND: CLI can execute commands in JSON mode\nAND: CLI uses JSON adapters for output"
-                        },
-                        {
-                          "name": "CLI displays status in JSON format",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_status_in_json_format",
-                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays complete status output in JSON format\nAND: Output is valid JSON with required fields (name, bot_directory, workspace_directory, behavior_names, current_behavior)"
-                        },
-                        {
-                          "name": "CLI displays header section in JSON",
-                          "sequential_order": 3.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_header_section_in_json",
-                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays header section with JSON structure\nAND: Output is valid JSON dictionary"
-                        },
-                        {
-                          "name": "CLI displays bot section in JSON",
-                          "sequential_order": 4.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_bot_section_in_json",
-                          "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays bot section with JSON structure\nAND: JSON includes bot name and directory fields"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
                     },
                     {
                       "name": "Exit CLI REPL",
@@ -1947,8 +1947,56 @@
                   "acceptance_criteria": []
                 },
                 {
-                  "name": "Open Panel",
+                  "name": "Launch CLI in JSON Mode",
                   "sequential_order": 3.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "Web View",
+                    "API Client"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestStartCLISessionInJSONMode",
+                  "scenarios": [
+                    {
+                      "name": "CLI launches in JSON mode",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_launches_in_json_mode",
+                      "steps": "GIVEN: CLISession is configured for JSON mode (mode='json' set explicitly)\nWHEN: commands are executed\nTHEN: CLISession creates session\nAND: CLI can execute commands in JSON mode\nAND: CLI uses JSON adapters for output"
+                    },
+                    {
+                      "name": "CLI displays status in JSON format",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_status_in_json_format",
+                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays complete status output in JSON format\nAND: Output is valid JSON with required fields (name, bot_directory, workspace_directory, behavior_names, current_behavior)"
+                    },
+                    {
+                      "name": "CLI displays header section in JSON",
+                      "sequential_order": 3.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_header_section_in_json",
+                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays header section with JSON structure\nAND: Output is valid JSON dictionary"
+                    },
+                    {
+                      "name": "CLI displays bot section in JSON",
+                      "sequential_order": 4.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_bot_section_in_json",
+                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays bot section with JSON structure\nAND: JSON includes bot name and directory fields"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": []
+                },
+                {
+                  "name": "Open Panel",
+                  "sequential_order": 4.0,
                   "connector": null,
                   "story_type": "user",
                   "users": [
@@ -2027,54 +2075,6 @@
                   ]
                 },
                 {
-                  "name": "Launch CLI in JSON Mode",
-                  "sequential_order": 4.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "Web View",
-                    "API Client"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestStartCLISessionInJSONMode",
-                  "scenarios": [
-                    {
-                      "name": "CLI launches in JSON mode",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_launches_in_json_mode",
-                      "steps": "GIVEN: CLISession is configured for JSON mode (mode='json' set explicitly)\nWHEN: commands are executed\nTHEN: CLISession creates session\nAND: CLI can execute commands in JSON mode\nAND: CLI uses JSON adapters for output"
-                    },
-                    {
-                      "name": "CLI displays status in JSON format",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_status_in_json_format",
-                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays complete status output in JSON format\nAND: Output is valid JSON with required fields (name, bot_directory, workspace_directory, behavior_names, current_behavior)"
-                    },
-                    {
-                      "name": "CLI displays header section in JSON",
-                      "sequential_order": 3.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_header_section_in_json",
-                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays header section with JSON structure\nAND: Output is valid JSON dictionary"
-                    },
-                    {
-                      "name": "CLI displays bot section in JSON",
-                      "sequential_order": 4.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_bot_section_in_json",
-                      "steps": "GIVEN: CLISession is initialized in JSON mode\nWHEN: user executes 'status' command\nTHEN: CLI displays bot section with JSON structure\nAND: JSON includes bot name and directory fields"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
                   "name": "Exit CLI REPL",
                   "sequential_order": 5.0,
                   "connector": "and",
@@ -2111,249 +2111,8 @@
                   "connector": null,
                   "stories": [
                     {
-                      "name": "Display Session Status panel",
-                      "sequential_order": 0.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDisplaySessionStatus",
-                      "scenarios": [
-                        {
-                          "name": "",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel is open displaying current bot status\nAnd Bot state has changed since panel was opened\nWhen User clicks refresh button\nThen Panel displays updated bot name\nAnd Panel displays updated workspace path\nAnd Panel displays updated behavior action section\nAnd Panel displays updated scope\nAnd Panel displays updated instructions"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Bot is at behavior shape and action clarify\nWhen Panel opens\nThen Panel displays current bot name\nAnd Panel displays current workspace path\nAnd Panel displays shape.clarify as current action"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User clicks refresh button",
-                          "text": "WHEN User clicks refresh button",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "THEN System displays bot name",
-                          "text": "THEN System displays bot name",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "AND System displays updated workspace path",
-                          "text": "AND System displays updated workspace path",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "AND System displays updated bot path",
-                          "text": "AND System displays updated bot path",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "AND System displays updated available botss",
-                          "text": "AND System displays updated available botss",
-                          "sequential_order": 5.0
-                        },
-                        {
-                          "name": "AND System displays updated behavior action section",
-                          "text": "AND System displays updated behavior action section",
-                          "sequential_order": 6.0
-                        },
-                        {
-                          "name": "AND System displays updated scope section",
-                          "text": "AND System displays updated scope section",
-                          "sequential_order": 7.0
-                        },
-                        {
-                          "name": "AND System displays updated instructions section",
-                          "text": "AND System displays updated instructions section",
-                          "sequential_order": 8.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Toggle Panel Section",
-                      "sequential_order": 1.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestTogglePanelSection",
-                      "scenarios": [
-                        {
-                          "name": "",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel is open with behaviors section collapsed\nWhen User clicks behaviors section header\nThen Behaviors section expands\nAnd User sees behavior tree content"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel is open with instructions section expanded\nWhen User clicks instructions section header\nThen Instructions section collapses\nAnd User no longer sees instructions content"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User clicks section header",
-                          "text": "WHEN User clicks section header",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "THEN System expands or collapses section",
-                          "text": "THEN System expands or collapses section",
-                          "sequential_order": 2.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Display Piped Mode Instructions for AI Agents",
-                      "sequential_order": 2.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "CLI"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDisplayPipedModeInstructionsForAIAgents",
-                      "scenarios": [
-                        {
-                          "name": "CLI displays piped mode instructions in pipe mode",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_piped_mode_instructions_in_pipe_mode",
-                          "steps": "GIVEN: REPLSession detects piped input\nWHEN: CLI initializes\nTHEN: CLI displays piped mode instructions header"
-                        },
-                        {
-                          "name": "CLI omits piped mode instructions in interactive mode",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_omits_piped_mode_instructions_in_interactive_mode",
-                          "steps": "GIVEN: REPLSession detects interactive TTY\nWHEN: CLI initializes\nTHEN: CLI does not display piped mode instructions"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Display CLI Bot Command in Navigation Menu Footer",
-                      "sequential_order": 3.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "CLI"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDisplayCLIBotCommandInNavigationMenuFooter",
-                      "scenarios": [
-                        {
-                          "name": "CLI displays bot command in footer",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_bot_command_in_footer",
-                          "steps": "Given: CLI displays footer\nWhen: CLI renders footer\nThen: CLI shows available navigation commands"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
-                          "text": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
-                          "text": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
-                          "text": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
-                          "text": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Display Headless Mode Status in CLI",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "CLI"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestViewHeadlessModeStatus",
-                      "scenarios": [
-                        {
-                          "name": "CLI displays headless mode section when configured",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_headless_mode_section_when_configured",
-                          "steps": "Given: CLI is initialized\nAnd: headless mode is configured with API key\nWhen: user enters 'status'\nThen: CLI displays headless mode section\nAND: CLI shows 'Headless Mode:' label\nAND: CLI shows 'Status: Available (configured)'\nAND: CLI shows 'API Key: key_2780b8...' (masked)\nAND: CLI shows 'Usage:' section with headless command format\nAND: CLI shows 'Examples:' section with example commands\nAND: CLI shows subsection separator after headless mode section"
-                        },
-                        {
-                          "name": "CLI displays active headless session when running",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_cli_displays_active_headless_session_when_running",
-                          "steps": "Given: CLI is initialized\nAnd: headless mode is configured\nAnd: active headless session is running\nWhen: user enters 'status'\nThen: CLI displays 'Active Session:' section\nAND: CLI shows 'Session ID: 2025-12-30-01-31-17'\nAND: CLI shows 'Status: running'\nAND: CLI shows 'Log:' with log file path"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
-                          "text": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
-                          "text": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
-                          "text": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
-                          "text": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    },
-                    {
                       "name": "Display CLI Header",
-                      "sequential_order": 5.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "system",
                       "users": [
@@ -2458,255 +2217,255 @@
                           "sequential_order": 4.0
                         }
                       ]
+                    },
+                    {
+                      "name": "Display CLI Bot Command in Navigation Menu Footer",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "CLI"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplayCLIBotCommandInNavigationMenuFooter",
+                      "scenarios": [
+                        {
+                          "name": "CLI displays bot command in footer",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_bot_command_in_footer",
+                          "steps": "Given: CLI displays footer\nWhen: CLI renders footer\nThen: CLI shows available navigation commands"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
+                          "text": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
+                          "text": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
+                          "text": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
+                          "text": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
+                          "sequential_order": 4.0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Display Piped Mode Instructions for AI Agents",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "CLI"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplayPipedModeInstructionsForAIAgents",
+                      "scenarios": [
+                        {
+                          "name": "CLI displays piped mode instructions in pipe mode",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_piped_mode_instructions_in_pipe_mode",
+                          "steps": "GIVEN: REPLSession detects piped input\nWHEN: CLI initializes\nTHEN: CLI displays piped mode instructions header"
+                        },
+                        {
+                          "name": "CLI omits piped mode instructions in interactive mode",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_omits_piped_mode_instructions_in_interactive_mode",
+                          "steps": "GIVEN: REPLSession detects interactive TTY\nWHEN: CLI initializes\nTHEN: CLI does not display piped mode instructions"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Display Headless Mode Status in CLI",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "CLI"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestViewHeadlessModeStatus",
+                      "scenarios": [
+                        {
+                          "name": "CLI displays headless mode section when configured",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_headless_mode_section_when_configured",
+                          "steps": "Given: CLI is initialized\nAnd: headless mode is configured with API key\nWhen: user enters 'status'\nThen: CLI displays headless mode section\nAND: CLI shows 'Headless Mode:' label\nAND: CLI shows 'Status: Available (configured)'\nAND: CLI shows 'API Key: key_2780b8...' (masked)\nAND: CLI shows 'Usage:' section with headless command format\nAND: CLI shows 'Examples:' section with example commands\nAND: CLI shows subsection separator after headless mode section"
+                        },
+                        {
+                          "name": "CLI displays active headless session when running",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_cli_displays_active_headless_session_when_running",
+                          "steps": "Given: CLI is initialized\nAnd: headless mode is configured\nAnd: active headless session is running\nWhen: user enters 'status'\nThen: CLI displays 'Active Session:' section\nAND: CLI shows 'Session ID: 2025-12-30-01-31-17'\nAND: CLI shows 'Status: running'\nAND: CLI shows 'Log:' with log file path"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
+                          "text": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
+                          "text": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
+                          "text": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
+                          "text": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
+                          "sequential_order": 4.0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Display Session Status panel",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplaySessionStatus",
+                      "scenarios": [
+                        {
+                          "name": "",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel is open displaying current bot status\nAnd Bot state has changed since panel was opened\nWhen User clicks refresh button\nThen Panel displays updated bot name\nAnd Panel displays updated workspace path\nAnd Panel displays updated behavior action section\nAnd Panel displays updated scope\nAnd Panel displays updated instructions"
+                        },
+                        {
+                          "name": "",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Bot is at behavior shape and action clarify\nWhen Panel opens\nThen Panel displays current bot name\nAnd Panel displays current workspace path\nAnd Panel displays shape.clarify as current action"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User clicks refresh button",
+                          "text": "WHEN User clicks refresh button",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN System displays bot name",
+                          "text": "THEN System displays bot name",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND System displays updated workspace path",
+                          "text": "AND System displays updated workspace path",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "AND System displays updated bot path",
+                          "text": "AND System displays updated bot path",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "AND System displays updated available botss",
+                          "text": "AND System displays updated available botss",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "AND System displays updated behavior action section",
+                          "text": "AND System displays updated behavior action section",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "AND System displays updated scope section",
+                          "text": "AND System displays updated scope section",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "AND System displays updated instructions section",
+                          "text": "AND System displays updated instructions section",
+                          "sequential_order": 8.0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Toggle Panel Section",
+                      "sequential_order": 5.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestTogglePanelSection",
+                      "scenarios": [
+                        {
+                          "name": "",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel is open with behaviors section collapsed\nWhen User clicks behaviors section header\nThen Behaviors section expands\nAnd User sees behavior tree content"
+                        },
+                        {
+                          "name": "",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel is open with instructions section expanded\nWhen User clicks instructions section header\nThen Instructions section collapses\nAnd User no longer sees instructions content"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User clicks section header",
+                          "text": "WHEN User clicks section header",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN System expands or collapses section",
+                          "text": "THEN System expands or collapses section",
+                          "sequential_order": 2.0
+                        }
+                      ]
                     }
                   ]
                 }
               ],
               "stories": [
                 {
-                  "name": "Display Session Status panel",
-                  "sequential_order": 0.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "User"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestDisplaySessionStatus",
-                  "scenarios": [
-                    {
-                      "name": "",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": null,
-                      "steps": "Given Panel is open displaying current bot status\nAnd Bot state has changed since panel was opened\nWhen User clicks refresh button\nThen Panel displays updated bot name\nAnd Panel displays updated workspace path\nAnd Panel displays updated behavior action section\nAnd Panel displays updated scope\nAnd Panel displays updated instructions"
-                    },
-                    {
-                      "name": "",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": null,
-                      "steps": "Given Bot is at behavior shape and action clarify\nWhen Panel opens\nThen Panel displays current bot name\nAnd Panel displays current workspace path\nAnd Panel displays shape.clarify as current action"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN User clicks refresh button",
-                      "text": "WHEN User clicks refresh button",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN System displays bot name",
-                      "text": "THEN System displays bot name",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "AND System displays updated workspace path",
-                      "text": "AND System displays updated workspace path",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "AND System displays updated bot path",
-                      "text": "AND System displays updated bot path",
-                      "sequential_order": 4.0
-                    },
-                    {
-                      "name": "AND System displays updated available botss",
-                      "text": "AND System displays updated available botss",
-                      "sequential_order": 5.0
-                    },
-                    {
-                      "name": "AND System displays updated behavior action section",
-                      "text": "AND System displays updated behavior action section",
-                      "sequential_order": 6.0
-                    },
-                    {
-                      "name": "AND System displays updated scope section",
-                      "text": "AND System displays updated scope section",
-                      "sequential_order": 7.0
-                    },
-                    {
-                      "name": "AND System displays updated instructions section",
-                      "text": "AND System displays updated instructions section",
-                      "sequential_order": 8.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Toggle Panel Section",
-                  "sequential_order": 1.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "User"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestTogglePanelSection",
-                  "scenarios": [
-                    {
-                      "name": "",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": null,
-                      "steps": "Given Panel is open with behaviors section collapsed\nWhen User clicks behaviors section header\nThen Behaviors section expands\nAnd User sees behavior tree content"
-                    },
-                    {
-                      "name": "",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": null,
-                      "steps": "Given Panel is open with instructions section expanded\nWhen User clicks instructions section header\nThen Instructions section collapses\nAnd User no longer sees instructions content"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN User clicks section header",
-                      "text": "WHEN User clicks section header",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN System expands or collapses section",
-                      "text": "THEN System expands or collapses section",
-                      "sequential_order": 2.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Display Piped Mode Instructions for AI Agents",
-                  "sequential_order": 2.0,
-                  "connector": "and",
-                  "story_type": "system",
-                  "users": [
-                    "CLI"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestDisplayPipedModeInstructionsForAIAgents",
-                  "scenarios": [
-                    {
-                      "name": "CLI displays piped mode instructions in pipe mode",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_piped_mode_instructions_in_pipe_mode",
-                      "steps": "GIVEN: REPLSession detects piped input\nWHEN: CLI initializes\nTHEN: CLI displays piped mode instructions header"
-                    },
-                    {
-                      "name": "CLI omits piped mode instructions in interactive mode",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_omits_piped_mode_instructions_in_interactive_mode",
-                      "steps": "GIVEN: REPLSession detects interactive TTY\nWHEN: CLI initializes\nTHEN: CLI does not display piped mode instructions"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Display CLI Bot Command in Navigation Menu Footer",
-                  "sequential_order": 3.0,
-                  "connector": "and",
-                  "story_type": "system",
-                  "users": [
-                    "CLI"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestDisplayCLIBotCommandInNavigationMenuFooter",
-                  "scenarios": [
-                    {
-                      "name": "CLI displays bot command in footer",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_bot_command_in_footer",
-                      "steps": "Given: CLI displays footer\nWhen: CLI renders footer\nThen: CLI shows available navigation commands"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
-                      "text": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
-                      "text": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
-                      "text": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
-                      "text": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
-                      "sequential_order": 4.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Display Headless Mode Status in CLI",
-                  "sequential_order": 4.0,
-                  "connector": "and",
-                  "story_type": "system",
-                  "users": [
-                    "CLI"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestViewHeadlessModeStatus",
-                  "scenarios": [
-                    {
-                      "name": "CLI displays headless mode section when configured",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_headless_mode_section_when_configured",
-                      "steps": "Given: CLI is initialized\nAnd: headless mode is configured with API key\nWhen: user enters 'status'\nThen: CLI displays headless mode section\nAND: CLI shows 'Headless Mode:' label\nAND: CLI shows 'Status: Available (configured)'\nAND: CLI shows 'API Key: key_2780b8...' (masked)\nAND: CLI shows 'Usage:' section with headless command format\nAND: CLI shows 'Examples:' section with example commands\nAND: CLI shows subsection separator after headless mode section"
-                    },
-                    {
-                      "name": "CLI displays active headless session when running",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_cli_displays_active_headless_session_when_running",
-                      "steps": "Given: CLI is initialized\nAnd: headless mode is configured\nAnd: active headless session is running\nWhen: user enters 'status'\nThen: CLI displays 'Active Session:' section\nAND: CLI shows 'Session ID: 2025-12-30-01-31-17'\nAND: CLI shows 'Status: running'\nAND: CLI shows 'Log:' with log file path"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
-                      "text": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
-                      "text": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
-                      "text": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
-                      "text": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
-                      "sequential_order": 4.0
-                    }
-                  ]
-                },
-                {
                   "name": "Display CLI Header",
-                  "sequential_order": 5.0,
+                  "sequential_order": 0.0,
                   "connector": null,
                   "story_type": "system",
                   "users": [
@@ -2809,6 +2568,247 @@
                       "name": "WHEN header is displayed\nTHEN CLI includes separator line after header",
                       "text": "WHEN header is displayed\nTHEN CLI includes separator line after header",
                       "sequential_order": 4.0
+                    }
+                  ]
+                },
+                {
+                  "name": "Display CLI Bot Command in Navigation Menu Footer",
+                  "sequential_order": 1.0,
+                  "connector": "and",
+                  "story_type": "system",
+                  "users": [
+                    "CLI"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestDisplayCLIBotCommandInNavigationMenuFooter",
+                  "scenarios": [
+                    {
+                      "name": "CLI displays bot command in footer",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_bot_command_in_footer",
+                      "steps": "Given: CLI displays footer\nWhen: CLI renders footer\nThen: CLI shows available navigation commands"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
+                      "text": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
+                      "text": "WHEN displaying footer\nTHEN CLI shows command syntax for navigation and actions",
+                      "sequential_order": 2.0
+                    },
+                    {
+                      "name": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
+                      "text": "WHEN displaying footer\nTHEN CLI includes examples of dot notation commands",
+                      "sequential_order": 3.0
+                    },
+                    {
+                      "name": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
+                      "text": "WHEN displaying commands\nTHEN CLI shows behavior.action.operation format examples",
+                      "sequential_order": 4.0
+                    }
+                  ]
+                },
+                {
+                  "name": "Display Piped Mode Instructions for AI Agents",
+                  "sequential_order": 2.0,
+                  "connector": "and",
+                  "story_type": "system",
+                  "users": [
+                    "CLI"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestDisplayPipedModeInstructionsForAIAgents",
+                  "scenarios": [
+                    {
+                      "name": "CLI displays piped mode instructions in pipe mode",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_piped_mode_instructions_in_pipe_mode",
+                      "steps": "GIVEN: REPLSession detects piped input\nWHEN: CLI initializes\nTHEN: CLI displays piped mode instructions header"
+                    },
+                    {
+                      "name": "CLI omits piped mode instructions in interactive mode",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_omits_piped_mode_instructions_in_interactive_mode",
+                      "steps": "GIVEN: REPLSession detects interactive TTY\nWHEN: CLI initializes\nTHEN: CLI does not display piped mode instructions"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": []
+                },
+                {
+                  "name": "Display Headless Mode Status in CLI",
+                  "sequential_order": 3.0,
+                  "connector": "and",
+                  "story_type": "system",
+                  "users": [
+                    "CLI"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestViewHeadlessModeStatus",
+                  "scenarios": [
+                    {
+                      "name": "CLI displays headless mode section when configured",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_headless_mode_section_when_configured",
+                      "steps": "Given: CLI is initialized\nAnd: headless mode is configured with API key\nWhen: user enters 'status'\nThen: CLI displays headless mode section\nAND: CLI shows 'Headless Mode:' label\nAND: CLI shows 'Status: Available (configured)'\nAND: CLI shows 'API Key: key_2780b8...' (masked)\nAND: CLI shows 'Usage:' section with headless command format\nAND: CLI shows 'Examples:' section with example commands\nAND: CLI shows subsection separator after headless mode section"
+                    },
+                    {
+                      "name": "CLI displays active headless session when running",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_cli_displays_active_headless_session_when_running",
+                      "steps": "Given: CLI is initialized\nAnd: headless mode is configured\nAnd: active headless session is running\nWhen: user enters 'status'\nThen: CLI displays 'Active Session:' section\nAND: CLI shows 'Session ID: 2025-12-30-01-31-17'\nAND: CLI shows 'Status: running'\nAND: CLI shows 'Log:' with log file path"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
+                      "text": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
+                      "text": "WHEN headless mode is configured\nTHEN CLI shows headless mode status as Available\nAND: CLI shows configured API key prefix\nAND: CLI shows usage examples\nAND: CLI shows command examples",
+                      "sequential_order": 2.0
+                    },
+                    {
+                      "name": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
+                      "text": "WHEN headless mode is not configured\nTHEN CLI shows headless mode status as unavailable",
+                      "sequential_order": 3.0
+                    },
+                    {
+                      "name": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
+                      "text": "WHEN active headless session exists\nTHEN CLI shows active session section\nAND: CLI shows session ID\nAND: CLI shows session status\nAND: CLI shows log file path",
+                      "sequential_order": 4.0
+                    }
+                  ]
+                },
+                {
+                  "name": "Display Session Status panel",
+                  "sequential_order": 4.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "User"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestDisplaySessionStatus",
+                  "scenarios": [
+                    {
+                      "name": "",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": null,
+                      "steps": "Given Panel is open displaying current bot status\nAnd Bot state has changed since panel was opened\nWhen User clicks refresh button\nThen Panel displays updated bot name\nAnd Panel displays updated workspace path\nAnd Panel displays updated behavior action section\nAnd Panel displays updated scope\nAnd Panel displays updated instructions"
+                    },
+                    {
+                      "name": "",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": null,
+                      "steps": "Given Bot is at behavior shape and action clarify\nWhen Panel opens\nThen Panel displays current bot name\nAnd Panel displays current workspace path\nAnd Panel displays shape.clarify as current action"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN User clicks refresh button",
+                      "text": "WHEN User clicks refresh button",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "THEN System displays bot name",
+                      "text": "THEN System displays bot name",
+                      "sequential_order": 2.0
+                    },
+                    {
+                      "name": "AND System displays updated workspace path",
+                      "text": "AND System displays updated workspace path",
+                      "sequential_order": 3.0
+                    },
+                    {
+                      "name": "AND System displays updated bot path",
+                      "text": "AND System displays updated bot path",
+                      "sequential_order": 4.0
+                    },
+                    {
+                      "name": "AND System displays updated available botss",
+                      "text": "AND System displays updated available botss",
+                      "sequential_order": 5.0
+                    },
+                    {
+                      "name": "AND System displays updated behavior action section",
+                      "text": "AND System displays updated behavior action section",
+                      "sequential_order": 6.0
+                    },
+                    {
+                      "name": "AND System displays updated scope section",
+                      "text": "AND System displays updated scope section",
+                      "sequential_order": 7.0
+                    },
+                    {
+                      "name": "AND System displays updated instructions section",
+                      "text": "AND System displays updated instructions section",
+                      "sequential_order": 8.0
+                    }
+                  ]
+                },
+                {
+                  "name": "Toggle Panel Section",
+                  "sequential_order": 5.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "User"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestTogglePanelSection",
+                  "scenarios": [
+                    {
+                      "name": "",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": null,
+                      "steps": "Given Panel is open with behaviors section collapsed\nWhen User clicks behaviors section header\nThen Behaviors section expands\nAnd User sees behavior tree content"
+                    },
+                    {
+                      "name": "",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": null,
+                      "steps": "Given Panel is open with instructions section expanded\nWhen User clicks instructions section header\nThen Instructions section collapses\nAnd User no longer sees instructions content"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN User clicks section header",
+                      "text": "WHEN User clicks section header",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "THEN System expands or collapses section",
+                      "text": "THEN System expands or collapses section",
+                      "sequential_order": 2.0
                     }
                   ]
                 }
@@ -8365,7 +8365,7 @@
               ]
             },
             {
-              "name": "Subnit Scoped Action",
+              "name": "Submit Scoped Action",
               "sequential_order": 3.0,
               "sub_epics": [],
               "story_groups": [
