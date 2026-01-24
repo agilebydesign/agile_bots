@@ -1423,6 +1423,32 @@ class BotPanel {
         
         // Handle drag and drop for moving nodes
         let draggedNode = null;
+        let dropIndicator = null;
+        let currentDropZone = null; // 'before', 'after', or 'inside'
+        
+        // Create drop indicator line
+        function createDropIndicator() {
+            if (!dropIndicator) {
+                dropIndicator = document.createElement('div');
+                dropIndicator.style.position = 'fixed';
+                dropIndicator.style.height = '2px';
+                dropIndicator.style.backgroundColor = 'rgb(255, 140, 0)'; // Orange to match UI
+                dropIndicator.style.pointerEvents = 'none';
+                dropIndicator.style.zIndex = '10000';
+                dropIndicator.style.transition = 'all 0.1s ease';
+                dropIndicator.style.display = 'none'; // Start hidden
+                document.body.appendChild(dropIndicator);
+            }
+            return dropIndicator;
+        }
+        
+        function removeDropIndicator() {
+            if (dropIndicator && dropIndicator.parentNode) {
+                dropIndicator.parentNode.removeChild(dropIndicator);
+                dropIndicator = null;
+            }
+            currentDropZone = null;
+        }
         
         document.addEventListener('dragstart', function(e) {
             console.log('[WebView] DRAGSTART EVENT FIRED');
@@ -1475,6 +1501,7 @@ class BotPanel {
             if (target && target.classList.contains('story-node')) {
                 target.style.opacity = '1';
                 draggedNode = null;
+                removeDropIndicator();
                 vscode.postMessage({
                     command: 'logToFile',
                     message: '[WebView] Drag ended, cleared draggedNode'
@@ -1482,27 +1509,107 @@ class BotPanel {
             }
         }, true);
         
+        let dragoverLogCounter = 0; // Throttle dragover logs
         document.addEventListener('dragover', function(e) {
             // Find the story-node element
             let target = e.target;
-            while (target && !target.classList.contains('story-node')) {
+            let searchDepth = 0;
+            while (target && !target.classList.contains('story-node') && searchDepth < 10) {
                 target = target.parentElement;
+                searchDepth++;
+            }
+            
+            // Log every 20th dragover event to avoid spam
+            if (dragoverLogCounter++ % 20 === 0 && draggedNode) {
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DRAGOVER - found target: ' + (target ? 'YES' : 'NO') + ', draggedNode: ' + (draggedNode ? draggedNode.name : 'null')
+                });
             }
             
             if (target && target.classList.contains('story-node') && draggedNode) {
-                // Check if this is a valid drop target
                 const targetType = target.getAttribute('data-node-type');
-                const canContain = (targetType === 'epic' && (draggedNode.type === 'sub-epic')) ||
+                const targetPath = target.getAttribute('data-path');
+                const targetName = target.getAttribute('data-node-name');
+                
+                // Don't allow dropping on self
+                if (draggedNode.path === targetPath) {
+                    removeDropIndicator();
+                    return;
+                }
+                
+                // Check if target can contain dragged node
+                const canContain = (targetType === 'epic' && draggedNode.type === 'sub-epic') ||
                                   (targetType === 'sub-epic' && (draggedNode.type === 'sub-epic' || draggedNode.type === 'story'));
                 
-                if (canContain || draggedNode.type === targetType) {
+                // Check if nodes are same type for reordering
+                const sameType = draggedNode.type === targetType;
+                
+                if (canContain || sameType) {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
-                    // Use different color for nesting vs reordering
-                    target.style.backgroundColor = canContain 
-                        ? 'rgba(255, 140, 0, 0.3)'  // Orange tint for nesting
-                        : 'var(--vscode-list-hoverBackground)';  // Default for reordering
+                    
+                    // Get mouse position relative to target element
+                    const rect = target.getBoundingClientRect();
+                    const mouseY = e.clientY;
+                    const targetTop = rect.top;
+                    const targetHeight = rect.height;
+                    const relativeY = mouseY - targetTop;
+                    const percentY = relativeY / targetHeight;
+                    
+                    // Determine drop zone based on mouse position
+                    let dropZone;
+                    const indicator = createDropIndicator();
+                    
+                    // Check if target can contain the dragged node
+                    const hasStories = target.getAttribute('data-has-stories') === 'true';
+                    const hasNestedSubEpics = target.getAttribute('data-has-nested-sub-epics') === 'true';
+                    const isEmptyContainer = !hasStories && !hasNestedSubEpics;
+                    
+                    // "ON" vs "AFTER" logic:
+                    // - If hovering directly on item (middle 60%) AND can nest inside: show "inside" (orange background, no line)
+                    // - Otherwise: show "after" (orange line below item)
+                    if (canContain && isEmptyContainer && percentY >= 0.2 && percentY <= 0.8) {
+                        // Hovering ON the item - nest inside
+                        dropZone = 'inside';
+                        target.style.backgroundColor = 'rgba(255, 140, 0, 0.3)'; // Orange tint for nesting
+                        indicator.style.display = 'none';
+                        if (dragoverLogCounter % 20 === 0) {
+                            vscode.postMessage({
+                                command: 'logToFile',
+                                message: '[WebView] DRAGOVER ON (inside) - will nest inside ' + target.getAttribute('data-node-name')
+                            });
+                        }
+                    } else if (sameType) {
+                        // Same type: insert after
+                        dropZone = 'after';
+                        target.style.backgroundColor = '';
+                        indicator.style.display = 'block';
+                        indicator.style.left = rect.left + 'px';
+                        indicator.style.top = (rect.top + rect.height) + 'px'; // Line at BOTTOM of node
+                        indicator.style.width = rect.width + 'px';
+                        // Log indicator positioning
+                        if (dragoverLogCounter % 20 === 0) {
+                            vscode.postMessage({
+                                command: 'logToFile',
+                                message: '[WebView] DRAGOVER AFTER - hovering over: "' + targetName + '", line at y=' + (rect.top + rect.height) + ' (BOTTOM of node), will insert AFTER this node'
+                            });
+                        }
+                    } else {
+                        vscode.postMessage({
+                            command: 'logToFile',
+                            message: '[WebView] DRAGOVER INVALID - canContain: ' + canContain + ', sameType: ' + sameType + ', dragging ' + draggedNode.type + ' onto ' + targetType
+                        });
+                        removeDropIndicator();
+                        return;
+                    }
+                    
+                    currentDropZone = dropZone;
+                } else {
+                    removeDropIndicator();
                 }
+            } else {
+                removeDropIndicator();
             }
         }, true);
         
@@ -1519,10 +1626,10 @@ class BotPanel {
         }, true);
         
         document.addEventListener('drop', function(e) {
-            console.log('[WebView] DROP EVENT FIRED');
+            console.log('[WebView] ===== DROP EVENT FIRED =====');
             vscode.postMessage({
                 command: 'logToFile',
-                message: '[WebView] DROP EVENT - target classList: ' + (e.target.classList ? Array.from(e.target.classList).join(', ') : 'none') + ', draggedNode: ' + (draggedNode ? draggedNode.name : 'null')
+                message: '[WebView] ===== DROP EVENT FIRED ===== draggedNode: ' + (draggedNode ? draggedNode.name : 'null') + ', currentDropZone: ' + (currentDropZone || 'null')
             });
             
             // Find the story-node element (might be dropping on a child element)
@@ -1531,10 +1638,14 @@ class BotPanel {
                 target = target.parentElement;
             }
             
-            if (target && target.classList.contains('story-node') && draggedNode) {
+            if (target && target.classList.contains('story-node') && draggedNode && currentDropZone) {
                 e.preventDefault();
                 e.stopPropagation();
                 target.style.backgroundColor = '';
+                
+                // Save dropZone BEFORE removeDropIndicator clears it
+                const dropZone = currentDropZone;
+                removeDropIndicator();
                 
                 const targetPath = target.getAttribute('data-path');
                 const targetName = target.getAttribute('data-node-name');
@@ -1542,73 +1653,31 @@ class BotPanel {
                 
                 vscode.postMessage({
                     command: 'logToFile',
-                    message: '[WebView] DROP on story-node - dragged: ' + draggedNode.name + ' onto: ' + targetName
+                    message: '[WebView] DROP on story-node - dragged: ' + draggedNode.name + ' onto: ' + targetName + ', dropZone: ' + dropZone
                 });
                 
                 if (draggedNode.path !== targetPath) {
                     console.log('[WebView] Drop detected:', {
                         dragged: draggedNode,
-                        target: { path: targetPath, name: targetName, type: targetType }
+                        target: { path: targetPath, name: targetName, type: targetType },
+                        dropZone: dropZone
                     });
-                    
-                    // Extract parent paths to check if reordering siblings
-                    const getParentPath = (path) => {
-                        // Remove last quoted segment: story_graph."Epic1"."SubEpic1" -> story_graph."Epic1"
-                        const lastQuoteIndex = path.lastIndexOf('."');
-                        return lastQuoteIndex > 0 ? path.substring(0, lastQuoteIndex) : 'story_graph';
-                    };
-                    
-                    const draggedParent = getParentPath(draggedNode.path);
-                    const targetParent = getParentPath(targetPath);
                     
                     let command;
-                    // Determine if target can contain dragged node
-                    const canContain = (targetType === 'epic' && (draggedNode.type === 'sub-epic')) ||
-                                      (targetType === 'sub-epic' && (draggedNode.type === 'sub-epic' || draggedNode.type === 'story'));
                     
-                    // Check if node is already in the target (prevent moving into current parent)
-                    const isAlreadyInTarget = draggedParent === targetPath;
-                    
-                    const debugInfo = {
-                        draggedType: draggedNode.type,
-                        draggedName: draggedNode.name,
-                        draggedPath: draggedNode.path,
-                        targetType: targetType,
-                        targetName: targetName,
-                        targetPath: targetPath,
-                        canContain: canContain,
-                        sameParent: draggedParent === targetParent,
-                        sameType: draggedNode.type === targetType,
-                        draggedParent: draggedParent,
-                        targetParent: targetParent,
-                        isAlreadyInTarget: isAlreadyInTarget
-                    };
-                    
-                    vscode.postMessage({
-                        command: 'logToFile',
-                        message: '[WebView] DROP DEBUG: ' + JSON.stringify(debugInfo, null, 2)
-                    });
-                    
-                    if (canContain) {
-                        // Target can contain dragged node - nest it inside using move_to
+                    if (dropZone === 'inside') {
+                        // ON: Nest inside the target container
                         command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] NEST inside container: ' + targetName
+                            message: '[WebView] ON - NEST inside container: ' + targetName
                         });
-                    } else if (draggedParent === targetParent && draggedNode.type === targetType) {
-                        // Same parent and same type - use move_after to position after target
+                    } else if (dropZone === 'after') {
+                        // AFTER: Insert after the target sibling
                         command = \`\${draggedNode.path}.move_after sibling:"\${targetName}"\`;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] REORDER siblings - move after: ' + targetName
-                        });
-                    } else {
-                        // Fallback - try move_to
-                        command = \`\${draggedNode.path}.move_to target:"\${targetName}"\`;
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] MOVE to target (fallback): ' + targetName
+                            message: '[WebView] AFTER - INSERT AFTER: ' + targetName
                         });
                     }
                     
@@ -1629,9 +1698,10 @@ class BotPanel {
                     });
                 }
             } else {
+                removeDropIndicator();
                 vscode.postMessage({
                     command: 'logToFile',
-                    message: '[WebView] DROP ignored - not story-node or no draggedNode'
+                    message: '[WebView] DROP ignored - not story-node, no draggedNode, or no dropZone'
                 });
             }
         }, true);
