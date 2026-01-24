@@ -33,15 +33,7 @@
         "test:verbose": "node --test ../../test/panel/test_*.js --test-reporter=spec"
     },
     "files": [
-        "extension.js",
-        "bot_panel.js",
-        "bot_view.js",
-        "bot_header_view.js",
-        "paths_section.js",
-        "behaviors_view.js",
-        "story_map_view.js",
-        "instructions_view.js",
-        "panel_view.js",
+        "*.js",
         "img/**/*.png",
         "img/**/*.jpeg"
     ],
