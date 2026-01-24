@@ -10515,6 +10515,69 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Save Guardrails",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSaveGuardrailsViaCLI",
+                      "scenarios": [
+                        {
+                          "name": "Save answers to clarification file",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_save_guardrail_data_answers",
+                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves answers with question What is the scope of this work as Building bot system\nThen System loads existing clarification.json for shape behavior\nAnd System merges new answer with existing answers\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved answer"
+                        },
+                        {
+                          "name": "Save evidence to clarification file",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_save_guardrail_data_evidence",
+                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves evidence with Requirements doc as spec.md and User interviews as notes.md\nThen System loads existing clarification.json for shape behavior\nAnd System merges new evidence with existing evidence\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved evidence"
+                        },
+                        {
+                          "name": "Save decisions to strategy file",
+                          "sequential_order": 3.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_save_guardrail_data_decisions",
+                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves decisions with drill_down_approach as Dig deep on system interactions\nThen System loads existing strategy.json for shape behavior\nAnd System merges new decision with existing decisions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved decision"
+                        },
+                        {
+                          "name": "Save assumptions to strategy file",
+                          "sequential_order": 4.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_save_guardrail_data_assumptions",
+                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves assumptions with Focus on user flow over internal systems\nThen System loads existing strategy.json for shape behavior\nAnd System merges new assumption with existing assumptions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved assumption"
+                        },
+                        {
+                          "name": "Merge preserves existing answer fields",
+                          "sequential_order": 5.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_merge_with_existing_answers",
+                          "steps": "Given clarification.json contains existing answers for shape behavior\nAnd Existing answers include What is the scope of this work as Building bot system\nAnd Existing answers include Who are the target users as AI Agents\nWhen Action saves updated answer Who are the target users as Developers and AI Agents\nThen System preserves What is the scope of this work as Building bot system\nAnd System overwrites Who are the target users to Developers and AI Agents\nAnd clarification.json contains both answers with new value for updated field"
+                        },
+                        {
+                          "name": "Merge preserves existing decision fields",
+                          "sequential_order": 6.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_merge_with_existing_decisions",
+                          "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
                     }
                   ]
                 }
@@ -10749,6 +10812,69 @@
                       "background": [],
                       "test_method": "test_next_behavior_reminder_not_injected_when_no_next_behavior",
                       "steps": "Given discovery is the last behavior in bot_config.json\nWhen render action executes\nThen base_instructions do NOT include next behavior reminder\nThen And render is the final action"
+                    }
+                  ],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": []
+                },
+                {
+                  "name": "Save Guardrails",
+                  "sequential_order": 3.0,
+                  "connector": "and",
+                  "story_type": "user",
+                  "users": [
+                    "System"
+                  ],
+                  "test_file": null,
+                  "test_class": "TestSaveGuardrailsViaCLI",
+                  "scenarios": [
+                    {
+                      "name": "Save answers to clarification file",
+                      "sequential_order": 1.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_save_guardrail_data_answers",
+                      "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves answers with question What is the scope of this work as Building bot system\nThen System loads existing clarification.json for shape behavior\nAnd System merges new answer with existing answers\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved answer"
+                    },
+                    {
+                      "name": "Save evidence to clarification file",
+                      "sequential_order": 2.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_save_guardrail_data_evidence",
+                      "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves evidence with Requirements doc as spec.md and User interviews as notes.md\nThen System loads existing clarification.json for shape behavior\nAnd System merges new evidence with existing evidence\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved evidence"
+                    },
+                    {
+                      "name": "Save decisions to strategy file",
+                      "sequential_order": 3.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_save_guardrail_data_decisions",
+                      "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves decisions with drill_down_approach as Dig deep on system interactions\nThen System loads existing strategy.json for shape behavior\nAnd System merges new decision with existing decisions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved decision"
+                    },
+                    {
+                      "name": "Save assumptions to strategy file",
+                      "sequential_order": 4.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_save_guardrail_data_assumptions",
+                      "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves assumptions with Focus on user flow over internal systems\nThen System loads existing strategy.json for shape behavior\nAnd System merges new assumption with existing assumptions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved assumption"
+                    },
+                    {
+                      "name": "Merge preserves existing answer fields",
+                      "sequential_order": 5.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_merge_with_existing_answers",
+                      "steps": "Given clarification.json contains existing answers for shape behavior\nAnd Existing answers include What is the scope of this work as Building bot system\nAnd Existing answers include Who are the target users as AI Agents\nWhen Action saves updated answer Who are the target users as Developers and AI Agents\nThen System preserves What is the scope of this work as Building bot system\nAnd System overwrites Who are the target users to Developers and AI Agents\nAnd clarification.json contains both answers with new value for updated field"
+                    },
+                    {
+                      "name": "Merge preserves existing decision fields",
+                      "sequential_order": 6.0,
+                      "type": "",
+                      "background": [],
+                      "test_method": "test_merge_with_existing_decisions",
+                      "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
                     }
                   ],
                   "scenario_outlines": [],
@@ -11464,753 +11590,8 @@
           "sequential_order": 3.0,
           "sub_epics": [
             {
-              "name": "Perform Action",
-              "sequential_order": 0.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Render Story Graph using Story Graph API",
-                      "sequential_order": 1.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
-                          "text": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
-                          "text": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                          "text": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                          "sequential_order": 3.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Build Story Graph Using API",
-                      "sequential_order": 2.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestBuildStoryGraphUsingAPI",
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
-                          "text": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
-                          "text": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
-                          "text": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
-                          "text": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
-                          "text": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
-                          "sequential_order": 5.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Build Story Graph With CLI",
-                      "sequential_order": 3.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "AI Agent"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestBuildStoryGraphWithCLI",
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
-                          "text": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
-                          "text": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
-                          "text": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
-                          "text": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Validate Rules",
-                      "sequential_order": 999.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestValidateRules",
-                      "scenarios": [
-                        {
-                          "name": "Story graph validation includes rule content in instructions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_story_graph_rules_formatted_in_instructions",
-                          "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                        },
-                        {
-                          "name": "File validation includes rule content in instructions",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_file_rules_formatted_in_instructions",
-                          "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                        },
-                        {
-                          "name": "Story graph scanners receive scoped story_graph data",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_story_graph_scanner_receives_story_graph_data",
-                          "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
-                        },
-                        {
-                          "name": "File scanners receive scoped file paths",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_file_scanner_receives_file_data",
-                          "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Display Rules",
-                      "sequential_order": 999.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDisplayRules",
-                      "scenarios": [
-                        {
-                          "name": "Action loads and formats rules digest",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_loads_and_formats_rules_digest",
-                          "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Instructions contain formatted rules digest with descriptions, priorities, DO/DON'T sections"
-                        },
-                        {
-                          "name": "Rules list includes file paths for each rule",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_rules_list_includes_file_paths",
-                          "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Display includes rule names with their file paths"
-                        },
-                        {
-                          "name": "All behavior rules are included in the digest",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_all_behavior_rules_included_in_digest",
-                          "steps": "Given Production story_bot with tests behavior (has multiple rules)\nWhen Rules action executes\nThen All rules from behavior are included in digest"
-                        },
-                        {
-                          "name": "User message is included in instructions when provided",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_message_included_when_provided",
-                          "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes with message\nThen Instructions include user message\nThen And User message requesting specific rule information"
-                        },
-                        {
-                          "name": "No user message section when message is empty",
-                          "sequential_order": 5.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_no_user_message_section_when_empty",
-                          "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes without message\nThen Instructions do not include user message section"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Decide Strategy",
-                      "sequential_order": 999.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDecideStrategy",
-                      "scenarios": [
-                        {
-                          "name": "Action Injects Decision Criteria And Assumptions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_injects_decision_criteria_and_assumptions",
-                          "steps": "Given Production story_bot with shape behavior (has guardrails)\nWhen Action injects strategy criteria and assumptions\nThen Instructions contain all required strategy fields"
-                        },
-                        {
-                          "name": "Save strategy data when parameters are provided",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_save_strategy_data_when_parameters_provided",
-                          "steps": "Given Production story_bot strategy action\nWhen do_execute is called with decisions_made and assumptions_made\nThen strategy.json file is created in docs/stories/ folder\nThen And file contains behavior section with decisions_made and assumptions_made"
-                        },
-                        {
-                          "name": "Preserve existing strategy data when saving",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_preserve_existing_strategy_data_when_saving",
-                          "steps": "Given strategy.json already exists with data for 'discovery' behavior\nWhen do_execute is called with parameters\nThen strategy.json contains both 'discovery' and 'shape' sections\nThen And Production story_bot strategy action for 'shape' behavior\nThen And existing 'discovery' data is preserved"
-                        },
-                        {
-                          "name": "Skip saving when no strategy parameters are provided",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_skip_saving_when_no_strategy_parameters_provided",
-                          "steps": "Given Production story_bot strategy action\nWhen do_execute is called with empty parameters\nThen strategy.json file is not created"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Render Output",
-                      "sequential_order": 999.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestRenderOutput",
-                      "scenarios": [
-                        {
-                          "name": "Action injects render configs and instructions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_injects_render_configs_and_instructions",
-                          "steps": "Given Production story_bot with shape behavior (has render configs)\nWhen Action injects render data\nThen Instructions contain all required render fields"
-                        },
-                        {
-                          "name": "Synchronizers are executed automatically during render action",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_synchronizers_are_executed_automatically",
-                          "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Synchronizers are executed automatically"
-                        },
-                        {
-                          "name": "Template configs remain in instructions for AI handling",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_template_configs_remain_in_instructions",
-                          "steps": "Given Production story_bot with shape behavior (has templates)\nWhen Render output action executes\nThen Result includes instructions"
-                        },
-                        {
-                          "name": "Executed synchronizers information is included in AI instructions",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_executed_synchronizers_info_in_instructions",
-                          "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Instructions include synchronizer execution info"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Save Guardrails",
-                      "sequential_order": 7.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "System"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestSaveGuardrailsViaCLI",
-                      "scenarios": [
-                        {
-                          "name": "Save answers to clarification file",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_save_guardrail_data_answers",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves answers with question What is the scope of this work as Building bot system\nThen System loads existing clarification.json for shape behavior\nAnd System merges new answer with existing answers\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved answer"
-                        },
-                        {
-                          "name": "Save evidence to clarification file",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_save_guardrail_data_evidence",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves evidence with Requirements doc as spec.md and User interviews as notes.md\nThen System loads existing clarification.json for shape behavior\nAnd System merges new evidence with existing evidence\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved evidence"
-                        },
-                        {
-                          "name": "Save decisions to strategy file",
-                          "sequential_order": 3.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_save_guardrail_data_decisions",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves decisions with drill_down_approach as Dig deep on system interactions\nThen System loads existing strategy.json for shape behavior\nAnd System merges new decision with existing decisions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved decision"
-                        },
-                        {
-                          "name": "Save assumptions to strategy file",
-                          "sequential_order": 4.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_save_guardrail_data_assumptions",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves assumptions with Focus on user flow over internal systems\nThen System loads existing strategy.json for shape behavior\nAnd System merges new assumption with existing assumptions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved assumption"
-                        },
-                        {
-                          "name": "Merge preserves existing answer fields",
-                          "sequential_order": 5.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_merge_with_existing_answers",
-                          "steps": "Given clarification.json contains existing answers for shape behavior\nAnd Existing answers include What is the scope of this work as Building bot system\nAnd Existing answers include Who are the target users as AI Agents\nWhen Action saves updated answer Who are the target users as Developers and AI Agents\nThen System preserves What is the scope of this work as Building bot system\nAnd System overwrites Who are the target users to Developers and AI Agents\nAnd clarification.json contains both answers with new value for updated field"
-                        },
-                        {
-                          "name": "Merge preserves existing decision fields",
-                          "sequential_order": 6.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_merge_with_existing_decisions",
-                          "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    }
-                  ]
-                }
-              ],
-              "stories": [
-                {
-                  "name": "Render Story Graph using Story Graph API",
-                  "sequential_order": 1.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
-                  "scenarios": [],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
-                      "text": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
-                      "text": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                      "text": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                      "sequential_order": 3.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Build Story Graph Using API",
-                  "sequential_order": 2.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestBuildStoryGraphUsingAPI",
-                  "scenarios": [],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
-                      "text": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
-                      "text": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
-                      "text": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
-                      "text": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
-                      "sequential_order": 4.0
-                    },
-                    {
-                      "name": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
-                      "text": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
-                      "sequential_order": 5.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Build Story Graph With CLI",
-                  "sequential_order": 3.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "AI Agent"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestBuildStoryGraphWithCLI",
-                  "scenarios": [],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
-                      "text": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
-                      "text": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
-                      "sequential_order": 2.0
-                    },
-                    {
-                      "name": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
-                      "text": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
-                      "sequential_order": 3.0
-                    },
-                    {
-                      "name": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
-                      "text": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
-                      "sequential_order": 4.0
-                    }
-                  ]
-                },
-                {
-                  "name": "Validate Rules",
-                  "sequential_order": 999.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestValidateRules",
-                  "scenarios": [
-                    {
-                      "name": "Story graph validation includes rule content in instructions",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_story_graph_rules_formatted_in_instructions",
-                      "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                    },
-                    {
-                      "name": "File validation includes rule content in instructions",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_file_rules_formatted_in_instructions",
-                      "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                    },
-                    {
-                      "name": "Story graph scanners receive scoped story_graph data",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_story_graph_scanner_receives_story_graph_data",
-                      "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
-                    },
-                    {
-                      "name": "File scanners receive scoped file paths",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_file_scanner_receives_file_data",
-                      "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Display Rules",
-                  "sequential_order": 999.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestDisplayRules",
-                  "scenarios": [
-                    {
-                      "name": "Action loads and formats rules digest",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_loads_and_formats_rules_digest",
-                      "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Instructions contain formatted rules digest with descriptions, priorities, DO/DON'T sections"
-                    },
-                    {
-                      "name": "Rules list includes file paths for each rule",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_rules_list_includes_file_paths",
-                      "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Display includes rule names with their file paths"
-                    },
-                    {
-                      "name": "All behavior rules are included in the digest",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_all_behavior_rules_included_in_digest",
-                      "steps": "Given Production story_bot with tests behavior (has multiple rules)\nWhen Rules action executes\nThen All rules from behavior are included in digest"
-                    },
-                    {
-                      "name": "User message is included in instructions when provided",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_user_message_included_when_provided",
-                      "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes with message\nThen Instructions include user message\nThen And User message requesting specific rule information"
-                    },
-                    {
-                      "name": "No user message section when message is empty",
-                      "sequential_order": 5.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_no_user_message_section_when_empty",
-                      "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes without message\nThen Instructions do not include user message section"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Decide Strategy",
-                  "sequential_order": 999.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestDecideStrategy",
-                  "scenarios": [
-                    {
-                      "name": "Action Injects Decision Criteria And Assumptions",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_injects_decision_criteria_and_assumptions",
-                      "steps": "Given Production story_bot with shape behavior (has guardrails)\nWhen Action injects strategy criteria and assumptions\nThen Instructions contain all required strategy fields"
-                    },
-                    {
-                      "name": "Save strategy data when parameters are provided",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_save_strategy_data_when_parameters_provided",
-                      "steps": "Given Production story_bot strategy action\nWhen do_execute is called with decisions_made and assumptions_made\nThen strategy.json file is created in docs/stories/ folder\nThen And file contains behavior section with decisions_made and assumptions_made"
-                    },
-                    {
-                      "name": "Preserve existing strategy data when saving",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_preserve_existing_strategy_data_when_saving",
-                      "steps": "Given strategy.json already exists with data for 'discovery' behavior\nWhen do_execute is called with parameters\nThen strategy.json contains both 'discovery' and 'shape' sections\nThen And Production story_bot strategy action for 'shape' behavior\nThen And existing 'discovery' data is preserved"
-                    },
-                    {
-                      "name": "Skip saving when no strategy parameters are provided",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_skip_saving_when_no_strategy_parameters_provided",
-                      "steps": "Given Production story_bot strategy action\nWhen do_execute is called with empty parameters\nThen strategy.json file is not created"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Render Output",
-                  "sequential_order": 999.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestRenderOutput",
-                  "scenarios": [
-                    {
-                      "name": "Action injects render configs and instructions",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_injects_render_configs_and_instructions",
-                      "steps": "Given Production story_bot with shape behavior (has render configs)\nWhen Action injects render data\nThen Instructions contain all required render fields"
-                    },
-                    {
-                      "name": "Synchronizers are executed automatically during render action",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_synchronizers_are_executed_automatically",
-                      "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Synchronizers are executed automatically"
-                    },
-                    {
-                      "name": "Template configs remain in instructions for AI handling",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_template_configs_remain_in_instructions",
-                      "steps": "Given Production story_bot with shape behavior (has templates)\nWhen Render output action executes\nThen Result includes instructions"
-                    },
-                    {
-                      "name": "Executed synchronizers information is included in AI instructions",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_executed_synchronizers_info_in_instructions",
-                      "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Instructions include synchronizer execution info"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Save Guardrails",
-                  "sequential_order": 7.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "System"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestSaveGuardrailsViaCLI",
-                  "scenarios": [
-                    {
-                      "name": "Save answers to clarification file",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_save_guardrail_data_answers",
-                      "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves answers with question What is the scope of this work as Building bot system\nThen System loads existing clarification.json for shape behavior\nAnd System merges new answer with existing answers\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved answer"
-                    },
-                    {
-                      "name": "Save evidence to clarification file",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_save_guardrail_data_evidence",
-                      "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves evidence with Requirements doc as spec.md and User interviews as notes.md\nThen System loads existing clarification.json for shape behavior\nAnd System merges new evidence with existing evidence\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved evidence"
-                    },
-                    {
-                      "name": "Save decisions to strategy file",
-                      "sequential_order": 3.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_save_guardrail_data_decisions",
-                      "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves decisions with drill_down_approach as Dig deep on system interactions\nThen System loads existing strategy.json for shape behavior\nAnd System merges new decision with existing decisions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved decision"
-                    },
-                    {
-                      "name": "Save assumptions to strategy file",
-                      "sequential_order": 4.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_save_guardrail_data_assumptions",
-                      "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves assumptions with Focus on user flow over internal systems\nThen System loads existing strategy.json for shape behavior\nAnd System merges new assumption with existing assumptions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved assumption"
-                    },
-                    {
-                      "name": "Merge preserves existing answer fields",
-                      "sequential_order": 5.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_merge_with_existing_answers",
-                      "steps": "Given clarification.json contains existing answers for shape behavior\nAnd Existing answers include What is the scope of this work as Building bot system\nAnd Existing answers include Who are the target users as AI Agents\nWhen Action saves updated answer Who are the target users as Developers and AI Agents\nThen System preserves What is the scope of this work as Building bot system\nAnd System overwrites Who are the target users to Developers and AI Agents\nAnd clarification.json contains both answers with new value for updated field"
-                    },
-                    {
-                      "name": "Merge preserves existing decision fields",
-                      "sequential_order": 6.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_merge_with_existing_decisions",
-                      "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                }
-              ]
-            },
-            {
               "name": "Perform Action Using CLI",
-              "sequential_order": 1.0,
+              "sequential_order": 0.0,
               "sub_epics": [
                 {
                   "name": "Display Common Instructions Through REPL",
@@ -12620,7 +12001,7 @@
                           "acceptance_criteria": []
                         },
                         {
-                          "name": "Display Guardrails Through CLI",
+                          "name": "Get Clarify Instructions Through CLI",
                           "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
@@ -12628,15 +12009,15 @@
                             "User"
                           ],
                           "test_file": "test_display_clarify_instructions_using_repl.py",
-                          "test_class": "TestDisplayGuardrailsThroughCLI",
+                          "test_class": "TestGetClarifyInstructionsThroughCLI",
                           "scenarios": [
                             {
-                              "name": "Display key questions from guardrails",
+                              "name": "Get clarify instructions with questions",
                               "sequential_order": 1.0,
                               "type": "",
                               "background": [],
-                              "test_method": "test_display_key_questions_from_guardrails",
-                              "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: instructions are displayed\nTHEN: CLI shows key questions from guardrails"
+                              "test_method": "test_get_clarify_instructions_with_questions",
+                              "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'shape.clarify.instructions'\nTHEN: CLI displays key questions and required evidence"
                             }
                           ],
                           "scenario_outlines": [],
@@ -12660,29 +12041,6 @@
                               "background": [],
                               "test_method": "test_display_stored_clarification_data",
                               "steps": "GIVEN: Clarification data exists\nWHEN: user views clarify instructions\nTHEN: CLI displays stored clarification data"
-                            }
-                          ],
-                          "scenario_outlines": [],
-                          "acceptance_criteria": []
-                        },
-                        {
-                          "name": "Get Clarify Instructions Through CLI",
-                          "sequential_order": 3.0,
-                          "connector": "and",
-                          "story_type": "user",
-                          "users": [
-                            "User"
-                          ],
-                          "test_file": "test_display_clarify_instructions_using_repl.py",
-                          "test_class": "TestGetClarifyInstructionsThroughCLI",
-                          "scenarios": [
-                            {
-                              "name": "Get clarify instructions with questions",
-                              "sequential_order": 1.0,
-                              "type": "",
-                              "background": [],
-                              "test_method": "test_get_clarify_instructions_with_questions",
-                              "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'shape.clarify.instructions'\nTHEN: CLI displays key questions and required evidence"
                             }
                           ],
                           "scenario_outlines": [],
@@ -12756,7 +12114,7 @@
                       "acceptance_criteria": []
                     },
                     {
-                      "name": "Display Guardrails Through CLI",
+                      "name": "Get Clarify Instructions Through CLI",
                       "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
@@ -12764,15 +12122,15 @@
                         "User"
                       ],
                       "test_file": "test_display_clarify_instructions_using_repl.py",
-                      "test_class": "TestDisplayGuardrailsThroughCLI",
+                      "test_class": "TestGetClarifyInstructionsThroughCLI",
                       "scenarios": [
                         {
-                          "name": "Display key questions from guardrails",
+                          "name": "Get clarify instructions with questions",
                           "sequential_order": 1.0,
                           "type": "",
                           "background": [],
-                          "test_method": "test_display_key_questions_from_guardrails",
-                          "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: instructions are displayed\nTHEN: CLI shows key questions from guardrails"
+                          "test_method": "test_get_clarify_instructions_with_questions",
+                          "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'shape.clarify.instructions'\nTHEN: CLI displays key questions and required evidence"
                         }
                       ],
                       "scenario_outlines": [],
@@ -12800,29 +12158,6 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Get Clarify Instructions Through CLI",
-                      "sequential_order": 3.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": "test_display_clarify_instructions_using_repl.py",
-                      "test_class": "TestGetClarifyInstructionsThroughCLI",
-                      "scenarios": [
-                        {
-                          "name": "Get clarify instructions with questions",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_get_clarify_instructions_with_questions",
-                          "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'shape.clarify.instructions'\nTHEN: CLI displays key questions and required evidence"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
                     }
                   ]
                 },
@@ -12839,7 +12174,7 @@
                       "stories": [
                         {
                           "name": "Display Strategy Data Through CLI",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -12862,7 +12197,7 @@
                         },
                         {
                           "name": "Get Strategy Instructions Through CLI",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12882,6 +12217,53 @@
                           ],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Decide Strategy",
+                          "sequential_order": 2.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDecideStrategy",
+                          "scenarios": [
+                            {
+                              "name": "Action Injects Decision Criteria And Assumptions",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_injects_decision_criteria_and_assumptions",
+                              "steps": "Given Production story_bot with shape behavior (has guardrails)\nWhen Action injects strategy criteria and assumptions\nThen Instructions contain all required strategy fields"
+                            },
+                            {
+                              "name": "Save strategy data when parameters are provided",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_save_strategy_data_when_parameters_provided",
+                              "steps": "Given Production story_bot strategy action\nWhen do_execute is called with decisions_made and assumptions_made\nThen strategy.json file is created in docs/stories/ folder\nThen And file contains behavior section with decisions_made and assumptions_made"
+                            },
+                            {
+                              "name": "Preserve existing strategy data when saving",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_preserve_existing_strategy_data_when_saving",
+                              "steps": "Given strategy.json already exists with data for 'discovery' behavior\nWhen do_execute is called with parameters\nThen strategy.json contains both 'discovery' and 'shape' sections\nThen And Production story_bot strategy action for 'shape' behavior\nThen And existing 'discovery' data is preserved"
+                            },
+                            {
+                              "name": "Skip saving when no strategy parameters are provided",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_skip_saving_when_no_strategy_parameters_provided",
+                              "steps": "Given Production story_bot strategy action\nWhen do_execute is called with empty parameters\nThen strategy.json file is not created"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -12889,7 +12271,7 @@
                   "stories": [
                     {
                       "name": "Display Strategy Data Through CLI",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -12912,7 +12294,7 @@
                     },
                     {
                       "name": "Get Strategy Instructions Through CLI",
-                      "sequential_order": 2.0,
+                      "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -12928,6 +12310,53 @@
                           "background": [],
                           "test_method": "test_get_strategy_instructions_with_criteria",
                           "steps": "GIVEN: CLI is at shape.strategy.instructions\nWHEN: user enters 'shape.strategy.instructions'\nTHEN: CLI displays planning criteria and assumptions"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Decide Strategy",
+                      "sequential_order": 2.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDecideStrategy",
+                      "scenarios": [
+                        {
+                          "name": "Action Injects Decision Criteria And Assumptions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_injects_decision_criteria_and_assumptions",
+                          "steps": "Given Production story_bot with shape behavior (has guardrails)\nWhen Action injects strategy criteria and assumptions\nThen Instructions contain all required strategy fields"
+                        },
+                        {
+                          "name": "Save strategy data when parameters are provided",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_save_strategy_data_when_parameters_provided",
+                          "steps": "Given Production story_bot strategy action\nWhen do_execute is called with decisions_made and assumptions_made\nThen strategy.json file is created in docs/stories/ folder\nThen And file contains behavior section with decisions_made and assumptions_made"
+                        },
+                        {
+                          "name": "Preserve existing strategy data when saving",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_preserve_existing_strategy_data_when_saving",
+                          "steps": "Given strategy.json already exists with data for 'discovery' behavior\nWhen do_execute is called with parameters\nThen strategy.json contains both 'discovery' and 'shape' sections\nThen And Production story_bot strategy action for 'shape' behavior\nThen And existing 'discovery' data is preserved"
+                        },
+                        {
+                          "name": "Skip saving when no strategy parameters are provided",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_skip_saving_when_no_strategy_parameters_provided",
+                          "steps": "Given Production story_bot strategy action\nWhen do_execute is called with empty parameters\nThen strategy.json file is not created"
                         }
                       ],
                       "scenario_outlines": [],
@@ -13223,6 +12652,81 @@
                           ],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Build Story Graph With CLI",
+                          "sequential_order": 5.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "AI Agent"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestBuildStoryGraphWithCLI",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
+                              "text": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
+                              "text": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
+                              "text": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
+                              "text": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
+                              "sequential_order": 4.0
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Build Story Graph Using API",
+                          "sequential_order": 6.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestBuildStoryGraphUsingAPI",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
+                              "text": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
+                              "text": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
+                              "text": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
+                              "text": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
+                              "sequential_order": 4.0
+                            },
+                            {
+                              "name": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
+                              "text": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
+                              "sequential_order": 5.0
+                            }
+                          ]
                         }
                       ]
                     }
@@ -13374,6 +12878,81 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Build Story Graph With CLI",
+                      "sequential_order": 5.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "AI Agent"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestBuildStoryGraphWithCLI",
+                      "scenarios": [],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
+                          "text": "WHEN AI builds story graph through CLI\nTHEN AI calls CLI commands instead of writing raw JSON\nAND AI uses create_epic, create_sub_epic, create_story commands for fine-grained construction\nAND each CLI command invokes corresponding StoryMap API method\nAND validation errors returned immediately to AI",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
+                          "text": "WHEN AI builds large story graph structures through CLI\nTHEN AI uses create_from_json command for batch operations\nAND AI passes dictionary notation with epic/sub-epic/story hierarchy\nAND CLI accepts both inline JSON notation and file paths\nAND CLI invokes StoryMap.create_epic_from_dict() with provided data",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
+                          "text": "WHEN CLI wraps StoryMap API\nTHEN CLI exposes create_epic, create_sub_epic, create_story commands\nAND CLI exposes create_from_json for batch operations\nAND CLI provides save command to persist changes\nAND CLI can be called from AI or human users",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
+                          "text": "WHEN AI completes building story graph\nTHEN AI calls save command through CLI\nAND CLI invokes StoryMap.save() method\nAND story_graph persisted to file\nAND AI receives confirmation of successful save",
+                          "sequential_order": 4.0
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Build Story Graph Using API",
+                      "sequential_order": 6.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestBuildStoryGraphUsingAPI",
+                      "scenarios": [],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
+                          "text": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
+                          "text": "WHEN Bot is called with large story graph structures\nTHEN caller uses create_epic_from_dict() for batch operations\nAND caller passes dictionary notation with epic/sub-epic/story hierarchy\nAND StoryMap converts dict notation to domain objects\nAND StoryMap validates entire structure before committing",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
+                          "text": "WHEN StoryMap uses save() method\nTHEN StoryMap persists story_graph dict to JSON file\nAND file format matches existing story-graph.json structure\nAND all nodes converted to dict representation before saving",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
+                          "text": "WHEN StoryMap uses load() method\nTHEN StoryMap reads JSON file\nAND StoryMap rebuilds domain model from JSON\nAND StoryMap reconstructs all Epic, SubEpic, Story objects with relationships",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
+                          "text": "WHEN fine-grained and batch APIs implement same interface\nTHEN both validate hierarchy rules (no mixing sub-epics and stories)\nAND both handle positioning and resequencing\nAND both update story_graph dict representation\nAND interface enables incremental construction or bulk creation",
+                          "sequential_order": 5.0
+                        }
+                      ]
                     }
                   ]
                 },
@@ -13390,7 +12969,7 @@
                       "stories": [
                         {
                           "name": "Display Validation Scanners Through CLI",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -13413,7 +12992,7 @@
                         },
                         {
                           "name": "Display Validation Results Through CLI",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13436,7 +13015,7 @@
                         },
                         {
                           "name": "Get Validate Instructions Through CLI",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13456,6 +13035,53 @@
                           ],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Validate Rules",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestValidateRules",
+                          "scenarios": [
+                            {
+                              "name": "Story graph validation includes rule content in instructions",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_story_graph_rules_formatted_in_instructions",
+                              "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                            },
+                            {
+                              "name": "File validation includes rule content in instructions",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_rules_formatted_in_instructions",
+                              "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                            },
+                            {
+                              "name": "Story graph scanners receive scoped story_graph data",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_story_graph_scanner_receives_story_graph_data",
+                              "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
+                            },
+                            {
+                              "name": "File scanners receive scoped file paths",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_file_scanner_receives_file_data",
+                              "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -13463,7 +13089,7 @@
                   "stories": [
                     {
                       "name": "Display Validation Scanners Through CLI",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -13486,7 +13112,7 @@
                     },
                     {
                       "name": "Display Validation Results Through CLI",
-                      "sequential_order": 2.0,
+                      "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13509,7 +13135,7 @@
                     },
                     {
                       "name": "Get Validate Instructions Through CLI",
-                      "sequential_order": 3.0,
+                      "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13525,6 +13151,53 @@
                           "background": [],
                           "test_method": "test_get_validate_instructions_with_rules",
                           "steps": "GIVEN: CLI is at shape.validate.instructions\nWHEN: user enters 'shape.validate.instructions'\nTHEN: CLI displays validation rules and scanners"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Validate Rules",
+                      "sequential_order": 3.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestValidateRules",
+                      "scenarios": [
+                        {
+                          "name": "Story graph validation includes rule content in instructions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_story_graph_rules_formatted_in_instructions",
+                          "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                        },
+                        {
+                          "name": "File validation includes rule content in instructions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_file_rules_formatted_in_instructions",
+                          "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                        },
+                        {
+                          "name": "Story graph scanners receive scoped story_graph data",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_story_graph_scanner_receives_story_graph_data",
+                          "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
+                        },
+                        {
+                          "name": "File scanners receive scoped file paths",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_file_scanner_receives_file_data",
+                          "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
                         }
                       ],
                       "scenario_outlines": [],
@@ -13545,7 +13218,7 @@
                       "stories": [
                         {
                           "name": "Display Render Configurations Through CLI",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -13568,7 +13241,7 @@
                         },
                         {
                           "name": "Display Synchronizer Output Through CLI",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13591,7 +13264,7 @@
                         },
                         {
                           "name": "Get Render Instructions Through CLI",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13611,6 +13284,83 @@
                           ],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Render Output",
+                          "sequential_order": 3.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestRenderOutput",
+                          "scenarios": [
+                            {
+                              "name": "Action injects render configs and instructions",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_injects_render_configs_and_instructions",
+                              "steps": "Given Production story_bot with shape behavior (has render configs)\nWhen Action injects render data\nThen Instructions contain all required render fields"
+                            },
+                            {
+                              "name": "Synchronizers are executed automatically during render action",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_synchronizers_are_executed_automatically",
+                              "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Synchronizers are executed automatically"
+                            },
+                            {
+                              "name": "Template configs remain in instructions for AI handling",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_template_configs_remain_in_instructions",
+                              "steps": "Given Production story_bot with shape behavior (has templates)\nWhen Render output action executes\nThen Result includes instructions"
+                            },
+                            {
+                              "name": "Executed synchronizers information is included in AI instructions",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_executed_synchronizers_info_in_instructions",
+                              "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Instructions include synchronizer execution info"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Render Story Graph using Story Graph API",
+                          "sequential_order": 4.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
+                          "scenarios": [],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
+                              "text": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
+                              "text": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
+                              "text": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
+                              "sequential_order": 3.0
+                            }
+                          ]
                         }
                       ]
                     }
@@ -13618,7 +13368,7 @@
                   "stories": [
                     {
                       "name": "Display Render Configurations Through CLI",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -13641,7 +13391,7 @@
                     },
                     {
                       "name": "Display Synchronizer Output Through CLI",
-                      "sequential_order": 2.0,
+                      "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13664,7 +13414,7 @@
                     },
                     {
                       "name": "Get Render Instructions Through CLI",
-                      "sequential_order": 3.0,
+                      "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13684,6 +13434,83 @@
                       ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Render Output",
+                      "sequential_order": 3.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestRenderOutput",
+                      "scenarios": [
+                        {
+                          "name": "Action injects render configs and instructions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_injects_render_configs_and_instructions",
+                          "steps": "Given Production story_bot with shape behavior (has render configs)\nWhen Action injects render data\nThen Instructions contain all required render fields"
+                        },
+                        {
+                          "name": "Synchronizers are executed automatically during render action",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_synchronizers_are_executed_automatically",
+                          "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Synchronizers are executed automatically"
+                        },
+                        {
+                          "name": "Template configs remain in instructions for AI handling",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_template_configs_remain_in_instructions",
+                          "steps": "Given Production story_bot with shape behavior (has templates)\nWhen Render output action executes\nThen Result includes instructions"
+                        },
+                        {
+                          "name": "Executed synchronizers information is included in AI instructions",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_executed_synchronizers_info_in_instructions",
+                          "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Instructions include synchronizer execution info"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Render Story Graph using Story Graph API",
+                      "sequential_order": 4.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
+                      "scenarios": [],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
+                          "text": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
+                          "text": "When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
+                          "text": "When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
+                          "sequential_order": 3.0
+                        }
+                      ]
                     }
                   ]
                 },
@@ -13700,7 +13527,7 @@
                       "stories": [
                         {
                           "name": "Get Rules Instructions Through CLI",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -13757,6 +13584,61 @@
                               "sequential_order": 4.0
                             }
                           ]
+                        },
+                        {
+                          "name": "Display Rules",
+                          "sequential_order": 1.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestDisplayRules",
+                          "scenarios": [
+                            {
+                              "name": "Action loads and formats rules digest",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_loads_and_formats_rules_digest",
+                              "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Instructions contain formatted rules digest with descriptions, priorities, DO/DON'T sections"
+                            },
+                            {
+                              "name": "Rules list includes file paths for each rule",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_rules_list_includes_file_paths",
+                              "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Display includes rule names with their file paths"
+                            },
+                            {
+                              "name": "All behavior rules are included in the digest",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_all_behavior_rules_included_in_digest",
+                              "steps": "Given Production story_bot with tests behavior (has multiple rules)\nWhen Rules action executes\nThen All rules from behavior are included in digest"
+                            },
+                            {
+                              "name": "User message is included in instructions when provided",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_user_message_included_when_provided",
+                              "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes with message\nThen Instructions include user message\nThen And User message requesting specific rule information"
+                            },
+                            {
+                              "name": "No user message section when message is empty",
+                              "sequential_order": 5.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_no_user_message_section_when_empty",
+                              "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes without message\nThen Instructions do not include user message section"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -13764,7 +13646,7 @@
                   "stories": [
                     {
                       "name": "Get Rules Instructions Through CLI",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -13821,6 +13703,61 @@
                           "sequential_order": 4.0
                         }
                       ]
+                    },
+                    {
+                      "name": "Display Rules",
+                      "sequential_order": 1.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestDisplayRules",
+                      "scenarios": [
+                        {
+                          "name": "Action loads and formats rules digest",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_loads_and_formats_rules_digest",
+                          "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Instructions contain formatted rules digest with descriptions, priorities, DO/DON'T sections"
+                        },
+                        {
+                          "name": "Rules list includes file paths for each rule",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_rules_list_includes_file_paths",
+                          "steps": "Given Production story_bot with tests behavior (has rules)\nWhen Rules action executes\nThen Display includes rule names with their file paths"
+                        },
+                        {
+                          "name": "All behavior rules are included in the digest",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_all_behavior_rules_included_in_digest",
+                          "steps": "Given Production story_bot with tests behavior (has multiple rules)\nWhen Rules action executes\nThen All rules from behavior are included in digest"
+                        },
+                        {
+                          "name": "User message is included in instructions when provided",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_user_message_included_when_provided",
+                          "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes with message\nThen Instructions include user message\nThen And User message requesting specific rule information"
+                        },
+                        {
+                          "name": "No user message section when message is empty",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_no_user_message_section_when_empty",
+                          "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes without message\nThen Instructions do not include user message section"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
                     }
                   ]
                 }
@@ -13830,7 +13767,7 @@
             },
             {
               "name": "Perform Action Through Panel",
-              "sequential_order": 2.0,
+              "sequential_order": 1.0,
               "sub_epics": [],
               "story_groups": [
                 {
