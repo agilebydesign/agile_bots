@@ -15473,134 +15473,15 @@
           "stories": []
         },
         {
-          "name": "Get Bot Help",
+          "name": "Get Help Using CLI",
           "sequential_order": 4.0,
-          "sub_epics": [
+          "sub_epics": [],
+          "story_groups": [
             {
-              "name": "Get Help Using CLI",
+              "name": "",
               "sequential_order": 0.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Get Help",
-                      "sequential_order": 0.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestGetHelp",
-                      "scenarios": [
-                        {
-                          "name": "Verify actions can provide instructions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_has_instructions_method",
-                          "steps": "Given Bot has behavior with action\nWhen Action is accessed\nThen Action has method to get instructions\nThen Domain focus: Action instructions method availability"
-                        },
-                        {
-                          "name": "Action provides parameter help via .help property",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_provides_parameter_help",
-                          "steps": "Given Bot has behavior with action\nWhen Action.help is accessed\nThen Returns dict with description and parameters list\nThen Domain focus: Parameter help retrieval from Action.help"
-                        },
-                        {
-                          "name": "Action provides command examples",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_provides_command_examples",
-                          "steps": "Given Bot has behavior with action\nWhen Command examples are requested\nThen Action returns usage examples\nThen Domain focus: Command examples retrieval"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Display Parameter Help Using CLI",
-                      "sequential_order": 1.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Display Action Help Using CLI",
-                      "sequential_order": 2.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestDisplayActionHelpUsingCLI",
-                      "scenarios": [
-                        {
-                          "name": "User views all available commands",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_user_views_all_available_commands",
-                          "steps": "GIVEN: CLI is running\nWHEN: user enters 'help'\nTHEN: CLI displays help menu with commands"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions",
-                          "text": "WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action",
-                          "text": "WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions",
-                          "text": "WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands",
-                          "text": "WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands",
-                          "sequential_order": 4.0
-                        }
-                      ]
-                    },
-                    {
-                      "name": "Display Command Examples Using CLI",
-                      "sequential_order": 3.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    }
-                  ]
-                }
-              ],
+              "type": "and",
+              "connector": null,
               "stories": [
                 {
                   "name": "Get Help",
@@ -15716,8 +15597,119 @@
               ]
             }
           ],
-          "story_groups": [],
-          "stories": []
+          "stories": [
+            {
+              "name": "Get Help",
+              "sequential_order": 0.0,
+              "connector": "or",
+              "story_type": "user",
+              "users": [
+                "Bot Behavior"
+              ],
+              "test_file": null,
+              "test_class": "TestGetHelp",
+              "scenarios": [
+                {
+                  "name": "Verify actions can provide instructions",
+                  "sequential_order": 1.0,
+                  "type": "happy_path",
+                  "background": [],
+                  "test_method": "test_action_has_instructions_method",
+                  "steps": "Given Bot has behavior with action\nWhen Action is accessed\nThen Action has method to get instructions\nThen Domain focus: Action instructions method availability"
+                },
+                {
+                  "name": "Action provides parameter help via .help property",
+                  "sequential_order": 2.0,
+                  "type": "happy_path",
+                  "background": [],
+                  "test_method": "test_action_provides_parameter_help",
+                  "steps": "Given Bot has behavior with action\nWhen Action.help is accessed\nThen Returns dict with description and parameters list\nThen Domain focus: Parameter help retrieval from Action.help"
+                },
+                {
+                  "name": "Action provides command examples",
+                  "sequential_order": 3.0,
+                  "type": "happy_path",
+                  "background": [],
+                  "test_method": "test_action_provides_command_examples",
+                  "steps": "Given Bot has behavior with action\nWhen Command examples are requested\nThen Action returns usage examples\nThen Domain focus: Command examples retrieval"
+                }
+              ],
+              "scenario_outlines": [],
+              "acceptance_criteria": []
+            },
+            {
+              "name": "Display Parameter Help Using CLI",
+              "sequential_order": 1.0,
+              "connector": "and",
+              "story_type": "user",
+              "users": [
+                "User"
+              ],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": []
+            },
+            {
+              "name": "Display Action Help Using CLI",
+              "sequential_order": 2.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [
+                "User"
+              ],
+              "test_file": null,
+              "test_class": "TestDisplayActionHelpUsingCLI",
+              "scenarios": [
+                {
+                  "name": "User views all available commands",
+                  "sequential_order": 1.0,
+                  "type": "",
+                  "background": [],
+                  "test_method": "test_user_views_all_available_commands",
+                  "steps": "GIVEN: CLI is running\nWHEN: user enters 'help'\nTHEN: CLI displays help menu with commands"
+                }
+              ],
+              "scenario_outlines": [],
+              "acceptance_criteria": [
+                {
+                  "name": "WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions",
+                  "text": "WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions",
+                  "sequential_order": 1.0
+                },
+                {
+                  "name": "WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action",
+                  "text": "WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action",
+                  "sequential_order": 2.0
+                },
+                {
+                  "name": "WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions",
+                  "text": "WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions",
+                  "sequential_order": 3.0
+                },
+                {
+                  "name": "WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands",
+                  "text": "WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands",
+                  "sequential_order": 4.0
+                }
+              ]
+            },
+            {
+              "name": "Display Command Examples Using CLI",
+              "sequential_order": 3.0,
+              "connector": "and",
+              "story_type": "user",
+              "users": [
+                "User"
+              ],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": []
+            }
+          ]
         }
       ],
       "story_groups": []
