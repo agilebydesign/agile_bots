@@ -73,16 +73,7 @@ class PanelView {
             SUPPRESS_CLI_HEADER: '1'
         };
         
-        let pythonExe = "";
-        if (fs.existsSync(path.join(this._workspaceDir, '.venv', 'bin'))) {            
-            pythonExe = path.join(this._workspaceDir, '.venv', 'bin', 'python');
-        }
-        else if (fs.existsSync(path.join(this._workspaceDir, '.venv', 'Scripts'))) {            
-            pythonExe = path.join(this._workspaceDir, '.venv', 'Scripts', 'python.exe');
-        }
-        else {
-            throw new Error("Could not find Python virtual environment in workspace");
-        }
+        let pythonExe = "python";
         
         this._pythonProcess = spawn(pythonExe, [cliPath], {        
             cwd: this._workspaceDir,

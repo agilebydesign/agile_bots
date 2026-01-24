@@ -1793,7 +1793,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                      "test_file": null,
                       "test_class": "TestExitREPL",
                       "scenarios": [
                         {
@@ -2082,7 +2082,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                  "test_file": null,
                   "test_class": "TestExitREPL",
                   "scenarios": [
                     {
@@ -4264,7 +4264,7 @@
                               "users": [
                                 "User"
                               ],
-                              "test_file": "test_display_build_instructions_using_repl.py",
+                              "test_file": null,
                               "test_class": "TestDisplayBuildScopeThroughCLI",
                               "scenarios": [
                                 {
@@ -4427,7 +4427,7 @@
                               "users": [
                                 "User"
                               ],
-                              "test_file": "test_display_build_instructions_using_repl.py",
+                              "test_file": null,
                               "test_class": "TestDisplayFilteredKnowledgeGraphThroughCLI",
                               "scenarios": [
                                 {
@@ -4830,7 +4830,7 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": "test_display_build_instructions_using_repl.py",
+                          "test_file": null,
                           "test_class": "TestDisplayBuildScopeThroughCLI",
                           "scenarios": [
                             {
@@ -4993,7 +4993,7 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": "test_display_build_instructions_using_repl.py",
+                          "test_file": null,
                           "test_class": "TestDisplayFilteredKnowledgeGraphThroughCLI",
                           "scenarios": [
                             {
@@ -6163,8 +6163,81 @@
                       "story_type": "user",
                       "users": [],
                       "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestCreateChildStoryNode",
+                      "scenarios": [
+                        {
+                          "name": "Create child node at any hierarchy level with default position",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_child_node_at_hierarchy_level",
+                          "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node of specified type\nThen Child is added at last position with correct total count"
+                        },
+                        {
+                          "name": "Create child node with specified position",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_child_node_with_position",
+                          "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node at specific position\nThen Child is inserted at position and existing children shift"
+                        },
+                        {
+                          "name": "Create child node with invalid position adjusts to last position",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_child_invalid_position_adjusts",
+                          "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node at invalid position (exceeds child count)\nThen System adjusts position to last valid position"
+                        },
+                        {
+                          "name": "Create child node with duplicate name returns error",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_child_with_duplicate_name_returns_error",
+                          "steps": "Given Story Graph has parent node with existing child\nWhen Parent attempts to create child with duplicate name\nThen System identifies duplicate and returns error"
+                        },
+                        {
+                          "name": "Create child node without name generates unique name",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_child_without_name_generates_unique_name",
+                          "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child without providing name\nThen System generates unique name (Child1, Child2, etc.)"
+                        },
+                        {
+                          "name": "SubEpic creates Story and auto-creates StoryGroup on first Story",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_subepic_creates_story_and_storygroup",
+                          "steps": "Given SubEpic has existing Story count (0 or more)\nWhen SubEpic creates new Story\nThen StoryGroup is created (if first) or existing StoryGroup is used"
+                        },
+                        {
+                          "name": "SubEpic with Stories cannot create SubEpic child",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_subepic_with_stories_cannot_create_subepic_child",
+                          "steps": "Given SubEpic has existing Story children\nWhen SubEpic attempts to create SubEpic child\nThen System identifies hierarchy violation and returns error"
+                        },
+                        {
+                          "name": "SubEpic with SubEpics cannot create Story child",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_subepic_with_subepics_cannot_create_story_child",
+                          "steps": "Given SubEpic has existing SubEpic children\nWhen SubEpic attempts to create Story child\nThen System identifies hierarchy violation and returns error"
+                        },
+                        {
+                          "name": "Story creates child and adds to correct collection",
+                          "sequential_order": 9.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_story_creates_child_in_correct_collection",
+                          "steps": "Given Story exists in story graph\nWhen Story creates child of specific type (Scenario, ScenarioOutline, AcceptanceCriteria)\nThen Child is added to correct collection and not to others"
+                        }
+                      ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
                     },
@@ -6397,8 +6470,81 @@
                       "story_type": "user",
                       "users": [],
                       "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestCreateEpic",
+                      "scenarios": [
+                        {
+                          "name": "Create Epic with name at default position",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_with_name_at_default_position",
+                          "steps": "Given Story Map is initialized\nWhen Story Map creates Epic with name\nThen Epic is added at last position"
+                        },
+                        {
+                          "name": "Create Epic with position specified",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_with_position_specified",
+                          "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic at specific position\nThen Epic is inserted at position and existing Epics shift"
+                        },
+                        {
+                          "name": "Create Epic with invalid position adjusts to last",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_with_invalid_position_adjusts",
+                          "steps": "Given Story Map has 2 Epics\nWhen Story Map creates Epic at position 99\nThen Position is adjusted to last (position 2)"
+                        },
+                        {
+                          "name": "Create Epic without name generates unique name",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_without_name_generates_unique_name",
+                          "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic without name\nThen System generates unique name (Epic1, Epic2, etc.)"
+                        },
+                        {
+                          "name": "Create Epic with duplicate name returns error",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_with_duplicate_name_returns_error",
+                          "steps": "Given Story Map has Epic \"User Management\"\nWhen Story Map attempts to create Epic with duplicate name\nThen System identifies duplicate and returns error"
+                        },
+                        {
+                          "name": "Create Epic updates epics collection",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_updates_epics_collection",
+                          "steps": "Given Story Map has existing Epics\nWhen Story Map creates new Epic\nThen Epics collection is updated and new Epic is accessible"
+                        },
+                        {
+                          "name": "Create Epic updates underlying story_graph dict",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_updates_story_graph_dict",
+                          "steps": "Given Story Map has existing Epics\nWhen Story Map creates new Epic\nThen story_graph dict is updated with new Epic"
+                        },
+                        {
+                          "name": "Create multiple Epics in sequence",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_multiple_epics_in_sequence",
+                          "steps": "Given Story Map is initialized\nWhen Story Map creates multiple Epics\nThen All Epics are added in correct order"
+                        },
+                        {
+                          "name": "Create Epic at beginning (position 0)",
+                          "sequential_order": 9.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_create_epic_at_beginning_position",
+                          "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic at position 0\nThen Epic is inserted at beginning"
+                        }
+                      ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
                     },
@@ -6592,8 +6738,33 @@
                       "story_type": "user",
                       "users": [],
                       "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestDeleteStoryNode",
+                      "scenarios": [
+                        {
+                          "name": "Delete node without children",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_delete_node_without_children",
+                          "steps": "Given Story Graph has parent node with children\nWhen Node with no children is deleted\nThen Node is removed and siblings are resequenced"
+                        },
+                        {
+                          "name": "Delete node including children (cascade delete)",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_delete_node_including_children_cascade_delete",
+                          "steps": "Given Node has descendants\nWhen Node is deleted with cascade option\nThen Node and all descendants are deleted"
+                        },
+                        {
+                          "name": "Delete node at different positions verifies resequencing",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_delete_node_at_different_positions_verifies_resequencing",
+                          "steps": "Given Parent has children in order\nWhen Node at specific position is deleted\nThen Remaining children are resequenced properly"
+                        }
+                      ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
                     },
@@ -6786,8 +6957,73 @@
                       "story_type": "user",
                       "users": [],
                       "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestMoveStoryNodeToParent",
+                      "scenarios": [
+                        {
+                          "name": "Move node to new parent with default position",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_to_new_parent_with_default_position",
+                          "steps": "Given Node exists under source parent\nWhen Node moves to target parent\nThen Node is removed from source and added to target at last position"
+                        },
+                        {
+                          "name": "Move node to new parent with specified position",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_to_new_parent_with_specified_position",
+                          "steps": "Given Node exists under source parent, target parent has children\nWhen Node moves to target parent at specific position\nThen Node is inserted at position and target children shift"
+                        },
+                        {
+                          "name": "Move node with invalid position adjusts to last",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_with_invalid_position_adjusts_to_last",
+                          "steps": "Given Node exists under source parent\nWhen Moving to target with invalid position\nThen Position is adjusted to last valid position"
+                        },
+                        {
+                          "name": "Move node to same parent at different position",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_to_same_parent_at_different_position",
+                          "steps": "Given Parent has children in order\nWhen Node moves to different position within same parent\nThen Children are reordered correctly"
+                        },
+                        {
+                          "name": "Move node to parent where it already exists returns error",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_to_parent_where_it_already_exists_returns_error",
+                          "steps": "Given Node is already child of parent\nWhen Attempting to move node to same parent\nThen System identifies duplicate and returns error"
+                        },
+                        {
+                          "name": "Move SubEpic to SubEpic with Stories returns error",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_subepic_to_subepic_with_stories_returns_error",
+                          "steps": "Given Source has SubEpic, target has Stories\nWhen Attempting to move SubEpic to target with Stories\nThen System identifies hierarchy violation and returns error"
+                        },
+                        {
+                          "name": "Move Story to SubEpic with SubEpics returns error",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_story_to_subepic_with_subepics_returns_error",
+                          "steps": "Given Source has Story, target has SubEpics\nWhen Attempting to move Story to target with SubEpics\nThen System identifies hierarchy violation and returns error"
+                        },
+                        {
+                          "name": "Move node to create circular reference returns error",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_move_node_to_create_circular_reference_returns_error",
+                          "steps": "Given Parent has descendant\nWhen Attempting to move parent to its descendant\nThen System identifies circular reference and returns error"
+                        }
+                      ],
                       "scenario_outlines": [],
                       "acceptance_criteria": []
                     },
@@ -7006,7 +7242,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_build_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayStoryGraphThroughCLI",
                       "scenarios": [
                         {
@@ -7232,30 +7468,6 @@
                           "sequential_order": 7.0
                         }
                       ]
-                    },
-                    {
-                      "name": "Persist Story Graph Changes",
-                      "sequential_order": 14.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
-                      "name": "Save Story Nodes",
-                      "sequential_order": 15.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
                     }
                   ]
                 }
@@ -7268,8 +7480,81 @@
                   "story_type": "user",
                   "users": [],
                   "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
+                  "test_class": "TestCreateChildStoryNode",
+                  "scenarios": [
+                    {
+                      "name": "Create child node at any hierarchy level with default position",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_child_node_at_hierarchy_level",
+                      "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node of specified type\nThen Child is added at last position with correct total count"
+                    },
+                    {
+                      "name": "Create child node with specified position",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_child_node_with_position",
+                      "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node at specific position\nThen Child is inserted at position and existing children shift"
+                    },
+                    {
+                      "name": "Create child node with invalid position adjusts to last position",
+                      "sequential_order": 3.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_child_invalid_position_adjusts",
+                      "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child node at invalid position (exceeds child count)\nThen System adjusts position to last valid position"
+                    },
+                    {
+                      "name": "Create child node with duplicate name returns error",
+                      "sequential_order": 4.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_child_with_duplicate_name_returns_error",
+                      "steps": "Given Story Graph has parent node with existing child\nWhen Parent attempts to create child with duplicate name\nThen System identifies duplicate and returns error"
+                    },
+                    {
+                      "name": "Create child node without name generates unique name",
+                      "sequential_order": 5.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_child_without_name_generates_unique_name",
+                      "steps": "Given Story Graph has parent node with existing children\nWhen Parent creates child without providing name\nThen System generates unique name (Child1, Child2, etc.)"
+                    },
+                    {
+                      "name": "SubEpic creates Story and auto-creates StoryGroup on first Story",
+                      "sequential_order": 6.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_subepic_creates_story_and_storygroup",
+                      "steps": "Given SubEpic has existing Story count (0 or more)\nWhen SubEpic creates new Story\nThen StoryGroup is created (if first) or existing StoryGroup is used"
+                    },
+                    {
+                      "name": "SubEpic with Stories cannot create SubEpic child",
+                      "sequential_order": 7.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_subepic_with_stories_cannot_create_subepic_child",
+                      "steps": "Given SubEpic has existing Story children\nWhen SubEpic attempts to create SubEpic child\nThen System identifies hierarchy violation and returns error"
+                    },
+                    {
+                      "name": "SubEpic with SubEpics cannot create Story child",
+                      "sequential_order": 8.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_subepic_with_subepics_cannot_create_story_child",
+                      "steps": "Given SubEpic has existing SubEpic children\nWhen SubEpic attempts to create Story child\nThen System identifies hierarchy violation and returns error"
+                    },
+                    {
+                      "name": "Story creates child and adds to correct collection",
+                      "sequential_order": 9.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_story_creates_child_in_correct_collection",
+                      "steps": "Given Story exists in story graph\nWhen Story creates child of specific type (Scenario, ScenarioOutline, AcceptanceCriteria)\nThen Child is added to correct collection and not to others"
+                    }
+                  ],
                   "scenario_outlines": [],
                   "acceptance_criteria": []
                 },
@@ -7502,8 +7787,81 @@
                   "story_type": "user",
                   "users": [],
                   "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
+                  "test_class": "TestCreateEpic",
+                  "scenarios": [
+                    {
+                      "name": "Create Epic with name at default position",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_with_name_at_default_position",
+                      "steps": "Given Story Map is initialized\nWhen Story Map creates Epic with name\nThen Epic is added at last position"
+                    },
+                    {
+                      "name": "Create Epic with position specified",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_with_position_specified",
+                      "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic at specific position\nThen Epic is inserted at position and existing Epics shift"
+                    },
+                    {
+                      "name": "Create Epic with invalid position adjusts to last",
+                      "sequential_order": 3.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_with_invalid_position_adjusts",
+                      "steps": "Given Story Map has 2 Epics\nWhen Story Map creates Epic at position 99\nThen Position is adjusted to last (position 2)"
+                    },
+                    {
+                      "name": "Create Epic without name generates unique name",
+                      "sequential_order": 4.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_without_name_generates_unique_name",
+                      "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic without name\nThen System generates unique name (Epic1, Epic2, etc.)"
+                    },
+                    {
+                      "name": "Create Epic with duplicate name returns error",
+                      "sequential_order": 5.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_with_duplicate_name_returns_error",
+                      "steps": "Given Story Map has Epic \"User Management\"\nWhen Story Map attempts to create Epic with duplicate name\nThen System identifies duplicate and returns error"
+                    },
+                    {
+                      "name": "Create Epic updates epics collection",
+                      "sequential_order": 6.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_updates_epics_collection",
+                      "steps": "Given Story Map has existing Epics\nWhen Story Map creates new Epic\nThen Epics collection is updated and new Epic is accessible"
+                    },
+                    {
+                      "name": "Create Epic updates underlying story_graph dict",
+                      "sequential_order": 7.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_updates_story_graph_dict",
+                      "steps": "Given Story Map has existing Epics\nWhen Story Map creates new Epic\nThen story_graph dict is updated with new Epic"
+                    },
+                    {
+                      "name": "Create multiple Epics in sequence",
+                      "sequential_order": 8.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_multiple_epics_in_sequence",
+                      "steps": "Given Story Map is initialized\nWhen Story Map creates multiple Epics\nThen All Epics are added in correct order"
+                    },
+                    {
+                      "name": "Create Epic at beginning (position 0)",
+                      "sequential_order": 9.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_create_epic_at_beginning_position",
+                      "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic at position 0\nThen Epic is inserted at beginning"
+                    }
+                  ],
                   "scenario_outlines": [],
                   "acceptance_criteria": []
                 },
@@ -7697,8 +8055,33 @@
                   "story_type": "user",
                   "users": [],
                   "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
+                  "test_class": "TestDeleteStoryNode",
+                  "scenarios": [
+                    {
+                      "name": "Delete node without children",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_delete_node_without_children",
+                      "steps": "Given Story Graph has parent node with children\nWhen Node with no children is deleted\nThen Node is removed and siblings are resequenced"
+                    },
+                    {
+                      "name": "Delete node including children (cascade delete)",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_delete_node_including_children_cascade_delete",
+                      "steps": "Given Node has descendants\nWhen Node is deleted with cascade option\nThen Node and all descendants are deleted"
+                    },
+                    {
+                      "name": "Delete node at different positions verifies resequencing",
+                      "sequential_order": 3.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_delete_node_at_different_positions_verifies_resequencing",
+                      "steps": "Given Parent has children in order\nWhen Node at specific position is deleted\nThen Remaining children are resequenced properly"
+                    }
+                  ],
                   "scenario_outlines": [],
                   "acceptance_criteria": []
                 },
@@ -7891,8 +8274,73 @@
                   "story_type": "user",
                   "users": [],
                   "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
+                  "test_class": "TestMoveStoryNodeToParent",
+                  "scenarios": [
+                    {
+                      "name": "Move node to new parent with default position",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_to_new_parent_with_default_position",
+                      "steps": "Given Node exists under source parent\nWhen Node moves to target parent\nThen Node is removed from source and added to target at last position"
+                    },
+                    {
+                      "name": "Move node to new parent with specified position",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_to_new_parent_with_specified_position",
+                      "steps": "Given Node exists under source parent, target parent has children\nWhen Node moves to target parent at specific position\nThen Node is inserted at position and target children shift"
+                    },
+                    {
+                      "name": "Move node with invalid position adjusts to last",
+                      "sequential_order": 3.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_with_invalid_position_adjusts_to_last",
+                      "steps": "Given Node exists under source parent\nWhen Moving to target with invalid position\nThen Position is adjusted to last valid position"
+                    },
+                    {
+                      "name": "Move node to same parent at different position",
+                      "sequential_order": 4.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_to_same_parent_at_different_position",
+                      "steps": "Given Parent has children in order\nWhen Node moves to different position within same parent\nThen Children are reordered correctly"
+                    },
+                    {
+                      "name": "Move node to parent where it already exists returns error",
+                      "sequential_order": 5.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_to_parent_where_it_already_exists_returns_error",
+                      "steps": "Given Node is already child of parent\nWhen Attempting to move node to same parent\nThen System identifies duplicate and returns error"
+                    },
+                    {
+                      "name": "Move SubEpic to SubEpic with Stories returns error",
+                      "sequential_order": 6.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_subepic_to_subepic_with_stories_returns_error",
+                      "steps": "Given Source has SubEpic, target has Stories\nWhen Attempting to move SubEpic to target with Stories\nThen System identifies hierarchy violation and returns error"
+                    },
+                    {
+                      "name": "Move Story to SubEpic with SubEpics returns error",
+                      "sequential_order": 7.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_story_to_subepic_with_subepics_returns_error",
+                      "steps": "Given Source has Story, target has SubEpics\nWhen Attempting to move Story to target with SubEpics\nThen System identifies hierarchy violation and returns error"
+                    },
+                    {
+                      "name": "Move node to create circular reference returns error",
+                      "sequential_order": 8.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_move_node_to_create_circular_reference_returns_error",
+                      "steps": "Given Parent has descendant\nWhen Attempting to move parent to its descendant\nThen System identifies circular reference and returns error"
+                    }
+                  ],
                   "scenario_outlines": [],
                   "acceptance_criteria": []
                 },
@@ -8111,7 +8559,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_build_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayStoryGraphThroughCLI",
                   "scenarios": [
                     {
@@ -8337,30 +8785,6 @@
                       "sequential_order": 7.0
                     }
                   ]
-                },
-                {
-                  "name": "Persist Story Graph Changes",
-                  "sequential_order": 14.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
-                {
-                  "name": "Save Story Nodes",
-                  "sequential_order": 15.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_file": null,
-                  "test_class": null,
-                  "scenarios": [],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
                 }
               ]
             },
@@ -9184,7 +9608,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                      "test_file": null,
                       "test_class": "TestNavigateToBehaviorActionAndExecute",
                       "scenarios": [
                         {
@@ -9231,7 +9655,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                      "test_file": null,
                       "test_class": "TestNavigateSequentially",
                       "scenarios": [
                         {
@@ -9528,7 +9952,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                  "test_file": null,
                   "test_class": "TestNavigateToBehaviorActionAndExecute",
                   "scenarios": [
                     {
@@ -9575,7 +9999,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_navigate_behaviors_using_repl_commands.py",
+                  "test_file": null,
                   "test_class": "TestNavigateSequentially",
                   "scenarios": [
                     {
@@ -9751,7 +10175,7 @@
                       "test_class": "TestNavigateToBehaviorActionAndExecute",
                       "scenarios": [
                         {
-                          "name": "Execute behavior with action parameter",
+                          "name": "Execute Behavior with action parameter",
                           "sequential_order": 1.0,
                           "type": "happy_path",
                           "background": [],
@@ -10283,7 +10707,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_execute_actions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestReExecuteCurrentOperationUsingCLI",
                       "scenarios": [
                         {
@@ -10314,7 +10738,7 @@
                   "test_class": "TestNavigateToBehaviorActionAndExecute",
                   "scenarios": [
                     {
-                      "name": "Execute behavior with action parameter",
+                      "name": "Execute Behavior with action parameter",
                       "sequential_order": 1.0,
                       "type": "happy_path",
                       "background": [],
@@ -10846,7 +11270,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_execute_actions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestReExecuteCurrentOperationUsingCLI",
                   "scenarios": [
                     {
@@ -11610,7 +12034,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_execute_actions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetActionInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -11652,7 +12076,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_execute_actions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestSubmitInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -11744,7 +12168,7 @@
                       ]
                     },
                     {
-                      "name": "Display Instructions In Raw Format Panel",
+                      "name": "Display Raw Format Instructions In Panel",
                       "sequential_order": 4.0,
                       "connector": "and",
                       "story_type": "user",
@@ -11923,7 +12347,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_execute_actions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestHandleOperationErrorsAndValidationInCLI",
                       "scenarios": [
                         {
@@ -12046,7 +12470,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_execute_actions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetActionInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -12088,7 +12512,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_execute_actions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestSubmitInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -12180,7 +12604,7 @@
                   ]
                 },
                 {
-                  "name": "Display Instructions In Raw Format Panel",
+                  "name": "Display Raw Format Instructions In Panel",
                   "sequential_order": 4.0,
                   "connector": "and",
                   "story_type": "user",
@@ -12359,7 +12783,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_execute_actions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestHandleOperationErrorsAndValidationInCLI",
                   "scenarios": [
                     {
@@ -12515,7 +12939,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_clarify_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayClarificationDataThroughCLI",
                       "scenarios": [
                         {
@@ -12631,7 +13055,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_clarify_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetClarifyInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -12721,7 +13145,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_clarify_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayClarificationDataThroughCLI",
                   "scenarios": [
                     {
@@ -12837,7 +13261,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_clarify_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetClarifyInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -12920,7 +13344,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_strategy_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayStrategyDataThroughCLI",
                       "scenarios": [
                         {
@@ -13152,7 +13576,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_strategy_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetStrategyInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -13226,7 +13650,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_strategy_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayStrategyDataThroughCLI",
                   "scenarios": [
                     {
@@ -13458,7 +13882,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_strategy_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetStrategyInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -13541,7 +13965,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_build_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetBuildInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -13755,7 +14179,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_build_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetBuildInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -13978,7 +14402,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_validate_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayValidationResultsThroughCLI",
                       "scenarios": [
                         {
@@ -14001,7 +14425,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_validate_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayValidationScannersThroughCLI",
                       "scenarios": [
                         {
@@ -14076,7 +14500,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_validate_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetValidateInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -14150,7 +14574,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_validate_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayValidationResultsThroughCLI",
                   "scenarios": [
                     {
@@ -14173,7 +14597,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_validate_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayValidationScannersThroughCLI",
                   "scenarios": [
                     {
@@ -14248,7 +14672,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_validate_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetValidateInstructionsThroughCLI",
                   "scenarios": [
                     {
@@ -14284,7 +14708,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_render_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplayRenderConfigurationsThroughCLI",
                       "scenarios": [
                         {
@@ -14307,7 +14731,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_render_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestDisplaySynchronizerOutputThroughCLI",
                       "scenarios": [
                         {
@@ -14330,7 +14754,7 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test_display_render_instructions_using_repl.py",
+                      "test_file": null,
                       "test_class": "TestGetRenderInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -14504,7 +14928,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_render_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplayRenderConfigurationsThroughCLI",
                   "scenarios": [
                     {
@@ -14527,7 +14951,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_render_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestDisplaySynchronizerOutputThroughCLI",
                   "scenarios": [
                     {
@@ -14550,7 +14974,7 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": "test_display_render_instructions_using_repl.py",
+                  "test_file": null,
                   "test_class": "TestGetRenderInstructionsThroughCLI",
                   "scenarios": [
                     {
