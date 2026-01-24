@@ -16013,7 +16013,7 @@
               "acceptance_criteria": []
             }
           ],
-          "test_file": "invoke_bot/get_help/"
+          "test_file": "invoke_bot/get_help/test_get_help_using_cli.py"
         }
       ],
       "story_groups": []
