@@ -6,7 +6,7 @@ It creates the domain BotTestHelper internally and sets up the CLI session.
 """
 from pathlib import Path
 from cli.cli_session import CLISession
-from domain.bot_test_helper import BotTestHelper
+from helpers.bot_test_helper import BotTestHelper
 
 
 class CLIBotTestHelper:

@@ -7,6 +7,38 @@ from pathlib import Path
 from helpers.base_helper import BaseHelper
 
 
+def _setup_build_action_prerequisites(bot_directory: Path, behavior: str = 'exploration'):
+    """Set up directory structure and config files needed for build action tests.
+    
+    Creates the knowledge graph directory structure and basic config/template files
+    that BuildAction expects to find.
+    
+    Args:
+        bot_directory: Path to bot directory
+        behavior: Name of the behavior (default: 'exploration')
+    
+    Returns:
+        Path to the knowledge graph directory
+    """
+    # Create knowledge graph directory structure
+    kg_dir = bot_directory / 'behaviors' / behavior / 'knowledge_graph'
+    kg_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create a minimal config file
+    config_file = kg_dir / 'story_graph_config.json'
+    config_data = {
+        'template': 'story_graph_template.md',
+        'output_path': 'docs/stories'
+    }
+    config_file.write_text(json.dumps(config_data, indent=2), encoding='utf-8')
+    
+    # Create a minimal template file
+    template_file = kg_dir / 'story_graph_template.md'
+    template_file.write_text('# Story Graph Template\n\n{{content}}', encoding='utf-8')
+    
+    return kg_dir
+
+
 class BehaviorTestHelper(BaseHelper):
     """Helper for behavior and action management, workflows, and verification"""
     
@@ -318,9 +350,7 @@ class BehaviorTestHelper(BaseHelper):
         
         # If action is 'build', create story graph config structure
         if action_name == 'build':
-            from domain.test_build_knowledge import given_setup
-            kg_dir = given_setup('directory_structure', self.parent.bot_directory, behavior=behavior)
-            given_setup('config_and_template', self.parent.bot_directory, kg_dir=kg_dir)
+            _setup_build_action_prerequisites(self.parent.bot_directory, behavior=behavior)
         
         # Create mock behavior object
         class MockBotPath:

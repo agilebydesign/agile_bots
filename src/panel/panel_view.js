@@ -107,8 +107,16 @@ class PanelView {
                             this._pendingReject(new Error('No JSON found in CLI output'));
                         } else {
                             const jsonData = JSON.parse(jsonMatch[0]);
-                            console.log('[PanelView] Command executed successfully, response keys:', Object.keys(jsonData));
-                            this._pendingResolve(jsonData);
+                            
+                            // Check if response indicates an error from CLI
+                            if (jsonData.status === 'error' && jsonData.error) {
+                                console.error('[PanelView] CLI returned error:', jsonData.error);
+                                // Resolve with the error object so it can be handled gracefully
+                                this._pendingResolve(jsonData);
+                            } else {
+                                console.log('[PanelView] Command executed successfully, response keys:', Object.keys(jsonData));
+                                this._pendingResolve(jsonData);
+                            }
                         }
                     } catch (parseError) {
                         console.error('[PanelView] JSON parse error:', parseError.message);
