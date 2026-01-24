@@ -4,7 +4,7 @@ Handles story graph, story map, epics, scenarios testing
 """
 import json
 from pathlib import Path
-from .base_helper import BaseHelper
+from helpers.base_helper import BaseHelper
 
 
 class StoryTestHelper(BaseHelper):
