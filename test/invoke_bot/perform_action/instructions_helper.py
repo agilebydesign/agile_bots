@@ -6,6 +6,11 @@ from pathlib import Path
 from helpers.base_helper import BaseHelper
 
 
+def validate_violation_structure(violation: dict, required_fields: list) -> bool:
+    """Validate that a violation dict has all required fields."""
+    return all(field in violation for field in required_fields)
+
+
 class InstructionsTestHelper(BaseHelper):
     """Helper for instructions testing"""
     
@@ -17,7 +22,6 @@ class InstructionsTestHelper(BaseHelper):
             assert len(validation_rules) > 0, "Instructions should contain validation rules"
             
             from actions.rules.rule import Rule
-            from domain.test_validate_knowledge_and_content_against_rules import validate_violation_structure
             
             for rule in validation_rules:
                 if isinstance(rule, Rule):

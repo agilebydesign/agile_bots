@@ -189,7 +189,7 @@ class TestEnrichScopeWithLinks:
         test_links = [l for l in story['links'] if l['icon'] == 'test_tube']
         assert len(test_links) == 1
         assert 'test_story.py' in test_links[0]['url']
-        assert 'TestMyStory' in test_links[0]['url']
+        assert '#L' in test_links[0]['url']  # Verify it has a line number
     
     def test_story_without_test_file_gets_no_test_link(self, tmp_path):
         """
@@ -334,7 +334,7 @@ class TestEnrichScopeWithLinks:
         test_links = [l for l in story['links'] if l['icon'] == 'test_tube']
         assert len(test_links) == 1
         assert 'test_sub_epic.py' in test_links[0]['url']
-        assert 'TestMyStory' in test_links[0]['url']
+        assert '#L' in test_links[0]['url']  # Verify it has a line number
     
     def test_epic_with_docs_folder_gets_document_link(self, tmp_path):
         """
@@ -445,7 +445,7 @@ class TestEnrichScopeWithLinks:
         if has_test_link:
             assert len(test_links) == 1, f"Story should have test link with sub_epic test_file={sub_epic_test_file}, story test_class={story_test_class}"
             assert sub_epic_test_file in test_links[0]['url']
-            assert story_test_class in test_links[0]['url']
+            assert '#L' in test_links[0]['url']  # Verify it has a line number
         else:
             assert len(test_links) == 0, f"Story should not have test link with sub_epic test_file={sub_epic_test_file}, story test_class={story_test_class}"
     
