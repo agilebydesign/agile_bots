@@ -1569,7 +1569,7 @@ class BotPanel {
                     // "ON" vs "AFTER" logic:
                     // - If hovering directly on item (middle 60%) AND can nest inside: show "inside" (orange background, no line)
                     // - Otherwise: show "after" (orange line below item)
-                    if (canContain && isEmptyContainer && percentY >= 0.2 && percentY <= 0.8) {
+                    if (canContain && percentY >= 0.2 && percentY <= 0.8) {
                         // Hovering ON the item - nest inside
                         dropZone = 'inside';
                         target.style.backgroundColor = 'rgba(255, 140, 0, 0.3)'; // Orange tint for nesting

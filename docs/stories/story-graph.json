@@ -11475,53 +11475,6 @@
                   "connector": null,
                   "stories": [
                     {
-                      "name": "Build Story Graph",
-                      "sequential_order": 999.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_file": null,
-                      "test_class": "TestBuildStoryGraph",
-                      "scenarios": [
-                        {
-                          "name": "Action Injects Story Graph Template",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_injects_story_graph_template",
-                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph template\nThen Instructions contain template_path from existing templates"
-                        },
-                        {
-                          "name": "Action Loads And Merges Instructions",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_action_loads_and_merges_instructions",
-                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph and instructions\nThen Instructions contain all BuildStoryGraphAction-specific fields"
-                        },
-                        {
-                          "name": "All Template Variables Are Replaced In Instructions",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_all_template_variables_are_replaced_in_instructions",
-                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects all template variables\nThen Instructions contain all required BuildStoryGraphAction fields"
-                        },
-                        {
-                          "name": "Prioritization behavior updates existing story-graph.json",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_behavior_updates_existing_story_graph_json",
-                          "steps": "Given Production prioritization behavior with increments templates\nWhen Action injects story graph template for increments\nThen Instructions use production template (story_graph_increments.json) that updates existing file\nThen And Existing story-graph.json in workspace"
-                        }
-                      ],
-                      "scenario_outlines": [],
-                      "acceptance_criteria": []
-                    },
-                    {
                       "name": "Render Story Graph using Story Graph API",
                       "sequential_order": 1.0,
                       "connector": "or",
@@ -11889,53 +11842,6 @@
                 }
               ],
               "stories": [
-                {
-                  "name": "Build Story Graph",
-                  "sequential_order": 999.0,
-                  "connector": "or",
-                  "story_type": "user",
-                  "users": [
-                    "Bot Behavior"
-                  ],
-                  "test_file": null,
-                  "test_class": "TestBuildStoryGraph",
-                  "scenarios": [
-                    {
-                      "name": "Action Injects Story Graph Template",
-                      "sequential_order": 1.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_injects_story_graph_template",
-                      "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph template\nThen Instructions contain template_path from existing templates"
-                    },
-                    {
-                      "name": "Action Loads And Merges Instructions",
-                      "sequential_order": 2.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_action_loads_and_merges_instructions",
-                      "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph and instructions\nThen Instructions contain all BuildStoryGraphAction-specific fields"
-                    },
-                    {
-                      "name": "All Template Variables Are Replaced In Instructions",
-                      "sequential_order": 3.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_all_template_variables_are_replaced_in_instructions",
-                      "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects all template variables\nThen Instructions contain all required BuildStoryGraphAction fields"
-                    },
-                    {
-                      "name": "Prioritization behavior updates existing story-graph.json",
-                      "sequential_order": 4.0,
-                      "type": "happy_path",
-                      "background": [],
-                      "test_method": "test_behavior_updates_existing_story_graph_json",
-                      "steps": "Given Production prioritization behavior with increments templates\nWhen Action injects story graph template for increments\nThen Instructions use production template (story_graph_increments.json) that updates existing file\nThen And Existing story-graph.json in workspace"
-                    }
-                  ],
-                  "scenario_outlines": [],
-                  "acceptance_criteria": []
-                },
                 {
                   "name": "Render Story Graph using Story Graph API",
                   "sequential_order": 1.0,
@@ -13173,7 +13079,7 @@
                       "stories": [
                         {
                           "name": "Display Story Graph Through CLI",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": null,
                           "story_type": "user",
                           "users": [
@@ -13196,7 +13102,7 @@
                         },
                         {
                           "name": "Display Build Scope Through CLI",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13219,7 +13125,7 @@
                         },
                         {
                           "name": "Display Filtered Knowledge Graph Through CLI",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13242,7 +13148,7 @@
                         },
                         {
                           "name": "Get Build Instructions Through CLI",
-                          "sequential_order": 4.0,
+                          "sequential_order": 3.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -13270,6 +13176,53 @@
                           ],
                           "scenario_outlines": [],
                           "acceptance_criteria": []
+                        },
+                        {
+                          "name": "Build Story Graph",
+                          "sequential_order": 4.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_file": null,
+                          "test_class": "TestBuildStoryGraph",
+                          "scenarios": [
+                            {
+                              "name": "Action Injects Story Graph Template",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_injects_story_graph_template",
+                              "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph template\nThen Instructions contain template_path from existing templates"
+                            },
+                            {
+                              "name": "Action Loads And Merges Instructions",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_action_loads_and_merges_instructions",
+                              "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph and instructions\nThen Instructions contain all BuildStoryGraphAction-specific fields"
+                            },
+                            {
+                              "name": "All Template Variables Are Replaced In Instructions",
+                              "sequential_order": 3.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_all_template_variables_are_replaced_in_instructions",
+                              "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects all template variables\nThen Instructions contain all required BuildStoryGraphAction fields"
+                            },
+                            {
+                              "name": "Prioritization behavior updates existing story-graph.json",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_behavior_updates_existing_story_graph_json",
+                              "steps": "Given Production prioritization behavior with increments templates\nWhen Action injects story graph template for increments\nThen Instructions use production template (story_graph_increments.json) that updates existing file\nThen And Existing story-graph.json in workspace"
+                            }
+                          ],
+                          "scenario_outlines": [],
+                          "acceptance_criteria": []
                         }
                       ]
                     }
@@ -13277,7 +13230,7 @@
                   "stories": [
                     {
                       "name": "Display Story Graph Through CLI",
-                      "sequential_order": 1.0,
+                      "sequential_order": 0.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
@@ -13300,7 +13253,7 @@
                     },
                     {
                       "name": "Display Build Scope Through CLI",
-                      "sequential_order": 2.0,
+                      "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13323,7 +13276,7 @@
                     },
                     {
                       "name": "Display Filtered Knowledge Graph Through CLI",
-                      "sequential_order": 3.0,
+                      "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13346,7 +13299,7 @@
                     },
                     {
                       "name": "Get Build Instructions Through CLI",
-                      "sequential_order": 4.0,
+                      "sequential_order": 3.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -13370,6 +13323,53 @@
                           "background": [],
                           "test_method": "test_get_build_instructions_with_scope",
                           "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters 'shape.build.instructions scope=\"Story1\"'\nTHEN: CLI displays build instructions filtered to Story1"
+                        }
+                      ],
+                      "scenario_outlines": [],
+                      "acceptance_criteria": []
+                    },
+                    {
+                      "name": "Build Story Graph",
+                      "sequential_order": 4.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestBuildStoryGraph",
+                      "scenarios": [
+                        {
+                          "name": "Action Injects Story Graph Template",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_injects_story_graph_template",
+                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph template\nThen Instructions contain template_path from existing templates"
+                        },
+                        {
+                          "name": "Action Loads And Merges Instructions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_action_loads_and_merges_instructions",
+                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects story graph and instructions\nThen Instructions contain all BuildStoryGraphAction-specific fields"
+                        },
+                        {
+                          "name": "All Template Variables Are Replaced In Instructions",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_all_template_variables_are_replaced_in_instructions",
+                          "steps": "Given Production story_bot with shape behavior (has story graph templates)\nWhen Action injects all template variables\nThen Instructions contain all required BuildStoryGraphAction fields"
+                        },
+                        {
+                          "name": "Prioritization behavior updates existing story-graph.json",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_behavior_updates_existing_story_graph_json",
+                          "steps": "Given Production prioritization behavior with increments templates\nWhen Action injects story graph template for increments\nThen Instructions use production template (story_graph_increments.json) that updates existing file\nThen And Existing story-graph.json in workspace"
                         }
                       ],
                       "scenario_outlines": [],
