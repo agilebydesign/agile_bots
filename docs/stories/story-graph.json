@@ -15125,21 +15125,6 @@
               ],
               "story_groups": [],
               "stories": []
-            },
-            {
-              "name": "Perform Action Through Panel",
-              "sequential_order": 1.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "stories": []
-                }
-              ],
-              "stories": []
             }
           ],
           "story_groups": [],
