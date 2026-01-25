@@ -2253,37 +2253,6 @@ class BotPanel {
             return behaviorMap[behavior] || 'Submit';
         };
         
-        // Map behavior to submit icon filename (global function)
-        window.behaviorToIconFile = function(behavior) {
-            var iconMap = {
-                'shape': 'submit_epic.png',
-                'exploration': 'submit_story.png',
-                'scenarios': 'submit_ac.png',
-                'tests': 'submit_tests.png',
-                'code': 'submit_code.png'
-            };
-            return iconMap[behavior] || 'submit_code.png';
-        };
-        
-        // Update submit button icon based on behavior (global function)
-        window.updateSubmitButtonIcon = function(behavior) {
-            var btnSubmit = document.getElementById('btn-submit');
-            if (btnSubmit) {
-                var img = btnSubmit.querySelector('img');
-                if (img && behavior) {
-                    var iconFile = window.behaviorToIconFile(behavior);
-                    // Update the src to use the new icon
-                    var currentSrc = img.src;
-                    var newSrc = currentSrc.replace(/submit_[^.]+\.png/, iconFile);
-                    img.src = newSrc;
-                    
-                    vscode.postMessage({
-                        command: 'logToFile',
-                        message: '[WebView] Submit icon updated: behavior="' + behavior + '", icon="' + iconFile + '"'
-                    });
-                }
-            }
-        };
         
         // Update contextual action buttons based on selection
         window.updateContextualButtons = function() {
@@ -2299,7 +2268,6 @@ class BotPanel {
             const btnCreateAcceptanceCriteria = document.getElementById('btn-create-acceptance-criteria');
             const btnDelete = document.getElementById('btn-delete');
             const btnScopeTo = document.getElementById('btn-scope-to');
-            const btnSubmit = document.getElementById('btn-submit');
             
             // Hide all buttons first
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';
@@ -2309,7 +2277,6 @@ class BotPanel {
             if (btnCreateAcceptanceCriteria) btnCreateAcceptanceCriteria.style.display = 'none';
             if (btnDelete) btnDelete.style.display = 'none';
             if (btnScopeTo) btnScopeTo.style.display = 'none';
-            if (btnSubmit) btnSubmit.style.display = 'none';
             
             // Show buttons based on selection
             if (window.selectedNode.type === 'root') {
@@ -2318,36 +2285,6 @@ class BotPanel {
                 if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
-                if (btnSubmit) {
-                    btnSubmit.style.display = 'block';
-                    
-                    // Read behavior directly from node data (pre-calculated in Python)
-                    vscode.postMessage({
-                        command: 'logToFile',
-                        message: '[WebView] EPIC TOOLTIP - behavior="' + window.selectedNode.behavior + '", name="' + window.selectedNode.name + '"'
-                    });
-                    
-                    if (window.selectedNode.behavior) {
-                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
-                        var finalTooltip = tooltipText + ': ' + window.selectedNode.name;
-                        btnSubmit.setAttribute('title', finalTooltip);
-                        
-                        // Update submit button icon based on behavior
-                        window.updateSubmitButtonIcon(window.selectedNode.behavior);
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] EPIC TOOLTIP SET: "' + finalTooltip + '"'
-                        });
-                    } else {
-                        btnSubmit.setAttribute('title', 'Submit scope and start work');
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] EPIC TOOLTIP - No behavior, using default'
-                        });
-                    }
-                }
             } else if (window.selectedNode.type === 'sub-epic') {
                 // Sub-epics can have EITHER sub-epics OR stories, not both
                 // If it has stories, only show create story button
@@ -2366,72 +2303,12 @@ class BotPanel {
                 }
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
-                if (btnSubmit) {
-                    btnSubmit.style.display = 'block';
-                    
-                    // Read behavior directly from node data (pre-calculated in Python)
-                    vscode.postMessage({
-                        command: 'logToFile',
-                        message: '[WebView] SUB-EPIC TOOLTIP - behavior="' + window.selectedNode.behavior + '", name="' + window.selectedNode.name + '"'
-                    });
-                    
-                    if (window.selectedNode.behavior) {
-                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
-                        var finalTooltip = tooltipText + ': ' + window.selectedNode.name;
-                        btnSubmit.setAttribute('title', finalTooltip);
-                        
-                        // Update submit button icon based on behavior
-                        window.updateSubmitButtonIcon(window.selectedNode.behavior);
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] SUB-EPIC TOOLTIP SET: "' + finalTooltip + '"'
-                        });
-                    } else {
-                        btnSubmit.setAttribute('title', 'Submit scope and start work');
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] SUB-EPIC TOOLTIP - No behavior, using default'
-                        });
-                    }
-                }
             } else if (window.selectedNode.type === 'story') {
                 // Stories can have both scenarios and acceptance criteria
                 if (btnCreateScenario) btnCreateScenario.style.display = 'block';
                 if (btnCreateAcceptanceCriteria) btnCreateAcceptanceCriteria.style.display = 'block';
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
-                if (btnSubmit) {
-                    btnSubmit.style.display = 'block';
-                    
-                    // Read behavior directly from node data (pre-calculated in Python)
-                    vscode.postMessage({
-                        command: 'logToFile',
-                        message: '[WebView] STORY TOOLTIP - behavior="' + window.selectedNode.behavior + '", name="' + window.selectedNode.name + '"'
-                    });
-                    
-                    if (window.selectedNode.behavior) {
-                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
-                        var finalTooltip = tooltipText + ': ' + window.selectedNode.name;
-                        btnSubmit.setAttribute('title', finalTooltip);
-                        
-                        // Update submit button icon based on behavior
-                        window.updateSubmitButtonIcon(window.selectedNode.behavior);
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] STORY TOOLTIP SET: "' + finalTooltip + '"'
-                        });
-                    } else {
-                        btnSubmit.setAttribute('title', 'Submit scope and start work');
-                        
-                        vscode.postMessage({
-                            command: 'logToFile',
-                            message: '[WebView] STORY TOOLTIP - No behavior, using default'
-                        });
-                    }
-                }
             } else if (window.selectedNode.type === 'scenario') {
                 // Scenarios can also be scoped to
                 if (btnDelete) btnDelete.style.display = 'block';
@@ -2633,30 +2510,6 @@ class BotPanel {
             });
         };
         
-        // Handle submit scope action - submit selected node and start work
-        window.handleSubmitScope = function() {
-            console.log('[WebView] handleSubmitScope called for node:', window.selectedNode);
-            
-            if (!window.selectedNode.name) {
-                console.error('[WebView] ERROR: No node selected for submit');
-                return;
-            }
-            
-            // Use the node name for submit_scope command
-            const nodeName = window.selectedNode.name;
-            
-            console.log('[WebView] Submit scope for node:', nodeName);
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] SENDING SUBMIT SCOPE COMMAND: submit_scope "' + nodeName + '"'
-            });
-            
-            // Execute submit_scope command with the node name
-            vscode.postMessage({
-                command: 'executeCommand',
-                commandText: 'submit_scope "' + nodeName + '"'
-            });
-        };
         
         // Initialize: show Create Epic button by default
         setTimeout(() => {

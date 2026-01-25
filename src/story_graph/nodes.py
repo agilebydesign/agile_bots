@@ -24,6 +24,7 @@ class ActionResult:
 class StoryNode(ABC):
     name: str
     sequential_order: Optional[float] = None
+    behavior: Optional[str] = None
     _bot: Optional[Any] = field(default=None, repr=False)
 
     def __post_init__(self):
@@ -140,8 +141,8 @@ class StoryNode(ABC):
             parent._children.remove(self)
             parent._resequence_children()
             
-            # Save changes from PARENT - skip expensive behavior recalc for delete (behaviors are stale but acceptable)
-            parent.save(skip_behavior_recalc=True)
+            # Save changes from PARENT
+            parent.save()
             
             elapsed = time.time() - start_time
             print(f"[DELETE TIMING] Deleted {node_type} '{node_name}' in {elapsed:.3f}s")
@@ -154,8 +155,8 @@ class StoryNode(ABC):
         parent._children.remove(self)
         self._resequence_siblings()
         
-        # Save changes from PARENT - skip expensive behavior recalc for delete (behaviors are stale but acceptable)
-        parent.save(skip_behavior_recalc=True)
+        # Save changes from PARENT
+        parent.save()
         
         elapsed = time.time() - start_time
         print(f"[DELETE TIMING] Deleted {node_type} '{node_name}' in {elapsed:.3f}s")
