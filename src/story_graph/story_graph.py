@@ -58,30 +58,7 @@ class StoryGraph:
         
         raw_content = read_json_file(self._path)
         
-        # Only recalculate if file was modified AFTER panel's last edit
-        # (meaning someone edited it outside the panel)
-        if panel_edit_time > 0 and file_mtime <= panel_edit_time:
-            # File last changed by panel or before panel edit - no external changes
-            print(f"[DEBUG] StoryGraph: No external edits detected, using existing behaviors", file=sys.stderr)
-            return raw_content
-        
-        # File changed externally (or no panel edit history) - recalculate behaviors
-        print(f"[DEBUG] StoryGraph: External edit detected (file mtime {file_mtime} > panel edit {panel_edit_time}), recalculating", file=sys.stderr)
-        
-        # Use StoryMap to recalculate behaviors
-        try:
-            from story_graph.nodes import StoryMap
-            story_map = StoryMap(raw_content, bot=None, recalculate_behaviors=True)
-            # Convert back to dict with recalculated behaviors
-            from story_graph.nodes import Epic
-            content = {'epics': [story_map._epic_to_dict(epic) for epic in story_map._epics_list]}
-            if 'increments' in raw_content:
-                content['increments'] = raw_content['increments']
-            
-            return content
-        except Exception as e:
-            print(f"[DEBUG] StoryGraph: Failed to recalculate behaviors: {e}, using raw content", file=sys.stderr)
-            return raw_content
+        return raw_content
 
     @property
     def story_graph_spec(self) -> Optional['StoryGraphSpec']:
