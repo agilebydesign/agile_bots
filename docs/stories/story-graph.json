@@ -519,6 +519,14 @@
                       "test_class": "TestResolveBotPath",
                       "scenarios": [
                         {
+                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_base_actions_directory_property",
+                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
+                        },
+                        {
                           "name": "BotPath resolves directories from environment variables",
                           "sequential_order": 1.0,
                           "type": "happy_path",
@@ -527,20 +535,20 @@
                           "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
                         },
                         {
-                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_base_actions_directory_property",
-                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
-                        },
-                        {
                           "name": "BotPath.python_workspace_root property returns Python workspace root.",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_python_workspace_root_property",
                           "steps": ""
+                        },
+                        {
+                          "name": "BotPath raises error when environment variables not set",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
+                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
                         },
                         {
                           "name": "BotPath.find_repo_root() method returns repository root.",
@@ -549,14 +557,6 @@
                           "background": [],
                           "test_method": "test_bot_paths_find_repo_root_method",
                           "steps": ""
-                        },
-                        {
-                          "name": "BotPath raises error when environment variables not set",
-                          "sequential_order": 5.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
-                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
                         }
                       ],
                       "scenario_outlines": [],
