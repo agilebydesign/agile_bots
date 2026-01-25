@@ -81,9 +81,7 @@ class StoryTestHelper(BaseHelper):
                                                         "When story graph file does not exist",
                                                         "Then FileNotFoundError is raised"
                                                     ]
-                                                }
-                                            ],
-                                            "scenario_outlines": [
+                                                },
                                                 {
                                                     "name": "Load story graph with different formats",
                                                     "type": "happy_path",
@@ -413,17 +411,19 @@ class StoryTestHelper(BaseHelper):
                 story = self.access_story_item('story', source)
                 return story.scenarios[index]
         elif item_type == 'scenario_outline':
+            # Legacy support: scenario_outline is now just a scenario with examples
             if name:
-                scenario = source if hasattr(source, 'examples_columns') else self.access_story_item('scenario', source)
-                for outline in scenario.scenario_outlines if hasattr(scenario, 'scenario_outlines') else []:
-                    if outline.name == name:
-                        return outline
-                raise ValueError(f"Scenario outline '{name}' not found")
-            elif hasattr(source, 'scenario_outlines'):
-                return source.scenario_outlines[index]
+                story = source if hasattr(source, 'scenarios') else self.access_story_item('story', source)
+                for scenario in story.scenarios:
+                    if scenario.name == name and scenario.has_examples:
+                        return scenario
+                raise ValueError(f"Scenario with examples '{name}' not found")
             else:
                 story = self.access_story_item('story', source)
-                return story.scenario_outlines[index]
+                scenarios_with_examples = [s for s in story.scenarios if s.has_examples]
+                if scenarios_with_examples and index < len(scenarios_with_examples):
+                    return scenarios_with_examples[index]
+                return story.scenarios[index] if index < len(story.scenarios) else None
         else:
             raise ValueError(f"Unknown item_type: {item_type}")
     
@@ -463,16 +463,16 @@ class StoryTestHelper(BaseHelper):
             assert actual_names == expected_names, f"Expected names {expected_names}, got {actual_names}"
     
     def assert_scenario_outlines_match(self, scenario, expected_count=None, expected_names=None):
-        """Assert scenario outlines match expected count and names."""
+        """Assert scenarios with examples match expected count and names (legacy method name)."""
         from scanners.story_map import Story
         if isinstance(scenario, Story):
-            outlines = scenario.scenario_outlines
+            scenarios_with_examples = [s for s in scenario.scenarios if s.has_examples]
         else:
-            outlines = scenario.scenario_outlines if hasattr(scenario, 'scenario_outlines') else []
+            scenarios_with_examples = [s for s in scenario.scenarios if s.has_examples] if hasattr(scenario, 'scenarios') else []
         if expected_count is not None:
-            assert len(outlines) == expected_count, f"Expected {expected_count} scenario outlines, got {len(outlines)}"
+            assert len(scenarios_with_examples) == expected_count, f"Expected {expected_count} scenarios with examples, got {len(scenarios_with_examples)}"
         if expected_names is not None:
-            actual_names = [outline.name for outline in outlines]
+            actual_names = [s.name for s in scenarios_with_examples]
             assert actual_names == expected_names, f"Expected names {expected_names}, got {actual_names}"
     
     def assert_story_map_matches(self, story_map_or_epics, epic_name=None):
@@ -497,7 +497,7 @@ class StoryTestHelper(BaseHelper):
     
     def assert_map_location_matches(self, item, item_type=None, field=None):
         """Assert map location correctness for story map items."""
-        from scanners.story_map import Epic, SubEpic, Story, Scenario, ScenarioOutline
+        from scanners.story_map import Epic, SubEpic, Story, Scenario
         
         if item_type is None:
             if isinstance(item, Epic):
@@ -507,9 +507,11 @@ class StoryTestHelper(BaseHelper):
             elif isinstance(item, Story):
                 item_type = 'story'
             elif isinstance(item, Scenario):
-                item_type = 'scenario'
-            elif isinstance(item, ScenarioOutline):
-                item_type = 'scenario_outline'
+                # Check if it's a scenario with examples (legacy scenario_outline)
+                if item.has_examples:
+                    item_type = 'scenario_outline'
+                else:
+                    item_type = 'scenario'
         
         expected_locations = {
             'epic': {
@@ -527,7 +529,7 @@ class StoryTestHelper(BaseHelper):
                 None: "epics[0].sub_epics[0].story_groups[0].stories[0].scenarios[0].name"
             },
             'scenario_outline': {
-                None: "epics[0].sub_epics[0].story_groups[0].stories[0].scenario_outlines[0].name"
+                None: "epics[0].sub_epics[0].story_groups[0].stories[0].scenarios[2].name"
             }
         }
         
@@ -876,7 +878,8 @@ class StoryTestHelper(BaseHelper):
         if collection_name == 'scenarios':
             children = story.scenarios
         elif collection_name == 'scenario_outlines':
-            children = story.scenario_outlines
+            # Legacy support: scenario_outlines are now scenarios with examples
+            children = [s for s in story.scenarios if s.has_examples]
         elif collection_name == 'acceptance_criteria':
             children = story.acceptance_criteria
         else:
@@ -892,7 +895,8 @@ class StoryTestHelper(BaseHelper):
         if excluded_collection == 'scenarios':
             children = story.scenarios
         elif excluded_collection == 'scenario_outlines':
-            children = story.scenario_outlines
+            # Legacy support: scenario_outlines are now scenarios with examples
+            children = [s for s in story.scenarios if s.has_examples]
         elif excluded_collection == 'acceptance_criteria':
             children = story.acceptance_criteria
         else:
@@ -1414,7 +1418,6 @@ class StoryTestHelper(BaseHelper):
                 story_data.get('scenarios', []),
                 story_data.get('test_methods', [])
             ),
-            'scenario_outlines': [],
             'acceptance_criteria': self._build_acceptance_criteria_for_behavior_test(
                 story_data.get('acceptance_criteria', '')
             ),
@@ -1550,7 +1553,6 @@ class StoryTestHelper(BaseHelper):
                                             'test_file': None,
                                             'test_class': test_class if test_class else None,
                                             'scenarios': self._build_scenarios_for_behavior_test(scenarios, test_methods),
-                                            'scenario_outlines': [],
                                             'acceptance_criteria': self._build_acceptance_criteria_for_behavior_test(acceptance_criteria),
                                             'behavior': 'exploration'
                                         }

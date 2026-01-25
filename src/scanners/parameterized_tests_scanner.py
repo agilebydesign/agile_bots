@@ -21,12 +21,12 @@ class ParameterizedTestsScanner(Scanner):
         for epic in story_map.epics():
             for node in story_map.walk(epic):
                 if isinstance(node, Story):
-                    for scenario_outline in node.scenario_outlines:
-                        if scenario_outline.examples_rows and len(scenario_outline.examples_rows) > 1:
-                            location = scenario_outline.map_location()
+                    for scenario in node.scenarios:
+                        if scenario.has_examples and scenario.examples_rows and len(scenario.examples_rows) > 1:
+                            location = scenario.map_location()
                             violations.append(Violation(
                                 rule=self.rule,
-                                violation_message=f"Scenario outline '{scenario_outline.name}' has {len(scenario_outline.examples_rows)} examples but may not use @pytest.mark.parametrize",
+                                violation_message=f"Scenario '{scenario.name}' has {len(scenario.examples_rows)} examples but may not use @pytest.mark.parametrize",
                                 location=location,
                                 severity='warning'
                             ).to_dict())

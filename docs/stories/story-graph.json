@@ -39,7 +39,6 @@
                       "steps": "Given A bot configuration file with a working directory and behaviors\nAnd A bot that has been initialized with that config file\nWhen Generator processes Bot Config\nThen Generator creates 1 bot tool instance"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN Generator processes Bot Config",
@@ -74,7 +73,6 @@
                       "steps": "Given A bot configuration file with a working directory and behaviors\nAnd A bot that has been initialized with that config file\nWhen Generator processes Bot Config\nThen Generator creates 4 behavior tool instances"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN Generator processes Bot Config",
@@ -125,7 +123,6 @@
                       "steps": "Given A bot directory exists\nAnd Bot Config file exists with invalid JSON syntax\nWhen MCP Server Generator attempts to receive Bot Config\nThen Generator raises JSONDecodeError and does not create MCP Server instance"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN MCP Server Generator receives Bot Config",
@@ -170,7 +167,6 @@
                       "steps": "GIVEN: Bot with behaviors and actions\nWHEN: Tool generation is triggered\nTHEN: MCP tools are created for each action"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN Generator processes Bot Config",
@@ -218,7 +214,6 @@
                       "steps": "GIVEN: Bot tools are generated\nWHEN: Server deployment is triggered\nTHEN: MCP server is running with tools"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN Generation Complete",
@@ -273,7 +268,6 @@
                       "steps": "Given __pycache__ directories exist with .pyc files\nWhen clear_python_cache is called\nThen All __pycache__ directories are removed\nAnd All .pyc files are deleted\nAnd Cache is cleared before server restart"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN Bot code changes are detected",
@@ -331,7 +325,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN generator runs, THEN Orchestrator walks all bot behaviors",
@@ -377,7 +370,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN generator creates PowerShell script, THEN it generates bot-specific CLI launcher (e.g., story_cli.ps1)",
@@ -413,7 +405,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN generator creates CursorReplVisitor, THEN it follows existing visitor pattern",
@@ -449,7 +440,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN generator creates HelpReplVisitor, THEN it generates command reference with all REPL commands",
@@ -520,7 +510,7 @@
                       "scenarios": [
                         {
                           "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
-                          "sequential_order": 0.0,
+                          "sequential_order": 1.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_base_actions_directory_property",
@@ -528,7 +518,7 @@
                         },
                         {
                           "name": "BotPath resolves directories from environment variables",
-                          "sequential_order": 1.0,
+                          "sequential_order": 2.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
@@ -536,7 +526,7 @@
                         },
                         {
                           "name": "BotPath.python_workspace_root property returns Python workspace root.",
-                          "sequential_order": 2.0,
+                          "sequential_order": 3.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_python_workspace_root_property",
@@ -544,7 +534,7 @@
                         },
                         {
                           "name": "BotPath raises error when environment variables not set",
-                          "sequential_order": 3.0,
+                          "sequential_order": 4.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
@@ -552,14 +542,13 @@
                         },
                         {
                           "name": "BotPath.find_repo_root() method returns repository root.",
-                          "sequential_order": 4.0,
+                          "sequential_order": 5.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_bot_paths_find_repo_root_method",
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -607,7 +596,6 @@
                           "steps": "GIVEN: CLI session initialized\nWHEN: find_repo_root() called via CLI\nTHEN: Returns repository root path"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -647,7 +635,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
@@ -705,7 +692,6 @@
                           "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User switches bot",
@@ -766,7 +752,6 @@
                           "steps": "Given Behavior loaded from production config\nWhen Config properties accessed\nThen All properties accessible with correct structure"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -806,7 +791,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -838,7 +822,6 @@
                           "steps": "GIVEN: CLI session initialized\nWHEN: Bot name accessed\nTHEN: Returns correct bot name"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -878,7 +861,6 @@
                           "steps": "GIVEN: CLI session at prioritization behavior\nWHEN: Behavior config properties accessed\nTHEN: All properties accessible with correct structure"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -918,7 +900,6 @@
                           "steps": "GIVEN: CLI session at shape.clarify\nWHEN: Action instructions accessed\nTHEN: Merged instructions from base and behavior available"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -976,7 +957,6 @@
                           "steps": "GIVEN: JSON mode explicitly requested\nWHEN: CLISession created with mode='json'\nTHEN: Session uses JSON mode"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -1016,7 +996,6 @@
                           "steps": "GIVEN: Initialized CLI session\nWHEN: Command is executed\nTHEN: Session returns response"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -1056,7 +1035,6 @@
                           "steps": "Given VS Code workspace with no bots installed\nWhen User executes 'Open Status Panel' command\nThen Panel displays error message\nAnd Error message indicates no bots found"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User activates panel command",
@@ -1121,7 +1099,6 @@
                           "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -1227,7 +1204,6 @@
                           "steps": "Given: Headless mode is not configured\nWhen: CLI renders status display\nThen: CLI displays 'Headless Mode:' label\nAND: CLI shows 'Status: Unavailable (not configured)'\nAND: CLI shows configuration instructions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI displays status\nTHEN CLI shows header with bot name AND workspace path",
@@ -1272,7 +1248,6 @@
                           "steps": "Given: CLI displays footer\nWhen: CLI renders footer\nThen: CLI shows available navigation commands"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI displays footer\nTHEN CLI shows available navigation commands",
@@ -1325,7 +1300,6 @@
                           "steps": "GIVEN: REPLSession detects interactive TTY\nWHEN: CLI initializes\nTHEN: CLI does not display piped mode instructions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -1357,7 +1331,6 @@
                           "steps": "Given: CLI is initialized\nAnd: headless mode is configured\nAnd: active headless session is running\nWhen: user enters 'status'\nThen: CLI displays 'Active Session:' section\nAND: CLI shows 'Session ID: 2025-12-30-01-31-17'\nAND: CLI shows 'Status: running'\nAND: CLI shows 'Log:' with log file path"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI displays status\nTHEN CLI shows headless mode section",
@@ -1410,7 +1383,6 @@
                           "steps": "Given Bot is at behavior shape and action clarify\nWhen Panel opens\nThen Panel displays current bot name\nAnd Panel displays current workspace path\nAnd Panel displays shape.clarify as current action"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks refresh button",
@@ -1483,7 +1455,6 @@
                           "steps": "Given Panel is open with instructions section expanded\nWhen User clicks instructions section header\nThen Instructions section collapses\nAnd User no longer sees instructions content"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks section header",
@@ -1529,7 +1500,7 @@
                       "scenarios": [
                         {
                           "name": "Get List of Registered Bots",
-                          "sequential_order": 0.0,
+                          "sequential_order": 1.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_get_list_of_registered_bots",
@@ -1537,7 +1508,7 @@
                         },
                         {
                           "name": "Get Active Bot",
-                          "sequential_order": 1.0,
+                          "sequential_order": 2.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_get_active_bot",
@@ -1545,7 +1516,7 @@
                         },
                         {
                           "name": "Set Active Bot to Registered Bot",
-                          "sequential_order": 2.0,
+                          "sequential_order": 3.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_set_active_bot_to_registered_bot",
@@ -1553,7 +1524,7 @@
                         },
                         {
                           "name": "Attempt to Set Unregistered Bot",
-                          "sequential_order": 3.0,
+                          "sequential_order": 4.0,
                           "type": "error_path",
                           "background": [],
                           "test_method": "test_attempt_to_set_unregistered_bot",
@@ -1561,7 +1532,7 @@
                         },
                         {
                           "name": "Set Active Bot to Current Bot",
-                          "sequential_order": 4.0,
+                          "sequential_order": 5.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_set_active_bot_to_current_bot",
@@ -1569,14 +1540,13 @@
                         },
                         {
                           "name": "Child1",
-                          "sequential_order": 5.0,
+                          "sequential_order": 6.0,
                           "type": "",
                           "background": [],
                           "test_method": null,
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -1600,7 +1570,6 @@
                           "steps": "GIVEN: Bot has workspace path\nAND: workspace contains story-graph.json\nWHEN: REPLSession initializes CLIBot\nTHEN: CLIBot loads workspace context from bot paths"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -1640,7 +1609,6 @@
                           "steps": "Given Panel is open showing default workspace c:/dev/project_a\nWhen User changes workspace path to c:/dev/project_b\nAnd Panel displays project_b workspace and state\nAnd User refreshes panel\nThen Panel displays c:/dev/project_b as current workspace\nAnd Workspace path was persisted and restored"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User changes workspace path",
@@ -1728,7 +1696,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1743,7 +1710,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1758,7 +1724,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1773,7 +1738,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1788,7 +1752,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1803,7 +1766,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1818,7 +1780,6 @@
                               "test_file": null,
                               "test_class": "TestAddIncrementFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1833,7 +1794,6 @@
                               "test_file": null,
                               "test_class": "TestAddIncrementFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1848,7 +1808,6 @@
                               "test_file": null,
                               "test_class": "TestAddIncrementFilterPartToStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1863,7 +1822,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1878,7 +1836,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1893,7 +1850,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -1949,7 +1905,6 @@
                                   "steps": "GIVEN: CLI session\nWHEN: scope set to increment name\nTHEN: Only specified increment in scope"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             }
@@ -2031,7 +1986,6 @@
                                   "steps": "Given Story graph with epic containing story\nWhen Scope set to story name\nThen Story and parent epic are both returned"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2048,7 +2002,7 @@
                               "scenarios": [
                                 {
                                   "name": "",
-                                  "sequential_order": 18.0,
+                                  "sequential_order": 1.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
@@ -2056,7 +2010,7 @@
                                 },
                                 {
                                   "name": "",
-                                  "sequential_order": 19.0,
+                                  "sequential_order": 2.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
@@ -2064,7 +2018,7 @@
                                 },
                                 {
                                   "name": "",
-                                  "sequential_order": 20.0,
+                                  "sequential_order": 3.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
@@ -2072,14 +2026,13 @@
                                 },
                                 {
                                   "name": "",
-                                  "sequential_order": 21.0,
+                                  "sequential_order": 4.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
                                   "steps": "Given Panel is open\nWhen User types Open Panel in scope filter\nAnd Panel displays filtered hierarchy\nAnd User refreshes panel\nThen Panel displays same filtered hierarchy\nAnd Scope filter input shows Open Panel\nAnd Filter value was persisted and restored"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [
                                 {
                                   "name": "WHEN User types story name in filter",
@@ -2234,7 +2187,6 @@
                                   "steps": "Given A FileDiscovery component and a FileFilter\nWhen Files are discovered and then filtered\nThen Only matching files are returned\nThen This test verifies the integration between FileDiscovery and FileFilter,\nThen which was the core fix for the validation scope bug."
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2247,7 +2199,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2260,7 +2211,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2275,7 +2225,6 @@
                               "test_file": null,
                               "test_class": "TestGetFilesFilteredByStoryScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2288,7 +2237,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2301,7 +2249,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             }
@@ -2351,7 +2298,6 @@
                                   "steps": "GIVEN: Empty parameters dict\nWHEN: ActionScope instantiated\nTHEN: Scope defaults to 'all'"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2383,7 +2329,6 @@
                                   "steps": "GIVEN: CLI session with no scope set\nWHEN: scope accessed\nTHEN: Default scope is 'all'"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2407,7 +2352,6 @@
                                   "steps": "GIVEN: CLI session with scope set\nWHEN: scope displayed\nTHEN: Current scope shown in output"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2424,7 +2368,7 @@
                               "scenarios": [
                                 {
                                   "name": "Clear scope with show_all parameter",
-                                  "sequential_order": 0.0,
+                                  "sequential_order": 1.0,
                                   "type": "happy_path",
                                   "background": [],
                                   "test_method": "test_clear_scope_with_show_all_parameter",
@@ -2432,7 +2376,7 @@
                                 },
                                 {
                                   "name": "Clear scope without show_all parameter",
-                                  "sequential_order": 1.0,
+                                  "sequential_order": 2.0,
                                   "type": "happy_path",
                                   "background": [],
                                   "test_method": "test_clear_scope_without_show_all_parameter",
@@ -2440,14 +2384,13 @@
                                 },
                                 {
                                   "name": "Actions after clear process all content",
-                                  "sequential_order": 2.0,
+                                  "sequential_order": 3.0,
                                   "type": "happy_path",
                                   "background": [],
                                   "test_method": "test_actions_after_clear_process_all_content",
                                   "steps": "Given Bot had scope set, then cleared\nWhen Action executes\nThen Action processes all content without filtering"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2464,7 +2407,7 @@
                               "scenarios": [
                                 {
                                   "name": "User clicks Show All to clear filter",
-                                  "sequential_order": 2.0,
+                                  "sequential_order": 1.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": "test_user_clicks_show_all_to_clear_filter",
@@ -2472,14 +2415,13 @@
                                 },
                                 {
                                   "name": "Show All button visibility toggles with filter state",
-                                  "sequential_order": 7.0,
+                                  "sequential_order": 2.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": "test_show_all_button_is_visible_when_scope_is_filtered",
                                   "steps": "Given Panel has no scope filter applied\nWhen User views scope section\nThen Show All button is not visible\nWhen User applies filter to scope\nThen Show All button becomes visible"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [
                                 {
                                   "name": "WHEN User has filtered scope",
@@ -2542,7 +2484,6 @@
                                   "steps": "Given Bot with scope set\nWhen Action executes and completes\nThen Scope remains active for next action"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2590,7 +2531,6 @@
                                   "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [
                                 {
                                   "name": "WHEN User clicks graph link",
@@ -2667,7 +2607,6 @@
                                   "steps": "Given User has not selected any story node in the panel\nWhen User views the toolbar\nThen Scope To button is hidden"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2688,16 +2627,97 @@
                                   "test_method": "test_determine_behavior_for_story",
                                   "steps": "Given Bot has story map loaded with epic <epic_name>\nAnd Epic contains story <story_name>\nAnd Story has acceptance criteria <acceptance_criteria>\nAnd Story has scenarios <scenarios>\nAnd Story has test class <test_class>\nAnd Story has test methods <test_methods>\nWhen Bot determines behavior for the story\nThen Bot returns behavior <expected_behavior>",
                                   "examples": {
-                                    "columns": ["epic_name", "story_name", "test_class", "acceptance_criteria", "scenarios", "test_methods", "expected_behavior", "description"],
+                                    "columns": [
+                                      "epic_name",
+                                      "story_name",
+                                      "test_class",
+                                      "acceptance_criteria",
+                                      "scenarios",
+                                      "test_methods",
+                                      "expected_behavior",
+                                      "description"
+                                    ],
                                     "rows": [
-                                      ["File Management", "Upload File", "test_file_upload.py", "File size validated; File type checked; Upload progress tracked", "(1) User uploads valid file and sees success confirmation (2) User uploads oversized file and sees size limit error (3) User uploads invalid file type and sees type error (4) User cancels upload mid-transfer and sees cancellation confirmation (5) Upload fails with network error and user sees retry option", "test_user_uploads_valid_file_and_sees_success_confirmation; test_user_uploads_oversized_file_and_sees_size_limit_error; test_user_uploads_invalid_file_type_and_sees_type_error; test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation; test_upload_fails_with_network_error_and_user_sees_retry_option", "code", "All scenarios have tests, ready for implementation"],
-                                      ["File Management", "Download File", "test_file_download.py", "Download initiated; Progress displayed", "(1) User downloads file successfully and sees progress (2) User cancels download mid-transfer (3) Download fails due to network error and user sees error message", "test_user_downloads_file_successfully_and_sees_progress; test_user_cancels_download_mid_transfer", "test", "Some scenarios tested, missing test_download_fails"],
-                                      ["File Management", "Delete File", "test_file_delete.py", "Confirmation required; File removed from storage", "(1) User confirms delete and file is removed from system (2) User cancels delete and file remains (3) Delete operation fails due to permissions and user sees error", "", "test", "Scenarios exist but no tests written"],
-                                      ["User Management", "Create User", "", "Email validated; Password meets requirements", "", "", "scenario", "Has AC but no scenarios, need to write scenarios"],
-                                      ["Reporting", "View Report", "", "", "", "", "explore", "No AC and no scenarios, need exploration first"],
-                                      ["Authentication", "Reset Password", "test_reset_password.py", "", "(1) User requests password reset and receives reset email (2) User submits new password meeting requirements and password is updated (3) User submits invalid password not meeting requirements and sees validation error", "test_user_requests_password_reset_and_receives_reset_email; test_user_submits_new_password_meeting_requirements_and_password_is_updated; test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error", "code", "No AC but has scenarios with tests, lower level determines behavior"],
-                                      ["Data Export", "Export CSV", "test_export_csv.py", "", "(1) User exports data to CSV and file downloads successfully (2) Export handles empty data set and generates valid empty CSV (3) Export handles large dataset and shows progress indicator (4) Export with special characters in data and properly escapes them in CSV", "test_user_exports_data_to_csv_and_file_downloads_successfully; test_export_handles_empty_data_set_and_generates_valid_empty_csv", "test", "No AC but has scenarios, only some tested"],
-                                      ["Payment", "Process Payment", "test_process_payment.py", "", "(1) Payment processed with valid card and transaction completes successfully (2) Payment attempted with expired card and user sees card expired error", "", "test", "No AC but has scenarios without tests, need to write tests"]
+                                      [
+                                        "File Management",
+                                        "Upload File",
+                                        "test_file_upload.py",
+                                        "File size validated; File type checked; Upload progress tracked",
+                                        "(1) User uploads valid file and sees success confirmation (2) User uploads oversized file and sees size limit error (3) User uploads invalid file type and sees type error (4) User cancels upload mid-transfer and sees cancellation confirmation (5) Upload fails with network error and user sees retry option",
+                                        "test_user_uploads_valid_file_and_sees_success_confirmation; test_user_uploads_oversized_file_and_sees_size_limit_error; test_user_uploads_invalid_file_type_and_sees_type_error; test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation; test_upload_fails_with_network_error_and_user_sees_retry_option",
+                                        "code",
+                                        "All scenarios have tests, ready for implementation"
+                                      ],
+                                      [
+                                        "File Management",
+                                        "Download File",
+                                        "test_file_download.py",
+                                        "Download initiated; Progress displayed",
+                                        "(1) User downloads file successfully and sees progress (2) User cancels download mid-transfer (3) Download fails due to network error and user sees error message",
+                                        "test_user_downloads_file_successfully_and_sees_progress; test_user_cancels_download_mid_transfer",
+                                        "test",
+                                        "Some scenarios tested, missing test_download_fails"
+                                      ],
+                                      [
+                                        "File Management",
+                                        "Delete File",
+                                        "test_file_delete.py",
+                                        "Confirmation required; File removed from storage",
+                                        "(1) User confirms delete and file is removed from system (2) User cancels delete and file remains (3) Delete operation fails due to permissions and user sees error",
+                                        "",
+                                        "test",
+                                        "Scenarios exist but no tests written"
+                                      ],
+                                      [
+                                        "User Management",
+                                        "Create User",
+                                        "",
+                                        "Email validated; Password meets requirements",
+                                        "",
+                                        "",
+                                        "scenario",
+                                        "Has AC but no scenarios, need to write scenarios"
+                                      ],
+                                      [
+                                        "Reporting",
+                                        "View Report",
+                                        "",
+                                        "",
+                                        "",
+                                        "",
+                                        "explore",
+                                        "No AC and no scenarios, need exploration first"
+                                      ],
+                                      [
+                                        "Authentication",
+                                        "Reset Password",
+                                        "test_reset_password.py",
+                                        "",
+                                        "(1) User requests password reset and receives reset email (2) User submits new password meeting requirements and password is updated (3) User submits invalid password not meeting requirements and sees validation error",
+                                        "test_user_requests_password_reset_and_receives_reset_email; test_user_submits_new_password_meeting_requirements_and_password_is_updated; test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error",
+                                        "code",
+                                        "No AC but has scenarios with tests, lower level determines behavior"
+                                      ],
+                                      [
+                                        "Data Export",
+                                        "Export CSV",
+                                        "test_export_csv.py",
+                                        "",
+                                        "(1) User exports data to CSV and file downloads successfully (2) Export handles empty data set and generates valid empty CSV (3) Export handles large dataset and shows progress indicator (4) Export with special characters in data and properly escapes them in CSV",
+                                        "test_user_exports_data_to_csv_and_file_downloads_successfully; test_export_handles_empty_data_set_and_generates_valid_empty_csv",
+                                        "test",
+                                        "No AC but has scenarios, only some tested"
+                                      ],
+                                      [
+                                        "Payment",
+                                        "Process Payment",
+                                        "test_process_payment.py",
+                                        "",
+                                        "(1) Payment processed with valid card and transaction completes successfully (2) Payment attempted with expired card and user sees card expired error",
+                                        "",
+                                        "test",
+                                        "No AC but has scenarios without tests, need to write tests"
+                                      ]
                                     ]
                                   }
                                 },
@@ -2709,13 +2729,37 @@
                                   "test_method": "test_determine_behavior_for_sub_epic",
                                   "steps": "Given Bot has story map loaded with sub-epic <sub_epic_name>\nAnd Sub-epic contains stories shown in table\nWhen Bot determines behavior for the sub-epic\nThen Bot returns behavior <expected_behavior>",
                                   "examples": {
-                                    "columns": ["sub_epic_name", "expected_behavior", "description"],
+                                    "columns": [
+                                      "sub_epic_name",
+                                      "expected_behavior",
+                                      "description"
+                                    ],
                                     "rows": [
-                                      ["User Authentication", "code", "All 3 stories (Login, Logout, Refresh Token) have all scenarios tested"],
-                                      ["Payment Processing", "scenario", "Process Payment needs tests, Refund Payment needs scenarios - lowest is scenario"],
-                                      ["Data Management", "explore", "Archive Data has no AC making entire sub-epic explore level"],
-                                      ["File Operations", "test", "Upload File has tests, Download/Delete need tests - lowest is test"],
-                                      ["Search", "scenario", "Single story Basic Search at scenario level"]
+                                      [
+                                        "User Authentication",
+                                        "code",
+                                        "All 3 stories (Login, Logout, Refresh Token) have all scenarios tested"
+                                      ],
+                                      [
+                                        "Payment Processing",
+                                        "scenario",
+                                        "Process Payment needs tests, Refund Payment needs scenarios - lowest is scenario"
+                                      ],
+                                      [
+                                        "Data Management",
+                                        "explore",
+                                        "Archive Data has no AC making entire sub-epic explore level"
+                                      ],
+                                      [
+                                        "File Operations",
+                                        "test",
+                                        "Upload File has tests, Download/Delete need tests - lowest is test"
+                                      ],
+                                      [
+                                        "Search",
+                                        "scenario",
+                                        "Single story Basic Search at scenario level"
+                                      ]
                                     ]
                                   }
                                 },
@@ -2727,20 +2771,51 @@
                                   "test_method": "test_determine_behavior_for_epic",
                                   "steps": "Given Bot has story map loaded with epic <epic_name>\nAnd Epic contains sub-epics shown in table\nWhen Bot determines behavior for the epic\nThen Bot returns behavior <expected_behavior>",
                                   "examples": {
-                                    "columns": ["epic_name", "expected_behavior", "description"],
+                                    "columns": [
+                                      "epic_name",
+                                      "expected_behavior",
+                                      "description"
+                                    ],
                                     "rows": [
-                                      ["File Management", "code", "All sub-epics (File Operations, File Search) have code behavior"],
-                                      ["Reporting", "explore", "One sub-epic (Report Export) at explore level makes entire epic explore"],
-                                      ["User Management", "scenario", "One sub-epic (User Profile) at scenario level with others at code - epic follows highest (scenario)"],
-                                      ["Payment Processing", "test", "Multiple sub-epics (Process Payment, Refund Payment) at test level"],
-                                      ["Product Catalog", "shape", "Empty epic with no sub-epics"],
-                                      ["Product Management", "scenario", "Epic with nested sub-epics - Product Catalog contains nested children, highest is scenario"],
-                                      ["Data Management", "explore", "Parent sub-epic with nested sub-epics where Data Archive is at explore"]
+                                      [
+                                        "File Management",
+                                        "code",
+                                        "All sub-epics (File Operations, File Search) have code behavior"
+                                      ],
+                                      [
+                                        "Reporting",
+                                        "explore",
+                                        "One sub-epic (Report Export) at explore level makes entire epic explore"
+                                      ],
+                                      [
+                                        "User Management",
+                                        "scenario",
+                                        "One sub-epic (User Profile) at scenario level with others at code - epic follows highest (scenario)"
+                                      ],
+                                      [
+                                        "Payment Processing",
+                                        "test",
+                                        "Multiple sub-epics (Process Payment, Refund Payment) at test level"
+                                      ],
+                                      [
+                                        "Product Catalog",
+                                        "shape",
+                                        "Empty epic with no sub-epics"
+                                      ],
+                                      [
+                                        "Product Management",
+                                        "scenario",
+                                        "Epic with nested sub-epics - Product Catalog contains nested children, highest is scenario"
+                                      ],
+                                      [
+                                        "Data Management",
+                                        "explore",
+                                        "Parent sub-epic with nested sub-epics where Data Archive is at explore"
+                                      ]
                                     ]
                                   }
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [
                                 {
                                   "name": "Child1",
@@ -2787,7 +2862,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2802,7 +2876,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2817,7 +2890,6 @@
                               "test_file": null,
                               "test_class": "TestAddFilterPartToFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2832,7 +2904,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveFilterPartFromFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2845,7 +2916,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2860,7 +2930,6 @@
                               "test_file": null,
                               "test_class": "TestRemoveFilterPartFromFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             }
@@ -2891,7 +2960,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2904,7 +2972,6 @@
                               "test_file": null,
                               "test_class": null,
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2921,7 +2988,7 @@
                               "scenarios": [
                                 {
                                   "name": "",
-                                  "sequential_order": 3.0,
+                                  "sequential_order": 1.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
@@ -2929,14 +2996,13 @@
                                 },
                                 {
                                   "name": "",
-                                  "sequential_order": 4.0,
+                                  "sequential_order": 2.0,
                                   "type": "",
                                   "background": [],
                                   "test_method": null,
                                   "steps": "Given Panel displays scope section\nWhen User types file:**/*.spec.js in scope filter\nThen Panel displays all JavaScript test files\nAnd Files are displayed with full relative paths"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [
                                 {
                                   "name": "WHEN User types file pattern in filter",
@@ -2967,7 +3033,6 @@
                               "test_file": null,
                               "test_class": "TestFilterFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -2982,7 +3047,6 @@
                               "test_file": null,
                               "test_class": "TestFilterFileScope",
                               "scenarios": [],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             },
@@ -3014,7 +3078,6 @@
                                   "steps": "GIVEN: CLI session\nWHEN: scope set with exclude pattern\nTHEN: Excluded files not in scope"
                                 }
                               ],
-                              "scenario_outlines": [],
                               "acceptance_criteria": [],
                               "behavior": "exploration"
                             }
@@ -3051,7 +3114,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3066,7 +3128,6 @@
                       "test_file": null,
                       "test_class": "TestAddIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3081,7 +3142,6 @@
                       "test_file": null,
                       "test_class": "TestAddIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3094,7 +3154,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3109,7 +3168,6 @@
                       "test_file": null,
                       "test_class": "TestDeleteIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3124,7 +3182,6 @@
                       "test_file": null,
                       "test_class": "TestDeleteIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3137,7 +3194,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3152,7 +3208,6 @@
                       "test_file": null,
                       "test_class": "TestMoveStorytoIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3167,7 +3222,6 @@
                       "test_file": null,
                       "test_class": "TestMoveStorytoIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3182,7 +3236,6 @@
                       "test_file": null,
                       "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3197,7 +3250,6 @@
                       "test_file": null,
                       "test_class": "TestShowAllIncrementScopeThroughCLI",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3210,7 +3262,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3225,7 +3276,6 @@
                       "test_file": null,
                       "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3240,7 +3290,6 @@
                       "test_file": null,
                       "test_class": "TestShowAllIncrementScopeThroughPanel",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -3443,14 +3492,13 @@
                         },
                         {
                           "name": "Child1",
-                          "sequential_order": 21.0,
+                          "sequential_order": 22.0,
                           "type": "",
                           "background": [],
                           "test_method": null,
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3474,7 +3522,6 @@
                           "steps": "GIVEN: CLI session with story graph and scope\nWHEN: navigation commands used\nTHEN: Navigation respects scope"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3570,7 +3617,6 @@
                           "steps": "Given Epic has matching folder in docs/stories/map\nAnd Sub-epic has matching folder\nWhen User clicks epic name link\nThen VS Code reveals folder in explorer view\nWhen User clicks sub-epic name link\nThen VS Code reveals sub-epic folder in explorer view"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User views story scope",
@@ -3867,7 +3913,6 @@
                           "steps": "Given Story exists in story graph\nWhen Story creates child of specific type (Scenario, ScenarioOutline, AcceptanceCriteria)\nThen Child is added to correct collection and not to others"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -3953,7 +3998,6 @@
                           "steps": "And Story Graph has Epic \"User Management\" with SubEpic \"Authentication\"\nAnd new SubEpic exists under \"User Management\" with name in edit mode\nWhen User types \"Authentication\" in name field\nAnd User presses Tab\nThen Panel validates name in real-time\nAnd Panel shows warning message \"Child with name 'Authentication' already exists\"\nAnd Panel keeps node name in edit mode\nAnd Panel keeps text selected\nAnd Panel does not save the duplicate name"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User selects Epic node\nTHEN Panel shows \"Create Sub-Epic\" button",
@@ -4065,7 +4109,6 @@
                           "steps": "And Story Graph has Epic \"Invoke Bot\" with SubEpic \"Manage Bot Information\"\nWhen User executes CLI command: story_graph.\"Invoke Bot\".create_sub_epic.\"Manage Bot Information\"\nThen CLI parses dot notation to parent \"Invoke Bot\"\nAnd CLI resolves parent \"Invoke Bot\" successfully\nAnd CLI validates child name \"Manage Bot Information\"\nAnd CLI identifies duplicate name among siblings\nAnd CLI outputs error: \"Child with name 'Manage Bot Information' already exists under parent 'Invoke Bot'\"\nAnd CLI does not create duplicate SubEpic"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User creates new child with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".create_sub_epic name:\"Manage Bot Information\"\nTHEN CLI parses dot notation to parent\nAND resolves and validates parent exists\nAND sets the child type based on the command used\nAND creates child as last child\nAND outputs success message with node path",
@@ -4177,7 +4220,6 @@
                           "steps": "Given Story Map has existing Epics\nWhen Story Map creates Epic at position 0\nThen Epic is inserted at beginning"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -4215,7 +4257,6 @@
                           "steps": "Given Parent has children in order\nWhen Node at specific position is deleted\nThen Remaining children are resequenced properly"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -4261,7 +4302,6 @@
                           "steps": "And Story Graph has Epic \"Invoke Bot\" with SubEpic \"Manage Bot\"\nAnd Story Graph does not have SubEpic \"Non-existent Node\"\nWhen User executes CLI command: story_graph.\"Invoke Bot\".\"Non-existent Node\".delete\nThen CLI parses dot notation to node \"Non-existent Node\"\nAnd CLI attempts to resolve node \"Non-existent Node\"\nAnd CLI identifies node does not exist\nAnd CLI outputs error: \"Node 'Non-existent Node' not found. Valid paths under 'Invoke Bot': 'Manage Bot'\"\nAnd CLI does not modify Story Graph"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User deletes node with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Manage Bot\".delete\nTHEN CLI parses notation to node\nAND resolves and validates node exists\nAND removes node from parent\nAND resequences siblings\nAND outputs success message",
@@ -4363,7 +4403,6 @@
                           "steps": "And Story Graph has SubEpic \"Authentication\" with child Story \"Login Form\"\nAnd Delete confirmation is displayed on panel for \"Authentication\"\nWhen User clicks \"Cancel\" button\nThen Panel hides confirmation\nAnd Panel shows \"Delete\" button again\nAnd SubEpic \"Authentication\" remains in Story Graph\nAnd Story \"Login Form\" remains under \"Authentication\""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User selects node\nTHEN Panel shows \"Delete\" button",
@@ -4485,7 +4524,6 @@
                           "steps": "Given Story Navigate Story Graph exists under Manage Story Scope sub-epic\nAnd Test class TestNavigateStoryGraph exists in test_manage_story_scope.py file\nWhen Story Navigate Story Graph is moved to Edit Story Nodes sub-epic\nThen Test class TestNavigateStoryGraph is removed from test_manage_story_scope.py file\nAnd Test class TestNavigateStoryGraph is added to test_edit_story_nodes.py file\nAnd Test class imports are updated for new file location\nAnd All test methods remain intact after move"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -4561,7 +4599,6 @@
                           "steps": "And Story Graph has Epic \"User Management\" with SubEpic \"Authentication\"\nAnd SubEpic \"Authentication\" has SubEpic \"Login Flow\"\nWhen User executes CLI command: story_graph.\"User Management\".move_to target:\"Authentication\"\nThen CLI parses notation to source \"User Management\" and target \"Authentication\"\nAnd CLI resolves both nodes successfully\nAnd CLI detects target \"Authentication\" is descendant of source \"User Management\"\nAnd CLI identifies circular reference would occur\nAnd CLI outputs error: \"Cannot move 'User Management' to 'Authentication': target is a descendant of source (circular reference)\"\nAnd CLI does not modify Story Graph"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User moves node with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Manage Bot\".move_to target:\"Other Epic\" at_position:2\nTHEN CLI parses notation to source and target\nAND resolves and validates both exist\nAND validates type compatibility\nAND adjusts position if exceeds children count\nAND removes node from source\nAND inserts node at target position\nAND resequences both locations\nAND outputs success message",
@@ -4668,7 +4705,6 @@
                           "steps": "And Story Graph has SubEpic \"Authentication\" with Story \"Login Form\"\nAnd Story Graph has SubEpic \"Authorization\" with SubEpic \"Roles\"\nAnd User is dragging SubEpic \"Roles\"\nWhen User drops on SubEpic \"Authentication\" that contains Stories\nThen Panel ignores drop operation\nAnd SubEpic \"Roles\" returns to original position under \"Authorization\"\nAnd Panel does not modify Story Graph structure"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User drags node\nTHEN Panel shows drag cursor with node icon",
@@ -4760,7 +4796,6 @@
                           "steps": "And Story Graph has SubEpic \"Manage Bot\"\nWhen User executes CLI command: story_graph.\"Invoke Bot\".\"Manage Bot\".rename name:\"Name<>|*\"\nThen CLI parses dot notation to node \"Manage Bot\"\nAnd CLI resolves node \"Manage Bot\" successfully\nAnd CLI validates characters in name \"Name<>|*\"\nAnd CLI identifies invalid characters: <, >, |, *\nAnd CLI outputs error: \"Name contains invalid characters: < > | *\"\nAnd CLI does not update node name"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User renames node with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Old Name\".rename name:\"New Name\"\nTHEN CLI parses notation to node\nAND resolves and validates node exists\nAND validates name not empty and unique among siblings\nAND updates node name\nAND outputs success message",
@@ -4872,7 +4907,6 @@
                           "steps": "And Story Graph has SubEpic \"Authentication\"\nAnd User has clicked node name to edit\nAnd Panel is in inline editing mode\nWhen User types \"New Name\"\nAnd User presses Escape\nThen Panel exits editing mode\nAnd Panel retains original name \"Authentication\"\nAnd Panel does not save name change\nAnd Story Tree still shows \"Authentication\""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks node name\nTHEN Panel enables inline editing",
@@ -4964,7 +4998,6 @@
                           "steps": "GIVEN: Node exists with current name\nWHEN: Attempting to rename with invalid special characters\nTHEN: System identifies invalid characters and returns error"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5004,7 +5037,6 @@
                           "steps": "GIVEN: Node exists and bot has registered actions\nWHEN: Node attempts to execute non-existent action\nTHEN: Bot validates action exists and returns error"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -5035,7 +5067,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5091,7 +5122,6 @@
                           "steps": "Given Strategy action\nWhen Context is checked\nThen Uses StrategyActionContext (not ScopeActionContext)"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5137,7 +5167,6 @@
                           "steps": "And Story Graph has Story \"Create Scenarios\" with action \"generate_scenarios\"\nWhen User executes CLI command: story_graph.\"Create Scenarios\".generate_scenarios\nAnd CLI executes action successfully\nAnd action modifies story graph by adding new scenarios to Story \"Create Scenarios\"\nThen CLI validates updated graph structure\nAnd CLI confirms graph structure is valid\nAnd CLI outputs success message: \"Action 'generate_scenarios' completed. Story graph updated with 3 new scenarios.\"\nAnd Story Graph shows Story \"Create Scenarios\" with new scenarios added"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User executes action with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Manage Story Graph\".build.output.\"docs/stories\"\nTHEN CLI parses notation to scope\nAND resolves and validates scope exists\nAND validates action exists\nAND executes action with scope context\nAND outputs result",
@@ -5199,7 +5228,6 @@
                           "steps": "And Story Graph has Story \"Create Scenarios\" with action \"generate_scenarios\"\nAnd Story \"Create Scenarios\" is selected\nAnd action \"generate_scenarios\" is executing\nWhen Panel completes action execution\nAnd action has modified story graph by adding new scenarios\nThen Panel validates graph structure\nAnd Panel shows success message \"Scenarios generated successfully\"\nAnd Panel refreshes Story Tree\nAnd Story Tree shows updated \"Create Scenarios\" with new scenarios"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User selects a story scope node\nTHEN Panel shows available actions\nAND enables action buttons",
@@ -5232,7 +5260,7 @@
                       "scenarios": [
                         {
                           "name": "CLI detects file modification before command and refreshes with valid structure",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "type": "happy_path",
                           "background": [
                             "Given Story Graph is initialized in CLI"
@@ -5242,7 +5270,7 @@
                         },
                         {
                           "name": "CLI detects invalid structure and displays error retaining previous state",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "type": "error_case",
                           "background": [
                             "Given Story Graph is initialized in CLI"
@@ -5251,7 +5279,6 @@
                           "steps": "And Story Graph has Epic \"Invoke Bot\" with SubEpic \"Manage Bot\"\nAnd CLI has valid graph state loaded\nAnd file monitor is watching story-graph.json\nAnd external process modifies story-graph.json with invalid JSON syntax\nAnd CLI detects file modification before next command\nWhen User executes CLI command: story_graph.\"Invoke Bot\".list\nThen CLI reads updated story-graph.json\nAnd CLI validates graph structure\nAnd System identifies JSON parsing violations\nAnd CLI displays error notification: \"Story graph file contains invalid structure. Using previous valid state.\"\nAnd CLI retains previous valid Story Graph state\nAnd CLI executes command with previous valid graph\nAnd CLI outputs list showing: \"Manage Bot\""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI detects file modification before next command\nTHEN CLI reads updated graph\nAND validates structure\nAND CLI displays \"Story graph updated from external source\"\nAND CLI executes command with updated graph",
@@ -5298,7 +5325,6 @@
                           "steps": "And Story Graph has Epic \"Invoke Bot\" with SubEpic \"Manage Bot\"\nAnd Panel is displaying valid Story Graph Tree\nAnd file monitor is watching story-graph.json\nWhen external process modifies story-graph.json with invalid JSON syntax\nAnd Panel detects file modification\nAnd Panel reads updated story-graph.json\nThen Panel validates graph structure\nAnd System identifies JSON parsing violations\nAnd Panel displays error notification \"Story graph file contains invalid structure\"\nAnd Panel retains previous valid Story Graph state\nAnd Story Tree still shows Epic \"Invoke Bot\" with SubEpic \"Manage Bot\""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Panel detects file modification\nTHEN Panel reads updated graph\nAND validates structure\nAND Panel refreshes StoryGraph Tree\nAND Panel preserves navigation state if possible",
@@ -5322,7 +5348,6 @@
                       "test_file": null,
                       "test_class": null,
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5337,7 +5362,6 @@
                       "test_file": null,
                       "test_class": "TestSubmitActionScopedToIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5352,7 +5376,6 @@
                       "test_file": null,
                       "test_class": "TestSubmitActionScopedToIncrement",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5464,7 +5487,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5488,7 +5510,6 @@
                           "steps": "GIVEN: CLI session with scope set\nWHEN: action executed\nTHEN: Action operates within scope"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -5627,7 +5648,6 @@
                           "steps": "Given Bot is at last action in behavior\nWhen actions.next() called\nThen Returns None"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5651,7 +5671,6 @@
                           "steps": "GIVEN: Bot has behaviors configured\nWHEN: bot.behaviors.navigate_to('shape') is called\nTHEN: bot.behaviors.current.name == 'shape'\nAND: bot.behaviors.current.actions.current_action_name == 'clarify'"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5699,7 +5718,6 @@
                           "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'invalid_behavior.build.instructions'\nTHEN: CLI displays error message"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5731,7 +5749,6 @@
                           "steps": "GIVEN: CLI is at shape.strategy.instructions\nWHEN: user enters 'back'\nTHEN: CLI navigates to shape.clarify"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5779,7 +5796,6 @@
                           "steps": "Given Bot is at last action of last behavior\nWhen User views next button\nThen Next button is disabled"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks back button",
@@ -5924,7 +5940,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -5996,7 +6011,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6076,7 +6090,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -6190,7 +6203,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6207,7 +6219,7 @@
                       "scenarios": [
                         {
                           "name": "",
-                          "sequential_order": 12.0,
+                          "sequential_order": 1.0,
                           "type": "",
                           "background": [],
                           "test_method": null,
@@ -6215,7 +6227,7 @@
                         },
                         {
                           "name": "",
-                          "sequential_order": 13.0,
+                          "sequential_order": 2.0,
                           "type": "",
                           "background": [],
                           "test_method": null,
@@ -6223,14 +6235,13 @@
                         },
                         {
                           "name": "",
-                          "sequential_order": 14.0,
+                          "sequential_order": 3.0,
                           "type": "",
                           "background": [],
                           "test_method": null,
                           "steps": "Given Panel displays expanded shape.clarify action\nAnd Operations are visible (instructions, execute, confirm)\nWhen User clicks clarify.confirm operation\nThen Bot executes clarify.confirm operation\nAnd Panel displays confirm operation as current"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks behavior",
@@ -6403,7 +6414,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6459,7 +6469,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6491,7 +6500,6 @@
                           "steps": "Given action 'gather_context' executes in behavior 'discovery'\nWhen Activity logger creates entry\nThen Activity log entry includes:\nThen - action_state='story_bot.discovery.gather_context'\nThen - timestamp\nThen - Full path includes bot_name.behavior.action"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6515,7 +6523,6 @@
                           "steps": "Given Bot is ready to execute action\nWhen Action starts execution\nThen Activity log file exists or activity is trackable"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Action starts execution",
@@ -6555,7 +6562,6 @@
                           "steps": "Given Action has executed\nWhen Action completes\nThen Completion is tracked in completed_actions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Action completes execution",
@@ -6603,7 +6609,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6618,7 +6623,6 @@
                       "test_file": null,
                       "test_class": "TestRecordActivityMetricsAndPaths",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Activity is tracked",
@@ -6663,7 +6667,6 @@
                           "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters 'current'\nTHEN: CLI re-executes current instructions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6695,7 +6698,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -6745,7 +6747,6 @@
                           "steps": "GIVEN: CLI is at discovery.build.instructions\nWHEN: user views status\nTHEN: CLI displays clarify action with [x] indicator"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN user views status\nTHEN CLI displays bot hierarchy tree with behaviors and actions",
@@ -6795,7 +6796,6 @@
                           "steps": "GIVEN: bot.behaviors.current is at clarify action\nWHEN: actions.close_current() is called\nTHEN: 'clarify' not in actions.remaining_actions\nAND: actions.remaining_actions == ['validate', 'render']"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -6827,7 +6827,6 @@
                           "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user navigates to discovery behavior\nTHEN: CLI updates current position display to show discovery"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN user views status\nTHEN CLI displays current behavior, action, and operation",
@@ -6872,7 +6871,6 @@
                           "steps": "Given: CLI displays status\nWhen: CLI renders commands menu footer\nThen: CLI displays Commands section header\nAND: CLI shows command list: status | back | current | next | path [dir] | scope [filter] | headless \"msg\" | help | exit\nAND: CLI shows command usage example with echo syntax\nAND: CLI shows behaviors list: shape | prioritization | discovery | exploration | scenarios | tests | code\nAND: CLI shows actions list: clarify | strategy | build | validate | render\nAND: CLI applies section separator after footer"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN CLI displays status\nTHEN CLI shows footer with available commands",
@@ -6949,7 +6947,6 @@
                           "steps": "Given Bot has behaviors with defined sequential order\nWhen Panel renders behavior tree\nThen Behaviors appear in order (shape, prioritization, discovery, exploration, scenarios, tests, code)\nAnd Actions under each behavior appear in their configured order\nAnd Order matches behavior configuration JSON"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User views panel",
@@ -7090,7 +7087,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7130,7 +7126,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -7197,7 +7192,6 @@
                           "steps": "Given discovery is the last behavior in bot_config.json\nWhen render action executes\nThen base_instructions do NOT include next behavior reminder\nThen And render is the final action"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7229,7 +7223,6 @@
                           "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters just 'build'\nTHEN: CLI executes instructions operation on current behavior's build action"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN user navigates to behavior.action.instructions\nTHEN CLI displays formatted instructions for that action",
@@ -7272,7 +7265,6 @@
                           "steps": "GIVEN: CLI has no current action set\nWHEN: user enters 'submit'\nTHEN: CLI displays error message\nAND: Error indicates no current action"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User executes submit command",
@@ -7320,7 +7312,6 @@
                           "steps": "Given Panel displays base instructions\nWhen User clicks copy button\nThen Instructions are copied to clipboard\nAnd Panel displays confirmation message"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User views panel",
@@ -7373,7 +7364,6 @@
                           "steps": "Given Panel displays instructions in raw format\nWhen User clicks formatted view toggle button\nThen Panel displays instructions in formatted view\nAnd Instructions show with sections and styling"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks action instruction in Behavior Action Hierarchy",
@@ -7448,7 +7438,6 @@
                           "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7480,7 +7469,6 @@
                           "steps": "Given Bot is at shape.strategy\nWhen Panel renders strategy instructions\nThen Panel displays save button for decisions\nAnd Panel displays save button for assumptions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User fills in answers in panel form",
@@ -7540,7 +7528,6 @@
                           "steps": "GIVEN: CLI executes operation that fails\nWHEN: error occurs\nTHEN: CLI displays error message and remains operational"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7572,7 +7559,6 @@
                           "steps": "GIVEN: CLI is at shape.strategy\nWHEN: user runs 'save --decisions {\"drill_down\": \"Deep\"}'\nTHEN: CLI shows success message\nAND: strategy.json is updated"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN user runs save command with answers parameter",
@@ -7680,7 +7666,6 @@
                           "steps": "Given Workspace with strategy guardrails files\nWhen Behavior loads guardrails\nThen Strategy assumptions are loaded correctly"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7704,7 +7689,6 @@
                           "steps": "GIVEN: CLI is at shape.clarify\nWHEN: user navigates to shape.clarify\nTHEN: CLI output contains questions and evidence from guardrails"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7728,7 +7712,6 @@
                           "steps": "GIVEN: Clarification data exists\nWHEN: user views clarify instructions\nTHEN: CLI displays stored clarification data"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7776,7 +7759,6 @@
                           "steps": "Given Bot is at shape.clarify\nAnd User has previously made strategy decisions\nWhen Panel displays clarify instructions\nThen Panel displays Strategy section\nAnd Strategy section shows all decision criteria with selected options\nAnd Strategy section shows saved assumptions\nAnd Strategy data is read-only (not editable in clarify action)"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Current action is clarify",
@@ -7846,7 +7828,6 @@
                           "steps": "GIVEN: CLI is at shape.clarify.instructions\nWHEN: user enters 'shape.clarify.instructions'\nTHEN: CLI displays key questions and required evidence"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -7912,7 +7893,6 @@
                           "steps": "Given Production story_bot strategy action\nWhen do_execute is called with empty parameters\nThen strategy.json file is not created"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7936,7 +7916,6 @@
                           "steps": "GIVEN: CLI is at shape.strategy\nWHEN: user navigates to shape.strategy\nTHEN: CLI output contains decision criteria and assumptions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -7960,7 +7939,6 @@
                           "steps": "GIVEN: Strategy data exists\nWHEN: user views strategy instructions\nTHEN: CLI displays stored strategy decisions and assumptions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8008,7 +7986,6 @@
                           "steps": "Given Bot is at shape.strategy\nAnd User has previously answered clarify questions\nWhen Panel displays strategy instructions\nThen Panel displays Clarify section\nAnd Clarify section shows answered questions\nAnd Clarify data is read-only (not editable in strategy action)"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Current action is strategy",
@@ -8120,7 +8097,6 @@
                           "steps": "Given Bot is at shape.build\nAnd User has answered clarify questions\nAnd User has made strategy decisions\nWhen User clicks submit in panel\nThen Submitted instructions include Clarify section with answers\nAnd Submitted instructions include Strategy section with decisions and assumptions\nAnd All saved guardrails are visible in submitted markdown"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "When user has clicked on a Behavior Action's Instructions",
@@ -8195,7 +8171,6 @@
                           "steps": "GIVEN: CLI is at shape.strategy.instructions\nWHEN: user enters 'shape.strategy.instructions'\nTHEN: CLI displays planning criteria and assumptions"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -8261,7 +8236,6 @@
                           "steps": "Given Production prioritization behavior with increments templates\nWhen Action injects story graph template for increments\nThen Instructions use production template (story_graph_increments.json) that updates existing file\nThen And Existing story-graph.json in workspace"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8301,7 +8275,6 @@
                           "steps": "GIVEN: CLI is at prioritization.validate\nAND: Story graph exists in workspace\nWHEN: user navigates to prioritization.validate\nTHEN: CLI output shows validation instructions for increments"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8333,7 +8306,6 @@
                           "steps": "GIVEN: CLI is at shape.build.instructions\nWHEN: user enters 'shape.build.instructions scope=\"Story1\"'\nTHEN: CLI displays build instructions filtered to Story1"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8348,7 +8320,6 @@
                       "test_file": null,
                       "test_class": "TestBuildStoryGraphUsingAPI",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot is called through StoryMap API\nTHEN caller uses create_epic(), create_child(), create_story() for fine-grained construction\nAND caller validates each node during creation\nAND validation errors caught immediately before invalid structure created",
@@ -8406,7 +8377,6 @@
                           "steps": "Given Panel displays build instructions\nWhen User clicks template path link\nThen VS Code opens knowledge graph template file in editor"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Current action is build",
@@ -8498,7 +8468,6 @@
                           "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8530,7 +8499,6 @@
                           "steps": "GIVEN: CLI is at code.validate\nAND: Story graph exists\nWHEN: user navigates to code.validate\nTHEN: CLI output contains file validation rules"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8554,7 +8522,6 @@
                           "steps": "GIVEN: Validation has run\nWHEN: user views validate instructions\nTHEN: CLI displays violation report"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8578,7 +8545,6 @@
                           "steps": "GIVEN: Validation scanners exist\nWHEN: user views validate instructions\nTHEN: CLI displays list of available scanners"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8610,7 +8576,6 @@
                           "steps": "Given Panel displays validate instructions with rules\nWhen User clicks rule file link\nThen VS Code opens validation rule file in editor"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Current action is validate",
@@ -8655,7 +8620,6 @@
                           "steps": "GIVEN: CLI is at shape.validate.instructions\nWHEN: user enters 'shape.validate.instructions'\nTHEN: CLI displays validation rules and scanners"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
@@ -8721,7 +8685,6 @@
                           "steps": "Given Production story_bot with shape behavior (has synchronizers)\nWhen Render output action executes\nThen Instructions include synchronizer execution info"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8753,7 +8716,6 @@
                           "steps": "GIVEN: CLI is at shape.render\nWHEN: user navigates to shape.render\nTHEN: CLI output mentions synchronizers"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8777,7 +8739,6 @@
                           "steps": "GIVEN: Synchronizers have run\nWHEN: user views render instructions\nTHEN: CLI displays output file paths"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8801,7 +8762,6 @@
                           "steps": "GIVEN: Render configurations exist\nWHEN: user views render instructions\nTHEN: CLI displays templates and synchronizers"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8825,7 +8785,6 @@
                           "steps": "GIVEN: CLI is at shape.render.instructions\nWHEN: user enters 'shape.render.instructions'\nTHEN: CLI displays render instructions with templates and synchronizers"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -8840,7 +8799,6 @@
                       "test_file": null,
                       "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram",
@@ -8896,7 +8854,6 @@
                           "steps": "Given Panel displays render instructions\nWhen User clicks template file link\nThen VS Code opens template file in editor"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Current action is render",
@@ -9001,7 +8958,6 @@
                           "steps": "Given Production story_bot with tests behavior\nWhen Rules action executes without message\nThen Instructions do not include user message section"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -9057,7 +9013,6 @@
                           "steps": ""
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     },
@@ -9097,7 +9052,6 @@
                           "steps": "Given Panel displays behavior hierarchy\nWhen User clicks Get Rules button\nAnd Rules are successfully submitted to chat\nThen System displays success confirmation message\nAnd Message indicates rules were submitted to chat"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User clicks Get Rules button for a behavior",
@@ -9168,7 +9122,6 @@
                           "steps": "Given Production story_bot with tests behavior\nWhen User enters 'tests.rules' without message\nThen CLI displays rules digest\nAnd Instructions do not include user message section"
                         }
                       ],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User navigates to behavior.rules",
@@ -9222,7 +9175,6 @@
                       "test_file": null,
                       "test_class": "TestDetectStoryGraphChangesFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User makes changes to StoryOutput diagram\nTHEN the StoryMap hanging off StoryOutput reflects those changes in its object model\nAND the changes are visible when accessing the StoryMap directly via API\nAND the StoryRenderedNodes maintain parent/child relationships matching the modified structure",
@@ -9248,7 +9200,6 @@
                       "test_file": null,
                       "test_class": "TestCreateChildStoryNodeFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot's StoryMap reads batch of add operations from Synchronizer\nTHEN Bot's StoryMap creates new child nodes at correct hierarchy positions\nAND new nodes include all properties from diagram's StoryMap (name, type, sequential order)\nAND Bot's StoryMap resequences existing siblings when inserting at specific positions\nAND parent-child relationships match diagram's StoryMap structure",
@@ -9299,7 +9250,6 @@
                       "test_file": null,
                       "test_class": "TestDeleteStoryNodeFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot's StoryMap reads batch of delete operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from story_graph\nAND Bot's StoryMap resequences remaining siblings after deletion\nAND Bot's StoryMap handles cascade deletes (removing node removes all descendants)\nBUT Bot's StoryMap preserves scenarios and steps from deleted stories in archive/backup",
@@ -9325,7 +9275,6 @@
                       "test_file": null,
                       "test_class": "TestUpdateStoryNodeNameFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot's StoryMap reads batch of rename operations from Synchronizer\nTHEN Bot's StoryMap updates node names to match diagram's StoryMap names\nAND Bot's StoryMap validates no duplicate names at same hierarchy level\nAND Bot's StoryMap updates all references to renamed nodes",
@@ -9351,7 +9300,6 @@
                       "test_file": null,
                       "test_class": "TestMoveStoryNodeFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot's StoryMap reads batch of move/reorder operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from old parent\nAND Bot's StoryMap adds nodes to new parent at correct position\nAND Bot's StoryMap updates sequential_order values to match diagram's StoryMap ordering\nAND Bot's StoryMap resequences siblings in both old and new parent locations",
@@ -9377,7 +9325,6 @@
                       "test_file": null,
                       "test_class": "TestPersistStoryGraphChangesFromDiagram",
                       "scenarios": [],
-                      "scenario_outlines": [],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN Bot's StoryMap completes reading and applying all batches successfully\nTHEN Bot's StoryMap structure matches diagram's StoryMap structure\nAND all node names, types, hierarchy, and ordering match\nAND Bot's StoryMap logs summary (nodes added, deleted, renamed, moved)\nAND Bot's StoryMap persists updated story_graph to file using save() method",
@@ -9449,7 +9396,6 @@
                       "steps": "Given Bot has behavior with action\nWhen Command examples are requested\nThen Action returns usage examples\nThen Domain focus: Command examples retrieval"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [],
                   "behavior": "exploration"
                 },
@@ -9464,7 +9410,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [],
                   "behavior": "exploration"
                 },
@@ -9488,7 +9433,6 @@
                       "steps": "GIVEN: CLI is running\nWHEN: user enters 'help'\nTHEN: CLI displays help menu with commands"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [
                     {
                       "name": "WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions",
@@ -9524,7 +9468,6 @@
                   "test_file": null,
                   "test_class": null,
                   "scenarios": [],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [],
                   "behavior": "exploration"
                 },
@@ -9564,7 +9507,6 @@
                       "steps": "GIVEN: CLI is at shape.clarify\nWHEN: user navigates to action\nTHEN: CLI output shows how to use the action"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [],
                   "behavior": "exploration"
                 },
@@ -9596,7 +9538,6 @@
                       "steps": "GIVEN: CLI session active\nWHEN: user enters 'help status'\nTHEN: CLI displays help for 'status' command"
                     }
                   ],
-                  "scenario_outlines": [],
                   "acceptance_criteria": [],
                   "behavior": "exploration"
                 }

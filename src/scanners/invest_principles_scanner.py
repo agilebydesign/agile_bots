@@ -26,7 +26,7 @@ class InvestPrinciplesScanner(StoryScanner):
         if not has_scenarios and not has_acceptance_criteria:
             violation = Violation(
                 rule=self.rule,
-                violation_message=f'Story "{node.name}" lacks scenarios/scenario_outlines or acceptance criteria in story-graph.json - INVEST principle "Testable" requires clear testable outcomes',
+                violation_message=f'Story "{node.name}" lacks scenarios or acceptance criteria in story-graph.json - INVEST principle "Testable" requires clear testable outcomes',
                 location=node.name,
                 severity='warning'
             ).to_dict()

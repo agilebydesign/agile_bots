@@ -1,8 +1,8 @@
 {
   "_explanation": {
-    "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios and scenario_outlines with placeholders",
-    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), background (common setup), steps (Given/When/Then)",
-    "scenario_outline_structure": "scenario_outlines array: same as scenarios but steps use <variable_name> placeholders. Examples object has columns array (all variable names) and rows array (data values)",
+    "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios with optional examples for data-driven testing",
+    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), background (common setup), steps (Given/When/Then), and optional examples",
+    "examples_structure": "When a scenario needs data-driven testing, add examples object with columns array (all variable names) and rows array (data values). Steps use <variable_name> placeholders",
     "variable_matching": "Every <variable_name> in steps MUST appear in examples.columns. Include both input variables and expected output/result variables",
     "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure"
   },
@@ -49,9 +49,7 @@
                         "Then <expected_outcome>",
                         "And <another_expected_outcome>"
                       ]
-                    }
-                  ],
-                  "scenario_outlines": [
+                    },
                     {
                       "name": "",
                       "type": "happy_path|edge_case|error_case",
@@ -125,7 +123,7 @@
         "Acceptance criteria",
         "Background (common setup steps)",
         "Scenarios (happy path, edge cases, error cases)",
-        "Scenario Outlines with Examples tables (when decision criteria chosen)"
+        "Scenarios with Examples tables (for data-driven testing when decision criteria chosen)"
       ]
     },
     "structured_data": {
@@ -134,7 +132,7 @@
       "content": [
         "Epic/sub_epic/story_group/story hierarchy",
         "Scenario definitions with steps",
-        "Scenario Outline definitions with Examples tables (when decision criteria chosen)",
+        "Scenarios with optional Examples tables (for data-driven testing)",
         "Background steps per story",
         "Scenario types (happy_path, edge_case, error_case)",
         "Connectors for story groups and stories"

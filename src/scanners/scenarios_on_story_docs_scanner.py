@@ -106,14 +106,13 @@ class ScenariosOnStoryDocsScanner(StoryScanner):
             scenarios = story_data.get('scenarios', [])
             scenario_outlines = story_data.get('scenario_outlines', [])
             
-            has_scenarios = scenarios and len(scenarios) > 0
-            has_scenario_outlines = scenario_outlines and len(scenario_outlines) > 0
+            has_scenarios = (scenarios and len(scenarios) > 0) or (scenario_outlines and len(scenario_outlines) > 0)
             
-            if not has_scenarios and not has_scenario_outlines:
+            if not has_scenarios:
                 location = node.map_location()
                 violation = Violation(
                     rule=self.rule,
-                    violation_message=f'Story "{node.name}" has no scenarios or scenario_outlines in story-graph.json - scenarios should be in JSON (scenarios or scenario_outlines fields)',
+                    violation_message=f'Story "{node.name}" has no scenarios in story-graph.json - scenarios should be in JSON (scenarios field)',
                     location=location,
                     severity='error'
                 ).to_dict()
