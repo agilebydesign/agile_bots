@@ -153,27 +153,6 @@ class BotPanel {
               fs.appendFileSync(logPath, `[${timestamp}] ${message.message}\n`);
             }
             return;
-          case "analyzeNode":
-            this._log(`[BotPanel] analyzeNode: ${message.nodeName} (${message.nodeType})`);
-            
-            // Call backend to analyze node and determine behavior
-            this._botView?.execute(`analyze_node "${message.nodeName}" type:${message.nodeType}`)
-              .then((result) => {
-                this._log(`[BotPanel] analyzeNode result: ${JSON.stringify(result)}`);
-                
-                if (result && result.behavior) {
-                  // Send behavior back to webview to update button tooltip
-                  this._panel.webview.postMessage({
-                    command: 'updateSubmitTooltip',
-                    nodeName: message.nodeName,
-                    behavior: result.behavior
-                  });
-                }
-              })
-              .catch((error) => {
-                this._log(`[BotPanel] analyzeNode ERROR: ${error.message}`);
-              });
-            return;
           case "openFile":
             this._log('[BotPanel] openFile message received with filePath: ' + message.filePath);
             if (message.filePath) {
@@ -535,13 +514,13 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                   }
                   
-                  // Only refresh for non-optimistic operations
-                  if (!needsOptimisticUpdate) {
-                    this._log(`[BotPanel] Non-optimistic command - calling _update() to refresh panel...`);
-                    return this._update();
-                  } else {
-                    this._log(`[BotPanel] Optimistic command - skipping _update(), frontend already updated`);
-                  }
+              // Only refresh for non-optimistic operations
+              if (!needsOptimisticUpdate) {
+                this._log(`[BotPanel] Non-optimistic command - calling _update() to refresh panel...`);
+                return this._update();
+              } else {
+                this._log(`[BotPanel] Optimistic command - skipping _update(), frontend already updated`);
+              }
                 })
                 .then(() => {
                   if (!needsOptimisticUpdate) {
@@ -2291,14 +2270,14 @@ class BotPanel {
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
                 if (btnSubmit) {
                     btnSubmit.style.display = 'block';
-                    btnSubmit.setAttribute('title', 'Loading...');
                     
-                    // Ask backend for behavior determination
-                    vscode.postMessage({
-                        command: 'analyzeNode',
-                        nodeName: window.selectedNode.name,
-                        nodeType: window.selectedNode.type
-                    });
+                    // Read behavior directly from node data (pre-calculated in Python)
+                    if (window.selectedNode.behavior) {
+                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
+                        btnSubmit.setAttribute('title', tooltipText + ': ' + window.selectedNode.name);
+                    } else {
+                        btnSubmit.setAttribute('title', 'Submit scope and start work');
+                    }
                 }
             } else if (window.selectedNode.type === 'sub-epic') {
                 // Sub-epics can have EITHER sub-epics OR stories, not both
@@ -2320,14 +2299,14 @@ class BotPanel {
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
                 if (btnSubmit) {
                     btnSubmit.style.display = 'block';
-                    btnSubmit.setAttribute('title', 'Loading...');
                     
-                    // Ask backend for behavior determination
-                    vscode.postMessage({
-                        command: 'analyzeNode',
-                        nodeName: window.selectedNode.name,
-                        nodeType: window.selectedNode.type
-                    });
+                    // Read behavior directly from node data (pre-calculated in Python)
+                    if (window.selectedNode.behavior) {
+                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
+                        btnSubmit.setAttribute('title', tooltipText + ': ' + window.selectedNode.name);
+                    } else {
+                        btnSubmit.setAttribute('title', 'Submit scope and start work');
+                    }
                 }
             } else if (window.selectedNode.type === 'story') {
                 // Stories can have both scenarios and acceptance criteria
@@ -2337,14 +2316,14 @@ class BotPanel {
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
                 if (btnSubmit) {
                     btnSubmit.style.display = 'block';
-                    btnSubmit.setAttribute('title', 'Loading...');
                     
-                    // Ask backend for behavior determination
-                    vscode.postMessage({
-                        command: 'analyzeNode',
-                        nodeName: window.selectedNode.name,
-                        nodeType: window.selectedNode.type
-                    });
+                    // Read behavior directly from node data (pre-calculated in Python)
+                    if (window.selectedNode.behavior) {
+                        var tooltipText = window.behaviorToTooltipText(window.selectedNode.behavior);
+                        btnSubmit.setAttribute('title', tooltipText + ': ' + window.selectedNode.name);
+                    } else {
+                        btnSubmit.setAttribute('title', 'Submit scope and start work');
+                    }
                 }
             } else if (window.selectedNode.type === 'scenario') {
                 // Scenarios can also be scoped to
@@ -2735,17 +2714,6 @@ class BotPanel {
                         }
                         break;
                     }
-                }
-            }
-            
-            // Update submit button tooltip based on backend behavior analysis
-            if (message.command === 'updateSubmitTooltip') {
-                console.log('[WebView] updateSubmitTooltip:', message.behavior, 'for', message.nodeName);
-                var btnSubmit = document.getElementById('btn-submit');
-                if (btnSubmit && window.selectedNode && window.selectedNode.name === message.nodeName) {
-                    var tooltipText = window.behaviorToTooltipText(message.behavior);
-                    btnSubmit.setAttribute('title', tooltipText + ': ' + message.nodeName);
-                    console.log('[WebView] Updated tooltip to:', tooltipText + ': ' + message.nodeName);
                 }
             }
         });

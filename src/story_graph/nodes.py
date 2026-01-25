@@ -24,6 +24,7 @@ class ActionResult:
 class StoryNode(ABC):
     name: str
     sequential_order: Optional[float] = None
+    behavior: Optional[str] = None  # Stage: shape/exploration/scenarios/tests/code
     _bot: Optional[Any] = field(default=None, repr=False)
 
     def __post_init__(self):
@@ -58,6 +59,14 @@ class StoryNode(ABC):
             return  # Cannot save without bot context
         
         story_map = self._bot.story_map
+        
+        # Recalculate file_link if this is a story (path may have changed if moved)
+        if isinstance(self, Story):
+            self.file_link = story_map._calculate_story_file_link(self)
+        
+        # Recalculate behavior for this node and ancestors
+        story_map.recalculate_behavior_for_node(self)
+        
         # Update the story_graph dict
         story_map.story_graph['epics'] = [story_map._epic_to_dict(e) for e in story_map._epics_list]
         # Trigger file save
@@ -627,7 +636,12 @@ class Epic(StoryNode):
     @classmethod
     def from_dict(cls, data: Dict[str, Any], bot: Optional[Any]=None) -> 'Epic':
         domain_concepts = [DomainConcept.from_dict(dc) for dc in data.get('domain_concepts', [])]
-        epic = cls(name=data.get('name', ''), domain_concepts=domain_concepts, _bot=bot)
+        epic = cls(
+            name=data.get('name', ''),
+            domain_concepts=domain_concepts,
+            behavior=data.get('behavior'),
+            _bot=bot
+        )
         for sub_epic_data in data.get('sub_epics', []):
             sub_epic = SubEpic.from_dict(sub_epic_data, parent=epic, bot=bot)
             epic._children.append(sub_epic)
@@ -690,7 +704,13 @@ class SubEpic(StoryNode):
         sequential_order = data.get('sequential_order')
         if sequential_order is None:
             raise ValueError('SubEpic requires sequential_order')
-        sub_epic = cls(name=data.get('name', ''), sequential_order=float(sequential_order), _parent=parent, _bot=bot)
+        sub_epic = cls(
+            name=data.get('name', ''),
+            sequential_order=float(sequential_order),
+            behavior=data.get('behavior'),
+            _parent=parent,
+            _bot=bot
+        )
         sub_epic.test_file = data.get('test_file')
         for nested_sub_epic_data in data.get('sub_epics', []):
             nested_sub_epic = SubEpic.from_dict(nested_sub_epic_data, parent=sub_epic, bot=bot)
@@ -828,6 +848,7 @@ class StoryGroup(StoryNode):
             sequential_order=float(sequential_order),
             group_type=group_type,
             connector=connector,
+            behavior=data.get('behavior'),
             _parent=parent,
             _bot=bot
         )
@@ -844,6 +865,7 @@ class Story(StoryNode):
     users: Optional[List[StoryUser]] = None
     test_file: Optional[str] = None
     test_class: Optional[str] = None
+    file_link: Optional[str] = None  # Link to story markdown file
     _parent: Optional[StoryNode] = field(default=None, repr=False)
 
     def __post_init__(self):
@@ -956,7 +978,19 @@ class Story(StoryNode):
         if sequential_order is None:
             raise ValueError('Story requires sequential_order')
         users = [StoryUser.from_str(u) for u in data.get('users', [])]
-        story = cls(name=data.get('name', ''), sequential_order=float(sequential_order), connector=data.get('connector'), story_type=data.get('story_type', 'user'), users=users, test_file=data.get('test_file'), test_class=data.get('test_class'), _parent=parent, _bot=bot)
+        story = cls(
+            name=data.get('name', ''),
+            sequential_order=float(sequential_order),
+            connector=data.get('connector'),
+            story_type=data.get('story_type', 'user'),
+            users=users,
+            test_file=data.get('test_file'),
+            test_class=data.get('test_class'),
+            file_link=data.get('file_link'),
+            behavior=data.get('behavior'),
+            _parent=parent,
+            _bot=bot
+        )
         acceptance_criteria_data = data.get('acceptance_criteria', [])
         for idx, ac_data in enumerate(acceptance_criteria_data):
             ac = AcceptanceCriteria.from_dict(ac_data, index=idx, parent=story, bot=bot)
@@ -1346,13 +1380,16 @@ class StoryMap:
             counter += 1
 
     def _epic_to_dict(self, epic: Epic) -> Dict[str, Any]:
-        return {
+        result = {
             'name': epic.name,
             'sequential_order': epic.sequential_order,
             'domain_concepts': [dc.__dict__ for dc in epic.domain_concepts] if epic.domain_concepts else [],
             'sub_epics': [self._sub_epic_to_dict(child) for child in epic.children if isinstance(child, SubEpic)],
             'story_groups': [self._story_group_to_dict(child) for child in epic.children if isinstance(child, StoryGroup)]
         }
+        if epic.behavior is not None:
+            result['behavior'] = epic.behavior
+        return result
 
     def _sub_epic_to_dict(self, sub_epic: SubEpic) -> Dict[str, Any]:
         # Use _children to access actual structure (including StoryGroups)
@@ -1371,6 +1408,10 @@ class StoryMap:
         if sub_epic.test_file is not None:
             result['test_file'] = sub_epic.test_file
         
+        # Include behavior if present
+        if sub_epic.behavior is not None:
+            result['behavior'] = sub_epic.behavior
+        
         result.update({
             'sub_epics': [self._sub_epic_to_dict(child) for child in sub_epic._children if isinstance(child, SubEpic)],
             'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)],
@@ -1380,13 +1421,16 @@ class StoryMap:
         return result
 
     def _story_group_to_dict(self, story_group: StoryGroup) -> Dict[str, Any]:
-        return {
+        result = {
             'name': story_group.name,
             'sequential_order': story_group.sequential_order,
             'type': story_group.group_type,
             'connector': story_group.connector,
             'stories': [self._story_to_dict(child) for child in story_group.children if isinstance(child, Story)]
         }
+        if story_group.behavior is not None:
+            result['behavior'] = story_group.behavior
+        return result
 
     def _story_to_dict(self, story: Story) -> Dict[str, Any]:
         # Extract children by type
@@ -1402,7 +1446,7 @@ class StoryMap:
             elif isinstance(child, AcceptanceCriteria):
                 acceptance_criteria.append(self._acceptance_criteria_to_dict(child))
         
-        return {
+        result = {
             'name': story.name,
             'sequential_order': story.sequential_order,
             'connector': story.connector,
@@ -1414,6 +1458,11 @@ class StoryMap:
             'scenario_outlines': scenario_outlines,
             'acceptance_criteria': acceptance_criteria
         }
+        if story.file_link is not None:
+            result['file_link'] = story.file_link
+        if story.behavior is not None:
+            result['behavior'] = story.behavior
+        return result
     
     def _scenario_to_dict(self, scenario: Scenario) -> Dict[str, Any]:
         # Convert Step objects to newline-separated string
@@ -1446,3 +1495,103 @@ class StoryMap:
             'text': ac.text,
             'sequential_order': ac.sequential_order
         }
+    
+    def recalculate_behavior_for_node(self, node: StoryNode) -> None:
+        """
+        Recalculate behavior for a single node and propagate up to ancestors.
+        Only recalculates affected nodes, not the entire tree.
+        """
+        if isinstance(node, Story):
+            # Calculate behavior for story based on its state
+            if not node.has_acceptance_criteria():
+                node.behavior = 'exploration'
+            elif not node.has_scenarios():
+                node.behavior = 'scenarios'
+            elif not node.has_tests():
+                node.behavior = 'tests'
+            else:
+                node.behavior = 'code'
+        elif isinstance(node, (Epic, SubEpic, StoryGroup)):
+            # Get all descendant stories (only walk this subtree, not entire tree)
+            stories = []
+            for child_node in self.walk(node):
+                if isinstance(child_node, Story):
+                    stories.append(child_node)
+            
+            # Determine behavior from descendant stories (same logic as bot.py)
+            if not stories:
+                node.behavior = 'shape'
+            else:
+                any_missing_ac = any(not story.has_acceptance_criteria() for story in stories)
+                any_missing_scenarios = any(not story.has_scenarios() for story in stories)
+                any_missing_tests = any(not story.has_tests() for story in stories)
+                
+                if any_missing_ac:
+                    node.behavior = 'exploration'
+                elif any_missing_scenarios:
+                    node.behavior = 'scenarios'
+                elif any_missing_tests:
+                    node.behavior = 'tests'
+                else:
+                    node.behavior = 'code'
+        
+        # Propagate up to parent (only up the ancestor chain, not siblings)
+        if hasattr(node, '_parent') and node._parent is not None:
+            self.recalculate_behavior_for_node(node._parent)
+    
+    def calculate_missing_file_links_and_behaviors(self) -> None:
+        """
+        One-time calculation for nodes missing behavior or file_link fields.
+        Only calculates if fields are None (backward compatibility for old JSON files).
+        Called manually when needed, not automatically on load.
+        """
+        # First pass: calculate story file_links and behaviors if missing
+        for epic in self._epics_list:
+            for node in self.walk(epic):
+                if isinstance(node, Story):
+                    # Calculate file link if missing
+                    if node.file_link is None:
+                        node.file_link = self._calculate_story_file_link(node)
+                    
+                    # Calculate behavior if missing
+                    if node.behavior is None:
+                        if not node.has_acceptance_criteria():
+                            node.behavior = 'exploration'
+                        elif not node.has_scenarios():
+                            node.behavior = 'scenarios'
+                        elif not node.has_tests():
+                            node.behavior = 'tests'
+                        else:
+                            node.behavior = 'code'
+        
+        # Second pass: calculate epic/sub-epic behaviors from their stories
+        for epic in self._epics_list:
+            if epic.behavior is None:
+                self.recalculate_behavior_for_node(epic)
+    
+    def _calculate_story_file_link(self, story: Story) -> str:
+        """Calculate the file path for a story's markdown file."""
+        if not self._bot or not hasattr(self._bot, 'bot_paths'):
+            return ''
+        
+        # Build path: docs/stories/map/Epic/SubEpic/.../Story.md
+        path_parts = []
+        current = story
+        
+        # Walk up to collect all parent names
+        while hasattr(current, '_parent') and current._parent:
+            current = current._parent
+            if isinstance(current, (Epic, SubEpic)):
+                path_parts.insert(0, current.name)
+        
+        # Add story name
+        path_parts.append(f"📄 {story.name}.md")
+        
+        # Build full path
+        from pathlib import Path
+        docs_path = Path(self._bot.bot_paths.workspace_directory) / 'docs' / 'stories' / 'map'
+        story_path = docs_path
+        for part in path_parts:
+            story_path = story_path / part
+        
+        return str(story_path)
