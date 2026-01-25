@@ -481,11 +481,10 @@ class BotPanel {
               this._log(`[BotPanel] commandText: ${message.commandText}`);
               this._log(`[BotPanel] Full message: ${JSON.stringify(message)}`);
               
-              // Check if this is a create/delete/move operation (optimistic update candidates)
+              // All operations now refresh - optimistic updates disabled for simplicity
               const isCreateOp = message.commandText.includes('.create_') || message.commandText.includes('create child') || message.commandText.includes('create epic');
               const isDeleteOp = message.commandText.includes('.delete');
               const isMoveOp = message.commandText.includes('.move_to');
-              const needsOptimisticUpdate = isCreateOp || isDeleteOp || isMoveOp;
               
               // Log to file for create/delete/rename operations
               const fs = require('fs');
@@ -499,7 +498,7 @@ class BotPanel {
                 this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
               }
               
-              this._log(`[BotPanel] Calling botView.execute... (optimistic: ${needsOptimisticUpdate})`);
+              this._log(`[BotPanel] Calling botView.execute...`);
               this._botView?.execute(message.commandText)
                 .then((result) => {
                   this._log(`[BotPanel] *** executeCommand SUCCESS ***`);
@@ -514,18 +513,12 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                   }
                   
-              // Only refresh for non-optimistic operations
-              if (!needsOptimisticUpdate) {
-                this._log(`[BotPanel] Non-optimistic command - calling _update() to refresh panel...`);
-                return this._update();
-              } else {
-                this._log(`[BotPanel] Optimistic command - skipping _update(), frontend already updated`);
-              }
+                  // Always refresh to show latest backend state
+                  this._log(`[BotPanel] Command completed - calling _update() to refresh panel...`);
+                  return this._update();
                 })
                 .then(() => {
-                  if (!needsOptimisticUpdate) {
-                    this._log(`[BotPanel] Panel update completed`);
-                  }
+                  this._log(`[BotPanel] Panel update completed`);
                   this._log(`${'='.repeat(80)}\n`);
                 })
                 .catch((error) => {
@@ -544,13 +537,11 @@ class BotPanel {
                   
                   vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
                   
-                  // On error, refresh to revert optimistic updates
-                  if (needsOptimisticUpdate) {
-                    this._log(`[BotPanel] Optimistic command failed - calling _update() to revert`);
-                    this._update().catch(err => {
-                      this._log(`[BotPanel] ERROR in revert _update: ${err.message}`);
-                    });
-                  }
+                  // Always refresh on error to show accurate backend state
+                  this._log(`[BotPanel] Command failed - calling _update() to refresh panel...`);
+                  this._update().catch(err => {
+                    this._log(`[BotPanel] ERROR in _update after command failure: ${err.message}`);
+                  });
                   
                   this._log(`${'='.repeat(80)}\n`);
                 });
@@ -910,6 +901,15 @@ class BotPanel {
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
       this._log('[BotPanel] Webview HTML property set');
+      
+      // Give webview time to load, then trigger collapse state restoration
+      setTimeout(() => {
+        this._panel.webview.postMessage({ 
+          command: 'restoreCollapseState' 
+        });
+        this._log('[BotPanel] Sent restoreCollapseState message to webview');
+      }, 100);
+      
       console.log("[BotPanel] _update() completed successfully");
       this._log('[BotPanel] _update() completed successfully');
       this._log('[BotPanel] _update() END');
@@ -1547,7 +1547,8 @@ class BotPanel {
                 draggedNode = {
                     path: target.getAttribute('data-path'),
                     name: target.getAttribute('data-node-name'),
-                    type: target.getAttribute('data-node-type')
+                    type: target.getAttribute('data-node-type'),
+                    position: parseInt(target.getAttribute('data-position') || '0')
                 };
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', draggedNode.path);
@@ -1737,11 +1738,21 @@ class BotPanel {
                     message: '[WebView] DROP on story-node - dragged: ' + draggedNode.name + ' onto: ' + targetName + ', dropZone: ' + dropZone
                 });
                 
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] DROP INFO - draggedNode.path: ' + draggedNode.path + ', targetPath: ' + targetPath
+                });
+                
                 if (draggedNode.path !== targetPath) {
                     console.log('[WebView] Drop detected:', {
                         dragged: draggedNode,
                         target: { path: targetPath, name: targetName, type: targetType },
                         dropZone: dropZone
+                    });
+                    
+                    vscode.postMessage({
+                        command: 'logToFile',
+                        message: '[WebView] DROP DETECTED - Dragged: ' + draggedNode.name + ' (type: ' + draggedNode.type + ', pos: ' + draggedNode.position + ') onto Target: ' + targetName + ' (type: ' + targetType + '), dropZone: ' + dropZone
                     });
                     
                     // OPTIMISTIC UPDATE: Move DOM element immediately
@@ -1785,21 +1796,42 @@ class BotPanel {
                     
                     let command;
                     
+                    vscode.postMessage({
+                        command: 'logToFile',
+                        message: '[WebView] COMMAND CONSTRUCTION - dropZone: ' + dropZone
+                    });
+                    
                     if (dropZone === 'inside') {
-                        // ON: Nest inside the target container
-                        command = draggedNode.path + '.move_to target:"' + targetName + '"';
+                        // ON: Nest inside the target container - use FULL PATH not just name to avoid ambiguity
+                        // targetPath is like: story_graph."Epic1"."Child1"
+                        // Backend expects: target:"Epic1"."Child1" (path with internal quotes, no outer wrapping)
+                        var targetForCommand = targetPath.replace(/^story_graph\./, '');
+                        // targetForCommand already has quotes around each segment (e.g., "Epic1"."Child1")
+                        // Do NOT wrap in additional quotes
+                        command = draggedNode.path + '.move_to target:' + targetForCommand;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] ON - NEST inside container: ' + targetName
+                            message: '[WebView] INSIDE COMMAND - targetPath: ' + targetPath + ', targetForCommand: ' + targetForCommand + ', command: ' + command
                         });
                     } else if (dropZone === 'after') {
                         var targetPos = parseInt(target.getAttribute('data-position') || '0');
+                        var draggedPos = draggedNode.position;
                         var parentMatch = targetPath.match(/(.*)\."[^"]+"/);
                         var parentName = parentMatch ? parentMatch[1].match(/\."([^"]+)"$/)[1] : 'story_graph';
-                        command = draggedNode.path + '.move_to target:"' + parentName + '" at_position:' + targetPos;
+                        
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] AFTER - at_position: ' + targetPos + ' in ' + parentName
+                            message: '[WebView] AFTER CALCULATION - targetPos: ' + targetPos + ', draggedPos: ' + draggedPos + ', parentMatch: ' + JSON.stringify(parentMatch) + ', parentName: ' + parentName
+                        });
+                        
+                        // When moving DOWN (to later position), use targetPos as-is (item shifts down)
+                        // When moving UP (to earlier position), use targetPos + 1 (drop after target)
+                        var finalPos = (draggedPos < targetPos) ? targetPos : (targetPos + 1);
+                        
+                        command = draggedNode.path + '.move_to target:"' + parentName + '" at_position:' + finalPos;
+                        vscode.postMessage({
+                            command: 'logToFile',
+                            message: '[WebView] AFTER COMMAND - dragged from ' + draggedPos + ' to position: ' + finalPos + ' (target was at ' + targetPos + ') in ' + parentName + ', command: ' + command
                         });
                     }
                     
@@ -2666,6 +2698,23 @@ class BotPanel {
                 
                 // Auto-remove after 30 seconds
                 setTimeout(() => errorDiv.remove(), 30000);
+            }
+            
+            // Handle explicit collapse state restoration after refresh
+            if (message.command === 'restoreCollapseState') {
+                console.log('[WebView] Restoring collapse state after refresh');
+                const savedState = sessionStorage.getItem('collapseState');
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        window.restoreCollapseState(state);
+                        console.log('[WebView] Restored collapse state for', Object.keys(state).length, 'sections');
+                    } catch (err) {
+                        console.error('[WebView] Failed to restore collapse state:', err);
+                    }
+                } else {
+                    console.log('[WebView] No saved collapse state found');
+                }
             }
             
             // Optimistic update: rename node in DOM immediately
