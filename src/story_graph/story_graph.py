@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, Optional, TYPE_CHECKING
 import json
 import logging
@@ -37,7 +37,51 @@ class StoryGraph:
                 logger.error(f'Story graph file not found at {self._path}')
                 raise FileNotFoundError(f'Story graph file (story-graph.json) not found in {self._path.parent}. Cannot validate rules without story graph. Expected story graph to be created by build action before validate.')
             return {}
-        return read_json_file(self._path)
+        
+        import sys
+        import os
+        
+        # Get file modification time
+        file_mtime = os.path.getmtime(self._path)
+        print(f"[DEBUG] StoryGraph: story-graph.json mtime={file_mtime}", file=sys.stderr)
+        
+        # Check when panel last edited the file
+        panel_edit_time_file = self._path.parent / '.story-graph-panel-edit-time'
+        panel_edit_time = 0
+        if panel_edit_time_file.exists():
+            try:
+                with open(panel_edit_time_file, 'r') as f:
+                    panel_edit_time = float(f.read().strip()) / 1000.0  # Convert ms to seconds
+                print(f"[DEBUG] StoryGraph: Panel last edited at {panel_edit_time}", file=sys.stderr)
+            except Exception as e:
+                print(f"[DEBUG] StoryGraph: Failed to read panel edit time: {e}", file=sys.stderr)
+        
+        raw_content = read_json_file(self._path)
+        
+        # Only recalculate if file was modified AFTER panel's last edit
+        # (meaning someone edited it outside the panel)
+        if panel_edit_time > 0 and file_mtime <= panel_edit_time:
+            # File last changed by panel or before panel edit - no external changes
+            print(f"[DEBUG] StoryGraph: No external edits detected, using existing behaviors", file=sys.stderr)
+            return raw_content
+        
+        # File changed externally (or no panel edit history) - recalculate behaviors
+        print(f"[DEBUG] StoryGraph: External edit detected (file mtime {file_mtime} > panel edit {panel_edit_time}), recalculating", file=sys.stderr)
+        
+        # Use StoryMap to recalculate behaviors
+        try:
+            from story_graph.nodes import StoryMap
+            story_map = StoryMap(raw_content, bot=None, recalculate_behaviors=True)
+            # Convert back to dict with recalculated behaviors
+            from story_graph.nodes import Epic
+            content = {'epics': [story_map._epic_to_dict(epic) for epic in story_map._epics_list]}
+            if 'increments' in raw_content:
+                content['increments'] = raw_content['increments']
+            
+            return content
+        except Exception as e:
+            print(f"[DEBUG] StoryGraph: Failed to recalculate behaviors: {e}, using raw content", file=sys.stderr)
+            return raw_content
 
     @property
     def story_graph_spec(self) -> Optional['StoryGraphSpec']:
