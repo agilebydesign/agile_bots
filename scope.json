@@ -1,6 +1,8 @@
 {
-  "type": "showAll",
-  "value": [],
+  "type": "story",
+  "value": [
+    "Set scope to selected story node and submit"
+  ],
   "exclude": [],
   "skiprule": []
 }

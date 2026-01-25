@@ -24,7 +24,6 @@ class ActionResult:
 class StoryNode(ABC):
     name: str
     sequential_order: Optional[float] = None
-    behavior: Optional[str] = None  # Stage: shape/exploration/scenarios/tests/code
     _bot: Optional[Any] = field(default=None, repr=False)
 
     def __post_init__(self):
@@ -53,26 +52,16 @@ class StoryNode(ABC):
     def node_type(self) -> str:
         return self.__class__.__name__.lower()
 
-    def save(self, skip_behavior_recalc: bool = False) -> None:
-        """Save this node's changes to the story graph and persist to disk.
-        
-        Args:
-            skip_behavior_recalc: If True, skip behavior recalculation (e.g., after delete where behaviors are already correct)
-        """
+    def save(self) -> None:
+        """Save this node's changes to the story graph and persist to disk."""
         if not self._bot:
-            return  # Cannot save without bot context
+            return
         
         story_map = self._bot.story_map
         
-        if not skip_behavior_recalc:
-            # Recalculate file_link if this is a story (path may have changed if moved)
-            if isinstance(self, Story):
-                self.file_link = story_map._calculate_story_file_link(self)
-            
-            # Recalculate behavior for this node and ancestors
-            story_map.recalculate_behavior_for_node(self)
+        if isinstance(self, Story):
+            self.file_link = story_map._calculate_story_file_link(self)
         
-        # Trigger file save (StoryMap.save() will regenerate the dict)
         story_map.save()
     
     def save_all(self) -> None:
@@ -1217,27 +1206,13 @@ class EpicsCollection:
 
 class StoryMap:
 
-    def __init__(self, story_graph: Dict[str, Any], bot=None, recalculate_behaviors: bool = False):
+    def __init__(self, story_graph: Dict[str, Any], bot=None):
         self.story_graph = story_graph
         self._bot = bot
         self._epics_list: List[Epic] = []
         for epic_data in story_graph.get('epics', []):
             self._epics_list.append(Epic.from_dict(epic_data, bot=bot))
         self._epics = EpicsCollection(self._epics_list)
-        
-        # Only recalculate if explicitly requested (file has changed)
-        if recalculate_behaviors:
-            import sys
-            story_count = 0
-            for epic in self._epics_list:
-                for node in self.walk(epic):
-                    if isinstance(node, Story):
-                        story_count += 1
-                        self.recalculate_behavior_for_node(node)
-            print(f"[DEBUG] StoryMap.__init__: Recalculated behaviors for {story_count} stories", file=sys.stderr)
-        else:
-            import sys
-            print(f"[DEBUG] StoryMap.__init__: Using existing behaviors (no recalculation)", file=sys.stderr)
 
     @classmethod
     def from_bot(cls, bot: Any) -> 'StoryMap':
@@ -1572,87 +1547,6 @@ class StoryMap:
             'sequential_order': ac.sequential_order
         }
     
-    def recalculate_behavior_for_node(self, node: StoryNode) -> None:
-        """
-        Recalculate behavior for a single node and propagate up to ancestors.
-        Only recalculates affected nodes, not the entire tree.
-        """
-        if isinstance(node, Story):
-            # Calculate behavior for story based on its state
-            has_ac = node.has_acceptance_criteria()
-            has_sc = node.has_scenarios()
-            has_tests = node.has_tests()
-            old_behavior = node.behavior
-            
-            if not has_ac:
-                node.behavior = 'exploration'
-            elif not has_sc:
-                node.behavior = 'scenarios'
-            elif not has_tests:
-                node.behavior = 'tests'
-            else:
-                node.behavior = 'code'
-            
-            # DEBUG logging
-            import sys
-            print(f"[DEBUG] Recalc behavior for Story '{node.name}': AC={has_ac}, Scenarios={has_sc}, Tests={has_tests}, old='{old_behavior}', new='{node.behavior}'", file=sys.stderr)
-        elif isinstance(node, (Epic, SubEpic, StoryGroup)):
-            # Get all descendant stories (only walk this subtree, not entire tree)
-            stories = []
-            for child_node in self.walk(node):
-                if isinstance(child_node, Story):
-                    stories.append(child_node)
-            
-            # Determine behavior from descendant stories (same logic as bot.py)
-            if not stories:
-                node.behavior = 'shape'
-            else:
-                any_missing_ac = any(not story.has_acceptance_criteria() for story in stories)
-                any_missing_scenarios = any(not story.has_scenarios() for story in stories)
-                any_missing_tests = any(not story.has_tests() for story in stories)
-                
-                if any_missing_ac:
-                    node.behavior = 'exploration'
-                elif any_missing_scenarios:
-                    node.behavior = 'scenarios'
-                elif any_missing_tests:
-                    node.behavior = 'tests'
-                else:
-                    node.behavior = 'code'
-        
-        # Propagate up to parent (only up the ancestor chain, not siblings)
-        if hasattr(node, '_parent') and node._parent is not None:
-            self.recalculate_behavior_for_node(node._parent)
-    
-    def calculate_missing_file_links_and_behaviors(self) -> None:
-        """
-        One-time calculation for nodes missing behavior or file_link fields.
-        Only calculates if fields are None (backward compatibility for old JSON files).
-        Called manually when needed, not automatically on load.
-        """
-        # First pass: calculate story file_links and behaviors if missing
-        for epic in self._epics_list:
-            for node in self.walk(epic):
-                if isinstance(node, Story):
-                    # Calculate file link if missing
-                    if node.file_link is None:
-                        node.file_link = self._calculate_story_file_link(node)
-                    
-                    # Calculate behavior if missing
-                    if node.behavior is None:
-                        if not node.has_acceptance_criteria():
-                            node.behavior = 'exploration'
-                        elif not node.has_scenarios():
-                            node.behavior = 'scenarios'
-                        elif not node.has_tests():
-                            node.behavior = 'tests'
-                        else:
-                            node.behavior = 'code'
-        
-        # Second pass: calculate epic/sub-epic behaviors from their stories
-        for epic in self._epics_list:
-            if epic.behavior is None:
-                self.recalculate_behavior_for_node(epic)
     
     def _calculate_story_file_link(self, story: Story) -> str:
         """Calculate the file path for a story's markdown file."""

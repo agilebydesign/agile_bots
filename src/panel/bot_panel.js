@@ -200,6 +200,11 @@ class BotPanel {
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                   });
+                } else if (fileExtension === 'md') {
+                  // Open markdown files in preview mode
+                  vscode.commands.executeCommand('markdown.showPreview', fileUri).catch((error) => {
+                    vscode.window.showErrorMessage(`Failed to open markdown preview: ${message.filePath}\n${error.message}`);
+                  });
                 } else {
                 vscode.workspace.openTextDocument(fileUri).then(
                   (doc) => {
