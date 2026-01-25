@@ -3,7 +3,7 @@ from .scanner import Scanner
 from .violation import Violation
 
 from .story_map import (
-    StoryMap, StoryNode, Epic, SubEpic, StoryGroup, Story, Scenario, ScenarioOutline
+    StoryMap, StoryNode, Epic, SubEpic, StoryGroup, Story, Scenario
 )
 
 from .code_scanner import CodeScanner
@@ -38,6 +38,5 @@ __all__ = [
     'StoryGroup', 
     'Story', 
     'Scenario', 
-    'ScenarioOutline',
 ]
 

@@ -2135,9 +2135,10 @@ class BotPanel {
         
         window.createScenarioOutline = function(storyName) {
             console.log('[WebView] createScenarioOutline called for:', storyName);
+            console.log('[WebView] Note: ScenarioOutline deprecated, creating Scenario instead');
             vscode.postMessage({
                 command: 'executeCommand',
-                commandText: \`story_graph."\${storyName}".create_scenario_outline\`
+                commandText: \`story_graph."\${storyName}".create_scenario\`
             });
         };
         

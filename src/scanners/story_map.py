@@ -142,6 +142,27 @@ class Scenario(ScenarioBase):
         return self.data.get('background', [])
     
     @property
+    def examples(self) -> Optional[Dict[str, Any]]:
+        return self.data.get('examples')
+    
+    @property
+    def examples_columns(self) -> List[str]:
+        if self.examples:
+            return self.examples.get('columns', [])
+        return []
+    
+    @property
+    def examples_rows(self) -> List[List[str]]:
+        if self.examples:
+            return self.examples.get('rows', [])
+        return []
+    
+    @property
+    def has_examples(self) -> bool:
+        """Check if this scenario has examples (data-driven testing)."""
+        return self.examples is not None and len(self.examples.get('columns', [])) > 0
+    
+    @property
     def test_method(self) -> Optional[str]:
         return self.data.get('test_method')
     
@@ -149,44 +170,7 @@ class Scenario(ScenarioBase):
         story_location = self.story.map_location('scenarios')
         return f"{story_location}[{self.scenario_idx}].{field}"
 
-class ScenarioOutline(ScenarioBase):
-    
-    def __init__(self, data: Dict[str, Any], story: 'Story', scenario_outline_idx: int):
-        self.data = data
-        self.story = story
-        self.scenario_outline_idx = scenario_outline_idx
-    
-    @property
-    def name(self) -> str:
-        return self.data.get('name', '')
-    
-    @property
-    def type(self) -> str:
-        return self.data.get('type', '')
-    
-    @property
-    def background(self) -> List[str]:
-        return self.data.get('background', [])
-    
-    @property
-    def examples(self) -> Dict[str, Any]:
-        return self.data.get('examples', {})
-    
-    @property
-    def examples_columns(self) -> List[str]:
-        return self.examples.get('columns', [])
-    
-    @property
-    def examples_rows(self) -> List[List[str]]:
-        return self.examples.get('rows', [])
-    
-    @property
-    def test_method(self) -> Optional[str]:
-        return self.data.get('test_method')
-    
-    def map_location(self, field: str = 'name') -> str:
-        story_location = self.story.map_location('scenario_outlines')
-        return f"{story_location}[{self.scenario_outline_idx}].{field}"
+# ScenarioOutline class removed - use Scenario with optional examples field instead
 
 class Story(StoryNode):
     
@@ -213,14 +197,17 @@ class Story(StoryNode):
     @property
     def scenarios(self) -> List[Scenario]:
         scenarios_data = self.data.get('scenarios', [])
-        return [Scenario(scenario_data, self, scenario_idx) 
-                for scenario_idx, scenario_data in enumerate(scenarios_data)]
-    
-    @property
-    def scenario_outlines(self) -> List[ScenarioOutline]:
+        scenarios = [Scenario(scenario_data, self, scenario_idx) 
+                     for scenario_idx, scenario_data in enumerate(scenarios_data)]
+        
+        # Legacy support: merge scenario_outlines into scenarios
         scenario_outlines_data = self.data.get('scenario_outlines', [])
-        return [ScenarioOutline(scenario_outline_data, self, scenario_outline_idx)
-                for scenario_outline_idx, scenario_outline_data in enumerate(scenario_outlines_data)]
+        if scenario_outlines_data:
+            offset = len(scenarios)
+            for idx, outline_data in enumerate(scenario_outlines_data):
+                scenarios.append(Scenario(outline_data, self, offset + idx))
+        
+        return scenarios
     
     @property
     def test_class(self) -> Optional[str]:

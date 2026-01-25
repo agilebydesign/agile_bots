@@ -11,11 +11,11 @@ The scope submission functionality has been extended to work with **Scenario** n
 1. **Added `behavior_needed` property to `Scenario` class** (`src/story_graph/nodes.py`)
    - Returns `"code"` if the scenario has a test method (ready for implementation)
    - Returns `"test"` if the scenario has no test method (needs test)
+   - Note: ScenarioOutline has been merged into Scenario (scenarios can now optionally have an `examples` field)
 
-2. **Added `behavior_needed` property to `ScenarioOutline` class** (`src/story_graph/nodes.py`)
-   - Same logic as `Scenario`
-   - Returns `"code"` if it has a test method
-   - Returns `"test"` if it doesn't have a test method
+2. **Added behavior enrichment to JSON scope** (`src/scope/json_scope.py`)
+   - Scenarios now include their `behavior` property in the JSON sent to the panel
+   - This allows the panel to display the correct behavior indicator
 
 3. **Added tests** (`test/invoke_bot/edit_story_map/test_manage_story_scope.py`)
    - Tests verify that scenarios correctly determine their behavior based on test method presence

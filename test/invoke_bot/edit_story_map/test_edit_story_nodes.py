@@ -21,7 +21,7 @@ from pathlib import Path
 from helpers.bot_test_helper import BotTestHelper
 from helpers import TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper
 from story_graph import StoryMap
-from scanners.story_map import Epic, SubEpic, StoryGroup, Story, Scenario, ScenarioOutline
+from scanners.story_map import Epic, SubEpic, StoryGroup, Story, Scenario
 
 # ============================================================================
 # DOMAIN TESTS - Core Story Graph Navigation
@@ -130,13 +130,15 @@ class TestNavigateStoryGraph:
         story = helper.story.when_item_accessed('story', story_map)
         # When: Story scenarios are retrieved
         scenarios = story.scenarios
-        # Then: Scenarios contain expected scenarios
-        assert len(scenarios) == 2
+        # Then: Scenarios contain expected scenarios (including scenario with examples)
+        assert len(scenarios) == 3
         assert isinstance(scenarios[0], Scenario)
         assert scenarios[0].name == "Story graph file exists"
         assert scenarios[0].type == "happy_path"
         assert scenarios[1].name == "Story graph file missing"
         assert scenarios[1].type == "error_case"
+        assert scenarios[2].name == "Load story graph with different formats"
+        assert scenarios[2].has_examples
     
     def test_scenario_has_properties(self, tmp_path):
         """
@@ -170,37 +172,39 @@ class TestNavigateStoryGraph:
         # Then: Scenario has default test method
         assert scenario.default_test_method == "test_story_graph_file_exists"
     
-    def test_story_has_scenario_outlines(self, tmp_path):
+    def test_story_has_scenarios_with_examples(self, tmp_path):
         """
-        SCENARIO: Story Has Scenario Outlines
+        SCENARIO: Story Has Scenarios With Examples (data-driven testing)
         """
         # Given: Story map is loaded
         helper = BotTestHelper(tmp_path)
         story_map = helper.story.create_story_map()
         story = helper.story.when_item_accessed('story', story_map)
-        # When: Story scenario outlines are retrieved
-        scenario_outlines = story.scenario_outlines
-        # Then: Scenario outlines contain expected outline
-        assert len(scenario_outlines) == 1
-        assert isinstance(scenario_outlines[0], ScenarioOutline)
-        assert scenario_outlines[0].name == "Load story graph with different formats"
+        # When: Scenarios with examples are retrieved
+        scenarios_with_examples = [s for s in story.scenarios if s.has_examples]
+        # Then: At least one scenario has examples
+        assert len(scenarios_with_examples) >= 1
+        scenario = scenarios_with_examples[0]
+        assert isinstance(scenario, Scenario)
+        assert scenario.name == "Load story graph with different formats"
     
-    def test_scenario_outline_has_examples(self, tmp_path):
+    def test_scenario_has_examples(self, tmp_path):
         """
-        SCENARIO: Scenario Outline Has Examples
+        SCENARIO: Scenario Has Examples
         """
         # Given: Story map is loaded
         helper = BotTestHelper(tmp_path)
         story_map = helper.story.create_story_map()
         story = helper.story.when_item_accessed('story', story_map)
-        # When: Scenario outline is retrieved from story
-        scenario_outline = helper.story.when_item_accessed('scenario_outline', story)
-        # Then: Scenario outline has expected examples
-        assert len(scenario_outline.examples_columns) == 2
-        assert scenario_outline.examples_columns == ["file_path", "expected_epics"]
-        assert len(scenario_outline.examples_rows) == 2
-        assert scenario_outline.examples_rows[0] == ["story-graph.json", "2"]
-        assert scenario_outline.examples_rows[1] == ["story-graph-v2.json", "3"]
+        # When: Scenario with examples is retrieved from story
+        scenarios_with_examples = [s for s in story.scenarios if s.has_examples]
+        scenario = scenarios_with_examples[0]
+        # Then: Scenario has expected examples
+        assert len(scenario.examples_columns) == 2
+        assert scenario.examples_columns == ["file_path", "expected_epics"]
+        assert len(scenario.examples_rows) == 2
+        assert scenario.examples_rows[0] == ["story-graph.json", "2"]
+        assert scenario.examples_rows[1] == ["story-graph-v2.json", "3"]
     
     def test_story_default_test_class(self, tmp_path):
         """
@@ -287,18 +291,20 @@ class TestNavigateStoryGraph:
         # Then: Scenario map location is correct
         helper.story.assert_map_location_matches(scenario)
     
-    def test_scenario_outline_map_location(self, tmp_path):
+    def test_scenario_with_examples_map_location(self, tmp_path):
         """
-        SCENARIO: Scenario Outline Map Location
+        SCENARIO: Scenario With Examples Map Location
         """
         # Given: Story map is loaded
         helper = BotTestHelper(tmp_path)
         story_map = helper.story.create_story_map()
         epics = helper.story.when_item_accessed('epics', story_map)
-        # When: Scenario outline is retrieved from epics
-        scenario_outline = helper.story.when_item_accessed('scenario_outline', epics)
-        # Then: Scenario outline map location is correct
-        helper.story.assert_map_location_matches(scenario_outline)
+        story = helper.story.when_item_accessed('story', epics)
+        # When: Scenario with examples is retrieved from story
+        scenarios_with_examples = [s for s in story.scenarios if s.has_examples]
+        scenario = scenarios_with_examples[0] if scenarios_with_examples else story.scenarios[0]
+        # Then: Scenario map location is correct
+        helper.story.assert_map_location_matches(scenario)
     
     def test_from_bot_loads_story_graph(self, tmp_path):
         """
@@ -342,18 +348,20 @@ class TestNavigateStoryGraph:
         # Then: Scenario map location is correct
         helper.story.assert_map_location_matches(scenario)
     
-    def test_scenario_outline_map_location_duplicate(self, tmp_path):
+    def test_scenario_with_examples_map_location_duplicate(self, tmp_path):
         """
-        SCENARIO: Scenario Outline Map Location
+        SCENARIO: Scenario With Examples Map Location (duplicate handling)
         """
         # Given: Story map is loaded
         helper = BotTestHelper(tmp_path)
         story_map = helper.story.create_story_map()
         epics = helper.story.when_item_accessed('epics', story_map)
-        # When: Scenario outline is retrieved from epics
-        scenario_outline = helper.story.when_item_accessed('scenario_outline', epics)
-        # Then: Scenario outline map location is correct
-        helper.story.assert_map_location_matches(scenario_outline)
+        story = helper.story.when_item_accessed('story', epics)
+        # When: Scenario with examples is retrieved from story
+        scenarios_with_examples = [s for s in story.scenarios if s.has_examples]
+        scenario = scenarios_with_examples[0] if scenarios_with_examples else story.scenarios[0]
+        # Then: Scenario map location is correct
+        helper.story.assert_map_location_matches(scenario)
 
 # ============================================================================
 # DOMAIN TESTS - Core Story Graph Editing Logic
@@ -758,7 +766,7 @@ class TestCreateChildStoryNode:
     
     @pytest.mark.parametrize('story_name,child_type,child_name,target_collection,excluded_collection', [
         ('Validate Password', 'Scenario', 'Valid Password Entered', 'scenarios', 'acceptance_criteria'),
-        ('Validate Password', 'ScenarioOutline', 'Invalid Password Formats', 'scenario_outlines', 'acceptance_criteria'),
+        ('Validate Password', 'Scenario', 'Invalid Password Formats (with examples)', 'scenarios', 'acceptance_criteria'),
         ('Validate Password', 'AcceptanceCriteria', 'Password Must Not Be Empty', 'acceptance_criteria', 'scenarios'),
     ])
     def test_story_creates_child_in_correct_collection(self, tmp_path, story_name, child_type, child_name, target_collection, excluded_collection):

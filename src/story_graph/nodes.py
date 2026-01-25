@@ -633,6 +633,27 @@ class Epic(StoryNode):
                 return child
         return None
 
+    @property
+    def sub_epics(self) -> List['SubEpic']:
+        return [child for child in self.children if isinstance(child, SubEpic)]
+
+    @property
+    def behavior_needed(self) -> str:
+        hierarchy = ['shape', 'explore', 'scenario', 'test', 'code']
+        
+        sub_epics = self.sub_epics
+        if not sub_epics:
+            return 'shape'
+        
+        highest_behavior = 'code'
+        
+        for sub_epic in sub_epics:
+            sub_epic_behavior = sub_epic.behavior_needed
+            if hierarchy.index(sub_epic_behavior) < hierarchy.index(highest_behavior):
+                highest_behavior = sub_epic_behavior
+        
+        return highest_behavior
+
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
         return self.create_child(name, child_type, position)
@@ -781,17 +802,32 @@ class SubEpic(StoryNode):
 
     @property
     def behavior_needed(self) -> str:
-        stories = [child for child in self.children if isinstance(child, Story)]
+        hierarchy = ['shape', 'explore', 'scenario', 'test', 'code']
         
-        if not stories:
-            return 'shape'
-        
-        current_behavior = stories[0].behavior_needed
-        
-        for story in stories[1:]:
-            current_behavior = story.get_behavior_needed(current_behavior)
-        
-        return current_behavior
+        if self.has_subepics:
+            sub_epics = [child for child in self._children if isinstance(child, SubEpic)]
+            if not sub_epics:
+                return 'shape'
+            
+            highest_behavior = 'code'
+            for sub_epic in sub_epics:
+                sub_epic_behavior = sub_epic.behavior_needed
+                if hierarchy.index(sub_epic_behavior) < hierarchy.index(highest_behavior):
+                    highest_behavior = sub_epic_behavior
+            
+            return highest_behavior
+        else:
+            stories = [child for child in self.children if isinstance(child, Story)]
+            
+            if not stories:
+                return 'shape'
+            
+            current_behavior = stories[0].behavior_needed
+            
+            for story in stories[1:]:
+                current_behavior = story.get_behavior_needed(current_behavior)
+            
+            return current_behavior
 
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
@@ -955,10 +991,6 @@ class Story(StoryNode):
     @property
     def scenarios(self) -> List['Scenario']:
         return [child for child in self._children if isinstance(child, Scenario)]
-    
-    @property
-    def scenario_outlines(self) -> List['ScenarioOutline']:
-        return [child for child in self._children if isinstance(child, ScenarioOutline)]
 
     @property
     def acceptance_criteria(self) -> List['AcceptanceCriteria']:
@@ -976,7 +1008,7 @@ class Story(StoryNode):
         return len(self.acceptance_criteria) > 0
     
     def has_scenarios(self) -> bool:
-        return len(self.scenarios) > 0 or len(self.scenario_outlines) > 0
+        return len(self.scenarios) > 0
     
     def has_tests(self) -> bool:
         if self.test_class:
@@ -986,22 +1018,17 @@ class Story(StoryNode):
             if scenario.test_method:
                 return True
         
-        for scenario_outline in self.scenario_outlines:
-            if scenario_outline.test_method:
-                return True
-        
         return False
 
     @property
     def all_scenarios_have_tests(self) -> bool:
-        all_scenarios = self.scenarios + self.scenario_outlines
-        if not all_scenarios:
+        if not self.scenarios:
             return False
-        return all(scenario.test_method for scenario in all_scenarios)
+        return all(scenario.test_method for scenario in self.scenarios)
     
     @property
     def many_scenarios(self) -> int:
-        return len(self.scenarios) + len(self.scenario_outlines)
+        return len(self.scenarios)
     
     @property
     def many_acceptance_criteria(self) -> int:
@@ -1052,14 +1079,11 @@ class Story(StoryNode):
         if child_type == 'Scenario' or child_type is None:
             sequential_order = float(len(self._filter_children_by_type(Scenario))) if position is None else float(position)
             child = Scenario(name=name or self._generate_unique_child_name(), sequential_order=sequential_order, _parent=self, _bot=self._bot)
-        elif child_type == 'ScenarioOutline':
-            sequential_order = float(len(self._filter_children_by_type(ScenarioOutline))) if position is None else float(position)
-            child = ScenarioOutline(name=name or self._generate_unique_child_name(), sequential_order=sequential_order, _parent=self, _bot=self._bot)
         elif child_type == 'AcceptanceCriteria':
             sequential_order = float(len(self._filter_children_by_type(AcceptanceCriteria))) if position is None else float(position)
             child = AcceptanceCriteria(name=name or self._generate_unique_child_name(), text=name or self._generate_unique_child_name(), sequential_order=sequential_order, _parent=self, _bot=self._bot)
         else:
-            raise ValueError(f'Story can only create Scenario, ScenarioOutline, or AcceptanceCriteria children, not {child_type}')
+            raise ValueError(f'Story can only create Scenario or AcceptanceCriteria children, not {child_type}')
         if position is not None:
             adjusted_position = min(position, len(self._children))
             self._children.insert(adjusted_position, child)
@@ -1107,10 +1131,11 @@ class Story(StoryNode):
         for idx, scenario_data in enumerate(scenarios_data):
             scenario = Scenario.from_dict(scenario_data, index=idx, parent=story, bot=bot)
             story._children.append(scenario)
+        # Legacy support: merge scenario_outlines into scenarios
         scenario_outlines_data = data.get('scenario_outlines', [])
         for idx, scenario_outline_data in enumerate(scenario_outlines_data):
-            scenario_outline = ScenarioOutline.from_dict(scenario_outline_data, index=idx, parent=story, bot=bot)
-            story._children.append(scenario_outline)
+            scenario = Scenario.from_dict(scenario_outline_data, index=len(scenarios_data) + idx, parent=story, bot=bot)
+            story._children.append(scenario)
         return story
 
 @dataclass
@@ -1118,6 +1143,7 @@ class Scenario(StoryNode):
     sequential_order: float
     type: str = ''
     background: List[str] = field(default_factory=list)
+    examples: Optional[Dict[str, Any]] = None
     test_method: Optional[str] = None
     _parent: Optional[StoryNode] = field(default=None, repr=False)
 
@@ -1136,6 +1162,25 @@ class Scenario(StoryNode):
         return self._filter_children_by_type(Step)
 
     @property
+    def examples_columns(self) -> List[str]:
+        """Return columns from examples table, or empty list if no examples."""
+        if self.examples:
+            return self.examples.get('columns', [])
+        return []
+
+    @property
+    def examples_rows(self) -> List[List[str]]:
+        """Return rows from examples table, or empty list if no examples."""
+        if self.examples:
+            return self.examples.get('rows', [])
+        return []
+
+    @property
+    def has_examples(self) -> bool:
+        """Check if this scenario has examples (data-driven testing)."""
+        return self.examples is not None and len(self.examples.get('columns', [])) > 0
+
+    @property
     def default_test_method(self) -> str:
         return StoryNode._generate_default_test_method_name(self.name)
 
@@ -1148,57 +1193,11 @@ class Scenario(StoryNode):
     @classmethod
     def from_dict(cls, data: Dict[str, Any], index: int=0, parent: Optional[StoryNode]=None, bot: Optional[Any]=None) -> 'Scenario':
         sequential_order = float(data.get('sequential_order', index + 1))
-        scenario = cls(name=data.get('name', ''), sequential_order=sequential_order, type=data.get('type', ''), background=data.get('background', []), test_method=data.get('test_method'), _parent=parent, _bot=bot)
+        scenario = cls(name=data.get('name', ''), sequential_order=sequential_order, type=data.get('type', ''), background=data.get('background', []), examples=data.get('examples'), test_method=data.get('test_method'), _parent=parent, _bot=bot)
         cls._add_steps_to_node(scenario, cls._parse_steps_from_data(data.get('steps', '')))
         return scenario
 
-@dataclass
-class ScenarioOutline(StoryNode):
-    sequential_order: float
-    type: str = ''
-    background: List[str] = field(default_factory=list)
-    examples: Dict[str, Any] = field(default_factory=dict)
-    test_method: Optional[str] = None
-    _parent: Optional[StoryNode] = field(default=None, repr=False)
-
-    def __post_init__(self):
-        super().__post_init__()
-        if self.sequential_order is None:
-            raise ValueError('ScenarioOutline requires sequential_order')
-        self._children: List['StoryNode'] = []
-
-    @property
-    def children(self) -> List['StoryNode']:
-        return self._children
-
-    @property
-    def steps(self) -> List['Step']:
-        return self._filter_children_by_type(Step)
-
-    @property
-    def examples_columns(self) -> List[str]:
-        return self.examples.get('columns', [])
-
-    @property
-    def examples_rows(self) -> List[List[str]]:
-        return self.examples.get('rows', [])
-
-    @property
-    def default_test_method(self) -> str:
-        return StoryNode._generate_default_test_method_name(self.name)
-
-    @property
-    def behavior_needed(self) -> str:
-        if self.test_method:
-            return 'code'
-        return 'test'
-
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any], index: int=0, parent: Optional[StoryNode]=None, bot: Optional[Any]=None) -> 'ScenarioOutline':
-        sequential_order = float(data.get('sequential_order', index + 1))
-        scenario_outline = cls(name=data.get('name', ''), sequential_order=sequential_order, type=data.get('type', ''), background=data.get('background', []), examples=data.get('examples', {}), test_method=data.get('test_method'), _parent=parent, _bot=bot)
-        cls._add_steps_to_node(scenario_outline, cls._parse_steps_from_data(data.get('steps', '')))
-        return scenario_outline
+# ScenarioOutline class has been removed - use Scenario with optional examples field instead
 
 @dataclass
 class AcceptanceCriteria(StoryNode):
@@ -1540,14 +1539,11 @@ class StoryMap:
     def _story_to_dict(self, story: Story) -> Dict[str, Any]:
         # Extract children by type
         scenarios = []
-        scenario_outlines = []
         acceptance_criteria = []
         
         for child in story._children:
             if isinstance(child, Scenario):
                 scenarios.append(self._scenario_to_dict(child))
-            elif isinstance(child, ScenarioOutline):
-                scenario_outlines.append(self._scenario_outline_to_dict(child))
             elif isinstance(child, AcceptanceCriteria):
                 acceptance_criteria.append(self._acceptance_criteria_to_dict(child))
         
@@ -1560,7 +1556,6 @@ class StoryMap:
             'test_file': story.test_file,
             'test_class': story.test_class,
             'scenarios': scenarios,
-            'scenario_outlines': scenario_outlines,
             'acceptance_criteria': acceptance_criteria,
             'behavior': story.behavior  # Always include behavior (even if None)
         }
@@ -1571,7 +1566,7 @@ class StoryMap:
     def _scenario_to_dict(self, scenario: Scenario) -> Dict[str, Any]:
         # Convert Step objects to newline-separated string
         steps_text = '\n'.join(step.text for step in scenario.steps) if scenario.steps else ''
-        return {
+        result = {
             'name': scenario.name,
             'sequential_order': scenario.sequential_order,
             'type': scenario.type,
@@ -1579,19 +1574,10 @@ class StoryMap:
             'test_method': scenario.test_method,
             'steps': steps_text
         }
-    
-    def _scenario_outline_to_dict(self, scenario_outline: ScenarioOutline) -> Dict[str, Any]:
-        # Convert Step objects to newline-separated string
-        steps_text = '\n'.join(step.text for step in scenario_outline.steps) if scenario_outline.steps else ''
-        return {
-            'name': scenario_outline.name,
-            'sequential_order': scenario_outline.sequential_order,
-            'type': scenario_outline.type,
-            'background': scenario_outline.background,
-            'test_method': scenario_outline.test_method,
-            'steps': steps_text,
-            'examples': scenario_outline.examples
-        }
+        # Only include examples if present
+        if scenario.examples:
+            result['examples'] = scenario.examples
+        return result
     
     def _acceptance_criteria_to_dict(self, ac: AcceptanceCriteria) -> Dict[str, Any]:
         return {
