@@ -169,20 +169,42 @@ class DomainNavigator:
             if i < len(params_str) and params_str[i] == '"':
                 # Quoted value - may have dotted notation like "Epic1"."Child1"
                 value_parts = []
+                segment_count = 0
                 while i < len(params_str) and params_str[i] == '"':
-                    # Find closing quote
-                    close_quote = params_str.find('"', i + 1)
-                    if close_quote == -1:
+                    # Find closing quote, skipping escaped quotes
+                    j = i + 1
+                    while j < len(params_str):
+                        if params_str[j] == '"' and (j == 0 or params_str[j-1] != '\\'):
+                            # Found unescaped closing quote
+                            break
+                        j += 1
+                    
+                    if j >= len(params_str):
+                        # No closing quote found
                         break
-                    value_parts.append(params_str[i:close_quote+1])
-                    i = close_quote + 1
+                    
+                    segment_count += 1
+                    # Extract value - include quotes for dotted paths, strip for single values
+                    value_parts.append(params_str[i:j+1])  # Keep quotes for now
+                    i = j + 1
                     # Check for dot continuation
                     if i < len(params_str) and params_str[i:i+2] == '."':
                         value_parts.append('.')
                         i += 1  # Skip the dot
                     else:
                         break
-                params[param_name] = ''.join(value_parts)
+                # Join all parts
+                full_value = ''.join(value_parts)
+                # Strip quotes only for single-segment values (not dotted paths)
+                if segment_count == 1:
+                    # Single segment like name:"aaa" -> strip quotes to get "aaa"
+                    stripped_value = full_value[1:-1]  # Remove first and last quote
+                    # Unescape any escaped quotes or backslashes
+                    unescaped_value = stripped_value.replace('\\\"', '"').replace('\\\\', '\\')
+                    params[param_name] = unescaped_value
+                else:
+                    # Dotted path like target:"Epic1"."Child1" -> keep quotes
+                    params[param_name] = full_value
             else:
                 # Unquoted value - could be digit or word
                 value_match = re.match(r'(\d+|\w+)', params_str[i:])
