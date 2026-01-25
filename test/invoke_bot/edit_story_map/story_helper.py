@@ -1303,8 +1303,6 @@ class StoryTestHelper(BaseHelper):
         Returns:
             Created Story node
         """
-        from story_graph.nodes import Story
-        
         # Create story using SubEpic's create_story method
         story = subepic.create_story(name=story_name)
         
@@ -1312,6 +1310,266 @@ class StoryTestHelper(BaseHelper):
         if test_class:
             story.test_class = test_class
             story.save()
+        
+        return story
+    
+    # =======================================================================================
+    # Behavior Determination Helpers
+    # =======================================================================================
+    
+    def create_epic_with_sub_epics_for_behavior_test(self, epic_name, sub_epics_data):
+        """Create an epic with sub-epics for behavior determination testing.
+        
+        Sub-epics can contain either:
+        - Stories directly
+        - Nested sub-epics with their own stories
+        
+        Args:
+            epic_name: Name of the epic
+            sub_epics_data: List of dicts with sub-epic configuration:
+                {
+                    'name': str,
+                    'nested_sub_epics': [],  # Optional nested sub-epics
+                    'stories': []  # Optional stories
+                }
+        
+        Returns:
+            Epic node from loaded story graph
+        """
+        # Build sub-epics
+        sub_epics = []
+        for idx, sub_epic_data in enumerate(sub_epics_data):
+            sub_epic = self._build_sub_epic_for_behavior_test(sub_epic_data, idx)
+            sub_epics.append(sub_epic)
+        
+        # Create story graph structure
+        story_graph_data = {
+            'epics': [
+                {
+                    'name': epic_name,
+                    'behavior': 'exploration',
+                    'domain_concepts': [],
+                    'sub_epics': sub_epics
+                }
+            ]
+        }
+        
+        # Save and load
+        self.create_story_graph(story_graph_data)
+        
+        # Return the epic node
+        return self.bot.story_graph.epics[epic_name]
+    
+    def _build_sub_epic_for_behavior_test(self, sub_epic_data, idx):
+        """Build a sub-epic dict for behavior testing.
+        
+        Handles both stories and nested sub-epics recursively.
+        """
+        sub_epic = {
+            'name': sub_epic_data['name'],
+            'sequential_order': float(idx),
+            'behavior': 'exploration',
+            'test_file': None,
+            'sub_epics': [],
+            'story_groups': []
+        }
+        
+        # Check if this sub-epic has nested sub-epics
+        if sub_epic_data.get('nested_sub_epics'):
+            # Build nested sub-epics recursively
+            for nested_idx, nested_data in enumerate(sub_epic_data['nested_sub_epics']):
+                nested_sub_epic = self._build_sub_epic_for_behavior_test(nested_data, nested_idx)
+                sub_epic['sub_epics'].append(nested_sub_epic)
+        
+        # Build stories if present
+        if sub_epic_data.get('stories'):
+            stories = []
+            for story_idx, story_data in enumerate(sub_epic_data['stories']):
+                story = self._build_story_for_behavior_test(story_data, story_idx)
+                stories.append(story)
+            
+            # Add stories to a story group
+            sub_epic['story_groups'].append({
+                'name': '',
+                'sequential_order': 0.0,
+                'type': 'and',
+                'connector': None,
+                'behavior': 'exploration',
+                'stories': stories
+            })
+        
+        return sub_epic
+    
+    def _build_story_for_behavior_test(self, story_data, idx):
+        """Build a story dict for behavior testing."""
+        return {
+            'name': story_data['story_name'],
+            'sequential_order': float(idx + 1),
+            'connector': None,
+            'story_type': 'user',
+            'users': [],
+            'test_file': None,
+            'test_class': story_data.get('test_class', None),
+            'scenarios': self._build_scenarios_for_behavior_test(
+                story_data.get('scenarios', []),
+                story_data.get('test_methods', [])
+            ),
+            'scenario_outlines': [],
+            'acceptance_criteria': self._build_acceptance_criteria_for_behavior_test(
+                story_data.get('acceptance_criteria', '')
+            ),
+            'behavior': 'exploration'
+        }
+    
+    def _build_scenarios_for_behavior_test(self, scenarios, test_methods):
+        """Build scenarios list for behavior testing."""
+        if not scenarios:
+            return []
+        
+        scenario_list = []
+        for idx, scenario_name in enumerate(scenarios):
+            test_method = test_methods[idx] if idx < len(test_methods) else None
+            scenario_list.append({
+                'name': scenario_name,
+                'sequential_order': float(idx + 1),
+                'type': 'happy_path',
+                'background': [],
+                'test_method': test_method,
+                'steps': ''
+            })
+        
+        return scenario_list
+    
+    def _build_acceptance_criteria_for_behavior_test(self, acceptance_criteria):
+        """Build acceptance criteria list for behavior testing."""
+        if not acceptance_criteria:
+            return []
+        
+        # Split by semicolon to get individual AC items
+        ac_items = [ac.strip() for ac in acceptance_criteria.split(';') if ac.strip()]
+        
+        ac_list = []
+        for idx, ac_text in enumerate(ac_items):
+            ac_list.append({
+                'name': ac_text,
+                'text': ac_text,
+                'sequential_order': float(idx + 1)
+            })
+        
+        return ac_list
+    
+    def create_sub_epic_with_stories_for_behavior_test(self, sub_epic_name, stories_data):
+        """Create a sub-epic with multiple stories for behavior determination testing.
+        
+        Args:
+            sub_epic_name: Name of the sub-epic
+            stories_data: List of dicts with story configuration
+        
+        Returns:
+            SubEpic node from loaded story graph
+        """
+        # Build stories for the story group
+        stories = []
+        for idx, story_data in enumerate(stories_data):
+            story = self._build_story_for_behavior_test(story_data, idx)
+            stories.append(story)
+        
+        # Create story graph structure with sub-epic containing multiple stories
+        story_graph_data = {
+            'epics': [
+                {
+                    'name': 'Test Epic',
+                    'behavior': 'exploration',
+                    'domain_concepts': [],
+                    'sub_epics': [
+                        {
+                            'name': sub_epic_name,
+                            'sequential_order': 0.0,
+                            'behavior': 'exploration',
+                            'test_file': None,
+                            'sub_epics': [],
+                            'story_groups': [
+                                {
+                                    'name': '',
+                                    'sequential_order': 0.0,
+                                    'type': 'and',
+                                    'connector': None,
+                                    'behavior': 'exploration',
+                                    'stories': stories
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        # Save and load
+        self.create_story_graph(story_graph_data)
+        
+        # Return the sub-epic node
+        epic = self.bot.story_graph.epics['Test Epic']
+        return epic.children[0]
+    
+    def create_story_with_state_for_behavior_test(self, epic_name, story_name, test_class, acceptance_criteria, scenarios, test_methods):
+        """Create a story with specified completeness state for behavior determination testing.
+        
+        Returns a Story object with:
+        - Acceptance criteria (if provided)
+        - Scenarios (if provided)
+        - Test methods mapped to scenarios (if provided)
+        """
+        # Create story graph structure
+        story_graph_data = {
+            'epics': [
+                {
+                    'name': epic_name,
+                    'behavior': 'exploration',
+                    'domain_concepts': [],
+                    'sub_epics': [
+                        {
+                            'name': 'Test SubEpic',
+                            'sequential_order': 0.0,
+                            'behavior': 'exploration',
+                            'test_file': test_class if test_class else None,
+                            'sub_epics': [],
+                            'story_groups': [
+                                {
+                                    'name': '',
+                                    'sequential_order': 0.0,
+                                    'type': 'and',
+                                    'connector': None,
+                                    'behavior': 'exploration',
+                                    'stories': [
+                                        {
+                                            'name': story_name,
+                                            'sequential_order': 1.0,
+                                            'connector': None,
+                                            'story_type': 'user',
+                                            'users': [],
+                                            'test_file': None,
+                                            'test_class': test_class if test_class else None,
+                                            'scenarios': self._build_scenarios_for_behavior_test(scenarios, test_methods),
+                                            'scenario_outlines': [],
+                                            'acceptance_criteria': self._build_acceptance_criteria_for_behavior_test(acceptance_criteria),
+                                            'behavior': 'exploration'
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        # Save and load
+        self.create_story_graph(story_graph_data)
+        
+        # Return the story node
+        epic = self.bot.story_graph.epics[epic_name]
+        sub_epic = epic.children[0]
+        story = sub_epic.children[0]
         
         return story
 

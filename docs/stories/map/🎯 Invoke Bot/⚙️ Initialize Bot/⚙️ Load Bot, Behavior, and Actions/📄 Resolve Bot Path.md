@@ -19,17 +19,6 @@ Resolve Bot Path functionality for the mob minion system.
 
 ## Scenarios
 
-<a id="scenario-botpath-resolves-directories-from-environment-variables"></a>
-### Scenario: [BotPath resolves directories from environment variables](#scenario-botpath-resolves-directories-from-environment-variables) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L25)
-
-**Steps:**
-```gherkin
-Given BOT_DIRECTORY and WORKING_AREA environment variables set
-When BotPath accessed from bot
-Then Both directory properties return paths from environment
-```
-
-
 <a id="scenario-botpathbase_actions_directory-returns-real-agile_bot-base_actions"></a>
 ### Scenario: [BotPath.base_actions_directory returns real agile_bot base_actions](#scenario-botpathbase_actions_directory-returns-real-agile_bot-base_actions) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L43)
 
@@ -43,17 +32,19 @@ Then not the test directory. This is by design - see get_base_actions_directory(
 ```
 
 
-<a id="scenario-botpathpython_workspace_root-property-returns-python-workspace-root"></a>
-### Scenario: [BotPath.python_workspace_root property returns Python workspace root.](#scenario-botpathpython_workspace_root-property-returns-python-workspace-root) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L60)
+<a id="scenario-botpath-resolves-directories-from-environment-variables"></a>
+### Scenario: [BotPath resolves directories from environment variables](#scenario-botpath-resolves-directories-from-environment-variables) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L25)
 
 **Steps:**
 ```gherkin
-
+Given BOT_DIRECTORY and WORKING_AREA environment variables set
+When BotPath accessed from bot
+Then Both directory properties return paths from environment
 ```
 
 
-<a id="scenario-botpathfind_repo_root-method-returns-repository-root"></a>
-### Scenario: [BotPath.find_repo_root() method returns repository root.](#scenario-botpathfind_repo_root-method-returns-repository-root) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L68)
+<a id="scenario-botpathpython_workspace_root-property-returns-python-workspace-root"></a>
+### Scenario: [BotPath.python_workspace_root property returns Python workspace root.](#scenario-botpathpython_workspace_root-property-returns-python-workspace-root) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L60)
 
 **Steps:**
 ```gherkin
@@ -69,5 +60,14 @@ Then not the test directory. This is by design - see get_base_actions_directory(
 Given No BOT_DIRECTORY or WORKING_AREA environment variables
 When BotPath instantiated
 Then Raises RuntimeError
+```
+
+
+<a id="scenario-botpathfind_repo_root-method-returns-repository-root"></a>
+### Scenario: [BotPath.find_repo_root() method returns repository root.](#scenario-botpathfind_repo_root-method-returns-repository-root) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L68)
+
+**Steps:**
+```gherkin
+
 ```
 

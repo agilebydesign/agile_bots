@@ -779,6 +779,20 @@ class SubEpic(StoryNode):
     def has_stories(self) -> bool:
         return any(isinstance(child, (Story, StoryGroup)) for child in self._children)
 
+    @property
+    def behavior_needed(self) -> str:
+        stories = [child for child in self.children if isinstance(child, Story)]
+        
+        if not stories:
+            return 'shape'
+        
+        current_behavior = stories[0].behavior_needed
+        
+        for story in stories[1:]:
+            current_behavior = story.get_behavior_needed(current_behavior)
+        
+        return current_behavior
+
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
         return self.create_child(name, child_type, position)
@@ -965,29 +979,55 @@ class Story(StoryNode):
         return len(self.scenarios) > 0 or len(self.scenario_outlines) > 0
     
     def has_tests(self) -> bool:
-        # Stories use test_class (not test_file) to indicate tests exist
-        # test_class is set when a test class should exist for this story
         if self.test_class:
-            import sys
-            print(f"[DEBUG] has_tests() for '{self.name}': test_class={self.test_class} -> True", file=sys.stderr)
             return True
         
-        # Also check if any scenarios have test_method set
         for scenario in self.scenarios:
             if scenario.test_method:
-                import sys
-                print(f"[DEBUG] has_tests() for '{self.name}': scenario '{scenario.name}' has test_method={scenario.test_method} -> True", file=sys.stderr)
                 return True
         
         for scenario_outline in self.scenario_outlines:
             if scenario_outline.test_method:
-                import sys
-                print(f"[DEBUG] has_tests() for '{self.name}': scenario_outline '{scenario_outline.name}' has test_method={scenario_outline.test_method} -> True", file=sys.stderr)
                 return True
         
-        import sys
-        print(f"[DEBUG] has_tests() for '{self.name}': no test_class, no test_methods -> False", file=sys.stderr)
         return False
+
+    @property
+    def all_scenarios_have_tests(self) -> bool:
+        all_scenarios = self.scenarios + self.scenario_outlines
+        if not all_scenarios:
+            return False
+        return all(scenario.test_method for scenario in all_scenarios)
+    
+    @property
+    def many_scenarios(self) -> int:
+        return len(self.scenarios) + len(self.scenario_outlines)
+    
+    @property
+    def many_acceptance_criteria(self) -> int:
+        return len(self.acceptance_criteria)
+    
+    @property
+    def behavior_needed(self) -> str:
+        return self.get_behavior_needed()
+    
+    def get_behavior_needed(self, behavior_already_needed: str = None) -> str:
+        hierarchy = ['code', 'test', 'scenario', 'explore']
+        start_idx = 0 if behavior_already_needed is None else hierarchy.index(behavior_already_needed)
+        
+        if start_idx <= hierarchy.index('code'):
+            if self.all_scenarios_have_tests:
+                return 'code'
+        
+        if start_idx <= hierarchy.index('test'):
+            if self.many_scenarios > 0:
+                return 'test'
+        
+        if start_idx <= hierarchy.index('scenario'):
+            if self.many_acceptance_criteria > 0:
+                return 'scenario'
+        
+        return 'explore'
 
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
@@ -1099,6 +1139,12 @@ class Scenario(StoryNode):
     def default_test_method(self) -> str:
         return StoryNode._generate_default_test_method_name(self.name)
 
+    @property
+    def behavior_needed(self) -> str:
+        if self.test_method:
+            return 'code'
+        return 'test'
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any], index: int=0, parent: Optional[StoryNode]=None, bot: Optional[Any]=None) -> 'Scenario':
         sequential_order = float(data.get('sequential_order', index + 1))
@@ -1140,6 +1186,12 @@ class ScenarioOutline(StoryNode):
     @property
     def default_test_method(self) -> str:
         return StoryNode._generate_default_test_method_name(self.name)
+
+    @property
+    def behavior_needed(self) -> str:
+        if self.test_method:
+            return 'code'
+        return 'test'
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any], index: int=0, parent: Optional[StoryNode]=None, bot: Optional[Any]=None) -> 'ScenarioOutline':

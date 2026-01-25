@@ -1,6 +1,6 @@
 # 📄 Create Scope Using CLI
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L118)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L56)
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Edit Story Map](..) / [⚙️ Filter Scope](../..) / [⚙️ Scope Stories](..) / [⚙️ Manage Story Scope](.)  
@@ -20,7 +20,7 @@ Create Scope Using CLI functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-scope-set-with-different-parameter-combinations-via-cli"></a>
-### Scenario: [Scope set with different parameter combinations via CLI](#scenario-scope-set-with-different-parameter-combinations-via-cli) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L136)
+### Scenario: [Scope set with different parameter combinations via CLI](#scenario-scope-set-with-different-parameter-combinations-via-cli) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L74)
 
 **Steps:**
 ```gherkin
@@ -31,7 +31,7 @@ THEN: CLI sets scope to specified type
 
 
 <a id="scenario-scope-defaults-to-all-when-no-scope-set-via-cli"></a>
-### Scenario: [Scope defaults to 'all' when no scope set via CLI](#scenario-scope-defaults-to-all-when-no-scope-set-via-cli) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L162)
+### Scenario: [Scope defaults to 'all' when no scope set via CLI](#scenario-scope-defaults-to-all-when-no-scope-set-via-cli) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L100)
 
 **Steps:**
 ```gherkin
