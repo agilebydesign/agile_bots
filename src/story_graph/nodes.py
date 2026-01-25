@@ -297,15 +297,19 @@ class StoryNode(ABC):
                 _log(f"[move_to] Target SubEpic: None")
         
         # Perform the move
+        _log(f"[move_to] BEFORE MOVE - actual_target type: {type(actual_target).__name__}, name: {actual_target.name}, children count: {len(actual_target._children)}")
         self._parent._children.remove(self)
         self._parent._resequence_siblings()
         old_parent = self._parent
         self._parent = actual_target
         if position is not None:
             adjusted_position = min(position, len(actual_target.children))
+            _log(f"[move_to] INSERTING at position {adjusted_position}")
             actual_target._children.insert(adjusted_position, self)
         else:
+            _log(f"[move_to] APPENDING to children (no position specified)")
             actual_target._children.append(self)
+        _log(f"[move_to] AFTER MOVE - actual_target children count: {len(actual_target._children)}")
         actual_target._resequence_children()
         
         # Move test class if needed
@@ -366,7 +370,27 @@ class StoryNode(ABC):
         return False
     
     def _resolve_target_from_string(self, target_name: str) -> 'StoryNode':
-        """Resolve a target node name to an actual node by searching from root"""
+        """Resolve a target node name to an actual node by searching from root.
+        Supports both simple names and dotted paths like \"Epic1\".\"Child1\"
+        """
+        import re
+        
+        _log(f"[_resolve_target_from_string] RECEIVED target_name: '{target_name}' (type: {type(target_name)})")
+        
+        # Handle already-quoted paths from parameter parsing (e.g., "Epic1"."Child1")
+        path_str = target_name
+        if path_str.startswith('"') and '"."' in path_str:
+            # Already in quoted format, use as-is
+            _log(f"[_resolve_target_from_string] Detected quoted path format: '{path_str}'")
+        # Check if this is a dotted path (e.g., Epic1.Child1 or story_graph."Epic1"."Child1")
+        elif path_str.startswith('story_graph.'):
+            path_str = path_str[len('story_graph.'):]
+            _log(f"[_resolve_target_from_string] After stripping story_graph: '{path_str}'")
+        
+        # Parse quoted path segments (e.g., "Epic1"."Child1" -> ["Epic1", "Child1"])
+        path_segments = re.findall(r'"([^"]+)"', path_str)
+        _log(f"[_resolve_target_from_string] Extracted path_segments: {path_segments}")
+        
         # Navigate to root (story_map)
         current = self
         while hasattr(current, '_parent') and current._parent:
@@ -375,14 +399,40 @@ class StoryNode(ABC):
                 # Go one more level up to StoryMap if Epic has _bot
                 if hasattr(current, '_bot') and current._bot and hasattr(current._bot, 'story_graph'):
                     story_map = current._bot.story_map
-                    # Search for target in all epics
-                    for epic in story_map.epics:
-                        if epic.name == target_name:
-                            return epic
-                        # Search in epic's children recursively
-                        found = self._search_node_recursive(epic, target_name)
-                        if found:
-                            return found
+                    
+                    # If we have path segments, navigate the path
+                    if path_segments:
+                        node = None
+                        # Start from the first epic that matches
+                        for epic in story_map.epics:
+                            if epic.name == path_segments[0]:
+                                node = epic
+                                break
+                        
+                        if not node:
+                            raise ValueError(f"Epic '{path_segments[0]}' not found in path: {target_name}")
+                        
+                        # Navigate through remaining segments
+                        for segment in path_segments[1:]:
+                            found = False
+                            for child in node.children:
+                                if child.name == segment:
+                                    node = child
+                                    found = True
+                                    break
+                            if not found:
+                                raise ValueError(f"Node '{segment}' not found in path: {target_name}")
+                        
+                        return node
+                    else:
+                        # Simple name search (legacy behavior)
+                        for epic in story_map.epics:
+                            if epic.name == target_name:
+                                return epic
+                            # Search in epic's children recursively
+                            found = self._search_node_recursive(epic, target_name)
+                            if found:
+                                return found
                 break
         
         raise ValueError(f"Target '{target_name}' not found")
@@ -1403,8 +1453,14 @@ class StoryMap:
         # Use _children to access actual structure (including StoryGroups)
         # The .children property transparently flattens StoryGroups
         stories = []
+        _log(f"[_sub_epic_to_dict] SubEpic '{sub_epic.name}' has {len(sub_epic._children)} children")
         for child in sub_epic._children:
+            _log(f"[_sub_epic_to_dict]   Child type: {type(child).__name__}, name: {child.name if hasattr(child, 'name') else 'N/A'}")
             if isinstance(child, StoryGroup):
+                _log(f"[_sub_epic_to_dict]     StoryGroup has {len(child.children)} stories")
+                for story in child.children:
+                    if isinstance(story, Story):
+                        _log(f"[_sub_epic_to_dict]       Adding story: {story.name}")
                 stories.extend([self._story_to_dict(story) for story in child.children if isinstance(story, Story)])
         
         result = {

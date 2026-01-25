@@ -136,6 +136,7 @@ class DomainNavigator:
     
     def _parse_parameters(self, params_str: str) -> dict:
         """Parse parameters from string like: name:"User Management" at_position:1
+        Also handles dotted paths like: target:"Epic1"."Child1"
         
         Returns:
             dict with parameter names and values
@@ -145,23 +146,57 @@ class DomainNavigator:
         
         params = {}
         
-        pattern = r'(\w+):(?:"([^"]*)"|(\d+)|(\w+))'
-        matches = re.findall(pattern, params_str)
+        # Modified pattern to handle dotted notation within parameter values
+        # Matches: param_name:"value" or param_name:"Epic1"."Child1" or param_name:123 or param_name:word
+        # Use lookahead to match quoted string potentially followed by more quoted strings with dots
+        pattern = r'(\w+):(?:"([^"]*)"(?:\."([^"]*)")*|(\d+)|(\w+))'
         
-        for match in matches:
-            param_name = match[0]
+        i = 0
+        while i < len(params_str):
+            # Find next parameter name
+            param_match = re.match(r'(\w+):', params_str[i:])
+            if not param_match:
+                i += 1
+                continue
             
+            param_name = param_match.group(1)
             if param_name == 'at_position':
                 param_name = 'position'
             
-            # Check groups in precedence order: digits, words, then quoted strings
-            # This correctly handles: position:1 -> int, name:test -> str, name:"" -> empty str
-            if match[2]:  # Digits matched (e.g., position:1)
-                params[param_name] = int(match[2])
-            elif match[3]:  # Unquoted word matched (e.g., name:test)
-                params[param_name] = match[3]
-            else:  # Quoted string matched (e.g., name:"test" or name:"")
-                params[param_name] = match[1]
+            i += param_match.end()
+            
+            # Check what type of value follows
+            if i < len(params_str) and params_str[i] == '"':
+                # Quoted value - may have dotted notation like "Epic1"."Child1"
+                value_parts = []
+                while i < len(params_str) and params_str[i] == '"':
+                    # Find closing quote
+                    close_quote = params_str.find('"', i + 1)
+                    if close_quote == -1:
+                        break
+                    value_parts.append(params_str[i:close_quote+1])
+                    i = close_quote + 1
+                    # Check for dot continuation
+                    if i < len(params_str) and params_str[i:i+2] == '."':
+                        value_parts.append('.')
+                        i += 1  # Skip the dot
+                    else:
+                        break
+                params[param_name] = ''.join(value_parts)
+            else:
+                # Unquoted value - could be digit or word
+                value_match = re.match(r'(\d+|\w+)', params_str[i:])
+                if value_match:
+                    value = value_match.group(1)
+                    if value.isdigit():
+                        params[param_name] = int(value)
+                    else:
+                        params[param_name] = value
+                    i += value_match.end()
+            
+            # Skip whitespace between parameters
+            while i < len(params_str) and params_str[i].isspace():
+                i += 1
         
         return params
     

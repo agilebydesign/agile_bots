@@ -2,7 +2,7 @@
   "epics": [
     {
       "name": "Build Agile Bots",
-      "sequential_order": 0,
+      "sequential_order": null,
       "domain_concepts": [],
       "sub_epics": [
         {
@@ -921,13 +921,14 @@
     },
     {
       "name": "Invoke Bot",
-      "sequential_order": 1,
+      "sequential_order": null,
       "domain_concepts": [],
       "sub_epics": [
         {
           "name": "Initialize Bot",
           "sequential_order": 0.0,
           "test_file": "invoke_bot/initialize_bot/",
+          "behavior": "exploration",
           "sub_epics": [
             {
               "name": "Load Bot, Behavior, and Actions",
@@ -1781,6 +1782,7 @@
               "name": "Initialize Bot Interface",
               "sequential_order": 1.0,
               "test_file": "invoke_bot/initialize_bot/test_initialize_bot_interface.py",
+              "behavior": "exploration",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -1974,7 +1976,8 @@
                       "acceptance_criteria": [],
                       "behavior": "exploration"
                     }
-                  ]
+                  ],
+                  "behavior": "exploration"
                 }
               ],
               "stories": [
@@ -2897,6 +2900,7 @@
               "name": "Set Workspace",
               "sequential_order": 0.5,
               "test_file": "invoke_bot/initialize_bot/test_set_workspace.py",
+              "behavior": "exploration",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -3069,7 +3073,8 @@
                       ],
                       "behavior": "code"
                     }
-                  ]
+                  ],
+                  "behavior": "exploration"
                 }
               ],
               "stories": [
@@ -18827,36 +18832,219 @@
       "behavior": "exploration"
     },
     {
-      "name": "Epic2",
-      "sequential_order": 2,
+      "name": "Epic1",
+      "sequential_order": null,
       "domain_concepts": [],
       "sub_epics": [
         {
           "name": "Child1",
           "sequential_order": 0.0,
-          "sub_epics": [
+          "behavior": "exploration",
+          "sub_epics": [],
+          "story_groups": [
             {
-              "name": "Child1",
+              "name": "",
               "sequential_order": 0.0,
-              "sub_epics": [
+              "type": "and",
+              "connector": null,
+              "stories": [
                 {
-                  "name": "Child1",
+                  "name": "Story3",
                   "sequential_order": 0.0,
-                  "sub_epics": [],
-                  "story_groups": [],
-                  "stories": []
+                  "connector": null,
+                  "story_type": "user",
+                  "users": [],
+                  "test_file": null,
+                  "test_class": null,
+                  "scenarios": [],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [],
+                  "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\Child1\\📄 Story3.md",
+                  "behavior": "exploration"
+                },
+                {
+                  "name": "Story1",
+                  "sequential_order": 1.0,
+                  "connector": null,
+                  "story_type": "user",
+                  "users": [],
+                  "test_file": null,
+                  "test_class": null,
+                  "scenarios": [],
+                  "scenario_outlines": [],
+                  "acceptance_criteria": [],
+                  "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\Child1\\📄 Story1.md",
+                  "behavior": "exploration"
                 }
               ],
-              "story_groups": [],
-              "stories": []
+              "behavior": "exploration"
             }
           ],
-          "story_groups": [],
+          "stories": [
+            {
+              "name": "Story3",
+              "sequential_order": 0.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\Child1\\📄 Story3.md",
+              "behavior": "exploration"
+            },
+            {
+              "name": "Story1",
+              "sequential_order": 1.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\Child1\\📄 Story1.md",
+              "behavior": "exploration"
+            }
+          ]
+        },
+        {
+          "name": "Child3",
+          "sequential_order": 2.0,
+          "behavior": "exploration",
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "name": "",
+              "sequential_order": 0.0,
+              "type": "and",
+              "connector": null,
+              "stories": [],
+              "behavior": "exploration"
+            }
+          ],
+          "stories": []
+        },
+        {
+          "name": "Child4",
+          "sequential_order": 3.0,
+          "behavior": "exploration",
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "name": "",
+              "sequential_order": 0.0,
+              "type": "and",
+              "connector": null,
+              "stories": [],
+              "behavior": "exploration"
+            }
+          ],
+          "stories": []
+        },
+        {
+          "name": "Child5",
+          "sequential_order": 4.0,
+          "behavior": "exploration",
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "name": "",
+              "sequential_order": 0.0,
+              "type": "and",
+              "connector": null,
+              "stories": [],
+              "behavior": "exploration"
+            }
+          ],
           "stories": []
         }
       ],
-      "story_groups": [],
-      "behavior": "shape"
+      "story_groups": [
+        {
+          "name": "",
+          "sequential_order": 0.0,
+          "type": "and",
+          "connector": null,
+          "stories": [
+            {
+              "name": "Story2",
+              "sequential_order": 0.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\📄 Story2.md",
+              "behavior": "exploration"
+            },
+            {
+              "name": "Story1",
+              "sequential_order": 1.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\📄 Story1.md",
+              "behavior": "exploration"
+            },
+            {
+              "name": "Story1",
+              "sequential_order": 2.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\📄 Story1.md",
+              "behavior": "exploration"
+            },
+            {
+              "name": "Story2",
+              "sequential_order": 3.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\📄 Story2.md",
+              "behavior": "exploration"
+            },
+            {
+              "name": "Story1",
+              "sequential_order": 4.0,
+              "connector": null,
+              "story_type": "user",
+              "users": [],
+              "test_file": null,
+              "test_class": null,
+              "scenarios": [],
+              "scenario_outlines": [],
+              "acceptance_criteria": [],
+              "file_link": "c:\\dev\\agile_bots\\docs\\stories\\map\\Epic1\\📄 Story1.md",
+              "behavior": "exploration"
+            }
+          ],
+          "behavior": "exploration"
+        }
+      ],
+      "behavior": "exploration"
     }
   ],
   "increments": [
