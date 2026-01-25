@@ -113,7 +113,7 @@ class StoryNode(ABC):
         if name != name.strip():
             raise ValueError('Node name cannot be whitespace-only')
         
-        invalid_chars = ['<', '>', '\\', '|', '*', '?']
+        invalid_chars = ['<', '>', '\\', '|', '*', '?', '"']
         found_invalid = [ch for ch in invalid_chars if ch in name]
         if found_invalid:
             chars_str = ', '.join(found_invalid)
@@ -1450,19 +1450,7 @@ class StoryMap:
         return result
 
     def _sub_epic_to_dict(self, sub_epic: SubEpic) -> Dict[str, Any]:
-        # Use _children to access actual structure (including StoryGroups)
-        # The .children property transparently flattens StoryGroups
-        stories = []
-        _log(f"[_sub_epic_to_dict] SubEpic '{sub_epic.name}' has {len(sub_epic._children)} children")
-        for child in sub_epic._children:
-            _log(f"[_sub_epic_to_dict]   Child type: {type(child).__name__}, name: {child.name if hasattr(child, 'name') else 'N/A'}")
-            if isinstance(child, StoryGroup):
-                _log(f"[_sub_epic_to_dict]     StoryGroup has {len(child.children)} stories")
-                for story in child.children:
-                    if isinstance(story, Story):
-                        _log(f"[_sub_epic_to_dict]       Adding story: {story.name}")
-                stories.extend([self._story_to_dict(story) for story in child.children if isinstance(story, Story)])
-        
+        # Stories are ONLY serialized in story_groups, not duplicated in a flattened array
         result = {
             'name': sub_epic.name,
             'sequential_order': sub_epic.sequential_order,
@@ -1478,8 +1466,7 @@ class StoryMap:
         
         result.update({
             'sub_epics': [self._sub_epic_to_dict(child) for child in sub_epic._children if isinstance(child, SubEpic)],
-            'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)],
-            'stories': stories  # Flattened list of stories for easier test access
+            'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)]
         })
         
         return result

@@ -410,16 +410,10 @@ class BotPanel {
                 placeHolder: 'Enter new name'
               }).then((newName) => {
                 if (newName && newName !== message.currentName) {
-                  // Optimistic update: tell webview to update DOM immediately
-                  this._panel.webview.postMessage({
-                    command: 'optimisticRename',
-                    nodePath: message.nodePath,
-                    oldName: message.currentName,
-                    newName: newName
-                  });
-                  
+                  // Strip any surrounding quotes from the input first (user shouldn't need to quote the name)
+                  const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
                   // Escape quotes and backslashes in the new name
-                  const escapedName = newName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+                  const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
                   const command = `${message.nodePath}.rename name:"${escapedName}"`;
                   this._log(`[BotPanel] Rename command: ${command}`);
                   
@@ -435,7 +429,7 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
                   }
                   
-                  // Execute backend command asynchronously (no await, no _update on success)
+                  // Execute backend command and always refresh to show accurate state
                   this._botView?.execute(command)
                     .then((result) => {
                       this._log(`[BotPanel] Rename success: ${JSON.stringify(result).substring(0, 500)}`);
@@ -448,7 +442,8 @@ class BotPanel {
                         this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                       }
                       
-                      // NO _update() call - optimistic update already happened
+                      // Always refresh after rename to show backend state
+                      return this._update();
                     })
                     .catch((error) => {
                       this._log(`[BotPanel] Rename ERROR: ${error.message}`);
@@ -463,11 +458,9 @@ class BotPanel {
                       
                       vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
                       
-                      // Revert optimistic update on error
-                      this._panel.webview.postMessage({
-                        command: 'revertRename',
-                        nodePath: message.nodePath,
-                        oldName: message.currentName
+                      // Always refresh on error to show accurate backend state
+                      this._update().catch(err => {
+                        this._log(`[BotPanel] ERROR in _update after rename failure: ${err.message}`);
                       });
                     });
                 }
@@ -1755,44 +1748,8 @@ class BotPanel {
                         message: '[WebView] DROP DETECTED - Dragged: ' + draggedNode.name + ' (type: ' + draggedNode.type + ', pos: ' + draggedNode.position + ') onto Target: ' + targetName + ' (type: ' + targetType + '), dropZone: ' + dropZone
                     });
                     
-                    // OPTIMISTIC UPDATE: Move DOM element immediately
-                    // Find the dragged element's parent container (the div that contains the node)
-                    const draggedElements = document.querySelectorAll('.story-node');
-                    let draggedElement = null;
-                    for (const el of draggedElements) {
-                        if (el.getAttribute('data-path') === draggedNode.path) {
-                            draggedElement = el;
-                            break;
-                        }
-                    }
-                    
-                    if (draggedElement) {
-                        // Find the parent div container for the dragged node
-                        let draggedContainer = draggedElement.parentElement;
-                        while (draggedContainer && !draggedContainer.style.marginLeft && draggedContainer.parentElement) {
-                            draggedContainer = draggedContainer.parentElement;
-                        }
-                        
-                        // Perform optimistic DOM move
-                        if (dropZone === 'inside') {
-                            // Move inside: append to target's collapsible content
-                            const targetCollapsible = target.parentElement.nextElementSibling;
-                            if (targetCollapsible && targetCollapsible.classList.contains('collapsible-content')) {
-                                console.log('[WebView] Optimistically moving inside target container');
-                                targetCollapsible.appendChild(draggedContainer);
-                            }
-                        } else if (dropZone === 'after') {
-                            // Move after: insert after target's container
-                            let targetContainer = target.parentElement;
-                            while (targetContainer && !targetContainer.style.marginLeft && targetContainer.parentElement) {
-                                targetContainer = targetContainer.parentElement;
-                            }
-                            if (targetContainer && targetContainer.parentElement) {
-                                console.log('[WebView] Optimistically moving after target');
-                                targetContainer.parentElement.insertBefore(draggedContainer, targetContainer.nextSibling);
-                            }
-                        }
-                    }
+                    // Optimistic update disabled - full refresh preserves structure correctly
+                    console.log('[WebView] Move operation - waiting for backend and full refresh');
                     
                     let command;
                     
@@ -1816,29 +1773,36 @@ class BotPanel {
                     } else if (dropZone === 'after') {
                         var targetPos = parseInt(target.getAttribute('data-position') || '0');
                         var draggedPos = draggedNode.position;
+                        
+                        // Extract parent path (everything except the last segment)
+                        // targetPath is like: story_graph."Epic1"."Child1"."Story1"
+                        // parentPath should be: story_graph."Epic1"."Child1"
                         var parentMatch = targetPath.match(/(.*)\."[^"]+"/);
-                        var parentName = parentMatch ? parentMatch[1].match(/\."([^"]+)"$/)[1] : 'story_graph';
+                        var parentPath = parentMatch ? parentMatch[1] : 'story_graph';
+                        
+                        // Strip off "story_graph." prefix to get the target parameter value
+                        var targetForCommand = parentPath.replace(/^story_graph\./, '');
                         
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] AFTER CALCULATION - targetPos: ' + targetPos + ', draggedPos: ' + draggedPos + ', parentMatch: ' + JSON.stringify(parentMatch) + ', parentName: ' + parentName
+                            message: '[WebView] AFTER CALCULATION - targetPos: ' + targetPos + ', draggedPos: ' + draggedPos + ', parentPath: ' + parentPath + ', targetForCommand: ' + targetForCommand
                         });
                         
                         // When moving DOWN (to later position), use targetPos as-is (item shifts down)
                         // When moving UP (to earlier position), use targetPos + 1 (drop after target)
                         var finalPos = (draggedPos < targetPos) ? targetPos : (targetPos + 1);
                         
-                        command = draggedNode.path + '.move_to target:"' + parentName + '" at_position:' + finalPos;
+                        command = draggedNode.path + '.move_to target:' + targetForCommand + ' at_position:' + finalPos;
                         vscode.postMessage({
                             command: 'logToFile',
-                            message: '[WebView] AFTER COMMAND - dragged from ' + draggedPos + ' to position: ' + finalPos + ' (target was at ' + targetPos + ') in ' + parentName + ', command: ' + command
+                            message: '[WebView] AFTER COMMAND - dragged from ' + draggedPos + ' to position: ' + finalPos + ' (target was at ' + targetPos + '), command: ' + command
                         });
                     }
                     
                     console.log('[WebView] Move command:', command);
                     vscode.postMessage({
                         command: 'logToFile',
-                        message: '[WebView] SENDING MOVE COMMAND (optimistic update already applied): ' + command
+                        message: '[WebView] SENDING MOVE COMMAND (panel will refresh after backend completes): ' + command
                     });
                     
                     vscode.postMessage({
@@ -2717,53 +2681,16 @@ class BotPanel {
                 }
             }
             
-            // Optimistic update: rename node in DOM immediately
+            // Optimistic update disabled - full refresh preserves icons and structure
+            // (textContent wiped out icon HTML, causing icons to disappear)
             if (message.command === 'optimisticRename') {
-                console.log('[WebView] Optimistic rename:', message.oldName, '->', message.newName);
-                // Find node by path and update text
-                const nodes = document.querySelectorAll('.story-node');
-                for (const node of nodes) {
-                    if (node.getAttribute('data-path') === message.nodePath) {
-                        // Update node name in DOM
-                        const oldText = node.textContent;
-                        const newText = oldText.replace(message.oldName, message.newName);
-                        node.textContent = newText;
-                        // Update data attribute
-                        node.setAttribute('data-node-name', message.newName);
-                        console.log('[WebView] Updated node text:', oldText, '->', newText);
-                        
-                        // Update selected node if this is the selected node
-                        if (window.selectedNode && window.selectedNode.path === message.nodePath) {
-                            window.selectedNode.name = message.newName;
-                            sessionStorage.setItem('selectedNode', JSON.stringify(window.selectedNode));
-                        }
-                        break;
-                    }
-                }
+                console.log('[WebView] Optimistic rename disabled - waiting for full refresh');
+                // Panel will refresh after backend rename completes
             }
             
-            // Revert rename on error
+            // Revert rename disabled - no longer needed without optimistic updates
             if (message.command === 'revertRename') {
-                console.log('[WebView] Reverting rename to:', message.oldName);
-                const nodes = document.querySelectorAll('.story-node');
-                for (const node of nodes) {
-                    if (node.getAttribute('data-path') === message.nodePath) {
-                        // Revert node name in DOM
-                        const currentText = node.textContent;
-                        const revertedText = currentText.replace(/[^"]+$/, message.oldName);
-                        node.textContent = revertedText;
-                        // Revert data attribute
-                        node.setAttribute('data-node-name', message.oldName);
-                        console.log('[WebView] Reverted node text to:', message.oldName);
-                        
-                        // Update selected node if this is the selected node
-                        if (window.selectedNode && window.selectedNode.path === message.nodePath) {
-                            window.selectedNode.name = message.oldName;
-                            sessionStorage.setItem('selectedNode', JSON.stringify(window.selectedNode));
-                        }
-                        break;
-                    }
-                }
+                console.log('[WebView] Revert rename command received but not needed');
             }
         });
     </script>
