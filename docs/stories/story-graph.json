@@ -2678,154 +2678,76 @@
                               "story_type": "user",
                               "users": [],
                               "test_file": null,
-                              "test_class": "TestSetScopeAndSubmit",
+                              "test_class": "TestSetScopeToSelectedStoryNodeAndSubmit",
                               "scenarios": [
                                 {
-                                  "name": "User submits scope from panel to start work on epic",
+                                  "name": "Determine Behavior For Story",
                                   "sequential_order": 1.0,
                                   "type": "happy_path",
                                   "background": [],
-                                  "test_method": "test_user_submits_scope_from_panel",
-                                  "steps": "Given User has selected epic named Invoke Bot in the panel\nAnd Panel displays all story nodes\nWhen User clicks the Submit button\nThen System sends selected epic Invoke Bot to bot for analysis\nAnd System analyzes the epic and its children\nAnd System determines appropriate behavior and action\nAnd System sets bot to build mode\nAnd CLI restores scope to previous state\nAnd Panel preserves current view without changing scope filter\nAnd Panel displays confirmation"
+                                  "test_method": "test_determine_behavior_for_story",
+                                  "steps": "Given Bot has story map loaded with epic <epic_name>\nAnd Epic contains story <story_name>\nAnd Story has acceptance criteria <acceptance_criteria>\nAnd Story has scenarios <scenarios>\nAnd Story has test class <test_class>\nAnd Story has test methods <test_methods>\nWhen Bot determines behavior for the story\nThen Bot returns behavior <expected_behavior>",
+                                  "examples": {
+                                    "columns": ["epic_name", "story_name", "test_class", "acceptance_criteria", "scenarios", "test_methods", "expected_behavior", "description"],
+                                    "rows": [
+                                      ["File Management", "Upload File", "test_file_upload.py", "File size validated; File type checked; Upload progress tracked", "(1) User uploads valid file and sees success confirmation (2) User uploads oversized file and sees size limit error (3) User uploads invalid file type and sees type error (4) User cancels upload mid-transfer and sees cancellation confirmation (5) Upload fails with network error and user sees retry option", "test_user_uploads_valid_file_and_sees_success_confirmation; test_user_uploads_oversized_file_and_sees_size_limit_error; test_user_uploads_invalid_file_type_and_sees_type_error; test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation; test_upload_fails_with_network_error_and_user_sees_retry_option", "code", "All scenarios have tests, ready for implementation"],
+                                      ["File Management", "Download File", "test_file_download.py", "Download initiated; Progress displayed", "(1) User downloads file successfully and sees progress (2) User cancels download mid-transfer (3) Download fails due to network error and user sees error message", "test_user_downloads_file_successfully_and_sees_progress; test_user_cancels_download_mid_transfer", "test", "Some scenarios tested, missing test_download_fails"],
+                                      ["File Management", "Delete File", "test_file_delete.py", "Confirmation required; File removed from storage", "(1) User confirms delete and file is removed from system (2) User cancels delete and file remains (3) Delete operation fails due to permissions and user sees error", "", "test", "Scenarios exist but no tests written"],
+                                      ["User Management", "Create User", "", "Email validated; Password meets requirements", "", "", "scenario", "Has AC but no scenarios, need to write scenarios"],
+                                      ["Reporting", "View Report", "", "", "", "", "explore", "No AC and no scenarios, need exploration first"],
+                                      ["Authentication", "Reset Password", "test_reset_password.py", "", "(1) User requests password reset and receives reset email (2) User submits new password meeting requirements and password is updated (3) User submits invalid password not meeting requirements and sees validation error", "test_user_requests_password_reset_and_receives_reset_email; test_user_submits_new_password_meeting_requirements_and_password_is_updated; test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error", "code", "No AC but has scenarios with tests, lower level determines behavior"],
+                                      ["Data Export", "Export CSV", "test_export_csv.py", "", "(1) User exports data to CSV and file downloads successfully (2) Export handles empty data set and generates valid empty CSV (3) Export handles large dataset and shows progress indicator (4) Export with special characters in data and properly escapes them in CSV", "test_user_exports_data_to_csv_and_file_downloads_successfully; test_export_handles_empty_data_set_and_generates_valid_empty_csv", "test", "No AC but has scenarios, only some tested"],
+                                      ["Payment", "Process Payment", "test_process_payment.py", "", "(1) Payment processed with valid card and transaction completes successfully (2) Payment attempted with expired card and user sees card expired error", "", "test", "No AC but has scenarios without tests, need to write tests"]
+                                    ]
+                                  }
                                 },
                                 {
-                                  "name": "User submits scope via CLI command",
+                                  "name": "Determine Behavior For Sub Epic",
                                   "sequential_order": 2.0,
                                   "type": "happy_path",
                                   "background": [],
-                                  "test_method": "test_user_submits_scope_via_cli",
-                                  "steps": "Given User has workspace with story graph\nAnd CLI has current scope state\nWhen User executes scope submit command with epic name Edit Story Map\nThen System sends epic Edit Story Map to bot for analysis\nAnd System analyzes the epic and its children\nAnd System determines appropriate behavior and action\nAnd System sets bot to build mode\nAnd CLI restores scope to previous state\nAnd CLI displays confirmation with determined behavior"
+                                  "test_method": "test_determine_behavior_for_sub_epic",
+                                  "steps": "Given Bot has story map loaded with sub-epic <sub_epic_name>\nAnd Sub-epic contains stories shown in table\nWhen Bot determines behavior for the sub-epic\nThen Bot returns behavior <expected_behavior>",
+                                  "examples": {
+                                    "columns": ["sub_epic_name", "expected_behavior", "description"],
+                                    "rows": [
+                                      ["User Authentication", "code", "All 3 stories (Login, Logout, Refresh Token) have all scenarios tested"],
+                                      ["Payment Processing", "scenario", "Process Payment needs tests, Refund Payment needs scenarios - lowest is scenario"],
+                                      ["Data Management", "explore", "Archive Data has no AC making entire sub-epic explore level"],
+                                      ["File Operations", "test", "Upload File has tests, Download/Delete need tests - lowest is test"],
+                                      ["Search", "scenario", "Single story Basic Search at scenario level"]
+                                    ]
+                                  }
                                 },
                                 {
-                                  "name": "Bot processes scope submission at domain level",
+                                  "name": "Determine Behavior For Epic",
                                   "sequential_order": 3.0,
                                   "type": "happy_path",
                                   "background": [],
-                                  "test_method": "test_bot_processes_scope_submission_at_domain_level",
-                                  "steps": "Given Bot has story graph loaded\nAnd Epic named Filter Scope exists in story graph\nWhen Bot receives scope submission request for Filter Scope\nThen Bot analyzes the epic and its children\nAnd Bot determines appropriate behavior based on node state\nAnd Bot sets current behavior to determined behavior\nAnd Bot sets current action to build\nAnd Bot state reflects submission was processed"
-                                },
-                                {
-                                  "name": "Bot determines shape behavior for empty epic",
-                                  "sequential_order": 4.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_shape_for_empty_epic",
-                                  "steps": "Given Epic named Product Management has no sub-epics\nAnd Epic has no stories\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be shape\nAnd Bot sets current action to build\nAnd Bot is ready to start shaping work"
-                                },
-                                {
-                                  "name": "Bot determines shape behavior for empty sub-epic",
-                                  "sequential_order": 5.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_shape_for_empty_sub_epic",
-                                  "steps": "Given Sub-epic named User Management has no stories\nAnd Sub-epic has no nested sub-epics\nWhen Bot analyzes the sub-epic after scope submission\nThen Bot determines behavior should be shape\nAnd Bot sets current action to build\nAnd Bot is ready to start shaping work"
-                                },
-                                {
-                                  "name": "Bot determines explore behavior when stories lack acceptance criteria",
-                                  "sequential_order": 6.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_explore_for_stories_without_ac",
-                                  "steps": "Given Epic named Reporting contains three stories\nAnd All stories have empty acceptance criteria\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be explore\nAnd Bot sets current action to build\nAnd Bot is ready to start exploration work"
-                                },
-                                {
-                                  "name": "Bot determines scenarios behavior when stories lack scenarios",
-                                  "sequential_order": 7.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_scenarios_for_stories_without_scenarios",
-                                  "steps": "Given Epic named Authentication contains two stories\nAnd All stories have acceptance criteria\nAnd All stories have empty scenarios\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be scenarios\nAnd Bot sets current action to build\nAnd Bot is ready to start scenario writing work"
-                                },
-                                {
-                                  "name": "Bot determines tests behavior when stories lack tests",
-                                  "sequential_order": 8.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_tests_for_stories_without_tests",
-                                  "steps": "Given Epic named Data Export contains two stories\nAnd All stories have scenarios\nAnd All stories have empty test methods\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be tests\nAnd Bot sets current action to build\nAnd Bot is ready to start test writing work"
-                                },
-                                {
-                                  "name": "Bot determines code behavior when tests exist but fail",
-                                  "sequential_order": 9.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_code_for_failing_tests",
-                                  "steps": "Given Epic named File Upload contains one story\nAnd Story has test methods defined\nAnd Tests are failing\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be code\nAnd Bot sets current action to build\nAnd Bot is ready to start code implementation work"
-                                },
-                                {
-                                  "name": "Bot determines code behavior when tests pass but code not implemented",
-                                  "sequential_order": 10.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": "test_bot_determines_code_for_unimplemented_code",
-                                  "steps": "Given Epic named Search Feature contains one story\nAnd Story has test methods defined\nAnd Tests pass with mocked implementation\nAnd Production code is not implemented\nWhen Bot analyzes the epic after scope submission\nThen Bot determines behavior should be code\nAnd Bot sets current action to build\nAnd Bot is ready to start code implementation work"
-                                },
-                                {
-                                  "name": "User attempts to submit without selecting a node",
-                                  "sequential_order": 12.0,
-                                  "type": "edge_case",
-                                  "background": [],
-                                  "test_method": "test_user_attempts_submit_without_selection",
-                                  "steps": "Given User has not selected any story node in the panel\nWhen User views the toolbar\nThen Submit button is hidden"
-                                }
-                              ],
-                              "scenario_outlines": [
-                                {
-                                  "name": "Submit button displays behavior-specific icon",
-                                  "sequential_order": 11.0,
-                                  "type": "happy_path",
-                                  "background": [],
-                                  "test_method": null,
-                                  "steps": "Given User has selected a <node_type> in the panel\nAnd Node state indicates <behavior> behavior is needed\nWhen Panel renders the submit button\nThen Submit button displays <icon_file> icon indicating <behavior> behavior",
+                                  "test_method": "test_determine_behavior_for_epic",
+                                  "steps": "Given Bot has story map loaded with epic <epic_name>\nAnd Epic contains sub-epics shown in table\nWhen Bot determines behavior for the epic\nThen Bot returns behavior <expected_behavior>",
                                   "examples": {
-                                    "columns": [
-                                      "node_type",
-                                      "behavior",
-                                      "icon_file",
-                                      "description"
-                                    ],
+                                    "columns": ["epic_name", "expected_behavior", "description"],
                                     "rows": [
-                                      [
-                                        "empty epic",
-                                        "shape",
-                                        "submit_subepic.png",
-                                        "Epic needs structure"
-                                      ],
-                                      [
-                                        "empty sub-epic",
-                                        "shape",
-                                        "submit_subepic.png",
-                                        "Sub-epic needs structure"
-                                      ],
-                                      [
-                                        "story without AC",
-                                        "explore",
-                                        "submit_story.png",
-                                        "Story needs exploration"
-                                      ],
-                                      [
-                                        "story without scenarios",
-                                        "scenarios",
-                                        "submit_ac.png",
-                                        "Story needs scenarios"
-                                      ],
-                                      [
-                                        "story without tests",
-                                        "tests",
-                                        "submit_tests.png",
-                                        "Story needs tests"
-                                      ],
-                                      [
-                                        "story with failing tests",
-                                        "code",
-                                        "submit_code.png",
-                                        "Story needs code implementation"
-                                      ]
+                                      ["File Management", "code", "All sub-epics (File Operations, File Search) have code behavior"],
+                                      ["Reporting", "explore", "One sub-epic (Report Export) at explore level makes entire epic explore"],
+                                      ["User Management", "scenario", "One sub-epic (User Profile) at scenario level with others at code - epic follows highest (scenario)"],
+                                      ["Payment Processing", "test", "Multiple sub-epics (Process Payment, Refund Payment) at test level"],
+                                      ["Product Catalog", "shape", "Empty epic with no sub-epics"],
+                                      ["Product Management", "scenario", "Epic with nested sub-epics - Product Catalog contains nested children, highest is scenario"],
+                                      ["Data Management", "explore", "Parent sub-epic with nested sub-epics where Data Archive is at explore"]
                                     ]
                                   }
                                 }
                               ],
-                              "acceptance_criteria": [],
+                              "scenario_outlines": [],
+                              "acceptance_criteria": [
+                                {
+                                  "name": "Child1",
+                                  "text": "Child1",
+                                  "sequential_order": 0.0
+                                }
+                              ],
                               "behavior": "exploration"
                             }
                           ]

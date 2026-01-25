@@ -8,13 +8,9 @@ Domain tests verify core scope management logic.
 CLI tests verify command parsing and output formatting across TTY, Pipe, and JSON channels.
 """
 import pytest
-from pathlib import Path
-import json
-import os
 from helpers.bot_test_helper import BotTestHelper
 from helpers import TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper
-from story_graph import StoryMap
-from scanners.story_map import Epic, SubEpic, StoryGroup, Story, Scenario, ScenarioOutline
+from story_graph.nodes import Scenario
  
 
 # ============================================================================
@@ -52,64 +48,6 @@ class TestNavigateStoryGraphUsingCLI:
         
         # Then - Validate complete scope response
         helper.scope.assert_scope_shows_target(cli_response.output, 'story', 'TestStory')
-
-# ============================================================================
-# DOMAIN TESTS - Scope Creation (merged from test_display_scope.py)
-# ============================================================================
-
-class TestPersistScope:
-    
-    def test_scope_persists_across_bot_invocations(self, tmp_path):
-        """
-        SCENARIO: Scope persists across bot invocations
-        GIVEN: Bot with scope set
-        WHEN: Bot is reloaded
-        THEN: Scope is restored from workflow state
-        """
-        # TODO: Implement scope persistence tests
-        pass
-    
-    def test_scope_persists_after_action_execution(self, tmp_path):
-        """
-        SCENARIO: Scope persists after action execution
-        GIVEN: Bot with scope set
-        WHEN: Action executes and completes
-        THEN: Scope remains active for next action
-        """
-        # TODO: Implement
-        pass
-
-class TestClearScope:
-    
-    def test_clear_scope_with_show_all_parameter(self, tmp_path):
-        """
-        SCENARIO: Clear scope with show_all parameter
-        GIVEN: Bot with scope set
-        WHEN: Scope cleared with show_all=True
-        THEN: Scope is cleared and all content is shown
-        """
-        # TODO: Implement clear scope tests
-        pass
-    
-    def test_clear_scope_without_show_all_parameter(self, tmp_path):
-        """
-        SCENARIO: Clear scope without show_all parameter
-        GIVEN: Bot with scope set
-        WHEN: Scope cleared without show_all parameter
-        THEN: Scope is cleared
-        """
-        # TODO: Implement
-        pass
-    
-    def test_actions_after_clear_process_all_content(self, tmp_path):
-        """
-        SCENARIO: Actions after clear process all content
-        GIVEN: Bot had scope set, then cleared
-        WHEN: Action executes
-        THEN: Action processes all content without filtering
-        """
-        # TODO: Implement
-        pass
 
 # ============================================================================
 # CLI TESTS - Scope Operations via CLI Commands (merged from test_display_scope.py)
@@ -257,4 +195,829 @@ class TestCreateScope:
         
         helper.build.assert_build_scope_contains(action_scope, 'all', True)
 
+
+# ============================================================================
+# DOMAIN TESTS - Set scope to selected story node and submit
+# ============================================================================
+
+class TestSetScopeToSelectedStoryNodeAndSubmit:
+    """
+    Story: Set scope to selected story node and submit
+    
+    Tests the bot's ability to determine what behavior is needed for a story
+    based on its completeness state (acceptance criteria, scenarios, tests).
+    """
+    
+    @pytest.mark.parametrize("epic_name,story_name,test_class,acceptance_criteria,scenarios,test_methods,expected_behavior", [
+        # All scenarios have tests -> code behavior
+        (
+            "File Management",
+            "Upload File",
+            "test_file_upload.py",
+            "File size validated; File type checked; Upload progress tracked",
+            [
+                "User uploads valid file and sees success confirmation",
+                "User uploads oversized file and sees size limit error",
+                "User uploads invalid file type and sees type error",
+                "User cancels upload mid-transfer and sees cancellation confirmation",
+                "Upload fails with network error and user sees retry option"
+            ],
+            [
+                "test_user_uploads_valid_file_and_sees_success_confirmation",
+                "test_user_uploads_oversized_file_and_sees_size_limit_error",
+                "test_user_uploads_invalid_file_type_and_sees_type_error",
+                "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation",
+                "test_upload_fails_with_network_error_and_user_sees_retry_option"
+            ],
+            "code"
+        ),
+        # Some scenarios tested -> test behavior
+        (
+            "File Management",
+            "Download File",
+            "test_file_download.py",
+            "Download initiated; Progress displayed",
+            [
+                "User downloads file successfully and sees progress",
+                "User cancels download mid-transfer",
+                "Download fails due to network error and user sees error message"
+            ],
+            [
+                "test_user_downloads_file_successfully_and_sees_progress",
+                "test_user_cancels_download_mid_transfer",
+                None  # Third scenario has no test
+            ],
+            "test"
+        ),
+        # Scenarios exist but no tests -> test behavior
+        (
+            "File Management",
+            "Delete File",
+            "test_file_delete.py",
+            "Confirmation required; File removed from storage",
+            [
+                "User confirms delete and file is removed from system",
+                "User cancels delete and file remains",
+                "Delete operation fails due to permissions and user sees error"
+            ],
+            [],  # No test methods
+            "test"
+        ),
+        # Has AC but no scenarios -> scenario behavior
+        (
+            "User Management",
+            "Create User",
+            "",
+            "Email validated; Password meets requirements",
+            [],  # No scenarios
+            [],
+            "scenario"
+        ),
+        # No AC and no scenarios -> explore behavior
+        (
+            "Reporting",
+            "View Report",
+            "",
+            "",  # No AC
+            [],  # No scenarios
+            [],
+            "explore"
+        ),
+        # No AC but scenarios all tested -> code behavior
+        (
+            "Authentication",
+            "Reset Password",
+            "test_reset_password.py",
+            "",  # No AC
+            [
+                "User requests password reset and receives reset email",
+                "User submits new password meeting requirements and password is updated",
+                "User submits invalid password not meeting requirements and sees validation error"
+            ],
+            [
+                "test_user_requests_password_reset_and_receives_reset_email",
+                "test_user_submits_new_password_meeting_requirements_and_password_is_updated",
+                "test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error"
+            ],
+            "code"
+        ),
+        # No AC but some scenarios tested -> test behavior
+        (
+            "Data Export",
+            "Export CSV",
+            "test_export_csv.py",
+            "",  # No AC
+            [
+                "User exports data to CSV and file downloads successfully",
+                "Export handles empty data set and generates valid empty CSV",
+                "Export handles large dataset and shows progress indicator",
+                "Export with special characters in data and properly escapes them in CSV"
+            ],
+            [
+                "test_user_exports_data_to_csv_and_file_downloads_successfully",
+                "test_export_handles_empty_data_set_and_generates_valid_empty_csv",
+                None,  # Third scenario has no test
+                None   # Fourth scenario has no test
+            ],
+            "test"
+        ),
+        # No AC but scenarios without tests -> test behavior
+        (
+            "Payment",
+            "Process Payment",
+            "test_process_payment.py",
+            "",  # No AC
+            [
+                "Payment processed with valid card and transaction completes successfully",
+                "Payment attempted with expired card and user sees card expired error"
+            ],
+            [],  # No test methods
+            "test"
+        ),
+    ])
+    def test_determine_behavior_for_story(
+        self,
+        tmp_path,
+        epic_name,
+        story_name,
+        test_class,
+        acceptance_criteria,
+        scenarios,
+        test_methods,
+        expected_behavior
+    ):
+        """
+        SCENARIO: Determine Behavior For Story
+        GIVEN: Bot has story map loaded with epic <epic_name>
+        AND: Epic contains story <story_name>
+        AND: Story has acceptance criteria <acceptance_criteria>
+        AND: Story has scenarios <scenarios>
+        AND: Story has test class <test_class>
+        AND: Story has test methods <test_methods>
+        WHEN: Bot determines behavior for the story
+        THEN: Bot returns behavior <expected_behavior>
+        
+        This test validates the hierarchical logic:
+        - If all scenarios have tests -> code behavior
+        - If some/no scenarios tested -> test behavior
+        - If no scenarios exist -> scenario behavior
+        - If no acceptance criteria -> explore behavior
+        - Lower level artifacts take precedence (tests > scenarios > AC)
+        """
+        # Given - Create a test story with the specified state
+        helper = BotTestHelper(tmp_path)
+        story = helper.story.create_story_with_state_for_behavior_test(
+            epic_name,
+            story_name,
+            test_class,
+            acceptance_criteria,
+            scenarios,
+            test_methods
+        )
+        
+        # When - Bot determines behavior for the story
+        actual_behavior = story.behavior_needed
+        
+        # Then - Bot returns expected behavior
+        assert actual_behavior == expected_behavior, (
+            f"Expected behavior '{expected_behavior}' but got '{actual_behavior}'"
+        )
+
+    @pytest.mark.parametrize("sub_epic_name,stories_data,expected_behavior", [
+        # Example 1: All stories have tests -> code behavior
+        (
+            "User Authentication",
+            [
+                {
+                    "story_name": "Login User",
+                    "test_class": "test_login_user.py",
+                    "acceptance_criteria": "Valid credentials accepted; Invalid credentials rejected; Account locked after 3 failures",
+                    "scenarios": [
+                        "User enters valid username and password and sees dashboard",
+                        "User enters invalid password and sees error message",
+                        "User fails login 3 times and account is locked"
+                    ],
+                    "test_methods": [
+                        "test_user_enters_valid_username_and_password_and_sees_dashboard",
+                        "test_user_enters_invalid_password_and_sees_error_message",
+                        "test_user_fails_login_3_times_and_account_is_locked"
+                    ]
+                },
+                {
+                    "story_name": "Logout User",
+                    "test_class": "test_logout_user.py",
+                    "acceptance_criteria": "Session terminated on logout; User redirected to login page; Auth token invalidated",
+                    "scenarios": [
+                        "User clicks logout button and session ends",
+                        "User clicks logout and is redirected to login",
+                        "Logged out user cannot access protected pages"
+                    ],
+                    "test_methods": [
+                        "test_user_clicks_logout_button_and_session_ends",
+                        "test_user_clicks_logout_and_is_redirected_to_login",
+                        "test_logged_out_user_cannot_access_protected_pages"
+                    ]
+                },
+                {
+                    "story_name": "Refresh Token",
+                    "test_class": "test_refresh_token.py",
+                    "acceptance_criteria": "Token refreshed before expiry; Expired token triggers re-login; Refresh token rotated after use",
+                    "scenarios": [
+                        "User with expiring token gets new token automatically",
+                        "User with expired token is prompted to login",
+                        "Used refresh token becomes invalid"
+                    ],
+                    "test_methods": [
+                        "test_user_with_expiring_token_gets_new_token_automatically",
+                        "test_user_with_expired_token_is_prompted_to_login",
+                        "test_used_refresh_token_becomes_invalid"
+                    ]
+                }
+            ],
+            "code"
+        ),
+        # Example 2: One story needs scenario, sub-epic follows lowest -> scenario behavior
+        (
+            "Payment Processing",
+            [
+                {
+                    "story_name": "Process Payment",
+                    "test_class": "test_process_payment.py",
+                    "acceptance_criteria": "Card details validated; Payment amount verified; Transaction receipt generated",
+                    "scenarios": [
+                        "User enters valid card and payment succeeds",
+                        "User enters invalid card number and sees validation error",
+                        "Payment succeeds and receipt is emailed to user"
+                    ],
+                    "test_methods": []
+                },
+                {
+                    "story_name": "Refund Payment",
+                    "test_class": "",
+                    "acceptance_criteria": "Original payment verified; Refund amount calculated; Customer notified of refund",
+                    "scenarios": [],
+                    "test_methods": []
+                }
+            ],
+            "scenario"
+        ),
+        # Example 3: One story at explore level makes entire sub-epic explore -> explore behavior
+        (
+            "Data Management",
+            [
+                {
+                    "story_name": "Import Data",
+                    "test_class": "test_import_data.py",
+                    "acceptance_criteria": "CSV file format validated; Data schema verified; Import progress tracked",
+                    "scenarios": [
+                        "User uploads valid CSV and data is imported",
+                        "User uploads invalid CSV and sees format error",
+                        "User sees progress bar during import"
+                    ],
+                    "test_methods": []
+                },
+                {
+                    "story_name": "Export Data",
+                    "test_class": "",
+                    "acceptance_criteria": "Export format selected; Data filtered before export; Download link generated",
+                    "scenarios": [],
+                    "test_methods": []
+                },
+                {
+                    "story_name": "Validate Data",
+                    "test_class": "",
+                    "acceptance_criteria": "Data types checked; Required fields verified; Business rules applied",
+                    "scenarios": [],
+                    "test_methods": []
+                },
+                {
+                    "story_name": "Archive Data",
+                    "test_class": "",
+                    "acceptance_criteria": "",
+                    "scenarios": [],
+                    "test_methods": []
+                }
+            ],
+            "explore"
+        ),
+        # Example 4: Two stories need tests, sub-epic follows lowest -> test behavior
+        (
+            "File Operations",
+            [
+                {
+                    "story_name": "Upload File",
+                    "test_class": "test_file_upload.py",
+                    "acceptance_criteria": "File size validated; File type checked; Upload progress tracked",
+                    "scenarios": [
+                        "User uploads valid file and sees success confirmation",
+                        "User uploads oversized file and sees size limit error",
+                        "User uploads invalid file type and sees type error",
+                        "User cancels upload mid-transfer and sees cancellation confirmation",
+                        "Upload fails with network error and user sees retry option"
+                    ],
+                    "test_methods": [
+                        "test_user_uploads_valid_file_and_sees_success_confirmation",
+                        "test_user_uploads_oversized_file_and_sees_size_limit_error",
+                        "test_user_uploads_invalid_file_type_and_sees_type_error",
+                        "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation",
+                        "test_upload_fails_with_network_error_and_user_sees_retry_option"
+                    ]
+                },
+                {
+                    "story_name": "Download File",
+                    "test_class": "test_file_download.py",
+                    "acceptance_criteria": "Download initiated; Progress displayed",
+                    "scenarios": [
+                        "User clicks download and file transfer starts",
+                        "User sees download progress bar",
+                        "Download completes and file appears in downloads folder"
+                    ],
+                    "test_methods": []
+                },
+                {
+                    "story_name": "Delete File",
+                    "test_class": "test_file_delete.py",
+                    "acceptance_criteria": "Confirmation required; File removed from storage",
+                    "scenarios": [
+                        "User clicks delete and sees confirmation dialog",
+                        "User confirms deletion and file is removed",
+                        "User sees success message after deletion"
+                    ],
+                    "test_methods": []
+                }
+            ],
+            "test"
+        ),
+        # Example 5: Single story at scenario level -> scenario behavior
+        (
+            "Search",
+            [
+                {
+                    "story_name": "Basic Search",
+                    "test_class": "",
+                    "acceptance_criteria": "Search term entered; Results displayed; No results message shown when empty",
+                    "scenarios": [],
+                    "test_methods": []
+                }
+            ],
+            "scenario"
+        ),
+    ])
+    def test_determine_behavior_for_sub_epic(self, tmp_path, sub_epic_name, stories_data, expected_behavior):
+        """
+        SCENARIO: Determine Behavior For Sub Epic
+        GIVEN: Bot has story map loaded with sub-epic <sub_epic_name>
+        AND: Sub-epic contains stories shown in table
+        WHEN: Bot determines behavior for the sub-epic
+        THEN: Bot returns behavior <expected_behavior>
+        
+        This test validates the hierarchical degradation logic:
+        - Sub-epic checks first story for its behavior
+        - For each subsequent story, checks at degraded level
+        - Returns the lowest behavior needed across all stories
+        """
+        # Given - Create a test sub-epic with multiple stories
+        helper = BotTestHelper(tmp_path)
+        sub_epic = helper.story.create_sub_epic_with_stories_for_behavior_test(sub_epic_name, stories_data)
+        
+        # When - Bot determines behavior for the sub-epic
+        actual_behavior = sub_epic.behavior_needed
+        
+        # Then - Bot returns expected behavior
+        assert actual_behavior == expected_behavior, (
+            f"Expected behavior '{expected_behavior}' but got '{actual_behavior}' "
+            f"for sub-epic '{sub_epic_name}' with {len(stories_data)} stories"
+        )
+
+
+# ============================================================================
+# DOMAIN TESTS - Determine Behavior For Scenario
+# ============================================================================
+
+class TestDetermineBehaviorForScenario:
+    """
+    Tests the bot's ability to determine what behavior is needed for a scenario
+    based on whether it has a test method or not.
+    """
+    
+    @pytest.mark.parametrize("scenario_name,test_method,expected_behavior", [
+        # Scenario with test method -> code behavior
+        (
+            "User uploads valid file and sees success confirmation",
+            "test_user_uploads_valid_file_and_sees_success_confirmation",
+            "code"
+        ),
+        # Scenario without test method -> test behavior
+        (
+            "User downloads file successfully and sees progress",
+            None,
+            "test"
+        ),
+        # Scenario with empty test method -> test behavior
+        (
+            "User deletes file and sees confirmation",
+            "",
+            "test"
+        ),
+    ])
+    def test_determine_behavior_for_scenario(
+        self,
+        scenario_name,
+        test_method,
+        expected_behavior
+    ):
+        """
+        SCENARIO: Determine Behavior For Scenario
+        GIVEN: Scenario <scenario_name> with test method <test_method>
+        WHEN: Bot determines behavior for the scenario
+        THEN: Bot returns behavior <expected_behavior>
+        
+        This test validates the scenario-level logic:
+        - If scenario has test_method -> code behavior
+        - If scenario has no test_method -> test behavior
+        """
+        # Given - Create a scenario with the specified state
+        # Normalize test_method: empty string should be None
+        if test_method == "":
+            test_method = None
+        
+        scenario = Scenario(
+            name=scenario_name,
+            sequential_order=1.0,
+            type="happy_path",
+            background=[],
+            test_method=test_method,
+            _parent=None
+        )
+        
+        # When - Bot determines behavior for the scenario
+        actual_behavior = scenario.behavior_needed
+        
+        # Then - Bot returns expected behavior
+        assert actual_behavior == expected_behavior, (
+            f"Expected behavior '{expected_behavior}' but got '{actual_behavior}'"
+        )
+
+
+# ============================================================================
+# DOMAIN TESTS - Determine Behavior For Epic
+# ============================================================================
+
+class TestDetermineBehaviorForEpic:
+    """
+    Tests the bot's ability to determine what behavior is needed for an epic
+    based on the highest (earliest in workflow) behavior across all sub-epics.
+    
+    Behavior priority (highest to lowest):
+    1. shape - empty, needs structure
+    2. explore - needs exploration
+    3. scenario - needs scenarios
+    4. test - needs test code
+    5. code - needs production code
+    """
+    
+    @pytest.mark.parametrize("epic_name,sub_epics_data,expected_behavior", [
+        # Example 1: All sub-epics have code behavior -> code behavior
+        (
+            "File Management",
+            [
+                {
+                    "name": "File Operations",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Upload File",
+                            "test_class": "test_file_upload.py",
+                            "acceptance_criteria": "File size validated; File type checked; Upload progress tracked",
+                            "scenarios": [
+                                "User uploads valid file and sees success confirmation",
+                                "User uploads oversized file and sees size limit error",
+                                "User uploads invalid file type and sees type error"
+                            ],
+                            "test_methods": [
+                                "test_user_uploads_valid_file_and_sees_success_confirmation",
+                                "test_user_uploads_oversized_file_and_sees_size_limit_error",
+                                "test_user_uploads_invalid_file_type_and_sees_type_error"
+                            ]
+                        },
+                        {
+                            "story_name": "Download File",
+                            "test_class": "test_file_download.py",
+                            "acceptance_criteria": "Download initiated; Progress displayed",
+                            "scenarios": [
+                                "User downloads file successfully and sees progress",
+                                "User cancels download mid-transfer",
+                                "Download fails due to network error and user sees error message"
+                            ],
+                            "test_methods": [
+                                "test_user_downloads_file_successfully_and_sees_progress",
+                                "test_user_cancels_download_mid_transfer",
+                                "test_download_fails_due_to_network_error_and_user_sees_error_message"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "File Search",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Search by Name",
+                            "test_class": "test_search_by_name.py",
+                            "acceptance_criteria": "Search term validated; Results sorted by relevance; Partial matches included",
+                            "scenarios": [
+                                "User searches for file name and sees matching results",
+                                "User searches with partial name and sees partial matches",
+                                "User searches nonexistent file and sees no results message"
+                            ],
+                            "test_methods": [
+                                "test_user_searches_for_file_name_and_sees_matching_results",
+                                "test_user_searches_with_partial_name_and_sees_partial_matches",
+                                "test_user_searches_nonexistent_file_and_sees_no_results_message"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "code"
+        ),
+        # Example 2: One sub-epic at explore level -> explore behavior (highest wins)
+        (
+            "Reporting",
+            [
+                {
+                    "name": "Report Generation",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Generate Sales Report",
+                            "test_class": "test_generate_sales_report.py",
+                            "acceptance_criteria": "Date range validated; Data aggregated; Report formatted",
+                            "scenarios": [
+                                "User generates report for valid date range and sees report",
+                                "User generates report with invalid date range and sees error"
+                            ],
+                            "test_methods": []  # No test methods -> test behavior
+                        }
+                    ]
+                },
+                {
+                    "name": "Report Scheduling",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Schedule Report",
+                            "test_class": None,
+                            "acceptance_criteria": "Schedule time validated; Recipients specified; Report sent at scheduled time",
+                            "scenarios": [],
+                            "test_methods": []  # No scenarios -> scenario behavior
+                        }
+                    ]
+                },
+                {
+                    "name": "Report Export",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Export to PDF",
+                            "test_class": None,
+                            "acceptance_criteria": "",
+                            "scenarios": [],
+                            "test_methods": []  # No AC, no scenarios -> explore behavior
+                        }
+                    ]
+                }
+            ],
+            "explore"  # Highest behavior wins
+        ),
+        # Example 3: One sub-epic at scenario level with others at code -> scenario behavior
+        (
+            "User Management",
+            [
+                {
+                    "name": "Authentication",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Login User",
+                            "test_class": "test_login_user.py",
+                            "acceptance_criteria": "Valid credentials accepted; Invalid credentials rejected; Account locked after 3 failures",
+                            "scenarios": [
+                                "User enters valid username and password and sees dashboard",
+                                "User enters invalid password and sees error message",
+                                "User fails login 3 times and account is locked"
+                            ],
+                            "test_methods": [
+                                "test_user_enters_valid_username_and_password_and_sees_dashboard",
+                                "test_user_enters_invalid_password_and_sees_error_message",
+                                "test_user_fails_login_3_times_and_account_is_locked"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "User Profile",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Update Profile",
+                            "test_class": None,
+                            "acceptance_criteria": "Profile fields validated; Changes saved to database; Confirmation displayed",
+                            "scenarios": [],
+                            "test_methods": []  # No scenarios -> scenario behavior
+                        }
+                    ]
+                }
+            ],
+            "scenario"  # Highest behavior wins
+        ),
+        # Example 4: Multiple sub-epics at test level -> test behavior
+        (
+            "Payment Processing",
+            [
+                {
+                    "name": "Process Payment",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Validate Card",
+                            "test_class": "test_validate_card.py",
+                            "acceptance_criteria": "Card number validated; Expiry date checked; CVV verified",
+                            "scenarios": [
+                                "User enters valid card and validation passes",
+                                "User enters invalid card number and sees error",
+                                "User enters expired card and sees expiry error"
+                            ],
+                            "test_methods": []  # No test methods -> test behavior
+                        }
+                    ]
+                },
+                {
+                    "name": "Refund Payment",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Issue Refund",
+                            "test_class": "test_issue_refund.py",
+                            "acceptance_criteria": "Original payment verified; Refund amount calculated; Customer notified",
+                            "scenarios": [
+                                "Admin issues full refund and customer receives confirmation",
+                                "Admin issues partial refund and amount is calculated correctly"
+                            ],
+                            "test_methods": []  # No test methods -> test behavior
+                        }
+                    ]
+                }
+            ],
+            "test"
+        ),
+        # Example 5: Empty epic with no sub-epics -> shape behavior
+        (
+            "Product Catalog",
+            [],  # No sub-epics
+            "shape"
+        ),
+        # Example 6: Epic with nested sub-epics - parent sub-epic follows highest of nested children
+        (
+            "Product Management",
+            [
+                {
+                    "name": "Product Catalog",
+                    "nested_sub_epics": [
+                        {
+                            "name": "Category Management",
+                            "nested_sub_epics": [],
+                            "stories": [
+                                {
+                                    "story_name": "Create Category",
+                                    "test_class": "test_create_category.py",
+                                    "acceptance_criteria": "Category name validated; Parent category selected; Category saved",
+                                    "scenarios": [
+                                        "User creates new category with valid name",
+                                        "User creates subcategory under parent category"
+                                    ],
+                                    "test_methods": [
+                                        "test_user_creates_new_category_with_valid_name",
+                                        "test_user_creates_subcategory_under_parent_category"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Product Search",
+                            "nested_sub_epics": [],
+                            "stories": [
+                                {
+                                    "story_name": "Search Products",
+                                    "test_class": None,
+                                    "acceptance_criteria": "Search term entered; Filters applied; Results displayed",
+                                    "scenarios": [],
+                                    "test_methods": []  # No scenarios -> scenario behavior (highest of nested)
+                                }
+                            ]
+                        }
+                    ],
+                    "stories": []
+                },
+                {
+                    "name": "Inventory Management",
+                    "nested_sub_epics": [],
+                    "stories": [
+                        {
+                            "story_name": "Update Stock",
+                            "test_class": "test_update_stock.py",
+                            "acceptance_criteria": "Stock quantity validated; Inventory updated; Notification sent",
+                            "scenarios": [
+                                "Admin updates stock quantity and inventory reflects change"
+                            ],
+                            "test_methods": [
+                                "test_admin_updates_stock_quantity_and_inventory_reflects_change"
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "scenario"  # Product Catalog has scenario (from Product Search), which is higher than code
+        ),
+        # Example 7: Parent sub-epic with nested sub-epics -> explore behavior (highest of nested)
+        (
+            "Data Management Epic",
+            [
+                {
+                    "name": "Data Management",
+                    "nested_sub_epics": [
+                        {
+                            "name": "Data Import",
+                            "nested_sub_epics": [],
+                            "stories": [
+                                {
+                                    "story_name": "Import CSV",
+                                    "test_class": "test_import_csv.py",
+                                    "acceptance_criteria": "File format validated; Data parsed; Import completed",
+                                    "scenarios": [
+                                        "User imports valid CSV and data is loaded",
+                                        "User imports invalid CSV and sees error"
+                                    ],
+                                    "test_methods": []  # No test methods -> test behavior
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Data Validation",
+                            "nested_sub_epics": [],
+                            "stories": [
+                                {
+                                    "story_name": "Validate Records",
+                                    "test_class": None,
+                                    "acceptance_criteria": "Data types checked; Required fields verified; Business rules applied",
+                                    "scenarios": [],
+                                    "test_methods": []  # No scenarios -> scenario behavior
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Data Archive",
+                            "nested_sub_epics": [],
+                            "stories": [
+                                {
+                                    "story_name": "Archive Old Data",
+                                    "test_class": None,
+                                    "acceptance_criteria": "",
+                                    "scenarios": [],
+                                    "test_methods": []  # No AC, no scenarios -> explore behavior (highest)
+                                }
+                            ]
+                        }
+                    ],
+                    "stories": []
+                }
+            ],
+            "explore"  # Data Management has explore (from Data Archive), which is highest
+        ),
+    ])
+    def test_determine_behavior_for_epic(self, tmp_path, epic_name, sub_epics_data, expected_behavior):
+        """
+        SCENARIO: Determine Behavior For Epic
+        GIVEN: Bot has story map loaded with epic <epic_name>
+        AND: Epic contains sub-epics shown in table
+        WHEN: Bot determines behavior for the epic
+        THEN: Bot returns behavior <expected_behavior>
+        
+        This test validates the hierarchical behavior determination:
+        - Epic examines all sub-epics (including nested ones)
+        - Returns the HIGHEST behavior found (shape > explore > scenario > test > code)
+        - Can stop examining a sub-epic once a behavior at or above current highest is found
+        """
+        # Given - Create an epic with sub-epics (including nested if specified)
+        helper = BotTestHelper(tmp_path)
+        epic = helper.story.create_epic_with_sub_epics_for_behavior_test(epic_name, sub_epics_data)
+        
+        # When - Bot determines behavior for the epic
+        actual_behavior = epic.behavior_needed
+        
+        # Then - Bot returns expected behavior (follows highest across all sub-epics)
+        assert actual_behavior == expected_behavior, (
+            f"Expected behavior '{expected_behavior}' but got '{actual_behavior}' "
+            f"for epic '{epic_name}' with {len(sub_epics_data)} sub-epics"
+        )
 
