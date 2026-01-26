@@ -118,6 +118,15 @@ class Bot:
         
         return self._story_graph
     
+    def reload_story_graph(self) -> dict:
+        """Clear the cached story graph to force reload on next access.
+        
+        Returns:
+            dict: Status message indicating the cache was cleared
+        """
+        self._story_graph = None
+        return {'status': 'success', 'message': 'Story graph cache cleared'}
+    
     # Backward compatibility alias
     @property
     def story_graph(self) -> StoryMap:

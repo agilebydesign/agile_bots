@@ -51,14 +51,23 @@ class MarkdownStoryGraph(MarkdownAdapter):
         
         for story_group in sub_epic.get('story_groups', []):
             for story in story_group.get('stories', []):
-                story_name = story.get('name', 'Unknown')
-                story_indent = "  " * (indent_level + 2)
-                lines.append(f"{story_indent}- 📝  {story_name}")
+                self._render_story(story, lines, indent_level + 2)
         
         for story in sub_epic.get('stories', []):
-            story_name = story.get('name', 'Unknown')
-            story_indent = "  " * (indent_level + 2)
-            lines.append(f"{story_indent}- 📝  {story_name}")
+            self._render_story(story, lines, indent_level + 2)
+    
+    def _render_story(self, story: dict, lines: list, indent_level: int):
+        story_name = story.get('name', 'Unknown')
+        story_indent = "  " * indent_level
+        lines.append(f"{story_indent}- 📝  {story_name}")
+        
+        # Render scenarios if they exist
+        scenarios = story.get('scenarios', [])
+        if scenarios:
+            scenario_indent = "  " * (indent_level + 1)
+            for scenario in scenarios:
+                scenario_name = scenario.get('name', 'Unknown')
+                lines.append(f"{scenario_indent}- 🎬  {scenario_name}")
         
         for nested_sub_epic in sub_epic.get('sub_epics', []):
             self._render_sub_epic(nested_sub_epic, lines, indent_level + 1)

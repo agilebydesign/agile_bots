@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Any, List, Dict, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,7 +12,8 @@ class Instructions:
         self._data['base_instructions'] = list(base_instructions) if base_instructions else []
         self._display_content: List[str] = []
         self._bot_paths = bot_paths
-        self._scope = scope
+        # Make a copy of the scope so changes to the bot's scope don't affect instructions
+        self._scope = scope.copy() if scope and hasattr(scope, 'copy') else scope
         
         self._guardrails = None
         self._strategy = None

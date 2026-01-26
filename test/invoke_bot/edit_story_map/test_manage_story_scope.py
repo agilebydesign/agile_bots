@@ -414,8 +414,8 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == action
         
-        # And - Scope is set to the story
-        helper.scope.assert_scope_is_set('story', [story.name])
+        # And - Scope is restored to 'all' after getting instructions
+        helper.scope.assert_scope_is_cleared()
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
@@ -424,6 +424,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert instructions.get('action_metadata') is not None, "Instructions should have action metadata"
         assert instructions.get('behavior_metadata')['name'] == expected_behavior
         assert instructions.get('action_metadata')['name'] == action
+        
+        # And - Instructions contain the scope that was set
+        assert instructions.scope is not None, "Instructions should contain scope"
+        assert instructions.scope.type.value == 'story', f"Expected scope type 'story', got '{instructions.scope.type.value}'"
+        assert story.name in instructions.scope.value, f"Expected story '{story.name}' in scope value {instructions.scope.value}"
 
     @pytest.mark.parametrize("sub_epic_name,stories_data,expected_behavior,action,expected_instructions_contain", [
         # Example 1: All stories have tests -> code behavior
@@ -653,8 +658,8 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == action
         
-        # And - Scope is set to the sub-epic
-        helper.scope.assert_scope_is_set('story', [sub_epic.name])
+        # And - Scope is restored to 'all' after getting instructions
+        helper.scope.assert_scope_is_cleared()
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
@@ -1089,8 +1094,8 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == action
         
-        # And - Scope is set to the epic
-        helper.scope.assert_scope_is_set('story', [epic.name])
+        # And - Scope is restored to 'all' after getting instructions
+        helper.scope.assert_scope_is_cleared()
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
