@@ -76,6 +76,7 @@ class BotTestHelper:
         
         self.state = StateTestHelper(parent=self)
         self.behaviors = BehaviorTestHelper(parent=self)
+        self.behavior = self.behaviors
         self.navigation = NavigationTestHelper(parent=self)
         self.guardrails = GuardrailsTestHelper(parent=self)
         self.clarify = ClarifyTestHelper(parent=self)

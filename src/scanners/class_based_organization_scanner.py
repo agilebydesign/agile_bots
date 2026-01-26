@@ -26,7 +26,7 @@ class ClassBasedOrganizationScanner(TestScanner):
         
         sub_epic_names = self._extract_sub_epic_names(story_graph)
         file_name = file_path.stem
-        violation = self._check_file_name_matches_sub_epic(file_name, sub_epic_names, file_path, self.rule, story_graph)
+        violation = self._check_file_name_matches_sub_epic(file_name, sub_epic_names, file_path, story_graph)
         if violation:
             violations.append(violation)
         
@@ -49,7 +49,7 @@ class ClassBasedOrganizationScanner(TestScanner):
                         if isinstance(item, ast.FunctionDef):
                             if item.name.startswith('test_'):
                                 violation = self._check_method_name_matches_scenario(
-                                    item.name, node.name, story_names, story_graph, file_path, self.rule
+                                    item.name, node.name, story_names, story_graph, file_path
                                 )
                                 if violation:
                                     violations.append(violation)

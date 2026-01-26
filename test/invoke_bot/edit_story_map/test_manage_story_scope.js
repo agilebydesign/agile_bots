@@ -330,15 +330,21 @@ test('TestSetScopeToSelectedStoryNode', { concurrency: false }, async (t) => {
 
 test('TestPanelSubmitButtonDisplaysBehaviorSpecificIconWithHoverTooltip', { concurrency: false }, async (t) => {
     
-    await t.test('test_submit_button_icon_changes_based_on_behavior_needed', async () => {
+    await t.test('test_submit_button_icon_and_submits_instructions', async () => {
         /**
-         * SCENARIO: Panel submit button displays behavior-specific icon with hover tooltip
+         * SCENARIO: Panel submit button displays behavior-specific icon and submits instructions
          * GIVEN: User has selected a <node_type> <node_name> in the panel
          * AND: Node has behavior <behavior> needed
          * WHEN: Panel renders the submit button
          * THEN: Submit button displays <icon_file> icon indicating <behavior> behavior
          * WHEN: User hovers over the submit button
          * THEN: Submit button shows tooltip <tooltip_text>
+         * WHEN: User clicks the submit button
+         * THEN: Panel submits node with action "build"
+         * AND: Node calls get_required_behavior_instructions with action "build"
+         * AND: Bot is set to behavior <behavior>
+         * AND: Bot is set to action "build"
+         * AND: Instructions for <behavior> behavior and "build" action are returned
          * 
          * Examples table from scenario - tests all 5 behavior levels
          */
