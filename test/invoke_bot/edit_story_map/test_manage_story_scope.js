@@ -18,21 +18,63 @@ Module.prototype.require = function(...args) {
     return originalRequire.apply(this, args);
 };
 
-const { test, after } = require('node:test');
+const { test, after, before } = require('node:test');
 const assert = require('assert');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
 const StoryMapView = require('../../../src/panel/story_map_view');
 
-// Setup
-const workspaceDir = path.join(__dirname, '../../..');
-const botPath = path.join(workspaceDir, 'bots', 'story_bot');
+// Setup - Use temp directory for test workspace to avoid modifying production data
+const repoRoot = path.join(__dirname, '../../..');
+const productionBotPath = path.join(repoRoot, 'bots', 'story_bot');
+const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-scope-test-'));
+const tempBotPath = path.join(tempWorkspaceDir, 'bots', 'story_bot');
+
+// Copy bot configuration to temp directory
+function setupTestWorkspace() {
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'bots', 'story_bot'), { recursive: true });
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'stories'), { recursive: true });
+    
+    // Copy bot configuration files
+    const botFiles = ['mcp.json'];
+    for (const file of botFiles) {
+        const src = path.join(productionBotPath, file);
+        const dest = path.join(tempBotPath, file);
+        if (fs.existsSync(src)) {
+            fs.copyFileSync(src, dest);
+        }
+    }
+    
+    // Copy behaviors directory
+    const behaviorsSrc = path.join(productionBotPath, 'behaviors');
+    const behaviorsDest = path.join(tempBotPath, 'behaviors');
+    if (fs.existsSync(behaviorsSrc)) {
+        fs.cpSync(behaviorsSrc, behaviorsDest, { recursive: true });
+    }
+    
+    // Copy story-graph.json
+    const storyGraphSrc = path.join(repoRoot, 'docs', 'stories', 'story-graph.json');
+    const storyGraphDest = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    if (fs.existsSync(storyGraphSrc)) {
+        fs.copyFileSync(storyGraphSrc, storyGraphDest);
+    }
+}
+
+before(() => {
+    setupTestWorkspace();
+});
 
 // ONE CLI for all tests
-const cli = new PanelView(botPath);
+const cli = new PanelView(tempBotPath);
 
 after(() => {
     cli.cleanup();
+    // Clean up temp directory
+    if (fs.existsSync(tempWorkspaceDir)) {
+        fs.rmSync(tempWorkspaceDir, { recursive: true, force: true });
+    }
 });
 
 

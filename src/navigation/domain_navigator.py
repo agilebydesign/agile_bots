@@ -17,10 +17,16 @@ class DomainNavigator:
             story_graph.create_epic name:"User Management"
             story_graph."Epic Name".create_sub_epic name:"Auth"
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"[DomainNavigator] navigate() called with command: '{command}'")
+        
         command_part, params_part = self._split_command_and_params(command)
+        logger.info(f"[DomainNavigator] Split command: part='{command_part}', params='{params_part}'")
         
         current_object = self.bot
         parts = self._parse_dot_notation(command_part)
+        logger.info(f"[DomainNavigator] Parsed parts: {parts}")
         
         for i, part in enumerate(parts):
             is_last = i == len(parts) - 1
@@ -53,17 +59,29 @@ class DomainNavigator:
                             pass  # Fall through to normal navigation
                 
                 if is_last and callable(attr):
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"[DomainNavigator] Found callable method: '{part}'")
+                    
                     params = self._parse_parameters(params_part)
+                    logger.info(f"[DomainNavigator] Parsed params: {params}")
+                    
                     # If it's an Action and no params, return its instructions instead of executing
                     if type(attr).__name__ == 'Action' and not params:
                         # Just return the action's instructions, don't execute it
                         return self._format_object_result(attr)
                     # For other callables or actions with params, execute them
                     try:
+                        logger.info(f"[DomainNavigator] Calling {part} with params: {params}")
                         result = attr(**params)
+                        logger.info(f"[DomainNavigator] Method {part} returned: {type(result)}")
                         return self._format_result(part, result, params)
                     except ValueError as e:
+                        logger.error(f"[DomainNavigator] ValueError calling {part}: {str(e)}")
                         return {'status': 'error', 'message': str(e)}
+                    except Exception as e:
+                        logger.error(f"[DomainNavigator] Exception calling {part}: {str(e)}", exc_info=True)
+                        return {'status': 'error', 'message': f'Error calling {part}: {str(e)}'}
                 elif is_last:
                     return self._format_object_result(attr)
                 else:
@@ -291,6 +309,10 @@ class DomainNavigator:
                 if requested_position is not None and requested_position != actual_position:
                     response['message'] += f' (adjusted from {requested_position})'
             return response
+        
+        # If result is already a dict with status, return it as-is (like submit_instructions result)
+        if isinstance(result, dict) and 'status' in result:
+            return result
         
         if isinstance(result, (str, int, float, bool, list, dict)):
             return {'status': 'success', 'result': result}

@@ -13,18 +13,50 @@ const Module = require('module');
 const originalRequire = Module.prototype.require;
 Module.prototype.require = function(...args) {
     if (args[0] === 'vscode') {
-P        return require('../../helpers/mock_vscode');
+        return require('../../helpers/mock_vscode');
     }
     return originalRequire.apply(this, args);
 };
 
-const { test, after } = require('node:test');
+const { test, after, before } = require('node:test');
 const assert = require('node:assert');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
 const { BehaviorsViewTestHelper } = require('../../helpers');
 
-// Setup workspace
-const workspaceDir = process.env.TEST_WORKSPACE || path.join(__dirname, '../../..');
+// Setup - Use temp directory for test workspace to avoid modifying production data
+const repoRoot = path.join(__dirname, '../../..');
+const productionBotPath = path.join(repoRoot, 'bots', 'story_bot');
+
+// Create temp workspace for tests (data only - story graphs, etc.)
+const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-behavior-test-'));
+
+// For tests that modify story graph, we need to:
+// 1. Use production bot config and source code (can't copy all of it)
+// 2. Set WORKING_AREA to a temp directory so story graph changes go there
+// 
+// The PanelView derives workspaceDir from botPath, so we use production bot
+// but override the working area via environment variable before spawning
+
+// Create temp workspace for test data (story graphs, etc.)
+function setupTestWorkspace() {
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'stories'), { recursive: true });
+    
+    // Create empty test story graph
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    fs.writeFileSync(storyGraphPath, JSON.stringify({ epics: [] }, null, 2));
+    
+    // Set environment variable so Python backend uses temp workspace for data
+    process.env.WORKING_AREA = tempWorkspaceDir;
+}
+
+before(() => {
+    setupTestWorkspace();
+});
+
+// Use production workspace directory (has config, behaviors, and src) but temp workspace for data
+const workspaceDir = repoRoot;
 
 // Create ONE helper for all tests - shares single CLI process
 const helper = new BehaviorsViewTestHelper(workspaceDir, 'story_bot');
@@ -32,6 +64,16 @@ const helper = new BehaviorsViewTestHelper(workspaceDir, 'story_bot');
 // Cleanup after all tests
 after(() => {
     helper.cleanup();
+    // Clean up temp workspace and restore environment
+    try {
+        if (fs.existsSync(tempWorkspaceDir)) {
+            fs.rmSync(tempWorkspaceDir, { recursive: true, force: true });
+        }
+    } catch (err) {
+        console.warn('Failed to clean up temp workspace:', err.message);
+    }
+    // Restore WORKING_AREA to original or unset
+    delete process.env.WORKING_AREA;
 });
 
 class TestNavigateBehaviorAction {

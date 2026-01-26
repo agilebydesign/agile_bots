@@ -157,7 +157,18 @@ class BotPanel {
             } catch (err) {
               this._log(`[BotPanel] Warning: Could not delete cache: ${err.message}`);
             }
-            this._update().catch(err => console.error(`[BotPanel] Refresh error: ${err.message}`));
+            // Clear the story graph cache in the Bot instance to force reload
+            (async () => {
+              try {
+                this._log('[BotPanel] Clearing story graph cache...');
+                await this._botView.execute('reload_story_graph --format json');
+                this._log('[BotPanel] Story graph cache cleared');
+              } catch (err) {
+                this._log(`[BotPanel] Warning: Could not clear story graph cache: ${err.message}`);
+              }
+              // Proceed with refresh after clearing cache
+              this._update().catch(err => console.error(`[BotPanel] Refresh error: ${err.message}`));
+            })();
             return;
           case "logToFile":
             if (message.message) {
@@ -493,6 +504,12 @@ class BotPanel {
               this._log(`[BotPanel] commandText: ${message.commandText}`);
               this._log(`[BotPanel] Full message: ${JSON.stringify(message)}`);
               
+              // Special debug for submit commands
+              if (message.commandText.includes('submit_required_behavior_instructions')) {
+                this._log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
+                this._log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
+              }
+              
               // All operations now refresh - optimistic updates disabled for simplicity
               const isCreateOp = message.commandText.includes('.create_') || message.commandText.includes('create child') || message.commandText.includes('create epic');
               const isDeleteOp = message.commandText.includes('.delete');
@@ -523,6 +540,23 @@ class BotPanel {
                     fs.appendFileSync(logPath, resultLog);
                   } catch (err) {
                     this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
+                  }
+                  
+                  // Check if this is submit_required_behavior_instructions - show submit result
+                  const isSubmitInstructions = message.commandText.includes('submit_required_behavior_instructions');
+                  if (isSubmitInstructions && result) {
+                    this._log(`[BotPanel] Submit result from CLI: ${JSON.stringify(result).substring(0, 500)}`);
+                    // Show success/error message from CLI submit
+                    if (result.status === 'success') {
+                      const msg = result.message || 'Instructions submitted to chat!';
+                      vscode.window.showInformationMessage(msg);
+                    } else {
+                      const errorMsg = result.message || result.error || 'Failed to submit instructions';
+                      vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
+                    }
+                    // Don't refresh panel after submit - it's a read-only operation that doesn't change the story graph
+                    this._log(`[BotPanel] Submit completed - skipping panel refresh (no story graph changes)`);
+                    return Promise.resolve();
                   }
                   
                   // Log timestamp for when panel made a change (for behavior cache invalidation)
@@ -2384,17 +2418,17 @@ class BotPanel {
                         icon: btnSubmit.getAttribute('data-shape-icon'),
                         tooltip: btnSubmit.getAttribute('data-shape-tooltip') || 'Submit shape instructions for ' + nodeType
                     },
-                    'explore': {
-                        icon: btnSubmit.getAttribute('data-explore-icon'),
-                        tooltip: btnSubmit.getAttribute('data-explore-tooltip') || 'Submit explore instructions for ' + nodeType
+                    'exploration': {
+                        icon: btnSubmit.getAttribute('data-exploration-icon'),
+                        tooltip: btnSubmit.getAttribute('data-exploration-tooltip') || 'Submit exploration instructions for ' + nodeType
                     },
-                    'scenario': {
-                        icon: btnSubmit.getAttribute('data-scenario-icon'),
-                        tooltip: btnSubmit.getAttribute('data-scenario-tooltip') || 'Submit scenario instructions for ' + nodeType
+                    'scenarios': {
+                        icon: btnSubmit.getAttribute('data-scenarios-icon'),
+                        tooltip: btnSubmit.getAttribute('data-scenarios-tooltip') || 'Submit scenarios instructions for ' + nodeType
                     },
-                    'test': {
-                        icon: btnSubmit.getAttribute('data-test-icon'),
-                        tooltip: btnSubmit.getAttribute('data-test-tooltip') || 'Submit test instructions for ' + nodeType
+                    'tests': {
+                        icon: btnSubmit.getAttribute('data-tests-icon'),
+                        tooltip: btnSubmit.getAttribute('data-tests-tooltip') || 'Submit tests instructions for ' + nodeType
                     },
                     'code': {
                         icon: btnSubmit.getAttribute('data-code-icon'),
@@ -2660,31 +2694,59 @@ class BotPanel {
         };
         
         window.handleSubmit = function() {
+            console.log('[WebView] ========== handleSubmit CALLED ==========');
             console.log('[WebView] handleSubmit called for node:', window.selectedNode);
+            console.log('[WebView] Node name:', window.selectedNode?.name);
+            console.log('[WebView] Node path:', window.selectedNode?.path);
+            console.log('[WebView] Node behavior:', window.selectedNode?.behavior);
             
-            if (!window.selectedNode.name) {
+            if (!window.selectedNode || !window.selectedNode.name) {
                 console.error('[WebView] ERROR: No node selected for submit');
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] ERROR: handleSubmit called but no node selected'
+                });
                 return;
             }
             
             if (!window.selectedNode.behavior) {
                 console.error('[WebView] ERROR: No behavior for selected node');
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] ERROR: handleSubmit called but node has no behavior: ' + window.selectedNode.name
+                });
                 return;
             }
             
-            const behavior = window.selectedNode.behavior;
             const nodeName = window.selectedNode.name;
+            const nodePath = window.selectedNode.path;
             
-            console.log('[WebView] Submit:', behavior, 'instructions for', nodeName);
+            console.log('[WebView] Submit: Getting instructions for', nodeName);
             vscode.postMessage({
                 command: 'logToFile',
-                message: '[WebView] SUBMIT: behavior=' + behavior + ', node=' + nodeName
+                message: '[WebView] SUBMIT: Getting instructions for node=' + nodeName + ', path=' + nodePath
             });
             
-            // Execute submit command for the current behavior/action
+            // Call the domain object's method to submit instructions
+            // This will: get instructions, then submit them to Cursor chat
+            const commandText = nodePath 
+                ? nodePath + '.submit_required_behavior_instructions action:build'
+                : 'story_graph."' + nodeName + '".submit_required_behavior_instructions action:build';
+            
+            console.log('[WebView] ========== SENDING COMMAND ==========');
+            console.log('[WebView] Executing command:', commandText);
+            console.log('[WebView] Command type:', typeof commandText);
+            console.log('[WebView] Command length:', commandText.length);
+            
             vscode.postMessage({
                 command: 'executeCommand',
-                commandText: 'submit'
+                commandText: commandText
+            });
+            
+            console.log('[WebView] ========== COMMAND SENT ==========');
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] SUBMIT: Command sent: ' + commandText
             });
         };
         

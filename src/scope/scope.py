@@ -28,9 +28,11 @@ class StoryGraphFilter:
         if not self.search_terms and not self.increments:
             return story_graph
         
-        all_filter_names = self.search_terms
+        all_filter_names = self.search_terms or []
         
         def name_matches(name: str) -> bool:
+            if not all_filter_names:
+                return False
             return any(filter_name.lower() in name.lower() for filter_name in all_filter_names)
         
         def filter_sub_epic(sub_epic: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -172,6 +174,21 @@ class Scope:
         
         self._story_graph_filter: Optional[StoryGraphFilter] = None
         self._file_filter: Optional[FileFilter] = None
+    
+    def copy(self) -> 'Scope':
+        """Create a copy of this scope."""
+        new_scope = Scope(self.workspace_directory, self.bot_paths)
+        new_scope.type = self.type
+        new_scope.value = list(self.value)
+        new_scope.exclude = list(self.exclude)
+        new_scope.skiprule = list(self.skiprule)
+        new_scope._story_graph_filter = self._story_graph_filter
+        new_scope._file_filter = self._file_filter
+        if hasattr(self, '_cached_results'):
+            new_scope._cached_results = self._cached_results
+        if hasattr(self, '_results_dirty'):
+            new_scope._results_dirty = self._results_dirty
+        return new_scope
         
         self._cached_results = None
         self._results_dirty = True
@@ -209,18 +226,19 @@ class Scope:
     
     @property
     def results(self) -> Union['StoryGraph', List[Path], None]:
-        if not self._results_dirty and self._cached_results is not None:
+        if not getattr(self, '_results_dirty', True) and getattr(self, '_cached_results', None) is not None:
             return self._cached_results
         
         if self.type in (ScopeType.STORY, ScopeType.INCREMENT, ScopeType.SHOW_ALL):
-            self._cached_results = self._get_story_graph_results()
+            cached = self._get_story_graph_results()
         elif self.type == ScopeType.FILES:
-            self._cached_results = self._get_file_results()
+            cached = self._get_file_results()
         else:
-            self._cached_results = None
+            cached = None
         
+        self._cached_results = cached
         self._results_dirty = False
-        return self._cached_results
+        return cached
     
     def _get_story_graph_results(self):
         story_graph_path = self.workspace_directory / 'docs' / 'stories' / 'story-graph.json'

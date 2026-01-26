@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import json
 import logging
 import traceback
@@ -238,10 +238,39 @@ class Behaviors:
         state_data = {}
         if state_file.exists():
             try:
-                state_data = json.loads(state_file.read_text(encoding='utf-8'))
+                content = state_file.read_text(encoding='utf-8')
+                # Try to parse JSON, but handle corrupted files gracefully
+                try:
+                    state_data = json.loads(content)
+                except json.JSONDecodeError as e:
+                    # If JSON is corrupted, try to extract the first valid JSON object
+                    logger.warning(f'State file {state_file} has corrupted JSON: {e}. Attempting recovery...')
+                    # Try to find the first complete JSON object
+                    content_cleaned = content.strip()
+                    # Find the first complete JSON object by looking for balanced braces
+                    brace_count = 0
+                    end_pos = -1
+                    for i, char in enumerate(content_cleaned):
+                        if char == '{':
+                            brace_count += 1
+                        elif char == '}':
+                            brace_count -= 1
+                            if brace_count == 0:
+                                end_pos = i + 1
+                                break
+                    if end_pos > 0:
+                        try:
+                            state_data = json.loads(content_cleaned[:end_pos])
+                            logger.info(f'Recovered state from corrupted file (first {end_pos} chars)')
+                        except json.JSONDecodeError:
+                            logger.warning(f'Could not recover state from corrupted file, starting fresh')
+                            state_data = {}
+                    else:
+                        logger.warning(f'Could not find valid JSON object in corrupted file, starting fresh')
+                        state_data = {}
             except Exception as e:
-                logger.debug(f'Failed to load state file {state_file}: {e}')
-                raise
+                logger.warning(f'Failed to load state file {state_file}: {e}. Starting with empty state.')
+                state_data = {}
         state_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'
         if self.current.actions and self.current.actions.current:
             state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'
