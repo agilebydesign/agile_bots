@@ -40,23 +40,44 @@ class BotView extends PanelView {
      * @returns {Promise<string>} Complete HTML string
      */
     async render() {
+        // ===== PERFORMANCE: BotView render =====
+        const perfRenderStart = performance.now();
         console.log('[BotView] Starting render');
+        
+        // Header
+        const perfHeaderStart = performance.now();
         console.log('[BotView] Rendering header...');
         const header = await this.headerView.render();
+        const perfHeaderEnd = performance.now();
         console.log('[BotView] Header rendered, length:', header.length);
+        console.log(`[BotView] [PERF] Header render: ${(perfHeaderEnd - perfHeaderStart).toFixed(2)}ms`);
         
+        // Behaviors
+        const perfBehaviorsStart = performance.now();
         console.log('[BotView] Rendering behaviors...');
         const behaviors = await this.behaviorsView.render();
+        const perfBehaviorsEnd = performance.now();
         console.log('[BotView] Behaviors rendered, length:', behaviors.length);
+        console.log(`[BotView] [PERF] Behaviors render: ${(perfBehaviorsEnd - perfBehaviorsStart).toFixed(2)}ms`);
         
+        // Story map
+        const perfStoryMapStart = performance.now();
         console.log('[BotView] Rendering story map...');
         const storyMap = await this.storyMapView.render();
+        const perfStoryMapEnd = performance.now();
         console.log('[BotView] Story map rendered, length:', storyMap.length);
+        console.log(`[BotView] [PERF] Story map render: ${(perfStoryMapEnd - perfStoryMapStart).toFixed(2)}ms`);
         
+        // Instructions
+        const perfInstructionsStart = performance.now();
         console.log('[BotView] Rendering instructions...');
         const instructions = await this.instructionsSection.render();
+        const perfInstructionsEnd = performance.now();
         console.log('[BotView] Instructions rendered, length:', instructions.length);
+        console.log(`[BotView] [PERF] Instructions render: ${(perfInstructionsEnd - perfInstructionsStart).toFixed(2)}ms`);
         
+        // Final assembly
+        const perfAssemblyStart = performance.now();
         const finalHtml = `
             <div class="bot-view">
                 ${header}
@@ -65,8 +86,13 @@ class BotView extends PanelView {
                 ${instructions}
             </div>
         `;
+        const perfAssemblyEnd = performance.now();
+        console.log(`[BotView] [PERF] Final HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
         
+        const perfRenderEnd = performance.now();
+        const totalRenderTime = (perfRenderEnd - perfRenderStart).toFixed(2);
         console.log('[BotView] Render complete, total HTML length:', finalHtml.length);
+        console.log(`[BotView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
         return finalHtml;
     }
     
@@ -110,8 +136,16 @@ class BotView extends PanelView {
      * @returns {Promise<Object>} Updated bot JSON
      */
     async refresh() {
+        // ===== PERFORMANCE: BotView refresh =====
+        const perfRefreshStart = performance.now();
+        console.log('[BotView] Starting refresh (execute status)');
+        
         // "status" command returns the Bot object itself
         const botJSON = await this.execute('status');
+        
+        const perfRefreshEnd = performance.now();
+        const refreshDuration = (perfRefreshEnd - perfRefreshStart).toFixed(2);
+        console.log(`[BotView] [PERF] refresh() (execute status) duration: ${refreshDuration}ms`);
         return botJSON;
     }
     

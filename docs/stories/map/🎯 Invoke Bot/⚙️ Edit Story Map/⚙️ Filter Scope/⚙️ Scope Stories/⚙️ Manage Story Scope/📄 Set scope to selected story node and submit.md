@@ -19,8 +19,8 @@ Set scope to selected story node and submit functionality for the mob minion sys
 
 ## Scenarios
 
-<a id="scenario-determine-behavior-for-story"></a>
-### Scenario: [Determine Behavior For Story](#scenario-determine-behavior-for-story) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L338)
+<a id="scenario-determine-behavior-for-story-and-get-instructions"></a>
+### Scenario: [Determine Behavior For Story And Get Instructions](#scenario-determine-behavior-for-story-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L338)
 
 **Steps:**
 ```gherkin
@@ -32,13 +32,18 @@ And Story has test class <test_class>
 And Story has test methods <test_methods>
 When Bot determines behavior for the story
 Then Bot returns behavior <expected_behavior>
+When User calls story.get_required_behavior_instructions with action <action>
+Then Bot is set to behavior <expected_behavior>
+And Bot is set to action <action>
+And Instructions for <expected_behavior> behavior and <action> action are returned
+And Instructions contain required sections for <expected_behavior> behavior
 ```
 
 **Example 1: Story with all scenarios tested → code behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| File Management | Upload File | test_file_upload.py | File size validated; File type checked; Upload progress tracked | code |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| File Management | Upload File | test_file_upload.py | File size validated; File type checked; Upload progress tracked | code | build | code behavior; build action; file upload functionality; implement production code |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -53,9 +58,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 2: Story with some scenarios tested → test behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| File Management | Download File | test_file_download.py | Download initiated; Progress displayed | test |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| File Management | Download File | test_file_download.py | Download initiated; Progress displayed | test | build | test behavior; build action; file download test coverage; implement test methods for scenarios |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -68,9 +73,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 3: Story with scenarios but no tests → test behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| File Management | Delete File | test_file_delete.py | Confirmation required; File removed from storage | test |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| File Management | Delete File | test_file_delete.py | Confirmation required; File removed from storage | test | validate | test behavior; validate action; file deletion test coverage; verify test implementation |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -83,25 +88,25 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 4: Story with AC but no scenarios → scenario behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| User Management | Create User |  | Email validated; Password meets requirements | scenario |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| User Management | Create User |  | Email validated; Password meets requirements | scenario | build | scenario behavior; build action; user creation domain language; write detailed Given/When/Then scenarios |
 
 ---
 
 **Example 5: Story with no AC and no scenarios → explore behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| Reporting | View Report |  |  | explore |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| Reporting | View Report |  |  | explore | clarify | explore behavior; clarify action; report viewing concepts; add acceptance criteria and domain understanding |
 
 ---
 
 **Example 6: Story with no AC but scenarios all tested → code behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| Authentication | Reset Password | test_reset_password.py |  | code |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| Authentication | Reset Password | test_reset_password.py |  | code | validate | code behavior; validate action; password reset functionality; verify implementation meets requirements |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -114,9 +119,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 7: Story with no AC but some scenarios tested → test behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| Data Export | Export CSV | test_export_csv.py |  | test |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| Data Export | Export CSV | test_export_csv.py |  | test | clarify | test behavior; clarify action; CSV export test requirements; clarify test expectations |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -130,9 +135,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 8: Story with no AC but scenarios with no tests → test behavior**
 
-| epic_name | story_name | test_class | acceptance_criteria | expected_behavior |
-| --- | --- | --- | --- | --- |
-| Payment | Process Payment | test_process_payment.py |  | test |
+| epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- | --- | --- |
+| Payment | Process Payment | test_process_payment.py |  | test | build | test behavior; build action; payment processing test coverage; implement test methods |
 
 **Scenario to Test Method Mapping:**
 | scenario | test_method |
@@ -141,8 +146,8 @@ Then Bot returns behavior <expected_behavior>
 | Payment attempted with expired card and user sees card expired error |  |
 
 
-<a id="scenario-determine-behavior-for-sub-epic"></a>
-### Scenario: [Determine Behavior For Sub Epic](#scenario-determine-behavior-for-sub-epic) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L566)
+<a id="scenario-determine-behavior-for-sub-epic-and-get-instructions"></a>
+### Scenario: [Determine Behavior For Sub Epic And Get Instructions](#scenario-determine-behavior-for-sub-epic-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L566)
 
 **Steps:**
 ```gherkin
@@ -150,13 +155,18 @@ Given Bot has story map loaded with sub-epic <sub_epic_name>
 And Sub-epic contains stories shown in table
 When Bot determines behavior for the sub-epic
 Then Bot returns behavior <expected_behavior>
+When User calls sub_epic.get_required_behavior_instructions with action <action>
+Then Bot is set to behavior <expected_behavior>
+And Bot is set to action <action>
+And Instructions for <expected_behavior> behavior and <action> action are returned
+And Instructions contain required sections for <expected_behavior> behavior
 ```
 
 **Example 1: All stories have tests → code behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| User Authentication | code |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| User Authentication | code | build | code behavior; build action; authentication functionality; implement production code for feature |
 
 **Story: Login User**
 | story_name | test_class | acceptance_criteria | expected_behavior |
@@ -198,9 +208,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 2: One story needs scenario, sub-epic follows lowest → scenario behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| Payment Processing | scenario |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Payment Processing | scenario | validate | scenario behavior; validate action; payment processing domain language; verify scenarios are complete |
 
 **Story: Process Payment**
 | story_name | test_class | acceptance_criteria | expected_behavior |
@@ -223,9 +233,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 3: One story at explore level makes entire sub-epic explore → explore behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| Data Management | explore |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Data Management | explore | build | explore behavior; build action; data management domain concepts; add stories with acceptance criteria |
 
 **Story: Import Data**
 | story_name | test_class | acceptance_criteria | expected_behavior |
@@ -258,9 +268,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 4: Two stories need tests, sub-epic follows lowest → test behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| File Operations | test |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| File Operations | test | clarify | test behavior; clarify action; file operations test requirements; clarify test coverage expectations |
 
 **Story: Upload File**
 | story_name | test_class | acceptance_criteria | expected_behavior |
@@ -304,9 +314,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 5: Single story at scenario level → scenario behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| Search | scenario |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Search | scenario | build | scenario behavior; build action; search domain language; write detailed scenarios |
 
 **Story: Basic Search**
 | story_name | test_class | acceptance_criteria | expected_behavior |
@@ -314,8 +324,8 @@ Then Bot returns behavior <expected_behavior>
 | Basic Search |  | Search term entered; Results displayed; No results message shown when empty | scenario |
 
 
-<a id="scenario-determine-behavior-for-epic"></a>
-### Scenario: [Determine Behavior For Epic](#scenario-determine-behavior-for-epic) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L998)
+<a id="scenario-determine-behavior-for-epic-and-get-instructions"></a>
+### Scenario: [Determine Behavior For Epic And Get Instructions](#scenario-determine-behavior-for-epic-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L998)
 
 **Steps:**
 ```gherkin
@@ -323,13 +333,18 @@ Given Bot has story map loaded with epic <epic_name>
 And Epic contains sub-epics shown in table
 When Bot determines behavior for the epic
 Then Bot returns behavior <expected_behavior>
+When User calls epic.get_required_behavior_instructions with action <action>
+Then Bot is set to behavior <expected_behavior>
+And Bot is set to action <action>
+And Instructions for <expected_behavior> behavior and <action> action are returned
+And Instructions contain required sections for <expected_behavior> behavior
 ```
 
 **Example 1: All sub-epics have code behavior → code behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| File Management | code |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| File Management | code | validate | code behavior; validate action; file management functionality; verify implementation is complete |
 
 **Sub-Epic: File Operations**
 | sub_epic_name | expected_behavior |
@@ -381,9 +396,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 2: One sub-epic at explore level, epic follows highest → explore behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| Reporting | explore |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Reporting | explore | clarify | explore behavior; clarify action; reporting domain concepts; clarify feature requirements |
 
 **Sub-Epic: Report Generation**
 | sub_epic_name | expected_behavior |
@@ -425,9 +440,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 3: One sub-epic at scenario level with others at code, epic follows highest → scenario behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| User Management | scenario |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| User Management | scenario | build | scenario behavior; build action; user management domain language; write detailed scenarios |
 
 **Sub-Epic: Authentication**
 | sub_epic_name | expected_behavior |
@@ -460,9 +475,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 4: Multiple sub-epics at test level → test behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| Payment Processing | test |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Payment Processing | test | build | test behavior; build action; payment processing test coverage; implement test methods |
 
 **Sub-Epic: Process Payment**
 | sub_epic_name | expected_behavior |
@@ -501,9 +516,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 5: Empty epic with no sub-epics → shape behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| Product Catalog | shape |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Product Catalog | shape | build | shape behavior; build action; product catalog domain concepts; add sub-epics and stories |
 
 *(No sub-epics defined)*
 
@@ -511,9 +526,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 6: Epic with nested sub-epics - parent sub-epic follows highest of nested children → scenario behavior**
 
-| epic_name | expected_behavior |
-| --- | --- |
-| Product Management | scenario |
+| epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Product Management | scenario | validate | scenario behavior; validate action; product management domain language; verify scenarios are complete |
 
 **Sub-Epic: Product Catalog** (contains nested sub-epics)
 | sub_epic_name | expected_behavior |
@@ -565,9 +580,9 @@ Then Bot returns behavior <expected_behavior>
 
 **Example 7: Parent sub-epic with nested sub-epics (no epic context) → explore behavior**
 
-| sub_epic_name | expected_behavior |
-| --- | --- |
-| Data Management | explore |
+| sub_epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- |
+| Data Management | explore | clarify | explore behavior; clarify action; data management domain concepts; clarify feature requirements |
 
 **Nested Sub-Epic: Data Import**
 | sub_epic_name | expected_behavior |
@@ -606,8 +621,8 @@ Then Bot returns behavior <expected_behavior>
 | Archive Old Data |  |  | explore |
 
 
-<a id="scenario-panel-submit-button-displays-behavior-specific-icon-with-hover-tooltip"></a>
-### Scenario: [Panel submit button displays behavior-specific icon with hover tooltip](#scenario-panel-submit-button-displays-behavior-specific-icon-with-hover-tooltip) (happy_path)
+<a id="scenario-panel-submit-button-displays-behavior-specific-icon-and-submits-instructions"></a>
+### Scenario: [Panel submit button displays behavior-specific icon and submits instructions](#scenario-panel-submit-button-displays-behavior-specific-icon-and-submits-instructions) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -617,6 +632,12 @@ When Panel renders the submit button
 Then Submit button displays <icon_file> icon indicating <behavior> behavior
 When User hovers over the submit button
 Then Submit button shows tooltip <tooltip_text>
+When User clicks the submit button
+Then Panel submits node with action "build"
+And Node calls get_required_behavior_instructions with action "build"
+And Bot is set to behavior <behavior>
+And Bot is set to action "build"
+And Instructions for <behavior> behavior and "build" action are returned
 ```
 
 **Examples:**
@@ -629,19 +650,24 @@ Then Submit button shows tooltip <tooltip_text>
 | story | Upload File | code | submit_code.png | Submit code instructions for story |
 
 
-<a id="scenario-display-behavior-needed-via-cli-with-json-format"></a>
-### Scenario: [Display behavior needed via CLI with JSON format](#scenario-display-behavior-needed-via-cli-with-json-format) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L1003)
+<a id="scenario-display-behavior-needed-via-cli-and-get-instructions"></a>
+### Scenario: [Display behavior needed via CLI and get instructions](#scenario-display-behavior-needed-via-cli-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_manage_story_scope.py#L1003)
 
 **Steps:**
 ```gherkin
 Given CLI has story map loaded with <node_type> <epic_name>
 When User requests behavior for <epic_name> using JSON format
 Then CLI returns JSON with behavior <expected_behavior>
+When User calls CLI submit command for <epic_name> with action <action>
+And Node calls get_required_behavior_instructions with action <action>
+Then Bot is set to behavior <expected_behavior>
+And Bot is set to action <action>
+And Instructions for <expected_behavior> behavior and <action> action are returned
 ```
 
 **Examples:**
-| node_type | epic_name | expected_behavior |
-| --- | --- | --- |
-| epic | Product Catalog | shape |
+| node_type | epic_name | expected_behavior | action | expected_instructions_contain |
+| --- | --- | --- | --- | --- |
+| epic | Product Catalog | shape | build | shape behavior; build action; product catalog domain concepts; add sub-epics and stories |
 
-**Note:** This scenario validates that `behavior_needed` is accessible for JSON formatting. Full behavior determination logic is comprehensively tested in previous scenarios: [Determine Behavior For Story](#scenario-determine-behavior-for-story), [Determine Behavior For Sub Epic](#scenario-determine-behavior-for-sub-epic), and [Determine Behavior For Epic](#scenario-determine-behavior-for-epic).
+**Note:** This scenario validates that `behavior_needed` is accessible for JSON formatting and can be used to submit with correct behavior. Full behavior determination logic is comprehensively tested in previous scenarios: [Determine Behavior For Story And Get Instructions](#scenario-determine-behavior-for-story-and-get-instructions), [Determine Behavior For Sub Epic And Get Instructions](#scenario-determine-behavior-for-sub-epic-and-get-instructions), and [Determine Behavior For Epic And Get Instructions](#scenario-determine-behavior-for-epic-and-get-instructions).

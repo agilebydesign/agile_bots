@@ -85,7 +85,15 @@ class StoryMapView extends PanelView {
      * @returns {string} HTML string
      */
     async render() {
+        // ===== PERFORMANCE: Start story map rendering =====
+        const perfRenderStart = performance.now();
+        console.log('[StoryMapView] render() start');
+        
+        const perfStatusStart = performance.now();
         const botData = await this.execute('status');
+        const perfStatusEnd = performance.now();
+        console.log(`[StoryMapView] [PERF] execute('status'): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
+        
         const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
         const vscode = require('vscode');
         
@@ -262,13 +270,24 @@ class StoryMapView extends PanelView {
             <span onclick="openFile('${this.escapeForJs(storyMapPath)}')" style="color: var(--vscode-foreground); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
         `;
         
+        // ===== PERFORMANCE: Content rendering =====
+        const perfContentStart = performance.now();
         let contentHtml = '';
         let contentSummary = '';
         if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
             // content is an object with 'epics' property, not directly an array
             const epics = scopeData.content.epics || [];
+            
+            const perfRootNodeStart = performance.now();
             const rootNode = this.renderRootNode(actionButtonsHtml);
+            const perfRootNodeEnd = performance.now();
+            console.log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
+            
+            const perfTreeStart = performance.now();
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
+            const perfTreeEnd = performance.now();
+            console.log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
+            
             contentHtml = rootNode + treeHtml;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
         } else if (scopeData.type === 'files' && scopeData.content) {
@@ -278,11 +297,15 @@ class StoryMapView extends PanelView {
             contentHtml = '<div class="empty-state">All files in workspace</div>';
             contentSummary = 'all files';
         }
+        const perfContentEnd = performance.now();
+        console.log(`[StoryMapView] [PERF] Content rendering: ${(perfContentEnd - perfContentStart).toFixed(2)}ms`);
         
         const filterValue = this.escapeHtml(scopeData.filter || '');
         const hasFilter = filterValue.length > 0;
         
-        return `
+        // ===== PERFORMANCE: Final HTML assembly =====
+        const perfAssemblyStart = performance.now();
+        const result = `
     <div class="section scope-section card-primary">
         <div class="collapsible-section expanded">
             <div class="collapsible-header" onclick="toggleSection('scope-content')" style="
@@ -366,6 +389,15 @@ class StoryMapView extends PanelView {
             </div>
         </div>
     </div>`;
+        const perfAssemblyEnd = performance.now();
+        console.log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
+        
+        // ===== PERFORMANCE: Log total render time =====
+        const perfRenderEnd = performance.now();
+        const totalRenderTime = (perfRenderEnd - perfRenderStart).toFixed(2);
+        console.log(`[StoryMapView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
+        
+        return result;
     }
     
     /**

@@ -7,6 +7,7 @@ Parent Epic: Invoke Bot > Edit Story Map
 Domain tests verify core scope management logic.
 CLI tests verify command parsing and output formatting across TTY, Pipe, and JSON channels.
 """
+import json
 import pytest
 from helpers.bot_test_helper import BotTestHelper
 from helpers import TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper
@@ -208,7 +209,7 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
     based on its completeness state (acceptance criteria, scenarios, tests).
     """
     
-    @pytest.mark.parametrize("epic_name,story_name,test_class,acceptance_criteria,scenarios,test_methods,expected_behavior", [
+    @pytest.mark.parametrize("epic_name,story_name,test_class,acceptance_criteria,scenarios,test_methods,expected_behavior,action,expected_instructions_contain", [
         # All scenarios have tests -> code behavior
         (
             "File Management",
@@ -229,7 +230,9 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                 "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation",
                 "test_upload_fails_with_network_error_and_user_sees_retry_option"
             ],
-            "code"
+            "code",
+            "build",
+            "code behavior; build action; file upload functionality; implement production code"
         ),
         # Some scenarios tested -> test behavior
         (
@@ -247,9 +250,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                 "test_user_cancels_download_mid_transfer",
                 None  # Third scenario has no test
             ],
-            "test"
+            "tests",
+            "build",
+            "tests behavior; build action; file download test coverage; implement test methods for scenarios"
         ),
-        # Scenarios exist but no tests -> test behavior
+        # Scenarios exist but no tests -> tests behavior
         (
             "File Management",
             "Delete File",
@@ -260,28 +265,34 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                 "User cancels delete and file remains",
                 "Delete operation fails due to permissions and user sees error"
             ],
-            [],  # No test methods
-            "test"
+            [],
+            "tests",
+            "validate",
+            "tests behavior; validate action; file deletion test coverage; verify test implementation"
         ),
-        # Has AC but no scenarios -> scenario behavior
+        # Has AC but no scenarios -> scenarios behavior
         (
             "User Management",
             "Create User",
             "",
             "Email validated; Password meets requirements",
-            [],  # No scenarios
             [],
-            "scenario"
+            [],
+            "scenarios",
+            "build",
+            "scenarios behavior; build action; user creation domain language; write detailed Given/When/Then scenarios"
         ),
-        # No AC and no scenarios -> explore behavior
+        # No AC and no scenarios -> exploration behavior
         (
             "Reporting",
             "View Report",
             "",
-            "",  # No AC
-            [],  # No scenarios
+            "",
             [],
-            "explore"
+            [],
+            "exploration",
+            "clarify",
+            "exploration behavior; clarify action; report viewing concepts; add acceptance criteria and domain understanding"
         ),
         # No AC but scenarios all tested -> code behavior
         (
@@ -299,14 +310,16 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                 "test_user_submits_new_password_meeting_requirements_and_password_is_updated",
                 "test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error"
             ],
-            "code"
+            "code",
+            "validate",
+            "code behavior; validate action; password reset functionality; verify implementation meets requirements"
         ),
-        # No AC but some scenarios tested -> test behavior
+        # No AC but some scenarios tested -> tests behavior
         (
             "Data Export",
             "Export CSV",
             "test_export_csv.py",
-            "",  # No AC
+            "",
             [
                 "User exports data to CSV and file downloads successfully",
                 "Export handles empty data set and generates valid empty CSV",
@@ -316,26 +329,30 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
             [
                 "test_user_exports_data_to_csv_and_file_downloads_successfully",
                 "test_export_handles_empty_data_set_and_generates_valid_empty_csv",
-                None,  # Third scenario has no test
-                None   # Fourth scenario has no test
+                None,
+                None
             ],
-            "test"
+            "tests",
+            "clarify",
+            "tests behavior; clarify action; CSV export test requirements; clarify test expectations"
         ),
-        # No AC but scenarios without tests -> test behavior
+        # No AC but scenarios without tests -> tests behavior
         (
             "Payment",
             "Process Payment",
             "test_process_payment.py",
-            "",  # No AC
+            "",
             [
                 "Payment processed with valid card and transaction completes successfully",
                 "Payment attempted with expired card and user sees card expired error"
             ],
-            [],  # No test methods
-            "test"
+            [],
+            "tests",
+            "build",
+            "tests behavior; build action; payment processing test coverage; implement test methods"
         ),
     ])
-    def test_determine_behavior_for_story(
+    def test_determine_behavior_for_story_and_get_instructions(
         self,
         tmp_path,
         epic_name,
@@ -344,10 +361,12 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         acceptance_criteria,
         scenarios,
         test_methods,
-        expected_behavior
+        expected_behavior,
+        action,
+        expected_instructions_contain
     ):
         """
-        SCENARIO: Determine Behavior For Story
+        SCENARIO: Determine Behavior For Story And Get Instructions
         GIVEN: Bot has story map loaded with epic <epic_name>
         AND: Epic contains story <story_name>
         AND: Story has acceptance criteria <acceptance_criteria>
@@ -356,6 +375,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         AND: Story has test methods <test_methods>
         WHEN: Bot determines behavior for the story
         THEN: Bot returns behavior <expected_behavior>
+        WHEN: User calls story.get_required_behavior_instructions with action <action>
+        THEN: Bot is set to behavior <expected_behavior>
+        AND: Bot is set to action <action>
+        AND: Instructions for <expected_behavior> behavior and <action> action are returned
+        AND: Instructions contain required sections for <expected_behavior> behavior
         
         This test validates the hierarchical logic:
         - If all scenarios have tests -> code behavior
@@ -382,8 +406,26 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert actual_behavior == expected_behavior, (
             f"Expected behavior '{expected_behavior}' but got '{actual_behavior}'"
         )
+        
+        # When - User calls story.get_required_behavior_instructions with action
+        instructions = story.get_required_behavior_instructions(action)
+        
+        # Then - Bot is set to behavior and action
+        assert helper.bot.behaviors.current.name == expected_behavior
+        assert helper.bot.behaviors.current.actions.current.action_name == action
+        
+        # And - Instructions are returned
+        assert instructions is not None, "Instructions should not be None"
+        assert len(instructions) > 0, "Instructions should not be empty"
+        
+        # And - Instructions contain required sections for behavior
+        expected_phrases = expected_instructions_contain.split('; ')
+        for phrase in expected_phrases:
+            assert phrase.lower() in instructions.lower(), (
+                f"Expected instruction phrase '{phrase}' not found in instructions"
+            )
 
-    @pytest.mark.parametrize("sub_epic_name,stories_data,expected_behavior", [
+    @pytest.mark.parametrize("sub_epic_name,stories_data,expected_behavior,action,expected_instructions_contain", [
         # Example 1: All stories have tests -> code behavior
         (
             "User Authentication",
@@ -434,9 +476,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                     ]
                 }
             ],
-            "code"
+            "code",
+            "build",
+            "code behavior; build action; authentication functionality; implement production code for feature"
         ),
-        # Example 2: One story needs scenario, sub-epic follows lowest -> scenario behavior
+        # Example 2: One story needs scenarios, sub-epic follows lowest -> scenarios behavior
         (
             "Payment Processing",
             [
@@ -459,9 +503,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                     "test_methods": []
                 }
             ],
-            "scenario"
+            "scenarios",
+            "validate",
+            "scenarios behavior; validate action; payment processing domain language; verify scenarios are complete"
         ),
-        # Example 3: One story at explore level makes entire sub-epic explore -> explore behavior
+        # Example 3: One story at exploration level makes entire sub-epic exploration -> exploration behavior
         (
             "Data Management",
             [
@@ -498,9 +544,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                     "test_methods": []
                 }
             ],
-            "explore"
+            "exploration",
+            "build",
+            "exploration behavior; build action; data management domain concepts; add stories with acceptance criteria"
         ),
-        # Example 4: Two stories need tests, sub-epic follows lowest -> test behavior
+        # Example 4: Two stories need tests, sub-epic follows lowest -> tests behavior
         (
             "File Operations",
             [
@@ -546,9 +594,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                     "test_methods": []
                 }
             ],
-            "test"
+            "tests",
+            "clarify",
+            "tests behavior; clarify action; file operations test requirements; clarify test coverage expectations"
         ),
-        # Example 5: Single story at scenario level -> scenario behavior
+        # Example 5: Single story at scenarios level -> scenarios behavior
         (
             "Search",
             [
@@ -560,16 +610,23 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
                     "test_methods": []
                 }
             ],
-            "scenario"
+            "scenarios",
+            "build",
+            "scenarios behavior; build action; search domain language; write detailed scenarios"
         ),
     ])
-    def test_determine_behavior_for_sub_epic(self, tmp_path, sub_epic_name, stories_data, expected_behavior):
+    def test_determine_behavior_for_sub_epic_and_get_instructions(self, tmp_path, sub_epic_name, stories_data, expected_behavior, action, expected_instructions_contain):
         """
-        SCENARIO: Determine Behavior For Sub Epic
+        SCENARIO: Determine Behavior For Sub Epic And Get Instructions
         GIVEN: Bot has story map loaded with sub-epic <sub_epic_name>
         AND: Sub-epic contains stories shown in table
         WHEN: Bot determines behavior for the sub-epic
         THEN: Bot returns behavior <expected_behavior>
+        WHEN: User calls sub_epic.get_required_behavior_instructions with action <action>
+        THEN: Bot is set to behavior <expected_behavior>
+        AND: Bot is set to action <action>
+        AND: Instructions for <expected_behavior> behavior and <action> action are returned
+        AND: Instructions contain required sections for <expected_behavior> behavior
         
         This test validates the hierarchical degradation logic:
         - Sub-epic checks first story for its behavior
@@ -588,18 +645,25 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
             f"Expected behavior '{expected_behavior}' but got '{actual_behavior}' "
             f"for sub-epic '{sub_epic_name}' with {len(stories_data)} stories"
         )
+        
+        # When - User calls sub_epic.get_required_behavior_instructions with action
+        instructions = sub_epic.get_required_behavior_instructions(action)
+        
+        # Then - Bot is set to behavior and action
+        assert helper.bot.behaviors.current.name == expected_behavior
+        assert helper.bot.behaviors.current.actions.current.action_name == action
+        
+        # And - Instructions are returned
+        assert instructions is not None, "Instructions should not be None"
+        assert len(instructions) > 0, "Instructions should not be empty"
+        
+        # And - Instructions contain required sections for behavior
+        expected_phrases = expected_instructions_contain.split('; ')
+        for phrase in expected_phrases:
+            assert phrase.lower() in instructions.lower(), (
+                f"Expected instruction phrase '{phrase}' not found in instructions"
+            )
 
-
-# ============================================================================
-# DOMAIN TESTS - Determine Behavior For Scenario
-# ============================================================================
-
-class TestDetermineBehaviorForScenario:
-    """
-    Tests the bot's ability to determine what behavior is needed for a scenario
-    based on whether it has a test method or not.
-    """
-    
     @pytest.mark.parametrize("scenario_name,test_method,expected_behavior", [
         # Scenario with test method -> code behavior
         (
@@ -607,17 +671,17 @@ class TestDetermineBehaviorForScenario:
             "test_user_uploads_valid_file_and_sees_success_confirmation",
             "code"
         ),
-        # Scenario without test method -> test behavior
+        # Scenario without test method -> tests behavior
         (
             "User downloads file successfully and sees progress",
             None,
-            "test"
+            "tests"
         ),
-        # Scenario with empty test method -> test behavior
+        # Scenario with empty test method -> tests behavior
         (
             "User deletes file and sees confirmation",
-            "",
-            "test"
+            None,
+            "tests"
         ),
     ])
     def test_determine_behavior_for_scenario(
@@ -637,9 +701,6 @@ class TestDetermineBehaviorForScenario:
         - If scenario has no test_method -> test behavior
         """
         # Given - Create a scenario with the specified state
-        if test_method == "":
-            test_method = None
-        
         scenario = Scenario(
             name=scenario_name,
             sequential_order=1.0,
@@ -657,25 +718,7 @@ class TestDetermineBehaviorForScenario:
             f"Expected behavior '{expected_behavior}' but got '{actual_behavior}'"
         )
 
-
-# ============================================================================
-# DOMAIN TESTS - Determine Behavior For Epic
-# ============================================================================
-
-class TestDetermineBehaviorForEpic:
-    """
-    Tests the bot's ability to determine what behavior is needed for an epic
-    based on the highest (earliest in workflow) behavior across all sub-epics.
-    
-    Behavior priority (highest to lowest):
-    1. shape - empty, needs structure
-    2. explore - needs exploration
-    3. scenario - needs scenarios
-    4. test - needs test code
-    5. code - needs production code
-    """
-    
-    @pytest.mark.parametrize("epic_name,sub_epics_data,expected_behavior", [
+    @pytest.mark.parametrize("epic_name,sub_epics_data,expected_behavior,action,expected_instructions_contain", [
         # Example 1: All sub-epics have code behavior -> code behavior
         (
             "File Management",
@@ -738,9 +781,11 @@ class TestDetermineBehaviorForEpic:
                     ]
                 }
             ],
-            "code"
+            "code",
+            "validate",
+            "code behavior; validate action; file management functionality; verify implementation is complete"
         ),
-        # Example 2: One sub-epic at explore level -> explore behavior (highest wins)
+        # Example 2: One sub-epic at exploration level -> exploration behavior (highest wins)
         (
             "Reporting",
             [
@@ -756,7 +801,7 @@ class TestDetermineBehaviorForEpic:
                                 "User generates report for valid date range and sees report",
                                 "User generates report with invalid date range and sees error"
                             ],
-                            "test_methods": []  # No test methods -> test behavior
+                            "test_methods": []
                         }
                     ]
                 },
@@ -769,7 +814,7 @@ class TestDetermineBehaviorForEpic:
                             "test_class": None,
                             "acceptance_criteria": "Schedule time validated; Recipients specified; Report sent at scheduled time",
                             "scenarios": [],
-                            "test_methods": []  # No scenarios -> scenario behavior
+                            "test_methods": []
                         }
                     ]
                 },
@@ -782,14 +827,16 @@ class TestDetermineBehaviorForEpic:
                             "test_class": None,
                             "acceptance_criteria": "",
                             "scenarios": [],
-                            "test_methods": []  # No AC, no scenarios -> explore behavior
+                            "test_methods": []
                         }
                     ]
                 }
             ],
-            "explore"  # Highest behavior wins
+            "exploration",
+            "clarify",
+            "exploration behavior; clarify action; reporting domain concepts; clarify feature requirements"
         ),
-        # Example 3: One sub-epic at scenario level with others at code -> scenario behavior
+        # Example 3: One sub-epic at scenarios level with others at code -> scenarios behavior
         (
             "User Management",
             [
@@ -823,14 +870,16 @@ class TestDetermineBehaviorForEpic:
                             "test_class": None,
                             "acceptance_criteria": "Profile fields validated; Changes saved to database; Confirmation displayed",
                             "scenarios": [],
-                            "test_methods": []  # No scenarios -> scenario behavior
+                            "test_methods": []
                         }
                     ]
                 }
             ],
-            "scenario"  # Highest behavior wins
+            "scenarios",
+            "build",
+            "scenarios behavior; build action; user management domain language; write detailed scenarios"
         ),
-        # Example 4: Multiple sub-epics at test level -> test behavior
+        # Example 4: Multiple sub-epics at tests level -> tests behavior
         (
             "Payment Processing",
             [
@@ -847,7 +896,7 @@ class TestDetermineBehaviorForEpic:
                                 "User enters invalid card number and sees error",
                                 "User enters expired card and sees expiry error"
                             ],
-                            "test_methods": []  # No test methods -> test behavior
+                            "test_methods": []
                         }
                     ]
                 },
@@ -863,18 +912,22 @@ class TestDetermineBehaviorForEpic:
                                 "Admin issues full refund and customer receives confirmation",
                                 "Admin issues partial refund and amount is calculated correctly"
                             ],
-                            "test_methods": []  # No test methods -> test behavior
+                            "test_methods": []
                         }
                     ]
                 }
             ],
-            "test"
+            "tests",
+            "build",
+            "tests behavior; build action; payment processing test coverage; implement test methods"
         ),
         # Example 5: Empty epic with no sub-epics -> shape behavior
         (
             "Product Catalog",
             [],  # No sub-epics
-            "shape"
+            "shape",
+            "build",
+            "shape behavior; build action; product catalog domain concepts; add sub-epics and stories"
         ),
         # Example 6: Epic with nested sub-epics - parent sub-epic follows highest of nested children
         (
@@ -911,7 +964,7 @@ class TestDetermineBehaviorForEpic:
                                     "test_class": None,
                                     "acceptance_criteria": "Search term entered; Filters applied; Results displayed",
                                     "scenarios": [],
-                                    "test_methods": []  # No scenarios -> scenario behavior (highest of nested)
+                                    "test_methods": []
                                 }
                             ]
                         }
@@ -936,9 +989,11 @@ class TestDetermineBehaviorForEpic:
                     ]
                 }
             ],
-            "scenario"  # Product Catalog has scenario (from Product Search), which is higher than code
+            "scenarios",
+            "validate",
+            "scenarios behavior; validate action; product management domain language; verify scenarios are complete"
         ),
-        # Example 7: Parent sub-epic with nested sub-epics -> explore behavior (highest of nested)
+        # Example 7: Parent sub-epic with nested sub-epics -> exploration behavior (highest of nested)
         (
             "Data Management Epic",
             [
@@ -957,7 +1012,7 @@ class TestDetermineBehaviorForEpic:
                                         "User imports valid CSV and data is loaded",
                                         "User imports invalid CSV and sees error"
                                     ],
-                                    "test_methods": []  # No test methods -> test behavior
+                                    "test_methods": []
                                 }
                             ]
                         },
@@ -970,7 +1025,7 @@ class TestDetermineBehaviorForEpic:
                                     "test_class": None,
                                     "acceptance_criteria": "Data types checked; Required fields verified; Business rules applied",
                                     "scenarios": [],
-                                    "test_methods": []  # No scenarios -> scenario behavior
+                                    "test_methods": []
                                 }
                             ]
                         },
@@ -983,7 +1038,7 @@ class TestDetermineBehaviorForEpic:
                                     "test_class": None,
                                     "acceptance_criteria": "",
                                     "scenarios": [],
-                                    "test_methods": []  # No AC, no scenarios -> explore behavior (highest)
+                                    "test_methods": []
                                 }
                             ]
                         }
@@ -991,16 +1046,23 @@ class TestDetermineBehaviorForEpic:
                     "stories": []
                 }
             ],
-            "explore"  # Data Management has explore (from Data Archive), which is highest
+            "exploration",
+            "clarify",
+            "exploration behavior; clarify action; data management domain concepts; clarify feature requirements"
         ),
     ])
-    def test_determine_behavior_for_epic(self, tmp_path, epic_name, sub_epics_data, expected_behavior):
+    def test_determine_behavior_for_epic_and_get_instructions(self, tmp_path, epic_name, sub_epics_data, expected_behavior, action, expected_instructions_contain):
         """
-        SCENARIO: Determine Behavior For Epic
+        SCENARIO: Determine Behavior For Epic And Get Instructions
         GIVEN: Bot has story map loaded with epic <epic_name>
         AND: Epic contains sub-epics shown in table
         WHEN: Bot determines behavior for the epic
         THEN: Bot returns behavior <expected_behavior>
+        WHEN: User calls epic.get_required_behavior_instructions with action <action>
+        THEN: Bot is set to behavior <expected_behavior>
+        AND: Bot is set to action <action>
+        AND: Instructions for <expected_behavior> behavior and <action> action are returned
+        AND: Instructions contain required sections for <expected_behavior> behavior
         
         This test validates the hierarchical behavior determination:
         - Epic examines all sub-epics (including nested ones)
@@ -1019,19 +1081,41 @@ class TestDetermineBehaviorForEpic:
             f"Expected behavior '{expected_behavior}' but got '{actual_behavior}' "
             f"for epic '{epic_name}' with {len(sub_epics_data)} sub-epics"
         )
+        
+        # When - User calls epic.get_required_behavior_instructions with action
+        instructions = epic.get_required_behavior_instructions(action)
+        
+        # Then - Bot is set to behavior and action
+        assert helper.bot.behaviors.current.name == expected_behavior
+        assert helper.bot.behaviors.current.actions.current.action_name == action
+        
+        # And - Instructions are returned
+        assert instructions is not None, "Instructions should not be None"
+        assert len(instructions) > 0, "Instructions should not be empty"
+        
+        # And - Instructions contain required sections for behavior
+        expected_phrases = expected_instructions_contain.split('; ')
+        for phrase in expected_phrases:
+            assert phrase.lower() in instructions.lower(), (
+                f"Expected instruction phrase '{phrase}' not found in instructions"
+            )
 
-    def test_display_behavior_needed_via_cli_with_json_format(self, tmp_path):
+    def test_display_behavior_needed_via_cli_and_get_instructions(self, tmp_path):
         """
-        SCENARIO: Display behavior needed via CLI with JSON format
+        SCENARIO: Display behavior needed via CLI and get instructions
         GIVEN: CLI has story graph with stories at different behavior states
         WHEN: User executes 'scope' command
         THEN: CLI returns JSON with behavior field for each epic, sub-epic, and story
         AND: Behavior values match domain logic (explore/scenario/test/code)
+        WHEN: User calls CLI submit command for epic with action "build"
+        AND: Node calls get_required_behavior_instructions with action "build"
+        THEN: Bot is set to behavior <expected_behavior>
+        AND: Bot is set to action "build"
+        AND: Instructions for behavior and action are returned
         
-        This test validates that behavior_needed is included in CLI JSON output.
+        This test validates that behavior_needed is included in CLI JSON output
+        and can be used to submit with correct behavior.
         """
-        import json
-        
         # Given - Create story graph with stories at different behavior states
         helper = JsonBotTestHelper(tmp_path)
         helper.domain.state.set_state('shape', 'clarify')
@@ -1107,13 +1191,37 @@ class TestDetermineBehaviorForEpic:
         
         story_needs_tests = next(s for s in stories if s['name'] == 'Story Needs Tests')
         assert 'behavior_needed' in story_needs_tests, "Story missing 'behavior_needed' field"
-        assert story_needs_tests['behavior_needed'] == 'test', f"Expected 'test' but got '{story_needs_tests['behavior_needed']}'"
+        assert story_needs_tests['behavior_needed'] == 'tests', f"Expected 'tests' but got '{story_needs_tests['behavior_needed']}'"
         
         story_needs_scenarios = next(s for s in stories if s['name'] == 'Story Needs Scenarios')
         assert 'behavior_needed' in story_needs_scenarios, "Story missing 'behavior_needed' field"
-        assert story_needs_scenarios['behavior_needed'] == 'scenario', f"Expected 'scenario' but got '{story_needs_scenarios['behavior_needed']}'"
+        assert story_needs_scenarios['behavior_needed'] == 'scenarios', f"Expected 'scenarios' but got '{story_needs_scenarios['behavior_needed']}'"
         
         story_needs_exploration = next(s for s in stories if s['name'] == 'Story Needs Exploration')
         assert 'behavior_needed' in story_needs_exploration, "Story missing 'behavior_needed' field"
-        assert story_needs_exploration['behavior_needed'] == 'explore', f"Expected 'explore' but got '{story_needs_exploration['behavior_needed']}'"
+        assert story_needs_exploration['behavior_needed'] == 'exploration', f"Expected 'exploration' but got '{story_needs_exploration['behavior_needed']}'"
+        
+        # When - User calls CLI submit command for epic with action "build"
+        # (Using the epic's behavior_needed which should be 'explore' based on highest behavior)
+        expected_behavior = test_epic['behavior_needed']
+        action = 'build'
+        
+        # Get instructions using the domain method
+        instructions = epic.get_required_behavior_instructions(action)
+        
+        # Then - Bot is set to behavior and action
+        assert helper.bot.behaviors.current.name == expected_behavior
+        assert helper.bot.behaviors.current.actions.current.action_name == action
+        
+        # And - Instructions are returned
+        assert instructions is not None, "Instructions should not be None"
+        assert len(instructions) > 0, "Instructions should not be empty"
+        
+        # And - Instructions contain expected phrases for shape behavior and build action
+        expected_instructions_contain = "shape behavior; build action; product catalog domain concepts; add sub-epics and stories"
+        expected_phrases = expected_instructions_contain.split('; ')
+        for phrase in expected_phrases:
+            assert phrase.lower() in instructions.lower(), (
+                f"Expected instruction phrase '{phrase}' not found in instructions"
+            )
 

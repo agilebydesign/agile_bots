@@ -70,6 +70,33 @@ class StoryNode(ABC):
         # Same as save() since updating the parent updates all children
         self.save()
 
+    def get_required_behavior_instructions(self, action: str) -> str:
+        if not self._bot:
+            raise RuntimeError(f"Cannot get instructions: node '{self.name}' has no bot reference")
+        
+        behavior_needed = self.behavior_needed
+        
+        result = self._bot.execute(behavior_needed, action)
+        
+        if isinstance(result, dict) and result.get('status') == 'error':
+            raise RuntimeError(f"Failed to get instructions: {result.get('message')}")
+        
+        from instructions.instructions import Instructions
+        
+        node_name_lower = self.name.lower().replace('-', ' ').replace('_', ' ')
+        header = f"{behavior_needed} behavior; {action} action; {node_name_lower} functionality\n\n"
+        
+        if isinstance(result, Instructions):
+            base_instructions = result.get('base_instructions', [])
+            instructions_text = '\n'.join(base_instructions) if base_instructions else ''
+            return header + instructions_text
+        elif isinstance(result, dict):
+            return header + json.dumps(result, indent=2)
+        elif isinstance(result, str):
+            return header + result
+        else:
+            return header + str(result)
+
     @staticmethod
     def _parse_steps_from_data(steps_value: Any) -> List[str]:
         if isinstance(steps_value, str):
@@ -639,7 +666,7 @@ class Epic(StoryNode):
 
     @property
     def behavior_needed(self) -> str:
-        hierarchy = ['shape', 'explore', 'scenario', 'test', 'code']
+        hierarchy = ['shape', 'exploration', 'scenarios', 'tests', 'code']
         
         sub_epics = self.sub_epics
         if not sub_epics:
@@ -802,7 +829,7 @@ class SubEpic(StoryNode):
 
     @property
     def behavior_needed(self) -> str:
-        hierarchy = ['shape', 'explore', 'scenario', 'test', 'code']
+        hierarchy = ['shape', 'exploration', 'scenarios', 'tests', 'code']
         
         if self.has_subepics:
             sub_epics = [child for child in self._children if isinstance(child, SubEpic)]
@@ -1085,22 +1112,22 @@ class Story(StoryNode):
         return self.get_behavior_needed()
     
     def get_behavior_needed(self, behavior_already_needed: str = None) -> str:
-        hierarchy = ['code', 'test', 'scenario', 'explore']
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
         start_idx = 0 if behavior_already_needed is None else hierarchy.index(behavior_already_needed)
         
         if start_idx <= hierarchy.index('code'):
             if self.all_scenarios_have_tests:
                 return 'code'
         
-        if start_idx <= hierarchy.index('test'):
+        if start_idx <= hierarchy.index('tests'):
             if self.many_scenarios > 0:
-                return 'test'
+                return 'tests'
         
-        if start_idx <= hierarchy.index('scenario'):
+        if start_idx <= hierarchy.index('scenarios'):
             if self.many_acceptance_criteria > 0:
-                return 'scenario'
+                return 'scenarios'
         
-        return 'explore'
+        return 'exploration'
 
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
@@ -1232,28 +1259,22 @@ class Scenario(StoryNode):
 
     @property
     def behavior_needed(self) -> str:
-        # Only return 'code' if test_method exists AND the test file actually exists
         if not self.test_method:
-            return 'test'
+            return 'tests'
         
-        # If no bot context, can't check file existence - fall back to simple check
         if not self._bot or not hasattr(self._bot, 'bot_paths'):
-            return 'code' if self.test_method else 'test'
+            return 'code' if self.test_method else 'tests'
         
-        # Check if the test file exists
-        # Get test_file and test_class from parent Story
         parent = self._parent
         while parent and not isinstance(parent, Story):
             parent = parent._parent if hasattr(parent, '_parent') else None
         
         if not parent:
-            # No parent story - can't verify test exists, fall back to simple check
-            return 'code' if self.test_method else 'test'
+            return 'code' if self.test_method else 'tests'
         
         test_file = parent.test_file
         test_class = parent.test_class
         
-        # If story doesn't have test_file, get from parent sub-epic
         if not test_file:
             sub_epic_parent = parent._parent
             while sub_epic_parent:
@@ -1263,21 +1284,19 @@ class Scenario(StoryNode):
                 sub_epic_parent = sub_epic_parent._parent if hasattr(sub_epic_parent, '_parent') else None
         
         if not test_file or not test_class:
-            return 'test'
+            return 'tests'
         
-        # Check if test file exists on disk
         from pathlib import Path
         workspace_dir = Path(self._bot.bot_paths.workspace_directory if hasattr(self._bot.bot_paths, 'workspace_directory') else '.')
         test_dir = workspace_dir / self._bot.bot_paths.test_path
         test_file_path = test_dir / test_file
         
         if not test_file_path.exists():
-            return 'test'
+            return 'tests'
         
-        # Check if test method exists in file
         from utils import find_test_method_line
         if not find_test_method_line(test_file_path, self.test_method):
-            return 'test'
+            return 'tests'
         
         return 'code'
 
