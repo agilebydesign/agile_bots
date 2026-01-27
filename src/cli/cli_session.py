@@ -255,6 +255,26 @@ class CLISession:
         if isinstance(result, CLICommandResponse):
             return result
         
+        # Special handling for status command in JSON mode - wrap bot data consistently
+        from bot.bot import Bot
+        if isinstance(result, Bot) and self.mode == 'json':
+            import json
+            from utils import sanitize_json_string, sanitize_for_json
+            adapter = self._get_adapter_for_domain(result)
+            try:
+                bot_data = json.loads(adapter.serialize())
+            except ValueError as e:
+                if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"[CLISession] JSON parse error in bot data, sanitizing: {str(e)}")
+                    bot_data = json.loads(sanitize_json_string(adapter.serialize()))
+                else:
+                    raise
+            wrapped = {'bot': bot_data}
+            sanitized_wrapped = sanitize_for_json(wrapped)
+            return CLICommandResponse(output=json.dumps(sanitized_wrapped, indent=2, ensure_ascii=True), cli_terminated=cli_terminated)
+        
         adapter = self._get_adapter_for_domain(result)
         output = adapter.serialize()
         
@@ -269,11 +289,34 @@ class CLISession:
     
     def _build_json_instructions_response(self, output: str) -> CLICommandResponse:
         import json
-        instructions_data = json.loads(output) if isinstance(output, str) else output
+        from utils import sanitize_json_string, sanitize_for_json
+        
+        try:
+            instructions_data = json.loads(output) if isinstance(output, str) else output
+        except ValueError as e:
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[CLISession] JSON parse error in instructions, sanitizing: {str(e)}")
+                instructions_data = json.loads(sanitize_json_string(output)) if isinstance(output, str) else output
+            else:
+                raise
+        
         status_adapter = self._get_adapter_for_domain(self.bot)
-        status_data = json.loads(status_adapter.serialize())
+        try:
+            status_data = json.loads(status_adapter.serialize())
+        except ValueError as e:
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[CLISession] JSON parse error in status, sanitizing: {str(e)}")
+                status_data = json.loads(sanitize_json_string(status_adapter.serialize()))
+            else:
+                raise
+        
         unified = {'instructions': instructions_data, 'bot': status_data}
-        return CLICommandResponse(output=json.dumps(unified, indent=2), cli_terminated=False)
+        sanitized_unified = sanitize_for_json(unified)
+        return CLICommandResponse(output=json.dumps(sanitized_unified, indent=2, ensure_ascii=True), cli_terminated=False)
     
     def _append_navigation_context(self, result, output: str) -> str:
         if self.mode == 'json':
@@ -283,16 +326,38 @@ class CLISession:
     def _append_json_navigation_context(self, result, output: str) -> str:
         import json
         from instructions.instructions import Instructions
+        from utils import sanitize_json_string, sanitize_for_json
         
-        result_data = json.loads(output) if isinstance(output, str) else output
+        try:
+            result_data = json.loads(output) if isinstance(output, str) else output
+        except ValueError as e:
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[CLISession] JSON parse error in navigation context, sanitizing: {str(e)}")
+                result_data = json.loads(sanitize_json_string(output)) if isinstance(output, str) else output
+            else:
+                raise
+        
         unified = dict(result_data) if isinstance(result_data, dict) else {}
         
         if self._navigation_succeeded(result) and not isinstance(result, Instructions):
             self._add_instructions_to_unified(unified)
         
         status_adapter = self._get_adapter_for_domain(self.bot)
-        unified['bot'] = json.loads(status_adapter.serialize())
-        return json.dumps(unified, indent=2)
+        try:
+            unified['bot'] = json.loads(status_adapter.serialize())
+        except ValueError as e:
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[CLISession] JSON parse error in status, sanitizing: {str(e)}")
+                unified['bot'] = json.loads(sanitize_json_string(status_adapter.serialize()))
+            else:
+                raise
+        
+        sanitized_unified = sanitize_for_json(unified)
+        return json.dumps(sanitized_unified, indent=2, ensure_ascii=True)
     
     def _append_tty_navigation_context(self, result, output: str) -> str:
         from instructions.instructions import Instructions

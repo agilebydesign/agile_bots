@@ -44,7 +44,18 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
         return ""
     
     def serialize(self) -> str:
-        return json.dumps(self.to_dict(), indent=2)
+        from utils import sanitize_for_json
+        try:
+            data = self.to_dict()
+            sanitized_data = sanitize_for_json(data)
+            return json.dumps(sanitized_data, indent=2, ensure_ascii=True)
+        except (ValueError, TypeError) as e:
+            # If serialization fails, try to provide more context
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"[JSONBot] Error serializing bot data: {str(e)}")
+            # Fallback: try without sanitization (shouldn't happen but just in case)
+            return json.dumps(self.to_dict(), indent=2, ensure_ascii=True)
     
     def to_dict(self) -> dict:
         result = {
@@ -70,4 +81,16 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
         return result
     
     def deserialize(self, data: str) -> dict:
-        return json.loads(data)
+        from utils import sanitize_json_string
+        try:
+            # Try parsing as-is first
+            return json.loads(data)
+        except ValueError as e:
+            # If parsing fails due to control characters, sanitize and retry
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[JSONBot] JSON parse error, sanitizing and retrying: {str(e)}")
+                sanitized = sanitize_json_string(data)
+                return json.loads(sanitized)
+            raise
