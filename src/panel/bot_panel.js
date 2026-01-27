@@ -713,7 +713,13 @@ class BotPanel {
               const cmd = `${message.behaviorName}`;
               this._botView?.execute(cmd)
                 .then((result) => {
-                  return this._update();
+                  // Cache the navigation result to avoid redundant CLI calls
+                  if (result?.bot) {
+                    this._botView.botData = result.bot;
+                    // Also cache instructions for InstructionsSection
+                    PanelView._lastResponse = result;
+                  }
+                  return this._updateWithCachedData();
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] navigateToBehavior ERROR: ${error.message}`);
@@ -727,7 +733,13 @@ class BotPanel {
               const cmd = `${message.behaviorName}.${message.actionName}`;
               this._botView?.execute(cmd)
                 .then((result) => {
-                  return this._update();
+                  // Cache the navigation result to avoid redundant CLI calls
+                  if (result?.bot) {
+                    this._botView.botData = result.bot;
+                    // Also cache instructions for InstructionsSection
+                    PanelView._lastResponse = result;
+                  }
+                  return this._updateWithCachedData();
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] navigateToAction ERROR: ${error.message}`);
@@ -743,7 +755,13 @@ class BotPanel {
               this._botView?.execute(command)
                 .then((result) => {
                   this._log(`[BotPanel] navigateAndExecute success: ${command} | result keys: ${Object.keys(result || {})}`);
-                  return this._update();
+                  // Cache the navigation result to avoid redundant CLI calls
+                  if (result?.bot) {
+                    this._botView.botData = result.bot;
+                    // Also cache instructions for InstructionsSection
+                    PanelView._lastResponse = result;
+                  }
+                  return this._updateWithCachedData();
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] navigateAndExecute ERROR: ${error.message}`);
@@ -981,6 +999,57 @@ class BotPanel {
       if (disposable) {
         disposable.dispose();
       }
+    }
+  }
+
+  /**
+   * Update panel using already-cached data from navigation.
+   * Skips the refresh() call since botData is already populated.
+   * This significantly improves performance for navigation clicks.
+   */
+  async _updateWithCachedData() {
+    const perfUpdateStart = performance.now();
+    try {
+      this._log('[BotPanel] _updateWithCachedData() START - using cached data, skipping refresh');
+      console.log("[BotPanel] _updateWithCachedData() called - skipping refresh");
+      const webview = this._panel.webview;
+      this._panel.title = "Bot Panel";
+      
+      // Initialize BotView if needed (uses shared CLI)
+      if (!this._botView) {
+        const perfBotViewStart = performance.now();
+        this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
+        const perfBotViewEnd = performance.now();
+        this._log(`[PERF] BotView creation: ${(perfBotViewEnd - perfBotViewStart).toFixed(2)}ms`);
+      }
+      
+      // Skip refresh - data already cached from navigation command
+      this._log('[BotPanel] Skipping refresh() - using cached botData from navigation');
+      
+      // Render HTML using cached data
+      const perfRenderStart = performance.now();
+      const botData = this._botView.botData;
+      const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
+      const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
+      const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction);
+      const perfRenderEnd = performance.now();
+      this._log(`[PERF] HTML rendering: ${(perfRenderEnd - perfRenderStart).toFixed(2)}ms`);
+      
+      this._lastHtmlLength = html.length;
+      this._panel.webview.html = html;
+      
+      // Clear cached response after rendering
+      PanelView._lastResponse = null;
+      
+      const perfUpdateEnd = performance.now();
+      this._log(`[PERF] TOTAL _updateWithCachedData() duration: ${(perfUpdateEnd - perfUpdateStart).toFixed(2)}ms`);
+      this._log('[BotPanel] _updateWithCachedData() END');
+      
+    } catch (err) {
+      console.error(`[BotPanel] ERROR in _updateWithCachedData: ${err.message}`);
+      this._log(`[BotPanel] ERROR in _updateWithCachedData, falling back to full _update: ${err.message}`);
+      // Fall back to full update on error
+      return this._update();
     }
   }
 
