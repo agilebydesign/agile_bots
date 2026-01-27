@@ -82,41 +82,25 @@ class StoryNode(ABC):
         return f"story {self.name}"
 
     def submit_instructions(self, behavior: str, action: str, restore_scope: bool = True):
-        """Get instructions scoped to this node, submit them, and optionally restore scope.
-
-        Args:
-            behavior: Behavior name to use for getting instructions
-            action: Action name to use for getting instructions
-            restore_scope: Whether to reset scope to 'all' after submitting
-
-        Returns:
-            Submit result dictionary
-        """
-        if not self._bot:
-            raise RuntimeError(f"Cannot submit instructions: node '{self.name}' has no bot reference")
-        
+         
+        scope_file = self._bot.workspace_directory / 'scope.json'
+        with open(scope_file, 'r') as f:
+            scope_before = json.load(f)
+        print(f"Scope before: {scope_before}")
         self._bot.scope(self._scope_command_for_node())
         try:
             instructions = self._bot.execute(behavior, action_name=action)
             submit_result = self._bot.submit_instructions(instructions, behavior, action)
             return submit_result
         finally:
-            if restore_scope:
-                self._bot.scope('all')
-
+          #load scope_before and save it
+          with open(scope_file, 'w') as f:
+            json.dump(scope_before, f)
+        print(f"Scope after: {scope_before}")
 
     def get_required_behavior_instructions(self, action: str = 'build'):
-        """Get required behavior instructions without submitting them (build by default)."""
-        if not self._bot:
-            raise RuntimeError(f"Cannot get instructions: node '{self.name}' has no bot reference")
-        
         behavior_needed = self.behavior_needed
-        self._bot.scope(self._scope_command_for_node())
-        
-        try:
-            return self._bot.execute(behavior_needed, action_name=action)
-        finally:
-            self._bot.scope('all')
+        return self.submit_instructions(behavior=behavior_needed, action=action)
     
     def submit_required_behavior_instructions(self, action: str):
         """Submit the required behavior instructions. Behavior from node; action passed in (e.g. build)."""
@@ -624,8 +608,19 @@ class StoryNode(ABC):
             import json
             try:
                 parameters = json.loads(parameters)
-            except json.JSONDecodeError:
-                raise ValueError(f'Invalid JSON parameters: {parameters}')
+            except (json.JSONDecodeError, ValueError) as e:
+                # Try sanitizing if it's a control character error
+                if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                    from utils import sanitize_json_string
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"[StoryNode] JSON parse error in parameters, sanitizing: {str(e)}")
+                    try:
+                        parameters = json.loads(sanitize_json_string(parameters))
+                    except (json.JSONDecodeError, ValueError):
+                        raise ValueError(f'Invalid JSON parameters: {parameters}')
+                else:
+                    raise ValueError(f'Invalid JSON parameters: {parameters}')
         required_params = {
             'build': ['output'],
             'validate': ['rules'],
@@ -1422,8 +1417,23 @@ class StoryMap:
         story_graph_path = bot_directory / 'docs' / 'stories' / 'story-graph.json'
         if not story_graph_path.exists():
             raise FileNotFoundError(f'Story graph not found at {story_graph_path}')
-        with open(story_graph_path, 'r', encoding='utf-8') as f:
-            story_graph = json.load(f)
+        
+        # Load story graph with error handling for control characters
+        try:
+            with open(story_graph_path, 'r', encoding='utf-8') as f:
+                story_graph = json.load(f)
+        except ValueError as e:
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[StoryMap] JSON parse error in story graph file, sanitizing: {str(e)}")
+                from utils import sanitize_json_string
+                content = story_graph_path.read_text(encoding='utf-8')
+                sanitized_content = sanitize_json_string(content)
+                story_graph = json.loads(sanitized_content)
+            else:
+                raise
+        
         return cls(story_graph, bot=bot)
 
     def save(self) -> None:

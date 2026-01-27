@@ -2,12 +2,51 @@ from pathlib import Path
 import json
 import sys
 import ast
+import re
 from typing import Dict, Any, Optional
 
 def read_json_file(file_path: Path) -> Dict[str, Any]:
     if not file_path.exists():
         raise FileNotFoundError(f'File not found: {file_path}')
     return json.loads(file_path.read_text(encoding='utf-8-sig'))
+
+def sanitize_json_string(text: str) -> str:
+    """Remove invalid control characters from a string before JSON serialization.
+    
+    JSON only allows \n (0x0A), \r (0x0D), and \t (0x09) as control characters.
+    All other control characters (0x00-0x1F) are invalid and will cause parse errors.
+    
+    Args:
+        text: String that may contain invalid control characters
+        
+    Returns:
+        Sanitized string with invalid control characters removed
+    """
+    if not isinstance(text, str):
+        return text
+    
+    # Remove invalid control characters (0x00-0x1F) except \n (0x0A), \r (0x0D), \t (0x09)
+    # Pattern matches control chars: [\x00-\x08\x0B\x0C\x0E-\x1F]
+    sanitized = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F]', '', text)
+    return sanitized
+
+def sanitize_for_json(obj: Any) -> Any:
+    """Recursively sanitize an object for JSON serialization by removing invalid control characters.
+    
+    Args:
+        obj: Object to sanitize (dict, list, str, etc.)
+        
+    Returns:
+        Sanitized object safe for JSON serialization
+    """
+    if isinstance(obj, str):
+        return sanitize_json_string(obj)
+    elif isinstance(obj, dict):
+        return {key: sanitize_for_json(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_json(item) for item in obj]
+    else:
+        return obj
 
 def parse_command_text(text: str) -> tuple[str, str]:
     """Parse command text into verb and arguments.
