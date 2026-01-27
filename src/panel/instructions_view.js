@@ -77,56 +77,26 @@ class InstructionsSection extends PanelView {
         let instructionsData = lastResponse.instructions || {};
         let currentActionFromResponse = lastResponse.bot?.current_action || lastResponse.current_action;
 
-        // Fallback to status if no cached instructions
+        // Fallback to parent's cached botData if no cached instructions
         if (!instructionsData || Object.keys(instructionsData).length === 0) {
-            // Use cached botData from parent if available, otherwise fetch it
-            const botData = this.parentView?.botData || await this.execute('status');
+            // Use cached botData from parent - avoid making additional CLI calls
+            const botData = this.parentView?.botData;
             
-            // Check if there's a current behavior and action
-            const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior;
-            const currentAction = botData?.behaviors?.current_action || botData?.current_action;
-            
-            // If we have a current behavior/action, execute it to get instructions
-            if (currentBehavior && currentAction) {
-                try {
-                    const actionResponse = await this.execute('current');
-                    instructionsData = actionResponse?.instructions || {};
-                    currentActionFromResponse = currentAction;
-                } catch (error) {
-                    console.error('[InstructionsSection] Failed to load current action instructions:', error);
-                    instructionsData = botData?.instructions || botData?.bot?.instructions || {};
-                }
+            if (botData) {
+                console.log('[InstructionsSection] Using cached botData from parent');
+                instructionsData = botData?.instructions || {};
+                currentActionFromResponse = currentActionFromResponse ||
+                    botData?.current_action ||
+                    botData?.behaviors?.current_action;
             } else {
-                // No current action - auto-navigate to first behavior's first action
-                console.log('[InstructionsSection] No current action, auto-navigating to first action');
-                const behaviors = botData?.behaviors?.behaviors || botData?.bot?.behaviors?.behaviors || [];
-                if (behaviors.length > 0) {
-                    const firstBehavior = behaviors[0];
-                    const firstBehaviorName = firstBehavior.name || firstBehavior.behavior_name;
-                    const firstAction = firstBehavior.actions?.[0]?.name || firstBehavior.actions?.[0];
-                    
-                    if (firstBehaviorName && firstAction) {
-                        try {
-                            console.log(`[InstructionsSection] Auto-navigating to ${firstBehaviorName}.${firstAction}`);
-                            const actionResponse = await this.execute(`${firstBehaviorName}.${firstAction}`);
-                            instructionsData = actionResponse?.instructions || {};
-                            currentActionFromResponse = firstAction;
-                        } catch (error) {
-                            console.error('[InstructionsSection] Failed to auto-navigate to first action:', error);
-                            instructionsData = botData?.instructions || botData?.bot?.instructions || {};
-                        }
-                    } else {
-                        instructionsData = botData?.instructions || botData?.bot?.instructions || {};
-                    }
-                } else {
-                    instructionsData = botData?.instructions || botData?.bot?.instructions || {};
-                }
+                // Only fetch if we have no cached data at all
+                console.log('[InstructionsSection] No cached data, fetching status');
+                const fetchedData = await this.execute('status');
+                instructionsData = fetchedData?.instructions || {};
+                currentActionFromResponse = currentActionFromResponse ||
+                    fetchedData?.current_action ||
+                    fetchedData?.behaviors?.current_action;
             }
-            
-            currentActionFromResponse = currentActionFromResponse ||
-                botData?.current_action ||
-                botData?.behaviors?.current_action ||
-                botData?.bot?.current_action;
         }
 
         // Persist prompt content for submit button state
