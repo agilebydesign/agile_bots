@@ -57,6 +57,7 @@ class Bot:
         self._scope.load()
         
         self._story_graph = None
+        self._story_graph_file_mtime = None  # Track story-graph.json mtime when cache was loaded
         
         import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:37','message':'Bot.__init__ exit','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
 
@@ -106,8 +107,21 @@ class Bot:
         Raises:
             FileNotFoundError: If story-graph.json doesn't exist in workspace
         """
+        story_graph_path = self.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
+        
+        # Check if cache needs to be invalidated - compare story-graph.json mtime to cached mtime
+        if self._story_graph is not None and story_graph_path.exists():
+            try:
+                current_mtime = story_graph_path.stat().st_mtime
+                # If file is newer than when cache was loaded, invalidate cache
+                if self._story_graph_file_mtime is None or current_mtime > self._story_graph_file_mtime:
+                    self._story_graph = None
+                    self._story_graph_file_mtime = None
+            except (OSError, ValueError):
+                # If we can't read the file, ignore it
+                pass
+        
         if self._story_graph is None:
-            story_graph_path = self.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
             if not story_graph_path.exists():
                 raise FileNotFoundError(
                     f'Story graph not found at {story_graph_path}. '
@@ -118,6 +132,12 @@ class Bot:
                 story_graph_data = json.load(f)
             
             self._story_graph = StoryMap(story_graph_data, bot=self)
+            # Record story-graph.json mtime when cache was loaded
+            try:
+                self._story_graph_file_mtime = story_graph_path.stat().st_mtime
+            except (OSError, ValueError):
+                import time
+                self._story_graph_file_mtime = time.time()
         
         return self._story_graph
     
@@ -128,6 +148,7 @@ class Bot:
             dict: Status message indicating the cache was cleared
         """
         self._story_graph = None
+        self._story_graph_file_mtime = None
         return {'status': 'success', 'message': 'Story graph cache cleared'}
     
     # Backward compatibility alias

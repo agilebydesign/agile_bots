@@ -142,20 +142,27 @@ class BotView extends PanelView {
         }
         
         // In JSON mode, CLI returns unified structure: { execution?, instructions?, bot, scope? }
-        // For "status" command, return bot data (response is already { bot: ... })
+        // For "status" command, return bot data (response should be { bot: ... })
         if (command === 'status') {
             if (response.bot) {
                 return response.bot;
             }
             // If response.bot is missing, check if response itself has bot data structure
-            // (sometimes the response IS the bot data directly)
+            // (sometimes the response IS the bot data directly - legacy support)
             if (response.name || response.bot_name) {
                 log(`[BotView] Status response is bot data directly (no .bot wrapper)`);
                 return response;
             }
             // Log the actual response structure for debugging
-            log(`[BotView] ERROR: Status command response missing bot data. Response keys: ${Object.keys(response).join(', ')}`);
-            log(`[BotView] Response structure: ${JSON.stringify(response).substring(0, 500)}`);
+            const responseKeys = Object.keys(response).join(', ');
+            const responsePreview = JSON.stringify(response).substring(0, 500);
+            log(`[BotView] ERROR: Status command response missing bot data. Response keys: ${responseKeys}`);
+            log(`[BotView] Full response structure: ${responsePreview}`);
+            // Check if this looks like a submit/action response that got mixed up
+            if (response.status === 'success' && (response.behavior || response.action)) {
+                log(`[BotView] WARNING: Status command returned what appears to be a submit/action response instead of bot data`);
+                log(`[BotView] This may indicate a response buffering issue or command execution error`);
+            }
             throw new Error(`Status command returned invalid response: missing bot data. Response structure: ${JSON.stringify(response).substring(0, 200)}`);
         }
         

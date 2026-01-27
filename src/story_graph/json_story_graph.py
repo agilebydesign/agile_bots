@@ -158,4 +158,16 @@ class JSONStoryGraph(JSONAdapter):
         }
     
     def deserialize(self, data: str) -> dict:
-        return json.loads(data)
+        from utils import sanitize_json_string
+        try:
+            # Try parsing as-is first
+            return json.loads(data)
+        except ValueError as e:
+            # If parsing fails due to control characters, sanitize and retry
+            if 'control character' in str(e).lower() or 'Invalid' in str(e):
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"[JSONStoryGraph] JSON parse error, sanitizing and retrying: {str(e)}")
+                sanitized = sanitize_json_string(data)
+                return json.loads(sanitized)
+            raise
