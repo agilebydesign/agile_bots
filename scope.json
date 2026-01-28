@@ -1,7 +1,7 @@
 {
   "type": "story",
   "value": [
-    "Add Filter Part To File Scope"
+    "Generate CLI"
   ],
   "exclude": [],
   "skiprule": []
