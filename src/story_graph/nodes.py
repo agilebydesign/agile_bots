@@ -76,7 +76,7 @@ class StoryNode(ABC):
         if isinstance(self, Story):
             return f"story {self.name}"
         elif isinstance(self, SubEpic):
-            return f"sub-epic {self.name}"
+            return f"subepic {self.name}"
         elif isinstance(self, Epic):
             return f"epic {self.name}"
         return f"story {self.name}"

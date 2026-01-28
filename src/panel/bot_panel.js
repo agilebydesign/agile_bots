@@ -3265,7 +3265,7 @@ class BotPanel {
             if (nodeType === 'story') {
                 scopeCommand = 'story ' + nodeName;
             } else if (nodeType === 'sub-epic') {
-                scopeCommand = 'sub-epic ' + nodeName;
+                scopeCommand = 'subepic ' + nodeName;
             } else if (nodeType === 'epic') {
                 scopeCommand = 'epic ' + nodeName;
             } else {
