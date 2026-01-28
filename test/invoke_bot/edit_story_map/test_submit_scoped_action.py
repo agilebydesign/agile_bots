@@ -1174,6 +1174,11 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         helper.domain.bot.behaviors.navigate_to(behavior)
         helper.domain.bot.behaviors.current.actions.navigate_to(action)
         
+        # Capture scope before operation
+        scope_before = helper.domain.bot.scope()
+        scope_type_before = scope_before.type.value
+        scope_value_before = list(scope_before.value)
+        
         # When - Execute submit_current_instructions via CLI
         command = f'story_graph."{epic_name}"."Test SubEpic"."{story_name}".submit_current_instructions'
         cli_response = helper.cli_session.execute_command(command)
@@ -1192,8 +1197,8 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         assert helper.domain.bot.behaviors.current.name == behavior
         assert helper.domain.bot.behaviors.current.actions.current.action_name == action
         
-        # Verify scope is restored to original state (showAll)
-        scope = story._bot.scope() if story._bot else helper.domain.bot.scope()
-        assert scope.type.value == 'showAll', f"Expected scope type 'showAll', got '{scope.type.value}'"
-        assert len(scope.value) == 0, f"Expected empty scope value, got {scope.value}"
+        # Verify scope is restored to what it was before
+        scope_after = story._bot.scope() if story._bot else helper.domain.bot.scope()
+        assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
+        assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
 
