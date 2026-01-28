@@ -53,5 +53,5 @@
       }
     }
   ],
-  "scanner": "scanners.exception_handling_scanner.ExceptionHandlingScanner"
+  "scanner": "scanners.code.python.exception_handling_scanner.ExceptionHandlingScanner"
 }

@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
+    "scanner":  "scanners.code.python.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
 }

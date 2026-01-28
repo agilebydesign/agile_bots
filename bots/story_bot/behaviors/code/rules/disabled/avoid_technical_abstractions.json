@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must stay at the domain level, even if concrete. Don't separate technical details from domain concepts—they should be the same (class vs object vs file—all represent the same domain concept).",
-  "scanner": "scanners.technical_abstraction_code_scanner.TechnicalAbstractionCodeScanner",
+  "scanner": "scanners.code.python.technical_abstraction_code_scanner.TechnicalAbstractionCodeScanner",
   "examples": [
     {
       "do": {

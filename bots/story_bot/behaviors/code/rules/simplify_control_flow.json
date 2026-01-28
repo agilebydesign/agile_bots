@@ -51,5 +51,5 @@
       }
     }
   ],
-  "scanner": "scanners.simplify_control_flow_scanner.SimplifyControlFlowScanner"
+  "scanner": "scanners.code.python.simplify_control_flow_scanner.SimplifyControlFlowScanner"
 }

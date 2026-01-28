@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
+    "scanner":  "scanners.code.python.explicit_dependencies_scanner.ExplicitDependenciesScanner"
 }

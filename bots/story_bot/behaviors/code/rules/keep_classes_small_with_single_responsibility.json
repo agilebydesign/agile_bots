@@ -55,6 +55,6 @@
       }
     }
   ],
-  "scanner": "scanners.class_size_scanner.ClassSizeScanner"
+  "scanner": "scanners.code.python.class_size_scanner.ClassSizeScanner"
 }
 

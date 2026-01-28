@@ -63,5 +63,5 @@
       }
     }
   ],
-  "scanner": "scanners.separate_concerns_scanner.SeparateConcernsScanner"
+  "scanner": "scanners.code.python.separate_concerns_scanner.SeparateConcernsScanner"
 }

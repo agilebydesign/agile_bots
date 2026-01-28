@@ -61,5 +61,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
+    "scanner":  "scanners.code.python.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
 }

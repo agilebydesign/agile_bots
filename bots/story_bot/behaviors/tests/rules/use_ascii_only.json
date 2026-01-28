@@ -52,5 +52,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.ascii_only_scanner.AsciiOnlyScanner"
+    "scanner":  "scanners.code.python.ascii_only_scanner.AsciiOnlyScanner"
 }

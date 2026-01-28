@@ -48,5 +48,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.fixture_placement_scanner.FixturePlacementScanner"
+    "scanner":  "scanners.code.python.fixture_placement_scanner.FixturePlacementScanner"
 }

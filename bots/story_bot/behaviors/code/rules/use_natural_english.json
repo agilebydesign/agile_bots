@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: Code must use natural English for method names, variable names, and relationships. Use 'many' for collections, 'may' for optional, 'will' for required. Don't use technical notation or abbreviations.",
-  "scanner": "scanners.natural_english_code_scanner.NaturalEnglishCodeScanner",
+  "scanner": "scanners.code.python.natural_english_code_scanner.NaturalEnglishCodeScanner",
   "examples": [
     {
       "do": {

@@ -83,5 +83,5 @@
       }
     }
   ],
-  "scanner": "scanners.test_boundary_behavior_scanner.TestBoundaryBehaviorScanner"
+  "scanner": "scanners.code.python.test_boundary_behavior_scanner.TestBoundaryBehaviorScanner"
 }
