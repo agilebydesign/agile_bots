@@ -20,7 +20,7 @@ Load Actions functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-actions-are-loaded-and-available"></a>
-### Scenario: [Actions are loaded and available.](#scenario-actions-are-loaded-and-available) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L145)twrm
+### Scenario: [Actions are loaded and available.](#scenario-actions-are-loaded-and-available) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py#L145)
 
 **Steps:**
 ```gherkin
