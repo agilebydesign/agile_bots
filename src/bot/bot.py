@@ -671,19 +671,15 @@ class Bot:
                 'message': f'Error getting rules for {behavior_name}: {str(e)}'
             }
     
-    def submit_instructions(self, instructions, behavior_name: str = None, action_name: str = None) -> Dict[str, Any]:
-        display_content = instructions.display_content
-        if not display_content:
-            return {
-                'status': 'error',
-                'message': 'No instructions available to submit'
-            }
+    def _submit_to_clipboard_and_ide(self, content_str: str) -> tuple[str, str]:
+        """Submit content to clipboard and paste into IDE chat.
         
-        if isinstance(display_content, list):
-            content_str = '\n'.join(display_content)
-        else:
-            content_str = str(display_content)
-        
+        Args:
+            content_str: The content to copy and paste
+            
+        Returns:
+            Tuple of (clipboard_status, cursor_status)
+        """
         clipboard_status = 'failed'
         cursor_status = 'not_attempted'
         
@@ -697,7 +693,7 @@ class Bot:
             clipboard_status = 'success'
             time.sleep(0.2)
 
-            cursor = os.environ.get('IDE').lower() == 'cursor'
+            cursor = os.environ.get('IDE', '').lower() == 'cursor'
             mac = platform.system().lower() == 'darwin'            
 
             ## activate copilot chat window
@@ -728,6 +724,24 @@ class Bot:
             cursor_status = f'failed: pyautogui/pyperclip not installed - {str(e)}'
         except Exception as e:
             cursor_status = f'failed: {str(e)}'
+        
+        return clipboard_status, cursor_status
+    
+    def submit_instructions(self, instructions, behavior_name: str = None, action_name: str = None) -> Dict[str, Any]:
+        display_content = instructions.display_content
+        if not display_content:
+            return {
+                'status': 'error',
+                'message': 'No instructions available to submit'
+            }
+        
+        if isinstance(display_content, list):
+            content_str = '\n'.join(display_content)
+        else:
+            content_str = str(display_content)
+        
+        # Submit to clipboard and IDE (can be mocked in tests)
+        clipboard_status, cursor_status = self._submit_to_clipboard_and_ide(content_str)
         
         if not behavior_name:
             behavior_name = getattr(instructions, 'behavior_name', 

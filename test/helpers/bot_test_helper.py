@@ -78,6 +78,16 @@ class BotTestHelper:
             workspace_path=self.workspace
         )
         
+        # Mock out the clipboard/IDE submission to prevent tests from actually copying to clipboard
+        # and sending hotkeys to the IDE. The main submit_instructions logic still runs normally.
+        from unittest.mock import Mock
+        
+        def mock_submit_to_clipboard_and_ide(content_str: str) -> tuple:
+            """Mock that skips clipboard/hotkey operations but returns success status"""
+            return ('success', 'opened')
+        
+        self.bot._submit_to_clipboard_and_ide = mock_submit_to_clipboard_and_ide
+        
         self.state = StateTestHelper(parent=self)
         self.behaviors = BehaviorTestHelper(parent=self)
         self.behavior = self.behaviors
