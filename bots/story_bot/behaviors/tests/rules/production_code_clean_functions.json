@@ -73,5 +73,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.function_size_scanner.FunctionSizeScanner"
+    "scanner":  "scanners.code.python.function_size_scanner.FunctionSizeScanner"
 }

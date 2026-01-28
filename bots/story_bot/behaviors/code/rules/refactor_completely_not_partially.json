@@ -110,5 +110,5 @@
       }
     }
   ],
-  "scanner": "scanners.complete_refactoring_scanner.CompleteRefactoringScanner"
+  "scanner": "scanners.code.python.complete_refactoring_scanner.CompleteRefactoringScanner"
 }

@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.cover_all_paths_scanner.CoverAllPathsScanner"
+    "scanner":  "scanners.code.python.cover_all_paths_scanner.CoverAllPathsScanner"
 }

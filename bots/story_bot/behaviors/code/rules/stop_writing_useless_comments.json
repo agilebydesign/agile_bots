@@ -1,6 +1,6 @@
 {
   "description": "CRITICAL: DO NOT WRITE COMMENTS. Delete all comments written by the AI chat. Code must be self-explanatory through clear naming and structure. ONLY exception: legal/license requirements. If you think a comment is needed, the code is wrong - fix the code instead.",
-  "scanner": "scanners.useless_comments_scanner.UselessCommentsScanner",
+  "scanner": "scanners.code.python.useless_comments_scanner.UselessCommentsScanner",
   "examples": [
     {
       "do": {

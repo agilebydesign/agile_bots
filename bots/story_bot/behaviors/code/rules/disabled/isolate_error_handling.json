@@ -62,5 +62,5 @@
       }
     }
   ],
-  "scanner": "scanners.error_handling_isolation_scanner.ErrorHandlingIsolationScanner"
+  "scanner": "scanners.code.python.error_handling_isolation_scanner.ErrorHandlingIsolationScanner"
 }

@@ -64,5 +64,5 @@
       }
     }
   ],
-  "scanner": "scanners.duplication_scanner.DuplicationScanner"
+  "scanner": "scanners.code.python.duplication_scanner.DuplicationScanner"
 }

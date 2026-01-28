@@ -1,7 +1,7 @@
-﻿import dataclasses
+import dataclasses
 from typing import List, Dict
 from .description_extractor import DescriptionExtractor
-from actions.help_action import TypeHintConverter
+from help.help_action import TypeHintConverter
 from actions.action_factory import ActionFactory
 from utils import read_json_file
 

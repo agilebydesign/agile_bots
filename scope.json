@@ -1,6 +1,8 @@
 {
-  "type": "showAll",
-  "value": [],
+  "type": "files",
+  "value": [
+    "src/panel/bot_panel.js"
+  ],
   "exclude": [],
   "skiprule": []
 }

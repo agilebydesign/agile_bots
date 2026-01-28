@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.intention_revealing_names_scanner.IntentionRevealingNamesScanner"
+    "scanner":  "scanners.code.python.intention_revealing_names_scanner.IntentionRevealingNamesScanner"
 }

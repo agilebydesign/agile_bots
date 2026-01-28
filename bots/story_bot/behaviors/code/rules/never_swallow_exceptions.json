@@ -82,5 +82,5 @@
       }
     }
   ],
-  "scanner": "scanners.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
+  "scanner": "scanners.code.python.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
 }

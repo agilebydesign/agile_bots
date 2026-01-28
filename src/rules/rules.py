@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
@@ -77,15 +77,24 @@ class ValidationContext:
         if context.scope and context.scope.type == ScopeType.FILES:
             files_dict = {}
             for file_path_str in context.scope.value:
-                file_path = Path(file_path_str)
-                if 'test' in str(file_path).lower() or behavior.name in ('tests', 'test'):
-                    if 'test' not in files_dict:
-                        files_dict['test'] = []
-                    files_dict['test'].append(file_path)
+                # Expand glob patterns before adding to files list
+                if '*' in file_path_str or '?' in file_path_str:
+                    workspace_dir = behavior.bot_paths.workspace_directory
+                    pattern = file_path_str.replace('\\', '/')
+                    expanded_files = list(workspace_dir.glob(pattern))
+                    expanded_files = [f for f in expanded_files if f.is_file()]
                 else:
-                    if 'src' not in files_dict:
-                        files_dict['src'] = []
-                    files_dict['src'].append(file_path)
+                    expanded_files = [Path(file_path_str)]
+                
+                for file_path in expanded_files:
+                    if 'test' in str(file_path).lower() or behavior.name in ('tests', 'test'):
+                        if 'test' not in files_dict:
+                            files_dict['test'] = []
+                        files_dict['test'].append(file_path)
+                    else:
+                        if 'src' not in files_dict:
+                            files_dict['src'] = []
+                        files_dict['src'].append(file_path)
             
             if context.scope.file_filter:
                 filtered_files = {}
@@ -461,6 +470,15 @@ class Rules:
         rules_list = list(self)
         files = context.get_filtered_files(self)
         changed_files, all_files = context.filter_changed_files(files)
+        
+        # Detect target language from files being scanned
+        target_language = self._detect_target_language(files)
+        if target_language:
+            logger.info(f'Detected target language: {target_language} - reloading scanners')
+            # Reload all scanners for the detected language
+            for rule in rules_list:
+                if rule.scanner_class:
+                    rule.reload_scanner_for_language(target_language)
         for idx, rule in enumerate(rules_list, 1):
             rule_name = Path(rule.rule_file).stem
             if context.should_skip_rule(rule_name):
@@ -487,4 +505,26 @@ class Rules:
             for status_line in scanner_status_summary:
                 logger.info(status_line)
             logger.info('=== END SCANNER STATUS ===')
+    
+    def _detect_target_language(self, files: Dict[str, List[Path]]) -> Optional[str]:
+        """Detect if all files are of a single language type."""
+        all_files = []
+        for file_list in files.values():
+            all_files.extend(file_list)
+        
+        if not all_files:
+            return None
+        
+        extensions = set(f.suffix.lower() for f in all_files)
+        
+        # If all files are .js, target JavaScript only
+        if extensions == {'.js'}:
+            return 'javascript'
+        
+        # If all files are .py, target Python only  
+        if extensions == {'.py'}:
+            return 'python'
+        
+        # Mixed or unknown - load both languages
+        return None
 

@@ -63,5 +63,5 @@
       }
     }
   ],
-  "scanner": "scanners.vertical_density_scanner.VerticalDensityScanner"
+  "scanner": "scanners.code.python.vertical_density_scanner.VerticalDensityScanner"
 }

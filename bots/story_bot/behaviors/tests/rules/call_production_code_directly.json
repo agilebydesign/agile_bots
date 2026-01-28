@@ -57,5 +57,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.real_implementations_scanner.RealImplementationsScanner"
+    "scanner":  "scanners.code.python.real_implementations_scanner.RealImplementationsScanner"
 }

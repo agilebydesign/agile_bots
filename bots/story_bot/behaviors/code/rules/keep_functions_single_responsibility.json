@@ -49,5 +49,5 @@
       }
     }
   ],
-  "scanner": "scanners.single_responsibility_scanner.SingleResponsibilityScanner"
+  "scanner": "scanners.code.python.single_responsibility_scanner.SingleResponsibilityScanner"
 }

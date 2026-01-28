@@ -123,7 +123,11 @@ class CLISession:
         if hasattr(self.bot, verb):
             return self._execute_bot_attribute(verb, args)
         
-        if '.' in verb and hasattr(self.bot, verb.split('.')[0]):
+        # Check if command has -- style parameters (e.g., --scope-type=files)
+        # If so, route to behavior action instead of domain navigator
+        has_dash_params = '--' in command
+        
+        if '.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params:
             return self._execute_domain_object_command(command)
         
         return self._execute_action_or_route(verb, args, command)
@@ -464,6 +468,16 @@ class CLISession:
                 params['evidence_provided'] = json.loads(evidence_match.group(1))
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --evidence_provided: {e}")
+        
+        scope_type_match = re.search(r"--scope-type=(\S+)", args_string)
+        scope_value_match = re.search(r"--scope-value=(\S+)", args_string)
+        
+        # Combine scope-type and scope-value into a single scope dict parameter
+        if scope_type_match and scope_value_match:
+            params['scope'] = {
+                'type': scope_type_match.group(1),
+                'value': scope_value_match.group(1)
+            }
         
         return params
     

@@ -178,5 +178,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
+    "scanner":  "scanners.code.python.class_based_organization_scanner.ClassBasedOrganizationScanner"
 }

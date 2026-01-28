@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Dict, Any, List, Optional
-from scanners.code_scanner import CodeScanner
+from scanners.code.python.code_scanner import CodeScanner
 from scanners.scanner_registry import ScannerRegistry
-from scanners.test_scanner import TestScanner
+from scanners.code.python.test_scanner import TestScanner
 from scanners.resources.scan_context import ScanFilesContext, CrossFileScanContext, FileCollection
 from utils import read_json_file
 from rules.scan_config import ScanConfig
@@ -43,10 +43,16 @@ class Rule:
         self._scan_error: Optional[str] = None
         self._scanner_execution_status: Optional[str] = None
 
-    def _load_scanner(self, scanner_module_path: str) -> tuple[Optional[type], Optional[str]]:
+    def _load_scanner(self, scanner_module_path: str, target_language: str = None) -> tuple[Optional[type], Optional[str]]:
         scanner_registry = ScannerRegistry(self._bot_name)
-        scanner_class, error = scanner_registry.loads_scanner_class_with_error(scanner_module_path)
+        scanner_class, error = scanner_registry.loads_scanner_class_with_error(scanner_module_path, target_language)
         return (scanner_class, error)
+    
+    def reload_scanner_for_language(self, target_language: str) -> None:
+        """Reload scanner for a specific language."""
+        scanner_path = self._rule_content.get('scanner')
+        if scanner_path:
+            self._scanner, self._scanner_load_error = self._load_scanner(scanner_path, target_language)
 
     @property
     def name(self) -> str:

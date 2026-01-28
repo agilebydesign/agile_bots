@@ -31,6 +31,7 @@
     "@types/mocha": "^10.0.10",
     "@vscode/test-electron": "^2.5.2",
     "chai": "^6.2.2",
+    "esprima": "^4.0.1",
     "glob": "^13.0.0",
     "jsdom": "^27.4.0",
     "mocha": "^11.7.5",

@@ -64,6 +64,6 @@
       }
     }
   ],
-  "scanner": "scanners.excessive_guards_scanner.ExcessiveGuardsScanner"
+  "scanner": "scanners.code.python.excessive_guards_scanner.ExcessiveGuardsScanner"
 }
 

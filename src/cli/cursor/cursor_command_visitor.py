@@ -12,7 +12,7 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
     def __init__(self, workspace_root: Path, bot_location: Path, bot=None, bot_name: str = None):
         if not bot:
             raise ValueError("bot is required")
-        BaseBehaviorsAdapter.__init__(self, bot.behaviors, 'cursor')
+        # Set attributes BEFORE calling parent __init__ (which calls _build_wrapped_hierarchy)
         self.workspace_root = workspace_root
         self.bot_location = bot_location
         self.bot = bot
@@ -24,6 +24,12 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
         self._formatter: Optional[CliTerminalFormatter] = None
         self._description_extractor: Optional[DescriptionExtractor] = None
         self._data_collector: Optional[ActionDataCollector] = None
+        # Now call parent __init__
+        BaseBehaviorsAdapter.__init__(self, bot.behaviors, 'cursor')
+    
+    @property
+    def bot_directory(self) -> Path:
+        return self.bot_location
     
     @property
     def python_path(self) -> Path:
@@ -51,6 +57,28 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
                 description_extractor=self.description_extractor
             )
         return self._data_collector
+    
+    def _build_wrapped_hierarchy(self):
+        """Override to create CursorBehaviorWrapper instances instead of using factory"""
+        current_behavior_name = (
+            self.behaviors.current.name
+            if self.behaviors.current
+            else None
+        )
+        sorted_behaviors = sorted(list(self.behaviors), key=lambda b: b.order)
+        
+        for behavior in sorted_behaviors:
+            is_current = behavior.name == current_behavior_name
+            behavior_adapter = CursorBehaviorWrapper(
+                behavior=behavior,
+                workspace_root=self.workspace_root,
+                bot_location=self.bot_location,
+                bot_name=self.bot_name,
+                is_current=is_current,
+                bot=self.bot,
+                generator_ref=self
+            )
+            self._behavior_adapters.append(behavior_adapter)
     
     def _ensure_commands_directory(self) -> Path:
         commands_dir = self.workspace_root / '.cursor' / 'commands'
@@ -156,6 +184,16 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
                         lines.append(f"- {action_name}")
                 else:
                     lines.append(f"- {action_name}")
+            
+            # Add parameter documentation for each action
+            lines.append("")
+            lines.append("## Action Parameters:")
+            lines.append("")
+            for action_name in action_names:
+                params_section = self._build_action_parameters_section(behavior_name, action_name, bot_dir_str, workspace_str)
+                if params_section:
+                    lines.append(params_section)
+                    lines.append("")
         
         return "\n".join(lines)
     
@@ -169,6 +207,71 @@ class CursorCommandGenerator(BaseBehaviorsAdapter):
         
         short_desc = action_desc.split('\n')[0].split('.')[0]
         return f"- {action_name} - {short_desc}"
+    
+    def _build_action_parameters_section(self, behavior_name: str, action_name: str, bot_dir_str: str, workspace_str: str) -> str:
+        """Build parameter documentation for an action"""
+        if not self.data_collector:
+            return ""
+        
+        parameters = self.data_collector.get_action_parameters(action_name)
+        if not parameters:
+            return ""
+        
+        param_descriptions = self.data_collector.get_parameter_descriptions(action_name, parameters)
+        
+        lines = [f"### {action_name}"]
+        
+        # Special handling for validate action with scope parameters
+        if action_name == 'validate':
+            lines.append("")
+            lines.append("**Execute with scope (files):**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.validate --scope-type=files --scope-value=path/to/*.ext' | python -m src.cli.cli_main")
+            lines.append("```")
+            lines.append("")
+            lines.append("**Execute with scope (stories):**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.validate --scope-type=story --scope-value=\"Story Name\"' | python -m src.cli.cli_main")
+            lines.append("```")
+        
+        # Special handling for clarify action
+        elif action_name == 'clarify':
+            lines.append("")
+            lines.append("**Execute with answers:**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.clarify --answers='{{\"q1\":\"answer1\"}}'' | python -m src.cli.cli_main")
+            lines.append("```")
+            lines.append("")
+            lines.append("**Execute with evidence:**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.clarify --evidence_provided='{{\"type\":\"content\"}}'' | python -m src.cli.cli_main")
+            lines.append("```")
+        
+        # Special handling for strategy action
+        elif action_name == 'strategy':
+            lines.append("")
+            lines.append("**Execute with decisions:**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.strategy --decisions='{{\"criteria1\":\"choice1\"}}'' | python -m src.cli.cli_main")
+            lines.append("```")
+            lines.append("")
+            lines.append("**Execute with assumptions:**")
+            lines.append("```powershell")
+            lines.append(f"$env:BOT_DIRECTORY = '{bot_dir_str}'; $env:PYTHONPATH = '{workspace_str}'; echo '{behavior_name}.strategy --assumptions='[\"assumption1\"]'' | python -m src.cli.cli_main")
+            lines.append("```")
+        
+        # Generic parameter documentation
+        if parameters:
+            lines.append("")
+            lines.append("**Available Parameters:**")
+            for param in parameters:
+                desc = param_descriptions.get(param, "")
+                if desc:
+                    lines.append(f"- `{param}` - {desc}")
+                else:
+                    lines.append(f"- `{param}`")
+        
+        return "\n".join(lines)
     
     def _write_command_file(self, file_path: Path, command: str) -> Path:
         file_path.write_text(command, encoding='utf-8')
@@ -241,7 +344,14 @@ class CursorBehaviorWrapper(BaseBehaviorAdapter):
         self.bot_name = bot_name
         self.bot = bot
         self.generator_ref = generator_ref
-        BaseBehaviorAdapter.__init__(self, behavior, 'cursor', is_current)
+        self.behavior = behavior
+        self.is_current = is_current
+        # Don't call parent __init__ since we don't need to build action adapters
+        # We just need to generate command files
+    
+    def _build_wrapped_hierarchy(self):
+        """Override to skip building actions hierarchy - not needed for cursor commands"""
+        pass
     
     def format_behavior_name(self) -> str:
         return self._empty_stub()
