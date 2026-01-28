@@ -1,15 +1,15 @@
-# 📄 Set scope to selected Increment
+# 📄 Story1
 
 **Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
 
 **User:** System
-**Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Act With Selected Node](.)  
-**Sequential Order:** 3.0
+**Path:** [🎯 Build Agile Bots](../..) / [⚙️ Mobile Better Berath](.)  
+**Sequential Order:** 0.0
 **Story Type:** user
 
 ## Story Description
 
-Set scope to selected Increment functionality for the mob minion system.
+Story1 functionality for the mob minion system.
 
 ## Acceptance Criteria
 
@@ -19,7 +19,7 @@ Set scope to selected Increment functionality for the mob minion system.
 
 ## Scenarios
 
-### Scenario: Set scope to selected Increment (happy_path)
+### Scenario: Story1 (happy_path)
 
 **Steps:**
 ```gherkin
