@@ -43,9 +43,9 @@ class ScopeTestHelper(BaseHelper):
         assert scope.value == scope_value, f"Expected scope value {scope_value}, got {scope.value}"
     
     def assert_scope_is_cleared(self):
-        """Assert bot scope is cleared (not active)."""
+        """Assert bot scope is restored to default (showAll with empty value)."""
         scope = self.parent.bot.scope()
-        assert scope.type.value == 'all' and len(scope.value) == 0
+        assert scope.type.value == 'showAll' and len(scope.value) == 0, f"Expected scope type 'showAll' with empty value, got type '{scope.type.value}' with value {scope.value}"
     
     def assert_story_graph_contains_epic(self, filtered_graph: dict, epic_name: str):
         """Assert filtered story graph contains epic."""

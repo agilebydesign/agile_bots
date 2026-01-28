@@ -716,7 +716,11 @@ class BotPanel {
                   // Cache the navigation result to avoid redundant CLI calls
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Also cache instructions for InstructionsSection
+                    // Copy instructions into botData so InstructionsSection can find them
+                    if (result.instructions) {
+                      this._botView.botData.instructions = result.instructions;
+                    }
+                    // Also cache full response for InstructionsSection
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();
@@ -731,13 +735,29 @@ class BotPanel {
           case "navigateToAction":
             if (message.behaviorName && message.actionName) {
               const cmd = `${message.behaviorName}.${message.actionName}`;
+              this._log(`[BotPanel] navigateToAction: ${cmd}`);
               this._botView?.execute(cmd)
                 .then((result) => {
+                  this._log(`[BotPanel] navigateToAction result keys: ${Object.keys(result || {}).join(', ')}`);
+                  this._log(`[BotPanel] result.bot? ${!!result?.bot}`);
+                  this._log(`[BotPanel] result.instructions? ${!!result?.instructions}`);
+                  if (result?.instructions) {
+                    this._log(`[BotPanel] result.instructions keys: ${Object.keys(result.instructions).join(', ')}`);
+                  }
                   // Cache the navigation result to avoid redundant CLI calls
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Also cache instructions for InstructionsSection
+                    // Copy instructions into botData so InstructionsSection can find them
+                    if (result.instructions) {
+                      this._botView.botData.instructions = result.instructions;
+                      this._log(`[BotPanel] Copied instructions into botData`);
+                    } else {
+                      this._log(`[BotPanel] WARNING: No instructions in result to copy!`);
+                    }
+                    // Also cache full response for InstructionsSection
                     PanelView._lastResponse = result;
+                  } else {
+                    this._log(`[BotPanel] WARNING: No result.bot - not caching!`);
                   }
                   return this._updateWithCachedData();
                 })
@@ -758,7 +778,11 @@ class BotPanel {
                   // Cache the navigation result to avoid redundant CLI calls
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Also cache instructions for InstructionsSection
+                    // Copy instructions into botData so InstructionsSection can find them
+                    if (result.instructions) {
+                      this._botView.botData.instructions = result.instructions;
+                    }
+                    // Also cache full response for InstructionsSection
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();

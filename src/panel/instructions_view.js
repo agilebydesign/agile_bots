@@ -74,17 +74,32 @@ class InstructionsSection extends PanelView {
     async render() {
         // Prefer the most recent CLI response (navigation returns unified {bot,instructions})
         const lastResponse = PanelView._lastResponse || {};
+        console.log('[InstructionsSection] render() START');
+        console.log('[InstructionsSection] PanelView._lastResponse exists?', !!PanelView._lastResponse);
+        console.log('[InstructionsSection] lastResponse keys:', Object.keys(lastResponse).join(', ') || 'EMPTY');
+        
         let instructionsData = lastResponse.instructions || {};
         let currentActionFromResponse = lastResponse.bot?.current_action || lastResponse.current_action;
+        
+        console.log('[InstructionsSection] instructionsData from lastResponse keys:', Object.keys(instructionsData).join(', ') || 'EMPTY');
 
         // Fallback to parent's cached botData if no cached instructions
         if (!instructionsData || Object.keys(instructionsData).length === 0) {
+            console.log('[InstructionsSection] No instructions in lastResponse, checking parent botData');
             // Use cached botData from parent - avoid making additional CLI calls
             const botData = this.parentView?.botData;
+            
+            console.log('[InstructionsSection] parentView exists?', !!this.parentView);
+            console.log('[InstructionsSection] botData exists?', !!botData);
+            if (botData) {
+                console.log('[InstructionsSection] botData keys:', Object.keys(botData).join(', '));
+                console.log('[InstructionsSection] botData.instructions exists?', !!botData?.instructions);
+            }
             
             if (botData) {
                 console.log('[InstructionsSection] Using cached botData from parent');
                 instructionsData = botData?.instructions || {};
+                console.log('[InstructionsSection] instructionsData from botData keys:', Object.keys(instructionsData).join(', ') || 'EMPTY');
                 currentActionFromResponse = currentActionFromResponse ||
                     botData?.current_action ||
                     botData?.behaviors?.current_action;

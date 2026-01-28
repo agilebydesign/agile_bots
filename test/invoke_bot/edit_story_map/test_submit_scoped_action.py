@@ -225,6 +225,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
             f"Expected behavior '{expected_behavior}' but got '{actual_behavior}'"
         )
         
+        # Capture scope before operation
+        scope_before = helper.bot.scope()
+        scope_type_before = scope_before.type.value
+        scope_value_before = list(scope_before.value) if scope_before.value else []
+        
         # When - User calls story.get_required_behavior_instructions (always uses build)
         instructions = story.get_required_behavior_instructions()
         
@@ -232,10 +237,10 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == 'build'
         
-        # And - Scope remains set to the story node
-        scope = helper.bot.scope()
-        assert scope.type.value == 'story', f"Expected scope type 'story', got '{scope.type.value}'"
-        assert story.name in scope.value, f"Expected story '{story.name}' in scope value {scope.value}"
+        # And - Scope is restored to what it was before
+        scope_after = helper.bot.scope()
+        assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
+        assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
@@ -245,10 +250,10 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert instructions.get('behavior_metadata')['name'] == expected_behavior
         assert instructions.get('action_metadata')['name'] == 'build'
         
-        # And - Instructions contain the scope that was set
+        # And - Instructions contain the scope that was set during execution
         assert instructions.scope is not None, "Instructions should contain scope"
-        assert instructions.scope.type.value == 'story', f"Expected scope type 'story', got '{instructions.scope.type.value}'"
-        assert story.name in instructions.scope.value, f"Expected story '{story.name}' in scope value {instructions.scope.value}"
+        assert instructions.scope.type.value == 'story', f"Expected scope type 'story' in instructions, got '{instructions.scope.type.value}'"
+        assert story.name in instructions.scope.value, f"Expected story '{story.name}' in instructions scope value {instructions.scope.value}"
 
     @pytest.mark.parametrize("sub_epic_name,stories_data,expected_behavior,action,expected_instructions_contain", [
         # Example 1: All stories have tests -> code behavior
@@ -471,6 +476,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
             f"for sub-epic '{sub_epic_name}' with {len(stories_data)} stories"
         )
         
+        # Capture scope before operation
+        scope_before = helper.bot.scope()
+        scope_type_before = scope_before.type.value
+        scope_value_before = list(scope_before.value) if scope_before.value else []
+        
         # When - User calls sub_epic.get_required_behavior_instructions (always uses build)
         instructions = sub_epic.get_required_behavior_instructions()
         
@@ -478,8 +488,10 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == 'build'
         
-        # And - Scope is restored to 'all' after getting instructions
-        helper.scope.assert_scope_is_cleared()
+        # And - Scope is restored to what it was before
+        scope_after = helper.bot.scope()
+        assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
+        assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
@@ -907,6 +919,11 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
             f"for epic '{epic_name}' with {len(sub_epics_data)} sub-epics"
         )
         
+        # Capture scope before operation
+        scope_before = helper.bot.scope()
+        scope_type_before = scope_before.type.value
+        scope_value_before = list(scope_before.value) if scope_before.value else []
+        
         # When - User calls epic.get_required_behavior_instructions (always uses build)
         instructions = epic.get_required_behavior_instructions()
         
@@ -914,8 +931,10 @@ class TestSetScopeToSelectedStoryNodeAndSubmit:
         assert helper.bot.behaviors.current.name == expected_behavior
         assert helper.bot.behaviors.current.actions.current.action_name == 'build'
         
-        # And - Scope is restored to 'all' after getting instructions
-        helper.scope.assert_scope_is_cleared()
+        # And - Scope is restored to what it was before
+        scope_after = helper.bot.scope()
+        assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
+        assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
         
         # And - Instructions object is returned
         from instructions.instructions import Instructions
@@ -1101,6 +1120,11 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         helper.bot.behaviors.navigate_to(behavior)
         helper.bot.behaviors.current.actions.navigate_to(action)
         
+        # Capture scope before operation
+        scope_before = helper.bot.scope()
+        scope_type_before = scope_before.type.value
+        scope_value_before = list(scope_before.value) if scope_before.value else []
+        
         # When - User calls submit_current_instructions
         story.submit_current_instructions()
         
@@ -1108,10 +1132,10 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         assert helper.bot.behaviors.current.name == behavior
         assert helper.bot.behaviors.current.actions.current.action_name == action
         
-        # And - Scope is set to story
-        scope = helper.bot.scope()
-        assert scope.type.value == 'story'
-        assert story.name in scope.value
+        # And - Scope is restored to what it was before
+        scope_after = helper.bot.scope()
+        assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
+        assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
 
     @pytest.mark.parametrize("node_name,node_path,behavior,action", [
         ("Upload File", "File Management.Upload File", "code", "build"),
@@ -1154,18 +1178,22 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         command = f'story_graph."{epic_name}"."Test SubEpic"."{story_name}".submit_current_instructions'
         cli_response = helper.cli_session.execute_command(command)
         
-        # Then - CLI returns valid JSON with submit result
+        # Then - CLI returns valid JSON with Instructions object
         import json
         response_data = json.loads(cli_response.output.strip())
-        assert 'status' in response_data, "Response should contain status"
-        assert response_data.get('status') in ['success', 'error'], f"Status should be success or error, got {response_data.get('status')}"
+        assert 'instructions' in response_data, "Response should contain instructions"
+        assert 'bot' in response_data, "Response should contain bot data"
+        # Verify instructions have the expected structure
+        instructions_data = response_data['instructions']
+        assert 'behavior_metadata' in instructions_data or 'behavior_instructions' in instructions_data, "Instructions should have behavior metadata"
+        assert 'action_metadata' in instructions_data or 'action_instructions' in instructions_data, "Instructions should have action metadata"
         
         # Verify bot submitted instructions using current behavior and action
         assert helper.domain.bot.behaviors.current.name == behavior
         assert helper.domain.bot.behaviors.current.actions.current.action_name == action
         
-        # Verify scope is set to story (check on the story's bot instance)
+        # Verify scope is restored to original state (showAll)
         scope = story._bot.scope() if story._bot else helper.domain.bot.scope()
-        assert scope.type.value == 'story', f"Expected scope type 'story', got '{scope.type.value}'"
-        assert story_name in scope.value, f"Expected '{story_name}' in scope value, got {scope.value}"
+        assert scope.type.value == 'showAll', f"Expected scope type 'showAll', got '{scope.type.value}'"
+        assert len(scope.value) == 0, f"Expected empty scope value, got {scope.value}"
 

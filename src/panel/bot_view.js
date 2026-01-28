@@ -60,9 +60,17 @@ class BotView extends PanelView {
         log('[BotView] Starting render');
         
         // Fetch bot data ONCE and cache it for all child views
+        // Skip fetch if botData is already cached (e.g., from navigation)
         const perfFetchStart = performance.now();
         try {
-            this.botData = await this.execute('status');
+            if (!this.botData) {
+                log('[BotView] No cached botData, fetching status');
+                this.botData = await this.execute('status');
+            } else {
+                log('[BotView] Using cached botData, skipping status fetch');
+                log('[BotView] Cached botData keys: ' + Object.keys(this.botData).join(', '));
+                log('[BotView] Has instructions? ' + (this.botData.instructions ? 'YES - keys: ' + Object.keys(this.botData.instructions).join(', ') : 'NO'));
+            }
             // Validate botData has required fields
             if (!this.botData) {
                 throw new Error('Status command returned null/undefined bot data');

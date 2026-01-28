@@ -385,7 +385,31 @@ class CLISession:
             return
         
         adapter = self._get_adapter_for_domain(instructions_result)
-        unified['instructions'] = json.loads(adapter.serialize())
+        try:
+            serialized = adapter.serialize()
+            unified['instructions'] = json.loads(serialized)
+        except ValueError as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            error_msg = str(e)
+            logger.error(f"[CLISession] JSON parse error in instructions: {error_msg}")
+            # Try to identify the problematic position
+            import re
+            pos_match = re.search(r'column (\d+)', error_msg)
+            if pos_match and serialized:
+                pos = int(pos_match.group(1))
+                start = max(0, pos - 50)
+                end = min(len(serialized), pos + 50)
+                context = serialized[start:end]
+                logger.error(f"[CLISession] JSON context around error position {pos}: ...{repr(context)}...")
+            # Try sanitizing
+            from utils import sanitize_json_string
+            try:
+                unified['instructions'] = json.loads(sanitize_json_string(serialized))
+                logger.warning("[CLISession] Sanitization fixed the JSON parse error")
+            except ValueError:
+                logger.error("[CLISession] Sanitization did not fix the error, returning error object")
+                unified['instructions_error'] = f"Failed to parse instructions JSON: {error_msg}"
     
     def _add_instructions_to_parts(self, parts: list) -> None:
         instructions_result = self.bot.current()
