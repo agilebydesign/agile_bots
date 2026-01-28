@@ -1,15 +1,21 @@
-﻿from pathlib import Path
+from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 from bot_path import BotPath
 
-try:
-    from tinydb import TinyDB
-    TINYDB_AVAILABLE = True
-except ImportError:
-    TINYDB_AVAILABLE = False
-    TinyDB = None
+# DISABLED: TinyDB activity tracking was causing file corruption issues
+# The activity_log.json file got corrupted with null bytes, breaking the panel
+# To re-enable, set TINYDB_AVAILABLE = True and uncomment the import
+TINYDB_AVAILABLE = False
+TinyDB = None
+
+# try:
+#     from tinydb import TinyDB
+#     TINYDB_AVAILABLE = True
+# except ImportError:
+#     TINYDB_AVAILABLE = False
+#     TinyDB = None
 
 def make_json_serializable(obj: Any) -> Any:
     from instructions.instructions import Instructions
