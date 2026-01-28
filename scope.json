@@ -1,6 +1,1 @@
-{
-  "type": "showAll",
-  "value": [],
-  "exclude": [],
-  "skiprule": []
-}
+{"type": "story", "value": ["Initialize Bot"], "exclude": [], "skiprule": []}
