@@ -1,4 +1,4 @@
-﻿import os
+import os
 from pathlib import Path
 from typing import Optional, List
 from .bot_path import BotPath
@@ -12,6 +12,11 @@ class PathResolver:
             self._repo_root = self._find_repo_root()
 
     def resolve_path(self, file_path: Path) -> Path:
+        # Skip resolution for glob patterns - they'll be expanded later
+        path_str = str(file_path)
+        if '*' in path_str or '?' in path_str:
+            return file_path
+        
         if file_path.is_absolute():
             return file_path
         if self._repo_root:
@@ -41,7 +46,9 @@ class PathResolver:
         
         if '*' in path_str or '?' in path_str:
             base_path = self._repo_root if self._repo_root else (self.bot_paths.workspace_directory if self.bot_paths else Path.cwd())
-            matched_paths = list(base_path.glob(path_str))
+            # Normalize to forward slashes for glob (works on all platforms)
+            pattern = path_str.replace('\\', '/')
+            matched_paths = list(base_path.glob(pattern))
             return [p for p in matched_paths if p.is_file()]
         
         if file_path.exists() and file_path.is_dir():

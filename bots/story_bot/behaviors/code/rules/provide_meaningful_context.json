@@ -54,5 +54,5 @@
       }
     }
   ],
-  "scanner": "scanners.meaningful_context_scanner.MeaningfulContextScanner"
+  "scanner": "scanners.code.python.meaningful_context_scanner.MeaningfulContextScanner"
 }

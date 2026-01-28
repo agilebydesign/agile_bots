@@ -53,5 +53,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.observable_behavior_scanner.ObservableBehaviorScanner"
+    "scanner":  "scanners.code.python.observable_behavior_scanner.ObservableBehaviorScanner"
 }

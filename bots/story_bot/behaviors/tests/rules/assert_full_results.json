@@ -49,5 +49,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.full_result_assertions_scanner.FullResultAssertionsScanner"
+    "scanner":  "scanners.code.python.full_result_assertions_scanner.FullResultAssertionsScanner"
 }

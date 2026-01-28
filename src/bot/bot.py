@@ -558,6 +558,19 @@ class Bot:
             context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
             
             if params:
+                # Special handling for scope parameters passed as dict
+                if 'scope' in params and isinstance(params['scope'], dict):
+                    from scope.scope import Scope, ScopeType
+                    scope_dict = params.pop('scope')
+                    scope = Scope(self.workspace_directory, self.bot_paths)
+                    scope_type = ScopeType(scope_dict.get('type', 'all'))
+                    scope_value = scope_dict.get('value', [])
+                    if not isinstance(scope_value, list):
+                        scope_value = [scope_value]
+                    scope.filter(scope_type, scope_value)
+                    setattr(context, 'scope', scope)
+                
+                # Set remaining parameters
                 for key, value in params.items():
                     setattr(context, key, value)
             

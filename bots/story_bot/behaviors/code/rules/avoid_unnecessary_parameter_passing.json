@@ -53,6 +53,6 @@
       }
     }
   ],
-  "scanner": "scanners.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
+  "scanner": "scanners.code.python.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
 }
 

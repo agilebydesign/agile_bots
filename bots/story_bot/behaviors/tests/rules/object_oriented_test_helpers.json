@@ -72,5 +72,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner"
+    "scanner":  "scanners.code.python.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner"
 }

@@ -60,7 +60,7 @@
       }
     }
   ],
-  "scanner": "scanners.import_placement_scanner.ImportPlacementScanner"
+  "scanner": "scanners.code.python.import_placement_scanner.ImportPlacementScanner"
 }
 
 

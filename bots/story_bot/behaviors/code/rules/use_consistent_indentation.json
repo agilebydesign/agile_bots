@@ -64,5 +64,5 @@
       }
     }
   ],
-  "scanner": "scanners.consistent_indentation_scanner.ConsistentIndentationScanner"
+  "scanner": "scanners.code.python.consistent_indentation_scanner.ConsistentIndentationScanner"
 }

@@ -1,4 +1,4 @@
-﻿import os
+import os
 import logging
 from pathlib import Path
 from typing import Dict, Any, List, Optional, TYPE_CHECKING

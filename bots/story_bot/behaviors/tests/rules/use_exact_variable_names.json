@@ -55,5 +55,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.exact_variable_names_scanner.ExactVariableNamesScanner"
+    "scanner":  "scanners.code.python.exact_variable_names_scanner.ExactVariableNamesScanner"
 }
