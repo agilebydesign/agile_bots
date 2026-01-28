@@ -81,8 +81,16 @@ class StoryNode(ABC):
             return f"epic {self.name}"
         return f"story {self.name}"
 
-    def submit_instructions(self, behavior: str, action: str, restore_scope: bool = True):
-         
+    def submit_instructions(self, behavior: str, action: str):
+        """Submit instructions with scope set to this node, then restore original scope.
+        
+        Args:
+            behavior: The behavior name to execute
+            action: The action name to execute
+        
+        Returns:
+            Instructions object containing the generated instructions
+        """
         scope_file = self._bot.workspace_directory / 'scope.json'
         with open(scope_file, 'r') as f:
             scope_before = json.load(f)
@@ -90,13 +98,16 @@ class StoryNode(ABC):
         self._bot.scope(self._scope_command_for_node())
         try:
             instructions = self._bot.execute(behavior, action_name=action)
-            submit_result = self._bot.submit_instructions(instructions, behavior, action)
-            return submit_result
+            # Submit to clipboard/IDE (side effect only)
+            self._bot.submit_instructions(instructions, behavior, action)
+            return instructions
         finally:
-          #load scope_before and save it
-          with open(scope_file, 'w') as f:
-            json.dump(scope_before, f)
-        print(f"Scope after: {scope_before}")
+            # Always restore scope to original state
+            with open(scope_file, 'w') as f:
+                json.dump(scope_before, f)
+            # Reload in-memory scope from file to match
+            self._bot._scope.load()
+            print(f"Scope after: {scope_before}")
 
     def get_required_behavior_instructions(self, action: str = 'build'):
         behavior_needed = self.behavior_needed
@@ -112,7 +123,7 @@ class StoryNode(ABC):
         current_behavior = self._bot.behaviors.current.name
         current_action = self._bot.behaviors.current.actions.current.action_name
         
-        return self.submit_instructions(behavior=current_behavior, action=current_action, restore_scope=False)
+        return self.submit_instructions(behavior=current_behavior, action=current_action)
 
     @staticmethod
     def _parse_steps_from_data(steps_value: Any) -> List[str]:

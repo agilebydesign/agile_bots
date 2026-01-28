@@ -82,8 +82,11 @@ class DomainNavigator:
                         logger.info(f"[DomainNavigator] Method {part} returned: {type(result)}")
                         return self._format_result(part, result, params)
                     except ValueError as e:
-                        logger.error(f"[DomainNavigator] ValueError calling {part}: {str(e)}")
-                        return {'status': 'error', 'message': str(e)}
+                        import traceback
+                        error_msg = str(e)
+                        logger.error(f"[DomainNavigator] ValueError calling {part}: {error_msg}")
+                        logger.error(f"[DomainNavigator] Full traceback:\n{traceback.format_exc()}")
+                        return {'status': 'error', 'message': error_msg}
                     except Exception as e:
                         logger.error(f"[DomainNavigator] Exception calling {part}: {str(e)}", exc_info=True)
                         return {'status': 'error', 'message': f'Error calling {part}: {str(e)}'}

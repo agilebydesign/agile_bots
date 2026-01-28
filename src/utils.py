@@ -33,6 +33,8 @@ def sanitize_json_string(text: str) -> str:
 def sanitize_for_json(obj: Any) -> Any:
     """Recursively sanitize an object for JSON serialization by removing invalid control characters.
     
+    Also handles objects with to_dict() methods by converting them to dictionaries first.
+    
     Args:
         obj: Object to sanitize (dict, list, str, etc.)
         
@@ -45,6 +47,9 @@ def sanitize_for_json(obj: Any) -> Any:
         return {key: sanitize_for_json(value) for key, value in obj.items()}
     elif isinstance(obj, list):
         return [sanitize_for_json(item) for item in obj]
+    elif hasattr(obj, 'to_dict') and callable(getattr(obj, 'to_dict')):
+        # Handle objects with to_dict() method (e.g., DomainConcept, Responsibility, etc.)
+        return sanitize_for_json(obj.to_dict())
     else:
         return obj
 
