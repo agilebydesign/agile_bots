@@ -1,6 +1,6 @@
 # 📄 Submit Current Behavior Action For Selected Node
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
 
 **User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Act With Selected Node](.)  
@@ -87,3 +87,4 @@ And Scope is set to node <node_name>
 | node_name | node_path | behavior | action |
 | --- | --- | --- | --- |
 | Upload File | File Management.Upload File | code | build |
+

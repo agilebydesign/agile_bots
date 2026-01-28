@@ -1,7 +1,7 @@
 {
-  "type": "files",
+  "type": "story",
   "value": [
-    "src/panel/bot_panel.js"
+    "Execute Action"
   ],
   "exclude": [],
   "skiprule": []

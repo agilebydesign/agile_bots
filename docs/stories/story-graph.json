@@ -467,6 +467,36 @@
               ]
             }
           ]
+        },
+        {
+          "name": "Mobile Better Berath",
+          "sequential_order": 2.0,
+          "behavior": null,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "name": "Mobile Better Berath Stories",
+              "sequential_order": 0.0,
+              "type": "and",
+              "connector": null,
+              "behavior": null,
+              "stories": [
+                {
+                  "name": "Story1",
+                  "sequential_order": 0.0,
+                  "connector": null,
+                  "story_type": "user",
+                  "users": [],
+                  "test_file": null,
+                  "test_class": null,
+                  "scenarios": [],
+                  "acceptance_criteria": [],
+                  "behavior": null,
+                  "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Build Agile Bots\\Mobile Better Berath\\📄 Story1.md"
+                }
+              ]
+            }
+          ]
         }
       ],
       "story_groups": []
@@ -2636,7 +2666,7 @@
                               "type": "happy_path",
                               "background": [],
                               "test_method": "test_build_action_includes_scope_in_instructions",
-                              "steps": "Given Build action with story scope\nWhen Instructions are retrieved\nThen Instructions contain scope configuration"
+                              "steps": "Given Build action with story scope\nWhen Instructions are retrieved\nThen Instructions contain scope configuration\nAnd Instructions contain complete JSON for scoped epics, features, and stories"
                             },
                             {
                               "name": "Validate action accepts scope context",
@@ -2644,7 +2674,7 @@
                               "type": "happy_path",
                               "background": [],
                               "test_method": "test_validate_action_accepts_scope_context",
-                              "steps": "Given Validate action with story scope and story graph file\nWhen Instructions are retrieved\nThen No errors occur and scope is processed"
+                              "steps": "Given Validate action with story scope and story graph file\nWhen Instructions are retrieved\nThen No errors occur and scope is processed\nAnd Instructions contain complete JSON for scoped nodes"
                             },
                             {
                               "name": "Render action accepts scope context",
@@ -2652,7 +2682,7 @@
                               "type": "happy_path",
                               "background": [],
                               "test_method": "test_render_action_accepts_scope_context",
-                              "steps": "Given Render action with story scope\nWhen Instructions are retrieved\nThen No errors occur (render supports ScopeActionContext)"
+                              "steps": "Given Render action with story scope\nWhen Instructions are retrieved\nThen No errors occur (render supports ScopeActionContext)\nAnd Instructions contain complete JSON for scoped nodes"
                             },
                             {
                               "name": "Clarify action does not support scope",
@@ -2671,7 +2701,14 @@
                               "steps": "Given Strategy action\nWhen Context is checked\nThen Uses StrategyActionContext (not ScopeActionContext)"
                             }
                           ],
-                          "acceptance_criteria": [],
+                          "acceptance_criteria": [
+                            {
+                              "criteria": "When action executes with scope, then complete JSON for scoped epics, features, and stories is included in instructions"
+                            },
+                            {
+                              "criteria": "When action executes, then action completes successfully"
+                            }
+                          ],
                           "behavior": "exploration",
                           "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Edit Story Map\\Filter Scope\\Scope Stories\\Manage Story Scope\\📄 Execute Actions With Scope.md"
                         }
@@ -6895,19 +6932,6 @@
                       "acceptance_criteria": [],
                       "behavior": "exploration",
                       "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\📄 Set scope to selected Increment.md"
-                    },
-                    {
-                      "name": "Story1",
-                      "sequential_order": 4.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [],
-                      "test_file": null,
-                      "test_class": null,
-                      "scenarios": [],
-                      "acceptance_criteria": [],
-                      "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Story1.md"
                     }
                   ]
                 }
