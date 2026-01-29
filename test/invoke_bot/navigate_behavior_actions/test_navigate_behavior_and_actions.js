@@ -94,23 +94,24 @@ class TestNavigateBehaviorAction {
         
         await cli.execute('shape');
         const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
         
-        console.log('Current behavior:', statusResponse.behaviors.current);
-        console.log('Total behaviors:', statusResponse.behaviors.all_behaviors.length);
+        console.log('Current behavior:', response.behaviors.current);
+        console.log('Total behaviors:', response.behaviors.all_behaviors.length);
         
-        assert.strictEqual(statusResponse.behaviors.current, 'shape',
+        assert.strictEqual(response.behaviors.current, 'shape',
             'Current behavior should be shape');
-        assert.ok(Array.isArray(statusResponse.behaviors.names),
+        assert.ok(Array.isArray(response.behaviors.names),
             'Should have array of behavior names');
-        assert.ok(statusResponse.behaviors.names.includes('shape'),
+        assert.ok(response.behaviors.names.includes('shape'),
             'Shape should be in behavior names');
         
-        const behaviorsData = statusResponse.behaviors.all_behaviors;
+        const behaviorsData = response.behaviors.all_behaviors;
         assert.ok(Array.isArray(behaviorsData), 'Should have behaviors array');
         assert.ok(behaviorsData.length > 0, 'Should have at least one behavior');
         
         const html = await helper.render_html();
-        helper.assert_complete_state_rendered(html, statusResponse);
+        helper.assert_complete_state_rendered(html, response);
         
         const shapeBehavior = behaviorsData.find(b => b.name === 'shape');
         helper.assert_behavior_fully_rendered(html, shapeBehavior);
@@ -126,20 +127,21 @@ class TestNavigateBehaviorAction {
         
         await cli.execute('shape.strategy');
         const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
         
-        console.log('Current behavior:', statusResponse.behaviors.current);
-        console.log('Current action:', statusResponse.current_action);
-        console.log('Total behaviors rendered:', statusResponse.behaviors.all_behaviors.length);
+        console.log('Current behavior:', response.behaviors.current);
+        console.log('Current action:', response.current_action);
+        console.log('Total behaviors rendered:', response.behaviors.all_behaviors.length);
         
-        assert.strictEqual(statusResponse.behaviors.current, 'shape',
+        assert.strictEqual(response.behaviors.current, 'shape',
             'Should be at shape behavior');
-        assert.strictEqual(statusResponse.current_action, 'strategy',
+        assert.strictEqual(response.current_action, 'strategy',
             'Should be at strategy action');
         
         const html = await helper.render_html();
-        helper.assert_complete_state_rendered(html, statusResponse);
+        helper.assert_complete_state_rendered(html, response);
         
-        const shapeBehavior = statusResponse.behaviors.all_behaviors.find(b => b.name === 'shape');
+        const shapeBehavior = response.behaviors.all_behaviors.find(b => b.name === 'shape');
         helper.assert_behavior_fully_rendered(html, shapeBehavior);
     }
     
@@ -152,29 +154,32 @@ class TestNavigateBehaviorAction {
         const cli = helper._cli;
         
         const initialStatus = await cli.execute('status');
+        const initialResponse = initialStatus.bot || initialStatus;
         
         await cli.execute('shape');
         const afterShapeStatus = await cli.execute('status');
+        const afterShapeResponse = afterShapeStatus.bot || afterShapeStatus;
         const afterShapeHtml = await helper.render_html();
         
         await cli.execute('discovery');
         const afterDiscoveryStatus = await cli.execute('status');
+        const afterDiscoveryResponse = afterDiscoveryStatus.bot || afterDiscoveryStatus;
         const afterDiscoveryHtml = await helper.render_html();
         
         console.log('State progression:');
-        console.log('  Initial:', initialStatus.behaviors.current);
-        console.log('  After shape:', afterShapeStatus.behaviors.current);
-        console.log('  After discovery:', afterDiscoveryStatus.behaviors.current);
+        console.log('  Initial:', initialResponse.behaviors.current);
+        console.log('  After shape:', afterShapeResponse.behaviors.current);
+        console.log('  After discovery:', afterDiscoveryResponse.behaviors.current);
         
-        assert.strictEqual(afterShapeStatus.behaviors.current, 'shape',
+        assert.strictEqual(afterShapeResponse.behaviors.current, 'shape',
             'Should navigate to shape');
-        assert.strictEqual(afterDiscoveryStatus.behaviors.current, 'discovery',
+        assert.strictEqual(afterDiscoveryResponse.behaviors.current, 'discovery',
             'Should navigate to discovery');
         
-        helper.assert_complete_state_rendered(afterShapeHtml, afterShapeStatus);
-        helper.assert_complete_state_rendered(afterDiscoveryHtml, afterDiscoveryStatus);
+        helper.assert_complete_state_rendered(afterShapeHtml, afterShapeResponse);
+        helper.assert_complete_state_rendered(afterDiscoveryHtml, afterDiscoveryResponse);
         
-        assert.ok(afterDiscoveryStatus.behaviors.all_behaviors.length >= 2,
+        assert.ok(afterDiscoveryResponse.behaviors.all_behaviors.length >= 2,
             'Should have at least shape and discovery behaviors');
     }
     
@@ -191,24 +196,27 @@ class TestNavigateBehaviorAction {
         const status1 = await cli.execute('status');
         const status2 = await cli.execute('status');
         const status3 = await cli.execute('status');
+        const response1 = status1.bot || status1;
+        const response2 = status2.bot || status2;
+        const response3 = status3.bot || status3;
         
-        console.log('Status 1:', status1.current_action, `(${status1.behaviors.all_behaviors.length} behaviors)`);
-        console.log('Status 2:', status2.current_action, `(${status2.behaviors.all_behaviors.length} behaviors)`);
-        console.log('Status 3:', status3.current_action, `(${status3.behaviors.all_behaviors.length} behaviors)`);
+        console.log('Status 1:', response1.current_action, `(${response1.behaviors.all_behaviors.length} behaviors)`);
+        console.log('Status 2:', response2.current_action, `(${response2.behaviors.all_behaviors.length} behaviors)`);
+        console.log('Status 3:', response3.current_action, `(${response3.behaviors.all_behaviors.length} behaviors)`);
         
-        assert.strictEqual(status1.current_action, status2.current_action,
+        assert.strictEqual(response1.current_action, response2.current_action,
             'Action should persist across status calls');
-        assert.strictEqual(status2.current_action, status3.current_action,
+        assert.strictEqual(response2.current_action, response3.current_action,
             'Action should persist across multiple calls');
         
-        assert.strictEqual(status1.behaviors.all_behaviors.length, status2.behaviors.all_behaviors.length,
+        assert.strictEqual(response1.behaviors.all_behaviors.length, response2.behaviors.all_behaviors.length,
             'Behavior count should persist');
         
         const html1 = await helper.render_html();
         const html2 = await helper.render_html();
         
-        helper.assert_complete_state_rendered(html1, status1);
-        helper.assert_complete_state_rendered(html2, status2);
+        helper.assert_complete_state_rendered(html1, response1);
+        helper.assert_complete_state_rendered(html2, response2);
     }
 }
 
@@ -287,14 +295,16 @@ class TestBehaviorsView {
     async testCurrentBehaviorMarkedInHierarchy() {
         const html = await this.helper.render_html();
         const statusResponse = await this.helper._cli.execute('status');
-        const currentBehavior = statusResponse.current_behavior?.split('.').pop() || 'prioritization';
+        const response = statusResponse.bot || statusResponse;
+        const currentBehavior = response.current_behavior?.split('.').pop() || response.behaviors?.current || 'prioritization';
         this.helper.assert_current_behavior_marked(html, currentBehavior);
     }
     
     async testNonCurrentBehaviorNotMarked() {
         const html = await this.helper.render_html();
         const statusResponse = await this.helper._cli.execute('status');
-        const currentBehavior = statusResponse.current_behavior?.split('.').pop() || 'prioritization';
+        const response = statusResponse.bot || statusResponse;
+        const currentBehavior = response.current_behavior?.split('.').pop() || response.behaviors?.current || 'prioritization';
         this.helper.assert_current_behavior_marked(html, currentBehavior);
         assert.ok(html.includes('discovery'), 'Discovery should be present');
         assert.ok(html.includes('shape'), 'Shape should be present');
@@ -357,7 +367,8 @@ class TestBehaviorsView {
     async testCompleteHierarchyRendering() {
         const html = await this.helper.render_html();
         const statusResponse = await this.helper._cli.execute('status');
-        const currentBehavior = statusResponse.current_behavior?.split('.').pop() || 'prioritization';
+        const response = statusResponse.bot || statusResponse;
+        const currentBehavior = response.current_behavior?.split('.').pop() || response.behaviors?.current || 'prioritization';
         this.helper.assert_hierarchy_complete(html, {
             behaviors: ['prioritization', 'exploration', 'scenarios', 'tests', 'code', 'discovery', 'shape'],
             actions: {
@@ -400,12 +411,13 @@ class TestBehaviorsView {
     
     async testRenderingFromRealCLIResponse() {
         const statusResponse = await this.helper._cli.execute('status');
-        assert.ok(statusResponse.behaviors, 'Should have behaviors');
-        assert.ok(statusResponse.behaviors.all_behaviors, 'Should have all_behaviors');
-        assert.ok(Array.isArray(statusResponse.behaviors.all_behaviors), 'all_behaviors should be array');
-        const behaviorsData = statusResponse.behaviors.all_behaviors;
+        const response = statusResponse.bot || statusResponse;
+        assert.ok(response.behaviors, 'Should have behaviors');
+        assert.ok(response.behaviors.all_behaviors, 'Should have all_behaviors');
+        assert.ok(Array.isArray(response.behaviors.all_behaviors), 'all_behaviors should be array');
+        const behaviorsData = response.behaviors.all_behaviors;
         const html = await this.helper.render_html();
-        this.helper.assert_complete_state_rendered(html, statusResponse);
+        this.helper.assert_complete_state_rendered(html, response);
         for (const behavior of behaviorsData) {
             this.helper.assert_behavior_fully_rendered(html, behavior);
         }
@@ -418,31 +430,43 @@ class TestDisplayBehaviorHierarchy {
     }
     
     async testSingleBehaviorWithFiveActions() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         this.helper.assert_behavior_with_actions(html, 'shape', ['clarify', 'strategy', 'validate', 'build', 'render']);
     }
     
     async testMultipleBehaviorsInPriorityOrder() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         this.helper.assert_behaviors_in_order(html, ['shape', 'prioritization', 'discovery']);
     }
     
     async testCurrentBehaviorMarked() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         const statusResponse = await this.helper._cli.execute('status');
-        const currentBehavior = statusResponse.current_behavior?.split('.').pop() || 'shape';
+        const response = statusResponse.bot || statusResponse;
+        const currentBehavior = response.behaviors.current || 'shape';
         this.helper.assert_current_behavior_marked(html, currentBehavior);
     }
     
     async testCompletedActionsMarked() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         this.helper.assert_completed_actions_marked(html, ['clarify']);
     }
     
     async testBehaviorHierarchyComplete() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         const statusResponse = await this.helper._cli.execute('status');
-        const currentBehavior = statusResponse.current_behavior?.split('.').pop() || 'shape';
+        const response = statusResponse.bot || statusResponse;
+        const currentBehavior = response.behaviors.current || 'shape';
         this.helper.assert_hierarchy_complete(html, {
             behaviors: ['shape', 'prioritization', 'discovery', 'exploration'],
             actions: { shape: ['clarify', 'strategy', 'validate'] },
@@ -457,11 +481,15 @@ class TestDisplayBehaviorHierarchyEdgeCases {
     }
     
     async testEmptyBehaviorsList() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         assert.ok(typeof html === 'string', 'Should return HTML string');
     }
     
     async testBehaviorWithNoActions() {
+        // Initialize bot state - status command needs bot to be initialized
+        await this.helper._cli.execute('shape');
         const html = await this.helper.render_html();
         this.helper.assert_behavior_with_actions(html, 'shape', []);
     }

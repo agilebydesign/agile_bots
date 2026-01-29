@@ -392,3 +392,22 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
         assert.ok(hasStrategy, `Expected strategy action or shape behavior, got: ${JSON.stringify(status2)}`);
     });
 });
+
+after(() => {
+    // Cleanup backend panel to prevent hanging promises
+    if (backendPanel) {
+        backendPanel.cleanup();
+        backendPanel = null;
+        cli = null;
+    }
+    // Clean up temp workspace and restore environment
+    try {
+        if (fs.existsSync(tempWorkspaceDir)) {
+            fs.rmSync(tempWorkspaceDir, { recursive: true, force: true });
+        }
+    } catch (err) {
+        console.warn('Failed to clean up temp workspace:', err.message);
+    }
+    // Restore WORKING_AREA to original or unset
+    delete process.env.WORKING_AREA;
+});
