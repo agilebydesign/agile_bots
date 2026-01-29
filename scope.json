@@ -1,8 +1,1 @@
-{
-  "type": "story",
-  "value": [
-    "Execute Action"
-  ],
-  "exclude": [],
-  "skiprule": []
-}
+{"type": "showAll", "value": [], "exclude": [], "skiprule": []}

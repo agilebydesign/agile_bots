@@ -221,3 +221,84 @@ class InstructionsTestHelper(BaseHelper):
         """Assert action metadata is present."""
         action_metadata = instructions.get('action_metadata') or instructions.get('action_instructions')
         assert action_metadata is not None, "action_metadata should be set"
+    
+    def verify_scope_in_display_content(self, instructions):
+        """Verify scope appears in instructions display_content and return parsed JSON."""
+        import json
+        
+        # Verify display_content exists and contains scope markdown
+        assert instructions.display_content is not None
+        assert len(instructions.display_content) > 0
+        
+        # Join display_content to check for scope section
+        display_text = '\n'.join(instructions.display_content)
+        
+        # Verify "## Scope" section exists
+        assert '## Scope' in display_text, "display_content should contain '## Scope' section"
+        
+        # Verify story scope is mentioned
+        assert 'Story Scope' in display_text or 'Story1' in display_text, \
+            "display_content should contain story scope information"
+        
+        # Verify instruction text and story_graph JSON appears (from scope.results serialized via JSON adapter)
+        # The story_graph should appear after the scope section
+        scope_section_index = display_text.find('## Scope')
+        after_scope = display_text[scope_section_index:]
+        
+        # Verify instruction text appears before JSON
+        assert 'Please only work on the following scope' in after_scope, \
+            "display_content should contain instruction text 'Please only work on the following scope'"
+        assert 'Scope Filter:' in after_scope, "display_content should contain 'Scope Filter:' label"
+        assert 'Scope:' in after_scope, "display_content should contain 'Scope:' label"
+        
+        # Story graph JSON should be valid JSON (starts with {)
+        # Find JSON content after scope section - look for JSON structure
+        json_start = after_scope.find('{')
+        assert json_start != -1, "display_content should contain JSON story graph after scope section"
+        
+        # Extract and parse JSON to verify it's valid
+        json_content = after_scope[json_start:]
+        # Find the end of JSON (stop at next section marker)
+        json_end_marker = json_content.find('\n---')
+        if json_end_marker != -1:
+            json_content = json_content[:json_end_marker].strip()
+        
+        # Parse JSON to verify it's valid story graph structure
+        parsed_json = json.loads(json_content)
+        assert isinstance(parsed_json, dict), "Story graph JSON should be a dictionary"
+        # Verify it contains expected story graph structure (path, content, epics, etc.)
+        assert 'path' in parsed_json or 'content' in parsed_json or 'epics' in parsed_json or 'epic_count' in parsed_json, \
+            "display_content should contain story graph JSON with expected structure (path, content, epics, or epic_count)"
+        
+        # Verify bot.submit_instructions() can use this display_content
+        # This is what bot.submit_instructions() does - joins display_content
+        content_str = '\n'.join(instructions.display_content)
+        assert len(content_str) > 0, "display_content should produce non-empty string for submission"
+        assert '## Scope' in content_str, "Submitted content should contain scope section"
+        assert '{' in content_str or '[' in content_str, "Submitted content should contain JSON story graph"
+        
+        return parsed_json
+    
+    def verify_domain_concepts_in_json(self, parsed_json):
+        """Verify domain_concepts are present and properly structured in JSON."""
+        # Verify domain_concepts are present in the JSON
+        if 'content' in parsed_json and 'epics' in parsed_json['content']:
+            epics = parsed_json['content']['epics']
+            if len(epics) > 0:
+                epic = epics[0]
+                assert 'domain_concepts' in epic, "Epic should contain 'domain_concepts' in serialized JSON"
+                if epic.get('domain_concepts'):
+                    assert len(epic['domain_concepts']) > 0, "Epic should have domain_concepts"
+                    # Verify domain concept structure
+                    dc = epic['domain_concepts'][0]
+                    assert 'name' in dc, "Domain concept should have 'name'"
+                    assert 'responsibilities' in dc, "Domain concept should have 'responsibilities'"
+                    
+                    # Check sub-epic domain_concepts if they exist
+                    if 'sub_epics' in epic and len(epic['sub_epics']) > 0:
+                        sub_epic = epic['sub_epics'][0]
+                        if 'domain_concepts' in sub_epic:
+                            assert len(sub_epic['domain_concepts']) > 0, "Sub-epic should have domain_concepts"
+                            sub_dc = sub_epic['domain_concepts'][0]
+                            assert 'name' in sub_dc, "Sub-epic domain concept should have 'name'"
+                            assert 'responsibilities' in sub_dc, "Sub-epic domain concept should have 'responsibilities'"

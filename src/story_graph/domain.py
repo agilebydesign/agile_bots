@@ -1,4 +1,4 @@
-﻿from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
 
 @dataclass
@@ -28,13 +28,43 @@ class Responsibility:
 class DomainConcept:
     name: str
     responsibilities: List[Responsibility]
+    realization: Optional[List[Dict[str, Any]]] = None  # Walkthrough/realization data
+    module: Optional[str] = None
+    inherits_from: Optional[str] = None
+    _source_path: Optional[str] = None
+    _extra_fields: Optional[Dict[str, Any]] = None  # Store any other fields not explicitly defined
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'DomainConcept':
-        return cls(name=data.get('name', ''), responsibilities=[Responsibility.from_dict(r) for r in data.get('responsibilities', [])])
+        # Extract known fields
+        known_fields = {'name', 'responsibilities', 'realization', 'module', 'inherits_from', '_source_path'}
+        extra_fields = {k: v for k, v in data.items() if k not in known_fields}
+        
+        return cls(
+            name=data.get('name', ''),
+            responsibilities=[Responsibility.from_dict(r) for r in data.get('responsibilities', [])],
+            realization=data.get('realization'),  # Preserve realization field
+            module=data.get('module'),
+            inherits_from=data.get('inherits_from'),
+            _source_path=data.get('_source_path'),
+            _extra_fields=extra_fields if extra_fields else None
+        )
 
     def to_dict(self) -> Dict[str, Any]:
-        return {'name': self.name, 'responsibilities': [r.to_dict() for r in self.responsibilities]}
+        result = {'name': self.name, 'responsibilities': [r.to_dict() for r in self.responsibilities]}
+        # Preserve all optional fields if present
+        if self.realization is not None:
+            result['realization'] = self.realization
+        if self.module is not None:
+            result['module'] = self.module
+        if self.inherits_from is not None:
+            result['inherits_from'] = self.inherits_from
+        if self._source_path is not None:
+            result['_source_path'] = self._source_path
+        # Preserve any extra fields
+        if self._extra_fields:
+            result.update(self._extra_fields)
+        return result
 
 @dataclass
 class StoryUser:
