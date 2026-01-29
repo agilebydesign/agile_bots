@@ -92,7 +92,7 @@ Write-Host "      Done: Extension packaged: bot-panel-$newVersion.vsix" -Foregro
 
 # Uninstall old extension
 Write-Host "[3/6] Uninstalling old extension..." -ForegroundColor Cyan
-code --uninstall-extension agilebot.bot-panel > $null
+cursor --uninstall-extension agilebot.bot-panel > $null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "      Warning: Uninstall warning (may not be installed)" -ForegroundColor Yellow
 } else {
@@ -106,7 +106,7 @@ if (-not (Test-Path $vsixPath)) {
     Write-Host "      ERROR: VSIX file not found: $vsixPath" -ForegroundColor Red
     exit 1
 }
-code --install-extension "$vsixPath" --force > $null
+cursor --install-extension "$vsixPath" --force > $null
 if ($LASTEXITCODE -ne 0) {
     Write-Host "      ERROR: Installation failed!" -ForegroundColor Red
     exit 1
