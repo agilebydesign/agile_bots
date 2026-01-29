@@ -37,14 +37,42 @@ class JSONStoryGraph(JSONAdapter):
         from story_graph.nodes import StoryMap
         story_map = StoryMap(self.story_graph.content, bot=None)
         
+        # Create a mapping of epic/sub-epic names to their original JSON data for domain_concepts lookup
+        # Recursively collect all nested sub-epics
+        epic_name_to_data = {}
+        def collect_sub_epics(epic_or_sub_epic_data):
+            """Recursively collect all sub-epics from nested structure."""
+            name = epic_or_sub_epic_data.get('name')
+            if name:
+                epic_name_to_data[name] = epic_or_sub_epic_data
+            for sub_epic_data in epic_or_sub_epic_data.get('sub_epics', []):
+                collect_sub_epics(sub_epic_data)
+        
+        for epic_data in self.story_graph.content.get('epics', []):
+            collect_sub_epics(epic_data)
+        
         # Serialize domain objects to JSON by reading their properties
         content = {
-            'epics': [self._serialize_epic(epic) for epic in story_map._epics]
+            'epics': [self._serialize_epic(epic, epic_name_to_data) for epic in story_map._epics]
         }
         
         # Add increments and other top-level fields from original content
         if 'increments' in self.story_graph.content:
             content['increments'] = self.story_graph.content['increments']
+        
+        # Add domain_concepts if they exist at top level
+        if 'domain_concepts' in self.story_graph.content:
+            # Serialize domain_concepts if they are DomainConcept objects
+            domain_concepts_raw = self.story_graph.content['domain_concepts']
+            if domain_concepts_raw and isinstance(domain_concepts_raw, list) and len(domain_concepts_raw) > 0:
+                from story_graph.domain import DomainConcept
+                # Check if first item is already a dict or a DomainConcept object
+                if isinstance(domain_concepts_raw[0], dict):
+                    content['domain_concepts'] = domain_concepts_raw
+                else:
+                    content['domain_concepts'] = [dc.to_dict() if hasattr(dc, 'to_dict') else dc.__dict__ for dc in domain_concepts_raw]
+            else:
+                content['domain_concepts'] = domain_concepts_raw
         
         return {
             'path': str(self.story_graph.path),
@@ -55,18 +83,51 @@ class JSONStoryGraph(JSONAdapter):
             'content': content
         }
     
-    def _serialize_epic(self, epic) -> dict:
+    def _serialize_epic(self, epic, name_to_data_map=None) -> dict:
         """Serialize Epic object to dict by reading its properties."""
+        # Serialize domain_concepts properly (they are DomainConcept objects)
+        domain_concepts_serialized = []
+        if hasattr(epic, 'domain_concepts') and epic.domain_concepts:
+            from story_graph.domain import DomainConcept
+            # Get original data to preserve realization field
+            epic_data = None
+            if name_to_data_map and epic.name in name_to_data_map:
+                epic_data = name_to_data_map[epic.name]
+            
+            for dc in epic.domain_concepts:
+                dc_dict = dc.to_dict()
+                # Add realization from original data if it exists
+                if epic_data and 'domain_concepts' in epic_data:
+                    for orig_dc in epic_data['domain_concepts']:
+                        if orig_dc.get('name') == dc.name and 'realization' in orig_dc:
+                            dc_dict['realization'] = orig_dc['realization']
+                domain_concepts_serialized.append(dc_dict)
+        # Fallback: check original data if domain_concepts not loaded into object
+        elif name_to_data_map and epic.name in name_to_data_map:
+            epic_data = name_to_data_map[epic.name]
+            if 'domain_concepts' in epic_data:
+                domain_concepts_serialized = epic_data['domain_concepts']
+        
         return {
             'name': epic.name,
             'behavior_needed': epic.behavior_needed,
-            'domain_concepts': epic.domain_concepts if hasattr(epic, 'domain_concepts') else [],
-            'sub_epics': [self._serialize_sub_epic(child) for child in epic.children]
+            'domain_concepts': domain_concepts_serialized,
+            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map) for child in epic.children]
         }
     
-    def _serialize_sub_epic(self, sub_epic) -> dict:
+    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None) -> dict:
         """Serialize SubEpic object to dict by reading its properties."""
         from story_graph.nodes import SubEpic, Story, StoryGroup
+        
+        # Serialize domain_concepts if they exist in original data (SubEpic doesn't have domain_concepts as dataclass field)
+        domain_concepts_serialized = []
+        if name_to_data_map and sub_epic.name in name_to_data_map:
+            sub_epic_data = name_to_data_map[sub_epic.name]
+            if 'domain_concepts' in sub_epic_data:
+                domain_concepts_raw = sub_epic_data['domain_concepts']
+                if domain_concepts_raw:
+                    # Already dictionaries from JSON, so use as-is (includes realization field)
+                    domain_concepts_serialized = domain_concepts_raw
         
         result = {
             'name': sub_epic.name,
@@ -77,11 +138,15 @@ class JSONStoryGraph(JSONAdapter):
             'story_groups': []
         }
         
+        # Add domain_concepts if they were found
+        if domain_concepts_serialized:
+            result['domain_concepts'] = domain_concepts_serialized
+        
         # Collect nested sub-epics and story groups
         current_story_group = None
         for child in sub_epic.children:
             if isinstance(child, SubEpic):
-                result['sub_epics'].append(self._serialize_sub_epic(child))
+                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map))
             elif isinstance(child, StoryGroup):
                 result['story_groups'].append(self._serialize_story_group(child))
             elif isinstance(child, Story):
