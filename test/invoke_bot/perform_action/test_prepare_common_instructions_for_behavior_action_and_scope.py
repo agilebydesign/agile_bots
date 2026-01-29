@@ -295,6 +295,80 @@ class TestSaveFileIsolation:
                     assert "Test question" not in answers, "Test data should NOT appear in production file"
 
 
+class TestSubmitScopeInstructions:
+    """Story: Submit Scope Instructions"""
+    
+    def test_scope_appears_in_instructions_display_content(self, tmp_path):
+        """
+        SCENARIO: Scope appears in instructions display_content markdown
+        GIVEN: Build action with story scope set
+        WHEN: Instructions are retrieved via action.get_instructions()
+        THEN: instructions.display_content contains "## Scope" section
+        AND: instructions.display_content contains story_graph markdown from scope.results
+        AND: bot.submit_instructions() can use display_content to submit scope instructions
+        """
+        from actions.action_context import ScopeActionContext
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create story graph with test stories
+        story_graph = helper.story.given_story_graph_dict(epic='TestEpic')
+        stories_dir = helper.workspace / 'docs' / 'stories'
+        helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
+        
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        
+        # Set scope to a specific story - apply it to the bot first
+        scope = Scope(workspace_directory=tmp_path, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['Story1'])
+        scope.apply_to_bot()
+        context = ScopeActionContext(scope=scope)
+        
+        # Get instructions - this calls _build_display_content() which uses MarkdownInstructions.serialize()
+        instructions = action.get_instructions(context)
+        
+        # Verify display_content exists and contains scope markdown
+        assert instructions.display_content is not None
+        assert len(instructions.display_content) > 0
+        
+        # Join display_content to check for scope section
+        display_text = '\n'.join(instructions.display_content)
+        
+        # Verify "## Scope" section exists
+        assert '## Scope' in display_text, "display_content should contain '## Scope' section"
+        
+        # Verify story scope is mentioned
+        assert 'Story Scope' in display_text or 'Story1' in display_text, \
+            "display_content should contain story scope information"
+        
+        # Verify story_graph markdown appears (from scope.results serialized via markdown adapter)
+        # The story_graph should appear after the scope section
+        scope_section_index = display_text.find('## Scope')
+        after_scope = display_text[scope_section_index:]
+        
+        # Story graph markdown should contain the "## Story Graph" header
+        assert '## Story Graph' in after_scope, \
+            "display_content should contain '## Story Graph' header after scope section"
+        
+        # Story graph markdown should contain epic/story structure
+        # MarkdownStoryGraph serializes epics with "### Epics" header and epic names with 🎯 emoji
+        assert '### Epics' in after_scope or '🎯' in after_scope or 'TestEpic' in after_scope, \
+            "display_content should contain story_graph epics section with epic names"
+        
+        # Verify story graph path is included (MarkdownStoryGraph includes "**Path:** `...`")
+        assert '**Path:**' in after_scope or 'story-graph.json' in after_scope, \
+            "display_content should contain story graph path information"
+        
+        # Verify bot.submit_instructions() can use this display_content
+        # This is what bot.submit_instructions() does - joins display_content
+        content_str = '\n'.join(instructions.display_content)
+        assert len(content_str) > 0, "display_content should produce non-empty string for submission"
+        assert '## Scope' in content_str, "Submitted content should contain scope section"
+        assert '## Story Graph' in content_str, "Submitted content should contain story graph section"
+
+
 # ============================================================================
 # CLI TESTS - Guardrails Commands and Error Handling
 # ============================================================================
