@@ -1,8 +1,1 @@
-{
-  "type": "story",
-  "value": [
-    "submit"
-  ],
-  "exclude": [],
-  "skiprule": []
-}
+{"type": "story", "value": ["Execute a"], "exclude": [], "skiprule": []}
