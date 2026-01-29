@@ -1738,7 +1738,31 @@ class StoryTestHelper(BaseHelper):
         # Build stories if present
         if sub_epic_data.get('stories'):
             stories = []
+            # Collect all test classes for consolidation
+            all_test_classes = {}  # test_class_name -> test_methods mapping
             test_file_for_sub_epic = None
+            
+            for story_data in sub_epic_data['stories']:
+                if story_data.get('test_class') and story_data.get('test_methods'):
+                    test_file = story_data.get('test_class')  # This is actually the test file name
+                    # Use first story's test_file as SubEpic's test_file
+                    if not test_file_for_sub_epic:
+                        test_file_for_sub_epic = test_file
+                    
+                    # Extract class name from test file
+                    test_class_name = test_file.replace('.py', '').replace('test_', '')
+                    test_class_name = ''.join(word.capitalize() for word in test_class_name.split('_'))
+                    test_class_name = 'Test' + test_class_name if not test_class_name.startswith('Test') else test_class_name
+                    
+                    # Store test class and methods for later consolidation
+                    all_test_classes[test_class_name] = story_data.get('test_methods', [])
+            
+            # Create a single consolidated test file for the SubEpic
+            if test_file_for_sub_epic and all_test_classes:
+                self._create_consolidated_test_file(test_file_for_sub_epic, all_test_classes)
+            
+            # Set test_file on SubEpic
+            sub_epic['test_file'] = test_file_for_sub_epic
             
             for story_idx, story_data in enumerate(sub_epic_data['stories']):
                 story = self._build_story_for_behavior_test(story_data, story_idx)
@@ -1780,7 +1804,7 @@ class StoryTestHelper(BaseHelper):
             'connector': None,
             'story_type': 'user',
             'users': [],
-            'test_file': test_file if test_file else None,  # Set test_file to the actual test file
+            # Stories don't have test_file - it comes from parent SubEpic
             'test_class': test_class_name,
             'scenarios': self._build_scenarios_for_behavior_test(
                 story_data.get('scenarios', []),
@@ -1839,10 +1863,29 @@ class StoryTestHelper(BaseHelper):
         Returns:
             SubEpic node from loaded story graph
         """
-        # Create dummy test files for stories with test_methods
+        # Create a single test file for the SubEpic containing all test classes
+        # Determine SubEpic's test_file (use first story's test_file if available)
+        sub_epic_test_file = None
+        all_test_classes = {}  # test_class_name -> test_methods mapping
+        
         for story_data in stories_data:
             if story_data.get('test_class') and story_data.get('test_methods'):
-                self._create_dummy_test_file_for_story(story_data)
+                test_file = story_data.get('test_class')  # This is actually the test file name
+                # Use first story's test_file as SubEpic's test_file
+                if not sub_epic_test_file:
+                    sub_epic_test_file = test_file
+                
+                # Extract class name from test file
+                test_class_name = test_file.replace('.py', '').replace('test_', '')
+                test_class_name = ''.join(word.capitalize() for word in test_class_name.split('_'))
+                test_class_name = 'Test' + test_class_name if not test_class_name.startswith('Test') else test_class_name
+                
+                # Store test class and methods for later consolidation
+                all_test_classes[test_class_name] = story_data.get('test_methods', [])
+        
+        # Create a single consolidated test file for the SubEpic
+        if sub_epic_test_file and all_test_classes:
+            self._create_consolidated_test_file(sub_epic_test_file, all_test_classes)
         
         # Build stories for the story group
         stories = []
@@ -1862,7 +1905,7 @@ class StoryTestHelper(BaseHelper):
                             'name': sub_epic_name,
                             'sequential_order': 0.0,
                             'behavior': 'exploration',
-                            'test_file': None,
+                            'test_file': sub_epic_test_file,
                             'sub_epics': [],
                             'story_groups': [
                                 {
@@ -1984,6 +2027,27 @@ class {test_class}:
         
         test_path.write_text(content, encoding='utf-8')
     
+    def _create_consolidated_test_file(self, test_file, test_classes_dict):
+        """Create a single test file containing multiple test classes (one per story in SubEpic)."""
+        test_dir = self.workspace / 'test'
+        test_dir.mkdir(exist_ok=True)
+        
+        test_path = test_dir / test_file
+        
+        # Generate consolidated test file content with all test classes
+        content = "import pytest\n\n"
+        for test_class_name, test_methods in test_classes_dict.items():
+            content += f"class {test_class_name}:\n"
+            for test_method in test_methods:
+                if test_method:
+                    content += f"""    def {test_method}(self):
+        pass
+    
+"""
+            content += "\n"
+        
+        test_path.write_text(content, encoding='utf-8')
+    
     def _create_test_files_for_sub_epics(self, sub_epics_data):
         """Recursively create test files for all stories in sub-epics."""
         for sub_epic_data in sub_epics_data:
@@ -2013,4 +2077,85 @@ class {test_class}:
         # Don't modify story_data - that will be used later to build the story
         # Just create the test file with the calculated class name
         self._create_dummy_test_file(test_file, test_class_name, test_methods)
+    
+    # =======================================================================================
+    # File Testing Helpers
+    # =======================================================================================
+    
+    def create_test_file(self, test_file_path: str, test_class: str, test_methods: list = None) -> Path:
+        """Create a test file with test class and methods.
+        
+        Args:
+            test_file_path: Relative path from workspace/test (e.g., 'invoke_bot/edit_story_map/test_open_story_related_files.py')
+            test_class: Name of test class (e.g., 'TestOpenAllRelatedFiles')
+            test_methods: List of test method names (e.g., ['test_graph_button_opens_story_graph'])
+        
+        Returns:
+            Path to created test file
+        """
+        test_dir = self.parent.workspace / 'test'
+        test_dir.mkdir(parents=True, exist_ok=True)
+        test_file = test_dir / test_file_path
+        
+        # Create parent directories if they don't exist
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        content = f"class {test_class}:\n"
+        if test_methods:
+            for method in test_methods:
+                content += f"    def {method}(self):\n        pass\n"
+        else:
+            content += "    pass\n"
+        
+        test_file.write_text(content, encoding='utf-8')
+        return test_file
+    
+    def assert_file_exists(self, file_path, description: str = "File") -> Path:
+        """Assert that a file path exists and return Path object.
+        
+        Args:
+            file_path: File path (string or Path)
+            description: Description for error message
+        
+        Returns:
+            Path object for the file
+        """
+        file_path_obj = Path(file_path)
+        assert file_path_obj.exists(), f"{description} should exist at {file_path_obj}"
+        return file_path_obj
+    
+    def assert_story_graph_line_contains_node(self, story_graph_path: Path, line_number: int, node_name: str):
+        """Assert that a line in story graph JSON contains the node name.
+        
+        Args:
+            story_graph_path: Path to story-graph.json
+            line_number: Line number (1-based)
+            node_name: Expected node name
+        """
+        assert story_graph_path.exists(), f"Story graph file should exist at {story_graph_path}"
+        assert line_number is not None, "Line number should be found for node in JSON"
+        with open(story_graph_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            line_at_position = lines[line_number - 1]
+            assert f'"name": "{node_name}"' in line_at_position, f"Line {line_number} should contain node name: {line_at_position}"
+    
+    def create_story_files_for_node(self, node):
+        """Create story markdown files for a node and all its children recursively.
+        
+        Args:
+            node: StoryNode (Story, SubEpic, or Epic) to create files for
+        """
+        from story_graph.nodes import Story, Epic, SubEpic
+        
+        # Calculate file_link by calling save if it's a Story
+        if isinstance(node, Story):
+            node.save()  # This calculates file_link
+            if node.file_link:
+                story_file_path = Path(node.file_link)
+                story_file_path.parent.mkdir(parents=True, exist_ok=True)
+                story_file_path.write_text(f"# {node.name}\n\n", encoding='utf-8')
+        elif isinstance(node, (Epic, SubEpic)):
+            # Recursively create files for all child stories
+            for child in node.children:
+                self.create_story_files_for_node(child)
 

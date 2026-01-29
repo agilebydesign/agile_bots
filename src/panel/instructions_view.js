@@ -953,7 +953,7 @@ class InstructionsSection extends PanelView {
         if (!fullPath) return '';
         const fileName = fullPath.split(/[\/\\]/).pop();
         const jsEscapedPath = fullPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        return `<a href="#" onclick="openFile('${jsEscapedPath}'); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(fileName)}</a>`;
+        return '<a href="#" onclick="openFile(\'' + jsEscapedPath + '\'); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">' + this.escapeHtml(fileName) + '</a>';
     }
 
     _formatRenderInstructions(value) {
