@@ -660,6 +660,159 @@ class StoryNode(ABC):
                     valid_str = ', '.join(valid_list)
                     raise ValueError(f'Invalid {param} value: {parameters[param]}. Expected: {valid_str}')
 
+    def openStoryFile(self) -> dict:
+        """Open story markdown files for this node and all children recursively.
+        
+        Returns:
+            dict with status and list of opened files
+        """
+        opened_files = []
+        
+        if isinstance(self, Story):
+            # Single story - open its file
+            if self.file_link:
+                opened_files.append(self.file_link)
+        elif isinstance(self, (Epic, SubEpic)):
+            # Epic or SubEpic - recursively open all story files
+            for child in self.children:
+                if isinstance(child, Story):
+                    if child.file_link:
+                        opened_files.append(child.file_link)
+                elif isinstance(child, (Epic, SubEpic)):
+                    # Recursively get files from nested epics/sub-epics
+                    result = child.openStoryFile()
+                    if result.get('files'):
+                        opened_files.extend(result['files'])
+        
+        return {
+            'status': 'success',
+            'node': self.name,
+            'node_type': self.node_type,
+            'files': opened_files,
+            'count': len(opened_files)
+        }
+    
+    def openTest(self) -> dict:
+        """Open test files for this node and all children recursively.
+        
+        Returns:
+            dict with status and list of opened test files with scope information
+        """
+        opened_files = []
+        
+        if isinstance(self, Story):
+            # Single story - test_file comes from parent sub-epic, not the story itself
+            test_file = None
+            if self._parent:
+                # Get test_file from parent sub-epic
+                parent = self._parent
+                while parent:
+                    if isinstance(parent, SubEpic):
+                        test_file = parent.test_file if hasattr(parent, 'test_file') else None
+                        break
+                    parent = parent._parent if hasattr(parent, '_parent') else None
+            
+            if test_file:
+                opened_files.append({
+                    'file': test_file,
+                    'test_class': self.test_class,
+                    'scenarios': [
+                        {
+                            'name': s.name,
+                            'test_method': s.test_method
+                        }
+                        for s in self.scenarios if s.test_method
+                    ]
+                })
+        elif isinstance(self, (Epic, SubEpic)):
+            # Epic or SubEpic - recursively open all test files
+            for child in self.children:
+                if isinstance(child, Story):
+                    # test_file ALWAYS comes from parent sub-epic, never from the story itself
+                    test_file = None
+                    # Find the SubEpic that contains this Story
+                    parent = child._parent
+                    while parent:
+                        if isinstance(parent, SubEpic):
+                            test_file = parent.test_file if hasattr(parent, 'test_file') else None
+                            break
+                        parent = parent._parent if hasattr(parent, '_parent') else None
+                    
+                    if test_file:
+                        opened_files.append({
+                            'file': test_file,
+                            'test_class': child.test_class,
+                            'scenarios': [
+                                {
+                                    'name': s.name,
+                                    'test_method': s.test_method
+                                }
+                                for s in child.scenarios if s.test_method
+                            ]
+                        })
+                elif isinstance(child, (Epic, SubEpic)):
+                    # Recursively get test files from nested epics/sub-epics
+                    result = child.openTest()
+                    if result.get('files'):
+                        opened_files.extend(result['files'])
+        
+        return {
+            'status': 'success',
+            'node': self.name,
+            'node_type': self.node_type,
+            'files': opened_files,
+            'count': len(opened_files)
+        }
+    
+    def openStoryGraph(self) -> dict:
+        """Open story-graph.json with this node's path expanded and cursor positioned.
+        
+        Returns:
+            dict with status and story graph path, node path, and line number info
+        """
+        from pathlib import Path
+        import json
+        if not self._bot or not hasattr(self._bot, 'bot_paths'):
+            raise ValueError('Bot context required to open story graph')
+        
+        story_graph_path = Path(self._bot.bot_paths.workspace_directory) / 'docs' / 'stories' / 'story-graph.json'
+        node_path = self._scope_command_for_node()
+        
+        # Try to find line number for this node in the JSON file
+        line_number = None
+        if story_graph_path.exists():
+            try:
+                with open(story_graph_path, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                    text = ''.join(lines)
+                    
+                # Search for the node by name in the JSON
+                # Look for "name": "NodeName" pattern
+                for i, line in enumerate(lines):
+                    # Match node name in JSON (accounting for escaped quotes)
+                    import re
+                    name_pattern = re.compile(r'"name"\s*:\s*"' + re.escape(self.name) + r'"')
+                    if name_pattern.search(line):
+                        # Verify this is the right node by checking context
+                        # For epics: should be within "epics": [ ... ]
+                        # For sub-epics: should be within parent epic's "sub_epics": [ ... ]
+                        # For stories: should be within "stories": [ ... ]
+                        line_number = i + 1  # VS Code uses 1-based line numbers
+                        break
+            except Exception as e:
+                # If we can't find the line number, that's okay - cursor positioning is optional
+                pass
+        
+        return {
+            'status': 'success',
+            'node': self.name,
+            'node_type': self.node_type,
+            'story_graph_path': str(story_graph_path),
+            'node_path': node_path,
+            'expand_path': node_path,
+            'line_number': line_number
+        }
+
 @dataclass
 class Epic(StoryNode):
     domain_concepts: Optional[List[DomainConcept]] = None
@@ -791,12 +944,15 @@ class Epic(StoryNode):
 @dataclass
 class SubEpic(StoryNode):
     sequential_order: float
+    domain_concepts: Optional[List[DomainConcept]] = None
     _parent: Optional[StoryNode] = field(default=None, repr=False)
 
     def __post_init__(self):
         super().__post_init__()
         if self.sequential_order is None:
             raise ValueError('SubEpic requires sequential_order')
+        if self.domain_concepts is None:
+            self.domain_concepts = []
         self._children: List['StoryNode'] = []
         # Initialize test_file attribute (not a dataclass field to avoid signature issues)
         if not hasattr(self, 'test_file'):
@@ -842,9 +998,11 @@ class SubEpic(StoryNode):
         sequential_order = data.get('sequential_order')
         if sequential_order is None:
             raise ValueError('SubEpic requires sequential_order')
+        domain_concepts = [DomainConcept.from_dict(dc) for dc in data.get('domain_concepts', [])]
         sub_epic = cls(
             name=data.get('name', ''),
             sequential_order=float(sequential_order),
+            domain_concepts=domain_concepts,
             behavior=data.get('behavior'),
             _parent=parent,
             _bot=bot
@@ -864,7 +1022,16 @@ class SubEpic(StoryNode):
 
     @property
     def has_stories(self) -> bool:
-        return any(isinstance(child, (Story, StoryGroup)) for child in self._children)
+        # Check for actual Story objects, not just StoryGroups
+        # An empty StoryGroup doesn't count as having stories
+        for child in self._children:
+            if isinstance(child, Story):
+                return True
+            elif isinstance(child, StoryGroup):
+                # Check if the StoryGroup actually contains Stories
+                if child._children and any(isinstance(story, Story) for story in child._children):
+                    return True
+        return False
 
     @property
     def behavior_needed(self) -> str:
@@ -925,7 +1092,9 @@ class SubEpic(StoryNode):
             child = SubEpic(name=name or self._generate_unique_child_name(), sequential_order=sequential_order, _parent=self, _bot=self._bot)
                 
         elif child_type == 'Story':
-            if self.has_subepics:
+            # Only prevent creating Stories if there are SubEpics AND no Stories exist yet
+            # If Stories already exist, we're in a mixed state which is handled
+            if self.has_subepics and not self.has_stories:
                 raise ValueError('Cannot create Story under SubEpic with SubEpics')
             story_group = self._get_or_create_story_group()
                 
@@ -1100,26 +1269,21 @@ class Story(StoryNode):
             return True
         
         # Check if the test file actually exists
-        # Need to get test file from story or parent sub-epic
-        test_file = self.test_file
+        # test_file ALWAYS comes from parent sub-epic, never from the story itself
+        test_file = None
         test_class = self.test_class
         
-        # If story doesn't have test_file/test_class, get from parent sub-epic
-        if not test_file or not test_class:
-            parent = self._parent
-            while parent:
-                if hasattr(parent, 'test_file') and parent.test_file:
-                    test_file = parent.test_file
-                    break
-                parent = parent._parent if hasattr(parent, '_parent') else None
-            
-            # If still no test_file, tests don't exist
-            if not test_file:
-                return False
-            
-            # Use story's test_class if available
-            if not test_class:
-                test_class = self.test_class
+        # Get test_file from parent sub-epic
+        parent = self._parent
+        while parent:
+            if isinstance(parent, SubEpic):
+                test_file = parent.test_file if hasattr(parent, 'test_file') else None
+                break
+            parent = parent._parent if hasattr(parent, '_parent') else None
+        
+        # If no test_file, tests don't exist
+        if not test_file:
+            return False
         
         # Check if test file exists on disk
         from pathlib import Path
@@ -1311,16 +1475,17 @@ class Scenario(StoryNode):
         if not parent:
             return 'code' if self.test_method else 'tests'
         
-        test_file = parent.test_file
+        # test_file ALWAYS comes from parent sub-epic, never from the story itself
+        test_file = None
         test_class = parent.test_class
         
-        if not test_file:
-            sub_epic_parent = parent._parent
-            while sub_epic_parent:
-                if hasattr(sub_epic_parent, 'test_file') and sub_epic_parent.test_file:
-                    test_file = sub_epic_parent.test_file
-                    break
-                sub_epic_parent = sub_epic_parent._parent if hasattr(sub_epic_parent, '_parent') else None
+        # Get test_file from parent sub-epic (Story's parent is StoryGroup, StoryGroup's parent is SubEpic)
+        sub_epic_parent = parent._parent
+        while sub_epic_parent:
+            if isinstance(sub_epic_parent, SubEpic):
+                test_file = sub_epic_parent.test_file if hasattr(sub_epic_parent, 'test_file') else None
+                break
+            sub_epic_parent = sub_epic_parent._parent if hasattr(sub_epic_parent, '_parent') else None
         
         if not test_file or not test_class:
             return 'tests'
@@ -1664,9 +1829,9 @@ class StoryMap:
             'name': epic.name,
             'sequential_order': epic.sequential_order,
             'behavior': epic.behavior,  # Always include behavior (even if None)
-            'domain_concepts': [dc.__dict__ for dc in epic.domain_concepts] if epic.domain_concepts else [],
-            'sub_epics': [self._sub_epic_to_dict(child) for child in epic.children if isinstance(child, SubEpic)],
-            'story_groups': [self._story_group_to_dict(child) for child in epic.children if isinstance(child, StoryGroup)]
+            'domain_concepts': [dc.to_dict() for dc in epic.domain_concepts] if epic.domain_concepts else [],
+            'sub_epics': [self._sub_epic_to_dict(child) for child in epic._children if isinstance(child, SubEpic)],
+            'story_groups': [self._story_group_to_dict(child) for child in epic._children if isinstance(child, StoryGroup)]
         }
         return result
 
@@ -1676,14 +1841,17 @@ class StoryMap:
             'name': sub_epic.name,
             'sequential_order': sub_epic.sequential_order,
             'behavior': sub_epic.behavior,  # Always include behavior (even if None)
+            'domain_concepts': [dc.to_dict() for dc in sub_epic.domain_concepts] if sub_epic.domain_concepts else [],
         }
         
         # Include test_file if present (critical for test links in panel)
         if sub_epic.test_file is not None:
             result['test_file'] = sub_epic.test_file
         
+        # Serialize nested sub-epics - check all children and filter SubEpics
+        nested_subepics = [child for child in sub_epic._children if isinstance(child, SubEpic)]
         result.update({
-            'sub_epics': [self._sub_epic_to_dict(child) for child in sub_epic._children if isinstance(child, SubEpic)],
+            'sub_epics': [self._sub_epic_to_dict(child) for child in nested_subepics],
             'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)]
         })
         
@@ -1717,7 +1885,7 @@ class StoryMap:
             'connector': story.connector,
             'story_type': story.story_type,
             'users': [str(u) for u in story.users] if story.users else [],
-            'test_file': story.test_file,
+            # Note: test_file belongs to SubEpic, not Story - do not serialize it here
             'test_class': story.test_class,
             'scenarios': scenarios,
             'acceptance_criteria': acceptance_criteria,

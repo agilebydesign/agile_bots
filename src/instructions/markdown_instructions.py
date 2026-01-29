@@ -1,4 +1,4 @@
-﻿
+
 from cli.adapters import MarkdownAdapter
 from instructions.instructions import Instructions
 
@@ -29,9 +29,28 @@ class MarkdownInstructions(MarkdownAdapter):
             
             results = scope.results
             if results:
+                # Add instruction text before the JSON
+                output_lines.append("Please only work on the following scope.")
+                output_lines.append("")
+                
+                # Add scope filter information
+                if scope.type.value == 'story':
+                    scope_filter_value = ', '.join(scope.value) if scope.value else ''
+                elif scope.type.value == 'files':
+                    scope_filter_value = ', '.join(scope.value) if scope.value else ''
+                elif scope.type.value == 'showAll':
+                    scope_filter_value = 'Show All (entire story graph)'
+                else:
+                    scope_filter_value = f"{scope.type.value} - {', '.join(scope.value) if scope.value else 'all'}"
+                
+                output_lines.append(f"Scope Filter: \"{scope_filter_value}\"")
+                output_lines.append("")
+                output_lines.append("Scope:")
+                output_lines.append("")
+                
                 from cli.adapter_factory import AdapterFactory
                 try:
-                    adapter = AdapterFactory.create(results, 'markdown')
+                    adapter = AdapterFactory.create(results, 'json')
                     scope_content = adapter.serialize()
                     output_lines.append(scope_content)
                 except Exception:

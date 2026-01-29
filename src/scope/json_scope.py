@@ -177,7 +177,8 @@ class JSONScope(JSONAdapter):
                 'icon': 'document'
             })
         
-        test_file = story.get('test_file') or parent_test_file
+        # test_file ALWAYS comes from parent sub-epic, never from the story itself
+        test_file = parent_test_file
         test_class = story.get('test_class')
         
         # Only add test icon if we have both test_file and test_class with a valid file AND the class exists

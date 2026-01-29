@@ -131,7 +131,7 @@ class BotHeaderView extends PanelView {
             botLinksHtml = availableBots.map(botName => {
                 const isActive = botName === currentBot;
                 const activeClass = isActive ? ' active' : '';
-                return `<a href="javascript:void(0)" class="bot-link${activeClass}" onclick="switchBot('${this.escapeHtml(botName)}')">${this.escapeHtml(botName)}</a>`;
+                return '<a href="javascript:void(0)" class="bot-link' + activeClass + '" onclick="switchBot(\'' + this.escapeHtml(botName) + '\')">' + this.escapeHtml(botName) + '</a>';
             }).join('\n                ');
         }
         

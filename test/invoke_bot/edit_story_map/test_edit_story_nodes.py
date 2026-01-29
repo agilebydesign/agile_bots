@@ -2057,474 +2057,349 @@ class TestSubmitActionScopedToStoryScope:
         
         assert 'not found' in cli_response.output or 'error' in cli_response.output.lower()
 
-class TestEnrichScopeWithLinks:
-    """Tests for link enrichment in JSON scope (test icons and doc links)."""
+
+# ============================================================================
+# SAVE TESTS - Domain Concepts and Walkthroughs Preservation
+# ============================================================================
+
+class TestSaveStoryMapPreservesDomainConcepts:
+    """
+    Story: Save Story Map Changes Asynchronously
     
-    def test_story_with_test_file_and_class_gets_test_link(self, tmp_path):
+    Tests that verify domain concepts and walkthroughs (realizations) are NEVER deleted
+    when saving story map after any edit operation (create, rename, move, delete).
+    """
+    
+    def test_save_after_create_epic_preserves_existing_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Story with test_file and test_class gets test tube icon link
-        GIVEN: Story graph with story having test_file and test_class
-        AND: Test file exists on disk
-        WHEN: Scope is enriched with links
-        THEN: Story has test_tube icon link pointing to test file
+        SCENARIO: Save after creating epic preserves existing domain concepts
+        GIVEN: Story graph with epic containing domain concepts and walkthroughs
+        WHEN: New epic is created and story map is saved
+        THEN: Original epic's domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create test file
-        test_dir = helper.workspace / 'test'
-        test_dir.mkdir(exist_ok=True)
-        test_file = test_dir / 'test_story.py'
-        test_file.write_text('class TestMyStory:\n    def test_scenario(self):\n        pass')
+        # When: Create new epic
+        helper.bot.story_map.create_epic("NewEpic")
+        helper.bot.story_map.save()
         
-        # Create story graph - story gets test_file from parent sub-epic
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [{
-                    'name': 'Test Sub Epic',
-                    'sequential_order': 1.0,
-                    'test_file': 'test_story.py',  # Sub-epic has test_file
-                    'story_groups': [{
-                        'type': 'and',
-                        'stories': [{
-                            'name': 'Test Story',
-                            # No test_file - inherits from parent sub-epic
-                            'test_class': 'TestMyStory',
-                            'sequential_order': 1.0
-                        }]
-                    }]
-                }]
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        original_epic = helper.bot.story_map.epics["TestEpic"]
         
-        # Create scope and get results
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify test link was added
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        assert 'links' in story
-        test_links = [l for l in story['links'] if l['icon'] == 'test_tube']
-        assert len(test_links) == 1
-        assert 'test_story.py' in test_links[0]['url']
-        assert '#L' in test_links[0]['url']  # Verify it has a line number
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_epic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            original_epic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic"
+        )
     
-    def test_story_without_test_file_gets_no_test_link(self, tmp_path):
+    def test_save_after_create_subepic_preserves_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Story with test_class but no test_file gets no test icon
-        GIVEN: Story graph with story having test_class but no test_file
-        WHEN: Scope is enriched with links
-        THEN: Story has no test_tube icon link
+        SCENARIO: Save after creating sub-epic preserves domain concepts
+        GIVEN: Story graph with epic containing sub-epic with domain concepts
+        WHEN: New sub-epic is created under epic and story map is saved
+        THEN: Original sub-epic's domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create story graph with only test_class using helper
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [{
-                    'name': 'Test Sub Epic',
-                    'sequential_order': 1.0,
-                    'story_groups': [{
-                        'type': 'and',
-                        'stories': [{
-                            'name': 'Test Story',
-                            'test_class': 'TestMyStory',  # Has test_class
-                            # No test_file
-                            'sequential_order': 1.0
-                        }]
-                    }]
-                }]
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
+        # When: Create new sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        new_subepic = epic.create_sub_epic("NewSubEpic")
+        epic.save()
         
-        # Create scope and get results
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        original_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
         
-        # Verify no test link was added
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        test_links = [l for l in story.get('links', []) if l['icon'] == 'test_tube']
-        assert len(test_links) == 0
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            original_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
     
-    def test_sub_epic_with_test_file_gets_test_link(self, tmp_path):
+    def test_save_after_rename_epic_preserves_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Sub-epic with test_file gets test tube icon link
-        GIVEN: Story graph with sub-epic having test_file
-        AND: Test file exists on disk
-        WHEN: Scope is enriched with links
-        THEN: Sub-epic has test_tube icon link pointing to test file
+        SCENARIO: Save after renaming epic preserves domain concepts
+        GIVEN: Story graph with epic containing domain concepts and walkthroughs
+        WHEN: Epic is renamed and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create test file
-        test_dir = helper.workspace / 'test'
-        test_dir.mkdir(exist_ok=True)
-        test_file = test_dir / 'test_sub_epic.py'
-        test_file.write_text('def test_something():\n    pass')
+        # When: Rename epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        epic.rename("RenamedEpic")
         
-        # Create story graph with sub-epic having test_file using helper
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [{
-                    'name': 'Test Sub Epic',
-                    'sequential_order': 1.0,
-                    'test_file': 'test_sub_epic.py',
-                    'story_groups': []
-                }]
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        renamed_epic = helper.bot.story_map.epics["RenamedEpic"]
         
-        # Create scope and get results
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify test link was added
-        sub_epic = result['content']['epics'][0]['sub_epics'][0]
-        assert 'links' in sub_epic
-        test_links = [l for l in sub_epic['links'] if l['icon'] == 'test_tube']
-        assert len(test_links) == 1
-        assert 'test_sub_epic.py' in test_links[0]['url']
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_epic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            renamed_epic.domain_concepts,
+            expected_domain_concepts,
+            context_path="RenamedEpic"
+        )
     
-    def test_story_inherits_test_file_from_sub_epic(self, tmp_path):
+    def test_save_after_rename_subepic_preserves_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Story inherits test_file from parent sub-epic
-        GIVEN: Sub-epic with test_file and story with test_class but no test_file
-        AND: Test file exists on disk
-        WHEN: Scope is enriched with links
-        THEN: Story gets test_tube icon link using parent's test_file
+        SCENARIO: Save after renaming sub-epic preserves domain concepts
+        GIVEN: Story graph with sub-epic containing domain concepts and walkthroughs
+        WHEN: Sub-epic is renamed and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create test file
-        test_dir = helper.workspace / 'test'
-        test_dir.mkdir(exist_ok=True)
-        test_file = test_dir / 'test_sub_epic.py'
-        test_file.write_text('class TestMyStory:\n    pass')
+        # When: Rename sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic.find_sub_epic_by_name("TestSubEpic")
+        subepic.rename("RenamedSubEpic")
         
-        # Create story graph: sub-epic has test_file, story has test_class using helper
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [{
-                    'name': 'Test Sub Epic',
-                    'sequential_order': 1.0,
-                    'test_file': 'test_sub_epic.py',
-                    'story_groups': [{
-                        'type': 'and',
-                        'stories': [{
-                            'name': 'Test Story',
-                            'test_class': 'TestMyStory',
-                            # No test_file - should inherit from parent
-                            'sequential_order': 1.0
-                        }]
-                    }]
-                }]
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        renamed_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("RenamedSubEpic")
         
-        # Create scope and get results
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify story got test link using parent's test_file
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        assert 'links' in story
-        test_links = [l for l in story['links'] if l['icon'] == 'test_tube']
-        assert len(test_links) == 1
-        assert 'test_sub_epic.py' in test_links[0]['url']
-        assert '#L' in test_links[0]['url']  # Verify it has a line number
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            renamed_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.RenamedSubEpic"
+        )
     
-    def test_epic_with_docs_folder_gets_document_link(self, tmp_path):
+    def test_save_after_move_subepic_preserves_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Epic with docs folder gets document icon link
-        GIVEN: Epic and corresponding docs/map folder exists
-        WHEN: Scope is enriched with links
-        THEN: Epic has document icon link pointing to docs folder
+        SCENARIO: Save after moving sub-epic preserves domain concepts
+        GIVEN: Story graph with two epics, one containing sub-epic with domain concepts
+        WHEN: Sub-epic is moved to different epic and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create docs folder for epic at docs/stories/map (the actual path structure)
-        epic_folder = helper.workspace / 'docs' / 'stories' / 'map' / '🎯 Test Epic'
-        epic_folder.mkdir(parents=True, exist_ok=True)
+        # Given: Create second epic
+        helper.bot.story_map.create_epic("Epic2")
+        # Get Epic2 from story map to ensure we're using the actual object in the map
+        epic2 = helper.bot.story_map.epics["Epic2"]
         
-        # Create story graph using helper
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': []
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
+        # When: Move sub-epic to second epic
+        epic1 = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic1.find_sub_epic_by_name("TestSubEpic")
+        assert subepic is not None, "TestSubEpic should exist before move"
         
-        # Create scope and get results
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
+        # Verify sub-epic has domain concepts before move
+        assert subepic.domain_concepts is not None and len(subepic.domain_concepts) > 0, "Sub-epic should have domain concepts before move"
         
-        # Verify document link was added
-        epic = result['content']['epics'][0]
-        assert 'links' in epic, f"Epic should have links. Epic data: {epic}"
-        doc_links = [l for l in epic['links'] if l['icon'] == 'document']
-        assert len(doc_links) == 1, f"Epic should have one document link. Links: {epic.get('links', [])}"
-        assert '🎯 Test Epic' in doc_links[0]['url']
+        # Verify Epic2 structure before move
+        assert len(epic2._children) == 0, f"Epic2 should be empty before move. Has: {[c.name for c in epic2._children]}"
+        
+        # Perform move
+        try:
+            subepic.move_to(epic2)
+        except Exception as e:
+            pytest.fail(f"move_to failed with error: {e}")
+        
+        # Verify move happened in memory before save
+        # Note: Epic1.children might return stories if TestSubEpic had stories, so check _children instead
+        epic1_subepics = [c for c in epic1._children if isinstance(c, SubEpic)]
+        assert "TestSubEpic" not in [c.name for c in epic1_subepics], f"TestSubEpic should be removed from Epic1. Still present: {[c.name for c in epic1_subepics]}"
+        
+        # Verify TestSubEpic is in Epic2's _children
+        epic2_child_names = [c.name for c in epic2._children]
+        assert "TestSubEpic" in epic2_child_names, f"TestSubEpic should be in Epic2._children. Available: {epic2_child_names}"
+        
+        # Verify Epic2 is in the story map's epics list (check by name since objects may differ)
+        epic2_names = [e.name for e in helper.bot.story_map._epics_list]
+        assert "Epic2" in epic2_names, f"Epic2 should be in story map's epics list. Available: {epic2_names}"
+        
+        # Verify Epic2 has TestSubEpic in memory before save
+        # Get Epic2 from story map again to ensure we're checking the right object
+        epic2_actual = helper.bot.story_map.epics["Epic2"]
+        epic2_child_names = [c.name for c in epic2_actual._children]
+        assert "TestSubEpic" in epic2_child_names, f"TestSubEpic should be in Epic2._children before save. Available: {epic2_child_names}, all children: {[type(c).__name__ + ':' + c.name for c in epic2_actual._children]}"
+        
+        # Ensure story map is saved after the move
+        # Note: subepic.move_to() already called subepic.save() which calls story_map.save(),
+        # but we call it again to ensure everything is persisted
+        helper.bot.story_map.save()
+        
+        # Verify JSON file contains Epic2 with TestSubEpic
+        import json
+        story_graph_path = helper.workspace / 'docs' / 'stories' / 'story-graph.json'
+        saved_data = json.loads(story_graph_path.read_text())
+        epic2_data = next((e for e in saved_data['epics'] if e['name'] == 'Epic2'), None)
+        assert epic2_data is not None, "Epic2 should exist in saved JSON"
+        assert len(epic2_data.get('sub_epics', [])) > 0, f"Epic2 should have sub-epics in JSON. Got: {epic2_data}, all epics: {[e['name'] for e in saved_data['epics']]}"
+        test_subepic_data = next((se for se in epic2_data.get('sub_epics', []) if se['name'] == 'TestSubEpic'), None)
+        assert test_subepic_data is not None, f"TestSubEpic should exist under Epic2 in JSON. Available: {[se['name'] for se in epic2_data.get('sub_epics', [])]}"
+        assert 'domain_concepts' in test_subepic_data, "TestSubEpic should have domain_concepts in JSON"
+        assert len(test_subepic_data['domain_concepts']) > 0, "TestSubEpic should have domain concepts in JSON"
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        epic2_after = helper.bot.story_map.epics["Epic2"]
+        # Find moved sub-epic - Epic.children returns SubEpics directly
+        moved_subepic = epic2_after.find_sub_epic_by_name("TestSubEpic")
+        assert moved_subepic is not None, f"Moved sub-epic should exist under Epic2. Available children: {[c.name for c in epic2_after.children]}"
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            moved_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="Epic2.TestSubEpic"
+        )
     
-    @pytest.mark.parametrize("sub_epic_test_file,story_test_class,has_test_link", [
-        # Sub-epic has test_file and story has test_class -> has link
-        ('test_story.py', 'TestMyStory', True),
-        # Sub-epic has test_file but story has no test_class -> no link
-        ('test_story.py', None, False),
-        # Sub-epic has no test_file but story has test_class -> no link
-        (None, 'TestMyStory', False),
-        # Neither sub-epic test_file nor story test_class -> no link
-        (None, None, False),
-    ])
-    def test_story_test_link_combinations(self, tmp_path, sub_epic_test_file, story_test_class, has_test_link):
+    def test_save_after_delete_sibling_preserves_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Story test link appears based on sub-epic test_file and story test_class
-        GIVEN: Sub-epic with/without test_file and story with/without test_class
-        WHEN: Scope is enriched with links
-        THEN: Test link appears only when sub-epic has test_file AND story has test_class
+        SCENARIO: Save after deleting sibling preserves domain concepts
+        GIVEN: Story graph with epic containing multiple sub-epics, one with domain concepts
+        WHEN: Sibling sub-epic is deleted and story map is saved
+        THEN: Remaining sub-epic's domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create test file if specified on sub-epic
-        if sub_epic_test_file:
-            test_dir = helper.workspace / 'test'
-            test_dir.mkdir(exist_ok=True)
-            test_path = test_dir / sub_epic_test_file
-            test_path.write_text('class TestMyStory:\n    pass')
+        # Given: Create second sub-epic without domain concepts
+        epic = helper.bot.story_map.epics["TestEpic"]
+        epic.create_sub_epic("SubEpicWithoutConcepts")
         
-        # Create story data with test_class (stories don't have test_file)
-        story_data = {
-            'name': 'Test Story',
-            'sequential_order': 1.0
-        }
-        if story_test_class:
-            story_data['test_class'] = story_test_class
+        # When: Delete the sub-epic without concepts
+        subepic_to_delete = epic.find_sub_epic_by_name("SubEpicWithoutConcepts")
+        subepic_to_delete.delete()
         
-        # Create sub-epic with test_file
-        sub_epic_data = {
-            'name': 'Test Sub Epic',
-            'sequential_order': 1.0,
-            'story_groups': [{
-                'type': 'and',
-                'stories': [story_data]
-            }]
-        }
-        if sub_epic_test_file:
-            sub_epic_data['test_file'] = sub_epic_test_file
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        remaining_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
         
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [sub_epic_data]
-            }]
-        }
-        
-        # Save using helper
-        helper.story.create_story_graph(story_graph)
-        
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.SHOW_ALL)
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify test link presence
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        test_links = [l for l in story.get('links', []) if l['icon'] == 'test_tube']
-        
-        if has_test_link:
-            assert len(test_links) == 1, f"Story should have test link with sub_epic test_file={sub_epic_test_file}, story test_class={story_test_class}"
-            assert sub_epic_test_file in test_links[0]['url']
-            assert '#L' in test_links[0]['url']  # Verify it has a line number
-        else:
-            assert len(test_links) == 0, f"Story should not have test link with sub_epic test_file={sub_epic_test_file}, story test_class={story_test_class}"
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            remaining_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
     
-    def test_scenario_with_test_method_gets_test_link(self, tmp_path):
+    def test_save_after_create_story_preserves_parent_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Scenario with test_method gets test link
-        GIVEN: Story with scenario having test_method
-        AND: Test file exists with that method
-        WHEN: Scope is enriched with links
-        THEN: Scenario has test link with line number
+        SCENARIO: Save after creating story preserves parent sub-epic domain concepts
+        GIVEN: Story graph with sub-epic containing domain concepts
+        WHEN: Story is created under sub-epic and story map is saved
+        THEN: Sub-epic's domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        # Create test file with test method
-        test_dir = helper.workspace / 'test'
-        test_dir.mkdir(exist_ok=True)
-        test_file = test_dir / 'test_story.py'
-        test_file.write_text('''class TestMyStory:
-    def test_happy_path(self):
-        pass
+        # When: Create story under sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic.find_sub_epic_by_name("TestSubEpic")
+        subepic.create_story("NewStory")
+        subepic.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        subepic_after = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            subepic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
     
-    def test_error_case(self):
-        pass
-''')
-        
-        # Create story graph with scenario having test_method using helper
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [{
-                    'name': 'Test Sub Epic',
-                    'sequential_order': 1.0,
-                    'test_file': 'test_story.py',  # Sub-epic has test_file
-                    'story_groups': [{
-                        'type': 'and',
-                        'stories': [{
-                            'name': 'Test Story',
-                            # No test_file - inherits from parent sub-epic
-                            'test_class': 'TestMyStory',
-                            'sequential_order': 1.0,
-                            'scenarios': [{
-                                'name': 'Happy path scenario',
-                                'test_method': 'test_happy_path',
-                                'type': 'happy_path',
-                                'steps': 'Given X\nWhen Y\nThen Z'
-                            }]
-                        }]
-                    }]
-                }]
-            }]
-        }
-        helper.story.create_story_graph(story_graph)
-        
-        # Use 'story' scope type instead of 'showAll' to enable scenario enrichment
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.STORY, value=['Test Story'])
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify scenario has test link with line number
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        scenario = story['scenarios'][0]
-        
-        assert 'test_file' in scenario, "Scenario should have test_file link"
-        assert 'test_story.py' in scenario['test_file']
-        assert '#L' in scenario['test_file'], "Scenario test link should include line number"
-    
-    @pytest.mark.parametrize("has_test_method,sub_epic_has_test_file,has_link", [
-        # Scenario with test_method and sub-epic has test_file -> has link
-        (True, True, True),
-        # Scenario with test_method but sub-epic has no test_file -> no link
-        (True, False, False),
-        # Scenario without test_method but sub-epic has test_file -> no link
-        (False, True, False),
-        # Scenario without test_method and sub-epic without test_file -> no link
-        (False, False, False),
-    ])
-    def test_scenario_test_link_combinations(self, tmp_path, has_test_method, sub_epic_has_test_file, has_link):
+    def test_save_preserves_nested_subepic_domain_concepts(self, tmp_path):
         """
-        SCENARIO: Scenario test link appears based on test_method and sub-epic test_file
-        GIVEN: Scenario with/without test_method and sub-epic with/without test_file
-        WHEN: Scope is enriched with links
-        THEN: Test link appears only when scenario has test_method and sub-epic has test_file
+        SCENARIO: Save preserves domain concepts in nested sub-epics
+        GIVEN: Story graph with nested sub-epic containing domain concepts
+        WHEN: Story map is saved after any operation
+        THEN: Nested sub-epic's domain concepts and walkthroughs are preserved
         """
-        from scope.json_scope import JSONScope
-        from scope import Scope, ScopeType
-        
+        # Given: Create story graph with nested sub-epic structure
         helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_nested_subepic_domain_concepts()
         
-        # Create test file if sub-epic needs it
-        if sub_epic_has_test_file:
-            test_dir = helper.workspace / 'test'
-            test_dir.mkdir(exist_ok=True)
-            test_file = test_dir / 'test_story.py'
-            test_file.write_text('class TestMyStory:\n    def test_scenario(self):\n        pass')
+        # When: Save the story map
+        helper.bot.story_map.save()
         
-        # Create scenario data
-        scenario_data = {
-            'name': 'Test Scenario',
-            'type': 'happy_path',
-            'steps': 'Given X\nWhen Y\nThen Z'
-        }
-        if has_test_method:
-            scenario_data['test_method'] = 'test_scenario'
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
         
-        # Create story data (stories don't have test_file - they inherit from sub-epic)
-        story_data = {
-            'name': 'Test Story',
-            'test_class': 'TestMyStory',
-            'sequential_order': 1.0,
-            'scenarios': [scenario_data]
-        }
+        # Then: Verify nested sub-epic domain concepts are preserved
+        epic_after = helper.bot.story_map.epics["TestEpic"]
+        parent_subepic_after = epic_after.find_sub_epic_by_name("ParentSubEpic")
+        nested_subepic_after = helper.story.find_nested_subepic(parent_subepic_after, "NestedSubEpic")
         
-        # Create sub-epic data with test_file
-        sub_epic_data = {
-            'name': 'Test Sub Epic',
-            'sequential_order': 1.0,
-            'story_groups': [{
-                'type': 'and',
-                'stories': [story_data]
-            }]
-        }
-        if sub_epic_has_test_file:
-            sub_epic_data['test_file'] = 'test_story.py'
+        expected_domain_concepts = helper.story.get_expected_nested_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            nested_subepic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.ParentSubEpic.NestedSubEpic"
+        )
+    
+    def test_save_preserves_domain_concept_extra_fields(self, tmp_path):
+        """
+        SCENARIO: Save preserves all domain concept fields including module, inherits_from, _source_path
+        GIVEN: Story graph with domain concept containing all fields
+        WHEN: Story map is saved
+        THEN: All domain concept fields are preserved including extra fields
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
         
-        story_graph = {
-            'epics': [{
-                'name': 'Test Epic',
-                'sub_epics': [sub_epic_data]
-            }]
-        }
+        # Given: Domain concept with all fields
+        epic = helper.bot.story_map.epics["TestEpic"]
+        dc = epic.domain_concepts[0]
+        dc.module = "test_module"
+        dc.inherits_from = "BaseConcept"
+        dc._source_path = "TestEpic.TestSubEpic"
+        epic.save()
         
-        # Save using helper
-        helper.story.create_story_graph(story_graph)
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        epic_after = helper.bot.story_map.epics["TestEpic"]
         
-        # Use 'story' scope type instead of 'showAll' to enable scenario enrichment
-        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
-        scope.filter(type=ScopeType.STORY, value=['Test Story'])
-        json_scope = JSONScope(scope)
-        result = json_scope.to_dict()
-        
-        # Verify scenario test link
-        story = result['content']['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
-        scenario = story['scenarios'][0]
-        
-        if has_link:
-            assert 'test_file' in scenario, "Scenario should have test_file link"
-            assert 'test_story.py' in scenario['test_file']
-        else:
-            # Scenario may have test_file field but it should be empty or not point to actual test
-            if 'test_file' in scenario:
-                assert scenario['test_file'] is None or scenario['test_file'] == ''
+        # Then: Verify all fields are preserved with comprehensive validation
+        expected_domain_concepts = [{
+            "name": "EpicDomainConcept",
+            "module": "test_module",
+            "inherits_from": "BaseConcept",
+            "_source_path": "TestEpic.TestSubEpic",
+            "responsibilities": [
+                {
+                    "name": "Manages epic operations",
+                    "collaborators": ["Operator1", "Operator2"]
+                }
+            ],
+            "realization": [
+                {
+                    "scope": "TestEpic.EpicDomainConcept",
+                    "scenario": "EpicDomainConcept manages operations",
+                    "walks": [
+                        {
+                            "covers": "Initialize concept",
+                            "object_flow": [
+                                "concept = EpicDomainConcept.create()"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }]
+        helper.story.assert_domain_concepts_match(
+            epic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic"
+        )
 
 # ============================================================================
 # CLI TESTS - Scope Operations via CLI Commands

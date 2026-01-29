@@ -1268,6 +1268,96 @@ class StoryTestHelper(BaseHelper):
             }
             self.create_story_graph(story_graph_data)
     
+    def create_story_graph_with_domain_concepts(self):
+        """Create story graph with domain concepts at epic and sub-epic levels.
+        
+        Returns:
+            Story graph dict with domain concepts including walkthroughs/realizations
+        """
+        story_graph = {
+            "epics": [
+                {
+                    "name": "TestEpic",
+                    "sequential_order": 0,
+                    "domain_concepts": [
+                        {
+                            "name": "EpicDomainConcept",
+                            "module": "test",
+                            "responsibilities": [
+                                {
+                                    "name": "Manages epic operations",
+                                    "collaborators": ["Operator1", "Operator2"]
+                                }
+                            ],
+                            "realization": [
+                                {
+                                    "scope": "TestEpic.EpicDomainConcept",
+                                    "scenario": "EpicDomainConcept manages operations",
+                                    "walks": [
+                                        {
+                                            "covers": "Initialize concept",
+                                            "object_flow": [
+                                                "concept = EpicDomainConcept.create()"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "sub_epics": [
+                        {
+                            "name": "TestSubEpic",
+                            "sequential_order": 0,
+                            "domain_concepts": [
+                                {
+                                    "name": "SubEpicDomainConcept",
+                                    "module": "test",
+                                    "responsibilities": [
+                                        {
+                                            "name": "Handles sub-epic operations",
+                                            "collaborators": ["Handler"]
+                                        }
+                                    ],
+                                    "realization": [
+                                        {
+                                            "scope": "TestEpic.TestSubEpic.SubEpicDomainConcept",
+                                            "scenario": "SubEpicDomainConcept handles operations",
+                                            "walks": [
+                                                {
+                                                    "covers": "Process operations",
+                                                    "object_flow": [
+                                                        "result = concept.handle_operations()"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "story_groups": [
+                                {
+                                    "name": "",
+                                    "sequential_order": 0,
+                                    "type": "and",
+                                    "stories": [
+                                        {
+                                            "name": "TestStory",
+                                            "sequential_order": 0,
+                                            "scenarios": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        self.create_story_graph(story_graph)
+        return story_graph
+    
     def create_story_graph_with_sub_epics(self, epic_subepic_list):
         """Create story graph with epics and sub-epics.
         
@@ -1296,6 +1386,156 @@ class StoryTestHelper(BaseHelper):
         self.create_story_graph(story_graph_data)
         return story_graph_data
     
+    def assert_domain_concepts_match(self, actual_domain_concepts, expected_domain_concepts, context_path=""):
+        """Comprehensively validate domain concepts match expected structure.
+        
+        Validates all fields including:
+        - Basic fields: name, module, inherits_from, _source_path
+        - Responsibilities: name, collaborators
+        - Realizations: scope, scenario, walks with covers and object_flow
+        
+        Args:
+            actual_domain_concepts: List of DomainConcept objects from loaded story map
+            expected_domain_concepts: List of dicts with expected domain concept structure
+            context_path: Path string for error messages (e.g., "TestEpic.TestSubEpic")
+        
+        Raises:
+            AssertionError: If any field doesn't match expected structure
+        """
+        assert actual_domain_concepts is not None, f"Domain concepts should exist at {context_path}"
+        assert len(actual_domain_concepts) == len(expected_domain_concepts), \
+            f"Expected {len(expected_domain_concepts)} domain concepts at {context_path}, got {len(actual_domain_concepts)}"
+        
+        # Create lookup by name for easier matching
+        actual_by_name = {dc.name: dc for dc in actual_domain_concepts}
+        
+        for expected_dc in expected_domain_concepts:
+            expected_name = expected_dc['name']
+            assert expected_name in actual_by_name, \
+                f"Domain concept '{expected_name}' not found at {context_path}"
+            
+            actual_dc = actual_by_name[expected_name]
+            dc_path = f"{context_path}.{expected_name}" if context_path else expected_name
+            
+            # Validate basic fields
+            assert actual_dc.name == expected_name, \
+                f"Domain concept name mismatch at {dc_path}: expected '{expected_name}', got '{actual_dc.name}'"
+            
+            if 'module' in expected_dc:
+                assert actual_dc.module == expected_dc['module'], \
+                    f"Domain concept module mismatch at {dc_path}: expected '{expected_dc['module']}', got '{actual_dc.module}'"
+            
+            if 'inherits_from' in expected_dc:
+                assert actual_dc.inherits_from == expected_dc['inherits_from'], \
+                    f"Domain concept inherits_from mismatch at {dc_path}: expected '{expected_dc['inherits_from']}', got '{actual_dc.inherits_from}'"
+            
+            if '_source_path' in expected_dc:
+                assert actual_dc._source_path == expected_dc['_source_path'], \
+                    f"Domain concept _source_path mismatch at {dc_path}: expected '{expected_dc['_source_path']}', got '{actual_dc._source_path}'"
+            
+            # Validate responsibilities
+            expected_responsibilities = expected_dc.get('responsibilities', [])
+            assert len(actual_dc.responsibilities) == len(expected_responsibilities), \
+                f"Domain concept '{expected_name}' at {dc_path} should have {len(expected_responsibilities)} responsibilities, got {len(actual_dc.responsibilities)}"
+            
+            for idx, (actual_resp, expected_resp_dict) in enumerate(zip(actual_dc.responsibilities, expected_responsibilities)):
+                expected_resp_name = expected_resp_dict['name']
+                assert actual_resp.name == expected_resp_name, \
+                    f"Responsibility {idx} name mismatch at {dc_path}: expected '{expected_resp_name}', got '{actual_resp.name}'"
+                
+                expected_collaborators = expected_resp_dict.get('collaborators', [])
+                actual_collaborator_names = [c.name for c in actual_resp.collaborators]
+                assert actual_collaborator_names == expected_collaborators, \
+                    f"Responsibility '{actual_resp.name}' collaborators mismatch at {dc_path}: expected {expected_collaborators}, got {actual_collaborator_names}"
+            
+            # Validate realizations (walkthroughs)
+            expected_realizations = expected_dc.get('realization', [])
+            assert actual_dc.realization is not None, \
+                f"Domain concept '{expected_name}' at {dc_path} should have realization field"
+            assert len(actual_dc.realization) == len(expected_realizations), \
+                f"Domain concept '{expected_name}' at {dc_path} should have {len(expected_realizations)} realizations, got {len(actual_dc.realization)}"
+            
+            for idx, (actual_real, expected_real) in enumerate(zip(actual_dc.realization, expected_realizations)):
+                assert actual_real['scope'] == expected_real['scope'], \
+                    f"Realization {idx} scope mismatch at {dc_path}: expected '{expected_real['scope']}', got '{actual_real['scope']}'"
+                
+                assert actual_real['scenario'] == expected_real['scenario'], \
+                    f"Realization {idx} scenario mismatch at {dc_path}: expected '{expected_real['scenario']}', got '{actual_real['scenario']}'"
+                
+                expected_walks = expected_real.get('walks', [])
+                assert 'walks' in actual_real, \
+                    f"Realization {idx} at {dc_path} should have 'walks' field"
+                assert len(actual_real['walks']) == len(expected_walks), \
+                    f"Realization {idx} at {dc_path} should have {len(expected_walks)} walks, got {len(actual_real['walks'])}"
+                
+                for walk_idx, (actual_walk, expected_walk) in enumerate(zip(actual_real['walks'], expected_walks)):
+                    assert actual_walk['covers'] == expected_walk['covers'], \
+                        f"Walk {walk_idx} in realization {idx} at {dc_path}: covers mismatch - expected '{expected_walk['covers']}', got '{actual_walk['covers']}'"
+                    
+                    expected_object_flow = expected_walk.get('object_flow', [])
+                    assert 'object_flow' in actual_walk, \
+                        f"Walk {walk_idx} in realization {idx} at {dc_path} should have 'object_flow' field"
+                    assert actual_walk['object_flow'] == expected_object_flow, \
+                        f"Walk {walk_idx} in realization {idx} at {dc_path}: object_flow mismatch - expected {expected_object_flow}, got {actual_walk['object_flow']}"
+    
+    def get_expected_epic_domain_concepts(self):
+        """Get expected domain concepts structure for TestEpic."""
+        return [
+            {
+                "name": "EpicDomainConcept",
+                "module": "test",
+                "responsibilities": [
+                    {
+                        "name": "Manages epic operations",
+                        "collaborators": ["Operator1", "Operator2"]
+                    }
+                ],
+                "realization": [
+                    {
+                        "scope": "TestEpic.EpicDomainConcept",
+                        "scenario": "EpicDomainConcept manages operations",
+                        "walks": [
+                            {
+                                "covers": "Initialize concept",
+                                "object_flow": [
+                                    "concept = EpicDomainConcept.create()"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    
+    def get_expected_subepic_domain_concepts(self):
+        """Get expected domain concepts structure for TestSubEpic."""
+        return [
+            {
+                "name": "SubEpicDomainConcept",
+                "module": "test",
+                "responsibilities": [
+                    {
+                        "name": "Handles sub-epic operations",
+                        "collaborators": ["Handler"]
+                    }
+                ],
+                "realization": [
+                    {
+                        "scope": "TestEpic.TestSubEpic.SubEpicDomainConcept",
+                        "scenario": "SubEpicDomainConcept handles operations",
+                        "walks": [
+                            {
+                                "covers": "Process operations",
+                                "object_flow": [
+                                    "result = concept.handle_operations()"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    
     def create_story_under_subepic(self, subepic, story_name, test_class=None):
         """Create a story under a SubEpic.
         
@@ -1316,6 +1556,113 @@ class StoryTestHelper(BaseHelper):
             story.save()
         
         return story
+    
+    def create_story_graph_with_nested_subepic_domain_concepts(self):
+        """Create story graph with nested sub-epic containing domain concepts.
+        
+        Structure: Epic > ParentSubEpic > NestedSubEpic (with domain concepts)
+        Note: ParentSubEpic must NOT have stories (constraint: cannot nest sub-epics under sub-epics with stories)
+        
+        Returns:
+            Story graph dict with nested sub-epic structure
+        """
+        story_graph = {
+            "epics": [
+                {
+                    "name": "TestEpic",
+                    "sequential_order": 0,
+                    "domain_concepts": [],
+                    "sub_epics": [
+                        {
+                            "name": "ParentSubEpic",
+                            "sequential_order": 0,
+                            "domain_concepts": [],
+                            "sub_epics": [
+                                {
+                                    "name": "NestedSubEpic",
+                                    "sequential_order": 0,
+                                    "domain_concepts": [
+                                        {
+                                            "name": "NestedSubEpicDomainConcept",
+                                            "module": "test",
+                                            "responsibilities": [
+                                                {
+                                                    "name": "Handles nested sub-epic operations",
+                                                    "collaborators": ["NestedHandler"]
+                                                }
+                                            ],
+                                            "realization": [
+                                                {
+                                                    "scope": "TestEpic.ParentSubEpic.NestedSubEpic.NestedSubEpicDomainConcept",
+                                                    "scenario": "NestedSubEpicDomainConcept handles nested operations",
+                                                    "walks": [
+                                                        {
+                                                            "covers": "Process nested operations",
+                                                            "object_flow": [
+                                                                "result = nested_concept.process_nested_operations()"
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "story_groups": [],
+                                    "sub_epics": []
+                                }
+                            ],
+                            "story_groups": []  # Must be empty - cannot nest under sub-epic with stories
+                        }
+                    ]
+                }
+            ]
+        }
+        
+        self.create_story_graph(story_graph)
+        return story_graph
+    
+    def get_expected_nested_subepic_domain_concepts(self):
+        """Get expected domain concepts structure for NestedSubEpic."""
+        return [
+            {
+                "name": "NestedSubEpicDomainConcept",
+                "module": "test",
+                "responsibilities": [
+                    {
+                        "name": "Handles nested sub-epic operations",
+                        "collaborators": ["NestedHandler"]
+                    }
+                ],
+                "realization": [
+                    {
+                        "scope": "TestEpic.ParentSubEpic.NestedSubEpic.NestedSubEpicDomainConcept",
+                        "scenario": "NestedSubEpicDomainConcept handles nested operations",
+                        "walks": [
+                            {
+                                "covers": "Process nested operations",
+                                "object_flow": [
+                                    "result = nested_concept.process_nested_operations()"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    
+    def find_nested_subepic(self, parent_subepic, nested_subepic_name):
+        """Find nested sub-epic under a parent sub-epic.
+        
+        Args:
+            parent_subepic: Parent SubEpic node
+            nested_subepic_name: Name of the nested sub-epic to find
+            
+        Returns:
+            Nested SubEpic node or None if not found
+        """
+        # Find nested sub-epic by iterating through _children
+        # Use type name check instead of isinstance to avoid import issues
+        return next((child for child in parent_subepic._children if type(child).__name__ == 'SubEpic' and child.name == nested_subepic_name), None)
     
     # =======================================================================================
     # Behavior Determination Helpers
@@ -1391,7 +1738,31 @@ class StoryTestHelper(BaseHelper):
         # Build stories if present
         if sub_epic_data.get('stories'):
             stories = []
+            # Collect all test classes for consolidation
+            all_test_classes = {}  # test_class_name -> test_methods mapping
             test_file_for_sub_epic = None
+            
+            for story_data in sub_epic_data['stories']:
+                if story_data.get('test_class') and story_data.get('test_methods'):
+                    test_file = story_data.get('test_class')  # This is actually the test file name
+                    # Use first story's test_file as SubEpic's test_file
+                    if not test_file_for_sub_epic:
+                        test_file_for_sub_epic = test_file
+                    
+                    # Extract class name from test file
+                    test_class_name = test_file.replace('.py', '').replace('test_', '')
+                    test_class_name = ''.join(word.capitalize() for word in test_class_name.split('_'))
+                    test_class_name = 'Test' + test_class_name if not test_class_name.startswith('Test') else test_class_name
+                    
+                    # Store test class and methods for later consolidation
+                    all_test_classes[test_class_name] = story_data.get('test_methods', [])
+            
+            # Create a single consolidated test file for the SubEpic
+            if test_file_for_sub_epic and all_test_classes:
+                self._create_consolidated_test_file(test_file_for_sub_epic, all_test_classes)
+            
+            # Set test_file on SubEpic
+            sub_epic['test_file'] = test_file_for_sub_epic
             
             for story_idx, story_data in enumerate(sub_epic_data['stories']):
                 story = self._build_story_for_behavior_test(story_data, story_idx)
@@ -1433,7 +1804,7 @@ class StoryTestHelper(BaseHelper):
             'connector': None,
             'story_type': 'user',
             'users': [],
-            'test_file': test_file if test_file else None,  # Set test_file to the actual test file
+            # Stories don't have test_file - it comes from parent SubEpic
             'test_class': test_class_name,
             'scenarios': self._build_scenarios_for_behavior_test(
                 story_data.get('scenarios', []),
@@ -1492,10 +1863,29 @@ class StoryTestHelper(BaseHelper):
         Returns:
             SubEpic node from loaded story graph
         """
-        # Create dummy test files for stories with test_methods
+        # Create a single test file for the SubEpic containing all test classes
+        # Determine SubEpic's test_file (use first story's test_file if available)
+        sub_epic_test_file = None
+        all_test_classes = {}  # test_class_name -> test_methods mapping
+        
         for story_data in stories_data:
             if story_data.get('test_class') and story_data.get('test_methods'):
-                self._create_dummy_test_file_for_story(story_data)
+                test_file = story_data.get('test_class')  # This is actually the test file name
+                # Use first story's test_file as SubEpic's test_file
+                if not sub_epic_test_file:
+                    sub_epic_test_file = test_file
+                
+                # Extract class name from test file
+                test_class_name = test_file.replace('.py', '').replace('test_', '')
+                test_class_name = ''.join(word.capitalize() for word in test_class_name.split('_'))
+                test_class_name = 'Test' + test_class_name if not test_class_name.startswith('Test') else test_class_name
+                
+                # Store test class and methods for later consolidation
+                all_test_classes[test_class_name] = story_data.get('test_methods', [])
+        
+        # Create a single consolidated test file for the SubEpic
+        if sub_epic_test_file and all_test_classes:
+            self._create_consolidated_test_file(sub_epic_test_file, all_test_classes)
         
         # Build stories for the story group
         stories = []
@@ -1515,7 +1905,7 @@ class StoryTestHelper(BaseHelper):
                             'name': sub_epic_name,
                             'sequential_order': 0.0,
                             'behavior': 'exploration',
-                            'test_file': None,
+                            'test_file': sub_epic_test_file,
                             'sub_epics': [],
                             'story_groups': [
                                 {
@@ -1637,6 +2027,27 @@ class {test_class}:
         
         test_path.write_text(content, encoding='utf-8')
     
+    def _create_consolidated_test_file(self, test_file, test_classes_dict):
+        """Create a single test file containing multiple test classes (one per story in SubEpic)."""
+        test_dir = self.workspace / 'test'
+        test_dir.mkdir(exist_ok=True)
+        
+        test_path = test_dir / test_file
+        
+        # Generate consolidated test file content with all test classes
+        content = "import pytest\n\n"
+        for test_class_name, test_methods in test_classes_dict.items():
+            content += f"class {test_class_name}:\n"
+            for test_method in test_methods:
+                if test_method:
+                    content += f"""    def {test_method}(self):
+        pass
+    
+"""
+            content += "\n"
+        
+        test_path.write_text(content, encoding='utf-8')
+    
     def _create_test_files_for_sub_epics(self, sub_epics_data):
         """Recursively create test files for all stories in sub-epics."""
         for sub_epic_data in sub_epics_data:
@@ -1666,4 +2077,85 @@ class {test_class}:
         # Don't modify story_data - that will be used later to build the story
         # Just create the test file with the calculated class name
         self._create_dummy_test_file(test_file, test_class_name, test_methods)
+    
+    # =======================================================================================
+    # File Testing Helpers
+    # =======================================================================================
+    
+    def create_test_file(self, test_file_path: str, test_class: str, test_methods: list = None) -> Path:
+        """Create a test file with test class and methods.
+        
+        Args:
+            test_file_path: Relative path from workspace/test (e.g., 'invoke_bot/edit_story_map/test_open_story_related_files.py')
+            test_class: Name of test class (e.g., 'TestOpenAllRelatedFiles')
+            test_methods: List of test method names (e.g., ['test_graph_button_opens_story_graph'])
+        
+        Returns:
+            Path to created test file
+        """
+        test_dir = self.parent.workspace / 'test'
+        test_dir.mkdir(parents=True, exist_ok=True)
+        test_file = test_dir / test_file_path
+        
+        # Create parent directories if they don't exist
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        content = f"class {test_class}:\n"
+        if test_methods:
+            for method in test_methods:
+                content += f"    def {method}(self):\n        pass\n"
+        else:
+            content += "    pass\n"
+        
+        test_file.write_text(content, encoding='utf-8')
+        return test_file
+    
+    def assert_file_exists(self, file_path, description: str = "File") -> Path:
+        """Assert that a file path exists and return Path object.
+        
+        Args:
+            file_path: File path (string or Path)
+            description: Description for error message
+        
+        Returns:
+            Path object for the file
+        """
+        file_path_obj = Path(file_path)
+        assert file_path_obj.exists(), f"{description} should exist at {file_path_obj}"
+        return file_path_obj
+    
+    def assert_story_graph_line_contains_node(self, story_graph_path: Path, line_number: int, node_name: str):
+        """Assert that a line in story graph JSON contains the node name.
+        
+        Args:
+            story_graph_path: Path to story-graph.json
+            line_number: Line number (1-based)
+            node_name: Expected node name
+        """
+        assert story_graph_path.exists(), f"Story graph file should exist at {story_graph_path}"
+        assert line_number is not None, "Line number should be found for node in JSON"
+        with open(story_graph_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            line_at_position = lines[line_number - 1]
+            assert f'"name": "{node_name}"' in line_at_position, f"Line {line_number} should contain node name: {line_at_position}"
+    
+    def create_story_files_for_node(self, node):
+        """Create story markdown files for a node and all its children recursively.
+        
+        Args:
+            node: StoryNode (Story, SubEpic, or Epic) to create files for
+        """
+        from story_graph.nodes import Story, Epic, SubEpic
+        
+        # Calculate file_link by calling save if it's a Story
+        if isinstance(node, Story):
+            node.save()  # This calculates file_link
+            if node.file_link:
+                story_file_path = Path(node.file_link)
+                story_file_path.parent.mkdir(parents=True, exist_ok=True)
+                story_file_path.write_text(f"# {node.name}\n\n", encoding='utf-8')
+        elif isinstance(node, (Epic, SubEpic)):
+            # Recursively create files for all child stories
+            for child in node.children:
+                self.create_story_files_for_node(child)
 
