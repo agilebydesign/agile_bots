@@ -289,7 +289,12 @@ class CLISession:
         if is_navigation_command and not cli_terminated:
             output = self._append_navigation_context(result, output)
         
-        return CLICommandResponse(output=output, cli_terminated=cli_terminated)
+        # Extract status from result if it's a dict
+        status = None
+        if isinstance(result, dict):
+            status = result.get('status')
+        
+        return CLICommandResponse(output=output, status=status, cli_terminated=cli_terminated)
     
     def _build_json_instructions_response(self, output: str) -> CLICommandResponse:
         import json

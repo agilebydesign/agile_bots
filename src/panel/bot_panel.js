@@ -13,9 +13,6 @@ const BotView = require("./bot_view");
 const PanelView = require("./panel_view");
 
 class BotPanel {
-  static currentPanel = undefined;
-  static viewType = "agilebot.botPanel";
-
   constructor(panel, workspaceRoot, extensionUri) {
     // ===== PERFORMANCE: Start constructor timing =====
     const perfConstructorStart = performance.now();
@@ -272,6 +269,119 @@ class BotPanel {
                 }
               }
             }
+            return;
+          case "openFileInColumn":
+            this._log('[BotPanel] openFileInColumn message received');
+            if (message.filePath) {
+              const rawPath = message.filePath;
+              const cleanPath = rawPath.split('#')[0];
+              const viewColumn = message.viewColumn || 'Beside';
+              
+              let absolutePath;
+              if (cleanPath.startsWith('file://')) {
+                absolutePath = vscode.Uri.parse(cleanPath).fsPath;
+              } else {
+                const decoded = decodeURIComponent(cleanPath);
+                absolutePath = path.isAbsolute(decoded) 
+                  ? decoded 
+                  : path.join(this._workspaceRoot, decoded);
+              }
+              const fileUri = vscode.Uri.file(absolutePath);
+              
+              const columnMap = {
+                'One': vscode.ViewColumn.One,
+                'Two': vscode.ViewColumn.Two,
+                'Three': vscode.ViewColumn.Three,
+                'Four': vscode.ViewColumn.Four,
+                'Beside': vscode.ViewColumn.Beside,
+                'Active': vscode.ViewColumn.Active
+              };
+              const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.Beside;
+              
+              vscode.workspace.openTextDocument(fileUri).then(
+                (doc) => {
+                  vscode.window.showTextDocument(doc, { viewColumn: targetColumn });
+                },
+                (error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                }
+              );
+            }
+            return;
+          case "openFileWithState":
+            this._log('[BotPanel] openFileWithState message received');
+            if (message.filePath) {
+              // Open file and apply state (collapse/expand)
+              const rawPath = message.filePath;
+              const cleanPath = rawPath.split('#')[0];
+              let absolutePath;
+              if (cleanPath.startsWith('file://')) {
+                absolutePath = vscode.Uri.parse(cleanPath).fsPath;
+              } else {
+                const decoded = decodeURIComponent(cleanPath);
+                absolutePath = path.isAbsolute(decoded) 
+                  ? decoded 
+                  : path.join(this._workspaceRoot, decoded);
+              }
+              const fileUri = vscode.Uri.file(absolutePath);
+              
+              vscode.workspace.openTextDocument(fileUri).then(
+                (doc) => {
+                  let lineNumber = null;
+                  
+                  // If state includes line number or node info, find the line
+                  if (message.state && message.state.lineNumber) {
+                    lineNumber = message.state.lineNumber;
+                  } else if (message.state && message.state.selectedNode) {
+                    // Try to find line number by searching for the node in JSON
+                    const node = message.state.selectedNode;
+                    const text = doc.getText();
+                    const lines = text.split('\n');
+                    
+                    // Search for the node by name and type
+                    // Look for patterns like "name": "NodeName" within the appropriate structure
+                    for (let i = 0; i < lines.length; i++) {
+                      const line = lines[i];
+                      // Match node name in JSON (accounting for escaped quotes)
+                      const namePattern = new RegExp(`"name"\\s*:\\s*"${node.name.replace(/"/g, '\\"')}"`);
+                      if (namePattern.test(line)) {
+                        // Check if this matches the node type context
+                        // For epics: look for "epics": [ ... ]
+                        // For sub-epics: look within parent epic
+                        // For stories: look within story_groups
+                        lineNumber = i + 1; // VS Code uses 1-based line numbers
+                        break;
+                      }
+                    }
+                  }
+                  
+                  const options = lineNumber 
+                    ? { 
+                        viewColumn: vscode.ViewColumn.Two,
+                        selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0)
+                      }
+                    : { viewColumn: vscode.ViewColumn.Two };
+                  
+                  vscode.window.showTextDocument(doc, options).then(() => {
+                    // Send state information - actual collapse/expand will be handled by story graph viewer if it supports it
+                    if (message.state) {
+                      this._log(`[BotPanel] File opened with state: collapseAll=${message.state.collapseAll}, expandPath=${message.state.expandPath}, lineNumber=${lineNumber}`);
+                    }
+                  });
+                },
+                (error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                }
+              );
+            }
+            return;
+          case "openStoryFiles":
+          case "openTestFiles":
+          case "openCodeFiles":
+          case "openAllRelatedFiles":
+            // These commands need to query story graph data, so delegate to bot
+            this._log(`[BotPanel] ${message.command} message received for node: ${message.nodeName}`);
+            this._handleOpenRelatedFiles(message);
             return;
           case "clearScopeFilter":
             this._botView?.execute('scope all')
@@ -1006,6 +1116,114 @@ class BotPanel {
     }
   }
 
+  async _handleOpenRelatedFiles(message) {
+    try {
+      const { command, nodeType, nodeName, nodePath, singleFileLink, storyGraphPath } = message;
+      this._log(`[BotPanel] _handleOpenRelatedFiles: ${command} for ${nodeType} "${nodeName}"`);
+      
+      if (!this._botView) {
+        vscode.window.showErrorMessage('Bot view not available');
+        return;
+      }
+      
+      // Query story graph to get file information
+      const storyGraph = await this._botView.execute('story_graph');
+      if (!storyGraph || !storyGraph.story_graph) {
+        vscode.window.showErrorMessage('Could not load story graph');
+        return;
+      }
+      
+      const fs = require('fs');
+      const path = require('path');
+      const workspaceRoot = this._workspaceRoot;
+      
+      // Helper to resolve file path
+      const resolvePath = (filePath) => {
+        if (!filePath) return null;
+        if (path.isAbsolute(filePath)) return filePath;
+        return path.join(workspaceRoot, filePath);
+      };
+      
+      // Helper to open file in column
+      const openInColumn = async (filePath, column, options = {}) => {
+        const absolutePath = resolvePath(filePath);
+        if (!absolutePath || !fs.existsSync(absolutePath)) {
+          this._log(`[BotPanel] File not found: ${filePath}`);
+          return;
+        }
+        const fileUri = vscode.Uri.file(absolutePath);
+        const doc = await vscode.workspace.openTextDocument(fileUri);
+        const openOptions = { viewColumn: column, ...options };
+        await vscode.window.showTextDocument(doc, openOptions);
+      };
+      
+      if (command === 'openStoryFiles') {
+        // Open story markdown files
+        if (singleFileLink) {
+          // Single story - open normally
+          await openInColumn(singleFileLink, vscode.ViewColumn.One);
+        } else {
+          // Query for all story files under node
+          this._log(`[BotPanel] Opening story files for ${nodeType} "${nodeName}"`);
+          
+          // Use the openStoryFile domain API to get all story files
+          try {
+            const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
+            if (result && result.files && Array.isArray(result.files)) {
+              // Open files normally (not in separate panes)
+              for (const filePath of result.files) {
+                await openInColumn(filePath, vscode.ViewColumn.One);
+              }
+              this._log(`[BotPanel] Opened ${result.files.length} story files`);
+            }
+          } catch (error) {
+            this._log(`[BotPanel] Error getting story files: ${error.message}`);
+            // Fallback: try to discover files from story graph structure
+            // TODO: Implement story file discovery from story graph
+          }
+        }
+      } else if (command === 'openTestFiles') {
+        // Open test files with scope expanded
+        // Query story graph for test_file and test_class
+        this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
+        // TODO: Implement test file discovery and scope expansion
+      } else if (command === 'openCodeFiles') {
+        // Infer and open code files from test files
+        this._log(`[BotPanel] Opening code files inferred from tests for ${nodeType} "${nodeName}"`);
+        // TODO: Implement code file inference from test files
+      } else if (command === 'openAllRelatedFiles') {
+        // Open all files in separate split editors: graph (right), stories, tests, code (left)
+        const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/stories/story-graph.json');
+        
+        // Open story graph in column 2 (rightmost)
+        await openInColumn(graphPath, vscode.ViewColumn.Two);
+        
+        // Open story files in separate editor panes (to the left of graph)
+        if (singleFileLink) {
+          await openInColumn(singleFileLink, vscode.ViewColumn.Beside);
+        } else {
+          // Get all story files and open each in its own pane
+          try {
+            const storyResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
+            if (storyResult && storyResult.files && Array.isArray(storyResult.files)) {
+              for (const filePath of storyResult.files) {
+                await openInColumn(filePath, vscode.ViewColumn.Beside);
+              }
+            }
+          } catch (error) {
+            this._log(`[BotPanel] Error getting story files for All: ${error.message}`);
+          }
+        }
+        
+        // TODO: Open test files and code files in appropriate columns (further left)
+        this._log(`[BotPanel] Opened all related files for ${nodeType} "${nodeName}" in separate split editors`);
+      }
+    } catch (error) {
+      this._log(`[BotPanel] ERROR in _handleOpenRelatedFiles: ${error.message}`);
+      vscode.window.showErrorMessage(`Failed to open related files: ${error.message}`);
+    }
+  }
+
   dispose() {
     BotPanel.currentPanel = undefined;
 
@@ -1255,7 +1473,7 @@ class BotPanel {
 
   _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null) {
     const currentBehaviorScript = currentBehavior 
-      ? `\n        <script>\n            window.currentBehavior = ${JSON.stringify(currentBehavior)};\n            ${currentAction ? `window.currentAction = ${JSON.stringify(currentAction)};` : ''}\n        </script>`
+      ? '\n        <script>\n            window.currentBehavior = ' + JSON.stringify(currentBehavior) + ';\n            ' + (currentAction ? 'window.currentAction = ' + JSON.stringify(currentAction) + ';' : '') + '\n        </script>'
       : '';
     return `<!DOCTYPE html>
 <html lang="en">
@@ -1731,10 +1949,10 @@ class BotPanel {
             font-style: italic;
             padding: var(--space-sm);
         }
-    </style>${currentBehaviorScript}
+    </style>' + currentBehaviorScript + '
 </head>
 <body>
-    ${contentHtml}
+    ' + contentHtml + '
     
     <script>
         const vscode = acquireVsCodeApi();
@@ -2785,7 +3003,7 @@ class BotPanel {
                 // Fallback: send command directly (defaults to optimistic for story-changing ops)
                 vscode.postMessage({
                     command: 'executeCommand',
-                    commandText: \`\${nodePath}.delete\`
+                    commandText: nodePath + '.delete'
                     // optimistic defaults to true for story-changing operations
                 });
             }
@@ -2807,7 +3025,7 @@ class BotPanel {
                 // Backend delete() method defaults to cascade=True (always includes children)
                 vscode.postMessage({
                     command: 'executeCommand',
-                    commandText: \`\${nodePath}.delete()\`
+                    commandText: nodePath + '.delete()'
                     // optimistic defaults to true for story-changing operations
                 });
             }
@@ -2872,6 +3090,11 @@ class BotPanel {
             const btnDelete = document.getElementById('btn-delete');
             const btnScopeTo = document.getElementById('btn-scope-to');
             const btnSubmit = document.getElementById('btn-submit');
+            const btnOpenGraph = document.getElementById('btn-open-graph');
+            const btnOpenStories = document.getElementById('btn-open-stories');
+            const btnOpenTests = document.getElementById('btn-open-tests');
+            const btnOpenCode = document.getElementById('btn-open-code');
+            const btnOpenAll = document.getElementById('btn-open-all');
             
             // Hide all buttons first
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';
@@ -2882,6 +3105,11 @@ class BotPanel {
             if (btnDelete) btnDelete.style.display = 'none';
             if (btnScopeTo) btnScopeTo.style.display = 'none';
             if (btnSubmit) btnSubmit.style.display = 'none';
+            if (btnOpenGraph) btnOpenGraph.style.display = 'none';
+            if (btnOpenStories) btnOpenStories.style.display = 'none';
+            if (btnOpenTests) btnOpenTests.style.display = 'none';
+            if (btnOpenCode) btnOpenCode.style.display = 'none';
+            if (btnOpenAll) btnOpenAll.style.display = 'none';
             
             // Show buttons based on selection
             if (window.selectedNode.type === 'root') {
@@ -2919,6 +3147,15 @@ class BotPanel {
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
                 // Note: submit button will be shown below if scenario has behavior_needed
+            }
+            
+            // Show related files buttons for all non-root nodes
+            if (window.selectedNode.type !== 'root') {
+                if (btnOpenGraph) btnOpenGraph.style.display = 'block';
+                if (btnOpenStories) btnOpenStories.style.display = 'block';
+                if (btnOpenTests) btnOpenTests.style.display = 'block';
+                if (btnOpenCode) btnOpenCode.style.display = 'block';
+                if (btnOpenAll) btnOpenAll.style.display = 'block';
             }
             
             // Update submit button based on current behavior and action
@@ -3083,7 +3320,7 @@ class BotPanel {
             // Fallback to name+type if path not found
             if (!targetNode) {
                 const nodeName = name || 'Story Map';
-                targetNode = document.querySelector(\`.story-node[data-node-type="\${type}"][data-node-name="\${nodeName}"]\`);
+                targetNode = document.querySelector('.story-node[data-node-type="' + type + '"][data-node-name="' + nodeName + '"]');
                 console.log('[WebView]   Found node by type+name:', type, nodeName);
             }
             
@@ -3240,7 +3477,7 @@ class BotPanel {
                 console.warn('[WebView] handleDeleteNode not available, falling back to direct command');
                 // Fallback: send command directly (will still work, but no optimistic update)
                 // Backend delete() method defaults to cascade=True (always includes children)
-                const commandText = \`\${nodePath}.delete()\`;
+                const commandText = nodePath + '.delete()';
                 vscode.postMessage({
                     command: 'executeCommand',
                     commandText: commandText
@@ -3384,6 +3621,127 @@ class BotPanel {
             });
             
             console.log('[WebView] ========== COMMAND SENT ==========');
+        };
+        
+        // Helper function to get file link from selected node DOM element
+        function getSelectedNodeFileLink() {
+            if (!window.selectedNode || !window.selectedNode.name) return null;
+            const nodeElement = document.querySelector('.story-node[data-node-type="' + window.selectedNode.type + '"][data-node-name="' + window.selectedNode.name + '"]');
+            return nodeElement ? nodeElement.getAttribute('data-file-link') : null;
+        }
+        
+        // Helper function to get workspace directory
+        function getWorkspaceDir() {
+            // Try to get from botData if available
+            if (window.botData && window.botData.workspace_directory) {
+                return window.botData.workspace_directory;
+            }
+            // Fallback: try to infer from story graph path
+            const storyGraphPath = 'docs/stories/story-graph.json';
+            return ''; // Will be resolved relative to workspace root
+        }
+        
+        // Helper function to open file in specific view column (for split editors)
+        function openFileInColumn(filePath, viewColumn) {
+            vscode.postMessage({
+                command: 'openFileInColumn',
+                filePath: filePath,
+                viewColumn: viewColumn // 'One', 'Two', 'Three', 'Four', 'Beside', 'Active'
+            });
+        }
+        
+        window.handleOpenGraph = function() {
+            console.log('[WebView] handleOpenGraph called');
+            const workspaceDir = getWorkspaceDir();
+            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            
+            // Open story graph and request to collapse all, expand selected node path, position cursor
+            vscode.postMessage({
+                command: 'openFileWithState',
+                filePath: storyGraphPath,
+                state: {
+                    collapseAll: true,
+                    expandPath: window.selectedNode.path || null,
+                    selectedNode: window.selectedNode,
+                    positionCursor: true // Request cursor positioning at expanded section
+                }
+            });
+        };
+        
+        window.handleOpenStories = function() {
+            console.log('[WebView] handleOpenStories called');
+            const fileLink = getSelectedNodeFileLink();
+            
+            if (!window.selectedNode || !window.selectedNode.name) {
+                console.error('[WebView] No node selected');
+                return;
+            }
+            
+            // Request story files for selected node
+            vscode.postMessage({
+                command: 'openStoryFiles',
+                nodeType: window.selectedNode.type,
+                nodeName: window.selectedNode.name,
+                nodePath: window.selectedNode.path,
+                singleFileLink: fileLink
+            });
+        };
+        
+        window.handleOpenTests = function() {
+            console.log('[WebView] handleOpenTests called');
+            
+            if (!window.selectedNode || !window.selectedNode.name) {
+                console.error('[WebView] No node selected');
+                return;
+            }
+            
+            // Request test files for selected node with scope expansion
+            vscode.postMessage({
+                command: 'openTestFiles',
+                nodeType: window.selectedNode.type,
+                nodeName: window.selectedNode.name,
+                nodePath: window.selectedNode.path
+            });
+        };
+        
+        window.handleOpenCode = function() {
+            console.log('[WebView] handleOpenCode called');
+            
+            if (!window.selectedNode || !window.selectedNode.name) {
+                console.error('[WebView] No node selected');
+                return;
+            }
+            
+            // Request code files inferred from tests for selected node
+            vscode.postMessage({
+                command: 'openCodeFiles',
+                nodeType: window.selectedNode.type,
+                nodeName: window.selectedNode.name,
+                nodePath: window.selectedNode.path
+            });
+        };
+        
+        window.handleOpenAll = function() {
+            console.log('[WebView] handleOpenAll called');
+            
+            if (!window.selectedNode || !window.selectedNode.name) {
+                console.error('[WebView] No node selected');
+                return;
+            }
+            
+            const fileLink = getSelectedNodeFileLink();
+            const workspaceDir = getWorkspaceDir();
+            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            
+            // Open all files in split editors
+            vscode.postMessage({
+                command: 'openAllRelatedFiles',
+                nodeType: window.selectedNode.type,
+                nodeName: window.selectedNode.name,
+                nodePath: window.selectedNode.path,
+                singleFileLink: fileLink,
+                storyGraphPath: storyGraphPath
+            });
         };
         
         
@@ -3574,5 +3932,9 @@ class BotPanel {
 </html>`;
   }
 }
+
+// Static properties (assigned after class definition for compatibility)
+BotPanel.currentPanel = undefined;
+BotPanel.viewType = "agilebot.botPanel";
 
 module.exports = BotPanel;
