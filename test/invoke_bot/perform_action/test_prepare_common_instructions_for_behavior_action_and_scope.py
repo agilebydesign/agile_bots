@@ -343,30 +343,43 @@ class TestSubmitScopeInstructions:
         assert 'Story Scope' in display_text or 'Story1' in display_text, \
             "display_content should contain story scope information"
         
-        # Verify story_graph markdown appears (from scope.results serialized via markdown adapter)
+        # Verify instruction text and story_graph JSON appears (from scope.results serialized via JSON adapter)
         # The story_graph should appear after the scope section
         scope_section_index = display_text.find('## Scope')
         after_scope = display_text[scope_section_index:]
         
-        # Story graph markdown should contain the "## Story Graph" header
-        assert '## Story Graph' in after_scope, \
-            "display_content should contain '## Story Graph' header after scope section"
+        # Verify instruction text appears before JSON
+        assert 'Please only work on the following scope' in after_scope, \
+            "display_content should contain instruction text 'Please only work on the following scope'"
+        assert 'Scope Filter:' in after_scope, "display_content should contain 'Scope Filter:' label"
+        assert 'Scope:' in after_scope, "display_content should contain 'Scope:' label"
         
-        # Story graph markdown should contain epic/story structure
-        # MarkdownStoryGraph serializes epics with "### Epics" header and epic names with 🎯 emoji
-        assert '### Epics' in after_scope or '🎯' in after_scope or 'TestEpic' in after_scope, \
-            "display_content should contain story_graph epics section with epic names"
+        # Story graph JSON should be valid JSON (starts with {)
+        import json
+        # Find JSON content after scope section - look for JSON structure
+        json_start = after_scope.find('{')
+        assert json_start != -1, "display_content should contain JSON story graph after scope section"
         
-        # Verify story graph path is included (MarkdownStoryGraph includes "**Path:** `...`")
-        assert '**Path:**' in after_scope or 'story-graph.json' in after_scope, \
-            "display_content should contain story graph path information"
+        # Extract and parse JSON to verify it's valid
+        json_content = after_scope[json_start:]
+        # Find the end of JSON (stop at next section marker)
+        json_end_marker = json_content.find('\n---')
+        if json_end_marker != -1:
+            json_content = json_content[:json_end_marker].strip()
+        
+        # Parse JSON to verify it's valid story graph structure
+        parsed_json = json.loads(json_content)
+        assert isinstance(parsed_json, dict), "Story graph JSON should be a dictionary"
+        # Verify it contains expected story graph structure (path, content, epics, etc.)
+        assert 'path' in parsed_json or 'content' in parsed_json or 'epics' in parsed_json or 'epic_count' in parsed_json, \
+            "display_content should contain story graph JSON with expected structure (path, content, epics, or epic_count)"
         
         # Verify bot.submit_instructions() can use this display_content
         # This is what bot.submit_instructions() does - joins display_content
         content_str = '\n'.join(instructions.display_content)
         assert len(content_str) > 0, "display_content should produce non-empty string for submission"
         assert '## Scope' in content_str, "Submitted content should contain scope section"
-        assert '## Story Graph' in content_str, "Submitted content should contain story graph section"
+        assert '{' in content_str or '[' in content_str, "Submitted content should contain JSON story graph"
 
 
 # ============================================================================
