@@ -357,10 +357,10 @@ class BotPanel {
                   
                   const options = lineNumber 
                     ? { 
-                        viewColumn: vscode.ViewColumn.Two,
+                        viewColumn: vscode.ViewColumn.One,
                         selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0)
                       }
-                    : { viewColumn: vscode.ViewColumn.Two };
+                    : { viewColumn: vscode.ViewColumn.One };
                   
                   vscode.window.showTextDocument(doc, options).then(() => {
                     // Send state information - actual collapse/expand will be handled by story graph viewer if it supports it
@@ -1186,28 +1186,112 @@ class BotPanel {
         // Open test files with scope expanded
         // Query story graph for test_file and test_class
         this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
-        // TODO: Implement test file discovery and scope expansion
+        
+        try {
+          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
+          if (result && result.files && Array.isArray(result.files)) {
+            // Open each test file with scope information
+            for (const testFileInfo of result.files) {
+              const testFilePath = testFileInfo.file;
+              const absolutePath = path.isAbsolute(testFilePath)
+                ? testFilePath
+                : path.join(workspaceRoot, testFilePath);
+              
+              const fileUri = vscode.Uri.file(absolutePath);
+              const doc = await vscode.workspace.openTextDocument(fileUri);
+              
+              // Open in Column One
+              await vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.One,
+                preserveFocus: false
+              });
+              
+              // TODO: Implement fold/unfold logic to expand test_class/test_method and collapse others
+              // This would require using VS Code's folding API or commands
+            }
+            this._log(`[BotPanel] Opened ${result.files.length} test files`);
+          }
+        } catch (error) {
+          this._log(`[BotPanel] Error getting test files: ${error.message}`);
+          vscode.window.showErrorMessage(`Failed to open test files: ${error.message}`);
+        }
       } else if (command === 'openCodeFiles') {
         // Infer and open code files from test files
         this._log(`[BotPanel] Opening code files inferred from tests for ${nodeType} "${nodeName}"`);
-        // TODO: Implement code file inference from test files
+        
+        try {
+          // First get test files
+          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
+          if (result && result.files && Array.isArray(result.files)) {
+            const inferredCodeFiles = new Set(); // Use Set to avoid duplicates
+            
+            // Infer code files from test files
+            for (const testFileInfo of result.files) {
+              const testFilePath = testFileInfo.file;
+              
+              // Infer code file path: replace "test/" with "src/" and remove "test_" prefix
+              let codeFilePath = testFilePath;
+              
+              // Replace test/ with src/
+              codeFilePath = codeFilePath.replace(/[\\/]test[\\/]/g, '/src/');
+              codeFilePath = codeFilePath.replace(/^test[\\/]/g, 'src/');
+              
+              // Remove test_ prefix from filename
+              const parts = codeFilePath.split(/[\\/]/);
+              const filename = parts[parts.length - 1];
+              if (filename.startsWith('test_')) {
+                parts[parts.length - 1] = filename.substring(5); // Remove "test_"
+                codeFilePath = parts.join('/');
+              }
+              
+              inferredCodeFiles.add(codeFilePath);
+            }
+            
+            // Open each inferred code file
+            for (const codeFilePath of inferredCodeFiles) {
+              const absolutePath = path.isAbsolute(codeFilePath)
+                ? codeFilePath
+                : path.join(workspaceRoot, codeFilePath);
+              
+              const fileUri = vscode.Uri.file(absolutePath);
+              
+              // Check if file exists before trying to open
+              const fs = require('fs');
+              if (fs.existsSync(absolutePath)) {
+                const doc = await vscode.workspace.openTextDocument(fileUri);
+                
+                // Open in Column One
+                await vscode.window.showTextDocument(doc, {
+                  viewColumn: vscode.ViewColumn.One,
+                  preserveFocus: false
+                });
+              } else {
+                this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
+              }
+            }
+            this._log(`[BotPanel] Opened ${inferredCodeFiles.size} inferred code files`);
+          }
+        } catch (error) {
+          this._log(`[BotPanel] Error opening code files: ${error.message}`);
+          vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
+        }
       } else if (command === 'openAllRelatedFiles') {
-        // Open all files in separate split editors: graph (right), stories, tests, code (left)
+        // Open all files in separate split editors: graph (leftmost), stories, tests, code (rightmost)
         const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/stories/story-graph.json');
         
-        // Open story graph in column 2 (rightmost)
-        await openInColumn(graphPath, vscode.ViewColumn.Two);
+        // Open story graph in column 1 (leftmost)
+        await openInColumn(graphPath, vscode.ViewColumn.One);
         
-        // Open story files in separate editor panes (to the left of graph)
+        // Open story files in column 2 (to the right of graph)
         if (singleFileLink) {
-          await openInColumn(singleFileLink, vscode.ViewColumn.Beside);
+          await openInColumn(singleFileLink, vscode.ViewColumn.Two);
         } else {
-          // Get all story files and open each in its own pane
+          // Get all story files and open each in column 2
           try {
             const storyResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
             if (storyResult && storyResult.files && Array.isArray(storyResult.files)) {
               for (const filePath of storyResult.files) {
-                await openInColumn(filePath, vscode.ViewColumn.Beside);
+                await openInColumn(filePath, vscode.ViewColumn.Two);
               }
             }
           } catch (error) {
@@ -1215,7 +1299,60 @@ class BotPanel {
           }
         }
         
-        // TODO: Open test files and code files in appropriate columns (further left)
+        // Open test files in column 3
+        try {
+          const testResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
+          if (testResult && testResult.files && Array.isArray(testResult.files)) {
+            for (const testFileInfo of testResult.files) {
+              const testFilePath = testFileInfo.file;
+              await openInColumn(testFilePath, vscode.ViewColumn.Three);
+            }
+          }
+        } catch (error) {
+          this._log(`[BotPanel] Error getting test files for All: ${error.message}`);
+        }
+        
+        // Open code files in column 4 (rightmost)
+        try {
+          const testResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
+          if (testResult && testResult.files && Array.isArray(testResult.files)) {
+            const inferredCodeFiles = new Set();
+            
+            // Infer code files from test files
+            for (const testFileInfo of testResult.files) {
+              const testFilePath = testFileInfo.file;
+              
+              // Infer code file path
+              let codeFilePath = testFilePath;
+              codeFilePath = codeFilePath.replace(/[\\/]test[\\/]/g, '/src/');
+              codeFilePath = codeFilePath.replace(/^test[\\/]/g, 'src/');
+              
+              const parts = codeFilePath.split(/[\\/]/);
+              const filename = parts[parts.length - 1];
+              if (filename.startsWith('test_')) {
+                parts[parts.length - 1] = filename.substring(5);
+                codeFilePath = parts.join('/');
+              }
+              
+              inferredCodeFiles.add(codeFilePath);
+            }
+            
+            // Open each inferred code file
+            const fs = require('fs');
+            for (const codeFilePath of inferredCodeFiles) {
+              const absolutePath = path.isAbsolute(codeFilePath)
+                ? codeFilePath
+                : path.join(workspaceRoot, codeFilePath);
+              
+              if (fs.existsSync(absolutePath)) {
+                await openInColumn(codeFilePath, vscode.ViewColumn.Four);
+              }
+            }
+          }
+        } catch (error) {
+          this._log(`[BotPanel] Error getting code files for All: ${error.message}`);
+        }
+        
         this._log(`[BotPanel] Opened all related files for ${nodeType} "${nodeName}" in separate split editors`);
       }
     } catch (error) {
@@ -1949,10 +2086,10 @@ class BotPanel {
             font-style: italic;
             padding: var(--space-sm);
         }
-    </style>' + currentBehaviorScript + '
+    </style>${currentBehaviorScript}
 </head>
 <body>
-    ' + contentHtml + '
+    ${contentHtml}
     
     <script>
         const vscode = acquireVsCodeApi();
