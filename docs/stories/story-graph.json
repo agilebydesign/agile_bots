@@ -13703,7 +13703,7 @@
               "name": "Prepare Common Instructions For Behavior, Action, and Scope",
               "sequential_order": 0.0,
               "behavior": "exploration",
-              "test_file": "invoke_bot/perform_action/test_prepare_common_instructions.py",
+              "test_file": "invoke_bot/perform_action/test_prepare_common_instructions_for_behavior_action_and_scope.py",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -13936,7 +13936,7 @@
                       "behavior": "code"
                     },
                     {
-                      "name": "Save Guardrails",
+                      "name": "Save Clarification Answers",
                       "sequential_order": 5.0,
                       "connector": "and",
                       "story_type": "user",
@@ -13944,55 +13944,131 @@
                         "System"
                       ],
                       "test_file": null,
-                      "test_class": "TestSaveGuardrailsViaCLI",
+                      "test_class": "TestSaveClarificationAnswers",
                       "scenarios": [
                         {
-                          "name": "Save answers to clarification file",
+                          "name": "Save new clarification answers",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_save_guardrail_data_answers",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves answers with question What is the scope of this work as Building bot system\nThen System loads existing clarification.json for shape behavior\nAnd System merges new answer with existing answers\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved answer"
+                          "test_method": "test_save_new_clarification_answers",
+                          "steps": "GIVEN: Bot with no existing clarifications\nWHEN: User saves answers via Bot.save()\nTHEN: Answers saved to clarification.json in test workspace"
                         },
                         {
-                          "name": "Save evidence to clarification file",
+                          "name": "Save merges with existing clarification answers",
                           "sequential_order": 2.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_save_guardrail_data_evidence",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has clarify action\nWhen Action saves evidence with Requirements doc as spec.md and User interviews as notes.md\nThen System loads existing clarification.json for shape behavior\nAnd System merges new evidence with existing evidence\nAnd System saves updated clarification.json to workspace docs folder\nAnd File contains shape behavior section with saved evidence"
+                          "test_method": "test_save_merges_with_existing_clarification_answers",
+                          "steps": "GIVEN: Bot with existing clarification answers\nWHEN: User saves additional/modified answers\nTHEN: New answers merged with existing, new overrides existing for same question"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": "exploration"
+                    },
+                    {
+                      "name": "Save Clarification Evidence",
+                      "sequential_order": 5.1,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSaveClarificationEvidence",
+                      "scenarios": [
+                        {
+                          "name": "Save evidence provided",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_save_evidence_provided",
+                          "steps": "GIVEN: Bot with clarification requirements\nWHEN: User provides evidence via Bot.save()\nTHEN: Evidence saved to clarification.json"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": "exploration"
+                    },
+                    {
+                      "name": "Save Strategy Decisions",
+                      "sequential_order": 5.2,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSaveStrategyDecisions",
+                      "scenarios": [
+                        {
+                          "name": "Save strategy decisions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_save_strategy_decisions",
+                          "steps": "GIVEN: Bot with strategy decision criteria\nWHEN: User makes decisions via Bot.save()\nTHEN: Only chosen decisions saved (not entire criteria template)"
                         },
                         {
-                          "name": "Save decisions to strategy file",
-                          "sequential_order": 3.0,
-                          "type": "",
+                          "name": "Save strategy assumptions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_save_guardrail_data_decisions",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves decisions with drill_down_approach as Dig deep on system interactions\nThen System loads existing strategy.json for shape behavior\nAnd System merges new decision with existing decisions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved decision"
+                          "test_method": "test_save_strategy_assumptions",
+                          "steps": "GIVEN: Bot with strategy context\nWHEN: User saves assumptions via Bot.save()\nTHEN: Assumptions saved to strategy.json"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": "exploration"
+                    },
+                    {
+                      "name": "Save Multiple Guardrails Together",
+                      "sequential_order": 5.3,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSaveMultipleGuardrails",
+                      "scenarios": [
+                        {
+                          "name": "Save all guardrails at once",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_save_all_guardrails_at_once",
+                          "steps": "GIVEN: Bot with current behavior\nWHEN: User saves answers, evidence, decisions, and assumptions together\nTHEN: All data saved to respective files"
                         },
                         {
-                          "name": "Save assumptions to strategy file",
-                          "sequential_order": 4.0,
-                          "type": "",
+                          "name": "Save preserves data across behaviors",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_save_guardrail_data_assumptions",
-                          "steps": "Given Bot is at shape behavior\nAnd Behavior has strategy action\nWhen Action saves assumptions with Focus on user flow over internal systems\nThen System loads existing strategy.json for shape behavior\nAnd System merges new assumption with existing assumptions\nAnd System saves updated strategy.json to workspace docs folder\nAnd File contains shape behavior section with saved assumption"
-                        },
+                          "test_method": "test_save_preserves_data_across_behaviors",
+                          "steps": "GIVEN: Multiple behaviors with saved guardrails\nWHEN: Switching between behaviors and saving\nTHEN: Each behavior's data is preserved independently"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": "exploration"
+                    },
+                    {
+                      "name": "Save File Isolation",
+                      "sequential_order": 5.4,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "System"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestSaveFileIsolation",
+                      "scenarios": [
                         {
-                          "name": "Merge preserves existing answer fields",
-                          "sequential_order": 5.0,
-                          "type": "",
+                          "name": "Save uses test workspace not production",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_merge_with_existing_answers",
-                          "steps": "Given clarification.json contains existing answers for shape behavior\nAnd Existing answers include What is the scope of this work as Building bot system\nAnd Existing answers include Who are the target users as AI Agents\nWhen Action saves updated answer Who are the target users as Developers and AI Agents\nThen System preserves What is the scope of this work as Building bot system\nAnd System overwrites Who are the target users to Developers and AI Agents\nAnd clarification.json contains both answers with new value for updated field"
-                        },
-                        {
-                          "name": "Merge preserves existing decision fields",
-                          "sequential_order": 6.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_merge_with_existing_decisions",
-                          "steps": "Given strategy.json contains existing decisions for shape behavior\nAnd Existing decisions include drill_down_approach as High and wide across all epics\nAnd Existing decisions include depth_of_shaping as Extensive\nWhen Action saves updated decision drill_down_approach as Dig deep on system interactions\nThen System preserves depth_of_shaping as Extensive\nAnd System overwrites drill_down_approach to Dig deep on system interactions\nAnd strategy.json contains both decisions with new value for updated field"
+                          "test_method": "test_save_uses_test_workspace_not_production",
+                          "steps": "GIVEN: Bot initialized with tmp_path workspace\nWHEN: Saving any data\nTHEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/stories"
                         }
                       ],
                       "acceptance_criteria": [],
@@ -14066,7 +14142,7 @@
                       "behavior": "code"
                     },
                     {
-                      "name": "Handle Operation Errors and Validation in CLI",
+                      "name": "Submit Scope Instructions",
                       "sequential_order": 7.0,
                       "connector": "and",
                       "story_type": "user",
@@ -14074,15 +14150,46 @@
                         "User"
                       ],
                       "test_file": null,
-                      "test_class": "TestHandleOperationErrorsAndValidationInCLI",
+                      "test_class": "TestSubmitScopeInstructions",
                       "scenarios": [
                         {
-                          "name": "Handle operation errors gracefully",
+                          "name": "Scope appears in instructions display_content markdown",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": "test_handle_operation_errors_gracefully",
-                          "steps": "GIVEN: CLI executes operation that fails\nWHEN: error occurs\nTHEN: CLI displays error message and remains operational"
+                          "test_method": "test_scope_appears_in_instructions_display_content",
+                          "steps": "GIVEN: Build action with story scope set\nWHEN: Instructions are retrieved via action.get_instructions()\nTHEN: instructions.display_content contains \"## Scope\" section\nAND: instructions.display_content contains story_graph markdown from scope.results\nAND: bot.submit_instructions() can use display_content to submit scope instructions"
+                        },
+                        {
+                          "name": "Domain concepts are properly serialized in JSON story graph",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_domain_concepts_serialized_in_json_story_graph",
+                          "steps": "GIVEN: Story graph with domain_concepts at epic and sub-epic levels\nWHEN: Instructions are retrieved with scope\nTHEN: display_content contains JSON with domain_concepts properly serialized\nAND: Domain concepts from both epic and sub-epic levels are included"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": "exploration"
+                    },
+                    {
+                      "name": "Handle Operation Errors and Validation in CLI",
+                      "sequential_order": 8.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_file": null,
+                      "test_class": "TestHandleErrorsUsingCLI",
+                      "scenarios": [
+                        {
+                          "name": "Invalid command shows error",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_invalid_command_shows_error",
+                          "steps": "GIVEN: CLI is at shape.build\nWHEN: user enters 'invalid_command'\nTHEN: CLI displays error message in appropriate channel format"
                         }
                       ],
                       "acceptance_criteria": [],
@@ -14090,7 +14197,7 @@
                     },
                     {
                       "name": "Save Guardrails Through CLI",
-                      "sequential_order": 8.0,
+                      "sequential_order": 9.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [
