@@ -2527,5 +2527,348 @@ class TestEnrichScopeWithLinks:
                 assert scenario['test_file'] is None or scenario['test_file'] == ''
 
 # ============================================================================
+# SAVE TESTS - Domain Concepts and Walkthroughs Preservation
+# ============================================================================
+
+class TestSaveStoryMapPreservesDomainConcepts:
+    """
+    Story: Save Story Map Changes Asynchronously
+    
+    Tests that verify domain concepts and walkthroughs (realizations) are NEVER deleted
+    when saving story map after any edit operation (create, rename, move, delete).
+    """
+    
+    def test_save_after_create_epic_preserves_existing_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after creating epic preserves existing domain concepts
+        GIVEN: Story graph with epic containing domain concepts and walkthroughs
+        WHEN: New epic is created and story map is saved
+        THEN: Original epic's domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # When: Create new epic
+        helper.bot.story_map.create_epic("NewEpic")
+        helper.bot.story_map.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        original_epic = helper.bot.story_map.epics["TestEpic"]
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_epic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            original_epic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic"
+        )
+    
+    def test_save_after_create_subepic_preserves_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after creating sub-epic preserves domain concepts
+        GIVEN: Story graph with epic containing sub-epic with domain concepts
+        WHEN: New sub-epic is created under epic and story map is saved
+        THEN: Original sub-epic's domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # When: Create new sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        new_subepic = epic.create_sub_epic("NewSubEpic")
+        epic.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        original_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            original_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
+    
+    def test_save_after_rename_epic_preserves_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after renaming epic preserves domain concepts
+        GIVEN: Story graph with epic containing domain concepts and walkthroughs
+        WHEN: Epic is renamed and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # When: Rename epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        epic.rename("RenamedEpic")
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        renamed_epic = helper.bot.story_map.epics["RenamedEpic"]
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_epic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            renamed_epic.domain_concepts,
+            expected_domain_concepts,
+            context_path="RenamedEpic"
+        )
+    
+    def test_save_after_rename_subepic_preserves_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after renaming sub-epic preserves domain concepts
+        GIVEN: Story graph with sub-epic containing domain concepts and walkthroughs
+        WHEN: Sub-epic is renamed and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # When: Rename sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic.find_sub_epic_by_name("TestSubEpic")
+        subepic.rename("RenamedSubEpic")
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        renamed_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("RenamedSubEpic")
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            renamed_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.RenamedSubEpic"
+        )
+    
+    def test_save_after_move_subepic_preserves_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after moving sub-epic preserves domain concepts
+        GIVEN: Story graph with two epics, one containing sub-epic with domain concepts
+        WHEN: Sub-epic is moved to different epic and story map is saved
+        THEN: Domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # Given: Create second epic
+        helper.bot.story_map.create_epic("Epic2")
+        # Get Epic2 from story map to ensure we're using the actual object in the map
+        epic2 = helper.bot.story_map.epics["Epic2"]
+        
+        # When: Move sub-epic to second epic
+        epic1 = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic1.find_sub_epic_by_name("TestSubEpic")
+        assert subepic is not None, "TestSubEpic should exist before move"
+        
+        # Verify sub-epic has domain concepts before move
+        assert subepic.domain_concepts is not None and len(subepic.domain_concepts) > 0, "Sub-epic should have domain concepts before move"
+        
+        # Verify Epic2 structure before move
+        assert len(epic2._children) == 0, f"Epic2 should be empty before move. Has: {[c.name for c in epic2._children]}"
+        
+        # Perform move
+        try:
+            subepic.move_to(epic2)
+        except Exception as e:
+            pytest.fail(f"move_to failed with error: {e}")
+        
+        # Verify move happened in memory before save
+        # Note: Epic1.children might return stories if TestSubEpic had stories, so check _children instead
+        epic1_subepics = [c for c in epic1._children if isinstance(c, SubEpic)]
+        assert "TestSubEpic" not in [c.name for c in epic1_subepics], f"TestSubEpic should be removed from Epic1. Still present: {[c.name for c in epic1_subepics]}"
+        
+        # Verify TestSubEpic is in Epic2's _children
+        epic2_child_names = [c.name for c in epic2._children]
+        assert "TestSubEpic" in epic2_child_names, f"TestSubEpic should be in Epic2._children. Available: {epic2_child_names}"
+        
+        # Verify Epic2 is in the story map's epics list (check by name since objects may differ)
+        epic2_names = [e.name for e in helper.bot.story_map._epics_list]
+        assert "Epic2" in epic2_names, f"Epic2 should be in story map's epics list. Available: {epic2_names}"
+        
+        # Verify Epic2 has TestSubEpic in memory before save
+        # Get Epic2 from story map again to ensure we're checking the right object
+        epic2_actual = helper.bot.story_map.epics["Epic2"]
+        epic2_child_names = [c.name for c in epic2_actual._children]
+        assert "TestSubEpic" in epic2_child_names, f"TestSubEpic should be in Epic2._children before save. Available: {epic2_child_names}, all children: {[type(c).__name__ + ':' + c.name for c in epic2_actual._children]}"
+        
+        # Ensure story map is saved after the move
+        # Note: subepic.move_to() already called subepic.save() which calls story_map.save(),
+        # but we call it again to ensure everything is persisted
+        helper.bot.story_map.save()
+        
+        # Verify JSON file contains Epic2 with TestSubEpic
+        import json
+        story_graph_path = helper.workspace / 'docs' / 'stories' / 'story-graph.json'
+        saved_data = json.loads(story_graph_path.read_text())
+        epic2_data = next((e for e in saved_data['epics'] if e['name'] == 'Epic2'), None)
+        assert epic2_data is not None, "Epic2 should exist in saved JSON"
+        assert len(epic2_data.get('sub_epics', [])) > 0, f"Epic2 should have sub-epics in JSON. Got: {epic2_data}, all epics: {[e['name'] for e in saved_data['epics']]}"
+        test_subepic_data = next((se for se in epic2_data.get('sub_epics', []) if se['name'] == 'TestSubEpic'), None)
+        assert test_subepic_data is not None, f"TestSubEpic should exist under Epic2 in JSON. Available: {[se['name'] for se in epic2_data.get('sub_epics', [])]}"
+        assert 'domain_concepts' in test_subepic_data, "TestSubEpic should have domain_concepts in JSON"
+        assert len(test_subepic_data['domain_concepts']) > 0, "TestSubEpic should have domain concepts in JSON"
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        epic2_after = helper.bot.story_map.epics["Epic2"]
+        # Find moved sub-epic - Epic.children returns SubEpics directly
+        moved_subepic = epic2_after.find_sub_epic_by_name("TestSubEpic")
+        assert moved_subepic is not None, f"Moved sub-epic should exist under Epic2. Available children: {[c.name for c in epic2_after.children]}"
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            moved_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="Epic2.TestSubEpic"
+        )
+    
+    def test_save_after_delete_sibling_preserves_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after deleting sibling preserves domain concepts
+        GIVEN: Story graph with epic containing multiple sub-epics, one with domain concepts
+        WHEN: Sibling sub-epic is deleted and story map is saved
+        THEN: Remaining sub-epic's domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # Given: Create second sub-epic without domain concepts
+        epic = helper.bot.story_map.epics["TestEpic"]
+        epic.create_sub_epic("SubEpicWithoutConcepts")
+        
+        # When: Delete the sub-epic without concepts
+        subepic_to_delete = epic.find_sub_epic_by_name("SubEpicWithoutConcepts")
+        subepic_to_delete.delete()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        remaining_subepic = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            remaining_subepic.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
+    
+    def test_save_after_create_story_preserves_parent_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save after creating story preserves parent sub-epic domain concepts
+        GIVEN: Story graph with sub-epic containing domain concepts
+        WHEN: Story is created under sub-epic and story map is saved
+        THEN: Sub-epic's domain concepts and walkthroughs are preserved
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # When: Create story under sub-epic
+        epic = helper.bot.story_map.epics["TestEpic"]
+        subepic = epic.find_sub_epic_by_name("TestSubEpic")
+        subepic.create_story("NewStory")
+        subepic.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        subepic_after = helper.bot.story_map.epics["TestEpic"].find_sub_epic_by_name("TestSubEpic")
+        
+        # Then: Verify domain concepts are preserved with comprehensive validation
+        expected_domain_concepts = helper.story.get_expected_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            subepic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.TestSubEpic"
+        )
+    
+    def test_save_preserves_nested_subepic_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Save preserves domain concepts in nested sub-epics
+        GIVEN: Story graph with nested sub-epic containing domain concepts
+        WHEN: Story map is saved after any operation
+        THEN: Nested sub-epic's domain concepts and walkthroughs are preserved
+        """
+        # Given: Create story graph with nested sub-epic structure
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_nested_subepic_domain_concepts()
+        
+        # When: Save the story map
+        helper.bot.story_map.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        
+        # Then: Verify nested sub-epic domain concepts are preserved
+        epic_after = helper.bot.story_map.epics["TestEpic"]
+        parent_subepic_after = epic_after.find_sub_epic_by_name("ParentSubEpic")
+        nested_subepic_after = helper.story.find_nested_subepic(parent_subepic_after, "NestedSubEpic")
+        
+        expected_domain_concepts = helper.story.get_expected_nested_subepic_domain_concepts()
+        helper.story.assert_domain_concepts_match(
+            nested_subepic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic.ParentSubEpic.NestedSubEpic"
+        )
+    
+    def test_save_preserves_domain_concept_extra_fields(self, tmp_path):
+        """
+        SCENARIO: Save preserves all domain concept fields including module, inherits_from, _source_path
+        GIVEN: Story graph with domain concept containing all fields
+        WHEN: Story map is saved
+        THEN: All domain concept fields are preserved including extra fields
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.story.create_story_graph_with_domain_concepts()
+        
+        # Given: Domain concept with all fields
+        epic = helper.bot.story_map.epics["TestEpic"]
+        dc = epic.domain_concepts[0]
+        dc.module = "test_module"
+        dc.inherits_from = "BaseConcept"
+        dc._source_path = "TestEpic.TestSubEpic"
+        epic.save()
+        
+        # Then: Reload story map
+        helper.story.load_story_graph_into_bot()
+        epic_after = helper.bot.story_map.epics["TestEpic"]
+        
+        # Then: Verify all fields are preserved with comprehensive validation
+        expected_domain_concepts = [{
+            "name": "EpicDomainConcept",
+            "module": "test_module",
+            "inherits_from": "BaseConcept",
+            "_source_path": "TestEpic.TestSubEpic",
+            "responsibilities": [
+                {
+                    "name": "Manages epic operations",
+                    "collaborators": ["Operator1", "Operator2"]
+                }
+            ],
+            "realization": [
+                {
+                    "scope": "TestEpic.EpicDomainConcept",
+                    "scenario": "EpicDomainConcept manages operations",
+                    "walks": [
+                        {
+                            "covers": "Initialize concept",
+                            "object_flow": [
+                                "concept = EpicDomainConcept.create()"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }]
+        helper.story.assert_domain_concepts_match(
+            epic_after.domain_concepts,
+            expected_domain_concepts,
+            context_path="TestEpic"
+        )
+
+# ============================================================================
 # CLI TESTS - Scope Operations via CLI Commands
 # ============================================================================

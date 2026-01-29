@@ -791,12 +791,15 @@ class Epic(StoryNode):
 @dataclass
 class SubEpic(StoryNode):
     sequential_order: float
+    domain_concepts: Optional[List[DomainConcept]] = None
     _parent: Optional[StoryNode] = field(default=None, repr=False)
 
     def __post_init__(self):
         super().__post_init__()
         if self.sequential_order is None:
             raise ValueError('SubEpic requires sequential_order')
+        if self.domain_concepts is None:
+            self.domain_concepts = []
         self._children: List['StoryNode'] = []
         # Initialize test_file attribute (not a dataclass field to avoid signature issues)
         if not hasattr(self, 'test_file'):
@@ -842,9 +845,11 @@ class SubEpic(StoryNode):
         sequential_order = data.get('sequential_order')
         if sequential_order is None:
             raise ValueError('SubEpic requires sequential_order')
+        domain_concepts = [DomainConcept.from_dict(dc) for dc in data.get('domain_concepts', [])]
         sub_epic = cls(
             name=data.get('name', ''),
             sequential_order=float(sequential_order),
+            domain_concepts=domain_concepts,
             behavior=data.get('behavior'),
             _parent=parent,
             _bot=bot
@@ -1664,9 +1669,9 @@ class StoryMap:
             'name': epic.name,
             'sequential_order': epic.sequential_order,
             'behavior': epic.behavior,  # Always include behavior (even if None)
-            'domain_concepts': [dc.__dict__ for dc in epic.domain_concepts] if epic.domain_concepts else [],
-            'sub_epics': [self._sub_epic_to_dict(child) for child in epic.children if isinstance(child, SubEpic)],
-            'story_groups': [self._story_group_to_dict(child) for child in epic.children if isinstance(child, StoryGroup)]
+            'domain_concepts': [dc.to_dict() for dc in epic.domain_concepts] if epic.domain_concepts else [],
+            'sub_epics': [self._sub_epic_to_dict(child) for child in epic._children if isinstance(child, SubEpic)],
+            'story_groups': [self._story_group_to_dict(child) for child in epic._children if isinstance(child, StoryGroup)]
         }
         return result
 
@@ -1676,14 +1681,17 @@ class StoryMap:
             'name': sub_epic.name,
             'sequential_order': sub_epic.sequential_order,
             'behavior': sub_epic.behavior,  # Always include behavior (even if None)
+            'domain_concepts': [dc.to_dict() for dc in sub_epic.domain_concepts] if sub_epic.domain_concepts else [],
         }
         
         # Include test_file if present (critical for test links in panel)
         if sub_epic.test_file is not None:
             result['test_file'] = sub_epic.test_file
         
+        # Serialize nested sub-epics - check all children and filter SubEpics
+        nested_subepics = [child for child in sub_epic._children if isinstance(child, SubEpic)]
         result.update({
-            'sub_epics': [self._sub_epic_to_dict(child) for child in sub_epic._children if isinstance(child, SubEpic)],
+            'sub_epics': [self._sub_epic_to_dict(child) for child in nested_subepics],
             'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)]
         })
         
