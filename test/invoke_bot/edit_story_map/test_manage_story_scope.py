@@ -223,9 +223,13 @@ class TestExecuteActionsWithScope:
         
         instructions = action.get_instructions(context)
         
-        assert 'scope' in instructions
-        assert instructions['scope'] is not None
-        assert isinstance(instructions['scope'], dict)
+        # Verify scope appears in display_content markdown
+        assert instructions.display_content is not None
+        assert len(instructions.display_content) > 0
+        display_text = '\n'.join(instructions.display_content)
+        assert '## Scope' in display_text, "display_content should contain '## Scope' section"
+        # Scope information is included in the markdown serialization, not necessarily as "Story Scope" text
+        # The scope section should exist when scope context is provided
     
     def test_validate_action_accepts_scope_context(self, tmp_path):
         """
@@ -446,8 +450,21 @@ class TestExecuteActionsWithScopeUsingCLI:
         cli_response1 = helper.cli_session.execute_command('scope set epic TestEpic')
         cli_response2 = helper.cli_session.execute_command('shape.validate')
         
-        # Then - Validate complete action execution response
-        helper.bot.assert_status_section_present(cli_response2.output)
+        # Then - Validate that scope is in instructions and contains what we set
+        # Get instructions from the action execution to verify scope is used
+        bot = helper.cli_session.bot
+        action = bot.behaviors.current.actions.current
+        from actions.action_context import ScopeActionContext
+        scope = bot.scope()
+        context = ScopeActionContext(scope=scope)
+        instructions = action.get_instructions(context)
+        
+        # Verify scope appears in display_content markdown
+        assert instructions.display_content is not None
+        assert len(instructions.display_content) > 0
+        display_text = '\n'.join(instructions.display_content)
+        assert '## Scope' in display_text, "display_content should contain '## Scope' section"
+        assert 'TestEpic' in display_text, "display_content should contain epic scope information"
 
 # ============================================================================
 # STORY: Navigate Story Graph

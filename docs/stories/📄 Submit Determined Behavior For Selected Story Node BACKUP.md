@@ -276,6 +276,7 @@ Then Bot returns behavior <expected_behavior>
 **Grandchildren Table (scenarios):**
 | story_name | scenario | test_method |
 | --- | --- | --- |
+|
 
 
 <a id="scenario-determine-behavior-for-epic-and-get-instructions"></a>

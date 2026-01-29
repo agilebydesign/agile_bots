@@ -234,13 +234,44 @@ class PanelView {
     }
     
     /**
-     * Cleanup - kill the Python process
+     * Cleanup - kill the Python process and remove all event listeners
      */
     cleanup() {
         if (this._pythonProcess) {
             console.log('[PanelView] Killing Python process');
-            this._pythonProcess.kill();
+            
+            // Remove all event listeners to prevent keeping event loop alive
+            if (this._pythonProcess.stdout) {
+                this._pythonProcess.stdout.removeAllListeners();
+                this._pythonProcess.stdout.destroy();
+            }
+            if (this._pythonProcess.stderr) {
+                this._pythonProcess.stderr.removeAllListeners();
+                this._pythonProcess.stderr.destroy();
+            }
+            if (this._pythonProcess.stdin) {
+                this._pythonProcess.stdin.removeAllListeners();
+                this._pythonProcess.stdin.end();
+            }
+            
+            // Remove process-level listeners
+            this._pythonProcess.removeAllListeners();
+            
+            // Kill the process
+            this._pythonProcess.kill('SIGTERM');
+            
+            // Force kill after a short delay if still running
+            setTimeout(() => {
+                if (this._pythonProcess && !this._pythonProcess.killed) {
+                    console.log('[PanelView] Force killing Python process');
+                    this._pythonProcess.kill('SIGKILL');
+                }
+            }, 100);
+            
             this._pythonProcess = null;
+            this._pendingResolve = null;
+            this._pendingReject = null;
+            this._responseBuffer = '';
         }
     }
     

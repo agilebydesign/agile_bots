@@ -158,8 +158,7 @@ class InstructionsViewTestHelper {
      * @returns {Promise<string>} - Rendered HTML
      */
     async render_html() {
-        const view = this.createInstructionsView();
-        return await view.render();
+        return await this._view.render();
     }
     
     // ========================================================================

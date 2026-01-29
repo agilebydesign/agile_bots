@@ -295,6 +295,178 @@ class TestSaveFileIsolation:
                     assert "Test question" not in answers, "Test data should NOT appear in production file"
 
 
+class TestSubmitScopeInstructions:
+    """Story: Submit Scope Instructions"""
+    
+    def test_scope_appears_in_instructions_display_content(self, tmp_path):
+        """
+        SCENARIO: Scope appears in instructions display_content markdown
+        GIVEN: Build action with story scope set
+        WHEN: Instructions are retrieved via action.get_instructions()
+        THEN: instructions.display_content contains "## Scope" section
+        AND: instructions.display_content contains story_graph markdown from scope.results
+        AND: bot.submit_instructions() can use display_content to submit scope instructions
+        """
+        from actions.action_context import ScopeActionContext
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create story graph with test stories
+        story_graph = helper.story.given_story_graph_dict(epic='TestEpic')
+        
+        # Set up sub_epics structure with Story1 for scope filtering
+        epic = story_graph['epics'][0]
+        epic['sub_epics'] = [
+            {
+                "name": "SubEpic1",
+                "sequential_order": 1,
+                "story_groups": [
+                    {
+                        "stories": [
+                            {
+                                "name": "Story1",
+                                "sequential_order": 1,
+                                "scenarios": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        
+        stories_dir = helper.workspace / 'docs' / 'stories'
+        helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
+        
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        
+        # Set scope to a specific story - apply it to the bot first
+        scope = Scope(workspace_directory=tmp_path, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['Story1'])
+        scope.apply_to_bot()
+        context = ScopeActionContext(scope=scope)
+        
+        # Get instructions - this calls _build_display_content() which uses MarkdownInstructions.serialize()
+        instructions = action.get_instructions(context)
+        
+        # Verify scope appears in display_content
+        helper.instructions.verify_scope_in_display_content(instructions)
+    
+    def test_domain_concepts_serialized_in_json_story_graph(self, tmp_path):
+        """
+        SCENARIO: Domain concepts are properly serialized in JSON story graph
+        GIVEN: Build action with story scope set and story graph containing domain_concepts
+        WHEN: Instructions are retrieved via action.get_instructions()
+        THEN: instructions.display_content contains "## Scope" section
+        AND: instructions.display_content contains story_graph markdown with domain_concepts from scope.results
+        AND: Domain concepts from both epic and sub-epic levels are included in JSON
+        """
+        from actions.action_context import ScopeActionContext
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create story graph with test stories - same as previous test
+        story_graph = helper.story.given_story_graph_dict(epic='TestEpic')
+        
+        # Add domain_concepts to epic
+        epic = story_graph['epics'][0]
+        epic['domain_concepts'] = [
+            {
+                "name": "EpicDomainConcept",
+                "responsibilities": [
+                    {
+                        "name": "Manages epic-level responsibilities",
+                        "collaborators": ["EpicCollaborator1", "EpicCollaborator2"]
+                    }
+                ],
+                "realization": [
+                    {
+                        "scope": "TestEpic.EpicDomainConcept.Manages epic-level responsibilities",
+                        "scenario": "EpicDomainConcept manages responsibilities",
+                        "walks": [
+                            {
+                                "covers": "Steps 1-2",
+                                "object_flow": [
+                                    "concept: EpicDomainConcept = EpicDomainConcept.create(name: 'EpicDomainConcept')"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        
+        # Set up sub_epics structure with Story1 for scope filtering
+        epic['sub_epics'] = [
+            {
+                "name": "SubEpic1",
+                "sequential_order": 1,
+                "story_groups": [
+                    {
+                        "stories": [
+                            {
+                                "name": "Story1",
+                                "sequential_order": 1,
+                                "scenarios": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        
+        # Add domain_concepts to first sub-epic
+        sub_epic = epic['sub_epics'][0]
+        sub_epic['domain_concepts'] = [
+            {
+                "name": "SubEpicDomainConcept",
+                "responsibilities": [
+                    {
+                        "name": "Manages sub-epic responsibilities",
+                        "collaborators": ["SubEpicCollaborator"]
+                    }
+                ],
+                "realization": [
+                    {
+                        "scope": "TestEpic.SubEpic1.SubEpicDomainConcept.Manages sub-epic responsibilities",
+                        "scenario": "SubEpicDomainConcept manages responsibilities",
+                        "walks": [
+                            {
+                                "covers": "Steps 1-2",
+                                "object_flow": [
+                                    "concept: SubEpicDomainConcept = SubEpicDomainConcept.create(name: 'SubEpicDomainConcept')"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+        
+        stories_dir = helper.workspace / 'docs' / 'stories'
+        helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
+        
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        
+        # Set scope to a specific story - apply it to the bot first
+        scope = Scope(workspace_directory=tmp_path, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['Story1'])
+        scope.apply_to_bot()
+        context = ScopeActionContext(scope=scope)
+        
+        # Get instructions - this calls _build_display_content() which uses MarkdownInstructions.serialize()
+        instructions = action.get_instructions(context)
+        
+        # Verify scope appears in display_content and get parsed JSON
+        parsed_json = helper.instructions.verify_scope_in_display_content(instructions)
+        
+        # Verify domain_concepts are present and properly structured
+        helper.instructions.verify_domain_concepts_in_json(parsed_json)
+
+
 # ============================================================================
 # CLI TESTS - Guardrails Commands and Error Handling
 # ============================================================================

@@ -299,6 +299,49 @@ class StoryMapView extends PanelView {
                             data-refresh-icon="${refreshIconPath}">
                         <img id="btn-submit-current-icon" src="${refreshIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Submit Current" />
                     </button>
+                    <!-- Related Files button group -->
+                    <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: 4px;">
+                        <button id="btn-open-graph" 
+                                onclick="event.stopPropagation(); handleOpenGraph();" 
+                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                                onmouseover="this.style.opacity='0.7'" 
+                                onmouseout="this.style.opacity='1'" 
+                                title="Open story graph with selected node expanded">
+                            <img src="${documentIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Graph" />
+                        </button>
+                        <button id="btn-open-stories" 
+                                onclick="event.stopPropagation(); handleOpenStories();" 
+                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                                onmouseover="this.style.opacity='0.7'" 
+                                onmouseout="this.style.opacity='1'" 
+                                title="Open story markdown files">
+                            <img src="${pageIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Stories" />
+                        </button>
+                        <button id="btn-open-tests" 
+                                onclick="event.stopPropagation(); handleOpenTests();" 
+                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                                onmouseover="this.style.opacity='0.7'" 
+                                onmouseout="this.style.opacity='1'" 
+                                title="Open test files with scope expanded">
+                            <img src="${testTubeIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Tests" />
+                        </button>
+                        <button id="btn-open-code" 
+                                onclick="event.stopPropagation(); handleOpenCode();" 
+                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                                onmouseover="this.style.opacity='0.7'" 
+                                onmouseout="this.style.opacity='1'" 
+                                title="Open code files inferred from tests">
+                            <img src="${gearIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Code" />
+                        </button>
+                        <button id="btn-open-all" 
+                                onclick="event.stopPropagation(); handleOpenAll();" 
+                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                                onmouseover="this.style.opacity='0.7'" 
+                                onmouseout="this.style.opacity='1'" 
+                                title="Open all related files in split editors">
+                            <img src="${showAllIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="All" />
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
