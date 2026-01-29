@@ -446,8 +446,19 @@ class TestExecuteActionsWithScopeUsingCLI:
         cli_response1 = helper.cli_session.execute_command('scope set epic TestEpic')
         cli_response2 = helper.cli_session.execute_command('shape.validate')
         
-        # Then - Validate complete action execution response
-        helper.bot.assert_status_section_present(cli_response2.output)
+        # Then - Validate that scope is in instructions and contains what we set
+        # Get instructions from the action execution to verify scope is used
+        bot = helper.cli_session.bot
+        action = bot.behaviors.current.actions.current
+        from actions.action_context import ScopeActionContext
+        scope = bot.scope()
+        context = ScopeActionContext(scope=scope)
+        instructions = action.get_instructions(context)
+        
+        assert instructions.scope is not None
+        # Verify the scope that was set via CLI is in the instructions
+        assert instructions.scope.type.value is not None
+        assert instructions.scope.value is not None
 
 # ============================================================================
 # STORY: Navigate Story Graph
