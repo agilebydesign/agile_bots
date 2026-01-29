@@ -16,20 +16,36 @@ class BehaviorsViewTestHelper {
         const PanelView = require('../../src/panel/panel_view');
         this._cli = new PanelView(this.botPath);
         
-        // Create view with injected CLI
+        // Create mock parentView like BotView does in production
+        // BotView sets this.botData = await this.execute('status') where execute() unwraps {bot: {...}}
+        const BotView = require('../../src/panel/bot_view');
+        this._parentView = new BotView(this._cli);
+        
+        // Create view with parentView, like production: new BehaviorsView(botPathOrCli, webview, extensionUri, this)
         const BehaviorsView = require('../../src/panel/behaviors_view');
-        this._view = new BehaviorsView(this._cli);
+        this._view = new BehaviorsView(this._cli, null, null, this._parentView);
     }
     
     /**
      * Cleanup CLI process
      */
     cleanup() {
+        // Cleanup view reference
+        if (this._view) {
+            this._view = null;
+        }
+        // Cleanup parentView - BotView extends PanelView so it has cleanup()
+        // BotView creates child views but they share the same CLI, so cleanup parentView first
+        if (this._parentView) {
+            this._parentView.cleanup();
+            this._parentView = null;
+        }
+        // Cleanup CLI - this kills the Python process
+        // BotView and BehaviorsView share the same CLI instance, so cleanup once
         if (this._cli) {
             this._cli.cleanup();
             this._cli = null;
         }
-        this._view = null;
     }
     
     // ========================================================================
@@ -41,6 +57,11 @@ class BehaviorsViewTestHelper {
      * @returns {Promise<string>} - Rendered HTML
      */
     async render_html() {
+        // Ensure parentView has botData set (like BotView.render() does)
+        // BehaviorsView uses parentView.botData if available
+        // BotView.execute('status') unwraps {bot: {...}} to just the bot data
+        // Always refresh botData to get latest state (like BotView.render() does when botData is null)
+        this._view.parentView.botData = await this._view.parentView.execute('status');
         return await this._view.render();
     }
     
@@ -252,8 +273,11 @@ class BehaviorsViewTestHelper {
     assert_complete_state_rendered(html, statusResponse) {
         // Rule: assert_full_results - Validate complete transformation JSON → HTML
         
+        // Unwrap bot wrapper if present (like BotView.execute('status') does in production)
+        const response = statusResponse.bot || statusResponse;
+        
         // 1. Assert ALL behaviors from response are in HTML
-        const allBehaviors = statusResponse.behaviors.all_behaviors || [];
+        const allBehaviors = response.behaviors.all_behaviors || [];
         assert.ok(allBehaviors.length > 0, 'Status response should have behaviors');
         
         for (const behavior of allBehaviors) {
@@ -277,13 +301,13 @@ class BehaviorsViewTestHelper {
             `HTML should have ${behaviorCount} behaviors, found ${htmlBehaviorMatches.length}`);
         
         // 4. Assert current behavior is marked
-        const currentBehavior = statusResponse.behaviors.current;
+        const currentBehavior = response.behaviors.current;
         if (currentBehavior) {
             this.assert_current_behavior_marked(html, currentBehavior);
         }
         
         // 5. Assert current action is marked if present
-        const currentAction = statusResponse.current_action;
+        const currentAction = response.current_action;
         if (currentAction) {
             assert.ok(html.includes(currentAction),
                 `HTML should contain current action "${currentAction}"`);
