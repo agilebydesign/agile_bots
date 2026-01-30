@@ -138,6 +138,8 @@ class StoryMapView extends PanelView {
         let magnifyingGlassIconPath = 'img/magnifying_glass.png';
         let clearIconPath = 'img/close.png';
         let showAllIconPath = 'img/show_all.png';
+        let jsonIconPath = 'img/json.png';
+        let filesIconPath = 'img/files.png';
         let plusIconPath = 'img/plus.png';
         let subtractIconPath = 'img/subtract.png';
         let emptyIconPath = 'img/empty.png';
@@ -171,6 +173,12 @@ class StoryMapView extends PanelView {
                 
                 const showAllUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'show_all.png');
                 showAllIconPath = this.webview.asWebviewUri(showAllUri).toString();
+                
+                const jsonUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'json.png');
+                jsonIconPath = this.webview.asWebviewUri(jsonUri).toString();
+                
+                const filesUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'files.png');
+                filesIconPath = this.webview.asWebviewUri(filesUri).toString();
                 
                 const plusUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'plus.png');
                 plusIconPath = this.webview.asWebviewUri(plusUri).toString();
@@ -244,37 +252,39 @@ class StoryMapView extends PanelView {
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `
-            <div id="contextual-actions" style="display: flex; align-items: center; margin-left: 12px; gap: 6px;">
+            <div id="contextual-actions" style="display: flex; align-items: center; margin-left: 12px; margin-right: 12px; gap: 6px;">
+                <!-- Left side: Create, delete, scope, and submit buttons -->
+                <div style="display: flex; align-items: center; gap: 6px;">
                 <!-- Create and delete buttons with tight spacing -->
                 <div style="display: flex; align-items: center; gap: 2px;">
-                    <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
-                        <img src="${addEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Epic" />
+                    <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
+                        <img src="${addEpicIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Epic" />
                     </button>
-                    <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
-                        <img src="${addSubEpicIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Sub-Epic" />
+                    <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
+                        <img src="${addSubEpicIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Sub-Epic" />
                     </button>
-                    <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
-                        <img src="${addStoryIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Story" />
+                    <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
+                        <img src="${addStoryIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Story" />
                     </button>
-                    <button id="btn-create-scenario" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Scenario">
-                        <img src="${addTestsIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Scenario" />
+                    <button id="btn-create-scenario" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Scenario">
+                        <img src="${addTestsIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Scenario" />
                     </button>
-                    <button id="btn-create-acceptance-criteria" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Acceptance Criteria">
-                        <img src="${addAcceptanceCriteriaIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Create Acceptance Criteria" />
+                    <button id="btn-create-acceptance-criteria" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Acceptance Criteria">
+                        <img src="${addAcceptanceCriteriaIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Acceptance Criteria" />
                     </button>
-                    <button id="btn-delete" onclick="event.stopPropagation(); handleDelete();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Delete (including children)">
-                        <img src="${deleteIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Delete" />
+                    <button id="btn-delete" onclick="event.stopPropagation(); handleDelete();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Delete (including children)">
+                        <img src="${deleteIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Delete" />
                     </button>
                 </div>
                 
                 <!-- Scope buttons group with space for additional scope buttons -->
                 <div style="display: flex; align-items: center; gap: 2px; margin-left: 10px;">
-                    <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
-                        <img src="${scopeToIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Scope To" />
+                    <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
+                        <img src="${scopeToIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Scope To" />
                     </button>
                     <button id="btn-submit" 
                             onclick="event.stopPropagation(); handleSubmit();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
                             onmouseover="this.style.opacity='0.7'" 
                             onmouseout="this.style.opacity='1'" 
                             title="Submit shape instructions for epic"
@@ -288,60 +298,38 @@ class StoryMapView extends PanelView {
                             data-scenarios-tooltip="Submit scenarios instructions for story"
                             data-tests-tooltip="Submit tests instructions for story"
                             data-code-tooltip="Submit code instructions for story">
-                        <img id="btn-submit-icon" src="${submitShapeIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Submit" />
+                        <img id="btn-submit-icon" src="${submitShapeIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit" />
                     </button>
                     <button id="btn-submit-current" 
                             onclick="event.stopPropagation(); handleSubmitCurrent();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
                             onmouseover="this.style.opacity='0.7'" 
                             onmouseout="this.style.opacity='1'" 
                             title=""
                             data-refresh-icon="${refreshIconPath}">
-                        <img id="btn-submit-current-icon" src="${refreshIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Submit Current" />
+                        <img id="btn-submit-current-icon" src="${refreshIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Current" />
                     </button>
-                    <!-- Related Files button group -->
-                    <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: 4px;">
-                        <button id="btn-open-graph" 
-                                onclick="event.stopPropagation(); handleOpenGraph();" 
-                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
-                                onmouseover="this.style.opacity='0.7'" 
-                                onmouseout="this.style.opacity='1'" 
-                                title="Open story graph with selected node expanded">
-                            <img src="${documentIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Graph" />
-                        </button>
-                        <button id="btn-open-stories" 
-                                onclick="event.stopPropagation(); handleOpenStories();" 
-                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
-                                onmouseover="this.style.opacity='0.7'" 
-                                onmouseout="this.style.opacity='1'" 
-                                title="Open story markdown files">
-                            <img src="${pageIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Stories" />
-                        </button>
-                        <button id="btn-open-tests" 
-                                onclick="event.stopPropagation(); handleOpenTests();" 
-                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
-                                onmouseover="this.style.opacity='0.7'" 
-                                onmouseout="this.style.opacity='1'" 
-                                title="Open test files with scope expanded">
-                            <img src="${testTubeIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Tests" />
-                        </button>
-                        <button id="btn-open-code" 
-                                onclick="event.stopPropagation(); handleOpenCode();" 
-                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
-                                onmouseover="this.style.opacity='0.7'" 
-                                onmouseout="this.style.opacity='1'" 
-                                title="Open code files inferred from tests">
-                            <img src="${gearIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Code" />
-                        </button>
-                        <button id="btn-open-all" 
-                                onclick="event.stopPropagation(); handleOpenAll();" 
-                                style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
-                                onmouseover="this.style.opacity='0.7'" 
-                                onmouseout="this.style.opacity='1'" 
-                                title="Open all related files in split editors">
-                            <img src="${showAllIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="All" />
-                        </button>
-                    </div>
+                </div>
+                </div>
+                
+                <!-- Right side: Related Files button group -->
+                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 0px; margin-left: auto; padding-left: 10px;">
+                    <button id="btn-open-graph" 
+                            onclick="event.stopPropagation(); handleOpenGraph();" 
+                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            onmouseover="this.style.opacity='0.7'" 
+                            onmouseout="this.style.opacity='1'" 
+                            title="Open story graph with selected node expanded">
+                        <img src="${jsonIconPath}" style="width: 60px; height: 60px; object-fit: contain; display: block; flex-shrink: 0;" alt="Graph" />
+                    </button>
+                    <button id="btn-open-all" 
+                            onclick="event.stopPropagation(); handleOpenAll();" 
+                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            onmouseover="this.style.opacity='0.7'" 
+                            onmouseout="this.style.opacity='1'" 
+                            title="Open all related files in split editors">
+                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="All" />
+                    </button>
                 </div>
             </div>
         `;
@@ -2599,7 +2587,7 @@ class StoryMapView extends PanelView {
                     onmouseover="this.style.opacity='0.7'" 
                     onmouseout="this.style.opacity='1'"
                     title="Show all scope (scope showall)">
-                        <img src="${showAllIconPath}" style="width: 28px; height: 28px; object-fit: contain;" alt="Show All" />
+                        <img src="${showAllIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Show All" />
                     </button>` : ''}
                     ${hasFilter && clearIconPath ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
                         background: transparent;

@@ -764,6 +764,61 @@ class StoryNode(ABC):
             'count': len(opened_files)
         }
     
+    def openAll(self) -> dict:
+        """Open all related files for this node: story files, test files, and inferred code files.
+        
+        Returns:
+            dict with story_files, test_files, and code_files lists
+        """
+        import re
+        from pathlib import Path
+        
+        # Get story files
+        story_result = self.openStoryFile()
+        story_files = story_result.get('files', [])
+        
+        # Get test files
+        test_result = self.openTest()
+        test_files = test_result.get('files', [])
+        
+        # Infer code files from test files
+        code_files = []
+        seen_code_files = set()  # Track unique code files
+        
+        for test_file_info in test_files:
+            test_file = test_file_info.get('file', '')
+            if not test_file:
+                continue
+                
+            # Infer code file path: replace "test/" with "src/" and remove "test_" prefix
+            code_file = test_file
+            
+            # Replace test/ with src/ (handle both forward and backslashes)
+            code_file = re.sub(r'[\\/]test[\\/]', '/src/', code_file)
+            code_file = re.sub(r'^test[\\/]', 'src/', code_file)
+            
+            # Remove test_ prefix from filename
+            parts = code_file.split('/')
+            filename = parts[-1]
+            if filename.startswith('test_'):
+                parts[-1] = filename[5:]  # Remove "test_" prefix
+                code_file = '/'.join(parts)
+            
+            # Only add if not already seen
+            if code_file not in seen_code_files:
+                seen_code_files.add(code_file)
+                code_files.append(code_file)
+        
+        return {
+            'status': 'success',
+            'node': self.name,
+            'node_type': self.node_type,
+            'story_files': story_files,
+            'test_files': test_files,
+            'code_files': code_files,
+            'total_count': len(story_files) + len(test_files) + len(code_files)
+        }
+    
     def openStoryGraph(self) -> dict:
         """Open story-graph.json with this node's path expanded and cursor positioned.
         

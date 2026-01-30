@@ -1126,11 +1126,12 @@ class BotPanel {
         return;
       }
       
-      // Query story graph to get file information
-      const storyGraph = await this._botView.execute('story_graph');
-      if (!storyGraph || !storyGraph.story_graph) {
-        vscode.window.showErrorMessage('Could not load story graph');
-        return;
+      // Verify story graph is available (but don't fail if it's not in the expected format)
+      try {
+        const storyGraph = await this._botView.execute('story_graph');
+        this._log(`[BotPanel] Story graph check result: ${JSON.stringify(storyGraph)}`);
+      } catch (error) {
+        this._log(`[BotPanel] Story graph check failed (continuing anyway): ${error.message}`);
       }
       
       const fs = require('fs');
@@ -1153,7 +1154,13 @@ class BotPanel {
         }
         const fileUri = vscode.Uri.file(absolutePath);
         const doc = await vscode.workspace.openTextDocument(fileUri);
-        const openOptions = { viewColumn: column, ...options };
+        // Open as a new tab (preview: false) without taking focus (preserveFocus: true)
+        const openOptions = { 
+          viewColumn: column, 
+          preview: false,
+          preserveFocus: true,
+          ...options 
+        };
         await vscode.window.showTextDocument(doc, openOptions);
       };
       
@@ -1276,81 +1283,133 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
         }
       } else if (command === 'openAllRelatedFiles') {
-        // Open all files in separate split editors: graph (leftmost), stories, tests, code (rightmost)
+        // Open all files in separate split editors: graph + stories (column 1), tests (column 2), code (column 3)
         const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/stories/story-graph.json');
         
-        // Open story graph in column 1 (leftmost)
-        await openInColumn(graphPath, vscode.ViewColumn.One);
+        this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
+        this._log(`[BotPanel] nodePath: ${nodePath}`);
+        this._log(`[BotPanel] graphPath: ${graphPath}`);
         
-        // Open story files in column 2 (to the right of graph)
-        if (singleFileLink) {
-          await openInColumn(singleFileLink, vscode.ViewColumn.Two);
+        // Open story graph in column 1 (leftmost) - using exact same logic as openFileWithState
+        const rawPath = graphPath;
+        const cleanPath = rawPath.split('#')[0];
+        let absolutePath;
+        if (cleanPath.startsWith('file://')) {
+          absolutePath = vscode.Uri.parse(cleanPath).fsPath;
         } else {
-          // Get all story files and open each in column 2
-          try {
-            const storyResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
-            if (storyResult && storyResult.files && Array.isArray(storyResult.files)) {
-              for (const filePath of storyResult.files) {
-                await openInColumn(filePath, vscode.ViewColumn.Two);
+          const decoded = decodeURIComponent(cleanPath);
+          absolutePath = path.isAbsolute(decoded) 
+            ? decoded 
+            : path.join(workspaceRoot, decoded);
+        }
+        const fileUri = vscode.Uri.file(absolutePath);
+        
+        try {
+          const doc = await vscode.workspace.openTextDocument(fileUri);
+          let lineNumber = null;
+          
+          // Search for the node by name in the JSON to position cursor
+          if (nodeName) {
+            const text = doc.getText();
+            const lines = text.split('\n');
+            
+            // Search for the node by name and type
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              // Match node name in JSON (accounting for escaped quotes)
+              const namePattern = new RegExp(`"name"\\s*:\\s*"${nodeName.replace(/"/g, '\\"')}"`);
+              if (namePattern.test(line)) {
+                lineNumber = i + 1; // VS Code uses 1-based line numbers
+                break;
               }
             }
-          } catch (error) {
-            this._log(`[BotPanel] Error getting story files for All: ${error.message}`);
           }
+          
+          const options = lineNumber 
+            ? { 
+                viewColumn: vscode.ViewColumn.One,
+                preview: false,
+                selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0)
+              }
+            : { 
+                viewColumn: vscode.ViewColumn.One,
+                preview: false
+              };
+          
+          await vscode.window.showTextDocument(doc, options);
+          this._log(`[BotPanel] Story graph opened in column 1${lineNumber ? ` at line ${lineNumber}` : ''}`);
+        } catch (error) {
+          this._log(`[BotPanel] Error opening story graph: ${error.message}`);
+          vscode.window.showErrorMessage(`Failed to open story graph: ${error.message}`);
         }
         
-        // Open test files in column 3
+        // Call the bot's openAll() method to get all related files
         try {
-          const testResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
-          if (testResult && testResult.files && Array.isArray(testResult.files)) {
-            for (const testFileInfo of testResult.files) {
-              const testFilePath = testFileInfo.file;
-              await openInColumn(testFilePath, vscode.ViewColumn.Three);
+          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openAll()`);
+          
+          if (!result || result.status !== 'success') {
+            throw new Error('openAll() returned invalid result');
+          }
+          
+          const { story_files = [], test_files = [], code_files = [] } = result;
+          this._log(`[BotPanel] openAll() returned: ${story_files.length} stories, ${test_files.length} tests, ${code_files.length} code files`);
+          
+          // Open story files in Column 1 (left panel with graph)
+          if (singleFileLink && !story_files.includes(singleFileLink)) {
+            await openInColumn(singleFileLink, vscode.ViewColumn.One);
+          }
+          for (const filePath of story_files) {
+            if (filePath.endsWith('.md')) {
+              await openInColumn(filePath, vscode.ViewColumn.One);
             }
           }
-        } catch (error) {
-          this._log(`[BotPanel] Error getting test files for All: ${error.message}`);
-        }
-        
-        // Open code files in column 4 (rightmost)
-        try {
-          const testResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
-          if (testResult && testResult.files && Array.isArray(testResult.files)) {
-            const inferredCodeFiles = new Set();
+          this._log(`[BotPanel] Opened ${story_files.length} story files`);
+          
+          // Open test files in Column 2
+          for (const testFileInfo of test_files) {
+            const testFilePath = testFileInfo.file;
+            const absolutePath = path.isAbsolute(testFilePath)
+              ? testFilePath
+              : path.join(workspaceRoot, testFilePath);
             
-            // Infer code files from test files
-            for (const testFileInfo of testResult.files) {
-              const testFilePath = testFileInfo.file;
-              
-              // Infer code file path
-              let codeFilePath = testFilePath;
-              codeFilePath = codeFilePath.replace(/[\\/]test[\\/]/g, '/src/');
-              codeFilePath = codeFilePath.replace(/^test[\\/]/g, 'src/');
-              
-              const parts = codeFilePath.split(/[\\/]/);
-              const filename = parts[parts.length - 1];
-              if (filename.startsWith('test_')) {
-                parts[parts.length - 1] = filename.substring(5);
-                codeFilePath = parts.join('/');
-              }
-              
-              inferredCodeFiles.add(codeFilePath);
-            }
+            const fileUri = vscode.Uri.file(absolutePath);
+            const doc = await vscode.workspace.openTextDocument(fileUri);
             
-            // Open each inferred code file
-            const fs = require('fs');
-            for (const codeFilePath of inferredCodeFiles) {
-              const absolutePath = path.isAbsolute(codeFilePath)
-                ? codeFilePath
-                : path.join(workspaceRoot, codeFilePath);
+            await vscode.window.showTextDocument(doc, {
+              viewColumn: vscode.ViewColumn.Two,
+              preview: false,
+              preserveFocus: true
+            });
+          }
+          this._log(`[BotPanel] Opened ${test_files.length} test files`);
+          
+          // Open code files in Column 3 (check if they exist first)
+          const fs = require('fs');
+          let openedCodeCount = 0;
+          for (const codeFilePath of code_files) {
+            const absolutePath = path.isAbsolute(codeFilePath)
+              ? codeFilePath
+              : path.join(workspaceRoot, codeFilePath);
+            
+            if (fs.existsSync(absolutePath)) {
+              const fileUri = vscode.Uri.file(absolutePath);
+              const doc = await vscode.workspace.openTextDocument(fileUri);
               
-              if (fs.existsSync(absolutePath)) {
-                await openInColumn(codeFilePath, vscode.ViewColumn.Four);
-              }
+              await vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.Three,
+                preview: false,
+                preserveFocus: true
+              });
+              openedCodeCount++;
+            } else {
+              this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
             }
           }
+          this._log(`[BotPanel] Opened ${openedCodeCount} code files`);
+          
         } catch (error) {
-          this._log(`[BotPanel] Error getting code files for All: ${error.message}`);
+          this._log(`[BotPanel] Error opening all files: ${error.message}`);
+          this._log(`[BotPanel] Error stack: ${error.stack}`);
         }
         
         this._log(`[BotPanel] Opened all related files for ${nodeType} "${nodeName}" in separate split editors`);
@@ -1414,7 +1473,7 @@ class BotPanel {
       const botData = this._botView.botData;
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
       const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
-      const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction);
+      const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction, botData);
       const perfRenderEnd = performance.now();
       this._log(`[PERF] HTML rendering: ${(perfRenderEnd - perfRenderStart).toFixed(2)}ms`);
       
@@ -1501,7 +1560,7 @@ class BotPanel {
       const botData = this._botView.botData || await this._botView.execute('status');
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
       const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
-      const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction);
+      const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction, botData);
       const perfRenderEnd = performance.now();
       const renderDuration = (perfRenderEnd - perfRenderStart).toFixed(2);
       // #region agent log
@@ -1608,10 +1667,10 @@ class BotPanel {
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
-  _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null) {
+  _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null, botData = null) {
     const currentBehaviorScript = currentBehavior 
-      ? '\n        <script>\n            window.currentBehavior = ' + JSON.stringify(currentBehavior) + ';\n            ' + (currentAction ? 'window.currentAction = ' + JSON.stringify(currentAction) + ';' : '') + '\n        </script>'
-      : '';
+      ? '\n        <script>\n            window.currentBehavior = ' + JSON.stringify(currentBehavior) + ';\n            ' + (currentAction ? 'window.currentAction = ' + JSON.stringify(currentAction) + ';' : '') + '\n            ' + (botData ? 'window.botData = ' + JSON.stringify(botData) + ';' : '') + '\n        </script>'
+      : (botData ? '\n        <script>\n            window.botData = ' + JSON.stringify(botData) + ';\n        </script>' : '');
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1675,6 +1734,12 @@ class BotPanel {
             margin: 0;
             font-size: var(--font-size-base);
             font-weight: var(--font-weight-normal);
+        }
+        
+        /* Prevent images from scaling with panel width */
+        img {
+            flex-shrink: 0;
+            min-width: 0;
         }
         
         .bot-view {
@@ -2046,6 +2111,12 @@ class BotPanel {
             background-color: var(--vscode-button-background);
             opacity: 0.8;
             transform: scale(0.98);
+        }
+        
+        /* Ensure button images maintain fixed size */
+        button img {
+            flex-shrink: 0;
+            display: block;
         }
         
         a {
@@ -3228,9 +3299,6 @@ class BotPanel {
             const btnScopeTo = document.getElementById('btn-scope-to');
             const btnSubmit = document.getElementById('btn-submit');
             const btnOpenGraph = document.getElementById('btn-open-graph');
-            const btnOpenStories = document.getElementById('btn-open-stories');
-            const btnOpenTests = document.getElementById('btn-open-tests');
-            const btnOpenCode = document.getElementById('btn-open-code');
             const btnOpenAll = document.getElementById('btn-open-all');
             
             // Hide all buttons first
@@ -3243,9 +3311,6 @@ class BotPanel {
             if (btnScopeTo) btnScopeTo.style.display = 'none';
             if (btnSubmit) btnSubmit.style.display = 'none';
             if (btnOpenGraph) btnOpenGraph.style.display = 'none';
-            if (btnOpenStories) btnOpenStories.style.display = 'none';
-            if (btnOpenTests) btnOpenTests.style.display = 'none';
-            if (btnOpenCode) btnOpenCode.style.display = 'none';
             if (btnOpenAll) btnOpenAll.style.display = 'none';
             
             // Show buttons based on selection
@@ -3289,9 +3354,6 @@ class BotPanel {
             // Show related files buttons for all non-root nodes
             if (window.selectedNode.type !== 'root') {
                 if (btnOpenGraph) btnOpenGraph.style.display = 'block';
-                if (btnOpenStories) btnOpenStories.style.display = 'block';
-                if (btnOpenTests) btnOpenTests.style.display = 'block';
-                if (btnOpenCode) btnOpenCode.style.display = 'block';
                 if (btnOpenAll) btnOpenAll.style.display = 'block';
             }
             
@@ -3789,8 +3851,22 @@ class BotPanel {
         
         window.handleOpenGraph = function() {
             console.log('[WebView] handleOpenGraph called');
+            console.log('[WebView] selectedNode:', window.selectedNode);
+            
+            if (!window.selectedNode) {
+                console.error('[WebView] No node selected');
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] ERROR: handleOpenGraph called but no node selected'
+                });
+                return;
+            }
+            
             const workspaceDir = getWorkspaceDir();
             const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            
+            console.log('[WebView] Opening story graph:', storyGraphPath);
+            console.log('[WebView] Node path:', window.selectedNode.path);
             
             // Open story graph and request to collapse all, expand selected node path, position cursor
             vscode.postMessage({
@@ -3824,51 +3900,31 @@ class BotPanel {
             });
         };
         
-        window.handleOpenTests = function() {
-            console.log('[WebView] handleOpenTests called');
-            
-            if (!window.selectedNode || !window.selectedNode.name) {
-                console.error('[WebView] No node selected');
-                return;
-            }
-            
-            // Request test files for selected node with scope expansion
-            vscode.postMessage({
-                command: 'openTestFiles',
-                nodeType: window.selectedNode.type,
-                nodeName: window.selectedNode.name,
-                nodePath: window.selectedNode.path
-            });
-        };
-        
-        window.handleOpenCode = function() {
-            console.log('[WebView] handleOpenCode called');
-            
-            if (!window.selectedNode || !window.selectedNode.name) {
-                console.error('[WebView] No node selected');
-                return;
-            }
-            
-            // Request code files inferred from tests for selected node
-            vscode.postMessage({
-                command: 'openCodeFiles',
-                nodeType: window.selectedNode.type,
-                nodeName: window.selectedNode.name,
-                nodePath: window.selectedNode.path
-            });
-        };
-        
         window.handleOpenAll = function() {
             console.log('[WebView] handleOpenAll called');
             
             if (!window.selectedNode || !window.selectedNode.name) {
                 console.error('[WebView] No node selected');
+                vscode.postMessage({
+                    command: 'logToFile',
+                    message: '[WebView] ERROR: handleOpenAll called but no node selected'
+                });
                 return;
             }
             
             const fileLink = getSelectedNodeFileLink();
             const workspaceDir = getWorkspaceDir();
             const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            
+            console.log('[WebView] handleOpenAll - selectedNode:', JSON.stringify(window.selectedNode));
+            console.log('[WebView] handleOpenAll - workspaceDir:', workspaceDir);
+            console.log('[WebView] handleOpenAll - storyGraphPath:', storyGraphPath);
+            console.log('[WebView] handleOpenAll - fileLink:', fileLink);
+            
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] handleOpenAll: node=' + window.selectedNode.name + ', type=' + window.selectedNode.type + ', path=' + window.selectedNode.path + ', workspace=' + workspaceDir
+            });
             
             // Open all files in split editors
             vscode.postMessage({
