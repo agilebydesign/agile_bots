@@ -1,0 +1,16 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}/src/panel"
+			],
+			"name": "Debug Panel",
+			"outFiles": [
+				"${workspaceFolder}/src/panel/out/**/*.js"
+			],
+			"request": "launch",
+			"type": "extensionHost"
+		},
+	]
+}
