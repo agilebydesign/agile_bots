@@ -1,1 +1,6 @@
-{"type": "story", "value": ["Open Story Related Files"], "exclude": [], "skiprule": []}
+{
+  "type": "showAll",
+  "value": [],
+  "exclude": [],
+  "skiprule": []
+}
