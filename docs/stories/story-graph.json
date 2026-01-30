@@ -28,7 +28,6 @@
                   "users": [
                     "MCP Server Generator"
                   ],
-                  "test_file": null,
                   "test_class": "TestGenerateBotTools",
                   "scenarios": [
                     {
@@ -62,7 +61,6 @@
                   "users": [
                     "MCP Server Generator"
                   ],
-                  "test_file": null,
                   "test_class": "TestGenerateBehaviorTools",
                   "scenarios": [
                     {
@@ -96,7 +94,6 @@
                   "users": [
                     "MCP Server Generator"
                   ],
-                  "test_file": null,
                   "test_class": "TestGenerateMCPBotServer",
                   "scenarios": [
                     {
@@ -156,7 +153,6 @@
                   "users": [
                     "MCP Server Generator"
                   ],
-                  "test_file": null,
                   "test_class": "TestGenerateBehaviorActionTools",
                   "scenarios": [
                     {
@@ -203,7 +199,6 @@
                   "connector": "and",
                   "story_type": "user",
                   "users": [],
-                  "test_file": null,
                   "test_class": "TestDeployMCPBotServer",
                   "scenarios": [
                     {
@@ -257,7 +252,6 @@
                   "users": [
                     "MCP Server Generator"
                   ],
-                  "test_file": null,
                   "test_class": "TestRestartMCPServerToLoadCodeChanges",
                   "scenarios": [
                     {
@@ -324,7 +318,6 @@
                   "users": [
                     "Generator"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [
@@ -369,7 +362,6 @@
                   "users": [
                     "Generator"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [
@@ -404,7 +396,6 @@
                   "users": [
                     "Generator"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [
@@ -439,7 +430,6 @@
                   "users": [
                     "Generator"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [
@@ -1201,7 +1191,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestResolveBotPath",
                       "scenarios": [
                         {
@@ -1256,7 +1245,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestResolveBotPathUsingCLI",
                       "scenarios": [
                         {
@@ -1303,7 +1291,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestSwitchRegisteredBots",
                       "scenarios": [
                         {
@@ -1368,7 +1355,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSwitchBot",
                       "scenarios": [
                         {
@@ -1420,7 +1406,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadBotBehaviors",
                       "scenarios": [
                         {
@@ -1459,7 +1444,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadActions",
                       "scenarios": [
                         {
@@ -1498,7 +1482,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadBotUsingCLI",
                       "scenarios": [
                         {
@@ -1529,7 +1512,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadBotBehaviorsUsingCLI",
                       "scenarios": [
                         {
@@ -1568,7 +1550,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadActionsUsingCLI",
                       "scenarios": [
                         {
@@ -2008,7 +1989,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDetectCLIMode",
                       "scenarios": [
                         {
@@ -2048,7 +2028,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestInitializeCLISession",
                       "scenarios": [
                         {
@@ -2088,7 +2067,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestOpenPanel",
                       "scenarios": [
                         {
@@ -2168,7 +2146,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestExitREPL",
                       "scenarios": [
                         {
@@ -2809,7 +2786,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestViewSessionHeader",
                       "scenarios": [
                         {
@@ -2917,7 +2893,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayCLIBotCommandInNavigationMenuFooter",
                       "scenarios": [
                         {
@@ -2961,7 +2936,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayPipedModeInstructionsForAIAgents",
                       "scenarios": [
                         {
@@ -2992,7 +2966,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestViewHeadlessModeStatus",
                       "scenarios": [
                         {
@@ -3044,7 +3017,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplaySessionStatus",
                       "scenarios": [
                         {
@@ -3116,7 +3088,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestTogglePanelSection",
                       "scenarios": [
                         {
@@ -3177,7 +3148,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestManageBotRegistry",
                       "scenarios": [
                         {
@@ -3240,7 +3210,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestLoadWorkspaceContext",
                       "scenarios": [
                         {
@@ -3263,7 +3232,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestChangeWorkspacePath",
                       "scenarios": [
                         {
@@ -3373,7 +3341,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3387,7 +3354,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3401,7 +3367,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3415,7 +3380,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveFilterPartFromFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3427,7 +3391,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3441,7 +3404,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveFilterPartFromFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3472,7 +3434,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3484,7 +3445,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3498,7 +3458,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterFileScope",
                           "scenarios": [
                             {
@@ -3545,7 +3504,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3559,7 +3517,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterFileScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3573,7 +3530,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterScopeByFilesUsingCLI",
                           "scenarios": [
                             {
@@ -3632,7 +3588,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterScopeByStories",
                           "scenarios": [
                             {
@@ -3695,7 +3650,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterScopeByStoriesUsingCLI",
                           "scenarios": [
                             {
@@ -3751,7 +3705,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterStoryScope",
                           "scenarios": [
                             {
@@ -3889,7 +3842,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestFilterScopeByFiles",
                           "scenarios": [
                             {
@@ -3950,7 +3902,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3962,7 +3913,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3976,7 +3926,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestGetFilesFilteredByStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -3988,7 +3937,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4000,7 +3948,6 @@
                           "connector": null,
                           "story_type": "user",
                           "users": [],
-                          "test_file": null,
                           "test_class": null,
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4295,7 +4242,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestCreateScope",
                           "scenarios": [
                             {
@@ -4326,7 +4272,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestCreateScopeUsingCLI",
                           "scenarios": [
                             {
@@ -4357,7 +4302,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestDisplayScopeUsingCLI",
                           "scenarios": [
                             {
@@ -4380,7 +4324,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestClearScope",
                           "scenarios": [
                             {
@@ -4419,7 +4362,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestShowAllScopeThroughPanel",
                           "scenarios": [
                             {
@@ -4481,7 +4423,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestExecuteActionsWithScopeUsingCLI",
                           "scenarios": [
                             {
@@ -4505,7 +4446,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestPersistScope",
                           "scenarios": [
                             {
@@ -4536,7 +4476,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestExecuteActionScopedToStoryNode",
                           "scenarios": [
                             {
@@ -4576,7 +4515,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestExecuteActionsWithScope",
                           "scenarios": [
                             {
@@ -4651,7 +4589,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4665,7 +4602,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4679,7 +4615,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4693,7 +4628,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4707,7 +4641,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4721,7 +4654,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4735,7 +4667,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddIncrementFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4749,7 +4680,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddIncrementFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4763,7 +4693,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestAddIncrementFilterPartToStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4777,7 +4706,6 @@
                           "users": [
                             "Bot Behavior"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4791,7 +4719,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -4805,7 +4732,6 @@
                           "users": [
                             "User"
                           ],
-                          "test_file": null,
                           "test_class": "TestRemoveIncrementFilterPartFromStoryScope",
                           "scenarios": [],
                           "acceptance_criteria": [],
@@ -7553,7 +7479,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateStoryGraph",
                       "scenarios": [
                         {
@@ -7744,7 +7669,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateStoryGraphUsingCLI",
                       "scenarios": [
                         {
@@ -7767,7 +7691,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayStoryScopeHierarchy",
                       "scenarios": [
                         {
@@ -8071,7 +7994,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestCreateChildStoryNode",
                       "scenarios": [
                         {
@@ -8158,7 +8080,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestCreateChildStoryNodeUnderParent",
                       "scenarios": [
                         {
@@ -8279,7 +8200,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestCreateChildStoryNodeUnderParent",
                       "scenarios": [
                         {
@@ -8378,7 +8298,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestCreateEpic",
                       "scenarios": [
                         {
@@ -8463,7 +8382,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestDeleteStoryNode",
                       "scenarios": [
                         {
@@ -8502,7 +8420,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDeleteStoryNodeFromParent",
                       "scenarios": [
                         {
@@ -8563,7 +8480,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDeleteStoryNodeFromParent",
                       "scenarios": [
                         {
@@ -8682,7 +8598,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestMoveStoryNodeToParent",
                       "scenarios": [
                         {
@@ -8769,7 +8684,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestMoveStoryNode",
                       "scenarios": [
                         {
@@ -8875,7 +8789,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestMoveStoryNode",
                       "scenarios": [
                         {
@@ -8976,7 +8889,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestUpdateStoryNodename",
                       "scenarios": [
                         {
@@ -9067,7 +8979,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestUpdateStoryNodename",
                       "scenarios": [
                         {
@@ -9188,7 +9099,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestUpdateStoryNodeName",
                       "scenarios": [
                         {
@@ -9243,7 +9153,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": "test/invoke_bot/edit_story_map/test_edit_story_nodes.js",
                       "test_class": "TestSaveStoryMapChangesAsynchronously",
                       "scenarios": [
                         {
@@ -9768,7 +9677,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestAutomaticallyRefreshStoryGraphChanges",
                       "scenarios": [
                         {
@@ -9815,7 +9723,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestAutomaticallyRefreshStoryGraphChanges",
                       "scenarios": [
                         {
@@ -9879,7 +9786,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9893,7 +9799,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestAddIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9907,7 +9812,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestAddIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9919,7 +9823,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9933,7 +9836,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDeleteIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9947,7 +9849,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDeleteIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9959,7 +9860,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9973,7 +9873,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestMoveStorytoIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -9987,7 +9886,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestMoveStorytoIncrement",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10001,7 +9899,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10015,7 +9912,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestShowAllIncrementScopeThroughCLI",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10027,7 +9923,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10041,7 +9936,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayIncrementScopeView",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10055,7 +9949,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestShowAllIncrementScopeThroughPanel",
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -10086,7 +9979,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestSetScopeToSelectedStoryNode",
                       "scenarios": [
                         {
@@ -10132,7 +10024,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestSetScopeToSelectedStoryNodeAndSubmit",
                       "scenarios": [
                         {
@@ -11245,7 +11136,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestSubmitCurrentBehaviorActionForSelectedNode",
                       "scenarios": [
                         {
@@ -11379,7 +11269,6 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
@@ -11411,12 +11300,11 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_file": null,
                       "test_class": "TestOpenAllRelatedFiles",
                       "scenarios": [
                         {
                           "name": "Graph button opens story graph with selected node expanded",
-                          "sequential_order": 1.0,
+                          "sequential_order": 8.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_graph_button_opens_story_graph_with_selected_node_expanded",
@@ -11424,23 +11312,15 @@
                         },
                         {
                           "name": "Stories button opens story markdown files",
-                          "sequential_order": 2.0,
+                          "sequential_order": 9.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_stories_button_opens_story_markdown_files",
                           "steps": "GIVEN: User has selected a story graph node (story, sub-epic, or epic)\nWHEN: User clicks Stories button\nTHEN: System opens story markdown file for single story if story selected\nOR: System opens all story markdown files for stories under selected node if sub-epic or epic selected"
                         },
                         {
-                          "name": "Test button opens test files with scope collapsed",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_test_button_opens_test_files_with_scope_collapsed",
-                          "steps": "GIVEN: User has selected a story graph node with test files\nWHEN: User clicks Test button\nTHEN: System opens test files associated with selected node\nAND: System expands methods/classes in scope (test_class or test_method)\nAND: System collapses other methods/classes in test files"
-                        },
-                        {
                           "name": "Code button infers and opens code files",
-                          "sequential_order": 4.0,
+                          "sequential_order": 10.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_code_button_infers_and_opens_code_files",
@@ -11448,7 +11328,7 @@
                         },
                         {
                           "name": "All button opens files in split editors",
-                          "sequential_order": 5.0,
+                          "sequential_order": 11.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_all_button_opens_files_in_split_editors",
@@ -11456,7 +11336,7 @@
                         },
                         {
                           "name": "CLI openStoryFile opens story markdown files",
-                          "sequential_order": 6.0,
+                          "sequential_order": 12.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_cli_open_story_file_opens_story_markdown_files",
@@ -11464,7 +11344,7 @@
                         },
                         {
                           "name": "CLI openTest opens test files recursively",
-                          "sequential_order": 7.0,
+                          "sequential_order": 13.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_cli_open_test_opens_test_files_recursively",
@@ -11472,7 +11352,7 @@
                         },
                         {
                           "name": "CLI openStoryGraph opens with node expanded",
-                          "sequential_order": 8.0,
+                          "sequential_order": 14.0,
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_cli_open_story_graph_opens_with_node_expanded",
@@ -11483,42 +11363,42 @@
                         {
                           "name": "WHEN user clicks Graph button THEN system opens story-graph.json AND system collapses all nodes AND system expands nodes representing selected node in tree AND system positions edit cursor at line of beginning of expanded section representing selected node",
                           "text": "WHEN user clicks Graph button THEN system opens story-graph.json AND system collapses all nodes AND system expands nodes representing selected node in tree AND system positions edit cursor at line of beginning of expanded section representing selected node",
-                          "sequential_order": 1.0
+                          "sequential_order": 0.0
                         },
                         {
                           "name": "WHEN user clicks Stories button THEN system opens story markdown files for single story or all stories under selected node",
                           "text": "WHEN user clicks Stories button THEN system opens story markdown files for single story or all stories under selected node",
-                          "sequential_order": 2.0
+                          "sequential_order": 1.0
                         },
                         {
                           "name": "WHEN user clicks Test button THEN system opens test files with methods/classes in scope AND system collapses other methods/classes",
                           "text": "WHEN user clicks Test button THEN system opens test files with methods/classes in scope AND system collapses other methods/classes",
-                          "sequential_order": 3.0
+                          "sequential_order": 2.0
                         },
                         {
                           "name": "WHEN user clicks Code button THEN system infers code files associated with tests AND system opens code files (not in story map, must be inferred)",
                           "text": "WHEN user clicks Code button THEN system infers code files associated with tests AND system opens code files (not in story map, must be inferred)",
-                          "sequential_order": 4.0
+                          "sequential_order": 3.0
                         },
                         {
                           "name": "WHEN user clicks All button THEN system opens all files in separate split editors AND system arranges story graph leftmost AND system arranges scenarios in next split AND system arranges tests in next split AND system arranges code in rightmost split",
                           "text": "WHEN user clicks All button THEN system opens all files in separate split editors AND system arranges story graph leftmost AND system arranges scenarios in next split AND system arranges tests in next split AND system arranges code in rightmost split",
-                          "sequential_order": 5.0
+                          "sequential_order": 4.0
                         },
                         {
                           "name": "WHEN user executes CLI command bot.<story hierarchy>.openStoryFile() THEN system opens story markdown files for node AND system opens all story files recursively for children if epic or sub-epic",
                           "text": "WHEN user executes CLI command bot.<story hierarchy>.openStoryFile() THEN system opens story markdown files for node AND system opens all story files recursively for children if epic or sub-epic",
-                          "sequential_order": 6.0
+                          "sequential_order": 5.0
                         },
                         {
                           "name": "WHEN user executes CLI command bot.<story hierarchy>.openTest() THEN system opens test files for node AND system opens all test files recursively for children if epic or sub-epic",
                           "text": "WHEN user executes CLI command bot.<story hierarchy>.openTest() THEN system opens test files for node AND system opens all test files recursively for children if epic or sub-epic",
-                          "sequential_order": 7.0
+                          "sequential_order": 6.0
                         },
                         {
                           "name": "WHEN user executes CLI command bot.<story hierarchy>.openStoryGraph() THEN system opens story-graph.json AND system collapses all nodes AND system expands nodes representing node path in tree",
                           "text": "WHEN user executes CLI command bot.<story hierarchy>.openStoryGraph() THEN system opens story-graph.json AND system collapses all nodes AND system expands nodes representing node path in tree",
-                          "sequential_order": 8.0
+                          "sequential_order": 7.0
                         }
                       ],
                       "behavior": null,
@@ -11532,7 +11412,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestEnrichScopeWithLinks",
                       "scenarios": [
                         {
@@ -11628,7 +11507,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestOpenStoryFiles",
                       "scenarios": [
                         {
@@ -12054,7 +11932,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateSequentially",
                       "scenarios": [
                         {
@@ -12165,7 +12042,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [
                         {
@@ -12188,7 +12064,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateToBehaviorActionAndExecute",
                       "scenarios": [
                         {
@@ -12235,7 +12110,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateSequentially",
                       "scenarios": [
                         {
@@ -12266,7 +12140,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateBehaviorAction",
                       "scenarios": [
                         {
@@ -12394,7 +12267,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestManageBehaviorsUsingCLI",
                       "scenarios": [
                         {
@@ -12457,7 +12329,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateToBehaviorActionAndExecuteUsingCLI",
                       "scenarios": [
                         {
@@ -12528,7 +12399,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateSequentiallyUsingCLI",
                       "scenarios": [
                         {
@@ -12815,7 +12685,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestNavigateToBehaviorActionAndExecute",
                       "scenarios": [
                         {
@@ -12910,7 +12779,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestExecuteBehaviorAction",
                       "scenarios": [
                         {
@@ -13010,7 +12878,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestManageBehaviors",
                       "scenarios": [
                         {
@@ -13121,7 +12988,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestManageBehaviorActionState",
                       "scenarios": [
                         {
@@ -13176,7 +13042,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestTrackActivityForWorkspace",
                       "scenarios": [
                         {
@@ -13207,7 +13072,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestTrackActionStart",
                       "scenarios": [
                         {
@@ -13246,7 +13110,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestTrackActionCompletion",
                       "scenarios": [
                         {
@@ -13285,7 +13148,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestExecuteEndToEndWorkflow",
                       "scenarios": [
                         {
@@ -13316,7 +13178,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestRecordActivityMetricsAndPaths",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -13351,7 +13212,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestReExecuteCurrentOperationUsingCLI",
                       "scenarios": [
                         {
@@ -13374,7 +13234,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestExecuteEndToEndWorkflowUsingCLI",
                       "scenarios": [
                         {
@@ -13424,7 +13283,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestViewBehaviorHierarchy",
                       "scenarios": [
                         {
@@ -13481,7 +13339,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": null,
                       "scenarios": [
                         {
@@ -13504,7 +13361,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestViewCurrentPosition",
                       "scenarios": [
                         {
@@ -13556,7 +13412,6 @@
                       "users": [
                         "CLI"
                       ],
-                      "test_file": null,
                       "test_class": "TestViewNavigationCommands",
                       "scenarios": [
                         {
@@ -13600,7 +13455,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayHierarchy",
                       "scenarios": [
                         {
@@ -13756,7 +13610,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestManageBehaviorActionStateUsingCLI",
                       "scenarios": [
                         {
@@ -13795,7 +13648,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayContextUsingCLI",
                       "scenarios": [
                         {
@@ -14063,7 +13915,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestInjectContextIntoInstructions",
                       "scenarios": [
                         {
@@ -14102,7 +13953,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetActionInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -14144,7 +13994,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSubmitInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -14191,7 +14040,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayBaseInstructions",
                       "scenarios": [
                         {
@@ -14243,7 +14091,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayInstructionsInRawFormat",
                       "scenarios": [
                         {
@@ -14285,7 +14132,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveClarificationAnswers",
                       "scenarios": [
                         {
@@ -14316,7 +14162,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveClarificationEvidence",
                       "scenarios": [
                         {
@@ -14339,7 +14184,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveStrategyDecisions",
                       "scenarios": [
                         {
@@ -14370,7 +14214,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveMultipleGuardrails",
                       "scenarios": [
                         {
@@ -14401,7 +14244,6 @@
                       "users": [
                         "System"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveFileIsolation",
                       "scenarios": [
                         {
@@ -14424,7 +14266,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveGuardrailsThroughPanel",
                       "scenarios": [
                         {
@@ -14491,7 +14332,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSubmitScopeInstructions",
                       "scenarios": [
                         {
@@ -14522,7 +14362,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestHandleErrorsUsingCLI",
                       "scenarios": [
                         {
@@ -14545,7 +14384,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSaveGuardrailsUsingCLI",
                       "scenarios": [
                         {
@@ -14826,7 +14664,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestClarifyRequirements",
                       "scenarios": [
                         {
@@ -14889,7 +14726,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestClarifyRequirementsUsingCLI",
                       "scenarios": [
                         {
@@ -14912,7 +14748,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayClarificationDataThroughCLI",
                       "scenarios": [
                         {
@@ -14935,7 +14770,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayClarifyInstructions",
                       "scenarios": [
                         {
@@ -15028,7 +14862,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetClarifyInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -15239,7 +15072,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDecideStrategy",
                       "scenarios": [
                         {
@@ -15286,7 +15118,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDecideStrategyUsingCLI",
                       "scenarios": [
                         {
@@ -15309,7 +15140,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayStrategyDataThroughCLI",
                       "scenarios": [
                         {
@@ -15332,7 +15162,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayStrategyInstructions",
                       "scenarios": [
                         {
@@ -15435,7 +15264,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSubmitInstructionsToAIAgent",
                       "scenarios": [
                         {
@@ -15541,7 +15369,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetStrategyInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -15756,7 +15583,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestBuildStoryGraph",
                       "scenarios": [
                         {
@@ -15803,7 +15629,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestBuildStoryGraphUsingCLI",
                       "scenarios": [
                         {
@@ -15842,7 +15667,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetBuildInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -15873,7 +15697,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestBuildStoryGraphUsingAPI",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -15913,7 +15736,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayBuildInstructions",
                       "scenarios": [
                         {
@@ -16164,7 +15986,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestValidateRules",
                       "scenarios": [
                         {
@@ -16211,7 +16032,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestValidateRulesUsingCLI",
                       "scenarios": [
                         {
@@ -16242,7 +16062,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayValidationResultsThroughCLI",
                       "scenarios": [
                         {
@@ -16265,7 +16084,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayValidationScannersThroughCLI",
                       "scenarios": [
                         {
@@ -16288,7 +16106,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayValidateInstructions",
                       "scenarios": [
                         {
@@ -16340,7 +16157,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetValidateInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -16657,7 +16473,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestRenderOutput",
                       "scenarios": [
                         {
@@ -16704,7 +16519,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestRenderOutputUsingCLI",
                       "scenarios": [
                         {
@@ -16735,7 +16549,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplaySynchronizerOutputThroughCLI",
                       "scenarios": [
                         {
@@ -16758,7 +16571,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayRenderConfigurationsThroughCLI",
                       "scenarios": [
                         {
@@ -16781,7 +16593,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetRenderInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -16804,7 +16615,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -16834,7 +16644,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayRenderInstructions",
                       "scenarios": [
                         {
@@ -17016,7 +16825,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayRules",
                       "scenarios": [
                         {
@@ -17071,7 +16879,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestDisplayRulesUsingCLI",
                       "scenarios": [
                         {
@@ -17126,7 +16933,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestSubmitBehaviorRulesThroughPanel",
                       "scenarios": [
                         {
@@ -17196,7 +17002,6 @@
                       "users": [
                         "User"
                       ],
-                      "test_file": null,
                       "test_class": "TestGetRulesInstructionsThroughCLI",
                       "scenarios": [
                         {
@@ -17275,7 +17080,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDetectStoryGraphChangesFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17300,7 +17104,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestCreateChildStoryNodeFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17350,7 +17153,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestDeleteStoryNodeFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17375,7 +17177,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestUpdateStoryNodeNameFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17400,7 +17201,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestMoveStoryNodeFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17425,7 +17225,6 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_file": null,
                       "test_class": "TestPersistStoryGraphChangesFromDiagram",
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17838,7 +17637,6 @@
                   "users": [
                     "Bot Behavior"
                   ],
-                  "test_file": null,
                   "test_class": "TestGetHelp",
                   "scenarios": [
                     {
@@ -17877,7 +17675,6 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [],
@@ -17891,7 +17688,6 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": null,
                   "test_class": "TestDisplayActionHelpUsingCLI",
                   "scenarios": [
                     {
@@ -17935,7 +17731,6 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": null,
                   "test_class": null,
                   "scenarios": [],
                   "acceptance_criteria": [],
@@ -17949,7 +17744,6 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": null,
                   "test_class": "TestGetHelpUsingCLI",
                   "scenarios": [
                     {
@@ -17988,7 +17782,6 @@
                   "users": [
                     "User"
                   ],
-                  "test_file": null,
                   "test_class": "TestDisplayHelpUsingCLI",
                   "scenarios": [
                     {
