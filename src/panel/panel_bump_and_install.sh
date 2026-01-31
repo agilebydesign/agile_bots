@@ -75,7 +75,7 @@ echo -e "\033[0;32mNew version:     $NEW_VERSION\033[0m"
 echo ""
 
 # Update package.json
-echo -e "\033[0;36m[1/6] Updating package.json...\033[0m"
+echo -e "\033[0;36m[1/4] Updating package.json...\033[0m"
 sed -i.bak "s/\"version\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\"version\": \"$NEW_VERSION\"/" package.json
 rm -f package.json.bak
 
@@ -86,7 +86,7 @@ sleep 0.2
 echo -e "\033[0;32m      Done: package.json updated\033[0m"
 
 # Package extension
-echo -e "\033[0;36m[2/6] Packaging extension...\033[0m"
+echo -e "\033[0;36m[2/4] Packaging extension...\033[0m"
 # Remove old vsix files first
 rm -f "$PANEL_DIR"/bot-panel-*.vsix
 npx @vscode/vsce package --allow-missing-repository --allow-star-activation > /dev/null 2>&1
@@ -99,7 +99,7 @@ sleep 0.5
 echo -e "\033[0;32m      Done: Extension packaged: bot-panel-$NEW_VERSION.vsix\033[0m"
 
 # Uninstall old extension
-echo -e "\033[0;36m[3/6] Uninstalling old extension...\033[0m"
+echo -e "\033[0;36m[3/4] Uninstalling old extension...\033[0m"
 code --uninstall-extension agilebot.bot-panel > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo -e "\033[0;33m      Warning: Uninstall warning (may not be installed)\033[0m"
@@ -108,7 +108,7 @@ else
 fi
 
 # Install new extension
-echo -e "\033[0;36m[4/6] Installing new extension...\033[0m"
+echo -e "\033[0;36m[4/4] Installing new extension...\033[0m"
 VSIX_PATH="$PANEL_DIR/bot-panel-$NEW_VERSION.vsix"
 if [ ! -f "$VSIX_PATH" ]; then
     echo -e "\033[0;31m      ERROR: VSIX file not found: $VSIX_PATH\033[0m"

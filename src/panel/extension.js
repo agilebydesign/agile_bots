@@ -23,6 +23,9 @@ function log(message) {
  * Extension activation
  * Called when extension is first activated (command invoked)
  */
+/**
+ * @param {vscode.ExtensionContext} context
+ */
 function activate(context) {
   // ===== PERFORMANCE: Extension activation =====
   const perfActivateStart = performance.now();
