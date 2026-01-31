@@ -1,10 +1,92 @@
 # Agile Bots
 
-AI-powered bots that inject Agile delivery, product, and engineering best practices directly into your workflow.
+**AI-powered bots that inject Agile delivery, product, and engineering best practices directly into your workflow.**
 
 ## Overview
 
-Agile Bots is a collection of AI-powered tools that guide teams through proven methodologies for story development and object-oriented design. This initial release includes **StoryBot** and **CRC Bot**, two complementary tools that transform how you work with AI assistants.
+Agile Bots enables **Agile-AI Augmented Delivery** through a VS Code/Cursor plugin that steer your AI agent through agile workflows that inject prompts with context, strategies, and best practices. Agile bots generates and synchronizes common agile artifacts (eg stories, tests, code) while preventing the most common AI mistakes.
+
+Integrating "agile"* practices with AI- assisted delivery can have a dramatic impact on pace, quality, cost, and outcomes. 
+
+This initial release includes **StoryBot** and **CRC Bot**, two complementary tools that:
+- **StoryBot** guides AI through story mapping → story exploration → story specifications → automated tests → code
+- **CRCBot** guides AI through domain modeling → technical design → Model walkthroughs to validate how objects message each other 
+- Inject context, templates, and practice guidance into every AI prompt
+- Validate AI output with automated scanners that check for anti-patterns
+- Keep all artifacts (stories, diagrams, tests, code) synchronized 
+
+> *We use the term "Agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CICD/DevOps. We're not talking about cargo cult adoption of Scrum, SAFe, or other random initials.*
+
+## Problems Solved
+
+
+AI delivery unchecked can result in:
+
+### 🛑 **Slop**
+Lazy use of AI makes undisciplined practices worse. AI without guardrails can result in big errors
+- wrong requirements buried in verbose prose 
+- vibe coding can an avalanch of slop, unsafe brittle code, waiting to be hacked, waiting to crash, and waiting to crumble in a unmaintainable mess
+
+### 💥 **Dysfunction**
+AI will amplify a broken system of work to be even worse, only faster. Bottlenecks will become more severe, and the impact of organizational dysfunction will explode
+
+### 🔄 **Churn**
+Overcoming AI's limitations through expert-led prompting is manual, repetitive, error-prone, and hard to scale.
+
+> *The biggest bottleneck faced by organizations that lead adoption of AI – augmented delivery is Seniors reviewing the onslaught of AI produced artifacts. *(Some random reddit thread I read and take as gospel)*
+
+## Core Principles & Features
+
+Agile Bots helps with five core agile principles that accelerate delivery:
+
+### 🎯 **Focus**
+We work on a small number of small, highest priority increments to completion, delivering maximum value
+
+Scope AI work to specific stories, epics, or increments so it works on small pieces at a time rather than trying to process your entire codebase
+
+**Features:**
+- **Agile Flows:** Configurable workflow that helps you complete your highest priority increment fast; in hours, even minutes all without generating slop
+- **Prompt Scoping:** Directs AI to work on a small number of stories/epics/increments at a time, keeping AI attention focused and precise
+
+### ✨ **Simplicity**
+We design and build for simplicity, evolving our solution to adapt to uncertainty
+
+Guide AI through a progressive workflow (clarify → strategy → build → validate) that evolves requirements step-by-step rather than trying to do everything at once
+
+**Features:**
+- **Prompt Injection:** Practices, context, and strategies are injected during every knowledge generation build
+- **Human-In-The-Loop Cycle:** A clarify → strategy → build → render → validate cycle minimizes hallucination
+
+### 🤝 **Co-Creation**
+We collaborate on common shared artifacts in order to maximize shared understanding
+
+Store all context (answers, decisions, strategies) in a shared knowledge graph that both humans and AI can read, edit, and reference
+
+**Features:**
+- **Layered Context Injection:** Answers, strategies, knowledge, and context are preserved and injected at each step
+- **Synchronizer Architecture:** Updates diagrams, markdown, and code when the story graph changes, keeping all artifacts aligned
+- **Multiple Channels:** Usable through UI, CLI, and MCP protocol
+
+### 👁️ **Transparency**
+We align outcomes, maps, model specs, and code through ubiquitous language
+
+Use consistent structure across stories, tests, and code with synchronized artifacts so changes in one place update everywhere automatically
+
+**Features:**
+- **Knowledge Graph:** Connects all story and story-related knowledge and code, enabling easy access for context injection
+- **Story Editor:** View and modify stories with changes reflected in real-time across rendered output
+- **Audit Trails:** Logs every answer, decision, and evidence provided, connecting artifacts to context
+
+### 🎓 **Mastery**
+We instill the highest level of craftsmanship in everything we do, enabling the best outcomes through best-in-class practice
+
+Validate AI output against configurable best practice rules with automated scanners that catch common mistakes before they become problems
+
+**Features:**
+- **Practice-as-Code Validation:** Practices implemented through code syntax and grammar checkers that guide AI to confirm, report, and fix errors
+- **Robust Practice Support:** Covers Story Mapping / Exploration, Spec By Example, Domain Modelling, Test Driven Development, and Clean Code
+
+> *Enterprises on the whole struggle with sustainably operating at high levels of craftsmanship, teamwork and flow at scale*
 
 ## What's Included
 
