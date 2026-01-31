@@ -4,19 +4,14 @@
     "description": "Visual dashboard for bot status showing workflow, scope, behaviors, and instructions",
     "version": "0.1.662",
     "publisher": "agilebot",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/yourusername/augmented-teams.git"
-    },
+    "repository": "https://github.com/agilebydesign/agile_bots.git",    
     "engines": {
         "vscode": "^1.80.0"
     },
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "*"
-    ],
+    "activationEvents": [],
     "main": "./extension.js",
     "contributes": {
         "commands": [
