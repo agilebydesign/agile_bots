@@ -17,6 +17,19 @@ This initial release includes **StoryBot** and **CRC Bot**, two complementary to
 
 > *We use the term "Agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CICD/DevOps. We're not talking about cargo cult adoption of Scrum, SAFe, or other random initials.*
 
+## 📖 **USER MANUAL - START HERE**
+
+**👉 [READ THE COMPLETE USER GUIDE](docs/manual/user-guide.md) 👈**
+
+**New to Agile Bots?** The user guide contains everything you need:
+- Step-by-step tutorials for StoryBot and CRC Bot
+- Complete workflow explanations (Clarify → Strategy → Build → Validate → Render)
+- CLI and panel interface guides
+- Story graph navigation and management
+- Real-world examples and screenshots
+
+---
+
 ## Problems Solved
 
 
