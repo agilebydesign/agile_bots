@@ -1,0 +1,54 @@
+{
+    "name": "trace-notebook",
+    "displayName": "Trace Notebook",
+    "description": "Story -> Test -> Code traceability in VS Code Notebooks",
+    "version": "0.1.7",
+    "publisher": "agilebot",
+    "license": "MIT",
+    "private": true,
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Notebooks"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "notebooks": [
+            {
+                "type": "trace-notebook",
+                "displayName": "Trace Notebook",
+                "selector": [
+                    {
+                        "filenamePattern": "*.trace"
+                    }
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "command": "trace.open",
+                "title": "Open Trace Notebook",
+                "category": "Trace"
+            },
+            {
+                "command": "trace.expand",
+                "title": "Expand Cell",
+                "category": "Trace"
+            },
+            {
+                "command": "trace.collapse",
+                "title": "Collapse Children",
+                "category": "Trace"
+            }
+        ]
+    },
+    "activationEvents": [
+        "onNotebook:trace-notebook"
+    ],
+    "scripts": {
+        "package": "vsce package --allow-missing-repository",
+        "install-ext": "powershell -File trace_bump_and_install_cursor.ps1"
+    },
+    "devDependencies": {}
+}

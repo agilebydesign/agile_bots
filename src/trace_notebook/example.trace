@@ -1,0 +1,59 @@
+{
+  "cells": [
+    {
+      "kind": "markdown",
+      "value": "# Validate Rules\n\n- **Story graph validation includes rule content in instructions**\n- **File validation includes rule content in instructions**\n- **Story graph scanners receive scoped story_graph data**\n- **File scanners receive scoped file paths**",
+      "language": "markdown"
+    },
+    {
+      "kind": "code",
+      "value": "class TestValidateRules:\n    \"\"\"Tests that rules are properly formatted into instructions for AI to use.\"\"\"\n\n    def test_story_graph_rules_formatted_in_instructions(self, tmp_path):\n        \"\"\"\n        SCENARIO: Story graph validation includes rule content in instructions\n        GIVEN: Production story_bot with shape behavior (validates story graph)\n        AND: Story graph file exists\n        WHEN: Validate action executes\n        THEN: Instructions contain rule descriptions from rule files\n        \"\"\"\n        helper = BotTestHelper(tmp_path)\n        helper.story.create_story_graph({'epics': []})\n        helper.bot.behaviors.navigate_to('shape')\n        \n        result = action.do_execute()\n        \n        helper.validate.assert_validate_instructions(result)",
+      "language": "python",
+      "metadata": {
+        "trace": {
+          "nodeId": "python:test/invoke_bot/perform_action/test_validate_with_rules.py:29:0:198:0",
+          "kind": "test",
+          "lang": "python",
+          "filePath": "test/invoke_bot/perform_action/test_validate_with_rules.py",
+          "symbol": "TestValidateRules",
+          "range": { "startLine": 29, "endLine": 198 },
+          "depth": 0
+        }
+      }
+    },
+    {
+      "kind": "code",
+      "value": "class BotTestHelper:\n    \"\"\"\n    Test helper that provides production story_bot and workspace.\n\n    All domain-specific methods are accessible through sub-helpers:\n    - helper.state.set_state()\n    - helper.behaviors.navigate_to()\n    - helper.story.create_story_graph()\n    \"\"\"\n\n    def __init__(self, tmp_path: Path, workspace_directory: Path = None):\n        self._workspace = workspace_directory or tmp_path / 'workspace'\n        self._workspace.mkdir(parents=True, exist_ok=True)\n        # ... initialization",
+      "language": "python",
+      "metadata": {
+        "trace": {
+          "nodeId": "python:test/helpers/bot_test_helper.py:25:0:162:0",
+          "kind": "code",
+          "lang": "python",
+          "filePath": "test/helpers/bot_test_helper.py",
+          "symbol": "BotTestHelper",
+          "range": { "startLine": 25, "endLine": 162 },
+          "depth": 1,
+          "parentNodeId": "python:test/invoke_bot/perform_action/test_validate_with_rules.py:29:0:198:0"
+        }
+      }
+    },
+    {
+      "kind": "code",
+      "value": "class Scope:\n\n    @staticmethod\n    def get_parameter_description() -> str:\n        return \"Scope structure: {'type': 'story'|'epic'|'increment'|'all', 'value': <names>}\"\n\n    def __init__(self, workspace_directory: Path, bot_paths=None):\n        self.workspace_directory = Path(workspace_directory)\n        self.bot_paths = bot_paths\n        self.type = ScopeType.ALL\n        self.value: List[str] = []\n        # ...",
+      "language": "python",
+      "metadata": {
+        "trace": {
+          "nodeId": "python:src/scope/scope.py:186:0:446:0",
+          "kind": "code",
+          "lang": "python",
+          "filePath": "src/scope/scope.py",
+          "symbol": "Scope",
+          "range": { "startLine": 186, "endLine": 446 },
+          "depth": 1,
+          "parentNodeId": "python:test/invoke_bot/perform_action/test_validate_with_rules.py:29:0:198:0"
+        }
+      }
+    }
+  ]
+}
