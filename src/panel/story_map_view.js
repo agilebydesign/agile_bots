@@ -252,7 +252,7 @@ class StoryMapView extends PanelView {
         
         const linksHtml = scopeData.graphLinks && scopeData.graphLinks.length > 0
             ? scopeData.graphLinks.map(link =>
-                `<span onclick="openFile('${this.escapeForJs(link.url)}')" style="color: var(--vscode-foreground); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${this.escapeHtml(link.text).toLowerCase()}</span>`
+                `<span onclick="openFile('${this.escapeForJs(link.url)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${this.escapeHtml(link.text).toLowerCase()}</span>`
             ).join('')
             : '';
         
@@ -262,8 +262,8 @@ class StoryMapView extends PanelView {
         const storyMapPath = workspaceDir ? `${workspaceDir}/docs/stories/story-map/story-map.md` : '';
         
         const permanentLinksHtml = `
-            <span onclick="openFile('${this.escapeForJs(storyGraphPath)}')" style="color: var(--vscode-foreground); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
-            <span onclick="openFile('${this.escapeForJs(storyMapPath)}')" style="color: var(--vscode-foreground); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
+            <span onclick="openFile('${this.escapeForJs(storyGraphPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
+            <span onclick="openFile('${this.escapeForJs(storyMapPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
         `;
         
         // ===== PERFORMANCE: Content rendering =====
@@ -2582,7 +2582,7 @@ ${clientScript}    </script>`;
             </div>
             <div id="save-status-indicator" class="save-status" style="display: none;">
                 <span id="save-status-spinner" class="save-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 140, 0, 0.3); border-top-color: #ff8c00; border-radius: 50%;"></span>
-                <span id="save-status-message" style="font-size: 12px; color: var(--vscode-foreground); margin-left: 6px;"></span>
+                <span id="save-status-message" style="font-size: 12px; color: var(--text-color-faded); margin-left: 6px;"></span>
             </div>
         </div>`;
     }

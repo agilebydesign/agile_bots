@@ -1649,7 +1649,7 @@ class BotPanel {
               🔄 Retry
             </button>
           </div>
-          <p style="margin-top: 20px; color: var(--vscode-descriptionForeground); font-size: 12px;">
+          <p style="margin-top: 20px; color: var(--text-color-faded); font-size: 12px;">
             Please ensure Python is installed and the bot CLI is available.
           </p>
         </div>
@@ -1673,14 +1673,21 @@ class BotPanel {
   }
 
   _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null, botData = null) {
-    // Get branding color for CSS theming
+    // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
+    const bgColor = branding.getBackgroundColor();
+    const textColor = branding.getTextColor();
+    const textColorFaded = branding.getTextColorFaded();
+    const fontWeight = branding.getFontWeight();
     // Convert hex to RGB for rgba() usage
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 140, 0';
     };
     const brandColorRgb = hexToRgb(brandColor);
+    const bgColorRgb = hexToRgb(bgColor);
+    const textColorRgb = hexToRgb(textColor);
+    const isLightBg = bgColor.toLowerCase() === '#ffffff' || bgColor.toLowerCase() === '#fff';
     
     const currentBehaviorScript = currentBehavior 
       ? '\n        <script>\n            window.currentBehavior = ' + JSON.stringify(currentBehavior) + ';\n            ' + (currentAction ? 'window.currentAction = ' + JSON.stringify(currentAction) + ';' : '') + '\n            ' + (botData ? 'window.botData = ' + JSON.stringify(botData) + ';' : '') + '\n        </script>'
@@ -1699,16 +1706,18 @@ class BotPanel {
         
         :root {
             /* Colors - from branding config */
-            --bg-base: #000000;
+            --bg-base: ${bgColor};
+            --text-color: ${textColor};
+            --text-color-faded: ${textColorFaded};
             --accent-color: ${brandColor};
             --border-color: ${brandColor};
             --divider-color: ${brandColor};
-            --hover-bg: rgba(255, 255, 255, 0.03);
+            --hover-bg: ${isLightBg ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)'};
             
             /* Input styling - chat-like appearance */
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-bg-focus: rgba(255, 255, 255, 0.08);
-            --input-border: rgba(255, 255, 255, 0.1);
+            --input-bg: ${isLightBg ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)'};
+            --input-bg-focus: ${isLightBg ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)'};
+            --input-border: ${isLightBg ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)'};
             --input-border-focus: var(--accent-color);
             --input-padding: 6px;
             --input-border-radius: 6px;
@@ -1735,7 +1744,7 @@ class BotPanel {
             --font-size-sm: 12px;
             --font-size-xs: 11px;
             --font-size-section: 14px;
-            --font-weight-normal: 400;
+            --font-weight-normal: ${fontWeight};
             --line-height-base: 1.6;
             --line-height-compact: 1.4;
         }
@@ -1743,7 +1752,7 @@ class BotPanel {
         body {
             font-family: var(--vscode-font-family), 'Segoe UI', sans-serif;
             padding: var(--space-md);
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             background-color: var(--bg-base);
             line-height: var(--line-height-base);
             margin: 0;
@@ -1851,7 +1860,7 @@ class BotPanel {
         .operation-item {
             margin-left: 24px;
             font-size: var(--font-size-sm);
-            color: var(--vscode-descriptionForeground);
+            color: var(--text-color-faded);
         }
         .collapsible-content {
             padding-left: 0;
@@ -1936,7 +1945,7 @@ class BotPanel {
         }
         
         .marker-pending {
-            color: var(--vscode-descriptionForeground);
+            color: var(--text-color-faded);
         }
         
         .scope-section {
@@ -1964,7 +1973,7 @@ class BotPanel {
             background-color: transparent;
             border-bottom: var(--input-header-border-width) solid var(--accent-color);
             font-size: var(--font-size-base);
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             font-weight: 600;
             transition: border-bottom-width 150ms ease;
         }
@@ -1975,14 +1984,14 @@ class BotPanel {
         .info-display {
             padding: var(--space-sm) 0;
             font-size: var(--font-size-base);
-            color: var(--vscode-foreground);
+            color: var(--text-color);
         }
         .info-display .label {
-            color: var(--vscode-descriptionForeground);
+            color: var(--text-color-faded);
             margin-right: 8px;
         }
         .info-display .value {
-            color: var(--vscode-foreground);
+            color: var(--text-color);
         }
         
         .main-header {
@@ -2000,12 +2009,12 @@ class BotPanel {
         .main-header-title {
             font-size: 20px;
             font-weight: 700;
-            color: var(--vscode-foreground);
+            color: var(--text-color);
         }
         .main-header-refresh {
             background-color: transparent;
             border: none;
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             font-size: 18px;
             padding: 3px;
             cursor: pointer;
@@ -2046,7 +2055,7 @@ class BotPanel {
             border: var(--input-border-width) solid var(--accent-color);
             border-radius: var(--input-border-radius);
             background-color: rgba(255, 140, 0, 0.1); /* Dark black with orange tint */
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             font-size: var(--font-size-sm);
             transition: opacity 0.3s, background-color 150ms ease;
             white-space: nowrap;
@@ -2096,7 +2105,7 @@ class BotPanel {
             width: 100%;
             padding: var(--space-sm) var(--input-padding);
             background-color: var(--input-bg);
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             border: none;
             border-radius: 0;
             font-family: var(--vscode-editor-font-family, 'Segoe UI', sans-serif);
@@ -2153,11 +2162,11 @@ class BotPanel {
             font-size: var(--font-size-base);
             cursor: pointer;
             text-decoration: underline;
-            color: var(--vscode-descriptionForeground);
+            color: var(--text-color-faded);
             opacity: 0.6;
         }
         .bot-link.active {
-            color: var(--vscode-foreground);
+            color: var(--text-color);
             font-weight: var(--font-weight-normal);
             text-decoration: none;
             cursor: default;
@@ -2168,7 +2177,7 @@ class BotPanel {
         }
         
         .empty-state {
-            color: var(--vscode-descriptionForeground);
+            color: var(--text-color-faded);
             font-style: italic;
             padding: var(--space-sm);
         }
