@@ -99,12 +99,18 @@ sleep 0.5
 echo -e "\033[0;32m      Done: Extension packaged: bot-panel-$NEW_VERSION.vsix\033[0m"
 
 # Uninstall old extension
+extension_name='agilebot.bot-panel'
 echo -e "\033[0;36m[3/4] Uninstalling old extension...\033[0m"
-code --uninstall-extension agilebot.bot-panel > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo -e "\033[0;33m      Warning: Uninstall warning (may not be installed)\033[0m"
+if code --list-extensions | grep -q $extension_name; then
+    echo "extension name: $extension_name found in extensions list, uninstalling"
+    code --uninstall-extension $extension_name > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo -e "\033[0;33m      Warning: Uninstall warning (may not be installed)\033[0m"
+    else
+        echo -e "\033[0;32m      Done: Old extension uninstalled\033[0m"
+    fi
 else
-    echo -e "\033[0;32m      Done: Old extension uninstalled\033[0m"
+    echo -e "\033[0;32m      Extension not found in installed list, skipping uninstall"
 fi
 
 # Install new extension
