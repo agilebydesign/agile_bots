@@ -4,12 +4,20 @@
         "ABD": {
             "path": "",
             "title": "Agile Bots",
-            "color": "#FF8C00"
+            "color": "#FF8C00",
+            "background": "#000000",
+            "textColor": "#FFFFFF",
+            "textColorFaded": "#999999",
+            "fontWeight": "400"
         },
         "Scotia": {
             "path": "scotia",
             "title": "Scotia Bots",
-            "color": "#EC111A"
+            "color": "#EC111A",
+            "background": "#FFFFFF",
+            "textColor": "#000000",
+            "textColorFaded": "#E88A8E",
+            "fontWeight": "600"
         }
     }
 }

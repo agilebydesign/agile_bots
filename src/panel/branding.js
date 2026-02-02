@@ -17,12 +17,20 @@ const DEFAULT_BRANDS = {
     ABD: {
         path: '',
         title: 'Agile Bots',
-        color: '#FF8C00'
+        color: '#FF8C00',
+        background: '#000000',
+        textColor: '#FFFFFF',
+        textColorFaded: '#999999',
+        fontWeight: '400'
     },
     Scotia: {
         path: 'scotia',
         title: 'Scotia Bots',
-        color: '#EC111A'
+        color: '#EC111A',
+        background: '#FFFFFF',
+        textColor: '#000000',
+        textColorFaded: '#E88A8E',
+        fontWeight: '600'
     }
 };
 
@@ -132,11 +140,43 @@ function getProductName() {
 }
 
 /**
- * Get branded title color (for HTML/CSS)
+ * Get branded title/accent color (for HTML/CSS)
  * @returns {string} CSS color value
  */
 function getTitleColor() {
     return getBrandSettings().color;
+}
+
+/**
+ * Get branded background color
+ * @returns {string} CSS color value
+ */
+function getBackgroundColor() {
+    return getBrandSettings().background || '#000000';
+}
+
+/**
+ * Get branded text color
+ * @returns {string} CSS color value
+ */
+function getTextColor() {
+    return getBrandSettings().textColor || '#FFFFFF';
+}
+
+/**
+ * Get branded font weight for body text
+ * @returns {string} CSS font-weight value
+ */
+function getFontWeight() {
+    return getBrandSettings().fontWeight || '400';
+}
+
+/**
+ * Get branded faded/secondary text color
+ * @returns {string} CSS color value
+ */
+function getTextColorFaded() {
+    return getBrandSettings().textColorFaded || '#999999';
 }
 
 /**
@@ -191,6 +231,10 @@ module.exports = {
     getImagePath,
     getProductName,
     getTitleColor,
+    getBackgroundColor,
+    getTextColor,
+    getTextColorFaded,
+    getFontWeight,
     getTitleStyle,
     getImageUri,
     clearCache

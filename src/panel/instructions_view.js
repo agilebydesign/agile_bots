@@ -140,7 +140,7 @@ class InstructionsSection extends PanelView {
                 <span style="font-weight: 600; font-size: 20px;">Instructions</span>
             </div>
             <div id="instructions-content" class="collapsible-content" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.3s ease;">
-                <div class="card-secondary" style="padding: 8px 10px; color: var(--vscode-descriptionForeground);">
+                <div class="card-secondary" style="padding: 8px 10px; color: var(--text-color-faded);">
                     <div style="margin-bottom: 4px;">No instructions available yet.</div>
                     <div>Navigate to a behavior/action to load instructions.</div>
                 </div>
@@ -1079,7 +1079,7 @@ class InstructionsSection extends PanelView {
                 const hasScanner = (rc.scanner || rc.scanners) ? '[Scanner]' : '[Manual]';
                 html += `<li style="margin-bottom: 6px;">`;
                 html += `<div><strong>${this.escapeHtml(name)}</strong> (Priority ${this.escapeHtml(priority)}, ${hasScanner})</div>`;
-                html += `<div style="font-size: 12px; color: var(--vscode-descriptionForeground);">File: <code>${this.escapeHtml(rule_file)}</code></div>`;
+                html += `<div style="font-size: 12px; color: var(--text-color-faded);">File: <code>${this.escapeHtml(rule_file)}</code></div>`;
                 if (desc) {
                     html += `<div style="margin-top: 2px;">${this.escapeHtml(desc)}</div>`;
                 }
@@ -1133,7 +1133,7 @@ class InstructionsSection extends PanelView {
 
     _formatClarificationData(clarificationData, borderColor) {
         if (!clarificationData || typeof clarificationData !== 'object') {
-            return '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No clarification data available</div>';
+            return '<div style="color: var(--text-color-faded); font-style: italic;">No clarification data available</div>';
         }
 
         let html = '';
@@ -1212,17 +1212,17 @@ class InstructionsSection extends PanelView {
             }
         });
 
-        return html || '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No clarification details available</div>';
+        return html || '<div style="color: var(--text-color-faded); font-style: italic;">No clarification details available</div>';
     }
 
     _formatQuestionsAndAnswers(answers, borderColor) {
         if (!answers || typeof answers !== 'object') {
-            return '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No questions answered yet</div>';
+            return '<div style="color: var(--text-color-faded); font-style: italic;">No questions answered yet</div>';
         }
 
         const entries = Object.entries(answers);
         if (entries.length === 0) {
-            return '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No questions answered yet</div>';
+            return '<div style="color: var(--text-color-faded); font-style: italic;">No questions answered yet</div>';
         }
 
         const qaBlocks = entries.map(([question, answer], index) => {
@@ -1239,7 +1239,7 @@ class InstructionsSection extends PanelView {
 
     _formatStrategyData(strategy, borderColor) {
         if (!strategy || typeof strategy !== 'object') {
-            return '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No strategy data available</div>';
+            return '<div style="color: var(--text-color-faded); font-style: italic;">No strategy data available</div>';
         }
         
         let html = '';
@@ -1320,7 +1320,7 @@ class InstructionsSection extends PanelView {
             }
         }
         
-        return html || '<div style="color: var(--vscode-descriptionForeground); font-style: italic;">No strategy details available</div>';
+        return html || '<div style="color: var(--text-color-faded); font-style: italic;">No strategy details available</div>';
     }
 }
 
