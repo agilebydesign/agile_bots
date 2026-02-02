@@ -36,5 +36,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.background_common_setup_scanner.BackgroundCommonSetupScanner"
+    "scanner":  "scanners.background_common_setup_scanner.BackgroundCommonSetupScanner"
 }

@@ -31,7 +31,7 @@ class ScannerOrchestrator:
         if not scanner_class:
             raise ValueError(f"No scanner found for rule: {rule.name}")
         
-        return scanner_class()
+        return scanner_class(rule=rule)
     
     def performs_scan_on_scope(
         self,

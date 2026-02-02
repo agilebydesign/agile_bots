@@ -49,5 +49,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.domain_rich_language_scanner.DomainRichLanguageScanner"
+    "scanner":  "scanners.domain_rich_language_scanner.DomainRichLanguageScanner"
 }
