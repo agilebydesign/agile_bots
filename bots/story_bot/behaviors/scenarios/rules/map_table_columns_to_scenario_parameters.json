@@ -48,5 +48,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.table_column_parameter_scanner.TableColumnParameterScanner"
+    "scanner":  "scanners.table_column_parameter_scanner.TableColumnParameterScanner"
 }

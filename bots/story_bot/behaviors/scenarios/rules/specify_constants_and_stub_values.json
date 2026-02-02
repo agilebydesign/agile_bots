@@ -49,5 +49,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.constants_and_stubs_scanner.ConstantsAndStubsScanner"
+    "scanner":  "scanners.constants_and_stubs_scanner.ConstantsAndStubsScanner"
 }

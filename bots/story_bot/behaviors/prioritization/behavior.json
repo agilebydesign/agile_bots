@@ -20,12 +20,20 @@
       {
         "name": "strategy",
         "order": 2,
-        "next_action": "validate",
+        "next_action": "build",
         "instructions": []
       },
       {
-        "name": "validate",
+        "name": "build",
         "order": 3,
+        "next_action": "validate",
+        "instructions": [
+          "prioritization: build delivery increments by organizing stories into sequenced slices"
+        ]
+      },
+      {
+        "name": "validate",
+        "order": 4,
         "next_action": "render",
         "instructions": [
           "prioritization: validate increment organization and dependencies"
@@ -33,7 +41,7 @@
       },
       {
         "name": "render",
-        "order": 4,
+        "order": 5,
         "instructions": [
           "prioritization: render increment documentation"
         ]

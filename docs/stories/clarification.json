@@ -18,5 +18,73 @@
       "provided": {}
     },
     "context": []
+  },
+  "work_with_story_map_panel_writeups": {
+    "key_questions": {
+      "answers": {
+        "What is the scope of this work?": "Writing documentation/writeups for all Panel-related stories in the 'Work With Story Map' sub-epic. Based on the story graph, there are approximately 18 Panel stories across 6 sub-epics: Scope Files (3 stories), Filter Scope of Stories (3 stories), Manage Story Scope (1 story), Set Scope Using Filter Parts (4 stories), Edit Story Map (8 stories), Edit Increments (3 stories), Open Story Related Files (2 stories).",
+        "Who are the target users for these writeups?": "Developers and end-users who interact with the Agile Bots VS Code panel to work with story maps. Based on the existing user guide structure, the documentation should explain how to use each panel feature.",
+        "What format should the writeups follow?": "Looking at the existing user-guide.md structure, each section uses: Headers (##, ###), Brief description of feature purpose, Step-by-step instructions where applicable, Screenshots references (images), Tables for acceptance criteria or feature summaries.",
+        "What information is available in the scope for each panel story?": "Each panel story in the scope contains: Story name, Acceptance criteria (WHEN/THEN statements), Scenarios with Given/When/Then steps, Test classes and test methods (where defined), Domain concepts (for Edit Story Map sub-epic).",
+        "Where should this documentation be added?": "Section 17 'The Story Graph' in user-guide.md appears to be the appropriate location, as it already covers navigating and editing the story graph. The panel stories would expand this section with detailed feature documentation."
+      }
+    },
+    "evidence": {
+      "required": [
+        "story-graph.json scope data",
+        "existing user-guide.md structure",
+        "acceptance criteria from panel stories"
+      ],
+      "provided": {
+        "story_graph_scope": "Provided in user request - complete scope JSON for Work With Story Map",
+        "user_guide": "c:\\dev\\agile_bots\\docs\\manual\\user-guide.md"
+      }
+    },
+    "context": [
+      "Panel stories are UI features in the VS Code extension that allow users to interact with the story graph",
+      "Each panel story has acceptance criteria defining WHEN/THEN behaviors",
+      "Stories cover: filtering scope, managing scope, editing story nodes, working with increments, and opening related files",
+      "Domain concepts include StoryNode, StoryMap, InlineNameEditor, StoryNodeDragDropManager and various View classes"
+    ],
+    "panel_stories_identified": {
+      "scope_files": [
+        "Add Filter Part To File Scope Panel",
+        "Remove Filter Part From File Scope Panel",
+        "Filter File Scope By Files Panel"
+      ],
+      "filter_scope_of_stories": [
+        "Filter Story Scope by Stories Panel",
+        "Filter Story Scope By Files Panel",
+        "Filter Story Scope By Increments Panel"
+      ],
+      "manage_story_scope": [
+        "Show All Scope Through Panel"
+      ],
+      "set_scope_using_filter_parts": [
+        "Add Filter Part To Story Scope In Panel",
+        "Remove Filter Part From Story Scope In Panel",
+        "Add Increment Filter Part To Story Scope Panel",
+        "Remove Increment Filter Part From Story Scope Panel"
+      ],
+      "edit_story_map": [
+        "Display Story Hierarchy Panel",
+        "Create Child Story Node Under Parent Panel",
+        "Delete Story Node From Parent Panel",
+        "Move Story Node Panel",
+        "Update Story Node name Panel",
+        "Save Story Map Changes Asynchronously",
+        "Automatically Refresh Story Graph Changes Panel"
+      ],
+      "edit_increments": [
+        "Add Increment Panel",
+        "Delete Increment Panel",
+        "Move Story to Increment Panel",
+        "Show All Increment Scope Through Panel"
+      ],
+      "open_story_related_files": [
+        "Open All Related Files",
+        "Open Story Files"
+      ]
+    }
   }
 }

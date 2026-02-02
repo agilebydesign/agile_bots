@@ -109,6 +109,92 @@ def get_common_background(scenarios_list):
     return common
 
 
+def format_examples_table(headers, rows, description='', indent_level=0):
+    """
+    Format examples data into markdown table(s).
+    
+    Handles multiple row formats:
+    - Simple rows: [["val1", "val2"], ["val3", "val4"]]
+    - Nested rows with children: [{"values": [...], "children": {...}}, ...]
+    
+    Args:
+        headers: List of column headers
+        rows: List of row data (simple arrays or dicts with values/children)
+        description: Optional table description
+        indent_level: Indentation level for nested tables
+    
+    Returns:
+        Formatted markdown string with table(s)
+    """
+    if not headers or not rows:
+        return ""
+    
+    indent = "  " * indent_level
+    result_parts = []
+    
+    # Add description if provided
+    if description and indent_level == 0:
+        result_parts.append(f"\n**Examples:** *{description}*\n")
+    elif description:
+        result_parts.append(f"\n{indent}*{description}*\n")
+    elif indent_level == 0:
+        result_parts.append("\n**Examples:**\n")
+    
+    # Build header row
+    header_row = f"{indent}| " + " | ".join(str(h) for h in headers) + " |"
+    separator_row = f"{indent}| " + " | ".join(["---"] * len(headers)) + " |"
+    
+    table_rows = [header_row, separator_row]
+    nested_tables = []
+    
+    for row in rows:
+        if isinstance(row, dict) and 'values' in row:
+            # Nested format: {"values": [...], "<nested_key>": {...}}
+            values = row.get('values', [])
+            
+            # Pad values to match header count if needed
+            while len(values) < len(headers):
+                values.append('')
+            
+            data_row = f"{indent}| " + " | ".join(str(v).strip() for v in values) + " |"
+            table_rows.append(data_row)
+            
+            # Find any nested table(s) - look for any dict with 'headers' and 'rows'
+            for key, value in row.items():
+                if key == 'values':
+                    continue  # Skip the values key
+                if isinstance(value, dict) and 'headers' in value and 'rows' in value:
+                    child_headers = value.get('headers', [])
+                    child_rows = value.get('rows', [])
+                    child_desc = value.get('description', '')
+                    
+                    if child_headers and child_rows:
+                        nested_table = format_examples_table(
+                            child_headers, 
+                            child_rows, 
+                            child_desc, 
+                            indent_level + 1
+                        )
+                        nested_tables.append(nested_table)
+        elif isinstance(row, list):
+            # Simple format: ["val1", "val2", ...]
+            # Pad row to match header count if needed
+            padded_row = list(row)
+            while len(padded_row) < len(headers):
+                padded_row.append('')
+            
+            data_row = f"{indent}| " + " | ".join(str(v).strip() for v in padded_row) + " |"
+            table_rows.append(data_row)
+    
+    # Combine main table with nested tables
+    result_parts.append("\n".join(table_rows))
+    
+    for nested in nested_tables:
+        result_parts.append(nested)
+    
+    return "\n".join(result_parts) + "\n"
+
+
 def format_scenarios(scenarios_list, common_background=None, story_test_file='', workspace_directory=None, story_file_path=None):
     """Format scenarios list into markdown"""
     if not scenarios_list:
@@ -160,18 +246,15 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
         examples_block = ""
         examples_data = scenario.get('examples')
         
-        # Handle two formats: list of dicts OR dict with columns+rows (template format)
-        if isinstance(examples_data, dict) and 'columns' in examples_data and 'rows' in examples_data:
-            # Template format: {"columns": [...], "rows": [[...]]}
-            columns = examples_data['columns']
-            rows = examples_data['rows']
-            header = "| " + " | ".join(columns) + " |"
-            separator = "| " + " | ".join(["---"] * len(columns)) + " |"
-            table_rows = []
-            for row in rows:
-                table_rows.append("| " + " | ".join(str(cell).strip() for cell in row) + " |")
-            table = "\n".join([header, separator] + table_rows)
-            examples_block = f"\n**Examples:**\n{table}\n"
+        # Handle multiple formats for examples data
+        if isinstance(examples_data, dict):
+            # Check for headers+rows format (story-graph.json format)
+            headers = examples_data.get('headers') or examples_data.get('columns')
+            rows = examples_data.get('rows', [])
+            description = examples_data.get('description', '')
+            
+            if headers and rows:
+                examples_block = format_examples_table(headers, rows, description)
         elif isinstance(examples_data, list) and examples_data:
             if all(isinstance(row, dict) for row in examples_data):
                 # Build a single table using all keys across rows (preserve first-seen order)
