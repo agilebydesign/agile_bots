@@ -117,6 +117,11 @@ class BotPath:
         return self._python_workspace_root
 
     @property
+    def repo_root(self) -> Path:
+        """The root of the agile_bots repo - derived from bot_directory (bot is at repo/bots/botname)"""
+        return self._bot_directory.parent.parent
+
+    @property
     def documentation_path(self) -> Path:
         return self._documentation_path
 
@@ -126,6 +131,34 @@ class BotPath:
 
     def find_repo_root(self) -> Path:
         return self.python_workspace_root
+
+    def get_branding_config(self) -> Dict[str, Any]:
+        """Load branding config from conf/config.json"""
+        config_path = self.repo_root / 'conf' / 'config.json'
+        default_config = {
+            'branding': 'ABD',
+            'brands': {
+                'ABD': {'path': '', 'title': 'Agile Bots', 'color': '#FF8C00'},
+                'Scotia': {'path': 'scotia', 'title': 'Scotia Bots', 'color': '#EC111A'}
+            }
+        }
+        if config_path.exists():
+            try:
+                config = read_json_file(config_path)
+                # Merge with defaults
+                config.setdefault('brands', {})
+                for brand, settings in default_config['brands'].items():
+                    config['brands'].setdefault(brand, settings)
+                return config
+            except Exception as e:
+                logger.debug(f'Failed to load branding config: {e}')
+        return default_config
+
+    def get_brand_settings(self) -> Dict[str, str]:
+        """Get current brand settings (path, title, color)"""
+        config = self.get_branding_config()
+        brand_name = config.get('branding', 'ABD')
+        return config['brands'].get(brand_name, config['brands']['ABD'])
 
     def resolve_path_to_absolute(self, path_str: str) -> str:
         path = Path(path_str)

@@ -7,6 +7,7 @@
  */
 
 const PanelView = require('./panel_view');
+const branding = require('./branding');
 const vscode = require('vscode');
 const path = require('path');
 
@@ -169,44 +170,19 @@ class InstructionsSection extends PanelView {
             delete instructions.behavior;
         }
 
-        // Load icon images
-        let clipboardIconPath = '';
-        let documentIconPath = '';
-        let lightbulbIconPath = '';
-        let lightbulbHeadIconPath = '';
-        let bullseyeIconPath = '';
-        let storyIconPath = '';
-        let botSubmitIconPath = '';
-        let copyIconPath = '';
-        if (this.webview && this.extensionUri) {
-            try {
-                const clipboardUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'clipboard.png');
-                clipboardIconPath = this.webview.asWebviewUri(clipboardUri).toString();
-                
-                const documentUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'document.png');
-                documentIconPath = this.webview.asWebviewUri(documentUri).toString();
-                
-                const lightbulbUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'lightbulb.png');
-                lightbulbIconPath = this.webview.asWebviewUri(lightbulbUri).toString();
-                
-                const lightbulbHeadUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'light_bulb_head.png');
-                lightbulbHeadIconPath = this.webview.asWebviewUri(lightbulbHeadUri).toString();
-                
-                const bullseyeUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'bullseye.png');
-                bullseyeIconPath = this.webview.asWebviewUri(bullseyeUri).toString();
-                
-                const storyUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'story.png');
-                storyIconPath = this.webview.asWebviewUri(storyUri).toString();
-                
-                const submitUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit.png');
-                botSubmitIconPath = this.webview.asWebviewUri(submitUri).toString();
-                
-                // Use clipboard.png as copy icon (copy.png doesn't exist)
-                copyIconPath = clipboardIconPath;
-            } catch (err) {
-                console.error('Failed to create icon URIs:', err);
-            }
-        }
+        // Load icon images using branding utility (handles ABD vs Scotia paths)
+        const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
+        
+        const clipboardIconPath = getIcon('clipboard.png');
+        const documentIconPath = getIcon('document.png');
+        const lightbulbIconPath = getIcon('lightbulb.png');
+        const lightbulbHeadIconPath = getIcon('light_bulb_head.png');
+        const bullseyeIconPath = getIcon('bullseye.png');
+        const storyIconPath = getIcon('story.png');
+        const botSubmitIconPath = getIcon('submit.png');
+        const copyIconPath = clipboardIconPath; // Use clipboard.png as copy icon
+        
+        console.log(`[InstructionsSection] Branding: ${branding.getBranding()}`);
 
         // RESTRUCTURE: Consolidate into EXACTLY 4 sections: Base, Clarify, Strategy, Build
         const restructured = {};

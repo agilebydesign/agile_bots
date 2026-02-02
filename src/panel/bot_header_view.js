@@ -7,6 +7,7 @@
  */
 
 const PanelView = require('./panel_view');
+const branding = require('./branding');
 
 class BotHeaderView extends PanelView {
     /**
@@ -135,45 +136,27 @@ class BotHeaderView extends PanelView {
             }).join('\n                ');
         }
         
-        // Get the proper webview URIs for images (bundled in extension)
-        let imagePath = '';
-        let refreshIconPath = '';
-        let storyIconPath = '';
-        let crcIconPath = '';
-        if (this.webview && this.extensionUri) {
-            try {
-                const iconUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'company_icon.png');
-                imagePath = this.webview.asWebviewUri(iconUri).toString();
-                console.log('[BotHeaderView] Company icon URI:', imagePath);
-                
-                const refreshUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'refresh.png');
-                refreshIconPath = this.webview.asWebviewUri(refreshUri).toString();
-                console.log('[BotHeaderView] Refresh icon URI:', refreshIconPath);
-                
-                const storyUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'story.png');
-                storyIconPath = this.webview.asWebviewUri(storyUri).toString();
-                console.log('[BotHeaderView] Story icon URI:', storyIconPath);
-                
-                const crcUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'crc.png');
-                crcIconPath = this.webview.asWebviewUri(crcUri).toString();
-                console.log('[BotHeaderView] CRC icon URI:', crcIconPath);
-            } catch (err) {
-                console.error('[BotHeaderView] Failed to create icon URI:', err);
-                console.error('[BotHeaderView] webview:', !!this.webview, 'extensionUri:', !!this.extensionUri, 'extensionUri value:', this.extensionUri?.toString());
-            }
-        } else {
-            console.warn('[BotHeaderView] Missing webview or extensionUri:', { hasWebview: !!this.webview, hasExtensionUri: !!this.extensionUri });
-        }
+        // Get the proper webview URIs for images using branding utility
+        const imagePath = branding.getImageUri(this.webview, this.extensionUri, 'company_icon.png');
+        const refreshIconPath = branding.getImageUri(this.webview, this.extensionUri, 'refresh.png');
+        const storyIconPath = branding.getImageUri(this.webview, this.extensionUri, 'story.png');
+        const crcIconPath = branding.getImageUri(this.webview, this.extensionUri, 'crc.png');
+        
+        console.log('[BotHeaderView] Branding:', branding.getBranding());
+        console.log('[BotHeaderView] Company icon URI:', imagePath);
         
         const versionHtml = this.panelVersion 
             ? `<span style="font-size: 14px; opacity: 0.7; margin-left: 6px;">v${this.escapeHtml(this.panelVersion)}</span>`
             : '';
         
+        const productName = branding.getProductName();
+        const titleStyle = branding.getTitleStyle();
+        
         return `
     <div class="section card-primary" style="border-top: none; padding-top: 0;">
         <div class="main-header">
             ${imagePath ? `<img src="${imagePath}" class="main-header-icon" alt="Company Icon" onerror="console.error('Failed to load icon:', this.src); this.style.border='1px solid red';" />` : ''}
-            <span class="main-header-title">Agile Bots ${versionHtml}</span>
+            <span class="main-header-title" ${titleStyle}>${productName} ${versionHtml}</span>
             <button class="main-header-refresh" onclick="refreshStatus()" title="Refresh">
                 ${refreshIconPath ? `<img src="${refreshIconPath}" style="width: 36px; height: 36px; object-fit: contain; filter: saturate(1.3) brightness(0.95) hue-rotate(-5deg);" alt="Refresh" />` : ''}
             </button>
