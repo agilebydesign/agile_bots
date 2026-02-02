@@ -172,6 +172,12 @@ class ScannerRegistry:
         """Load both Python and JavaScript versions of a scanner."""
         scanner_name = re.sub(r'(?<!^)(?=[A-Z])', '_', class_name).lower().replace('_scanner', '').replace('scanner', '')
         
+        # First try loading directly from the module path (for non-code scanners like story/scenario scanners)
+        direct_scanner, _ = self._load_single_scanner(module_path, class_name)
+        if direct_scanner:
+            # Return as Python scanner since it's language-agnostic
+            return direct_scanner, None
+        
         # Try Python scanner
         py_paths = [
             f'scanners.code.python.{scanner_name}_scanner',

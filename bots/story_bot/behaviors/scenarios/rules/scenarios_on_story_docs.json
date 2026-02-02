@@ -35,5 +35,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner"
+    "scanner":  "scanners.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner"
 }
