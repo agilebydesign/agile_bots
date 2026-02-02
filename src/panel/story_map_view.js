@@ -12,6 +12,7 @@
 
 const PanelView = require('./panel_view');
 const StoryGraphAsyncSaveController = require('./story_graph/async_save_controller.js');
+const branding = require('./branding');
 const fs = require('fs');
 const path = require('path');
 
@@ -131,124 +132,39 @@ class StoryMapView extends PanelView {
         log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
         const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
-        const vscode = require('vscode');
         
-        // Get the proper webview URIs for icons
-        // In test mode (no webview), use simple paths so tests can verify icon presence
-        let magnifyingGlassIconPath = 'img/magnifying_glass.png';
-        let clearIconPath = 'img/close.png';
-        let showAllIconPath = 'img/show_all.png';
-        let jsonIconPath = 'img/json.png';
-        let filesIconPath = 'img/files.png';
-        let plusIconPath = 'img/plus.png';
-        let subtractIconPath = 'img/subtract.png';
-        let emptyIconPath = 'img/empty.png';
-        let gearIconPath = 'img/gear.png';
-        let epicIconPath = 'img/light_bulb2.png';
-        let pageIconPath = 'img/page.png';
-        let testTubeIconPath = 'img/test_tube.png';
-        let documentIconPath = 'img/document.png';
-        let addEpicIconPath = 'img/add_epic.png';
-        let addSubEpicIconPath = 'img/add_sub_epic.png';
-        let addStoryIconPath = 'img/add_story.png';
-        let addTestsIconPath = 'img/add_tests.png';
-        let addAcceptanceCriteriaIconPath = 'img/add_ac.png';
-        let deleteIconPath = 'img/delete.png';
-        let deleteChildrenIconPath = 'img/delete_children.png';
-        let scopeToIconPath = 'img/bullseye.png';
-        let submitShapeIconPath = 'img/submit_subepic.png';
-        let submitExploreIconPath = 'img/submit_story.png';
-        let submitScenarioIconPath = 'img/submit_ac.png';
-        let submitTestIconPath = 'img/submit_tests.png';
-        let submitCodeIconPath = 'img/submit_code.png';
-        let refreshIconPath = 'img/refresh.png';
+        // Get icon URIs using branding utility (handles ABD vs Scotia paths)
+        const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
-        if (this.webview && this.extensionUri) {
-            try {
-                const magnifyingGlassUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'magnifying_glass.png');
-                magnifyingGlassIconPath = this.webview.asWebviewUri(magnifyingGlassUri).toString();
-                
-                const clearUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'close.png');
-                clearIconPath = this.webview.asWebviewUri(clearUri).toString();
-                
-                const showAllUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'show_all.png');
-                showAllIconPath = this.webview.asWebviewUri(showAllUri).toString();
-                
-                const jsonUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'json.png');
-                jsonIconPath = this.webview.asWebviewUri(jsonUri).toString();
-                
-                const filesUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'files.png');
-                filesIconPath = this.webview.asWebviewUri(filesUri).toString();
-                
-                const plusUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'plus.png');
-                plusIconPath = this.webview.asWebviewUri(plusUri).toString();
-                
-                const subtractUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'subtract.png');
-                subtractIconPath = this.webview.asWebviewUri(subtractUri).toString();
-                
-                const emptyUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'empty.png');
-                emptyIconPath = this.webview.asWebviewUri(emptyUri).toString();
-                
-                const gearUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'gear.png');
-                gearIconPath = this.webview.asWebviewUri(gearUri).toString();
-                
-                const epicUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'light_bulb2.png');
-                epicIconPath = this.webview.asWebviewUri(epicUri).toString();
-                
-                const pageUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'page.png');
-                pageIconPath = this.webview.asWebviewUri(pageUri).toString();
-                
-                const testTubeUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'test_tube.png');
-                testTubeIconPath = this.webview.asWebviewUri(testTubeUri).toString();
-                
-                const documentUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'document.png');
-                documentIconPath = this.webview.asWebviewUri(documentUri).toString();
-                
-                const addEpicUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_epic.png');
-                addEpicIconPath = this.webview.asWebviewUri(addEpicUri).toString();
-                
-                const addSubEpicUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_sub_epic.png');
-                addSubEpicIconPath = this.webview.asWebviewUri(addSubEpicUri).toString();
-                
-                const addStoryUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_story.png');
-                addStoryIconPath = this.webview.asWebviewUri(addStoryUri).toString();
-                
-                const addTestsUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_tests.png');
-                addTestsIconPath = this.webview.asWebviewUri(addTestsUri).toString();
-                
-                const addAcceptanceCriteriaUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'add_ac.png');
-                addAcceptanceCriteriaIconPath = this.webview.asWebviewUri(addAcceptanceCriteriaUri).toString();
-                
-                const deleteUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'delete.png');
-                deleteIconPath = this.webview.asWebviewUri(deleteUri).toString();
-                
-                const deleteChildrenUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'delete_children.png');
-                deleteChildrenIconPath = this.webview.asWebviewUri(deleteChildrenUri).toString();
-                
-                const scopeToUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'bullseye.png');
-                scopeToIconPath = this.webview.asWebviewUri(scopeToUri).toString();
-                
-                const submitShapeUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit_subepic.png');
-                submitShapeIconPath = this.webview.asWebviewUri(submitShapeUri).toString();
-                
-                const submitExploreUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit_story.png');
-                submitExploreIconPath = this.webview.asWebviewUri(submitExploreUri).toString();
-                
-                const submitScenarioUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit_ac.png');
-                submitScenarioIconPath = this.webview.asWebviewUri(submitScenarioUri).toString();
-                
-                const submitTestUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit_tests.png');
-                submitTestIconPath = this.webview.asWebviewUri(submitTestUri).toString();
-                
-                const submitCodeUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'submit_code.png');
-                submitCodeIconPath = this.webview.asWebviewUri(submitCodeUri).toString();
-                
-                const refreshUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'refresh.png');
-                refreshIconPath = this.webview.asWebviewUri(refreshUri).toString();
-            } catch (err) {
-                console.error('Failed to create icon URIs:', err);
-            }
-        }
+        const magnifyingGlassIconPath = getIcon('magnifying_glass.png');
+        const clearIconPath = getIcon('close.png');
+        const showAllIconPath = getIcon('show_all.png');
+        const jsonIconPath = getIcon('json.png');
+        const filesIconPath = getIcon('files.png');
+        const plusIconPath = getIcon('plus.png');
+        const subtractIconPath = getIcon('subtract.png');
+        const emptyIconPath = getIcon('empty.png');
+        const gearIconPath = getIcon('gear.png');
+        const epicIconPath = getIcon('light_bulb2.png');
+        const pageIconPath = getIcon('page.png');
+        const testTubeIconPath = getIcon('test_tube.png');
+        const documentIconPath = getIcon('document.png');
+        const addEpicIconPath = getIcon('add_epic.png');
+        const addSubEpicIconPath = getIcon('add_sub_epic.png');
+        const addStoryIconPath = getIcon('add_story.png');
+        const addTestsIconPath = getIcon('add_tests.png');
+        const addAcceptanceCriteriaIconPath = getIcon('add_ac.png');
+        const deleteIconPath = getIcon('delete.png');
+        const deleteChildrenIconPath = getIcon('delete_children.png');
+        const scopeToIconPath = getIcon('bullseye.png');
+        const submitShapeIconPath = getIcon('submit_subepic.png');
+        const submitExploreIconPath = getIcon('submit_story.png');
+        const submitScenarioIconPath = getIcon('submit_ac.png');
+        const submitTestIconPath = getIcon('submit_tests.png');
+        const submitCodeIconPath = getIcon('submit_code.png');
+        const refreshIconPath = getIcon('refresh.png');
+        
+        log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `

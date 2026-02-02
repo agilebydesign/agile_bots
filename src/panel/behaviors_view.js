@@ -7,6 +7,7 @@
  */
 
 const PanelView = require('./panel_view');
+const branding = require('./branding');
 
 class BehaviorsView extends PanelView {
     /**
@@ -112,54 +113,22 @@ class BehaviorsView extends PanelView {
         console.log(`[BehaviorsView] Status returned - current_behavior: ${botData.current_behavior}, current_action: ${botData.current_action}`);
         
         const behaviorsData = botData.behaviors.all_behaviors;
-        const vscode = require('vscode');
         
-        // Get the proper webview URIs for icons
-        let feedbackIconPath = '';
-        let gearIconPath = '';
-        let plusIconPath = '';
-        let subtractIconPath = '';
-        let tickIconPath = '';
-        let notTickedIconPath = '';
-        let leftIconPath = '';
-        let pointerIconPath = '';
-        let rightIconPath = '';
-        let clipboardIconPath = '';
-        if (this.webview && this.extensionUri) {
-            try {
-                const feedbackUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'feedback.png');
-                feedbackIconPath = this.webview.asWebviewUri(feedbackUri).toString();
-                
-                const gearUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'gear.png');
-                gearIconPath = this.webview.asWebviewUri(gearUri).toString();
-                
-                const plusUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'plus.png');
-                plusIconPath = this.webview.asWebviewUri(plusUri).toString();
-                
-                const subtractUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'subtract.png');
-                subtractIconPath = this.webview.asWebviewUri(subtractUri).toString();
-                
-                const tickUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'tick.png');
-                tickIconPath = this.webview.asWebviewUri(tickUri).toString();
-                
-                const notTickedUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'not_ticked.png');
-                notTickedIconPath = this.webview.asWebviewUri(notTickedUri).toString();
-                
-                const leftUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'left.png');
-                leftIconPath = this.webview.asWebviewUri(leftUri).toString();
-                
-                const pointerUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'pointer.png');
-                pointerIconPath = this.webview.asWebviewUri(pointerUri).toString();
-                
-                const rightUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'right.png');
-                rightIconPath = this.webview.asWebviewUri(rightUri).toString();
-                
-                const clipboardUri = vscode.Uri.joinPath(this.extensionUri, 'img', 'rules.png');
-                clipboardIconPath = this.webview.asWebviewUri(clipboardUri).toString();
-            } catch (err) {
-                console.error('Failed to create icon URIs:', err);
-            }
-        }
+        // Get icon URIs using branding utility (handles ABD vs Scotia paths)
+        const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
+        
+        const feedbackIconPath = getIcon('feedback.png');
+        const gearIconPath = getIcon('gear.png');
+        const plusIconPath = getIcon('plus.png');
+        const subtractIconPath = getIcon('subtract.png');
+        const tickIconPath = getIcon('tick.png');
+        const notTickedIconPath = getIcon('not_ticked.png');
+        const leftIconPath = getIcon('left.png');
+        const pointerIconPath = getIcon('pointer.png');
+        const rightIconPath = getIcon('right.png');
+        const clipboardIconPath = getIcon('rules.png');
+        
+        console.log(`[BehaviorsView] Branding: ${branding.getBranding()}, icon sample: ${plusIconPath}`);
         
         if (!behaviorsData || behaviorsData.length === 0) {
             return this.renderEmpty(feedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath);

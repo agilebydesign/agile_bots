@@ -1,1 +1,6 @@
-{"type": "story", "value": ["Work With Story Map"], "exclude": [], "skiprule": []}
+{
+  "type": "showAll",
+  "value": [],
+  "exclude": [],
+  "skiprule": []
+}

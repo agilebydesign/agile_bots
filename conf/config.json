@@ -1,0 +1,15 @@
+{
+    "branding": "Scotia",
+    "brands": {
+        "ABD": {
+            "path": "",
+            "title": "Agile Bots",
+            "color": "#FF8C00"
+        },
+        "Scotia": {
+            "path": "scotia",
+            "title": "Scotia Bots",
+            "color": "#EC111A"
+        }
+    }
+}

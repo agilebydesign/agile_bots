@@ -11,6 +11,7 @@ const path = require("path");
 const fs = require("fs");
 const BotView = require("./bot_view");
 const PanelView = require("./panel_view");
+const branding = require("./branding");
 
 class BotPanel {
   constructor(panel, workspaceRoot, extensionUri) {
@@ -52,6 +53,10 @@ class BotPanel {
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};
+      
+      // Initialize branding with repo root
+      branding.setRepoRoot(workspaceRoot);
+      this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
       // Read panel version from package.json
       const perfVersionStart = performance.now();
@@ -1668,6 +1673,15 @@ class BotPanel {
   }
 
   _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null, botData = null) {
+    // Get branding color for CSS theming
+    const brandColor = branding.getTitleColor();
+    // Convert hex to RGB for rgba() usage
+    const hexToRgb = (hex) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 140, 0';
+    };
+    const brandColorRgb = hexToRgb(brandColor);
+    
     const currentBehaviorScript = currentBehavior 
       ? '\n        <script>\n            window.currentBehavior = ' + JSON.stringify(currentBehavior) + ';\n            ' + (currentAction ? 'window.currentAction = ' + JSON.stringify(currentAction) + ';' : '') + '\n            ' + (botData ? 'window.botData = ' + JSON.stringify(botData) + ';' : '') + '\n        </script>'
       : (botData ? '\n        <script>\n            window.botData = ' + JSON.stringify(botData) + ';\n        </script>' : '');
@@ -1680,14 +1694,15 @@ class BotPanel {
     <style>
         /* ============================================================
            THEME SYSTEM - All styling variables in one place
+           Branding: ${branding.getBranding()} (${brandColor})
            ============================================================ */
         
         :root {
-            /* Colors */
+            /* Colors - from branding config */
             --bg-base: #000000;
-            --accent-color: #ff8c00;
-            --border-color: #ff8c00;
-            --divider-color: #ff8c00;
+            --accent-color: ${brandColor};
+            --border-color: ${brandColor};
+            --divider-color: ${brandColor};
             --hover-bg: rgba(255, 255, 255, 0.03);
             
             /* Input styling - chat-like appearance */
@@ -1865,11 +1880,11 @@ class BotPanel {
         }
         
         .story-node:hover {
-            background-color: rgba(255, 140, 0, 0.15); /* Faded orange on hover */
+            background-color: rgba(${brandColorRgb}, 0.15); /* Faded brand color on hover */
         }
         
         .story-node.selected {
-            background-color: rgba(255, 140, 0, 0.35); /* Distinct orange when selected */
+            background-color: rgba(${brandColorRgb}, 0.35); /* Distinct brand color when selected */
         }
         
         
@@ -1883,7 +1898,7 @@ class BotPanel {
             transform: rotate(0deg);
             font-style: normal;
             min-width: var(--space-md);
-            color: #ff8c00 !important;
+            color: ${brandColor} !important;
             font-size: 28px;
             margin-right: 8px;
         }

@@ -17,6 +17,8 @@ This initial release includes **StoryBot** and **CRC Bot**, two complementary to
 
 > *We use the term "Agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CICD/DevOps. We're not talking about cargo cult adoption of Scrum, SAFe, or other random initials.*
 
+For detailed instructions, see the [User Guide](docs/manual/user-guide.md).
+
 ## Problems Solved
 
 
