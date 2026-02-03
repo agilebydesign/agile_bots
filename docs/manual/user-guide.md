@@ -3,6 +3,7 @@
 **AI-powered bots that inject Agile delivery, product, and engineering best practices directly into your workflow.**
 
 ---
+**Note:** Please see the pre-requisites guide and 'one-click' setup script [HERE](https://agilebydesigncanada.sharepoint.com/:f:/s/ABDInternal/IgC0e4v5W7C9Roex9Cq7WpKZATFb3jeDPRbLM_N3-wCFcuU?e=qD2wIo)
 
 ## Table of Contents
 
@@ -15,20 +16,21 @@
 7. [Selecting Your Workspace](#7-selecting-your-workspace)
 8. [Navigating Behaviors](#8-navigating-behaviors)
 9. [The Behavior Workflow](#9-the-behavior-workflow)
-10. [Step 1: Clarify](#10-step-1-clarify)
-11. [Step 2: Strategy](#11-step-2-strategy)
-12. [Step 3: Build](#12-step-3-build)
-13. [Step 4: Validate](#13-step-4-validate)
-14. [Step 5: Render](#14-step-5-render)
-15. [Shape Behavior: Story Map Increments](#15-shape-behavior-story-map-increments)
-16. [Exploration Behavior: Scenario Details](#16-exploration-behavior-scenario-details)
-17. [Scenarios Behavior: BDD Specification](#17-scenarios-behavior-bdd-specification)
-18. [CRC Domain Behavior: Model Outline](#18-crc-domain-behavior-model-outline)
-19. [CRC Walkthrough Behavior: Realizations](#19-crc-walkthrough-behavior-realizations)
-20. [Tests Behavior: Test Generation](#20-tests-behavior-test-generation)
-21. [AI Code and Test Generation](#21-ai-code-and-test-generation)
-22. [The Story Graph](#22-the-story-graph)
-23. [Using the CLI](#23-using-the-cli)
+10. [The Action Cycle](#10-the-action-cycle)
+11. [Step 1: Clarify](#11-step-1-clarify)
+12. [Step 2: Strategy](#12-step-2-strategy)
+13. [Step 3: Build](#13-step-3-build)
+14. [Step 4: Validate](#14-step-4-validate)
+15. [Step 5: Render](#15-step-5-render)
+16. [Prioritize Behavior: Story Map Increments](#16-prioritize-behavior-story-map-increments)
+17. [Exploration Behavior: Scenario Details](#17-exploration-behavior-scenario-details)
+18. [Scenarios Behavior: BDD Specification](#18-scenarios-behavior-bdd-specification)
+19. [CRC Domain Behavior: Model Outline](#19-crc-domain-behavior-model-outline)
+20. [CRC Walkthrough Behavior: Realizations](#20-crc-walkthrough-behavior-realizations)
+21. [Test Behavior: Test Generation](#21-test-behavior-test-generation)
+22. [Code Behavior: Test-Driven Implementation](#22-code-behavior-test-driven-implementation)
+23. [The Story Graph](#23-the-story-graph)
+24. [Using the CLI](#24-using-the-cli)
 
 ---
 
@@ -257,7 +259,7 @@ Each action also has **optional action-specific sections** that add specialized 
 
 
 
-### Step 1: Clarify
+### 11. Step 1: Clarify
 
 The Clarify action gathers context through be being asked to answer a set of configurable questins unique to the behavior. This allows you to confirm that the AI understands. This allows you to confirm that the AI understands Before going too far down the rabbit hole of generating content.
 
@@ -289,7 +291,7 @@ The Clarify action injects **structured questions** specific to each behavior. F
 
 ---
 
-### Step 2: Strategy
+### 12. Step 2: Strategy
 
 The Strategy action helps you choose your approach based on the context you've gathered.
 
@@ -319,7 +321,7 @@ The Strategy action injects **decision options and tradeoffs** for the current b
 
 ---
 
-### Step 3: Build
+### 13. Step 3: Build
 
 The Build action constructs the knowledge graph, tests, or code based on your context and strategy.
 
@@ -354,7 +356,7 @@ The Build action injects **templates and content examples** from the behavior's 
 
 ---
 
-### Step 4: Validate
+### 14. Step 4: Validate
 
 The Validate action runs bot AI and code scripted scanners that check work against best practice rules.
 
@@ -439,7 +441,7 @@ The Validate action injects **rules and scanner definitions** from the behavior'
 
 ---
 
-### Step 5: Render
+### 15. Step 5: Render
 
 The Render action transforms the knowledge graph into readable documentation and diagrams.
 
@@ -459,7 +461,7 @@ The Render action injects **output templates and synchronizer definitions**. Tem
 
 ---
 
-## 15. Prioritize : Story Map Increments
+## 16. Prioritize Behavior: Story Map Increments
 
 The Prioritize behavior takes your initial story map structure, and organizes stories into prioritized increments.
 
@@ -470,7 +472,7 @@ The Prioritize behavior takes your initial story map structure, and organizes st
 
 ---
 
-## 16. Exploration Behavior: Scenario Details
+## 17. Exploration Behavior: Scenario Details
 
 The Exploration behavior expands each story into detailed scenarios. Click on any story or activity to see the underlying user actions and system behaviors.
 
@@ -480,7 +482,7 @@ The Exploration behavior expands each story into detailed scenarios. Click on an
 
 ---
 
-## 17. Scenarios Behavior: BDD Specification
+## 18. Scenarios Behavior: BDD Specification
 
 The Scenarios behavior produces detailed Given/When/Then specifications with example data tables.
 
@@ -490,7 +492,7 @@ The Scenarios behavior produces detailed Given/When/Then specifications with exa
 
 ---
 
-## 18. CRC Bot: Domain Modeling
+## 19. CRC Domain Behavior: Model Outline
 
 At this point—or even a little earlier—it's a good idea to switch to the **CRC Bot** and model your business domain. CRC (Class-Responsibility-Collaborator) cards help you identify domain concepts, define their responsibilities, and map how they collaborate.
 
@@ -502,7 +504,7 @@ The Domain behavior extracts concepts from your stories and organizes them into 
 
 ---
 
-## 19. CRC Walkthrough Realizations
+## 20. CRC Walkthrough Behavior: Realizations
 
 The Walkthrough behavior traces object interactions through scenarios, validating that your CRC model can handle real user flows.
 
@@ -514,7 +516,7 @@ The Walkthrough behavior traces object interactions through scenarios, validatin
 
 ---
 
-## 20. Test: Test Generation
+## 21. Test Behavior: Test Generation
 
 The Tests behavior transforms BDD scenarios into executable pytest code that validates your acceptance criteria.
 
@@ -527,7 +529,7 @@ The AI follows BDD patterns and scenario validation to produce proper test struc
 
 ---
 
-## 21. Code: Test-Driven Implementation
+## 22. Code Behavior: Test-Driven Implementation
 
 The Code behavior generates implementation code that is **driven entirely by your tests**. This is true test-driven development—every line of code exists to make a test pass.
 
@@ -565,7 +567,7 @@ These scanners catch the common mistakes AI makes when generating code—the "do
 
 ---
 
-## 22. The Story Graph  UI
+## 23. The Story Graph
 
 The **Story Graph** is the central knowledge artifact that connects all your work.
 
@@ -628,7 +630,7 @@ Each behavior enriches the graph, and Render transforms it into readable documen
 
 ---
 
-## 23. Using the CLI
+## 24. Using the CLI
 
 Agile Bots includes a **Command Line Interface** that provides the same functionality as the VS Code panel. The CLI is useful when:
 
