@@ -8,8 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 
-// Cache the config
-let _config = null;
+// Store repo root (no caching - always read fresh)
 let _repoRoot = null;
 
 // Default brand settings
@@ -41,46 +40,41 @@ const DEFAULT_BRANDS = {
 function setRepoRoot(repoRoot) {
     if (repoRoot && repoRoot !== _repoRoot) {
         _repoRoot = repoRoot;
-        _config = null; // Clear cache to reload with new path
         console.log(`[Branding] Repo root set to: ${_repoRoot}`);
     }
 }
 
 /**
  * Load branding config from conf/config.json
+ * Always reads fresh from disk (no caching)
  * @returns {Object} Config object with branding property
  */
 function loadConfig() {
-    if (_config) {
-        return _config;
-    }
-    
     if (!_repoRoot) {
         console.warn('[Branding] Repo root not set, using defaults');
-        _config = { branding: 'ABD', brands: DEFAULT_BRANDS };
-        return _config;
+        return { branding: 'ABD', brands: DEFAULT_BRANDS };
     }
     
     const configPath = path.join(_repoRoot, 'conf', 'config.json');
+    let config;
     
     try {
         if (fs.existsSync(configPath)) {
             const content = fs.readFileSync(configPath, 'utf8');
-            _config = JSON.parse(content);
-            console.log(`[Branding] Loaded config from ${configPath}: branding=${_config.branding}`);
+            config = JSON.parse(content);
         } else {
             console.warn(`[Branding] Config not found at ${configPath}, using defaults`);
-            _config = { branding: 'ABD', brands: DEFAULT_BRANDS };
+            config = { branding: 'ABD', brands: DEFAULT_BRANDS };
         }
     } catch (err) {
         console.error(`[Branding] Error loading config: ${err.message}`);
-        _config = { branding: 'ABD', brands: DEFAULT_BRANDS };
+        config = { branding: 'ABD', brands: DEFAULT_BRANDS };
     }
     
     // Merge with defaults to ensure all properties exist
-    _config.brands = { ...DEFAULT_BRANDS, ...(_config.brands || {}) };
+    config.brands = { ...DEFAULT_BRANDS, ...(config.brands || {}) };
     
-    return _config;
+    return config;
 }
 
 /**
@@ -214,13 +208,6 @@ function getImageUri(webview, extensionUri, imageName) {
     return `img/${imagePath}`;
 }
 
-/**
- * Clear cached config (useful for tests or hot-reload)
- */
-function clearCache() {
-    _config = null;
-}
-
 module.exports = {
     setRepoRoot,
     loadConfig,
@@ -236,6 +223,5 @@ module.exports = {
     getTextColorFaded,
     getFontWeight,
     getTitleStyle,
-    getImageUri,
-    clearCache
+    getImageUri
 };

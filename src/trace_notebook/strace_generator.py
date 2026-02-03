@@ -505,7 +505,10 @@ class DynamicStraceGenerator:
         # Format acceptance criteria as markdown
         acceptance_md = ""
         for ac in story.get('acceptance_criteria', []):
-            acceptance_md += f"- {ac.get('text', ac.get('name', ''))}\n"
+            if isinstance(ac, dict):
+                acceptance_md += f"- {ac.get('text', ac.get('name', ''))}\n"
+            else:
+                acceptance_md += f"- {ac}\n"
         
         # Format users/actors
         users = story.get('users', [])
@@ -518,6 +521,7 @@ class DynamicStraceGenerator:
                 "users": users_md,
                 "acceptance_criteria": acceptance_md,
                 "behavior": story.get('behavior', ''),
+                "test_class": story.get('test_class', ''),
                 "file": story.get('_file', story_graph_path),
                 "line": story.get('_line', 1)
             },
