@@ -446,31 +446,50 @@ class CLISession:
         
         params = {}
         
-        answers_match = re.search(r"--answers\s+'([^']+)'", args_string)
-        if answers_match:
+        # Pattern that handles escaped single quotes inside single-quoted strings
+        # Matches: --param 'content with \' escaped quotes'
+        def extract_single_quoted_value(param_name: str, args: str) -> str:
+            """Extract value from --param 'value' handling escaped quotes."""
+            pattern = rf"--{param_name}\s+'"
+            match = re.search(pattern, args)
+            if not match:
+                return None
+            start = match.end()
+            # Find closing quote (not preceded by backslash)
+            i = start
+            while i < len(args):
+                if args[i] == "'" and (i == 0 or args[i-1] != '\\'):
+                    # Unescape the value before returning
+                    value = args[start:i].replace("\\'", "'")
+                    return value
+                i += 1
+            return None
+        
+        answers_value = extract_single_quoted_value('answers', args_string)
+        if answers_value:
             try:
-                params['answers'] = json.loads(answers_match.group(1))
+                params['answers'] = json.loads(answers_value)
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --answers: {e}")
         
-        decisions_match = re.search(r"--decisions\s+'([^']+)'", args_string)
-        if decisions_match:
+        decisions_value = extract_single_quoted_value('decisions', args_string)
+        if decisions_value:
             try:
-                params['decisions'] = json.loads(decisions_match.group(1))
+                params['decisions'] = json.loads(decisions_value)
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --decisions: {e}")
         
-        assumptions_match = re.search(r"--assumptions\s+'([^']+)'", args_string)
-        if assumptions_match:
+        assumptions_value = extract_single_quoted_value('assumptions', args_string)
+        if assumptions_value:
             try:
-                params['assumptions'] = json.loads(assumptions_match.group(1))
+                params['assumptions'] = json.loads(assumptions_value)
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --assumptions: {e}")
         
-        evidence_match = re.search(r"--evidence_provided\s+'([^']+)'", args_string)
-        if evidence_match:
+        evidence_value = extract_single_quoted_value('evidence_provided', args_string)
+        if evidence_value:
             try:
-                params['evidence_provided'] = json.loads(evidence_match.group(1))
+                params['evidence_provided'] = json.loads(evidence_value)
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --evidence_provided: {e}")
         

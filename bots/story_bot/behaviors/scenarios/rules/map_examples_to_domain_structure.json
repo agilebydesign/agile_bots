@@ -1,0 +1,33 @@
+{
+  "name": "map_examples_to_domain_structure",
+  "description": "Example tables MUST mirror domain concept structure from story graph",
+  "instructions": [
+    "When domain_concepts exist in the story graph, example tables MUST align with domain model relationships:",
+    "",
+    "1. **Identify Domain Entities:**",
+    "   - Each domain concept becomes a table in the examples.tables array",
+    "   - Responsibilities define columns for that entity's table",
+    "   - Collaborator references appear as shared column values between tables",
+    "",
+    "2. **Structure Example Tables:**",
+    "   - Use examples.tables array with each table having: name, columns, rows",
+    "   - Table name matches domain concept name",
+    "   - Link tables via shared column values (e.g., customer_name, account_number)",
+    "",
+    "3. **Data Alignment:**",
+    "   - One-to-one: Related tables have matching row counts with shared key values",
+    "   - One-to-many: Child table has multiple rows sharing the same key value",
+    "",
+    "4. **Example Pattern:**",
+    "   Customer -> Account (1:1) -> Transaction (1:many)",
+    "   - Customer table: customer_name, customer_type, expected_outcome",
+    "   - Account table: customer_name, account_number, product_name, balance",
+    "   - Transaction table: account_number, transaction_id, amount, type"
+  ],
+  "applies_when": "domain_concepts array is present and non-empty in story graph nodes",
+  "validation": [
+    "Every relevant domain concept should have a corresponding table in examples.tables",
+    "Shared columns must have matching values to link related tables",
+    "Table columns should reflect domain concept responsibilities"
+  ]
+}

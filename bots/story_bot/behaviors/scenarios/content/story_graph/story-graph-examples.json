@@ -2,8 +2,9 @@
   "_explanation": {
     "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios with optional examples for data-driven testing",
     "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), background (common setup), steps (Given/When/Then), and optional examples",
-    "examples_structure": "When a scenario needs data-driven testing, add examples object with columns array (all variable names) and rows array (data values). Steps use <variable_name> placeholders",
-    "variable_matching": "Every <variable_name> in steps MUST appear in examples.columns. Include both input variables and expected output/result variables",
+    "examples_structure": "examples is an array of tables, each with name, columns, and rows. For simple single-table scenarios, use one table. For multi-table domain scenarios, add multiple tables",
+    "variable_matching": "Every <variable_name> in steps MUST appear in example columns. Include both input variables and expected output/result variables",
+    "domain_alignment": "Example tables MUST mirror domain_concepts structure: each domain concept with collaborators becomes a related table, responsibilities define the columns",
     "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure"
   },
   "epics": [
@@ -17,6 +18,7 @@
           "sequential_order": 1,
           "estimated_stories": null,
           "sub_epics": [],
+          "test_file": "",
           "story_groups": [
             {
               "type": "and",
@@ -31,69 +33,72 @@
                   "story_type": "user",
                   "test_file": "",
                   "test_class": "",
-                  "test_line": null,
                   "scenarios": [
                     {
-                      "name": "",
-                      "type": "happy_path|edge_case|error_case",
+                      "name": "Simple scenario with flat examples",
                       "test_method": "",
-                      "test_line": null,
-                      "background": [
-                        "Given <common_setup_step>",
-                        "And <another_common_setup>"
-                      ],
-                      "steps": [
-                        "Given <scenario_specific_state>",
-                        "And <scenario_specific_setup>",
-                        "When <user_action_or_system_event>",
-                        "Then <expected_outcome>",
-                        "And <another_expected_outcome>"
-                      ]
-                    },
-                    {
-                      "name": "",
-                      "type": "happy_path|edge_case|error_case",
-                      "test_method": "",
-                      "test_line": null,
                       "background": [
                         "Given <common_setup_step>",
                         "And <another_common_setup>"
                       ],
                       "steps": [
                         "Given <scenario_specific_state> at \"<variable_path>\"",
-                        "And <entity> exists at \"<variable_file_path>\"",
                         "When <action> with <variable_parameter>=\"<variable_value>\"",
-                        "Then <expected_outcome> equals \"<variable_expected_result>\"",
-                        "And <another_outcome> is \"<variable_result>\""
+                        "Then <expected_outcome> equals \"<variable_expected_result>\""
                       ],
-                      "examples": {
-                        "columns": [
-                          "variable_path",
-                          "variable_file_path",
-                          "variable_parameter",
-                          "variable_value",
-                          "variable_expected_result",
-                          "variable_result"
-                        ],
-                        "rows": [
-                          [
-                            "value1",
-                            "value2",
-                            "value3",
-                            "value4",
-                            "result1",
-                            "result2"
-                          ],
-                          [
-                            "value5",
-                            "value6",
-                            "value7",
-                            "value8",
-                            "result3",
-                            "result4"
+                      "examples": [
+                        {
+                          "name": "Input",
+                          "columns": ["variable_path", "variable_parameter", "variable_value", "variable_expected_result"],
+                          "rows": [
+                            ["value1", "param1", "input1", "result1"],
+                            ["value2", "param2", "input2", "result2"]
                           ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Scenario with hierarchical domain-aligned examples",
+                      "test_method": "",
+                      "type": "happy_path",
+                      "background": [],
+                      "steps": [
+                        "Given Customer <customer_name> has account <account_number>",
+                        "And Account belongs to product <product_name>",
+                        "And Account has transactions shown in table",
+                        "When Customer looks up account",
+                        "Then Customer sees transactions for <product_name>",
+                        "And Customer sees <expected_outcome>"
+                      ],
+                      "examples": [
+                          {
+                            "name": "Customer",
+                            "columns": ["customer_name", "customer_type", "expected_outcome"],
+                            "rows": [
+                              ["Alice Smith", "premium", "transaction approved"],
+                              ["Bob Jones", "standard", "transaction pending review"]
+                            ]
+                          },
+                          {
+                            "name": "Account",
+                            "columns": ["customer_name", "account_number", "product_name", "balance"],
+                            "rows": [
+                              ["Alice Smith", "ACC-001", "Gold Savings", "50000"],
+                              ["Bob Jones", "ACC-002", "Basic Checking", "1500"]
+                            ]
+                          },
+                          {
+                            "name": "Transaction",
+                            "columns": ["account_number", "transaction_id", "amount", "type"],
+                            "rows": [
+                              ["ACC-001", "TXN-101", "500", "deposit"],
+                              ["ACC-001", "TXN-102", "200", "withdrawal"],
+                              ["ACC-001", "TXN-103", "1000", "transfer"],
+                              ["ACC-002", "TXN-201", "100", "deposit"],
+                              ["ACC-002", "TXN-202", "50", "withdrawal"]
+                            ]
+                          }
                         ]
-                      }
                     }
                   ]
                 }
@@ -113,30 +118,5 @@
         ""
       ]
     }
-  ],
-  "generated_artifacts": {
-    "story_documents": {
-      "description": "Story documents with scenarios section added",
-      "location": "docs/stories/{epic_name}/{sub_epic_name}/{story_name}.md",
-      "content": [
-        "Story description",
-        "Acceptance criteria",
-        "Background (common setup steps)",
-        "Scenarios (happy path, edge cases, error cases)",
-        "Scenarios with Examples tables (for data-driven testing when decision criteria chosen)"
-      ]
-    },
-    "structured_data": {
-      "description": "JSON representation of story graph with scenarios added",
-      "location": "docs/stories/story-graph.json",
-      "content": [
-        "Epic/sub_epic/story_group/story hierarchy",
-        "Scenario definitions with steps",
-        "Scenarios with optional Examples tables (for data-driven testing)",
-        "Background steps per story",
-        "Scenario types (happy_path, edge_case, error_case)",
-        "Connectors for story groups and stories"
-      ]
-    }
-  }
+  ]
 }
