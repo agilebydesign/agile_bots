@@ -233,19 +233,8 @@ class JsonInstructionsHelper:
         return self.parent.bot._parse_json(output)
     
     def assert_section_shows_behavior_and_action(self, output: str, behavior: str, action: str):
-        """
-        Validate COMPLETE action execution response by comparing JSON objects.
         
-        Actual structure from bot.execute():
-        {
-          "instructions": {...},
-          "bot": {
-            "current_behavior": "behavior_name",
-            "current_action": "action_name",
-            ...
-          }
-        }
-        """
+        
         actual = self._parse_json(output)
         
         # Check for main structure

@@ -13,7 +13,7 @@ class StateTestHelper(BaseTestHelper):
     """Helper for state management - setting/getting/asserting state files."""
     
     def set_state(self, behavior: str, action: str, completed_actions: list = None):
-        """Set bot state to specific behavior/action."""
+       
         from datetime import datetime
         
         state_data = {
