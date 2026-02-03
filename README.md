@@ -19,6 +19,12 @@ This initial release includes **StoryBot** and **CRC Bot**, two complementary to
 
 ## 📖 **USER MANUAL - START HERE**
 
+### Pre-requisites
+1. [Visual Studio Code](https://code.visualstudio.com/download)
+2. [GitHub Copilot Account](https://github.com/features/copilot)
+3. [Python](https://www.python.org/downloads/)
+4. [Git for Windows](https://git-scm.com/install/windows) [Windows Only]
+
 **👉 [READ THE COMPLETE USER GUIDE](docs/manual/user-guide.md) 👈**
 
 **New to Agile Bots?** The user guide contains everything you need:
