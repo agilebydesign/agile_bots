@@ -40,7 +40,7 @@ class TestManageBehaviors:
             behavior=result,
             expected_name='prioritization',
             expected_order=2,
-            expected_actions=['clarify', 'strategy', 'validate', 'render'],
+            expected_actions=['clarify', 'strategy', 'build', 'validate', 'render'],
             expected_description='Organize stories into delivery increments based on business value, dependencies, and risk'
         )
         
@@ -119,7 +119,7 @@ class TestManageBehaviors:
             behavior=found_behavior,
             expected_name='prioritization',
             expected_order=2,
-            expected_actions=['clarify', 'strategy', 'validate', 'render'],
+            expected_actions=['clarify', 'strategy', 'build', 'validate', 'render'],
             expected_description='Organize stories into delivery increments based on business value, dependencies, and risk'
         )
     
@@ -318,18 +318,18 @@ class TestNavigateToBehaviorActionAndExecute:
         # Given: Bot with multiple behaviors
         helper = BotTestHelper(tmp_path)
         
-        # When: Comparing shape vs prioritization behaviors
+        # When: Comparing shape vs tests behaviors
         helper.bot.behaviors.navigate_to('shape')
         shape_actions = helper.bot.behaviors.current.actions.names
         
-        helper.bot.behaviors.navigate_to('prioritization')
-        prioritization_actions = helper.bot.behaviors.current.actions.names
+        helper.bot.behaviors.navigate_to('tests')
+        tests_actions = helper.bot.behaviors.current.actions.names
         
         # Then: They should have different action workflows
-        assert shape_actions != prioritization_actions, "Shape and prioritization behaviors should have different action workflows"
+        assert shape_actions != tests_actions, "Shape and tests behaviors should have different action workflows"
         assert shape_actions == ['clarify', 'strategy', 'build', 'validate', 'render']
-        # Prioritization skips 'build' action
-        assert prioritization_actions == ['clarify', 'strategy', 'validate', 'render']
+        # Tests behavior has render before validate
+        assert tests_actions == ['clarify', 'strategy', 'build', 'render', 'validate']
     
     def test_workflow_transitions_built_correctly_from_actions_workflow_json(self, tmp_path):
         """Scenario: Workflow transitions are built correctly from behavior.json"""
@@ -793,17 +793,17 @@ class TestNavigateToBehaviorActionAndExecuteUsingCLI:
         """
         helper = helper_class(tmp_path)
         
-        # Navigate to shape and prioritization
+        # Navigate to shape and tests
         cli_response1 = helper.cli_session.execute_command('shape')
         shape_actions = helper.cli_session.bot.behaviors.current.actions.names
         
-        cli_response2 = helper.cli_session.execute_command('prioritization')
-        prioritization_actions = helper.cli_session.bot.behaviors.current.actions.names
+        cli_response2 = helper.cli_session.execute_command('tests')
+        tests_actions = helper.cli_session.bot.behaviors.current.actions.names
         
-        # Workflows are different
-        assert shape_actions != prioritization_actions
-        assert 'build' in shape_actions
-        assert 'build' not in prioritization_actions  # prioritization skips build
+        # Workflows are different (tests has render before validate)
+        assert shape_actions != tests_actions
+        assert shape_actions == ['clarify', 'strategy', 'build', 'validate', 'render']
+        assert tests_actions == ['clarify', 'strategy', 'build', 'render', 'validate']
 
 
 # ============================================================================

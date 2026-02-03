@@ -17894,19 +17894,317 @@
         {
           "name": "Trace Story Graph",
           "sequential_order": 5.0,
-          "behavior": null,
+          "behavior": "shape",
           "domain_concepts": [],
-          "sub_epics": [],
-          "story_groups": [
+          "sub_epics": [
             {
-              "name": "",
-              "sequential_order": 0.0,
-              "type": "and",
-              "connector": null,
-              "behavior": null,
-              "stories": []
+              "name": "Trace Story",
+              "sequential_order": 1.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Display Stories",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer opens strace file",
+                          "text": "WHEN Developer opens strace file",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story properties display (name, users, acceptance criteria)",
+                          "text": "THEN story properties display (name, users, acceptance criteria)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND nested scenarios display under story",
+                          "text": "AND nested scenarios display under story",
+                          "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Edit Stories in Trace Editor",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer modifies story field",
+                          "text": "WHEN Developer modifies story field",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "text": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND JSON structure preserves",
+                          "text": "AND JSON structure preserves",
+                          "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Open Story Source",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on story",
+                          "text": "WHEN Developer clicks Open on story",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story-graph.json opens at story name line",
+                          "text": "THEN story-graph.json opens at story name line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trace Scenario",
+              "sequential_order": 2.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Display Scenario Steps",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer views scenario",
+                          "text": "WHEN Developer views scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN scenario steps display in given/when/then format",
+                          "text": "THEN scenario steps display in given/when/then format",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Display Test for Scenario",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer views scenario",
+                          "text": "WHEN Developer views scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN linked test method and file path display",
+                          "text": "THEN linked test method and file path display",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Edit Scenarios in Trace Editor",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer modifies scenario steps",
+                          "text": "WHEN Developer modifies scenario steps",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "text": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Open Scenario Source",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on scenario",
+                          "text": "WHEN Developer clicks Open on scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story-graph.json opens at scenario line",
+                          "text": "THEN story-graph.json opens at scenario line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trace Code",
+              "sequential_order": 3.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Generate Code Trace",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer opens strace for test",
+                          "text": "WHEN Developer opens strace for test",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN call hierarchy generates from test method",
+                          "text": "THEN call hierarchy generates from test method",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Display Code Hierarchy",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN trace generates",
+                          "text": "WHEN trace generates",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN nested call tree displays with function/method names",
+                          "text": "THEN nested call tree displays with function/method names",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Load Code Snippet",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer expands code node",
+                          "text": "WHEN Developer expands code node",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN lazy-loaded source displays with line numbers",
+                          "text": "THEN lazy-loaded source displays with line numbers",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Navigate to Source",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on code node",
+                          "text": "WHEN Developer clicks Open on code node",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN source file opens at specific line",
+                          "text": "THEN source file opens at specific line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
             }
-          ]
+          ],
+          "story_groups": []
         }
       ],
       "story_groups": []
