@@ -367,6 +367,163 @@ class DynamicStraceGenerator:
                 except Exception:
                     continue
     
+    def find_story_by_test_class(self, test_class: str, story_graph_path: str = "docs/stories/story-graph.json") -> Optional[dict]:
+        """Find a story in story-graph.json by its test_class.
+        
+        Returns the story dict with line numbers for story and each scenario.
+        """
+        full_path = self.workspace / story_graph_path
+        if not full_path.exists():
+            return None
+        
+        content = full_path.read_text(encoding='utf-8')
+        lines = content.split('\n')
+        
+        # Parse and find the story first to get the name
+        try:
+            data = json.loads(content)
+            story = self._find_story_recursive(data, test_class)
+            if not story:
+                return None
+            
+            story['_file'] = story_graph_path
+            
+            # Find the story name line (more accurate than test_class line)
+            story_name = story.get('name', '')
+            story_line = 1
+            for i, line in enumerate(lines, start=1):
+                if f'"name": "{story_name}"' in line:
+                    # Make sure this is the story, not a scenario with same name
+                    # Check if test_class appears within next 20 lines
+                    for j in range(i, min(i + 20, len(lines))):
+                        if f'"test_class": "{test_class}"' in lines[j - 1]:
+                            story_line = i
+                            break
+                    if story_line != 1:
+                        break
+            
+            story['_line'] = story_line
+            
+            # Find line numbers for each scenario
+            for scenario in story.get('scenarios', []):
+                scenario_name = scenario.get('name', '')
+                for i, line in enumerate(lines, start=1):
+                    if f'"name": "{scenario_name}"' in line:
+                        scenario['_line'] = i
+                        break
+            
+            return story
+        except Exception:
+            return None
+    
+    def _find_story_recursive(self, obj, test_class: str) -> Optional[dict]:
+        """Recursively search for a story with the given test_class."""
+        if isinstance(obj, dict):
+            if obj.get('test_class') == test_class:
+                return obj
+            for value in obj.values():
+                result = self._find_story_recursive(value, test_class)
+                if result:
+                    return result
+        elif isinstance(obj, list):
+            for item in obj:
+                result = self._find_story_recursive(item, test_class)
+                if result:
+                    return result
+        return None
+    
+    def generate_for_story(self, test_class: str, test_file: str, 
+                           story_graph_path: str = "docs/stories/story-graph.json") -> dict:
+        """Generate strace for an entire story with all its scenarios.
+        
+        Args:
+            test_class: The test class name to find the story
+            test_file: The test file containing the test methods
+            story_graph_path: Path to story-graph.json
+        
+        Returns:
+            Full strace data including story, all scenarios with their tests and code
+        """
+        # Build method index first
+        self._build_method_index()
+        
+        # Find the story in story-graph.json
+        story = self.find_story_by_test_class(test_class, story_graph_path)
+        if not story:
+            return {"error": f"Story with test_class '{test_class}' not found in {story_graph_path}"}
+        
+        # Read the test file
+        test_path = self.workspace / test_file
+        if not test_path.exists():
+            return {"error": f"Test file not found: {test_file}"}
+        
+        source = test_path.read_text(encoding='utf-8')
+        lines = source.split('\n')
+        
+        # Process each scenario
+        scenarios_data = []
+        for scenario in story.get('scenarios', []):
+            scenario_name = scenario.get('name', '')
+            test_method = scenario.get('test_method', '')
+            steps = scenario.get('steps', '')
+            
+            # Extract test method code
+            test_code, test_start, test_end = self._extract_method_from_class(
+                source, lines, test_class, test_method
+            )
+            
+            if test_code:
+                # Analyze test method for calls
+                # Reset seen symbols for each scenario to allow finding same methods
+                self.seen_symbols = set()
+                calls = self._find_calls_in_code(test_code)
+                code_sections = []
+                for call in calls:
+                    section = self._resolve_call(call, depth=1)
+                    if section:
+                        code_sections.append(section)
+            else:
+                test_code = f"# Test method '{test_method}' not found"
+                test_start = 0
+                code_sections = []
+            
+            scenarios_data.append({
+                "name": scenario_name,
+                "type": scenario.get('type', 'happy_path'),
+                "steps": steps,
+                "file": story.get('_file', 'docs/stories/story-graph.json'),
+                "line": scenario.get('_line', 1),
+                "test": {
+                    "method": test_method,
+                    "file": test_file,
+                    "line": test_start,
+                    "code": test_code
+                },
+                "code": code_sections
+            })
+        
+        # Format acceptance criteria as markdown
+        acceptance_md = ""
+        for ac in story.get('acceptance_criteria', []):
+            acceptance_md += f"- {ac.get('text', ac.get('name', ''))}\n"
+        
+        # Format users/actors
+        users = story.get('users', [])
+        users_md = "\n".join(f"- {u}" for u in users) if users else ""
+        
+        return {
+            "story": {
+                "name": story.get('name', 'Unknown Story'),
+                "story_type": story.get('story_type', 'user'),
+                "users": users_md,
+                "acceptance_criteria": acceptance_md,
+                "behavior": story.get('behavior', ''),
+                "file": story.get('_file', story_graph_path),
+                "line": story.get('_line', 1)
+            },
+            "scenarios": scenarios_data
+        }
+    
     def generate(self, test_file: str, test_class: str, test_method: str,
                  scenario_name: str, scenario_steps: str,
                  story_file: str = None, story_line: int = 1) -> dict:
@@ -608,30 +765,36 @@ class DynamicStraceGenerator:
 def main():
     workspace = Path.cwd()
     
-    # Config for this scenario
-    test_file = "test/invoke_bot/perform_action/test_use_rules_in_prompt.py"
+    # Config - use a story that exists in both story-graph.json and test files
     test_class = "TestDisplayRulesUsingCLI"
-    test_method = "test_rules_action_shows_rules_digest"
-    scenario_name = "Rules action shows rules digest in CLI output"
-    scenario_steps = "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest"
-    story_file = "docs/stories/story-graph.json"
-    story_line = 1  # TODO: Set to actual line when scenario is added to story-graph.json
+    test_file = "test/invoke_bot/perform_action/test_use_rules_in_prompt.py"
     
-    # Use dynamic generator - no hardcoding
+    # Use dynamic generator
     generator = DynamicStraceGenerator(workspace)
-    result = generator.generate(
-        test_file=test_file,
+    
+    # Try story-level generation first
+    result = generator.generate_for_story(
         test_class=test_class,
-        test_method=test_method,
-        scenario_name=scenario_name,
-        scenario_steps=scenario_steps,
-        story_file=story_file,
-        story_line=story_line
+        test_file=test_file,
+        story_graph_path="docs/stories/story-graph.json"
     )
     
     if "error" in result:
         print(f"Error: {result['error']}")
-        return
+        print("Falling back to sample scenario...")
+        # Fallback to old method for testing
+        result = generator.generate(
+            test_file="test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+            test_class="TestDisplayRulesUsingCLI",
+            test_method="test_rules_action_shows_rules_digest",
+            scenario_name="Rules action shows rules digest in CLI output",
+            scenario_steps="GIVEN: CLI is at shape.validate\nWHEN: user navigates\nTHEN: CLI shows output",
+            story_file="docs/stories/story-graph.json",
+            story_line=1
+        )
+        if "error" in result:
+            print(f"Fallback error: {result['error']}")
+            return
     
     # Write output
     output_path = workspace / "src" / "trace_notebook" / "scenario.strace"
@@ -644,17 +807,21 @@ def main():
             count += count_sections(c.get("children", []))
         return count
     
-    total = count_sections(result["code"])
-    print(f"Generated: {output_path}")
-    print(f"  Test: {test_method}")
-    print(f"  Found {total} code sections (nested)")
-    
-    def print_tree(items, indent=""):
-        for item in items:
-            print(f"{indent}- {item.get('symbol')} (depth {item.get('depth')})")
-            print_tree(item.get("children", []), indent + "  ")
-    
-    print_tree(result["code"])
+    # Handle both story-level and scenario-level output
+    if "story" in result:
+        # Story-level format
+        print(f"Generated: {output_path}")
+        print(f"  Story: {result['story'].get('name', 'Unknown')}")
+        print(f"  Scenarios: {len(result.get('scenarios', []))}")
+        for scenario in result.get('scenarios', []):
+            total = count_sections(scenario.get('code', []))
+            print(f"    - {scenario.get('name', 'Unknown')} ({total} code sections)")
+    else:
+        # Old scenario-level format
+        total = count_sections(result.get("code", []))
+        print(f"Generated: {output_path}")
+        print(f"  Scenario: {result.get('scenario', {}).get('name', 'Unknown')}")
+        print(f"  Found {total} code sections (nested)")
 
 
 if __name__ == "__main__":

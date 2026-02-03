@@ -1,328 +1,707 @@
 {
-  "scenario": {
-    "name": "Rules action shows rules digest in CLI output",
-    "type": "happy_path",
-    "steps": "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest",
+  "story": {
+    "name": "Display Rules Using CLI",
+    "story_type": "user",
+    "users": "- User",
+    "acceptance_criteria": "",
+    "behavior": "exploration",
     "file": "docs/stories/story-graph.json",
-    "line": 1
+    "line": 16952
   },
-  "test": {
-    "method": "test_rules_action_shows_rules_digest",
-    "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
-    "line": 168,
-    "code": "    def test_rules_action_shows_rules_digest(self, tmp_path, helper_class):\n        \"\"\"\n        SCENARIO: Rules action shows rules digest in CLI output\n        GIVEN: CLI is at shape.validate (which shows rules)\n        WHEN: user navigates to shape.validate\n        THEN: CLI output contains formatted rules digest\n        \n        Domain: test_action_loads_and_formats_rules_digest (adapted - using validate instead of rules action)\n        \"\"\"\n        # Given\n        helper = helper_class(tmp_path)\n        \n        # Create story graph for validation\n        story_graph_data = {'epics': []}\n        helper.domain.story.create_story_graph(story_graph_data)\n        \n        helper.domain.state.set_state('shape', 'validate')\n        \n        # When\n        cli_response = helper.cli_session.execute_command('shape.validate')\n        \n        # Then\n        helper.instructions.assert_section_shows_behavior_and_action(\n            cli_response.output, 'shape', 'validate')\n        # Rules content should be in output\n        output_lower = cli_response.output.lower()\n        assert 'rule' in output_lower or 'validate' in output_lower"
-  },
-  "code": [
+  "scenarios": [
     {
-      "symbol": "StoryTestHelper.create_story_graph",
-      "file": "test/invoke_bot/edit_story_map/story_helper.py",
-      "line": 18,
-      "depth": 1,
-      "children": [
+      "name": "Rules action shows rules digest in CLI output",
+      "type": "happy_path",
+      "steps": "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest",
+      "file": "docs/stories/story-graph.json",
+      "line": 16962,
+      "test": {
+        "method": "test_rules_action_shows_rules_digest",
+        "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+        "line": 168,
+        "code": "    def test_rules_action_shows_rules_digest(self, tmp_path, helper_class):\n\n        # Given\n        helper = helper_class(tmp_path)\n        \n        # Create story graph for validation\n        story_graph_data = {'epics': []}\n        helper.domain.story.create_story_graph(story_graph_data)\n        \n        helper.domain.state.set_state('shape', 'validate')\n        \n        # When\n        cli_response = helper.cli_session.execute_command('shape.validate')\n        \n        # Then\n        helper.instructions.assert_section_shows_behavior_and_action(\n            cli_response.output, 'shape', 'validate')\n        # Rules content should be in output\n        output_lower = cli_response.output.lower()\n        assert 'rule' in output_lower or 'validate' in output_lower"
+      },
+      "code": [
         {
-          "symbol": "StoryTestHelper.load_story_graph_into_bot",
+          "symbol": "StoryTestHelper.create_story_graph",
           "file": "test/invoke_bot/edit_story_map/story_helper.py",
-          "line": 801,
-          "depth": 2,
-          "children": [
-            {
-              "symbol": "FileScanContext.exists",
-              "file": "src/scanners/resources/scan_context.py",
-              "line": 37,
-              "depth": 3,
-              "children": [],
-              "lazy": true
-            }
-          ],
-          "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
-        }
-      ],
-      "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
-    },
-    {
-      "symbol": "StateTestHelper.set_state",
-      "file": "test/helpers/state_helper.py",
-      "line": 15,
-      "depth": 1,
-      "children": [
-        {
-          "symbol": "Behaviors.load_state",
-          "file": "src/behaviors/behaviors.py",
-          "line": 299,
-          "depth": 2,
-          "children": [
-            {
-              "symbol": "Behaviors._init_to_first_behavior",
-              "file": "src/behaviors/behaviors.py",
-              "line": 281,
-              "depth": 3,
-              "children": [],
-              "lazy": true
-            },
-            {
-              "symbol": "Behaviors._extract_behavior_name_from_state",
-              "file": "src/behaviors/behaviors.py",
-              "line": 291,
-              "depth": 3,
-              "children": [],
-              "lazy": true
-            },
-            {
-              "symbol": "Behaviors._find_behavior_index",
-              "file": "src/behaviors/behaviors.py",
-              "line": 285,
-              "depth": 3,
-              "children": [],
-              "lazy": true
-            }
-          ],
-          "code": "    def load_state(self):\n        if self.bot_paths is None:\n            self._init_to_first_behavior()\n            return\n        workspace_dir = self.bot_paths.workspace_directory\n        state_file = workspace_dir / 'behavior_action_state.json'\n        if not state_file.exists() or not self._behaviors:\n            self._init_to_first_behavior()\n            return\n        try:\n            state_data = json.loads(state_file.read_text(encoding='utf-8'))\n            behavior_name = self._extract_behavior_name_from_state(state_data.get('current_behavior', ''))\n\n            if behavior_name:\n                idx = self._find_behavior_index(behavior_name)\n                if idx >= 0:\n                    self._current_index = idx\n                    if self.current:\n                        self.current.actions.load_state()\n                    return\n            self._init_to_first_behavior()\n        except Exception:\n            self._init_to_first_behavior()\n\n            self._init_to_first_behavior()"
-        }
-      ],
-      "code": "    def set_state(self, behavior: str, action: str, completed_actions: list = None):\n       \n        from datetime import datetime\n        #comment\n        state_data = {\n            'current_behavior': f'story_bot.{behavior}',\n            'current_action': f'story_bot.{behavior}.{action}',\n            'operation': 'instructions',\n            'working_directory': str(self.workspace),\n            'timestamp': datetime.now().isoformat()\n        }\n        \n        if completed_actions:\n            state_data['completed_actions'] = [\n                {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n                for action_state in completed_actions\n            ]\n        \n        state_file = self.workspace / 'behavior_action_state.json'\n        state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')\n        \n        # Reload the bot state from the file\n        self.parent.bot.behaviors.load_state()\n        \n        return state_file"
-    },
-    {
-      "symbol": "CLISession.execute_command",
-      "file": "src/cli/cli_session.py",
-      "line": 17,
-      "depth": 1,
-      "children": [
-        {
-          "symbol": "CLISession._extract_format_mode",
-          "file": "src/cli/cli_session.py",
-          "line": 34,
-          "depth": 2,
-          "children": [],
-          "code": "    def _extract_format_mode(self, args: str) -> str:\n        if not args:\n            return args\n        if '--format json' in args or '--format=json' in args:\n            self.mode = 'json'\n            return args.replace('--format json', '').replace('--format=json', '').strip()\n        return args"
-        },
-        {
-          "symbol": "CLISession._parse_command",
-          "file": "src/cli/cli_session.py",
-          "line": 434,
-          "depth": 2,
-          "children": [],
-          "code": "    def _parse_command(self, command: str) -> tuple[str, str]:\n        parts = command.split(maxsplit=1)\n        verb = parts[0].lower()\n        args = parts[1] if len(parts) > 1 else \"\"\n        return verb, args"
-        },
-        {
-          "symbol": "CLISession._get_command_handler",
-          "file": "src/cli/cli_session.py",
-          "line": 42,
-          "depth": 2,
-          "children": [],
-          "code": "    def _get_command_handler(self, verb: str):\n        handlers = {\n            'save': self._handle_save,\n            'submit': self._handle_submit,\n        }\n        if verb.startswith('submitrules:') or verb.startswith('submitrules '):\n            return self._handle_submitrules\n        return handlers.get(verb)"
-        },
-        {
-          "symbol": "CLISession._execute_verb",
-          "file": "src/cli/cli_session.py",
-          "line": 114,
-          "depth": 2,
-          "children": [
-            {
-              "symbol": "CLISession._execute_action_or_route",
-              "file": "src/cli/cli_session.py",
-              "line": 185,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "CLISession._handle_action_shortcut",
-                  "file": "src/cli/cli_session.py",
-                  "line": 560,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "CLISession._check_rules_auto_submit",
-                  "file": "src/cli/cli_session.py",
-                  "line": 197,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "CLISession._try_route_to_behavior",
-                  "file": "src/cli/cli_session.py",
-                  "line": 221,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "CLISession._wrap_instructions_result",
-                  "file": "src/cli/cli_session.py",
-                  "line": 211,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "CLISession._execute_bot_attribute",
-              "file": "src/cli/cli_session.py",
-              "line": 152,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "Action.execute",
-                  "file": "src/actions/action.py",
-                  "line": 279,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "CLISession._execute_domain_object_command",
-              "file": "src/cli/cli_session.py",
-              "line": 169,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "DomainNavigator.__init__",
-                  "file": "src/navigation/domain_navigator.py",
-                  "line": 10,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "DomainNavigator.navigate",
-                  "file": "src/navigation/domain_navigator.py",
-                  "line": 13,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "CLISession._handle_bot_command",
-              "file": "src/cli/cli_session.py",
-              "line": 135,
-              "depth": 3,
-              "children": [],
-              "lazy": true
-            }
-          ],
-          "code": "    def _execute_verb(self, verb: str, args: str, command: str) -> tuple:\n        is_navigation_command = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')\n        \n        if verb == 'status':\n            return self.bot, is_navigation_command\n        \n        if verb == 'bot':\n            return self._handle_bot_command(args), is_navigation_command\n        \n        if hasattr(self.bot, verb):\n            return self._execute_bot_attribute(verb, args)\n        \n        # Check if command has -- style parameters (e.g., --scope-type=files)\n        # If so, route to behavior action instead of domain navigator\n        has_dash_params = '--' in command\n        \n        if '.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params:\n            return self._execute_domain_object_command(command)\n        \n        return self._execute_action_or_route(verb, args, command)"
-        },
-        {
-          "symbol": "CLISession._build_response",
-          "file": "src/cli/cli_session.py",
-          "line": 258,
-          "depth": 2,
-          "children": [
-            {
-              "symbol": "CLISession._get_adapter_for_domain",
-              "file": "src/cli/cli_session.py",
-              "line": 583,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "Epic.create",
-                  "file": "src/story_graph/nodes.py",
-                  "line": 931,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "JSONBot.serialize",
-              "file": "src/bot/json_bot.py",
-              "line": 46,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "JSONBot.to_dict",
-                  "file": "src/bot/json_bot.py",
-                  "line": 60,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "TerminalFormatter.error",
-                  "file": "src/utils.py",
-                  "line": 124,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "CLISession._build_json_instructions_response",
-              "file": "src/cli/cli_session.py",
-              "line": 299,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "TerminalFormatter.warning",
-                  "file": "src/utils.py",
-                  "line": 127,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            },
-            {
-              "symbol": "CLISession._append_navigation_context",
-              "file": "src/cli/cli_session.py",
-              "line": 330,
-              "depth": 3,
-              "children": [
-                {
-                  "symbol": "CLISession._append_tty_navigation_context",
-                  "file": "src/cli/cli_session.py",
-                  "line": 371,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                },
-                {
-                  "symbol": "CLISession._append_json_navigation_context",
-                  "file": "src/cli/cli_session.py",
-                  "line": 335,
-                  "depth": 4,
-                  "children": [],
-                  "lazy": true
-                }
-              ],
-              "lazy": true
-            }
-          ],
-          "code": "    def _build_response(self, result, is_navigation_command: bool, cli_terminated: bool) -> CLICommandResponse:\n        if isinstance(result, CLICommandResponse):\n            return result\n        \n        # Special handling for status command in JSON mode - wrap bot data consistently\n        from bot.bot import Bot\n        if isinstance(result, Bot) and self.mode == 'json':\n            import json\n            from utils import sanitize_json_string, sanitize_for_json\n            adapter = self._get_adapter_for_domain(result)\n            try:\n                bot_data = json.loads(adapter.serialize())\n            except ValueError as e:\n                if 'control character' in str(e).lower() or 'Invalid' in str(e):\n                    import logging\n                    logger = logging.getLogger(__name__)\n                    logger.warning(f\"[CLISession] JSON parse error in bot data, sanitizing: {str(e)}\")\n                    bot_data = json.loads(sanitize_json_string(adapter.serialize()))\n                else:\n                    raise\n            wrapped = {'bot': bot_data}\n            sanitized_wrapped = sanitize_for_json(wrapped)\n            return CLICommandResponse(output=json.dumps(sanitized_wrapped, indent=2, ensure_ascii=True), cli_terminated=cli_terminated)\n        \n        adapter = self._get_adapter_for_domain(result)\n        output = adapter.serialize()\n        \n        from instructions.instructions import Instructions\n        if isinstance(result, Instructions) and self.mode == 'json':\n            return self._build_json_instructions_response(output)\n        \n        if is_navigation_command and not cli_terminated:\n            output = self._append_navigation_context(result, output)\n        \n        # Extract status from result if it's a dict\n        status = None\n        if isinstance(result, dict):\n            status = result.get('status')\n        \n        return CLICommandResponse(output=output, status=status, cli_terminated=cli_terminated)"
-        }
-      ],
-      "code": "    def execute_command(self, command: str) -> CLICommandResponse:\n        # Extract format mode from the entire command first\n        command = self._extract_format_mode(command)\n        \n        verb, args = self._parse_command(command)\n        \n        handler = self._get_command_handler(verb)\n        if handler:\n            response = handler(verb, args)\n            if response:\n                return response\n        \n        result, is_navigation_command = self._execute_verb(verb, args, command)\n        cli_terminated = verb == 'exit'\n        \n        return self._build_response(result, is_navigation_command, cli_terminated)"
-    },
-    {
-      "symbol": "JsonInstructionsHelper.assert_section_shows_behavior_and_action",
-      "file": "test/helpers/json_bot_test_helper.py",
-      "line": 235,
-      "depth": 1,
-      "children": [
-        {
-          "symbol": "JsonBotHelper._parse_json",
-          "file": "test/helpers/json_bot_test_helper.py",
           "line": 18,
-          "depth": 2,
-          "children": [],
-          "code": "    def _parse_json(self, output: str) -> dict:\n        \"\"\"Parse JSON output.\"\"\"\n        output = output.strip()\n        try:\n            return json.loads(output)\n        except json.JSONDecodeError:\n            # Try to find first complete JSON object\n            start_idx = output.find('{')\n            if start_idx >= 0:\n                brace_count = 0\n                for i in range(start_idx, len(output)):\n                    if output[i] == '{':\n                        brace_count += 1\n                    elif output[i] == '}':\n                        brace_count -= 1\n                        if brace_count == 0:\n                            json_str = output[start_idx:i+1]\n                            return json.loads(json_str)\n            raise ValueError(f\"Output does not contain valid JSON: {output[:200]}\")"
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "StoryTestHelper.load_story_graph_into_bot",
+              "file": "test/invoke_bot/edit_story_map/story_helper.py",
+              "line": 801,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "FileScanContext.exists",
+                  "file": "src/scanners/resources/scan_context.py",
+                  "line": 37,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
+            }
+          ],
+          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
+        },
+        {
+          "symbol": "StateTestHelper.set_state",
+          "file": "test/helpers/state_helper.py",
+          "line": 15,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "Behaviors.load_state",
+              "file": "src/behaviors/behaviors.py",
+              "line": 299,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "Behaviors._init_to_first_behavior",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 281,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                },
+                {
+                  "symbol": "Behaviors._extract_behavior_name_from_state",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 291,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                },
+                {
+                  "symbol": "Behaviors._find_behavior_index",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 285,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def load_state(self):\n        if self.bot_paths is None:\n            self._init_to_first_behavior()\n            return\n        workspace_dir = self.bot_paths.workspace_directory\n        state_file = workspace_dir / 'behavior_action_state.json'\n        if not state_file.exists() or not self._behaviors:\n            self._init_to_first_behavior()\n            return\n        try:\n            state_data = json.loads(state_file.read_text(encoding='utf-8'))\n            behavior_name = self._extract_behavior_name_from_state(state_data.get('current_behavior', ''))\n\n            if behavior_name:\n                idx = self._find_behavior_index(behavior_name)\n                if idx >= 0:\n                    self._current_index = idx\n                    if self.current:\n                        self.current.actions.load_state()\n                    return\n            self._init_to_first_behavior()\n        except Exception:\n            self._init_to_first_behavior()\n\n            self._init_to_first_behavior()"
+            }
+          ],
+          "code": "    def set_state(self, behavior: str, action: str, completed_actions: list = None):\n       \n        from datetime import datetime\n        #comment\n        state_data = {\n            'current_behavior': f'story_bot.{behavior}',\n            'current_action': f'story_bot.{behavior}.{action}',\n            'operation': 'instructions',\n            'working_directory': str(self.workspace),\n            'timestamp': datetime.now().isoformat()\n        }\n        \n        if completed_actions:\n            state_data['completed_actions'] = [\n                {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n                for action_state in completed_actions\n            ]\n        \n        state_file = self.workspace / 'behavior_action_state.json'\n        state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')\n        \n        # Reload the bot state from the file\n        self.parent.bot.behaviors.load_state()\n        \n        return state_file"
+        },
+        {
+          "symbol": "CLISession.execute_command",
+          "file": "src/cli/cli_session.py",
+          "line": 17,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "CLISession._extract_format_mode",
+              "file": "src/cli/cli_session.py",
+              "line": 34,
+              "depth": 2,
+              "children": [],
+              "code": "    def _extract_format_mode(self, args: str) -> str:\n        if not args:\n            return args\n        if '--format json' in args or '--format=json' in args:\n            self.mode = 'json'\n            return args.replace('--format json', '').replace('--format=json', '').strip()\n        return args"
+            },
+            {
+              "symbol": "CLISession._parse_command",
+              "file": "src/cli/cli_session.py",
+              "line": 434,
+              "depth": 2,
+              "children": [],
+              "code": "    def _parse_command(self, command: str) -> tuple[str, str]:\n        parts = command.split(maxsplit=1)\n        verb = parts[0].lower()\n        args = parts[1] if len(parts) > 1 else \"\"\n        return verb, args"
+            },
+            {
+              "symbol": "CLISession._get_command_handler",
+              "file": "src/cli/cli_session.py",
+              "line": 42,
+              "depth": 2,
+              "children": [],
+              "code": "    def _get_command_handler(self, verb: str):\n        handlers = {\n            'save': self._handle_save,\n            'submit': self._handle_submit,\n        }\n        if verb.startswith('submitrules:') or verb.startswith('submitrules '):\n            return self._handle_submitrules\n        return handlers.get(verb)"
+            },
+            {
+              "symbol": "CLISession._execute_verb",
+              "file": "src/cli/cli_session.py",
+              "line": 114,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "CLISession._execute_action_or_route",
+                  "file": "src/cli/cli_session.py",
+                  "line": 185,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "CLISession._handle_action_shortcut",
+                      "file": "src/cli/cli_session.py",
+                      "line": 560,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._check_rules_auto_submit",
+                      "file": "src/cli/cli_session.py",
+                      "line": 197,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._try_route_to_behavior",
+                      "file": "src/cli/cli_session.py",
+                      "line": 221,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._wrap_instructions_result",
+                      "file": "src/cli/cli_session.py",
+                      "line": 211,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._execute_bot_attribute",
+                  "file": "src/cli/cli_session.py",
+                  "line": 152,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "Action.execute",
+                      "file": "src/actions/action.py",
+                      "line": 279,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._execute_domain_object_command",
+                  "file": "src/cli/cli_session.py",
+                  "line": 169,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "DomainNavigator.__init__",
+                      "file": "src/navigation/domain_navigator.py",
+                      "line": 10,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "DomainNavigator.navigate",
+                      "file": "src/navigation/domain_navigator.py",
+                      "line": 13,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._handle_bot_command",
+                  "file": "src/cli/cli_session.py",
+                  "line": 135,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def _execute_verb(self, verb: str, args: str, command: str) -> tuple:\n        is_navigation_command = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')\n        \n        if verb == 'status':\n            return self.bot, is_navigation_command\n        \n        if verb == 'bot':\n            return self._handle_bot_command(args), is_navigation_command\n        \n        if hasattr(self.bot, verb):\n            return self._execute_bot_attribute(verb, args)\n        \n        # Check if command has -- style parameters (e.g., --scope-type=files)\n        # If so, route to behavior action instead of domain navigator\n        has_dash_params = '--' in command\n        \n        if '.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params:\n            return self._execute_domain_object_command(command)\n        \n        return self._execute_action_or_route(verb, args, command)"
+            },
+            {
+              "symbol": "CLISession._build_response",
+              "file": "src/cli/cli_session.py",
+              "line": 258,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "CLISession._get_adapter_for_domain",
+                  "file": "src/cli/cli_session.py",
+                  "line": 583,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "Epic.create",
+                      "file": "src/story_graph/nodes.py",
+                      "line": 931,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "JSONBot.serialize",
+                  "file": "src/bot/json_bot.py",
+                  "line": 46,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "JSONBot.to_dict",
+                      "file": "src/bot/json_bot.py",
+                      "line": 60,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "TerminalFormatter.error",
+                      "file": "src/utils.py",
+                      "line": 124,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._build_json_instructions_response",
+                  "file": "src/cli/cli_session.py",
+                  "line": 299,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "TerminalFormatter.warning",
+                      "file": "src/utils.py",
+                      "line": 127,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._append_navigation_context",
+                  "file": "src/cli/cli_session.py",
+                  "line": 330,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "CLISession._append_tty_navigation_context",
+                      "file": "src/cli/cli_session.py",
+                      "line": 371,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._append_json_navigation_context",
+                      "file": "src/cli/cli_session.py",
+                      "line": 335,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                }
+              ],
+              "code": "    def _build_response(self, result, is_navigation_command: bool, cli_terminated: bool) -> CLICommandResponse:\n        if isinstance(result, CLICommandResponse):\n            return result\n        \n        # Special handling for status command in JSON mode - wrap bot data consistently\n        from bot.bot import Bot\n        if isinstance(result, Bot) and self.mode == 'json':\n            import json\n            from utils import sanitize_json_string, sanitize_for_json\n            adapter = self._get_adapter_for_domain(result)\n            try:\n                bot_data = json.loads(adapter.serialize())\n            except ValueError as e:\n                if 'control character' in str(e).lower() or 'Invalid' in str(e):\n                    import logging\n                    logger = logging.getLogger(__name__)\n                    logger.warning(f\"[CLISession] JSON parse error in bot data, sanitizing: {str(e)}\")\n                    bot_data = json.loads(sanitize_json_string(adapter.serialize()))\n                else:\n                    raise\n            wrapped = {'bot': bot_data}\n            sanitized_wrapped = sanitize_for_json(wrapped)\n            return CLICommandResponse(output=json.dumps(sanitized_wrapped, indent=2, ensure_ascii=True), cli_terminated=cli_terminated)\n        \n        adapter = self._get_adapter_for_domain(result)\n        output = adapter.serialize()\n        \n        from instructions.instructions import Instructions\n        if isinstance(result, Instructions) and self.mode == 'json':\n            return self._build_json_instructions_response(output)\n        \n        if is_navigation_command and not cli_terminated:\n            output = self._append_navigation_context(result, output)\n        \n        # Extract status from result if it's a dict\n        status = None\n        if isinstance(result, dict):\n            status = result.get('status')\n        \n        return CLICommandResponse(output=output, status=status, cli_terminated=cli_terminated)"
+            }
+          ],
+          "code": "    def execute_command(self, command: str) -> CLICommandResponse:\n        # Extract format mode from the entire command first\n        command = self._extract_format_mode(command)\n        \n        verb, args = self._parse_command(command)\n        \n        handler = self._get_command_handler(verb)\n        if handler:\n            response = handler(verb, args)\n            if response:\n                return response\n        \n        result, is_navigation_command = self._execute_verb(verb, args, command)\n        cli_terminated = verb == 'exit'\n        \n        return self._build_response(result, is_navigation_command, cli_terminated)"
+        },
+        {
+          "symbol": "JsonInstructionsHelper.assert_section_shows_behavior_and_action",
+          "file": "test/helpers/json_bot_test_helper.py",
+          "line": 235,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "JsonBotHelper._parse_json",
+              "file": "test/helpers/json_bot_test_helper.py",
+              "line": 18,
+              "depth": 2,
+              "children": [],
+              "code": "    def _parse_json(self, output: str) -> dict:\n        \"\"\"Parse JSON output.\"\"\"\n        output = output.strip()\n        try:\n            return json.loads(output)\n        except json.JSONDecodeError:\n            # Try to find first complete JSON object\n            start_idx = output.find('{')\n            if start_idx >= 0:\n                brace_count = 0\n                for i in range(start_idx, len(output)):\n                    if output[i] == '{':\n                        brace_count += 1\n                    elif output[i] == '}':\n                        brace_count -= 1\n                        if brace_count == 0:\n                            json_str = output[start_idx:i+1]\n                            return json.loads(json_str)\n            raise ValueError(f\"Output does not contain valid JSON: {output[:200]}\")"
+            }
+          ],
+          "code": "    def assert_section_shows_behavior_and_action(self, output: str, behavior: str, action: str):\n        \n        \n        actual = self._parse_json(output)\n        \n        # Check for main structure\n        assert 'instructions' in actual, \\\n            f\"Missing 'instructions' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        assert 'bot' in actual, \\\n            f\"Missing 'bot' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        # Check bot metadata\n        assert actual['bot']['current_behavior'] == behavior, \\\n            f\"Expected current_behavior='{behavior}', got '{actual['bot']['current_behavior']}'\"\n        \n        assert actual['bot']['current_action'] == action, \\\n            f\"Expected current_action='{action}', got '{actual['bot']['current_action']}'\""
         }
-      ],
-      "code": "    def assert_section_shows_behavior_and_action(self, output: str, behavior: str, action: str):\n        \n        \n        actual = self._parse_json(output)\n        \n        # Check for main structure\n        assert 'instructions' in actual, \\\n            f\"Missing 'instructions' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        assert 'bot' in actual, \\\n            f\"Missing 'bot' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        # Check bot metadata\n        assert actual['bot']['current_behavior'] == behavior, \\\n            f\"Expected current_behavior='{behavior}', got '{actual['bot']['current_behavior']}'\"\n        \n        assert actual['bot']['current_action'] == action, \\\n            f\"Expected current_action='{action}', got '{actual['bot']['current_action']}'\""
+      ]
+    },
+    {
+      "name": "Validation output includes rules content",
+      "type": "happy_path",
+      "steps": "GIVEN: CLI is at shape.validate\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains validation rules",
+      "file": "docs/stories/story-graph.json",
+      "line": 16970,
+      "test": {
+        "method": "test_rules_output_includes_validation_content",
+        "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+        "line": 194,
+        "code": "    def test_rules_output_includes_validation_content(self, tmp_path, helper_class):\n        \"\"\"\n        SCENARIO: Validation output includes rules content\n        GIVEN: CLI is at shape.validate\n        WHEN: user navigates to shape.validate\n        THEN: CLI output contains validation rules\n        \n        Domain: test_rules_list_includes_file_paths (adapted)\n        \"\"\"\n        # Given\n        helper = helper_class(tmp_path)\n        \n        # Create story graph for validation\n        story_graph_data = {'epics': []}\n        helper.domain.story.create_story_graph(story_graph_data)\n        \n        helper.domain.state.set_state('shape', 'validate')\n        \n        # When\n        cli_response = helper.cli_session.execute_command('shape.validate')\n        \n        # Then\n        helper.instructions.assert_section_shows_behavior_and_action(\n            cli_response.output, 'shape', 'validate')"
+      },
+      "code": [
+        {
+          "symbol": "StoryTestHelper.create_story_graph",
+          "file": "test/invoke_bot/edit_story_map/story_helper.py",
+          "line": 18,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "StoryTestHelper.load_story_graph_into_bot",
+              "file": "test/invoke_bot/edit_story_map/story_helper.py",
+              "line": 801,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "FileScanContext.exists",
+                  "file": "src/scanners/resources/scan_context.py",
+                  "line": 37,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
+            }
+          ],
+          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
+        },
+        {
+          "symbol": "StateTestHelper.set_state",
+          "file": "test/helpers/state_helper.py",
+          "line": 15,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "Behaviors.load_state",
+              "file": "src/behaviors/behaviors.py",
+              "line": 299,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "Behaviors._init_to_first_behavior",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 281,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                },
+                {
+                  "symbol": "Behaviors._extract_behavior_name_from_state",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 291,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                },
+                {
+                  "symbol": "Behaviors._find_behavior_index",
+                  "file": "src/behaviors/behaviors.py",
+                  "line": 285,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def load_state(self):\n        if self.bot_paths is None:\n            self._init_to_first_behavior()\n            return\n        workspace_dir = self.bot_paths.workspace_directory\n        state_file = workspace_dir / 'behavior_action_state.json'\n        if not state_file.exists() or not self._behaviors:\n            self._init_to_first_behavior()\n            return\n        try:\n            state_data = json.loads(state_file.read_text(encoding='utf-8'))\n            behavior_name = self._extract_behavior_name_from_state(state_data.get('current_behavior', ''))\n\n            if behavior_name:\n                idx = self._find_behavior_index(behavior_name)\n                if idx >= 0:\n                    self._current_index = idx\n                    if self.current:\n                        self.current.actions.load_state()\n                    return\n            self._init_to_first_behavior()\n        except Exception:\n            self._init_to_first_behavior()\n\n            self._init_to_first_behavior()"
+            }
+          ],
+          "code": "    def set_state(self, behavior: str, action: str, completed_actions: list = None):\n       \n        from datetime import datetime\n        #comment\n        state_data = {\n            'current_behavior': f'story_bot.{behavior}',\n            'current_action': f'story_bot.{behavior}.{action}',\n            'operation': 'instructions',\n            'working_directory': str(self.workspace),\n            'timestamp': datetime.now().isoformat()\n        }\n        \n        if completed_actions:\n            state_data['completed_actions'] = [\n                {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n                for action_state in completed_actions\n            ]\n        \n        state_file = self.workspace / 'behavior_action_state.json'\n        state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')\n        \n        # Reload the bot state from the file\n        self.parent.bot.behaviors.load_state()\n        \n        return state_file"
+        },
+        {
+          "symbol": "CLISession.execute_command",
+          "file": "src/cli/cli_session.py",
+          "line": 17,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "CLISession._extract_format_mode",
+              "file": "src/cli/cli_session.py",
+              "line": 34,
+              "depth": 2,
+              "children": [],
+              "code": "    def _extract_format_mode(self, args: str) -> str:\n        if not args:\n            return args\n        if '--format json' in args or '--format=json' in args:\n            self.mode = 'json'\n            return args.replace('--format json', '').replace('--format=json', '').strip()\n        return args"
+            },
+            {
+              "symbol": "CLISession._parse_command",
+              "file": "src/cli/cli_session.py",
+              "line": 434,
+              "depth": 2,
+              "children": [],
+              "code": "    def _parse_command(self, command: str) -> tuple[str, str]:\n        parts = command.split(maxsplit=1)\n        verb = parts[0].lower()\n        args = parts[1] if len(parts) > 1 else \"\"\n        return verb, args"
+            },
+            {
+              "symbol": "CLISession._get_command_handler",
+              "file": "src/cli/cli_session.py",
+              "line": 42,
+              "depth": 2,
+              "children": [],
+              "code": "    def _get_command_handler(self, verb: str):\n        handlers = {\n            'save': self._handle_save,\n            'submit': self._handle_submit,\n        }\n        if verb.startswith('submitrules:') or verb.startswith('submitrules '):\n            return self._handle_submitrules\n        return handlers.get(verb)"
+            },
+            {
+              "symbol": "CLISession._execute_verb",
+              "file": "src/cli/cli_session.py",
+              "line": 114,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "CLISession._execute_action_or_route",
+                  "file": "src/cli/cli_session.py",
+                  "line": 185,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "CLISession._handle_action_shortcut",
+                      "file": "src/cli/cli_session.py",
+                      "line": 560,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._check_rules_auto_submit",
+                      "file": "src/cli/cli_session.py",
+                      "line": 197,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._try_route_to_behavior",
+                      "file": "src/cli/cli_session.py",
+                      "line": 221,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._wrap_instructions_result",
+                      "file": "src/cli/cli_session.py",
+                      "line": 211,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._execute_bot_attribute",
+                  "file": "src/cli/cli_session.py",
+                  "line": 152,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "Action.execute",
+                      "file": "src/actions/action.py",
+                      "line": 279,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._execute_domain_object_command",
+                  "file": "src/cli/cli_session.py",
+                  "line": 169,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "DomainNavigator.__init__",
+                      "file": "src/navigation/domain_navigator.py",
+                      "line": 10,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "DomainNavigator.navigate",
+                      "file": "src/navigation/domain_navigator.py",
+                      "line": 13,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._handle_bot_command",
+                  "file": "src/cli/cli_session.py",
+                  "line": 135,
+                  "depth": 3,
+                  "children": [],
+                  "lazy": true
+                }
+              ],
+              "code": "    def _execute_verb(self, verb: str, args: str, command: str) -> tuple:\n        is_navigation_command = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')\n        \n        if verb == 'status':\n            return self.bot, is_navigation_command\n        \n        if verb == 'bot':\n            return self._handle_bot_command(args), is_navigation_command\n        \n        if hasattr(self.bot, verb):\n            return self._execute_bot_attribute(verb, args)\n        \n        # Check if command has -- style parameters (e.g., --scope-type=files)\n        # If so, route to behavior action instead of domain navigator\n        has_dash_params = '--' in command\n        \n        if '.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params:\n            return self._execute_domain_object_command(command)\n        \n        return self._execute_action_or_route(verb, args, command)"
+            },
+            {
+              "symbol": "CLISession._build_response",
+              "file": "src/cli/cli_session.py",
+              "line": 258,
+              "depth": 2,
+              "children": [
+                {
+                  "symbol": "CLISession._get_adapter_for_domain",
+                  "file": "src/cli/cli_session.py",
+                  "line": 583,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "Epic.create",
+                      "file": "src/story_graph/nodes.py",
+                      "line": 931,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "JSONBot.serialize",
+                  "file": "src/bot/json_bot.py",
+                  "line": 46,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "JSONBot.to_dict",
+                      "file": "src/bot/json_bot.py",
+                      "line": 60,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "TerminalFormatter.error",
+                      "file": "src/utils.py",
+                      "line": 124,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._build_json_instructions_response",
+                  "file": "src/cli/cli_session.py",
+                  "line": 299,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "TerminalFormatter.warning",
+                      "file": "src/utils.py",
+                      "line": 127,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                },
+                {
+                  "symbol": "CLISession._append_navigation_context",
+                  "file": "src/cli/cli_session.py",
+                  "line": 330,
+                  "depth": 3,
+                  "children": [
+                    {
+                      "symbol": "CLISession._append_tty_navigation_context",
+                      "file": "src/cli/cli_session.py",
+                      "line": 371,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    },
+                    {
+                      "symbol": "CLISession._append_json_navigation_context",
+                      "file": "src/cli/cli_session.py",
+                      "line": 335,
+                      "depth": 4,
+                      "children": [],
+                      "lazy": true
+                    }
+                  ],
+                  "lazy": true
+                }
+              ],
+              "code": "    def _build_response(self, result, is_navigation_command: bool, cli_terminated: bool) -> CLICommandResponse:\n        if isinstance(result, CLICommandResponse):\n            return result\n        \n        # Special handling for status command in JSON mode - wrap bot data consistently\n        from bot.bot import Bot\n        if isinstance(result, Bot) and self.mode == 'json':\n            import json\n            from utils import sanitize_json_string, sanitize_for_json\n            adapter = self._get_adapter_for_domain(result)\n            try:\n                bot_data = json.loads(adapter.serialize())\n            except ValueError as e:\n                if 'control character' in str(e).lower() or 'Invalid' in str(e):\n                    import logging\n                    logger = logging.getLogger(__name__)\n                    logger.warning(f\"[CLISession] JSON parse error in bot data, sanitizing: {str(e)}\")\n                    bot_data = json.loads(sanitize_json_string(adapter.serialize()))\n                else:\n                    raise\n            wrapped = {'bot': bot_data}\n            sanitized_wrapped = sanitize_for_json(wrapped)\n            return CLICommandResponse(output=json.dumps(sanitized_wrapped, indent=2, ensure_ascii=True), cli_terminated=cli_terminated)\n        \n        adapter = self._get_adapter_for_domain(result)\n        output = adapter.serialize()\n        \n        from instructions.instructions import Instructions\n        if isinstance(result, Instructions) and self.mode == 'json':\n            return self._build_json_instructions_response(output)\n        \n        if is_navigation_command and not cli_terminated:\n            output = self._append_navigation_context(result, output)\n        \n        # Extract status from result if it's a dict\n        status = None\n        if isinstance(result, dict):\n            status = result.get('status')\n        \n        return CLICommandResponse(output=output, status=status, cli_terminated=cli_terminated)"
+            }
+          ],
+          "code": "    def execute_command(self, command: str) -> CLICommandResponse:\n        # Extract format mode from the entire command first\n        command = self._extract_format_mode(command)\n        \n        verb, args = self._parse_command(command)\n        \n        handler = self._get_command_handler(verb)\n        if handler:\n            response = handler(verb, args)\n            if response:\n                return response\n        \n        result, is_navigation_command = self._execute_verb(verb, args, command)\n        cli_terminated = verb == 'exit'\n        \n        return self._build_response(result, is_navigation_command, cli_terminated)"
+        },
+        {
+          "symbol": "JsonInstructionsHelper.assert_section_shows_behavior_and_action",
+          "file": "test/helpers/json_bot_test_helper.py",
+          "line": 235,
+          "depth": 1,
+          "children": [
+            {
+              "symbol": "JsonBotHelper._parse_json",
+              "file": "test/helpers/json_bot_test_helper.py",
+              "line": 18,
+              "depth": 2,
+              "children": [],
+              "code": "    def _parse_json(self, output: str) -> dict:\n        \"\"\"Parse JSON output.\"\"\"\n        output = output.strip()\n        try:\n            return json.loads(output)\n        except json.JSONDecodeError:\n            # Try to find first complete JSON object\n            start_idx = output.find('{')\n            if start_idx >= 0:\n                brace_count = 0\n                for i in range(start_idx, len(output)):\n                    if output[i] == '{':\n                        brace_count += 1\n                    elif output[i] == '}':\n                        brace_count -= 1\n                        if brace_count == 0:\n                            json_str = output[start_idx:i+1]\n                            return json.loads(json_str)\n            raise ValueError(f\"Output does not contain valid JSON: {output[:200]}\")"
+            }
+          ],
+          "code": "    def assert_section_shows_behavior_and_action(self, output: str, behavior: str, action: str):\n        \n        \n        actual = self._parse_json(output)\n        \n        # Check for main structure\n        assert 'instructions' in actual, \\\n            f\"Missing 'instructions' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        assert 'bot' in actual, \\\n            f\"Missing 'bot' field in JSON.\\nActual keys: {list(actual.keys())}\"\n        \n        # Check bot metadata\n        assert actual['bot']['current_behavior'] == behavior, \\\n            f\"Expected current_behavior='{behavior}', got '{actual['bot']['current_behavior']}'\"\n        \n        assert actual['bot']['current_action'] == action, \\\n            f\"Expected current_action='{action}', got '{actual['bot']['current_action']}'\""
+        }
+      ]
+    },
+    {
+      "name": "User gets rules instructions for behavior",
+      "type": "happy_path",
+      "steps": "",
+      "file": "docs/stories/story-graph.json",
+      "line": 16978,
+      "test": {
+        "method": "test_user_gets_rules_instructions_for_behavior",
+        "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+        "line": 0,
+        "code": "# Test method 'test_user_gets_rules_instructions_for_behavior' not found"
+      },
+      "code": []
+    },
+    {
+      "name": "User gets rules with message parameter",
+      "type": "happy_path",
+      "steps": "",
+      "file": "docs/stories/story-graph.json",
+      "line": 16986,
+      "test": {
+        "method": "test_user_gets_rules_with_message_parameter",
+        "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+        "line": 0,
+        "code": "# Test method 'test_user_gets_rules_with_message_parameter' not found"
+      },
+      "code": []
+    },
+    {
+      "name": "User gets rules without message parameter",
+      "type": "happy_path",
+      "steps": "",
+      "file": "docs/stories/story-graph.json",
+      "line": 16994,
+      "test": {
+        "method": "test_user_gets_rules_without_message_parameter",
+        "file": "test/invoke_bot/perform_action/test_use_rules_in_prompt.py",
+        "line": 0,
+        "code": "# Test method 'test_user_gets_rules_without_message_parameter' not found"
+      },
+      "code": []
     }
   ]
 }

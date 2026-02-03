@@ -227,17 +227,26 @@ class StoryTraceEditorProvider {
 
     /**
      * Generate HTML for the webview with nested sections
+     * Supports both story-level format (story + scenarios array) and 
+     * single-scenario format (scenario + test + code)
      */
     getHtmlForWebview(webview, data) {
-        const scenario = data.scenario || {};
-        const test = data.test || {};
-        const code = data.code || [];
+        // Detect format: story-level or single-scenario
+        const isStoryFormat = data.story && data.scenarios;
         
         // Get image URIs for buttons
         const imgFolder = vscode.Uri.joinPath(this.context.extensionUri, 'img');
         const toggleCodeImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'toggle_code.png'));
         const expandAllImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'expand_all.png'));
         const expandCodeImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'expand_code.png'));
+        
+        // Extract data based on format
+        const story = data.story || {};
+        const scenarios = data.scenarios || [];
+        // For old format compatibility
+        const scenario = data.scenario || {};
+        const test = data.test || {};
+        const code = data.code || [];
 
         // Recursive function to render nested code sections
         // L1-3: code shown inline
@@ -569,26 +578,136 @@ class StoryTraceEditorProvider {
             color: var(--vscode-textLink-foreground) !important;
         }
         
-        .type-badge {
-            background: var(--vscode-badge-background);
-            color: var(--vscode-badge-foreground);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 0.75em;
-        }
-        
         .main-section {
             border-width: 2px;
+        }
+        
+        .story-section {
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .story-properties {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 8px;
+            padding: 8px;
+            background: var(--vscode-textBlockQuote-background);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .property-label {
+            font-weight: 600;
+            color: var(--vscode-descriptionForeground);
+            padding-top: 4px;
+        }
+        
+        .property-editor {
+            min-height: 40px;
         }
     </style>
 </head>
 <body>
-    <!-- SCENARIO -> TEST -> CODE (nested hierarchy) -->
+    ${isStoryFormat ? `
+    <!-- STORY FORMAT: Story -> Scenarios -> Test -> Code -->
+    <div class="section main-section story-section" id="story-section">
+        <div class="section-header" onclick="toggleSection('story-section')">
+            <span class="chevron">▼</span>
+            <span class="section-title" title="${escapeHtml(story.file || '')}:${story.line || ''}">${escapeHtml(story.name || 'Unknown Story')}</span>
+            <span class="child-count">(${scenarios.length} scenarios)</span>
+            <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('story-section')" title="Toggle hierarchy"><img src="${expandAllImg}" alt="Expand All"></button>
+            <button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('story-section')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>
+            <button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(story.file || '')}', ${story.line || 1})">Open</button>
+        </div>
+        <div class="section-content">
+            <!-- Story properties -->
+            <div class="story-properties">
+                <span class="property-label">Users:</span>
+                <div class="monaco-container property-editor" style="height: 40px;"
+                     data-file="${escapeHtml(story.file || '')}"
+                     data-line="${story.line || 1}"
+                     data-editable="true"
+                     data-language="markdown"
+                     data-story-property="users"
+                     data-code="${Buffer.from(story.users || '').toString('base64')}"></div>
+                
+                <span class="property-label">Acceptance Criteria:</span>
+                <div class="monaco-container property-editor" style="height: 80px;"
+                     data-file="${escapeHtml(story.file || '')}"
+                     data-line="${story.line || 1}"
+                     data-editable="true"
+                     data-language="markdown"
+                     data-story-property="acceptance_criteria"
+                     data-code="${Buffer.from(story.acceptance_criteria || '').toString('base64')}"></div>
+            </div>
+            
+            <!-- Scenarios -->
+            ${scenarios.map((s, i) => {
+                const scenarioId = `scenario-${i}`;
+                const testId = `${scenarioId}-test`;
+                const scenarioTest = s.test || {};
+                const scenarioCode = s.code || [];
+                return `
+                <div class="section" id="${scenarioId}">
+                    <div class="section-header" onclick="toggleSection('${scenarioId}')">
+                        <span class="chevron">▼</span>
+                        <span class="section-title" title="${escapeHtml(s.file || story.file || '')}:${s.line || 1}">${escapeHtml(s.name || 'Scenario')}</span>
+                        <span class="child-count">(${scenarioCode.length})</span>
+                        <button class="preview-btn" onclick="event.stopPropagation(); toggleScenarioPreview('${scenarioId}')" title="Toggle Edit/Preview">Preview</button>
+                        <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('${scenarioId}')" title="Toggle hierarchy"><img src="${expandAllImg}" alt="Expand All"></button>
+                        <button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('${scenarioId}')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>
+                        <button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(s.file || story.file || '')}', ${s.line || 1})">Open</button>
+                    </div>
+                    <div class="section-content">
+                        <!-- Scenario steps editor -->
+                        <div class="scenario-editor-container" id="${scenarioId}-editor">
+                            <div class="monaco-container scenario-monaco" style="height: 100px;"
+                                 data-file="${escapeHtml(story.file || '')}"
+                                 data-line="${story.line || 1}"
+                                 data-editable="true"
+                                 data-language="markdown"
+                                 data-scenario-name="${escapeHtml(s.name || '')}"
+                                 data-code="${Buffer.from(s.steps || '').toString('base64')}"></div>
+                        </div>
+                        <div class="scenario-preview" id="${scenarioId}-preview" style="display: none;">
+                            ${formatSteps(s.steps || '')}
+                        </div>
+                        
+                        <!-- Test nested inside Scenario -->
+                        <div class="section" id="${testId}">
+                            <div class="section-header" onclick="toggleSection('${testId}')">
+                                <span class="chevron">▼</span>
+                                <span class="section-title" title="${escapeHtml(scenarioTest.file || '')}:${scenarioTest.line || ''}">${escapeHtml(scenarioTest.method || 'Test')}</span>
+                                <span class="child-count">(${scenarioCode.length})</span>
+                                <button class="icon-btn toggle-code-btn" onclick="event.stopPropagation(); toggleCodeBlock('${testId}')" title="Toggle code"><img src="${toggleCodeImg}" alt="Toggle Code"></button>
+                                <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('${testId}')" title="Toggle hierarchy"><img src="${expandAllImg}" alt="Expand All"></button>
+                                <button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('${testId}')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>
+                                ${scenarioTest.file ? `<button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(scenarioTest.file)}', ${scenarioTest.line || 1})">Open</button>` : ''}
+                            </div>
+                            <div class="section-content">
+                                <div class="code-block collapsed" id="${testId}-code">
+                                    <div class="monaco-container" style="display:none; height: 300px;" 
+                                         data-file="${escapeHtml(scenarioTest.file || '')}" 
+                                         data-line="${scenarioTest.line || 1}" 
+                                         data-editable="true" 
+                                         data-code="${Buffer.from(scenarioTest.code || '// No test code').toString('base64')}"></div>
+                                </div>
+                                <div class="children-container">
+                                    ${scenarioCode.map((c, j) => renderCodeSection(c, j, `${testId}-code`)).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+    </div>
+    ` : `
+    <!-- OLD FORMAT: Single Scenario -> Test -> Code -->
     <div class="section main-section" id="scenario-section">
         <div class="section-header" onclick="toggleSection('scenario-section')">
             <span class="chevron">▼</span>
             <span class="section-title" title="${escapeHtml(scenario.file || test.file || '')}:${scenario.line || test.line || ''}">${escapeHtml(scenario.name || 'Unknown')}</span>
-            <span class="type-badge">${escapeHtml(scenario.type || 'happy_path')}</span>
             <span class="child-count">(1)</span>
             <button class="preview-btn" onclick="event.stopPropagation(); toggleScenarioPreview()" title="Toggle Edit/Preview">Preview</button>
             <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('scenario-section')" title="Toggle hierarchy (no code)"><img src="${expandAllImg}" alt="Expand All"></button>
@@ -596,7 +715,6 @@ class StoryTraceEditorProvider {
             <button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(scenario.file || test.file || '')}', ${scenario.line || test.line || 1})">Open</button>
         </div>
         <div class="section-content">
-            <!-- Scenario editor (markdown) -->
             <div class="scenario-editor-container" id="scenario-editor-container">
                 <div class="monaco-container scenario-monaco" style="height: 150px;" 
                      data-file="${escapeHtml(scenario.file || '')}" 
@@ -606,12 +724,10 @@ class StoryTraceEditorProvider {
                      data-scenario-name="${escapeHtml(scenario.name || '')}"
                      data-code="${Buffer.from(scenario.steps || '').toString('base64')}"></div>
             </div>
-            <!-- Scenario preview (rendered markdown) -->
             <div class="scenario-preview" id="scenario-preview" style="display: none;">
                 ${formatSteps(scenario.steps || '')}
             </div>
             
-            <!-- TEST nested inside SCENARIO -->
             <div class="section" id="test-section">
                 <div class="section-header" onclick="toggleSection('test-section')">
                     <span class="chevron">▼</span>
@@ -623,12 +739,9 @@ class StoryTraceEditorProvider {
                     ${test.file ? `<button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(test.file)}', ${test.line || 1})">Open</button>` : ''}
                 </div>
                 <div class="section-content">
-                    <!-- Test code block (starts collapsed) -->
                     <div class="code-block collapsed" id="test-section-code">
                         <div class="monaco-container" style="display:none; height: 300px;" data-file="${escapeHtml(test.file || '')}" data-line="${test.line || 1}" data-editable="true" data-code="${Buffer.from(test.code || '// No test code').toString('base64')}"></div>
                     </div>
-                    
-                    <!-- CODE SECTIONS nested inside TEST -->
                     <div class="children-container">
                         ${code.map((c, i) => renderCodeSection(c, i)).join('')}
                     </div>
@@ -636,6 +749,7 @@ class StoryTraceEditorProvider {
             </div>
         </div>
     </div>
+    `}
 
     <script>
         const vscode = acquireVsCodeApi();
@@ -678,10 +792,23 @@ class StoryTraceEditorProvider {
             });
         }
         // Initialize symbol map from data
+        ${isStoryFormat ? `
+        // Story format: build symbol map from all scenarios
+        ${JSON.stringify(scenarios)}.forEach((s, i) => {
+            const testId = 'scenario-' + i + '-test';
+            buildSymbolMap(s.code || [], testId + '-code');
+            const testMethod = s.test ? s.test.method : '';
+            if (testMethod) {
+                if (!symbolMap[testMethod]) symbolMap[testMethod] = [];
+                symbolMap[testMethod].push(testId);
+            }
+        });
+        ` : `
+        // Single scenario format
         buildSymbolMap(${JSON.stringify(code)});
-        // Add test section as navigable
         if (!symbolMap['${escapeHtml(test.method || '')}']) symbolMap['${escapeHtml(test.method || '')}'] = [];
         symbolMap['${escapeHtml(test.method || '')}'].push('test-section');
+        `}
         
         function toggleSection(id) {
             const section = document.getElementById(id);
@@ -710,10 +837,15 @@ class StoryTraceEditorProvider {
         }
         
         // Toggle scenario between Edit and Preview modes
-        function toggleScenarioPreview() {
-            const editorContainer = document.getElementById('scenario-editor-container');
-            const preview = document.getElementById('scenario-preview');
-            const btn = document.querySelector('.preview-btn');
+        // scenarioId is optional - if provided, uses that scenario's elements
+        function toggleScenarioPreview(scenarioId) {
+            const editorId = scenarioId ? scenarioId + '-editor' : 'scenario-editor-container';
+            const previewId = scenarioId ? scenarioId + '-preview' : 'scenario-preview';
+            const editorContainer = document.getElementById(editorId);
+            const preview = document.getElementById(previewId);
+            // Find the button within the section header
+            const section = scenarioId ? document.getElementById(scenarioId) : document.getElementById('scenario-section');
+            const btn = section ? section.querySelector('.preview-btn') : document.querySelector('.preview-btn');
             
             if (!editorContainer || !preview) return;
             
