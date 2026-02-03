@@ -63,6 +63,24 @@ class StoryTraceEditorProvider {
                         vscode.window.showErrorMessage(`Failed to save: ${e.message}`);
                     }
                     break;
+                case 'saveScenario':
+                    // Save scenario steps to story-graph.json
+                    console.log('Extension received saveScenario:', message.scenarioName);
+                    try {
+                        await this.saveScenarioToStoryGraph(message.file, message.scenarioName, message.newSteps);
+                        webviewPanel.webview.postMessage({
+                            command: 'scenarioSaved',
+                            scenarioName: message.scenarioName
+                        });
+                        vscode.window.showInformationMessage(`Saved scenario: ${message.scenarioName}`);
+                    } catch (e) {
+                        webviewPanel.webview.postMessage({
+                            command: 'saveError',
+                            error: e.message
+                        });
+                        vscode.window.showErrorMessage(`Failed to save scenario: ${e.message}`);
+                    }
+                    break;
             }
         });
 
@@ -110,6 +128,52 @@ class StoryTraceEditorProvider {
             fs.writeFileSync(fullPath, lines.join('\n'), 'utf-8');
             console.log('Saved changes by line to:', fullPath);
         }
+    }
+
+    /**
+     * Save scenario steps to story-graph.json
+     */
+    async saveScenarioToStoryGraph(storyGraphPath, scenarioName, newSteps) {
+        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!workspaceRoot) throw new Error('No workspace found');
+
+        const fullPath = path.join(workspaceRoot, storyGraphPath);
+        
+        // Read and parse the story graph
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const storyGraph = JSON.parse(content);
+        
+        // Find and update the scenario
+        let found = false;
+        const findAndUpdateScenario = (obj) => {
+            if (found) return;
+            if (Array.isArray(obj)) {
+                for (const item of obj) {
+                    findAndUpdateScenario(item);
+                }
+            } else if (obj && typeof obj === 'object') {
+                // Check if this is the scenario we're looking for
+                if (obj.name === scenarioName && 'steps' in obj) {
+                    obj.steps = newSteps;
+                    found = true;
+                    return;
+                }
+                // Recurse into all properties
+                for (const key of Object.keys(obj)) {
+                    findAndUpdateScenario(obj[key]);
+                }
+            }
+        };
+        
+        findAndUpdateScenario(storyGraph);
+        
+        if (!found) {
+            throw new Error(`Scenario "${scenarioName}" not found in ${storyGraphPath}`);
+        }
+        
+        // Write back with nice formatting
+        fs.writeFileSync(fullPath, JSON.stringify(storyGraph, null, 2), 'utf-8');
+        console.log('Saved scenario to:', fullPath);
     }
 
     /**
@@ -168,6 +232,12 @@ class StoryTraceEditorProvider {
         const scenario = data.scenario || {};
         const test = data.test || {};
         const code = data.code || [];
+        
+        // Get image URIs for buttons
+        const imgFolder = vscode.Uri.joinPath(this.context.extensionUri, 'img');
+        const toggleCodeImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'toggle_code.png'));
+        const expandAllImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'expand_all.png'));
+        const expandCodeImg = webview.asWebviewUri(vscode.Uri.joinPath(imgFolder, 'expand_code.png'));
 
         // Recursive function to render nested code sections
         // L1-3: code shown inline
@@ -191,10 +261,11 @@ class StoryTraceEditorProvider {
             const lineAttr = c.line || 1;
             const symbolAttr = escapeHtml(c.symbol || '');
             const isEditable = c.file && !c.file.includes('(stdlib)');
+            const fileTip = c.file ? `${escapeHtml(c.file)}:${c.line || 1}` : '';
             
             if (isLazy) {
                 // Lazy: show "Load code" button, code will be fetched on demand
-                codeContent = `<div class="lazy-code" id="${id}-code" data-file="${fileAttr}" data-line="${lineAttr}" data-symbol="${symbolAttr}" data-id="${id}">
+                codeContent = `<div class="lazy-code code-block collapsed" id="${id}-code" data-file="${fileAttr}" data-line="${lineAttr}" data-symbol="${symbolAttr}" data-id="${id}">
                      <button class="load-code-btn" onclick="event.stopPropagation(); requestCodeFromBtn(this)">
                        ▶ Load code
                      </button>
@@ -202,22 +273,36 @@ class StoryTraceEditorProvider {
                      <div class="loading-indicator" style="display:none;">Loading...</div>
                    </div>`;
             } else {
-                // Not lazy: code is already in JSON - use Monaco editor
+                // Not lazy: code is already in JSON - wrap in collapsible code-block (starts hidden)
                 const codeB64 = Buffer.from(c.code || '// No code').toString('base64');
-                codeContent = `<div class="monaco-container" style="height: 200px;" data-file="${fileAttr}" data-line="${lineAttr}" data-editable="${isEditable}" data-code="${codeB64}"></div>`;
+                codeContent = `<div class="code-block collapsed" id="${id}-code">
+                    <div class="monaco-container" style="display:none; height: 200px;" data-file="${fileAttr}" data-line="${lineAttr}" data-editable="${isEditable}" data-code="${codeB64}"></div>
+                </div>`;
             }
             
-            // All code sections start collapsed except L1
-            const startCollapsed = depth > 1 ? 'collapsed' : '';
+            // All sections start collapsed
+            const startCollapsed = 'collapsed';
+            
+            // Order: toggle_code, expand_all (hierarchy), expand_code (hierarchy + code)
+            // All buttons are toggles - collapse if expanded, expand if collapsed
+            // For lazy items, the toggle button triggers loading first, then shows code
+            const toggleCodeBtn = `<button class="icon-btn toggle-code-btn" onclick="event.stopPropagation(); toggleCodeBlock('${id}')" title="Toggle code"><img src="${toggleCodeImg}" alt="Toggle Code"></button>`;
+            const expandAllBtn = hasChildren 
+                ? `<button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('${id}')" title="Toggle hierarchy (no code)"><img src="${expandAllImg}" alt="Expand All"></button>`
+                : '';
+            const expandCodeBtn = hasChildren 
+                ? `<button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('${id}')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>`
+                : '';
             
             return `
             <div class="section depth-${depth} ${startCollapsed}" id="${id}" style="margin-left: ${indent}px;">
                 <div class="section-header" onclick="toggleSection('${id}')">
                     <span class="chevron">▼</span>
-                    <span class="section-title">${escapeHtml(c.symbol || c.file || 'Code')}</span>
-                    ${hasChildren ? `<span class="child-count">(${c.children.length} calls)</span>` : ''}
-                    <span class="depth-badge">L${depth}</span>
-                    <span class="section-meta">${escapeHtml(c.file || '')}:${c.line || ''}</span>
+                    <span class="section-title" title="${fileTip}">${escapeHtml(c.symbol || c.file || 'Code')}</span>
+                    ${hasChildren ? `<span class="child-count">(${c.children.length})</span>` : ''}
+                    ${toggleCodeBtn}
+                    ${expandAllBtn}
+                    ${expandCodeBtn}
                     ${c.file && !c.file.includes('(stdlib)') ? `<button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(c.file)}', ${c.line || 1})">Open</button>` : ''}
                 </div>
                 <div class="section-content">
@@ -286,53 +371,99 @@ class StoryTraceEditorProvider {
         .section-title {
             flex: 1;
             font-weight: 600;
+            cursor: help;
         }
         
-        .section-meta {
+        .child-count {
             font-size: 0.8em;
             color: var(--vscode-descriptionForeground);
+            margin-right: 4px;
         }
         
-        .depth-badge {
-            background: var(--vscode-badge-background);
-            color: var(--vscode-badge-foreground);
-            padding: 1px 4px;
-            border-radius: 3px;
-            font-size: 0.7em;
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            margin-left: 6px;
+            opacity: 0.8;
+            vertical-align: middle;
+            border-radius: 4px;
         }
         
-        .depth-1 > .section-header { border-left: 3px solid #4ec9b0; }
-        .depth-2 > .section-header { border-left: 3px solid #dcdcaa; }
-        .depth-3 > .section-header { border-left: 3px solid #9cdcfe; background: var(--vscode-editor-background); }
+        .icon-btn:hover {
+            opacity: 1;
+            background: var(--vscode-toolbar-hoverBackground, rgba(255,255,255,0.1));
+        }
         
-        .open-file-btn {
+        .icon-btn img {
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+        
+        .preview-btn {
             background: var(--vscode-button-secondaryBackground);
             color: var(--vscode-button-secondaryForeground);
             border: none;
-            padding: 2px 6px;
-            border-radius: 3px;
+            padding: 4px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.75em;
+            font-size: 0.85em;
+            margin-left: 6px;
         }
         
-        .open-file-btn:hover {
+        .preview-btn:hover {
             background: var(--vscode-button-secondaryHoverBackground);
         }
         
-        .expand-btn {
+        .preview-btn.active {
             background: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
-            border: none;
-            padding: 4px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.85em;
-            margin: 8px 0;
-            display: block;
         }
         
-        .expand-btn:hover {
-            background: var(--vscode-button-hoverBackground);
+        .scenario-preview {
+            padding: 8px 12px;
+            background: var(--vscode-editor-background);
+            border: 1px solid var(--vscode-panel-border);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .scenario-monaco {
+            margin-bottom: 8px;
+        }
+        
+        .depth-1 > .section-header,
+        .depth-2 > .section-header,
+        .depth-3 > .section-header { border-left: 3px solid #f5a623; }
+        
+        .open-file-btn, .show-code-btn, .expand-btn, .expand-all-btn {
+            background: var(--vscode-button-secondaryBackground);
+            color: var(--vscode-button-secondaryForeground);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 6px;
+        }
+        
+        .open-file-btn:hover, .show-code-btn:hover, .expand-btn:hover, .expand-all-btn:hover {
+            background: var(--vscode-button-secondaryHoverBackground);
+        }
+        
+        .show-code-btn {
+            font-family: monospace;
+        }
+        
+        .code-block.collapsed .monaco-container {
+            display: none !important;
+        }
+        
+        .code-block.collapsed {
+            height: 0;
+            overflow: hidden;
         }
         
         .section:not(.collapsed) .expand-btn {
@@ -452,42 +583,57 @@ class StoryTraceEditorProvider {
     </style>
 </head>
 <body>
-    <!-- SCENARIO SECTION -->
+    <!-- SCENARIO -> TEST -> CODE (nested hierarchy) -->
     <div class="section main-section" id="scenario-section">
         <div class="section-header" onclick="toggleSection('scenario-section')">
             <span class="chevron">▼</span>
-            <span class="section-title">Scenario: ${escapeHtml(scenario.name || 'Unknown')}</span>
+            <span class="section-title" title="${escapeHtml(scenario.file || test.file || '')}:${scenario.line || test.line || ''}">${escapeHtml(scenario.name || 'Unknown')}</span>
             <span class="type-badge">${escapeHtml(scenario.type || 'happy_path')}</span>
+            <span class="child-count">(1)</span>
+            <button class="preview-btn" onclick="event.stopPropagation(); toggleScenarioPreview()" title="Toggle Edit/Preview">Preview</button>
+            <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('scenario-section')" title="Toggle hierarchy (no code)"><img src="${expandAllImg}" alt="Expand All"></button>
+            <button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('scenario-section')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>
+            <button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(scenario.file || test.file || '')}', ${scenario.line || test.line || 1})">Open</button>
         </div>
         <div class="section-content">
-            <div class="scenario-steps">
+            <!-- Scenario editor (markdown) -->
+            <div class="scenario-editor-container" id="scenario-editor-container">
+                <div class="monaco-container scenario-monaco" style="height: 150px;" 
+                     data-file="${escapeHtml(scenario.file || '')}" 
+                     data-line="${scenario.line || 1}" 
+                     data-editable="true" 
+                     data-language="markdown"
+                     data-scenario-name="${escapeHtml(scenario.name || '')}"
+                     data-code="${Buffer.from(scenario.steps || '').toString('base64')}"></div>
+            </div>
+            <!-- Scenario preview (rendered markdown) -->
+            <div class="scenario-preview" id="scenario-preview" style="display: none;">
                 ${formatSteps(scenario.steps || '')}
             </div>
-        </div>
-    </div>
-
-    <!-- TEST METHOD SECTION -->
-    <div class="section main-section" id="test-section">
-        <div class="section-header" onclick="toggleSection('test-section')">
-            <span class="chevron">▼</span>
-            <span class="section-title">Test: ${escapeHtml(test.method || 'Unknown')}</span>
-            <span class="section-meta">${escapeHtml(test.file || '')}:${test.line || ''}</span>
-            ${test.file ? `<button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(test.file)}', ${test.line || 1})">Open</button>` : ''}
-        </div>
-        <div class="section-content">
-            <div class="monaco-container" style="height: 300px;" data-file="${escapeHtml(test.file || '')}" data-line="${test.line || 1}" data-editable="true" data-code="${Buffer.from(test.code || '// No test code').toString('base64')}"></div>
-        </div>
-    </div>
-
-    <!-- CODE SECTIONS (nested) - starts collapsed -->
-    <div class="section main-section collapsed" id="code-root">
-        <div class="section-header" onclick="toggleSection('code-root')">
-            <span class="chevron">▼</span>
-            <span class="section-title">Code Trace</span>
-            <span class="section-meta">${code.length} top-level calls</span>
-        </div>
-        <div class="section-content">
-            ${code.map((c, i) => renderCodeSection(c, i)).join('')}
+            
+            <!-- TEST nested inside SCENARIO -->
+            <div class="section" id="test-section">
+                <div class="section-header" onclick="toggleSection('test-section')">
+                    <span class="chevron">▼</span>
+                    <span class="section-title" title="${escapeHtml(test.file || '')}:${test.line || ''}">${escapeHtml(test.method || 'Test')}</span>
+                    <span class="child-count">(${code.length})</span>
+                    <button class="icon-btn toggle-code-btn" onclick="event.stopPropagation(); toggleCodeBlock('test-section')" title="Toggle code"><img src="${toggleCodeImg}" alt="Toggle Code"></button>
+                    <button class="icon-btn expand-all-btn" onclick="event.stopPropagation(); toggleHierarchy('test-section')" title="Toggle hierarchy (no code)"><img src="${expandAllImg}" alt="Expand All"></button>
+                    <button class="icon-btn expand-code-btn" onclick="event.stopPropagation(); toggleAllWithCode('test-section')" title="Toggle hierarchy + code"><img src="${expandCodeImg}" alt="Expand Code"></button>
+                    ${test.file ? `<button class="open-file-btn" onclick="event.stopPropagation(); openFile('${escapeHtml(test.file)}', ${test.line || 1})">Open</button>` : ''}
+                </div>
+                <div class="section-content">
+                    <!-- Test code block (starts collapsed) -->
+                    <div class="code-block collapsed" id="test-section-code">
+                        <div class="monaco-container" style="display:none; height: 300px;" data-file="${escapeHtml(test.file || '')}" data-line="${test.line || 1}" data-editable="true" data-code="${Buffer.from(test.code || '// No test code').toString('base64')}"></div>
+                    </div>
+                    
+                    <!-- CODE SECTIONS nested inside TEST -->
+                    <div class="children-container">
+                        ${code.map((c, i) => renderCodeSection(c, i)).join('')}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -563,6 +709,191 @@ class StoryTraceEditorProvider {
             }
         }
         
+        // Toggle scenario between Edit and Preview modes
+        function toggleScenarioPreview() {
+            const editorContainer = document.getElementById('scenario-editor-container');
+            const preview = document.getElementById('scenario-preview');
+            const btn = document.querySelector('.preview-btn');
+            
+            if (!editorContainer || !preview) return;
+            
+            const isPreviewMode = preview.style.display !== 'none';
+            
+            if (isPreviewMode) {
+                // Switch to Edit mode
+                preview.style.display = 'none';
+                editorContainer.style.display = 'block';
+                btn.textContent = 'Preview';
+                btn.classList.remove('active');
+                setTimeout(() => editors.forEach(e => e.layout()), 50);
+            } else {
+                // Switch to Preview mode - update preview content from editor
+                const monacoContainer = editorContainer.querySelector('.monaco-container');
+                const editor = editors.get(monacoContainer);
+                if (editor) {
+                    const markdown = editor.getValue();
+                    // Simple markdown to HTML (GIVEN/WHEN/THEN formatting)
+                    preview.innerHTML = formatMarkdownSteps(markdown);
+                }
+                editorContainer.style.display = 'none';
+                preview.style.display = 'block';
+                btn.textContent = 'Edit';
+                btn.classList.add('active');
+            }
+        }
+        
+        // Format markdown steps to HTML
+        function formatMarkdownSteps(text) {
+            if (!text) return '';
+            return text.split('\\n').map(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('GIVEN:')) {
+                    return '<div class="step given"><strong>GIVEN:</strong> ' + escapeHtmlJs(trimmed.substring(6).trim()) + '</div>';
+                } else if (trimmed.startsWith('WHEN:')) {
+                    return '<div class="step when"><strong>WHEN:</strong> ' + escapeHtmlJs(trimmed.substring(5).trim()) + '</div>';
+                } else if (trimmed.startsWith('THEN:')) {
+                    return '<div class="step then"><strong>THEN:</strong> ' + escapeHtmlJs(trimmed.substring(5).trim()) + '</div>';
+                } else if (trimmed.startsWith('AND:')) {
+                    return '<div class="step and"><strong>AND:</strong> ' + escapeHtmlJs(trimmed.substring(4).trim()) + '</div>';
+                } else if (trimmed) {
+                    return '<div class="step">' + escapeHtmlJs(trimmed) + '</div>';
+                }
+                return '';
+            }).join('');
+        }
+        
+        function escapeHtmlJs(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        
+        // Toggle code block visibility (show/hide code without affecting hierarchy)
+        // For lazy items, this triggers loading first if not already loaded
+        function toggleCodeBlock(sectionId) {
+            const codeBlock = document.getElementById(sectionId + '-code');
+            if (!codeBlock) return;
+            
+            // Check if this is a lazy block that needs loading
+            if (codeBlock.classList.contains('lazy-code') && !codeBlock.classList.contains('loaded')) {
+                // Trigger lazy loading
+                const loadBtn = codeBlock.querySelector('.load-code-btn');
+                if (loadBtn) {
+                    requestCodeFromBtn(loadBtn);
+                    return;
+                }
+            }
+            
+            const wasCollapsed = codeBlock.classList.contains('collapsed');
+            codeBlock.classList.toggle('collapsed');
+            
+            const container = codeBlock.querySelector('.monaco-container');
+            if (wasCollapsed) {
+                // Expanding code - show Monaco
+                if (container) {
+                    container.style.display = 'block';
+                    const savedHeight = container.dataset.savedHeight;
+                    if (savedHeight) container.style.height = savedHeight;
+                }
+                setTimeout(() => editors.forEach(e => e.layout()), 50);
+            } else {
+                // Collapsing code - hide Monaco
+                if (container) {
+                    container.style.display = 'none';
+                }
+            }
+        }
+        
+        // Check if a code block has been loaded (not lazy or already loaded)
+        function isCodeBlockLoaded(block) {
+            // If it has the lazy-code class but NOT the 'loaded' class, it's not loaded yet
+            if (block.classList.contains('lazy-code') && !block.classList.contains('loaded')) {
+                return false;
+            }
+            return true;
+        }
+        
+        // Toggle hierarchy (collapse if expanded, expand if collapsed) - no code
+        function toggleHierarchy(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            
+            // Check if any child sections are expanded
+            const childSections = section.querySelectorAll('.section');
+            const anyExpanded = Array.from(childSections).some(s => !s.classList.contains('collapsed'));
+            
+            if (anyExpanded) {
+                // Collapse all
+                childSections.forEach(child => child.classList.add('collapsed'));
+            } else {
+                // Expand all hierarchy, keep code collapsed
+                section.classList.remove('collapsed');
+                childSections.forEach(child => child.classList.remove('collapsed'));
+                
+                // Keep ALL code blocks collapsed
+                section.querySelectorAll('.code-block').forEach(block => {
+                    if (!isCodeBlockLoaded(block)) return;
+                    block.classList.add('collapsed');
+                    const container = block.querySelector('.monaco-container');
+                    if (container) container.style.display = 'none';
+                });
+                
+                const ownCodeBlock = document.getElementById(sectionId + '-code');
+                if (ownCodeBlock && isCodeBlockLoaded(ownCodeBlock)) {
+                    ownCodeBlock.classList.add('collapsed');
+                    const container = ownCodeBlock.querySelector('.monaco-container');
+                    if (container) container.style.display = 'none';
+                }
+            }
+        }
+        
+        // Toggle hierarchy + code (collapse if expanded, expand if collapsed)
+        function toggleAllWithCode(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            
+            // Check if any code blocks are expanded
+            const codeBlocks = section.querySelectorAll('.code-block');
+            const anyCodeExpanded = Array.from(codeBlocks).some(b => isCodeBlockLoaded(b) && !b.classList.contains('collapsed'));
+            
+            if (anyCodeExpanded) {
+                // Collapse all
+                section.querySelectorAll('.section').forEach(child => child.classList.add('collapsed'));
+                codeBlocks.forEach(block => {
+                    if (!isCodeBlockLoaded(block)) return;
+                    block.classList.add('collapsed');
+                    const container = block.querySelector('.monaco-container');
+                    if (container) container.style.display = 'none';
+                });
+            } else {
+                // Expand all hierarchy + code
+                section.classList.remove('collapsed');
+                section.querySelectorAll('.section').forEach(child => child.classList.remove('collapsed'));
+                
+                codeBlocks.forEach(block => {
+                    if (!isCodeBlockLoaded(block)) return;
+                    block.classList.remove('collapsed');
+                    const container = block.querySelector('.monaco-container');
+                    if (container) {
+                        container.style.display = 'block';
+                        const savedHeight = container.dataset.savedHeight;
+                        if (savedHeight) container.style.height = savedHeight;
+                    }
+                });
+                
+                const ownCodeBlock = document.getElementById(sectionId + '-code');
+                if (ownCodeBlock && isCodeBlockLoaded(ownCodeBlock)) {
+                    ownCodeBlock.classList.remove('collapsed');
+                    const container = ownCodeBlock.querySelector('.monaco-container');
+                    if (container) {
+                        container.style.display = 'block';
+                        const savedHeight = container.dataset.savedHeight;
+                        if (savedHeight) container.style.height = savedHeight;
+                    }
+                }
+            }
+            
+            setTimeout(() => editors.forEach(e => e.layout()), 100);
+        }
+        
         // Request code from extension (true lazy loading)
         function requestCodeFromBtn(btn) {
             const lazyCode = btn.parentElement;
@@ -589,6 +920,9 @@ class StoryTraceEditorProvider {
             }
             
             const isEditable = container.dataset.editable === 'true';
+            const language = container.dataset.language || 'python';
+            const isMarkdown = language === 'markdown';
+            
             // Initial height estimate - will be adjusted after editor renders
             const lineCount = (code.match(/\\n/g) || []).length + 1;
             const initialHeight = Math.min(Math.max(lineCount * 19 + 20, 60), 500);
@@ -598,13 +932,13 @@ class StoryTraceEditorProvider {
             const startLineNum = parseInt(line, 10) || 1;
             const editor = monaco.editor.create(container, {
                 value: code,
-                language: 'python',
+                language: language,
                 theme: getMonacoTheme(),  // Match VS Code theme
                 readOnly: !isEditable,
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
-                lineNumbers: (n) => String(n + startLineNum - 1),  // Show actual source line numbers
-                lineNumbersMinChars: 4,
+                lineNumbers: isMarkdown ? 'off' : (n) => String(n + startLineNum - 1),  // No line numbers for markdown
+                lineNumbersMinChars: isMarkdown ? 0 : 4,
                 fontSize: 13,
                 automaticLayout: true,
                 wordWrap: 'on'
@@ -626,38 +960,52 @@ class StoryTraceEditorProvider {
             // Update height when content changes (e.g., after word wrap recalculates)
             editor.onDidContentSizeChange(updateEditorHeight);
             
-            // Add decorations for method calls that have sections
-            addMethodDecorations(editor);
-            
-            // Double-click to navigate to method section
-            editor.onMouseDown(e => {
-                if (e.event.detail === 2) {  // Double-click
-                    const position = e.target.position;
-                    if (position) {
-                        const model = editor.getModel();
-                        const word = model.getWordAtPosition(position);
-                        if (word && symbolMap[word.word] && symbolMap[word.word].length > 0) {
-                            // Navigate to first match
-                            const sectionId = symbolMap[word.word][0];
-                            navigateToSection(sectionId);
+            // Add decorations and navigation only for code editors, not markdown
+            if (!isMarkdown) {
+                addMethodDecorations(editor);
+                
+                // Double-click to navigate to method section
+                editor.onMouseDown(e => {
+                    if (e.event.detail === 2) {  // Double-click
+                        const position = e.target.position;
+                        if (position) {
+                            const model = editor.getModel();
+                            const word = model.getWordAtPosition(position);
+                            if (word && symbolMap[word.word] && symbolMap[word.word].length > 0) {
+                                // Navigate to first match
+                                const sectionId = symbolMap[word.word][0];
+                                navigateToSection(sectionId);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
             
             // Save function - used by blur and Ctrl+S
             function saveEditorContent() {
                 const newCode = editor.getValue();
                 const originalCode = container.dataset.originalCode || code;
                 if (newCode !== originalCode) {
-                    console.log('Saving changes to:', file, 'line:', line);
-                    vscode.postMessage({
-                        command: 'saveCode',
-                        file: file,
-                        line: parseInt(line, 10),
-                        originalCode: originalCode,
-                        newCode: newCode
-                    });
+                    // Check if this is a scenario editor (markdown with scenario name)
+                    const scenarioName = container.dataset.scenarioName;
+                    if (isMarkdown && scenarioName) {
+                        console.log('Saving scenario:', scenarioName);
+                        vscode.postMessage({
+                            command: 'saveScenario',
+                            file: file,
+                            scenarioName: scenarioName,
+                            newSteps: newCode
+                        });
+                    } else {
+                        console.log('Saving changes to:', file, 'line:', line);
+                        vscode.postMessage({
+                            command: 'saveCode',
+                            file: file,
+                            line: parseInt(line, 10),
+                            originalCode: originalCode,
+                            newCode: newCode
+                        });
+                    }
                     container.dataset.originalCode = newCode;
                 }
             }
@@ -667,7 +1015,16 @@ class StoryTraceEditorProvider {
                 editor.onDidBlurEditorWidget(saveEditorContent);
                 
                 // Save on Ctrl+S (Windows/Linux) or Cmd+S (Mac)
-                editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveEditorContent);
+                // Monaco's addCommand doesn't work in VS Code webviews because 
+                // VS Code intercepts Ctrl+S before it reaches the webview.
+                // Use DOM keydown handler instead.
+                container.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        saveEditorContent();
+                    }
+                });
                 
                 container.dataset.originalCode = code;
             }
@@ -691,9 +1048,13 @@ class StoryTraceEditorProvider {
                     createEditor(monacoContainer, message.code, monacoContainer.dataset.file, monacoContainer.dataset.line);
                 }
                 
+                // Mark as loaded and expand the code block
                 lazyCode.classList.add('loaded');
+                lazyCode.classList.remove('collapsed');
             } else if (message.command === 'codeSaved') {
                 console.log('Code saved successfully:', message.file);
+            } else if (message.command === 'scenarioSaved') {
+                console.log('Scenario saved successfully:', message.scenarioName);
             } else if (message.command === 'saveError') {
                 console.error('Save failed:', message.error);
             }

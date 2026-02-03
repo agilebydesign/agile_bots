@@ -2,7 +2,9 @@
   "scenario": {
     "name": "Rules action shows rules digest in CLI output",
     "type": "happy_path",
-    "steps": "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest"
+    "steps": "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest",
+    "file": "docs/stories/story-graph.json",
+    "line": 1
   },
   "test": {
     "method": "test_rules_action_shows_rules_digest",
@@ -20,7 +22,7 @@
         {
           "symbol": "StoryTestHelper.load_story_graph_into_bot",
           "file": "test/invoke_bot/edit_story_map/story_helper.py",
-          "line": 810,
+          "line": 801,
           "depth": 2,
           "children": [
             {
@@ -35,7 +37,7 @@
           "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
         }
       ],
-      "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \"\"\"Create test story-graph.json in workspace and load into bot.story_graph.\n        \n        Args:\n            graph_data: Story graph dict (default: {'epics': []})\n            docs_path: Relative path from workspace to docs directory\n            filename: Story graph filename\n        \n        Returns:\n            Path to created story graph file\n        \"\"\"\n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
+      "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
     },
     {
       "symbol": "StateTestHelper.set_state",
@@ -77,7 +79,7 @@
           "code": "    def load_state(self):\n        if self.bot_paths is None:\n            self._init_to_first_behavior()\n            return\n        workspace_dir = self.bot_paths.workspace_directory\n        state_file = workspace_dir / 'behavior_action_state.json'\n        if not state_file.exists() or not self._behaviors:\n            self._init_to_first_behavior()\n            return\n        try:\n            state_data = json.loads(state_file.read_text(encoding='utf-8'))\n            behavior_name = self._extract_behavior_name_from_state(state_data.get('current_behavior', ''))\n\n            if behavior_name:\n                idx = self._find_behavior_index(behavior_name)\n                if idx >= 0:\n                    self._current_index = idx\n                    if self.current:\n                        self.current.actions.load_state()\n                    return\n            self._init_to_first_behavior()\n        except Exception:\n            self._init_to_first_behavior()\n\n            self._init_to_first_behavior()"
         }
       ],
-      "code": "    def set_state(self, behavior: str, action: str, completed_actions: list = None):\n       \n        from datetime import datetime\n        \n        state_data = {\n            'current_behavior': f'story_bot.{behavior}',\n            'current_action': f'story_bot.{behavior}.{action}',\n            'operation': 'instructions',\n            'working_directory': str(self.workspace),\n            'timestamp': datetime.now().isoformat()\n        }\n        \n        if completed_actions:\n            state_data['completed_actions'] = [\n                {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n                for action_state in completed_actions\n            ]\n        \n        state_file = self.workspace / 'behavior_action_state.json'\n        state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')\n        \n        # Reload the bot state from the file\n        self.parent.bot.behaviors.load_state()\n        \n        return state_file"
+      "code": "    def set_state(self, behavior: str, action: str, completed_actions: list = None):\n       \n        from datetime import datetime\n        #comment\n        state_data = {\n            'current_behavior': f'story_bot.{behavior}',\n            'current_action': f'story_bot.{behavior}.{action}',\n            'operation': 'instructions',\n            'working_directory': str(self.workspace),\n            'timestamp': datetime.now().isoformat()\n        }\n        \n        if completed_actions:\n            state_data['completed_actions'] = [\n                {'action_state': action_state, 'timestamp': datetime.now().isoformat()}\n                for action_state in completed_actions\n            ]\n        \n        state_file = self.workspace / 'behavior_action_state.json'\n        state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')\n        \n        # Reload the bot state from the file\n        self.parent.bot.behaviors.load_state()\n        \n        return state_file"
     },
     {
       "symbol": "CLISession.execute_command",
