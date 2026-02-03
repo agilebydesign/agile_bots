@@ -1,8 +1,8 @@
 {
-    "name": "trace-notebook",
-    "displayName": "Trace Notebook",
-    "description": "Story -> Test -> Code traceability in VS Code Notebooks",
-    "version": "0.1.7",
+    "name": "story-trace",
+    "displayName": "Story Trace",
+    "description": "Story â†’ Scenario â†’ Test â†’ Code traceability with collapsible nested sections",
+    "version": "0.8.4",
     "publisher": "agilebot",
     "license": "MIT",
     "private": true,
@@ -10,41 +10,37 @@
         "vscode": "^1.80.0"
     },
     "categories": [
-        "Notebooks"
+        "Other"
     ],
     "main": "./extension.js",
     "contributes": {
-        "notebooks": [
+        "customEditors": [
             {
-                "type": "trace-notebook",
-                "displayName": "Trace Notebook",
+                "viewType": "storyTrace.editor",
+                "displayName": "Story Trace",
                 "selector": [
                     {
-                        "filenamePattern": "*.trace"
+                        "filenamePattern": "*.strace"
                     }
-                ]
+                ],
+                "priority": "default"
             }
         ],
         "commands": [
             {
                 "command": "trace.open",
-                "title": "Open Trace Notebook",
+                "title": "Open Story Trace",
                 "category": "Trace"
             },
             {
-                "command": "trace.expand",
-                "title": "Expand Cell",
-                "category": "Trace"
-            },
-            {
-                "command": "trace.collapse",
-                "title": "Collapse Children",
+                "command": "trace.regenerate",
+                "title": "Regenerate Trace",
                 "category": "Trace"
             }
         ]
     },
     "activationEvents": [
-        "onNotebook:trace-notebook"
+        "onCustomEditor:storyTrace.editor"
     ],
     "scripts": {
         "package": "vsce package --allow-missing-repository",
