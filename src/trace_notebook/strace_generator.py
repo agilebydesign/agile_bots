@@ -16,7 +16,8 @@ class StraceGenerator:
         self.seen = set()  # Avoid duplicates
     
     def generate(self, test_file: str, test_class: str, test_method: str, 
-                 scenario_name: str, scenario_steps: str) -> dict:
+                 scenario_name: str, scenario_steps: str,
+                 story_file: str = None, story_line: int = 1) -> dict:
         """Generate strace data for a test method."""
         
         # Read the test file
@@ -40,7 +41,9 @@ class StraceGenerator:
             "scenario": {
                 "name": scenario_name,
                 "type": "happy_path",
-                "steps": scenario_steps
+                "steps": scenario_steps,
+                "file": story_file,
+                "line": story_line
             },
             "test": {
                 "method": test_method,
@@ -365,8 +368,13 @@ class DynamicStraceGenerator:
                     continue
     
     def generate(self, test_file: str, test_class: str, test_method: str,
-                 scenario_name: str, scenario_steps: str) -> dict:
-        """Generate strace by parsing and analyzing the test method."""
+                 scenario_name: str, scenario_steps: str,
+                 story_file: str = None, story_line: int = 1) -> dict:
+        """Generate strace by parsing and analyzing the test method.
+        
+        The caller should provide story_line - the line number where the scenario
+        was found in story_file. This avoids redundant searching.
+        """
         # Build index first
         self._build_method_index()
         
@@ -398,7 +406,9 @@ class DynamicStraceGenerator:
             "scenario": {
                 "name": scenario_name,
                 "type": "happy_path", 
-                "steps": scenario_steps
+                "steps": scenario_steps,
+                "file": story_file,
+                "line": story_line
             },
             "test": {
                 "method": test_method,
@@ -604,6 +614,8 @@ def main():
     test_method = "test_rules_action_shows_rules_digest"
     scenario_name = "Rules action shows rules digest in CLI output"
     scenario_steps = "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest"
+    story_file = "docs/stories/story-graph.json"
+    story_line = 1  # TODO: Set to actual line when scenario is added to story-graph.json
     
     # Use dynamic generator - no hardcoding
     generator = DynamicStraceGenerator(workspace)
@@ -612,7 +624,9 @@ def main():
         test_class=test_class,
         test_method=test_method,
         scenario_name=scenario_name,
-        scenario_steps=scenario_steps
+        scenario_steps=scenario_steps,
+        story_file=story_file,
+        story_line=story_line
     )
     
     if "error" in result:
