@@ -2,7 +2,7 @@
     "name": "story-trace",
     "displayName": "Story Trace",
     "description": "Story to Scenario to Test to Code traceability with collapsible nested sections",
-    "version": "0.10.2",
+    "version": "0.10.4",
     "publisher": "agilebot",
     "license": "MIT",
     "private": true,
