@@ -17,7 +17,8 @@ class BotPath:
         # Determine workspace directory:
         # 1. Use explicitly passed workspace_path (doesn't persist - for tests)
         # 2. Load from bot_config.json (mcp.env.WORKING_AREA)
-        # 3. Use environment variable (last resort)
+        # 3. Use environment variable (fallback)
+        # 4. Use python workspace root (last resort)
         # NOTE: workspace_directory is independent of bot_directory - don't derive from bot path
         if workspace_path is not None:
             # Explicitly passed - use as-is (for tests, doesn't persist)
@@ -28,8 +29,13 @@ class BotPath:
             if workspace_from_config:
                 self._workspace_directory = workspace_from_config
             else:
-                # Last resort: use environment variable
-                self._workspace_directory = get_workspace_directory()
+                # Fallback to environment variable, then python workspace root
+                env_workspace = os.environ.get('WORKING_AREA')
+                if env_workspace:
+                    self._workspace_directory = Path(env_workspace.strip()).resolve()
+                else:
+                    # Last resort: use python workspace root
+                    self._workspace_directory = self._python_workspace_root
         self._base_actions_directory = self._load_base_actions_directory()
         self._documentation_path = self._load_documentation_path()
 
