@@ -17916,7 +17916,9 @@
                       "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17943,7 +17945,9 @@
                       "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -17970,7 +17974,9 @@
                       "sequential_order": 3.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18010,7 +18016,9 @@
                       "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18032,7 +18040,9 @@
                       "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18054,7 +18064,9 @@
                       "sequential_order": 3.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18076,7 +18088,9 @@
                       "sequential_order": 4.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18116,7 +18130,9 @@
                       "sequential_order": 1.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18138,7 +18154,9 @@
                       "sequential_order": 2.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18160,7 +18178,9 @@
                       "sequential_order": 3.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18182,7 +18202,9 @@
                       "sequential_order": 4.0,
                       "connector": "and",
                       "story_type": "user",
-                      "users": ["Developer"],
+                      "users": [
+                        "Developer"
+                      ],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
@@ -18204,6 +18226,14 @@
               ]
             }
           ],
+          "story_groups": []
+        },
+        {
+          "name": "Child1",
+          "sequential_order": 6.0,
+          "behavior": null,
+          "domain_concepts": [],
+          "sub_epics": [],
           "story_groups": []
         }
       ],

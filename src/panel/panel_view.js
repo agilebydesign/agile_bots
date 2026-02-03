@@ -108,21 +108,17 @@ class PanelView {
         const testDir = path.join(this._workspaceDir, 'test');
         const pythonPath = `${srcDir}${path.delimiter}${testDir}${path.delimiter}${this._workspaceDir}`;
         
-        // Respect WORKING_AREA if already set, UNLESS it's the production repo root
-        // This allows:
-        // - Tests to use temp directories (safe)
-        // - Users to set custom working areas via UI commands (workspace command)
-        // - Prevents accidental use of production repo root in tests
+        // DON'T set WORKING_AREA here - let Python load it from bot_config.json
+        // The Python BotPath class loads WORKING_AREA from:
+        // 1. bot_config.json (mcp.env.WORKING_AREA) - preferred
+        // 2. Environment variable (fallback)
+        // Only pass through existing env WORKING_AREA if explicitly set by tests
         const envWorkingArea = process.env.WORKING_AREA;
-        const workingArea = (envWorkingArea && !isProductionRepoPath(envWorkingArea))
-            ? envWorkingArea 
-            : this._workspaceDir;
         
         const env = {
             ...process.env,
             PYTHONPATH: pythonPath,
             BOT_DIRECTORY: this._botPath,
-            WORKING_AREA: workingArea,
             CLI_MODE: 'json',
             SUPPRESS_CLI_HEADER: '1',            
             IDE: vscode.env.uriScheme.toLowerCase().includes('cursor') ? 'cursor' : 'vscode'

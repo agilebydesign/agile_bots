@@ -1,4 +1,46 @@
 {
-  "_explanation": {},
-  "epics": []
+  "_explanation": {
+    "purpose": "Shape phase - defines the story graph hierarchy structure (epics, sub_epics, story_groups, stories)",
+    "structure": "Hierarchical tree: epics contain sub_epics, sub_epics contain story_groups, story_groups contain stories",
+    "scope": "ONLY defines hierarchy and ordering. Does NOT add users, scenarios, steps, or acceptance criteria (those come in later phases)",
+    "fields": "sequential_order determines display order, connector defines logical relationship (and/or), story_type identifies the kind of story"
+  },
+  "epics": [
+    {
+      "name": "Epic Name",
+      "sequential_order": 1,
+      "sub_epics": [
+        {
+          "name": "Sub Epic Name",
+          "sequential_order": 1,
+          "behavior": "code",
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "name": "",
+              "sequential_order": 1,
+              "type": "and",
+              "connector": "or",
+              "behavior": "code",
+              "stories": [
+                {
+                  "name": "Story Name",
+                  "sequential_order":1,
+                  "connector": "and",
+                  "story_type": "user"
+                },
+                {
+                  "name": "Another Story Name",
+                  "sequential_order":2,
+                  "connector": "and",
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "story_groups": []
+    }
+  ]
 }

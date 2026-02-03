@@ -7,56 +7,73 @@
   },
   "epics": [
     {
-      "name": "",
-      "users": [],
+      "name": "User Management",
+      "users": ["Admin", "End User"],
       "sequential_order": 1,
-      "estimated_stories": null,
+      "estimated_stories": 7,
       "sub_epics": [
         {
-          "name": "",
-          "users": [],
+          "name": "Authentication",
+          "users": ["End User"],
           "sequential_order": 1,
-          "domain_concepts": [
+          "sub_epics": [],
+          "stories": [
             {
-              "name": "",
-              "responsibilities": [
-                {
-                  "name": "",
-                  "collaborators": []
-                }
-              ]
-            }
-          ],
-          "sub_epics": [
-            {
-              "name": "",
-              "users": [],
+              "name": "User Login",
+              "users": ["End User"],
               "sequential_order": 1,
-              "estimated_stories": null,
-              "stories": [
-                {
-                  "name": "",
-                  "users": [],
-                  "sequential_order": 1,
-                  "optional": false,
-                  "priority": 1
-                }
-              ]
+              "optional": false,
+              "priority": 1
+            },
+            {
+              "name": "User Logout",
+              "users": ["End User"],
+              "sequential_order": 2,
+              "optional": false,
+              "priority": 1
+            },
+            {
+              "name": "Password Reset",
+              "users": ["End User"],
+              "sequential_order": 3,
+              "optional": false,
+              "priority": 2
             }
           ]
         },
         {
-          "name": "",
-          "users": [],
-          "sequential_order": 1,
-          "estimated_stories": null,
+          "name": "User Administration",
+          "users": ["Admin"],
+          "sequential_order": 2,
+          "estimated_stories": 4,
           "stories": [
             {
-              "name": "",
-              "users": [],
+              "name": "Create User Account",
+              "users": ["Admin"],
               "sequential_order": 1,
               "optional": false,
               "priority": 1
+            },
+            {
+              "name": "Update User Profile",
+              "users": ["Admin", "End User"],
+              "sequential_order": 2,
+              "optional": false,
+              "priority": 1
+            },
+            {
+              "name": "Delete User Account",
+              "users": ["Admin"],
+              "sequential_order": 3,
+              "optional": false,
+              "priority": 2
+            },
+            {
+              "name": "Assign User Roles",
+              "users": ["Admin"],
+              "sequential_order": 4,
+              "optional": false,
+              "priority": 2
             }
           ]
         }
@@ -65,10 +82,16 @@
   ],
   "increments": [
     {
-      "name": "",
+      "name": "Core User Features",
       "priority": 1,
       "stories": [
-        ""
+        "User Login",
+        "User Logout",
+        "Password Reset",
+        "Create User Account",
+        "Update User Profile",
+        "Delete User Account",
+        "Assign User Roles"
       ]
     }
   ]
