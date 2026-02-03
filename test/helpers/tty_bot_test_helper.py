@@ -335,8 +335,10 @@ class TTYBotTestHelper(CLIBotTestHelper):
     def __init__(self, tmp_path: Path):
         super().__init__(tmp_path, mode='tty')
         self.bot = TTYBotHelper(self)
+        #cooment
         self.instructions = TTYInstructionsHelper(self)
         self.scope = TTYScopeHelper(self)
         self.navigation = TTYNavigationHelper(self)
         self.help = TTYHelpHelper(self)
+        self.behaviors = TTYBehaviorsHelper(self)
         self.behaviors = TTYBehaviorsHelper(self)
