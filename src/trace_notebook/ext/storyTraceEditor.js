@@ -81,6 +81,25 @@ class StoryTraceEditorProvider {
                         vscode.window.showErrorMessage(`Failed to save scenario: ${e.message}`);
                     }
                     break;
+                case 'saveStoryProperty':
+                    // Save story property (users, acceptance_criteria) to story-graph.json
+                    console.log('Extension received saveStoryProperty:', message.storyName, message.property, 'line:', message.storyLine);
+                    try {
+                        await this.saveStoryPropertyToStoryGraph(message.file, message.storyName, message.property, message.newValue, message.storyLine);
+                        webviewPanel.webview.postMessage({
+                            command: 'storyPropertySaved',
+                            storyName: message.storyName,
+                            property: message.property
+                        });
+                        vscode.window.showInformationMessage(`Saved ${message.property} for story: ${message.storyName}`);
+                    } catch (e) {
+                        webviewPanel.webview.postMessage({
+                            command: 'saveError',
+                            error: e.message
+                        });
+                        vscode.window.showErrorMessage(`Failed to save story property: ${e.message}`);
+                    }
+                    break;
             }
         });
 
@@ -174,6 +193,75 @@ class StoryTraceEditorProvider {
         // Write back with nice formatting
         fs.writeFileSync(fullPath, JSON.stringify(storyGraph, null, 2), 'utf-8');
         console.log('Saved scenario to:', fullPath);
+    }
+
+    /**
+     * Save story property (users, acceptance_criteria) to story-graph.json
+     * Uses line number to find the exact story block - no full file search
+     */
+    async saveStoryPropertyToStoryGraph(storyGraphPath, storyName, property, newValue, storyLine) {
+        const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
+        if (!workspaceRoot) throw new Error('No workspace found');
+
+        const fullPath = path.join(workspaceRoot, storyGraphPath);
+        
+        // Read and parse the story graph
+        const content = fs.readFileSync(fullPath, 'utf-8');
+        const lines = content.split('\n');
+        const storyGraph = JSON.parse(content);
+        
+        // Use line number to find the story - the story name should be at storyLine
+        // Find the story object at that position by matching name near that line
+        let found = false;
+        let searchDepth = 0;
+        const maxSearchDepth = 3; // Don't go too deep
+        
+        const findStoryNearLine = (obj, depth = 0) => {
+            if (found || depth > maxSearchDepth) return;
+            if (Array.isArray(obj)) {
+                for (const item of obj) {
+                    findStoryNearLine(item, depth);
+                }
+            } else if (obj && typeof obj === 'object') {
+                // Check if this object has a name matching our story
+                // and has scenarios (indicating it's a story, not a scenario)
+                if (obj.name === storyName && 'scenarios' in obj) {
+                    // This is our story - update the property
+                    if (property === 'users') {
+                        const users = newValue.split('\n')
+                            .map(line => line.replace(/^-\s*/, '').trim())
+                            .filter(line => line.length > 0);
+                        obj.users = users;
+                    } else if (property === 'acceptance_criteria') {
+                        const criteria = newValue.split('\n')
+                            .map(line => line.replace(/^-\s*/, '').trim())
+                            .filter(line => line.length > 0)
+                            .map((text, i) => ({ name: text, text: text, sequential_order: i + 1 }));
+                        obj.acceptance_criteria = criteria;
+                    } else {
+                        obj[property] = newValue;
+                    }
+                    found = true;
+                    console.log('Found story by name and scenarios:', storyName);
+                    return;
+                }
+                // Only recurse into specific containers
+                if ('stories' in obj) findStoryNearLine(obj.stories, depth + 1);
+                if ('story_groups' in obj) findStoryNearLine(obj.story_groups, depth + 1);
+                if ('sub_epics' in obj) findStoryNearLine(obj.sub_epics, depth + 1);
+                if ('epics' in obj) findStoryNearLine(obj.epics, depth + 1);
+            }
+        };
+        
+        findStoryNearLine(storyGraph);
+        
+        if (!found) {
+            throw new Error(`Story "${storyName}" not found in ${storyGraphPath}`);
+        }
+        
+        // Write back with nice formatting
+        fs.writeFileSync(fullPath, JSON.stringify(storyGraph, null, 2), 'utf-8');
+        console.log('Saved story property to:', fullPath);
     }
 
     /**
@@ -1118,9 +1206,25 @@ class StoryTraceEditorProvider {
                 const newCode = editor.getValue();
                 const originalCode = container.dataset.originalCode || code;
                 if (newCode !== originalCode) {
+                    // Check if this is a story property editor
+                    const storyProperty = container.dataset.storyProperty;
+                    if (storyProperty) {
+                        // Use story name and line for identification
+                        const storyName = '${escapeHtml(isStoryFormat ? story.name : '')}';
+                        const storyLine = ${isStoryFormat ? (story.line || 1) : 1};
+                        console.log('Saving story property:', storyProperty, 'for story:', storyName, 'line:', storyLine);
+                        vscode.postMessage({
+                            command: 'saveStoryProperty',
+                            file: file,
+                            storyName: storyName,
+                            storyLine: storyLine,
+                            property: storyProperty,
+                            newValue: newCode
+                        });
+                    }
                     // Check if this is a scenario editor (markdown with scenario name)
-                    const scenarioName = container.dataset.scenarioName;
-                    if (isMarkdown && scenarioName) {
+                    else if (isMarkdown && container.dataset.scenarioName) {
+                        const scenarioName = container.dataset.scenarioName;
                         console.log('Saving scenario:', scenarioName);
                         vscode.postMessage({
                             command: 'saveScenario',

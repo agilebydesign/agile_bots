@@ -3,8 +3,9 @@
     "name": "Display Rules Using CLI",
     "story_type": "user",
     "users": "- User",
-    "acceptance_criteria": "",
+    "acceptance_criteria": "- hello\n",
     "behavior": "exploration",
+    "test_class": "TestDisplayRulesUsingCLI",
     "file": "docs/stories/story-graph.json",
     "line": 16952
   },
