@@ -1,0 +1,35 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../demo"
+		},
+		{
+			"path": "../../../MIMS"
+		},
+		{
+			"path": "../../../onboarding_credit"
+		}
+	],
+	"settings": {
+		"python.languageServer": "None",
+		"testing.automaticallyOpenPeekView": "failureInVisibleDocument",
+		"workbench.colorTheme": "Cursor Dark High Contrast",
+		"workbench.colorCustomizations": {
+			"editorCursor.foreground": "#000000",
+			"editorCursor.background": "#ffffff",
+			"editor.selectionBackground": "#264f78",
+			"editor.lineHighlightBackground": "#2b2b2b"
+		},
+		"editor.tokenColorCustomizations": {
+			"textMateRules": []
+		},
+		"files.associations": {
+			"*.mdc": "markdown"
+		},
+		"testing.automaticallyOpenTestResults": "neverOpen",
+		"powershell.cwd": "agile_bots"
+	}
+}

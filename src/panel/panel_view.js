@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const vscode = require("vscode");
+const branding = require('./branding');
 
 /**
  * Check if a path is a temp directory

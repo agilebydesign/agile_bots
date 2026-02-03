@@ -166,14 +166,7 @@ class TestDisplayRulesUsingCLI:
         JsonBotTestHelper
     ])
     def test_rules_action_shows_rules_digest(self, tmp_path, helper_class):
-        """
-        SCENARIO: Rules action shows rules digest in CLI output
-        GIVEN: CLI is at shape.validate (which shows rules)
-        WHEN: user navigates to shape.validate
-        THEN: CLI output contains formatted rules digest
-        
-        Domain: test_action_loads_and_formats_rules_digest (adapted - using validate instead of rules action)
-        """
+
         # Given
         helper = helper_class(tmp_path)
         
