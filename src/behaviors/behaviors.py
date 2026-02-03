@@ -308,6 +308,7 @@ class Behaviors:
         try:
             state_data = json.loads(state_file.read_text(encoding='utf-8'))
             behavior_name = self._extract_behavior_name_from_state(state_data.get('current_behavior', ''))
+
             if behavior_name:
                 idx = self._find_behavior_index(behavior_name)
                 if idx >= 0:
@@ -317,6 +318,8 @@ class Behaviors:
                     return
             self._init_to_first_behavior()
         except Exception:
+            self._init_to_first_behavior()
+
             self._init_to_first_behavior()
 
     def initialize_state(self, confirmed_behavior: str):

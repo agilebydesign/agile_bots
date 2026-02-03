@@ -13,9 +13,9 @@ class StateTestHelper(BaseTestHelper):
     """Helper for state management - setting/getting/asserting state files."""
     
     def set_state(self, behavior: str, action: str, completed_actions: list = None):
-        """Set bot state to specific behavior/action."""
+       
         from datetime import datetime
-        
+        #comment
         state_data = {
             'current_behavior': f'story_bot.{behavior}',
             'current_action': f'story_bot.{behavior}.{action}',

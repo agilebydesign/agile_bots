@@ -52,6 +52,11 @@
     "**/agile_bot/legacy": true,
     "**/agile_bot/backups": true
   },
+  
+  "npm.exclude": [
+    "**/src/trace_notebook/ext/**",
+    "**/src/panel/**"
+  ],
   "python-envs.defaultEnvManager": "ms-python.python:system",
   "python-envs.pythonProjects": [],
   "testing.automaticallyOpenTestResults": "neverOpen"
