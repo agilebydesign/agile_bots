@@ -64,6 +64,7 @@ class ScanFilesContext(ScanContext):
         return self.files.test_files
     
     @property
+
     def code_files(self) -> List[Path]:
         return self.files.code_files
 
