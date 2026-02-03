@@ -2139,8 +2139,85 @@
                       "behavior": "code"
                     },
                     {
-                      "name": "Exit CLI REPL",
+                      "name": "Apply Visual Branding",
                       "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "Panel"
+                      ],
+                      "test_class": null,
+                      "scenarios": [
+                        {
+                          "name": "Panel applies default Agile By Design branding when no config entry exists",
+                          "sequential_order": 1.0,
+                          "type": "edge",
+                          "background": [],
+                          "test_method": "test_panel_applies_default_agile_by_design_branding_when_no_config_entry_exists",
+                          "steps": "GIVEN: Config file missing OR branding property not set OR repo root not set\nWHEN: Panel initializes with workspace root\nTHEN: Branding module logs warning about missing config\nAND: Branding module returns default ABD settings\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #000000 (dark background)\nAND: Panel injects --text-color as #FFFFFF\nAND: Panel injects --accent-color as #FF8C00 (orange)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Bots' as product name\nAND: Header loads images from default img/ directory\nBUT: Panel does not crash or show error"
+                        },
+                        {
+                          "name": "Panel applies Scotia branding when config specifies Scotia brand",
+                          "sequential_order": 2.0,
+                          "type": "happy",
+                          "background": [],
+                          "test_method": "test_panel_applies_scotia_branding_when_config_specifies_scotia_brand",
+                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'Scotia'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Branding module caches config for subsequent calls\nAND: Panel logs 'Scotia' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #FFFFFF (light background)\nAND: Panel injects --text-color as #000000\nAND: Panel injects --accent-color as #EC111A (Scotia red)\nAND: Panel injects --font-weight-normal as 600\nAND: Panel sets --hover-bg to dark overlay for light background\nWHEN: Header view renders\nTHEN: Header displays 'Scotia Bots' as product name\nAND: Header applies Scotia red to title style\nAND: Header loads images from img/scotia/ subdirectory"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Panel initializes THEN Panel loads branding config from conf/config.json",
+                          "text": "WHEN Panel initializes THEN Panel loads branding config from conf/config.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN branding property specifies brand name THEN Panel activates that brand's settings",
+                          "text": "WHEN branding property specifies brand name THEN Panel activates that brand's settings",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN Panel generates webview THEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
+                          "text": "WHEN Panel generates webview THEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN brand has path property THEN Panel loads images from that subdirectory",
+                          "text": "WHEN brand has path property THEN Panel loads images from that subdirectory",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN Header renders THEN Header displays product name from brand title AND applies brand accent color to title",
+                          "text": "WHEN Header renders THEN Header displays product name from brand title AND applies brand accent color to title",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "WHEN config file missing THEN Panel uses default ABD branding BUT does not crash",
+                          "text": "WHEN config file missing THEN Panel uses default ABD branding BUT does not crash",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "WHEN background is light (#FFFFFF) THEN Panel uses dark overlays for hover states",
+                          "text": "WHEN background is light (#FFFFFF) THEN Panel uses dark overlays for hover states",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "WHEN background is dark (#000000) THEN Panel uses light overlays for hover states",
+                          "text": "WHEN background is dark (#000000) THEN Panel uses light overlays for hover states",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "WHEN branding loads THEN branding caches config for subsequent calls",
+                          "text": "WHEN branding loads THEN branding caches config for subsequent calls",
+                          "sequential_order": 9.0
+                        }
+                      ],
+                      "behavior": "exploration",
+                      "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Apply Visual Branding.md"
+                    },
+                    {
+                      "name": "Exit CLI REPL",
+                      "sequential_order": 4.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -16922,7 +16999,13 @@
                           "steps": ""
                         }
                       ],
-                      "acceptance_criteria": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "hello",
+                          "text": "hello",
+                          "sequential_order": 1.0
+                        }
+                      ],
                       "behavior": "exploration"
                     },
                     {
@@ -17807,6 +17890,321 @@
               ]
             }
           ]
+        },
+        {
+          "name": "Trace Story Graph",
+          "sequential_order": 5.0,
+          "behavior": "shape",
+          "domain_concepts": [],
+          "sub_epics": [
+            {
+              "name": "Trace Story",
+              "sequential_order": 1.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Display Stories",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer opens strace file",
+                          "text": "WHEN Developer opens strace file",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story properties display (name, users, acceptance criteria)",
+                          "text": "THEN story properties display (name, users, acceptance criteria)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND nested scenarios display under story",
+                          "text": "AND nested scenarios display under story",
+                          "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Edit Stories in Trace Editor",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer modifies story field",
+                          "text": "WHEN Developer modifies story field",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "text": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "AND JSON structure preserves",
+                          "text": "AND JSON structure preserves",
+                          "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Open Story Source",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on story",
+                          "text": "WHEN Developer clicks Open on story",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story-graph.json opens at story name line",
+                          "text": "THEN story-graph.json opens at story name line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trace Scenario",
+              "sequential_order": 2.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Display Scenario Steps",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer views scenario",
+                          "text": "WHEN Developer views scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN scenario steps display in given/when/then format",
+                          "text": "THEN scenario steps display in given/when/then format",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Display Test for Scenario",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer views scenario",
+                          "text": "WHEN Developer views scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN linked test method and file path display",
+                          "text": "THEN linked test method and file path display",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Edit Scenarios in Trace Editor",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer modifies scenario steps",
+                          "text": "WHEN Developer modifies scenario steps",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "text": "THEN changes save to story-graph.json (on blur/Ctrl+S)",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Open Scenario Source",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on scenario",
+                          "text": "WHEN Developer clicks Open on scenario",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN story-graph.json opens at scenario line",
+                          "text": "THEN story-graph.json opens at scenario line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trace Code",
+              "sequential_order": 3.0,
+              "behavior": "shape",
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "and",
+                  "behavior": "shape",
+                  "stories": [
+                    {
+                      "name": "Generate Code Trace",
+                      "sequential_order": 1.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer opens strace for test",
+                          "text": "WHEN Developer opens strace for test",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN call hierarchy generates from test method",
+                          "text": "THEN call hierarchy generates from test method",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Display Code Hierarchy",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN trace generates",
+                          "text": "WHEN trace generates",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN nested call tree displays with function/method names",
+                          "text": "THEN nested call tree displays with function/method names",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Load Code Snippet",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer expands code node",
+                          "text": "WHEN Developer expands code node",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN lazy-loaded source displays with line numbers",
+                          "text": "THEN lazy-loaded source displays with line numbers",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    },
+                    {
+                      "name": "Navigate to Source",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": ["Developer"],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Developer clicks Open on code node",
+                          "text": "WHEN Developer clicks Open on code node",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "THEN source file opens at specific line",
+                          "text": "THEN source file opens at specific line",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": "shape"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "story_groups": []
         }
       ],
       "story_groups": []

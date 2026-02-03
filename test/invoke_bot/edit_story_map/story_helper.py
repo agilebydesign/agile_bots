@@ -16,16 +16,7 @@ class StoryTestHelper(BaseHelper):
         return self.parent.bot
     
     def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:
-        """Create test story-graph.json in workspace and load into bot.story_graph.
         
-        Args:
-            graph_data: Story graph dict (default: {'epics': []})
-            docs_path: Relative path from workspace to docs directory
-            filename: Story graph filename
-        
-        Returns:
-            Path to created story graph file
-        """
         if graph_data is None:
             graph_data = {'epics': []}
         

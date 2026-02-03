@@ -1,0 +1,50 @@
+{
+    "name": "story-trace",
+    "displayName": "Story Trace",
+    "description": "Story to Scenario to Test to Code traceability with collapsible nested sections",
+    "version": "0.10.4",
+    "publisher": "agilebot",
+    "license": "MIT",
+    "private": true,
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./extension.js",
+    "contributes": {
+        "customEditors": [
+            {
+                "viewType": "storyTrace.editor",
+                "displayName": "Story Trace",
+                "selector": [
+                    {
+                        "filenamePattern": "*.strace"
+                    }
+                ],
+                "priority": "default"
+            }
+        ],
+        "commands": [
+            {
+                "command": "trace.open",
+                "title": "Open Story Trace",
+                "category": "Trace"
+            },
+            {
+                "command": "trace.regenerate",
+                "title": "Regenerate Trace",
+                "category": "Trace"
+            }
+        ]
+    },
+    "activationEvents": [
+        "onCustomEditor:storyTrace.editor"
+    ],
+    "scripts": {
+        "package": "vsce package --allow-missing-repository",
+        "install-ext": "powershell -File trace_bump_and_install_cursor.ps1"
+    },
+    "devDependencies": {}
+}
