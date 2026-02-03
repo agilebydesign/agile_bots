@@ -136,7 +136,7 @@ class TestLoadBotBehaviors:
             behavior=behavior,
             expected_name='prioritization',
             expected_order=2,
-            expected_actions=['clarify', 'strategy', 'validate', 'render'],
+            expected_actions=['clarify', 'strategy', 'build', 'validate', 'render'],
             expected_description='Organize stories into delivery increments based on business value, dependencies, and risk'
         )
 
@@ -561,7 +561,7 @@ class TestLoadBotBehaviorsUsingCLI:
             behavior=behavior,
             expected_name='prioritization',
             expected_order=2,
-            expected_actions=['clarify', 'strategy', 'validate', 'render'],
+            expected_actions=['clarify', 'strategy', 'build', 'validate', 'render'],
             expected_description='Organize stories into delivery increments based on business value, dependencies, and risk'
         )
 
