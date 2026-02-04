@@ -663,9 +663,15 @@ class InstructionsSection extends PanelView {
                 const answerText = typeof item === 'object' ? (item.answer || '') : '';
                 
                 if (questionText) {
-                    html += `<div class="input-container" style="margin-top: ${idx > 0 ? '12px' : '0'};">`;
-                    html += `<div class="input-header">${this.escapeHtml(questionText)}</div>`;
-                    html += `<textarea id="clarify-answer-${idx}" data-question="${this.escapeForAttribute(questionText)}" rows="3" onblur="saveClarifyAnswers()" style="width: 100%; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(answerText)}</textarea>`;
+                    const hasAnswer = answerText && answerText.trim().length > 0;
+                    const isLongAnswer = hasAnswer && answerText.length > 100;
+                    const collapsedHeight = '60px';
+                    html += `<div class="input-container qa-container" style="margin-top: ${idx > 0 ? '12px' : '0'}; position: relative;">`;
+                    html += `<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;">`;
+                    html += `<span style="flex: 1; padding-right: 8px;">${this.escapeHtml(questionText)}</span>`;
+                    html += `<button onclick="toggleQAExpand(${idx})" id="qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">${isLongAnswer ? '▼' : '▲'}</button>`;
+                    html += `</div>`;
+                    html += `<textarea id="clarify-answer-${idx}" data-question="${this.escapeForAttribute(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${isLongAnswer ? collapsedHeight : 'auto'}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${isLongAnswer ? 'hidden' : 'visible'};" data-collapsed="${isLongAnswer ? 'true' : 'false'}">${this.escapeHtml(answerText)}</textarea>`;
                     html += `</div>`;
                 }
             });
@@ -697,7 +703,7 @@ class InstructionsSection extends PanelView {
                     .join('\n');
             }
             
-            html += `<textarea id="clarify-evidence" rows="3" onblur="saveClarifyEvidence()" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(providedText)}</textarea>`;
+            html += `<textarea id="clarify-evidence" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(providedText)}</textarea>`;
             html += '</div>';
             html += '</div>';
         }
@@ -785,7 +791,7 @@ class InstructionsSection extends PanelView {
         const assumptionsText = assumptionsMade.length > 0
             ? assumptionsMade.join('\n')
             : '';
-        html += `<textarea id="strategy-assumptions" rows="5" onblur="saveStrategyAssumptions()" placeholder="Enter assumptions (one per line)" style="width: 100%; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(assumptionsText)}</textarea>`;
+        html += `<textarea id="strategy-assumptions" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(assumptionsText)}</textarea>`;
         html += '</div>';
 
         return html;

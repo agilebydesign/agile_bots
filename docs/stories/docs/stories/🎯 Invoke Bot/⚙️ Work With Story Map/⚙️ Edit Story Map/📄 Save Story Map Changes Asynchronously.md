@@ -140,6 +140,7 @@ And Panel displays <node_type> <node_name> at position <target_position>
 ```
 
 **Examples:**
+
 | parent_node_type | parent_node_name | node_type | node_name | original_position | target_position | status_indicator | operation_count | debounce_time | success_indicator | success_message | auto_hide_time |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Epic | Invoke Bot | SubEpic | Edit Story Map | 1 | 3 | spinner icon | 1 operation | 500ms | green checkmark | Saved | 2 seconds |
@@ -173,6 +174,7 @@ And Panel displays <node_type> named <new_name>
 ```
 
 **Examples:**
+
 | parent_node_type | parent_node_name | node_type | original_name | new_name | status_indicator | operation_count | debounce_time | success_indicator | success_message | auto_hide_time |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Epic | Invoke Bot | SubEpic | Edit Story Map | Modify Story Map | spinner icon | 1 operation | 500ms | green checkmark | Saved | 2 seconds |
@@ -206,6 +208,7 @@ And Panel confirms <node_type> <node_name> no longer exists
 ```
 
 **Examples:**
+
 | parent_node_type | parent_node_name | node_type | node_name | node_position | status_indicator | operation_count | debounce_time | success_indicator | success_message | auto_hide_time |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SubEpic | Edit Story Map | Story | Deprecated Story Example | 8 | spinner icon | 1 operation | 500ms | green checkmark | Saved | 2 seconds |
@@ -239,6 +242,7 @@ And Panel displays <node_type> <new_node_name> under <parent_node_type>
 ```
 
 **Examples:**
+
 | parent_node_type | parent_node_name | node_type | new_node_name | status_indicator | operation_count | debounce_time | success_indicator | success_message | auto_hide_time |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Epic | Invoke Bot | SubEpic | Export Story Map | spinner icon | 1 operation | 500ms | green checkmark | Saved | 2 seconds |
@@ -277,6 +281,7 @@ And Panel confirms <story_name_c> no longer exists
 ```
 
 **Examples:**
+
 | epic_name | sub_epic_name | story_name_a | pos_a | new_pos_a | story_name_b | new_name_b | pos_b | story_name_c | pos_c | batch_window | status_indicator | batch_message | debounce_time | operation_count | success_indicator | success_message |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Invoke Bot | Edit Story Map | Save Story Map Changes Asynchronously | 0 | 2 | Filter Scope | Apply Scope Filter | 1 | Deprecated Feature X | 3 | 500ms | spinner icon | Saving 3 changes... | 500ms | 3 | green checkmark | Saved |
@@ -308,6 +313,7 @@ And Panel shows error details: <error_details>
 ```
 
 **Examples:**
+
 | parent_node_type | parent_node_name | node_type | original_name | invalid_name | status_indicator | debounce_time | error_type | error_message | error_indicator | error_display_message | error_details |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | SubEpic | Edit Story Map | Story | Save Story Map Changes Asynchronously |  | spinner icon | 500ms | validation | Story name cannot be empty | red X icon | Save failed - click for details | ValidationError: Story name is required and cannot be empty string |

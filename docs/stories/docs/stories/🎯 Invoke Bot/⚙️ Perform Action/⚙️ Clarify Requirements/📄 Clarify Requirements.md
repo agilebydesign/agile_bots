@@ -78,7 +78,7 @@ Then Questions and evidence are loaded correctly
 
 
 <a id="scenario-guardrails-loads-strategy-assumptions-from-workspace"></a>
-### Scenario: [Guardrails loads strategy assumptions from workspace](#scenario-guardrails-loads-strategy-assumptions-from-workspace) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L162)
+### Scenario: [Guardrails loads strategy assumptions from workspace](#scenario-guardrails-loads-strategy-assumptions-from-workspace) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L173)
 
 **Steps:**
 ```gherkin
