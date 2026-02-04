@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6.2.0
       with:
-        pip-install: requirements.txt
+        pip-install: -r requirements.txt
       
     - name: Install Node.js
       uses: actions/setup-node@v4
@@ -28,4 +28,4 @@ jobs:
       run: npm install
 
     - name: Run NPM Tests
-      run: npm run test
+      run: npm test
