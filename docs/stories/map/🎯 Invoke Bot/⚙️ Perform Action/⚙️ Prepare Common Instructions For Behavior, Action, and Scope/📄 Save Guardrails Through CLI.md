@@ -1,10 +1,10 @@
 # 📄 Save Guardrails Through CLI
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/perform_action/test_prepare_common_instructions_for_behavior_action_and_scope.py#L474)
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Perform Action](..) / [⚙️ Prepare Common Instructions For Behavior, Action, and Scope](.)  
-**Sequential Order:** 8.0
+**Sequential Order:** 9.0
 **Story Type:** user
 
 ## Story Description
@@ -28,7 +28,7 @@ Save Guardrails Through CLI functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-save-answers-via-cli-command"></a>
-### Scenario: [Save answers via CLI command](#scenario-save-answers-via-cli-command) ()
+### Scenario: [Save answers via CLI command](#scenario-save-answers-via-cli-command) ()  | [Test](/test/invoke_bot/perform_action/test_prepare_common_instructions_for_behavior_action_and_scope.py#L487)
 
 **Steps:**
 ```gherkin
@@ -40,7 +40,7 @@ AND: clarification.json is updated
 
 
 <a id="scenario-save-decisions-via-cli-command"></a>
-### Scenario: [Save decisions via CLI command](#scenario-save-decisions-via-cli-command) ()
+### Scenario: [Save decisions via CLI command](#scenario-save-decisions-via-cli-command) ()  | [Test](/test/invoke_bot/perform_action/test_prepare_common_instructions_for_behavior_action_and_scope.py#L517)
 
 **Steps:**
 ```gherkin

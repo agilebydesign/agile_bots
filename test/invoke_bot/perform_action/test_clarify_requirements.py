@@ -144,9 +144,20 @@ class TestClarifyRequirements:
         WHEN: Behavior loads guardrails
         THEN: Questions and evidence are loaded correctly
         """
-        # Given: Workspace with guardrails files
-        helper = BotTestHelper(tmp_path)
+        # Given: Workspace with guardrails files (use custom bot_directory to avoid writing to production)
+        helper = BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot')
         behavior_name = 'shape'
+        
+        # Create behavior.json for the custom bot directory
+        behavior_dir = helper.bot_directory / 'behaviors' / behavior_name
+        behavior_dir.mkdir(parents=True, exist_ok=True)
+        behavior_config = behavior_dir / 'behavior.json'
+        behavior_config.write_text(json.dumps({
+            'name': behavior_name,
+            'description': 'Test behavior',
+            'actions': ['clarify']
+        }, indent=2), encoding='utf-8')
+        
         helper.clarify.given_guardrails_in_workspace(behavior_name)
         
         # When: Behavior loads guardrails from workspace
@@ -166,9 +177,20 @@ class TestClarifyRequirements:
         WHEN: Behavior loads guardrails
         THEN: Strategy assumptions are loaded correctly
         """
-        # Given: Workspace with strategy guardrails files
-        helper = BotTestHelper(tmp_path)
+        # Given: Workspace with strategy guardrails files (use custom bot_directory to avoid writing to production)
+        helper = BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot')
         behavior_name = 'shape'
+        
+        # Create behavior.json for the custom bot directory
+        behavior_dir = helper.bot_directory / 'behaviors' / behavior_name
+        behavior_dir.mkdir(parents=True, exist_ok=True)
+        behavior_config = behavior_dir / 'behavior.json'
+        behavior_config.write_text(json.dumps({
+            'name': behavior_name,
+            'description': 'Test behavior',
+            'actions': ['strategy']
+        }, indent=2), encoding='utf-8')
+        
         helper.strategy.given_strategy_guardrails_in_workspace(behavior_name)
         
         # When: Behavior loads guardrails from workspace

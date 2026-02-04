@@ -13,13 +13,27 @@ def _setup_build_action_prerequisites(bot_directory: Path, behavior: str = 'expl
     Creates the knowledge graph directory structure and basic config/template files
     that BuildAction expects to find.
     
+    IMPORTANT: This function writes to bot_directory. To avoid writing to production,
+    ensure BotTestHelper was initialized with a custom bot_directory parameter.
+    
     Args:
         bot_directory: Path to bot directory
         behavior: Name of the behavior (default: 'exploration')
     
     Returns:
         Path to the knowledge graph directory
+        
+    Raises:
+        ValueError: If trying to write to production story_bot directory
     """
+    # Guard against writing to production
+    bot_dir_str = str(bot_directory).replace('\\', '/')
+    if 'bots/story_bot' in bot_dir_str and 'tmp' not in bot_dir_str.lower():
+        raise ValueError(
+            f"SAFETY: Cannot write to production bot directory: {bot_directory}. "
+            "Use BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot') for tests that write to bot files."
+        )
+    
     # Create knowledge graph directory structure
     kg_dir = bot_directory / 'behaviors' / behavior / 'knowledge_graph'
     kg_dir.mkdir(parents=True, exist_ok=True)

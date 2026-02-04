@@ -141,6 +141,7 @@ class BotHeaderView extends PanelView {
         const refreshIconPath = branding.getImageUri(this.webview, this.extensionUri, 'refresh.png');
         const storyIconPath = branding.getImageUri(this.webview, this.extensionUri, 'story.png');
         const crcIconPath = branding.getImageUri(this.webview, this.extensionUri, 'crc.png');
+        const folderBrowseIconPath = branding.getImageUri(this.webview, this.extensionUri, 'folder_browse.png');
         
         console.log('[BotHeaderView] Branding:', branding.getBranding());
         console.log('[BotHeaderView] Company icon URI:', imagePath);
@@ -190,12 +191,16 @@ class BotHeaderView extends PanelView {
                 <div class="card-secondary" style="padding: 1px 5px 2px 5px;">
                     <div class="input-container" style="margin-top: 0;">
                         <div class="input-header">Workspace</div>
-                        <input type="text" id="workspacePathInput" 
-                               value="${safeWorkspaceDir}" 
-                               placeholder="Path to workspace"
-                               onchange="updateWorkspace(this.value)"
-                               onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
-                               title="${safeWorkspaceDir}" />
+                        <div style="display: flex; gap: 4px; align-items: center;">
+                            <input type="text" id="workspacePathInput" 
+                                   value="${safeWorkspaceDir}" 
+                                   placeholder="Path to workspace"
+                                   style="flex: 1;"
+                                   onchange="updateWorkspace(this.value)"
+                                   onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
+                                   title="${safeWorkspaceDir}" />
+                            <button onclick="browseWorkspace()" title="Browse for folder" style="padding: 0; min-width: auto; display: flex; align-items: center; background: transparent; border: none;">${folderBrowseIconPath ? `<img src="${folderBrowseIconPath}" alt="Browse" style="width: 36px; height: 36px;" />` : '📁'}</button>
+                        </div>
                     </div>
                     <div class="info-display" style="margin-top: 4px;" title="${safeBotDir}">
                         <span class="label">Bot Path:</span>

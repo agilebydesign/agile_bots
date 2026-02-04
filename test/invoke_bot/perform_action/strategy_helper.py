@@ -16,12 +16,26 @@ class StrategyTestHelper(BaseHelper):
         Guardrails are templates: typical assumptions available for selection.
         They do NOT contain chosen assumptions - those go in workspace clarification.json.
         
+        IMPORTANT: This method writes to bot_directory. To avoid writing to production,
+        ensure BotTestHelper was initialized with a custom bot_directory parameter.
+        
         Args:
             behavior_name: Behavior name (e.g., 'shape', 'discovery')
             
         Returns:
             Path to assumptions file
+            
+        Raises:
+            ValueError: If trying to write to production story_bot directory
         """
+        # Guard against writing to production
+        bot_dir_str = str(self.parent.bot_directory).replace('\\', '/')
+        if 'bots/story_bot' in bot_dir_str and 'tmp' not in bot_dir_str.lower():
+            raise ValueError(
+                f"SAFETY: Cannot write guardrails to production bot directory: {self.parent.bot_directory}. "
+                "Use BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot') for tests that write to bot files."
+            )
+        
         # Fixed sample strategy assumptions (available options - not chosen yet)
         sample_assumptions = [
             'Focus on user flow over internal systems',
@@ -34,6 +48,19 @@ class StrategyTestHelper(BaseHelper):
         
         assumptions_file = guardrails_dir / 'typical_assumptions.json'
         assumptions_file.write_text(json.dumps({'typical_assumptions': sample_assumptions}, indent=2), encoding='utf-8')
+        
+        # Create decision_criteria directory with sample criteria file
+        decision_criteria_dir = guardrails_dir / 'decision_criteria'
+        decision_criteria_dir.mkdir(parents=True, exist_ok=True)
+        
+        sample_criteria = {
+            'approach': {
+                'question': 'What development approach should we use?',
+                'options': ['iterative', 'waterfall', 'hybrid']
+            }
+        }
+        criteria_file = decision_criteria_dir / 'approach.json'
+        criteria_file.write_text(json.dumps(sample_criteria, indent=2), encoding='utf-8')
         
         return assumptions_file
     

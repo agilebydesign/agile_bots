@@ -185,8 +185,13 @@ class JSONScope(JSONAdapter):
         if test_file and test_class:
             test_file_path = test_dir / test_file
             if test_file_path.exists():
-                from utils import find_test_class_line
-                line_number = find_test_class_line(test_file_path, test_class)
+                # Use JS-specific function for .js files, Python AST for .py files
+                if test_file_path.suffix == '.js':
+                    from utils import find_js_test_class_line
+                    line_number = find_js_test_class_line(test_file_path, test_class)
+                else:
+                    from utils import find_test_class_line
+                    line_number = find_test_class_line(test_file_path, test_class)
                 
                 if line_number:
                     test_url = f"{test_file_path}#L{line_number}"
@@ -207,8 +212,13 @@ class JSONScope(JSONAdapter):
         if story_test_file and test_method:
             test_file_path = test_dir / story_test_file
             if test_file_path.exists():
-                from utils import find_test_method_line
-                line_number = find_test_method_line(test_file_path, test_method)
+                # Use JS-specific function for .js files, Python AST for .py files
+                if test_file_path.suffix == '.js':
+                    from utils import find_js_test_method_line
+                    line_number = find_js_test_method_line(test_file_path, test_method)
+                else:
+                    from utils import find_test_method_line
+                    line_number = find_test_method_line(test_file_path, test_method)
                 
                 if line_number:
                     test_url = f"{test_file_path}#L{line_number}"
