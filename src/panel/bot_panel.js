@@ -473,6 +473,36 @@ class BotPanel {
                 });
             }
             return;
+          case "browseWorkspace":
+            this._log('[BotPanel] Received browseWorkspace message');
+            vscode.window.showOpenDialog({
+              canSelectFiles: false,
+              canSelectFolders: true,
+              canSelectMany: false,
+              openLabel: 'Select Workspace Folder'
+            }).then((folders) => {
+              if (folders && folders.length > 0) {
+                const folderPath = folders[0].fsPath;
+                this._log('[BotPanel] User selected folder: ' + folderPath);
+                // Update the workspace input in the webview
+                this._panel.webview.postMessage({
+                  command: 'setWorkspacePath',
+                  path: folderPath
+                });
+                // Trigger workspace update
+                this._botView?.handleEvent('updateWorkspace', { workspacePath: folderPath })
+                  .then((result) => {
+                    this._log('[BotPanel] browseWorkspace updateWorkspace result: ' + JSON.stringify(result));
+                    this._workspaceRoot = folderPath;
+                    return this._update();
+                  })
+                  .catch((error) => {
+                    this._log('[BotPanel] ERROR browseWorkspace: ' + error.message);
+                    vscode.window.showErrorMessage(`Failed to update workspace: ${error.message}`);
+                  });
+              }
+            });
+            return;
           case "switchBot":
             if (message.botName) {
               this._botView?.headerView?.handleEvent('switchBot', { botName: message.botName })
@@ -2135,6 +2165,11 @@ class BotPanel {
         .text-input:focus {
             outline: none;
         }
+        input[type="text"].drag-over {
+            background-color: var(--vscode-editor-selectionBackground, rgba(255, 140, 0, 0.2));
+            border: 1px dashed var(--vscode-focusBorder, #ff8c00);
+            box-shadow: 0 0 4px rgba(255, 140, 0, 0.4);
+        }
         
         button {
             background-color: var(--vscode-button-background);
@@ -3145,6 +3180,13 @@ class BotPanel {
             });
         }
         
+        function browseWorkspace() {
+            console.log('[WebView] browseWorkspace called');
+            vscode.postMessage({
+                command: 'browseWorkspace'
+            });
+        }
+        
         window.switchBot = function(botName) {
             console.log('[WebView] switchBot called with:', botName);
             vscode.postMessage({
@@ -4118,6 +4160,15 @@ class BotPanel {
                     });
                 } else {
                     console.warn('[WebView] handleRenameNode not available');
+                }
+                return;
+            }
+            
+            if (message.command === 'setWorkspacePath') {
+                console.log('[WebView] Received setWorkspacePath message:', message.path);
+                const input = document.getElementById('workspacePathInput');
+                if (input) {
+                    input.value = message.path;
                 }
                 return;
             }

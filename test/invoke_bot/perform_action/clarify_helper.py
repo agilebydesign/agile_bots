@@ -159,12 +159,26 @@ class ClarifyTestHelper(BaseHelper):
         Guardrails are templates: questions to ask, evidence required, assumptions available.
         They do NOT contain answers/provided evidence - those go in workspace clarification.json.
         
+        IMPORTANT: This method writes to bot_directory. To avoid writing to production,
+        ensure BotTestHelper was initialized with a custom bot_directory parameter.
+        
         Args:
             behavior_name: Behavior name (e.g., 'shape', 'discovery')
             
         Returns:
             Tuple of (questions_file_path, evidence_file_path)
+            
+        Raises:
+            ValueError: If trying to write to production story_bot directory
         """
+        # Guard against writing to production
+        bot_dir_str = str(self.parent.bot_directory).replace('\\', '/')
+        if 'bots/story_bot' in bot_dir_str and 'tmp' not in bot_dir_str.lower():
+            raise ValueError(
+                f"SAFETY: Cannot write guardrails to production bot directory: {self.parent.bot_directory}. "
+                "Use BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot') for tests that write to bot files."
+            )
+        
         # Fixed sample questions (what to ask - no answers yet)
         sample_questions = [
             'What is the scope of this work?',

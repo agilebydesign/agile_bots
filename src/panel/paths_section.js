@@ -63,8 +63,11 @@ class PathsSection extends PanelView {
     async render() {
         console.log('[PathsSection] Starting render');
         console.log('[PathsSection] Executing status command...');
-        const botData = await this.execute('status');
-        console.log('[PathsSection] Status response:', JSON.stringify(botData).substring(0, 300));
+        const response = await this.execute('status');
+        console.log('[PathsSection] Status response:', JSON.stringify(response).substring(0, 300));
+        
+        // Extract bot data from response (handle nested structure)
+        const botData = response?.bot || response;
         
         // NO FALLBACKS - let it fail if data is missing
         if (!botData) throw new Error('[PathsSection] botData is null/undefined');
@@ -81,12 +84,19 @@ class PathsSection extends PanelView {
             <div class="card-secondary" style="padding: 1px 5px 2px 5px;">
                 <div class="input-container" style="margin-top: 0;">
                     <div class="input-header">Workspace</div>
-                    <input type="text" id="workspacePathInput" 
-                           value="${safeWorkspaceDir}" 
-                           placeholder="Path to workspace"
-                           onchange="updateWorkspace(this.value)"
-                           onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
-                           title="${safeWorkspaceDir}" />
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <input type="text" id="workspacePathInput" 
+                               value="${safeWorkspaceDir}" 
+                               placeholder="Path to workspace"
+                               style="flex: 1;"
+                               onchange="updateWorkspace(this.value)"
+                               onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
+                               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; this.classList.add('drag-over');"
+                               ondragleave="this.classList.remove('drag-over');"
+                               ondrop="event.preventDefault(); this.classList.remove('drag-over'); const items = event.dataTransfer.items || []; for (let i = 0; i < items.length; i++) { const item = items[i]; if (item.kind === 'file') { const entry = item.webkitGetAsEntry ? item.webkitGetAsEntry() : null; if (entry && entry.isDirectory) { this.value = entry.fullPath || event.dataTransfer.getData('text/plain'); updateWorkspace(this.value); return; } } } const text = event.dataTransfer.getData('text/uri-list') || event.dataTransfer.getData('text/plain'); if (text) { let path = text.replace(/^file:\\/\\/\\//, '').replace(/^file:\\/\\//, ''); path = decodeURIComponent(path); this.value = path; updateWorkspace(path); }"
+                               title="${safeWorkspaceDir}" />
+                        <button onclick="browseWorkspace()" title="Browse for folder" style="padding: 4px 8px; min-width: auto;">📁</button>
+                    </div>
                 </div>
                 <div class="info-display" style="margin-top: 4px;" title="${safeBotDir}">
                     <span class="label">Bot Path:</span>

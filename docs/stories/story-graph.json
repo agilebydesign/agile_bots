@@ -33,6 +33,8 @@
                       "sequential_order": 1.0,
                       "type": "",
                       "background": [],
+                      "test_method": "test_generator_fails_when_bot_config_malformed",
+                      "steps": "Given A bot directory exists\nAnd Bot Config file exists with invalid JSON syntax\nWhen MCP Server Generator attempts to receive Bot Config\nThen Generator raises JSONDecodeError and does not create MCP Server instance",
                       "examples": [
                         {
                           "columns": [
@@ -126,9 +128,7 @@
                             ]
                           ]
                         }
-                      ],
-                      "test_method": "test_generator_fails_when_bot_config_malformed",
-                      "steps": "Given A bot directory exists\nAnd Bot Config file exists with invalid JSON syntax\nWhen MCP Server Generator attempts to receive Bot Config\nThen Generator raises JSONDecodeError and does not create MCP Server instance"
+                      ]
                     }
                   ],
                   "acceptance_criteria": [
@@ -3217,7 +3217,7 @@
               "sequential_order": 3.0,
               "behavior": "exploration",
               "domain_concepts": [],
-              "test_file": "invoke_bot/initialize_bot/test_set_workspace.py",
+              "test_file": "invoke_bot/initialize_bot/test_set_workspace.js",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -3322,28 +3322,36 @@
                       "test_class": "TestChangeWorkspacePath",
                       "scenarios": [
                         {
-                          "name": "",
+                          "name": "User changes workspace and panel displays new state",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "testUserChangesWorkspacePanelDisplaysNewState",
                           "steps": "Given Panel is open showing workspace at c:/dev/project_a\nAnd Workspace at c:/dev/project_b exists with different bot state\nWhen User changes workspace path to c:/dev/project_b\nThen Panel displays c:/dev/project_b as current workspace\nAnd Panel displays behavior action state from project_b\nAnd Panel refreshes all sections with project_b data"
                         },
                         {
-                          "name": "",
+                          "name": "User changes to nonexistent directory shows error",
                           "sequential_order": 2.0,
-                          "type": "",
+                          "type": "error_case",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "testUserChangesToNonexistentDirectoryShowsError",
                           "steps": "Given Panel is open showing valid workspace\nWhen User changes workspace path to non-existent directory\nThen Panel displays error message\nAnd Error message indicates directory not found\nAnd Panel retains previous valid workspace"
                         },
                         {
-                          "name": "",
+                          "name": "Workspace path persists after panel refresh",
                           "sequential_order": 3.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "testWorkspacePathPersistsAfterPanelRefresh",
                           "steps": "Given Panel is open showing default workspace c:/dev/project_a\nWhen User changes workspace path to c:/dev/project_b\nAnd Panel displays project_b workspace and state\nAnd User refreshes panel\nThen Panel displays c:/dev/project_b as current workspace\nAnd Workspace path was persisted and restored"
+                        },
+                        {
+                          "name": "Set path by dragging folder to panel",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "testWorkspaceInputAcceptsDrop",
+                          "steps": "Given Panel is open showing workspace at c:/dev/project_a\nAnd Folder c:/dev/project_b exists in VS Code explorer\nWhen User drags folder c:/dev/project_b from explorer to workspace text entry\nThen Workspace text entry displays c:/dev/project_b\nAnd Panel displays c:/dev/project_b as current workspace\nAnd Panel displays behavior action state from project_b"
                         }
                       ],
                       "acceptance_criteria": [
@@ -10146,251 +10154,251 @@
                                 "test_method"
                               ],
                               "rows": [
-                              [
-                                "File Management",
-                                "Upload File",
-                                "test_file_upload.py",
-                                "File size validated; File type checked; Upload progress tracked",
-                                "code",
-                                "build",
-                                "code behavior; build action; file upload functionality; implement production code",
-                                "User uploads valid file and sees success confirmation",
-                                "test_user_uploads_valid_file_and_sees_success_confirmation"
-                              ],
-                              [
-                                "File Management",
-                                "Upload File",
-                                "test_file_upload.py",
-                                "File size validated; File type checked; Upload progress tracked",
-                                "code",
-                                "build",
-                                "code behavior; build action; file upload functionality; implement production code",
-                                "User uploads oversized file and sees size limit error",
-                                "test_user_uploads_oversized_file_and_sees_size_limit_error"
-                              ],
-                              [
-                                "File Management",
-                                "Upload File",
-                                "test_file_upload.py",
-                                "File size validated; File type checked; Upload progress tracked",
-                                "code",
-                                "build",
-                                "code behavior; build action; file upload functionality; implement production code",
-                                "User uploads invalid file type and sees type error",
-                                "test_user_uploads_invalid_file_type_and_sees_type_error"
-                              ],
-                              [
-                                "File Management",
-                                "Upload File",
-                                "test_file_upload.py",
-                                "File size validated; File type checked; Upload progress tracked",
-                                "code",
-                                "build",
-                                "code behavior; build action; file upload functionality; implement production code",
-                                "User cancels upload mid-transfer and sees cancellation confirmation",
-                                "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation"
-                              ],
-                              [
-                                "File Management",
-                                "Upload File",
-                                "test_file_upload.py",
-                                "File size validated; File type checked; Upload progress tracked",
-                                "code",
-                                "build",
-                                "code behavior; build action; file upload functionality; implement production code",
-                                "Upload fails with network error and user sees retry option",
-                                "test_upload_fails_with_network_error_and_user_sees_retry_option"
-                              ],
-                              [
-                                "File Management",
-                                "Download File",
-                                "test_file_download.py",
-                                "Download initiated; Progress displayed",
-                                "test",
-                                "build",
-                                "test behavior; build action; file download test coverage; implement test methods for scenarios",
-                                "User downloads file successfully and sees progress",
-                                "test_user_downloads_file_successfully_and_sees_progress"
-                              ],
-                              [
-                                "File Management",
-                                "Download File",
-                                "test_file_download.py",
-                                "Download initiated; Progress displayed",
-                                "test",
-                                "build",
-                                "test behavior; build action; file download test coverage; implement test methods for scenarios",
-                                "User cancels download mid-transfer",
-                                "test_user_cancels_download_mid_transfer"
-                              ],
-                              [
-                                "File Management",
-                                "Download File",
-                                "test_file_download.py",
-                                "Download initiated; Progress displayed",
-                                "test",
-                                "build",
-                                "test behavior; build action; file download test coverage; implement test methods for scenarios",
-                                "Download fails due to network error and user sees error message",
-                                ""
-                              ],
-                              [
-                                "File Management",
-                                "Delete File",
-                                "test_file_delete.py",
-                                "Confirmation required; File removed from storage",
-                                "test",
-                                "validate",
-                                "test behavior; validate action; file deletion test coverage; verify test implementation",
-                                "User confirms delete and file is removed from system",
-                                ""
-                              ],
-                              [
-                                "File Management",
-                                "Delete File",
-                                "test_file_delete.py",
-                                "Confirmation required; File removed from storage",
-                                "test",
-                                "validate",
-                                "test behavior; validate action; file deletion test coverage; verify test implementation",
-                                "User cancels delete and file remains",
-                                ""
-                              ],
-                              [
-                                "File Management",
-                                "Delete File",
-                                "test_file_delete.py",
-                                "Confirmation required; File removed from storage",
-                                "test",
-                                "validate",
-                                "test behavior; validate action; file deletion test coverage; verify test implementation",
-                                "Delete operation fails due to permissions and user sees error",
-                                ""
-                              ],
-                              [
-                                "User Management",
-                                "Create User",
-                                "",
-                                "Email validated; Password meets requirements",
-                                "scenario",
-                                "build",
-                                "scenario behavior; build action; user creation domain language; write detailed Given/When/Then scenarios",
-                                "",
-                                ""
-                              ],
-                              [
-                                "Reporting",
-                                "View Report",
-                                "",
-                                "",
-                                "explore",
-                                "clarify",
-                                "explore behavior; clarify action; report viewing concepts; add acceptance criteria and domain understanding",
-                                "",
-                                ""
-                              ],
-                              [
-                                "Authentication",
-                                "Reset Password",
-                                "test_reset_password.py",
-                                "",
-                                "code",
-                                "validate",
-                                "code behavior; validate action; password reset functionality; verify implementation meets requirements",
-                                "User requests password reset and receives reset email",
-                                "test_user_requests_password_reset_and_receives_reset_email"
-                              ],
-                              [
-                                "Authentication",
-                                "Reset Password",
-                                "test_reset_password.py",
-                                "",
-                                "code",
-                                "validate",
-                                "code behavior; validate action; password reset functionality; verify implementation meets requirements",
-                                "User submits new password meeting requirements and password is updated",
-                                "test_user_submits_new_password_meeting_requirements_and_password_is_updated"
-                              ],
-                              [
-                                "Authentication",
-                                "Reset Password",
-                                "test_reset_password.py",
-                                "",
-                                "code",
-                                "validate",
-                                "code behavior; validate action; password reset functionality; verify implementation meets requirements",
-                                "User submits invalid password not meeting requirements and sees validation error",
-                                "test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error"
-                              ],
-                              [
-                                "Data Export",
-                                "Export CSV",
-                                "test_export_csv.py",
-                                "",
-                                "test",
-                                "clarify",
-                                "test behavior; clarify action; CSV export test requirements; clarify test expectations",
-                                "User exports data to CSV and file downloads successfully",
-                                "test_user_exports_data_to_csv_and_file_downloads_successfully"
-                              ],
-                              [
-                                "Data Export",
-                                "Export CSV",
-                                "test_export_csv.py",
-                                "",
-                                "test",
-                                "clarify",
-                                "test behavior; clarify action; CSV export test requirements; clarify test expectations",
-                                "Export handles empty data set and generates valid empty CSV",
-                                "test_export_handles_empty_data_set_and_generates_valid_empty_csv"
-                              ],
-                              [
-                                "Data Export",
-                                "Export CSV",
-                                "test_export_csv.py",
-                                "",
-                                "test",
-                                "clarify",
-                                "test behavior; clarify action; CSV export test requirements; clarify test expectations",
-                                "Export handles large dataset and shows progress indicator",
-                                ""
-                              ],
-                              [
-                                "Data Export",
-                                "Export CSV",
-                                "test_export_csv.py",
-                                "",
-                                "test",
-                                "clarify",
-                                "test behavior; clarify action; CSV export test requirements; clarify test expectations",
-                                "Export with special characters in data and properly escapes them in CSV",
-                                ""
-                              ],
-                              [
-                                "Payment",
-                                "Process Payment",
-                                "test_process_payment.py",
-                                "",
-                                "test",
-                                "build",
-                                "test behavior; build action; payment processing test coverage; implement test methods",
-                                "Payment processed with valid card and transaction completes successfully",
-                                ""
-                              ],
-                              [
-                                "Payment",
-                                "Process Payment",
-                                "test_process_payment.py",
-                                "",
-                                "test",
-                                "build",
-                                "test behavior; build action; payment processing test coverage; implement test methods",
-                                "Payment attempted with expired card and user sees card expired error",
-                                ""
+                                [
+                                  "File Management",
+                                  "Upload File",
+                                  "test_file_upload.py",
+                                  "File size validated; File type checked; Upload progress tracked",
+                                  "code",
+                                  "build",
+                                  "code behavior; build action; file upload functionality; implement production code",
+                                  "User uploads valid file and sees success confirmation",
+                                  "test_user_uploads_valid_file_and_sees_success_confirmation"
+                                ],
+                                [
+                                  "File Management",
+                                  "Upload File",
+                                  "test_file_upload.py",
+                                  "File size validated; File type checked; Upload progress tracked",
+                                  "code",
+                                  "build",
+                                  "code behavior; build action; file upload functionality; implement production code",
+                                  "User uploads oversized file and sees size limit error",
+                                  "test_user_uploads_oversized_file_and_sees_size_limit_error"
+                                ],
+                                [
+                                  "File Management",
+                                  "Upload File",
+                                  "test_file_upload.py",
+                                  "File size validated; File type checked; Upload progress tracked",
+                                  "code",
+                                  "build",
+                                  "code behavior; build action; file upload functionality; implement production code",
+                                  "User uploads invalid file type and sees type error",
+                                  "test_user_uploads_invalid_file_type_and_sees_type_error"
+                                ],
+                                [
+                                  "File Management",
+                                  "Upload File",
+                                  "test_file_upload.py",
+                                  "File size validated; File type checked; Upload progress tracked",
+                                  "code",
+                                  "build",
+                                  "code behavior; build action; file upload functionality; implement production code",
+                                  "User cancels upload mid-transfer and sees cancellation confirmation",
+                                  "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation"
+                                ],
+                                [
+                                  "File Management",
+                                  "Upload File",
+                                  "test_file_upload.py",
+                                  "File size validated; File type checked; Upload progress tracked",
+                                  "code",
+                                  "build",
+                                  "code behavior; build action; file upload functionality; implement production code",
+                                  "Upload fails with network error and user sees retry option",
+                                  "test_upload_fails_with_network_error_and_user_sees_retry_option"
+                                ],
+                                [
+                                  "File Management",
+                                  "Download File",
+                                  "test_file_download.py",
+                                  "Download initiated; Progress displayed",
+                                  "test",
+                                  "build",
+                                  "test behavior; build action; file download test coverage; implement test methods for scenarios",
+                                  "User downloads file successfully and sees progress",
+                                  "test_user_downloads_file_successfully_and_sees_progress"
+                                ],
+                                [
+                                  "File Management",
+                                  "Download File",
+                                  "test_file_download.py",
+                                  "Download initiated; Progress displayed",
+                                  "test",
+                                  "build",
+                                  "test behavior; build action; file download test coverage; implement test methods for scenarios",
+                                  "User cancels download mid-transfer",
+                                  "test_user_cancels_download_mid_transfer"
+                                ],
+                                [
+                                  "File Management",
+                                  "Download File",
+                                  "test_file_download.py",
+                                  "Download initiated; Progress displayed",
+                                  "test",
+                                  "build",
+                                  "test behavior; build action; file download test coverage; implement test methods for scenarios",
+                                  "Download fails due to network error and user sees error message",
+                                  ""
+                                ],
+                                [
+                                  "File Management",
+                                  "Delete File",
+                                  "test_file_delete.py",
+                                  "Confirmation required; File removed from storage",
+                                  "test",
+                                  "validate",
+                                  "test behavior; validate action; file deletion test coverage; verify test implementation",
+                                  "User confirms delete and file is removed from system",
+                                  ""
+                                ],
+                                [
+                                  "File Management",
+                                  "Delete File",
+                                  "test_file_delete.py",
+                                  "Confirmation required; File removed from storage",
+                                  "test",
+                                  "validate",
+                                  "test behavior; validate action; file deletion test coverage; verify test implementation",
+                                  "User cancels delete and file remains",
+                                  ""
+                                ],
+                                [
+                                  "File Management",
+                                  "Delete File",
+                                  "test_file_delete.py",
+                                  "Confirmation required; File removed from storage",
+                                  "test",
+                                  "validate",
+                                  "test behavior; validate action; file deletion test coverage; verify test implementation",
+                                  "Delete operation fails due to permissions and user sees error",
+                                  ""
+                                ],
+                                [
+                                  "User Management",
+                                  "Create User",
+                                  "",
+                                  "Email validated; Password meets requirements",
+                                  "scenario",
+                                  "build",
+                                  "scenario behavior; build action; user creation domain language; write detailed Given/When/Then scenarios",
+                                  "",
+                                  ""
+                                ],
+                                [
+                                  "Reporting",
+                                  "View Report",
+                                  "",
+                                  "",
+                                  "explore",
+                                  "clarify",
+                                  "explore behavior; clarify action; report viewing concepts; add acceptance criteria and domain understanding",
+                                  "",
+                                  ""
+                                ],
+                                [
+                                  "Authentication",
+                                  "Reset Password",
+                                  "test_reset_password.py",
+                                  "",
+                                  "code",
+                                  "validate",
+                                  "code behavior; validate action; password reset functionality; verify implementation meets requirements",
+                                  "User requests password reset and receives reset email",
+                                  "test_user_requests_password_reset_and_receives_reset_email"
+                                ],
+                                [
+                                  "Authentication",
+                                  "Reset Password",
+                                  "test_reset_password.py",
+                                  "",
+                                  "code",
+                                  "validate",
+                                  "code behavior; validate action; password reset functionality; verify implementation meets requirements",
+                                  "User submits new password meeting requirements and password is updated",
+                                  "test_user_submits_new_password_meeting_requirements_and_password_is_updated"
+                                ],
+                                [
+                                  "Authentication",
+                                  "Reset Password",
+                                  "test_reset_password.py",
+                                  "",
+                                  "code",
+                                  "validate",
+                                  "code behavior; validate action; password reset functionality; verify implementation meets requirements",
+                                  "User submits invalid password not meeting requirements and sees validation error",
+                                  "test_user_submits_invalid_password_not_meeting_requirements_and_sees_validation_error"
+                                ],
+                                [
+                                  "Data Export",
+                                  "Export CSV",
+                                  "test_export_csv.py",
+                                  "",
+                                  "test",
+                                  "clarify",
+                                  "test behavior; clarify action; CSV export test requirements; clarify test expectations",
+                                  "User exports data to CSV and file downloads successfully",
+                                  "test_user_exports_data_to_csv_and_file_downloads_successfully"
+                                ],
+                                [
+                                  "Data Export",
+                                  "Export CSV",
+                                  "test_export_csv.py",
+                                  "",
+                                  "test",
+                                  "clarify",
+                                  "test behavior; clarify action; CSV export test requirements; clarify test expectations",
+                                  "Export handles empty data set and generates valid empty CSV",
+                                  "test_export_handles_empty_data_set_and_generates_valid_empty_csv"
+                                ],
+                                [
+                                  "Data Export",
+                                  "Export CSV",
+                                  "test_export_csv.py",
+                                  "",
+                                  "test",
+                                  "clarify",
+                                  "test behavior; clarify action; CSV export test requirements; clarify test expectations",
+                                  "Export handles large dataset and shows progress indicator",
+                                  ""
+                                ],
+                                [
+                                  "Data Export",
+                                  "Export CSV",
+                                  "test_export_csv.py",
+                                  "",
+                                  "test",
+                                  "clarify",
+                                  "test behavior; clarify action; CSV export test requirements; clarify test expectations",
+                                  "Export with special characters in data and properly escapes them in CSV",
+                                  ""
+                                ],
+                                [
+                                  "Payment",
+                                  "Process Payment",
+                                  "test_process_payment.py",
+                                  "",
+                                  "test",
+                                  "build",
+                                  "test behavior; build action; payment processing test coverage; implement test methods",
+                                  "Payment processed with valid card and transaction completes successfully",
+                                  ""
+                                ],
+                                [
+                                  "Payment",
+                                  "Process Payment",
+                                  "test_process_payment.py",
+                                  "",
+                                  "test",
+                                  "build",
+                                  "test behavior; build action; payment processing test coverage; implement test methods",
+                                  "Payment attempted with expired card and user sees card expired error",
+                                  ""
+                                ]
                               ]
-                            ]
-                          }
-                        ]
+                            }
+                          ]
                         },
                         {
                           "name": "Determine Behavior For Sub Epic",
@@ -11621,33 +11629,33 @@
                       "test_class": "TestOpenStoryFiles",
                       "scenarios": [
                         {
-                          "name": "",
+                          "name": "User opens story graph JSON file",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_user_opens_story_graph_json_file",
                           "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
                         },
                         {
-                          "name": "",
+                          "name": "User opens story map diagram",
                           "sequential_order": 2.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_user_opens_story_map_diagram",
                           "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
                         },
                         {
-                          "name": "",
+                          "name": "User clicks link to non-existent file shows error",
                           "sequential_order": 3.0,
-                          "type": "",
+                          "type": "error_case",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_user_clicks_link_to_nonexistent_file_shows_error",
                           "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
                         },
                         {
-                          "name": "",
+                          "name": "Story graph and map links always visible in scope header",
                           "sequential_order": 4.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
                           "test_method": "test_story_graph_and_story_map_links_always_visible",
                           "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
