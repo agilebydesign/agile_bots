@@ -40,6 +40,7 @@ And Instructions contain required sections for <expected_behavior> behavior
 ```
 
 **Examples:**
+
 | epic_name | story_name | test_class | acceptance_criteria | expected_behavior | action | expected_instructions_contain | scenario | test_method |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | File Management | Upload File | test_file_upload.py | File size validated; File type checked; Upload progress tracked | code | build | code behavior; build action; file upload functionality; implement production code | User uploads valid file and sees success confirmation | test_user_uploads_valid_file_and_sees_success_confirmation |
@@ -126,6 +127,7 @@ Then CLI returns JSON with behavior <expected_behavior>
 ```
 
 **Examples:**
+
 | node_type | epic_name | expected_behavior | action | expected_instructions_contain |
 | --- | --- | --- | --- | --- |
 | epic | Product Catalog | shape | build | shape behavior; build action; product catalog domain concepts; add sub-epics and stories |
@@ -151,6 +153,7 @@ And Instructions for <behavior> behavior and "build" action are returned
 ```
 
 **Examples:**
+
 | node_type | node_name | behavior | icon_file | tooltip_text |
 | --- | --- | --- | --- | --- |
 | epic | Product Catalog | shape | submit_subepic.png | Submit shape instructions for epic |
