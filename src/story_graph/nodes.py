@@ -1121,6 +1121,24 @@ class SubEpic(StoryNode):
             
             return current_behavior
 
+    @property
+    def behaviors_needed(self) -> List[str]:
+        """Return list of applicable behaviors for this sub-epic.
+        
+        Empty sub-epics (no sub-epics, no stories) return both 'shape' and 'exploration'.
+        Sub-epics with content return single behavior in a list.
+        """
+        if self.has_subepics:
+            sub_epics = [child for child in self._children if isinstance(child, SubEpic)]
+            if not sub_epics:
+                return ['shape', 'exploration']
+            return [self.behavior_needed]
+        else:
+            stories = [child for child in self.children if isinstance(child, Story)]
+            if not stories:
+                return ['shape', 'exploration']
+            return [self.behavior_needed]
+
     def create(self, name: Optional[str] = None, child_type: Optional[str] = None, position: Optional[int] = None) -> StoryNode:
         """Alias for create_child"""
         return self.create_child(name, child_type, position)
@@ -1372,6 +1390,22 @@ class Story(StoryNode):
     @property
     def behavior_needed(self) -> str:
         return self.get_behavior_needed()
+    
+    @property
+    def behaviors_needed(self) -> List[str]:
+        """Return list of applicable behaviors for this story.
+        
+        Empty stories (no AC, no scenarios) return both 'exploration' and 'scenarios'.
+        Stories with content return single behavior in a list.
+        """
+        if self.all_scenarios_have_tests:
+            return ['code']
+        if self.many_scenarios > 0:
+            return ['tests']
+        if self.many_acceptance_criteria > 0:
+            return ['scenarios']
+        # Empty story - return both options
+        return ['exploration', 'scenarios']
     
     def get_behavior_needed(self, behavior_already_needed: str = None) -> str:
         hierarchy = ['code', 'tests', 'scenarios', 'exploration']
