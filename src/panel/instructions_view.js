@@ -735,12 +735,18 @@ class InstructionsSection extends PanelView {
                     // Get the saved decision for this criteria
                     const savedDecision = decisionsMade[criteriaKey];
                     
-                    // Render options as radio buttons
+                    // All strategy choices use checkboxes (multi-select)
                     const options = criteria.options || [];
                     if (options.length > 0) {
                         html += '<div style="margin-top: 8px;">';
+                        
+                        // savedDecision can be a string (legacy) or array
+                        const savedSelections = Array.isArray(savedDecision) 
+                            ? savedDecision 
+                            : (savedDecision ? [savedDecision] : []);
+                        
                         options.forEach((option, optionIdx) => {
-                            const radioName = `decision-criteria-${criteriaIdx}`;
+                            const inputName = `decision-criteria-${criteriaIdx}`;
                             
                             // Extract option text (could be string or object with 'name' field)
                             let optionText = '';
@@ -750,16 +756,15 @@ class InstructionsSection extends PanelView {
                                 optionText = option.name || option.id || JSON.stringify(option);
                             }
                             
-                            // Check if this option matches the saved decision
-                            const isSelected = savedDecision && optionText === savedDecision;
+                            // Check if this option is in the saved selections
+                            const isSelected = savedSelections.includes(optionText);
                             
                             // Escape for use in onclick attribute
                             const escapedCriteriaKey = this.escapeHtml(criteriaKey).replace(/'/g, "\\'");
-                            const escapedOptionText = this.escapeHtml(optionText).replace(/'/g, "\\'");
                             
                             html += `<div style="margin-bottom: 8px;">`;
                             html += `<label style="display: flex; align-items: flex-start; cursor: pointer;">`;
-                            html += `<input type="radio" name="${radioName}" value="${optionIdx}" ${isSelected ? 'checked' : ''} onchange="saveStrategyDecision('${escapedCriteriaKey}', '${escapedOptionText}')" style="margin-right: 8px; margin-top: 4px; cursor: pointer;" />`;
+                            html += `<input type="checkbox" name="${inputName}" value="${optionIdx}" ${isSelected ? 'checked' : ''} onchange="saveStrategyMultiDecision('${escapedCriteriaKey}', '${inputName}')" style="margin-right: 8px; margin-top: 4px; cursor: pointer;" />`;
                             html += `<span style="flex: 1; ${isSelected ? 'font-weight: 600; color: var(--vscode-textLink-foreground);' : ''}">${this.escapeHtml(optionText)}</span>`;
                             html += `</label>`;
                             html += `</div>`;

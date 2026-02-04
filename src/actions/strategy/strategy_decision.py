@@ -1,4 +1,4 @@
-﻿from typing import Dict, Any
+from typing import Dict, Any
 from bot_path import BotPath
 from actions.strategy.json_persistent import JsonPersistent
 from actions.strategy.strategy import Strategy
@@ -8,7 +8,7 @@ class StrategyDecision(JsonPersistent):
     @staticmethod
     def get_decisions_parameter_description() -> str:
         """Get description for decisions_made/decisions/choices parameter."""
-        return "Dict mapping decision criteria keys to selected options/values"
+        return "Dict mapping decision criteria keys to selected option(s). Value can be a string (single selection) or list of strings (multiple selections for allow_multiple criteria)"
     
     @staticmethod
     def get_assumptions_parameter_description() -> str:

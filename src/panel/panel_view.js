@@ -86,6 +86,8 @@ class PanelView {
         this._pendingResolve = null;
         this._pendingReject = null;
         this._responseBuffer = '';
+        // Serialize CLI commands to prevent interleaved responses
+        this._commandQueue = Promise.resolve();
     }
     
     /**
@@ -276,55 +278,63 @@ class PanelView {
      * Execute command using the persistent Python process.
      */
     async execute(command) {
-        // Delegate to injected CLI if present
-        if (this._cli) {
-            return this._cli.execute(command);
-        }
-        
-        if (!this._pythonProcess) {
-            this._spawnProcess();
-        }
-        
-        console.log(`[PanelView] Executing command: "${command}"`);
-        
-        // Increase timeout for scope/status commands (they enrich scenarios with test links)
-        const timeoutMs = (command.includes('scope') || command.includes('status')) ? 60000 : 30000;
-        console.log(`[PanelView] Using timeout: ${timeoutMs}ms for command: "${command}"`);
-        
-        return new Promise((resolve, reject) => {
-            this._pendingResolve = resolve;
-            this._pendingReject = reject;
+        const runCommand = async () => {
+            // Delegate to injected CLI if present
+            if (this._cli) {
+                return this._cli.execute(command);
+            }
             
-            const timeoutId = setTimeout(() => {
-                if (this._pendingReject) {
-                    console.error(`[PanelView] Command timed out after ${timeoutMs}ms: "${command}"`);
-                    this._pendingReject(new Error(`Command timed out after ${timeoutMs / 1000} seconds: ${command}`));
+            if (!this._pythonProcess) {
+                this._spawnProcess();
+            }
+            
+            console.log(`[PanelView] Executing command: "${command}"`);
+            
+            // Increase timeout for scope/status commands (they enrich scenarios with test links)
+            const timeoutMs = (command.includes('scope') || command.includes('status')) ? 60000 : 30000;
+            console.log(`[PanelView] Using timeout: ${timeoutMs}ms for command: "${command}"`);
+            
+            return new Promise((resolve, reject) => {
+                this._pendingResolve = resolve;
+                this._pendingReject = reject;
+                
+                const timeoutId = setTimeout(() => {
+                    if (this._pendingReject) {
+                        console.error(`[PanelView] Command timed out after ${timeoutMs}ms: "${command}"`);
+                        this._pendingReject(new Error(`Command timed out after ${timeoutMs / 1000} seconds: ${command}`));
+                        this._pendingResolve = null;
+                        this._pendingReject = null;
+                    }
+                }, timeoutMs);
+                
+                const originalResolve = resolve;
+                const originalReject = reject;
+                this._pendingResolve = (value) => {
+                    clearTimeout(timeoutId);
+                    originalResolve(value);
+                };
+                this._pendingReject = (err) => {
+                    clearTimeout(timeoutId);
+                    originalReject(err);
+                };
+                
+                try {
+                    const cmd = command.includes('--format json') ? command : `${command} --format json`;
+                    this._pythonProcess.stdin.write(cmd + '\n');
+                } catch (err) {
+                    clearTimeout(timeoutId);
                     this._pendingResolve = null;
                     this._pendingReject = null;
+                    reject(new Error(`Failed to send command: ${err.message}`));
                 }
-            }, timeoutMs);
-            
-            const originalResolve = resolve;
-            const originalReject = reject;
-            this._pendingResolve = (value) => {
-                clearTimeout(timeoutId);
-                originalResolve(value);
-            };
-            this._pendingReject = (err) => {
-                clearTimeout(timeoutId);
-                originalReject(err);
-            };
-            
-            try {
-                const cmd = command.includes('--format json') ? command : `${command} --format json`;
-                this._pythonProcess.stdin.write(cmd + '\n');
-            } catch (err) {
-                clearTimeout(timeoutId);
-                this._pendingResolve = null;
-                this._pendingReject = null;
-                reject(new Error(`Failed to send command: ${err.message}`));
-            }
-        });
+            });
+        };
+
+        const previous = this._commandQueue;
+        const queued = previous.then(() => runCommand());
+        // Keep queue alive even if a command fails
+        this._commandQueue = queued.catch(() => {});
+        return queued;
     }
 }
 
