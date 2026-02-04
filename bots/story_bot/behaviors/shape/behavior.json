@@ -7,7 +7,7 @@
   "outputs": "story-graph.json, story-map.md, story-map-outline.drawio, story-map.txt",
   "baseActionsPath": "agile_bot/base_actions",
   "instructions": [
-    "Create a story map that captures the user's journey through epics, features, and stories"
+    "Create a story map that captures the user's journey through epics, sub-epics, and stories"
   ],
   "actions_workflow": {
     "actions": [

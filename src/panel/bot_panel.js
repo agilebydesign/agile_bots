@@ -4028,6 +4028,32 @@ class BotPanel {
             window.selectNode('root', null);
         }, 100);
         
+        // Toggle Q&A expand/collapse
+        window.toggleQAExpand = function(idx) {
+            const textarea = document.getElementById('clarify-answer-' + idx);
+            const toggleBtn = document.getElementById('qa-toggle-' + idx);
+            if (!textarea) return;
+            
+            const isCollapsed = textarea.getAttribute('data-collapsed') === 'true';
+            const defaultHeight = 60; // Default collapsed height in px
+            
+            if (isCollapsed) {
+                // Expand to full content
+                textarea.style.height = 'auto';
+                const fullHeight = textarea.scrollHeight;
+                textarea.style.height = fullHeight + 'px';
+                textarea.style.overflow = 'visible';
+                textarea.setAttribute('data-collapsed', 'false');
+                if (toggleBtn) toggleBtn.textContent = '▲';
+            } else {
+                // Collapse to default height
+                textarea.style.height = defaultHeight + 'px';
+                textarea.style.overflow = 'hidden';
+                textarea.setAttribute('data-collapsed', 'true');
+                if (toggleBtn) toggleBtn.textContent = '▼';
+            }
+        };
+        
         // Save functions for guardrails
         window.saveClarifyAnswers = function() {
             console.log('[WebView] saveClarifyAnswers triggered');

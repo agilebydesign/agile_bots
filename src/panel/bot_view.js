@@ -204,9 +204,33 @@ class BotView extends PanelView {
             if (!botJSON.name && !botJSON.bot_name) {
                 log(`[BotView] WARNING: Refresh returned bot data missing name field. Keys: ${Object.keys(botJSON).join(', ')}`);
             }
+            
+            // Also fetch instructions based on current behavior and action
+            const currentBehavior = botJSON.behaviors?.current_behavior || botJSON.current_behavior;
+            const currentAction = botJSON.behaviors?.current_action || botJSON.current_action;
+            
+            if (currentBehavior && currentAction) {
+                log(`[BotView] Fetching instructions for behavior=${currentBehavior}, action=${currentAction}`);
+                try {
+                    // Use the behavior.action command to get instructions
+                    const instructionsResponse = await super.execute(`${currentBehavior}.${currentAction}`);
+                    if (instructionsResponse && instructionsResponse.instructions) {
+                        this.botData.instructions = instructionsResponse.instructions;
+                        // Also cache for InstructionsSection
+                        PanelView._lastResponse = instructionsResponse;
+                        log(`[BotView] Instructions loaded: ${Object.keys(instructionsResponse.instructions).join(', ')}`);
+                    }
+                } catch (instrError) {
+                    log(`[BotView] WARNING: Could not fetch instructions: ${instrError.message}`);
+                    // Don't fail the whole refresh for instructions
+                }
+            } else {
+                log(`[BotView] No current behavior/action, skipping instructions fetch`);
+            }
+            
             const perfRefreshEnd = performance.now();
             const refreshDuration = (perfRefreshEnd - perfRefreshStart).toFixed(2);
-            log(`[BotView] [PERF] refresh() (execute status) duration: ${refreshDuration}ms`);
+            log(`[BotView] [PERF] refresh() (execute status + instructions) duration: ${refreshDuration}ms`);
             return botJSON;
         } catch (error) {
             log(`[BotView] ERROR in refresh(): ${error.message}`);

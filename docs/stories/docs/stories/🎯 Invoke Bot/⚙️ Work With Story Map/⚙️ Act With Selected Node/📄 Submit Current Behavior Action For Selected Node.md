@@ -34,6 +34,7 @@ And Scope is set to node <node_name>
 ```
 
 **Examples:**
+
 | node_name | node_path | behavior | action |
 | --- | --- | --- | --- |
 | Upload File | File Management.Upload File | code | build |
@@ -60,6 +61,7 @@ And Scope is set to <node_type> <node_name>
 ```
 
 **Examples:**
+
 | node_type | node_name | behavior | action | icon_file | tooltip_text | node_path |
 | --- | --- | --- | --- | --- | --- | --- |
 | epic | Product Catalog | shape | build | submit_subepic.png | Submit shape instructions for epic | Product Catalog |
@@ -84,6 +86,7 @@ And Scope is set to node <node_name>
 ```
 
 **Examples:**
+
 | node_name | node_path | behavior | action |
 | --- | --- | --- | --- |
 | Upload File | File Management.Upload File | code | build |
