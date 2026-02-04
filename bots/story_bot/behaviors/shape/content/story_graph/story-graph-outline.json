@@ -3,17 +3,20 @@
     "purpose": "Shape phase - defines the story graph hierarchy structure (epics, sub_epics, story_groups, stories)",
     "structure": "Hierarchical tree: epics contain sub_epics, sub_epics contain story_groups, story_groups contain stories",
     "scope": "ONLY defines hierarchy and ordering. Does NOT add users, scenarios, steps, or acceptance criteria (those come in later phases)",
-    "fields": "sequential_order determines display order, connector defines logical relationship (and/or), story_type identifies the kind of story"
+    "fields": "sequential_order determines display order, connector defines logical relationship (and/or), story_type identifies the kind of story",
+    "context_source": "REQUIRED on all elements - traces knowledge to source document, page, section, or conversation. Format: {file, page, section} or {type: 'chat'|'code'|'inferred', description}"
   },
   "epics": [
     {
       "name": "Epic Name",
       "sequential_order": 1,
+      "context_source": {"file": "source.pdf", "page": "1", "section": "1.1 Overview"},
       "sub_epics": [
         {
           "name": "Sub Epic Name",
           "sequential_order": 1,
           "behavior": "code",
+          "context_source": {"file": "source.pdf", "page": "5", "section": "2.1 Feature Details"},
           "sub_epics": [],
           "story_groups": [
             {
@@ -22,18 +25,21 @@
               "type": "and",
               "connector": "or",
               "behavior": "code",
+              "context_source": {"file": "source.pdf", "page": "8", "section": "2.1.3 User Workflows"},
               "stories": [
                 {
                   "name": "Story Name",
-                  "sequential_order":1,
+                  "sequential_order": 1,
                   "connector": "and",
-                  "story_type": "user"
+                  "story_type": "user",
+                  "context_source": {"file": "source.pdf", "page": "8", "section": "2.1.3 User Workflows"}
                 },
                 {
                   "name": "Another Story Name",
-                  "sequential_order":2,
+                  "sequential_order": 2,
                   "connector": "and",
-                  "story_type": "user"
+                  "story_type": "user",
+                  "context_source": {"file": "source.pdf", "page": "9", "section": "2.1.4 Alternate Flows"}
                 }
               ]
             }
