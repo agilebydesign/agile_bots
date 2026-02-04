@@ -2348,6 +2348,17 @@ class StoryMapView extends PanelView {
             '                nodeSpan.setAttribute(\'data-path\', tempPath);\n' +
             '                nodeSpan.setAttribute(\'data-position\', position.toString());\n' +
             '                nodeSpan.setAttribute(\'data-has-children\', \'false\');\n' +
+            '                // Set behavior_needed and behaviors_needed for new empty nodes\n' +
+            '                if (nodeType === \'story\') {\n' +
+            '                    nodeSpan.setAttribute(\'data-behavior-needed\', \'exploration\');\n' +
+            '                    nodeSpan.setAttribute(\'data-behaviors-needed\', JSON.stringify([\"exploration\", \"scenarios\"]));\n' +
+            '                } else if (nodeType === \'sub-epic\') {\n' +
+            '                    nodeSpan.setAttribute(\'data-behavior-needed\', \'shape\');\n' +
+            '                    nodeSpan.setAttribute(\'data-behaviors-needed\', JSON.stringify([\"shape\", \"exploration\"]));\n' +
+            '                } else if (nodeType === \'epic\') {\n' +
+            '                    nodeSpan.setAttribute(\'data-behavior-needed\', \'shape\');\n' +
+            '                    nodeSpan.setAttribute(\'data-behaviors-needed\', JSON.stringify([\"shape\"]));\n' +
+            '                }\n' +
             '                nodeSpan.style.cssText = \'cursor: pointer;\';\n' +
             '                // For stories: icon goes INSIDE the span (backend line 2275: ${storyIcon}${name})\n' +
             '                // For epics/sub-epics: icon goes OUTSIDE the span\n' +
