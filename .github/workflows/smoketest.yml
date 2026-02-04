@@ -15,20 +15,17 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v6.2.0
+      with:
+        pip-install: requirements.txt
       
     - name: Install Node.js
       uses: actions/setup-node@v4
 
     - name: Install npm dependencies
       run: npm install
-      
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
 
     - name: Run NPM Tests
       run: npm run test
