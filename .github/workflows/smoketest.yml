@@ -29,3 +29,11 @@ jobs:
 
     - name: Run NPM Tests
       run: npm test
+
+    - name: Test Report
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      with:
+        name: Node Tests            # Name of the check run which will be created
+        path: test/test_reports/test_results.xml    # Path to test results
+        reporter: jest-junit        # Format of test results
