@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<mxfile host="65bd71144e">
+  <diagram id="story-map" name="Story Map">
+    <mxGraphModel dx="2656" dy="1035" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4000" pageHeight="3000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="epic-group" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="0" y="0" width="2502" height="190" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1" value="Build Agile Bots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="20" y="120" width="2194" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f1" value="Generate MCP Tools" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="20" y="200" width="1092" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f1s1" value="Generate Bot Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="22" y="475" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s1_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN MCP Server Generator receives Bot Config', 'text': 'WHEN MCP Server Generator receives Bot Config', 'sequential_order': 0.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="22" y="535" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s1_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'THEN Generator generates unique MCP Server instance with Unique server name from bot name', 'text': 'THEN Generator generates unique MCP Server instance with Unique server name from bot name', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="22" y="605" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s1_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Generated server includes Bot Config reference', 'text': 'AND Generated server includes Bot Config reference', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="22" y="675" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s1_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Generated server leverages Specific Bot instantiation code', 'text': 'AND Generated server leverages Specific Bot instantiation code', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="22" y="745" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_e1f1s2_MCP Server Generator" value="MCP Server Generator" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="415" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f1s2" value="Generate Behavior Action Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="475" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s2_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN Generator processes Bot Config', 'text': 'WHEN Generator processes Bot Config', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="535" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s2_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'THEN Generator creates tool code for each (behavior, action) pair', 'text': 'THEN Generator creates tool code for each (behavior, action) pair', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="605" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s2_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Enumerates all behaviors and actions from Bot Config', 'text': 'AND Enumerates all behaviors and actions from Bot Config', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="675" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s2_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND For each pair, generates tool code with unique name, trigger words, forwarding logic', 'text': 'AND For each pair, generates tool code with unique name, trigger words, forwarding logic', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="745" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s2_4" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Tool catalog prepared with all generated tool instances', 'text': 'AND Tool catalog prepared with all generated tool instances', 'sequential_order': 5.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="292" y="815" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f1s3" value="Deploy MCP BOT Server" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="475" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN Generation Complete', 'text': 'WHEN Generation Complete', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="535" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'THEN Generator deploys/starts generated MCP Server', 'text': 'THEN Generator deploys/starts generated MCP Server', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="605" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Server initializes in separate thread', 'text': 'AND Server initializes in separate thread', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="675" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Server registers with MCP Protocol Handler using unique server name', 'text': 'AND Server registers with MCP Protocol Handler using unique server name', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="745" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_4" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Server publishes tool catalog to AI Chat', 'text': 'AND Server publishes tool catalog to AI Chat', 'sequential_order': 5.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="815" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s3_5" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Each tool entry includes name, description, trigger patterns, parameters', 'text': 'AND Each tool entry includes name, description, trigger patterns, parameters', 'sequential_order': 6.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="562" y="885" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f1s4" value="Restart MCP Server To Load Code Changes" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="475" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s4_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN Bot code changes are detected', 'text': 'WHEN Bot code changes are detected', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="535" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s4_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'THEN MCP Server clears Python bytecode cache (__pycache__)', 'text': 'THEN MCP Server clears Python bytecode cache (__pycache__)', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="605" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s4_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND MCP Server restarts to load new code', 'text': 'AND MCP Server restarts to load new code', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="675" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s4_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Server restarts gracefully without losing state', 'text': 'AND Server restarts gracefully without losing state', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="745" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f1s4_4" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'AND Server re-registers with MCP Protocol Handler after restart', 'text': 'AND Server re-registers with MCP Protocol Handler after restart', 'sequential_order': 5.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="832" y="815" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f2" value="Generate CLI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="1122" y="200" width="1092" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_e1f2s1_Generator" value="Generator" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="290" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f2s1" value="Generate Command Definitions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="350" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN generator runs, THEN Orchestrator walks all bot behaviors', 'text': 'WHEN generator runs, THEN Orchestrator walks all bot behaviors', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="410" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN behaviors are walked, THEN ActionDataCollector gathers action metadata for each behavior', 'text': 'WHEN behaviors are walked, THEN ActionDataCollector gathers action metadata for each behavior', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="480" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': &quot;WHEN actions are gathered, THEN generator extracts parameters from each action's context_class&quot;, 'text': &quot;WHEN actions are gathered, THEN generator extracts parameters from each action's context_class&quot;, 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="550" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN metadata is collected, THEN ReplCommandVisitor generates navigate commands for all behaviors and actions', 'text': 'WHEN metadata is collected, THEN ReplCommandVisitor generates navigate commands for all behaviors and actions', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="620" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_4" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN commands are generated, THEN scope commands are created for scope.type, scope.value, scope.exclude', 'text': 'WHEN commands are generated, THEN scope commands are created for scope.type, scope.value, scope.exclude', 'sequential_order': 5.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="690" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s1_5" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN all commands are defined, THEN generator outputs command definition file', 'text': 'WHEN all commands are defined, THEN generator outputs command definition file', 'sequential_order': 6.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1124" y="760" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f2s2" value="Generate CLI Entry Point" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1394" y="350" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s2_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN generator creates PowerShell script, THEN it generates bot-specific CLI launcher (e.g., story_cli.ps1)', 'text': 'WHEN generator creates PowerShell script, THEN it generates bot-specific CLI launcher (e.g., story_cli.ps1)', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1394" y="410" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s2_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN PowerShell script is generated, THEN it sets BOT_DIRECTORY and PYTHONPATH environment variables', 'text': 'WHEN PowerShell script is generated, THEN it sets BOT_DIRECTORY and PYTHONPATH environment variables', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1394" y="480" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s2_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN script is generated, THEN it launches repl_main.py for the specific bot', 'text': 'WHEN script is generated, THEN it launches repl_main.py for the specific bot', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1394" y="550" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s2_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN REPL is launched, THEN it includes TTY detection, state display, command parsing, and execution', 'text': 'WHEN REPL is launched, THEN it includes TTY detection, state display, command parsing, and execution', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1394" y="620" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f2s3" value="Generate Cursor Commands" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1664" y="350" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s3_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN generator creates CursorReplVisitor, THEN it follows existing visitor pattern', 'text': 'WHEN generator creates CursorReplVisitor, THEN it follows existing visitor pattern', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1664" y="410" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s3_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN visitor generates shortcuts, THEN it creates navigate shortcuts for behaviors', 'text': 'WHEN visitor generates shortcuts, THEN it creates navigate shortcuts for behaviors', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1664" y="480" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s3_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN visitor generates action shortcuts, THEN it creates shortcuts for behavior-action combinations', 'text': 'WHEN visitor generates action shortcuts, THEN it creates shortcuts for behavior-action combinations', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1664" y="550" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s3_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN visitor generates help shortcuts, THEN it creates help and status commands', 'text': 'WHEN visitor generates help shortcuts, THEN it creates help and status commands', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1664" y="620" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1f2s4" value="Generate Help Documentation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1934" y="350" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s4_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN generator creates HelpReplVisitor, THEN it generates command reference with all REPL commands', 'text': 'WHEN generator creates HelpReplVisitor, THEN it generates command reference with all REPL commands', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1934" y="410" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s4_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN help is generated, THEN it includes parameter reference with descriptions for all action parameters', 'text': 'WHEN help is generated, THEN it includes parameter reference with descriptions for all action parameters', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1934" y="480" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s4_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN examples are generated, THEN it includes scope examples with dot-notation syntax', 'text': 'WHEN examples are generated, THEN it includes scope examples with dot-notation syntax', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1934" y="550" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e1f2s4_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN documentation is output, THEN it creates Markdown help files in .cursor/commands/ and terminal help', 'text': 'WHEN documentation is output, THEN it creates Markdown help files in .cursor/commands/ and terminal help', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="1934" y="620" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="Invoke Bot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="2244" y="120" width="258" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2f1" value="Get Help" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="2244" y="200" width="258" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_e2f1s1_User" value="User" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="290" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2f1s1" value="Display Action Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="350" width="50" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e2f1s1_0" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions', 'text': 'WHEN user enters help command\nTHEN CLI displays available commands AND their descriptions', 'sequential_order': 1.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="410" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e2f1s1_1" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action', 'text': 'WHEN user requests help for specific action\nTHEN CLI displays detailed help for that action', 'sequential_order': 2.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="480" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e2f1s1_2" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions', 'text': 'WHEN displaying help\nTHEN CLI shows command syntax AND parameter descriptions', 'sequential_order': 3.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="550" width="250" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="ac_e2f1s1_3" value="&lt;div style=&quot;font-size: 8px;&quot;&gt;{'name': 'WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands', 'text': 'WHEN help is requested for non-existent command\nTHEN CLI displays error message with available commands', 'sequential_order': 4.0}&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontSize=8;" parent="1" vertex="1">
+          <mxGeometry x="2246" y="620" width="250" height="60" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
