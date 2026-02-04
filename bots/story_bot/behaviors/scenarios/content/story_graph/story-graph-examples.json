@@ -5,7 +5,8 @@
     "examples_structure": "examples is an array of tables, each with name, columns, and rows. For simple single-table scenarios, use one table. For multi-table domain scenarios, add multiple tables",
     "variable_matching": "Every <variable_name> in steps MUST appear in example columns. Include both input variables and expected output/result variables",
     "domain_alignment": "Example tables MUST mirror domain_concepts structure: each domain concept with collaborators becomes a related table, responsibilities define the columns",
-    "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure"
+    "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure",
+    "context_source": "REQUIRED on scenarios and examples - traces knowledge to source document, page, section, or conversation. Format: {file, page, section} or {type: 'chat'|'code'|'inferred', description}"
   },
   "epics": [
     {
@@ -37,6 +38,7 @@
                     {
                       "name": "Simple scenario with flat examples",
                       "test_method": "",
+                      "context_source": {"file": "requirements.pdf", "page": "15", "section": "4.1 Basic Flow"},
                       "background": [
                         "Given <common_setup_step>",
                         "And <another_common_setup>"
@@ -53,7 +55,8 @@
                           "rows": [
                             ["value1", "param1", "input1", "result1"],
                             ["value2", "param2", "input2", "result2"]
-                          ]
+                          ],
+                          "context_source": {"file": "test-data.xlsx", "page": "Sheet1", "section": "Test Cases 1-2"}
                         }
                       ]
                     },
@@ -61,6 +64,7 @@
                       "name": "Scenario with hierarchical domain-aligned examples",
                       "test_method": "",
                       "type": "happy_path",
+                      "context_source": {"file": "requirements.pdf", "page": "20", "section": "5.2 Customer Account Lookup"},
                       "background": [],
                       "steps": [
                         "Given Customer <customer_name> has account <account_number>",
@@ -77,7 +81,8 @@
                             "rows": [
                               ["Alice Smith", "premium", "transaction approved"],
                               ["Bob Jones", "standard", "transaction pending review"]
-                            ]
+                            ],
+                            "context_source": {"file": "test-data.xlsx", "page": "Customers", "section": "Premium and Standard"}
                           },
                           {
                             "name": "Account",
@@ -85,7 +90,8 @@
                             "rows": [
                               ["Alice Smith", "ACC-001", "Gold Savings", "50000"],
                               ["Bob Jones", "ACC-002", "Basic Checking", "1500"]
-                            ]
+                            ],
+                            "context_source": {"file": "test-data.xlsx", "page": "Accounts", "section": "Test Accounts"}
                           },
                           {
                             "name": "Transaction",
@@ -96,7 +102,8 @@
                               ["ACC-001", "TXN-103", "1000", "transfer"],
                               ["ACC-002", "TXN-201", "100", "deposit"],
                               ["ACC-002", "TXN-202", "50", "withdrawal"]
-                            ]
+                            ],
+                            "context_source": {"file": "test-data.xlsx", "page": "Transactions", "section": "Sample Transactions"}
                           }
                         ]
                     }

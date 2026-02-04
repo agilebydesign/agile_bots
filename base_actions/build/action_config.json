@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "build_knowledge",
   "description": "Build story graph from content area and render using story graph renderer",
   "workflow": true,
@@ -29,6 +29,16 @@
     "- Read existing files before changes - preserve all content",
     "- Match template structure exactly - don't invent schemas",
     "- Trace all knowledge to clarification/planning data",
-    "- Process builds sequentially - validate each"
+    "- Process builds sequentially - validate each",
+    "",
+    "**4. SOURCE TRACEABILITY**",
+    "Knowledge artifacts should include source references when available:",
+    "- `context_source` field on epics, sub_epics, story_groups, stories, and domain concepts",
+    "- Format: `{\"file\": \"filename.pdf\", \"page\": \"12\", \"section\": \"3.2.1 Payment Flow\"}`",
+    "- For multiple sources: use array of source objects",
+    "- If source is chat/conversation: `{\"type\": \"chat\", \"description\": \"User clarification on approval workflow\"}`",
+    "- If source is code: `{\"file\": \"path/to/file.py\", \"lines\": \"45-67\", \"function\": \"process_payment\"}`",
+    "- Prefer tracing knowledge to a source when possible",
+    "- When source is unclear, mark as `{\"type\": \"inferred\", \"basis\": \"description of inference basis\"}`"
   ]
 }
