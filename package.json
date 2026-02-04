@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node --test-reporter=junit --test-reporter-destination=test/test_reports/test_results.xml --test test/**/*.js ",    
+    "test": "node --test-reporter=junit --test-reporter=spec --test-reporter-destination=test/test_reports/test_results.xml --test-reporter-destination=stdout --test test/**/*.js ",    
     "test:watch": "node --test --watch test/**/*.js",
     "ui-test": "cd src/panel && extest setup-and-run '../../test/end_2_end/**/*_e2e.js' --mocha_config ../../.mocharc.js",
     "ui-test-setup": "cd src/panel && extest setup-tests",
