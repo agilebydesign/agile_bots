@@ -1,6 +1,6 @@
 {
   "behaviorName": "exploration",
-  "order": 4,
+  "order": 3,
   "description": "Explore and document story implementation details with acceptance criteria and scenarios",
   "goal": "Document detailed acceptance criteria and high-level scenarios for story implementation",
   "inputs": "Elaborated stories from discovery phase",
