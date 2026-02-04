@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, List, Optional, Type
 import json
 import importlib
@@ -28,11 +28,17 @@ class RenderOutputAction(Action):
     def action_name(self, value: str):
         raise AttributeError('action_name is read-only for RenderOutputAction')
 
-    def _execute_synchronizers(self, render_specs: List['RenderSpec']) -> None:
+    def _execute_synchronizers(self, render_specs: List['RenderSpec'], context: ScopeActionContext = None) -> None:
+        # Extract scope value from context if available
+        scope_value = None
+        if context and context.scope and context.scope.value:
+            # Use first scope value for filename placeholder
+            scope_value = context.scope.value[0] if context.scope.value else None
+        
         for spec in render_specs:
             if spec.synchronizer:
                 try:
-                    result = spec.execute_synchronizer()
+                    result = spec.execute_synchronizer(scope=scope_value)
                     spec.mark_executed(result)
                     logger.info(f"Executed synchronizer for {spec.name}: {result.get('output_path', 'N/A')}")
                 except Exception as e:
@@ -43,7 +49,7 @@ class RenderOutputAction(Action):
         render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
         
-        self._execute_synchronizers(render_specs)
+        self._execute_synchronizers(render_specs, context=context)
         
         merged_data = {
             'base_instructions': instructions.get('base_instructions', []),
@@ -97,7 +103,7 @@ class RenderOutputAction(Action):
     def do_execute(self, context: ScopeActionContext = None):
         render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
-        self._execute_synchronizers(render_specs)
+        self._execute_synchronizers(render_specs, context=context)
         
         instructions = self.get_instructions(context)
         

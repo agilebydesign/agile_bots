@@ -98,7 +98,6 @@ class StoryNode(ABC):
         scope_file = self._bot.workspace_directory / 'scope.json'
         with open(scope_file, 'r') as f:
             scope_before = json.load(f)
-        print(f"Scope before: {scope_before}")
         self._bot.scope(self._scope_command_for_node())
         try:
             instructions = self._bot.execute(behavior, action_name=action)
@@ -111,7 +110,6 @@ class StoryNode(ABC):
                 json.dump(scope_before, f)
             # Reload in-memory scope from file to match
             self._bot._scope.load()
-            print(f"Scope after: {scope_before}")
 
     def get_required_behavior_instructions(self, action: str = 'build'):
         behavior_needed = self.behavior_needed

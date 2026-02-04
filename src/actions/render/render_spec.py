@@ -87,13 +87,13 @@ class RenderSpec:
         self._execution_result = {'error': error}
         self._execution_status = 'failed'
 
-    def execute_synchronizer(self) -> Dict[str, Any]:
+    def execute_synchronizer(self, scope: Optional[str] = None) -> Dict[str, Any]:
         if not self.synchronizer:
             raise ValueError(f"No synchronizer specified in render spec '{self.name}'")
         synchronizer_instance = self._import_synchronizer_class(self.synchronizer.synchronizer_class_path)()
         input_path = self._resolve_input_path()
-        output_path = self._resolve_output_path(input_path)
-        kwargs = self._build_synchronizer_kwargs()
+        output_path = self._resolve_output_path(input_path, scope=scope)
+        kwargs = self._build_synchronizer_kwargs(scope=scope)
         return synchronizer_instance.render(str(input_path), str(output_path), **kwargs)
 
     def _resolve_input_path(self) -> Path:
@@ -105,13 +105,25 @@ class RenderSpec:
             input_path = workspace_dir / 'docs' / 'stories' / input_file
         return input_path
 
-    def _resolve_output_path(self, input_path: Path) -> Path:
+    def _resolve_output_path(self, input_path: Path, scope: Optional[str] = None) -> Path:
         workspace_dir = self._bot_paths.workspace_directory
         config_path = self._config_data.get('path', 'docs/stories')
         output_file = self._config_data.get('output', 'output.md')
         if '{solution_name_slug}' in output_file:
             output_file = self._resolve_solution_name_slug(output_file, input_path)
+        if '{scope}' in output_file:
+            output_file = self._resolve_scope_placeholder(output_file, scope)
         return workspace_dir / config_path / output_file
+    
+    def _resolve_scope_placeholder(self, output_file: str, scope: Optional[str] = None) -> str:
+        """Replace {scope} placeholder with actual scope value or default."""
+        if scope:
+            # Sanitize scope for filename: replace spaces with dashes, keep alphanumeric and dashes
+            sanitized_scope = scope.lower().replace(' ', '-')
+            sanitized_scope = ''.join(c for c in sanitized_scope if c.isalnum() or c == '-')
+            return output_file.replace('{scope}', sanitized_scope)
+        # If no scope provided, use 'all' as default
+        return output_file.replace('{scope}', 'all')
 
     def _resolve_solution_name_slug(self, output_file: str, input_path: Path) -> str:
         try:
@@ -122,12 +134,14 @@ class RenderSpec:
             logging.getLogger(__name__).debug(f'Failed to get solution name: {e}')
         return output_file.replace('{solution_name_slug}', 'solution')
 
-    def _build_synchronizer_kwargs(self) -> Dict[str, Any]:
+    def _build_synchronizer_kwargs(self, scope: Optional[str] = None) -> Dict[str, Any]:
         kwargs = {'project_path': str(self._bot_paths.workspace_directory)}
         if 'renderer_command' in self._config_data:
             kwargs['renderer_command'] = self._config_data['renderer_command']
         if 'force_outline' in self._config_data:
             kwargs['force_outline'] = self._config_data['force_outline']
+        if scope:
+            kwargs['scope'] = scope
         return kwargs
 
     def _import_synchronizer_class(self, synchronizer_class_path: str):
