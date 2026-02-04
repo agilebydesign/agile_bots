@@ -234,9 +234,16 @@ class BotPanel {
                     vscode.window.showErrorMessage(`Failed to open markdown preview: ${message.filePath}\n${error.message}`);
                   });
                 } else {
-                vscode.workspace.openTextDocument(fileUri).then(
-                  (doc) => {
-                    if (symbolName) {
+                const openOptions = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
+                
+                if (lineNumber && !symbolName) {
+                  openOptions.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
+                  vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
+                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  });
+                } else if (symbolName) {
+                  vscode.workspace.openTextDocument(fileUri).then(
+                    (doc) => {
                       const text = doc.getText();
                       const lines = text.split('\n');
                       let foundLine = -1;
@@ -255,22 +262,19 @@ class BotPanel {
                       }
                       
                       if (foundLine >= 0) {
-                        lineNumber = foundLine + 1;
+                        openOptions.selection = new vscode.Range(foundLine, 0, foundLine, 0);
                       }
+                      vscode.window.showTextDocument(doc, openOptions);
+                    },
+                    (error) => {
+                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                     }
-                    
-                    const options = lineNumber 
-                      ? { 
-                          selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0),
-                          viewColumn: vscode.ViewColumn.One
-                        }
-                      : { viewColumn: vscode.ViewColumn.One };
-                    vscode.window.showTextDocument(doc, options);
-                  },
-                  (error) => {
+                  );
+                } else {
+                  vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
-                  }
-                );
+                  });
+                }
                 }
               }
             }
@@ -301,16 +305,11 @@ class BotPanel {
                 'Beside': vscode.ViewColumn.Beside,
                 'Active': vscode.ViewColumn.Active
               };
-              const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.Beside;
+              const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.One;
               
-              vscode.workspace.openTextDocument(fileUri).then(
-                (doc) => {
-                  vscode.window.showTextDocument(doc, { viewColumn: targetColumn });
-                },
-                (error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
-                }
-              );
+              vscode.window.showTextDocument(fileUri, { viewColumn: targetColumn, preserveFocus: false }).catch((error) => {
+                vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+              });
             }
             return;
           case "openFileWithState":
@@ -330,54 +329,97 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              vscode.workspace.openTextDocument(fileUri).then(
-                (doc) => {
-                  let lineNumber = null;
-                  
-                  // If state includes line number or node info, find the line
-                  if (message.state && message.state.lineNumber) {
-                    lineNumber = message.state.lineNumber;
-                  } else if (message.state && message.state.selectedNode) {
-                    // Try to find line number by searching for the node in JSON
+              // If state has a direct line number, open without document search
+              if (message.state && message.state.lineNumber) {
+                const options = {
+                  viewColumn: vscode.ViewColumn.One,
+                  selection: new vscode.Range(message.state.lineNumber - 1, 0, message.state.lineNumber - 1, 0),
+                  preserveFocus: false
+                };
+                vscode.window.showTextDocument(fileUri, options).then(() => {
+                  this._log(`[BotPanel] File opened with state: lineNumber=${message.state.lineNumber}`);
+                }).catch((error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                });
+              } else if (message.state && message.state.selectedNode) {
+                // Need to search document for node - use openTextDocument
+                vscode.workspace.openTextDocument(fileUri).then(
+                  (doc) => {
                     const node = message.state.selectedNode;
                     const text = doc.getText();
                     const lines = text.split('\n');
                     
-                    // Search for the node by name and type
-                    // Look for patterns like "name": "NodeName" within the appropriate structure
+                    let nameLineIndex = -1;
+                    const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
+                    
                     for (let i = 0; i < lines.length; i++) {
-                      const line = lines[i];
-                      // Match node name in JSON (accounting for escaped quotes)
-                      const namePattern = new RegExp(`"name"\\s*:\\s*"${node.name.replace(/"/g, '\\"')}"`);
-                      if (namePattern.test(line)) {
-                        // Check if this matches the node type context
-                        // For epics: look for "epics": [ ... ]
-                        // For sub-epics: look within parent epic
-                        // For stories: look within story_groups
-                        lineNumber = i + 1; // VS Code uses 1-based line numbers
+                      if (namePattern.test(lines[i])) {
+                        nameLineIndex = i;
                         break;
                       }
                     }
-                  }
-                  
-                  const options = lineNumber 
-                    ? { 
-                        viewColumn: vscode.ViewColumn.One,
-                        selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0)
+                    
+                    let options = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
+                    
+                    if (nameLineIndex >= 0) {
+                      // Find the opening brace of this object (search backwards)
+                      let startLine = nameLineIndex;
+                      for (let i = nameLineIndex - 1; i >= 0; i--) {
+                        const line = lines[i].trim();
+                        if (line === '{' || line.endsWith('{')) {
+                          startLine = i;
+                          break;
+                        }
+                        if (line.startsWith('}') || line === '},') {
+                          break;
+                        }
                       }
-                    : { viewColumn: vscode.ViewColumn.One };
-                  
-                  vscode.window.showTextDocument(doc, options).then(() => {
-                    // Send state information - actual collapse/expand will be handled by story graph viewer if it supports it
-                    if (message.state) {
-                      this._log(`[BotPanel] File opened with state: collapseAll=${message.state.collapseAll}, expandPath=${message.state.expandPath}, lineNumber=${lineNumber}`);
+                      
+                      // Find the matching closing brace (count braces forward)
+                      let braceCount = 0;
+                      let endLine = nameLineIndex;
+                      let started = false;
+                      
+                      for (let i = startLine; i < lines.length; i++) {
+                        const line = lines[i];
+                        for (const char of line) {
+                          if (char === '{') {
+                            braceCount++;
+                            started = true;
+                          } else if (char === '}') {
+                            braceCount--;
+                            if (started && braceCount === 0) {
+                              endLine = i;
+                              break;
+                            }
+                          }
+                        }
+                        if (started && braceCount === 0) break;
+                      }
+                      
+                      // Select from start of opening brace line to end of closing brace line
+                      const endLineLength = lines[endLine] ? lines[endLine].length : 0;
+                      options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
                     }
-                  });
-                },
-                (error) => {
+                    
+                    vscode.window.showTextDocument(doc, options).then(() => {
+                      this._log(`[BotPanel] File opened with state: selectedNode=${node.name}`);
+                    });
+                  },
+                  (error) => {
+                    // Fallback: open file without positioning
+                    vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch(() => {
+                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    });
+                  }
+                );
+              } else {
+                // No state - just open the file directly
+                vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
-                }
-              );
+                });
+              }
             }
             return;
           case "openStoryFiles":
