@@ -60,6 +60,7 @@ const botPath = productionBotPath;
 // Shared backend panel - will be initialized in before() hook after workspace is set up
 let backendPanel = null;
 let cli = null;
+let testPanel = null;
 
 before(() => {
     setupTestWorkspace();
@@ -73,6 +74,7 @@ before(() => {
     // WORKING_AREA is set to tempWorkspaceDir, so all data writes go to temp directory
     backendPanel = new PanelView(botPath);
     cli = backendPanel;
+    testPanel = createTestBotPanel();
 });
 
 /**
@@ -86,36 +88,49 @@ function createTestBotPanel() {
     let messageHandler = null;
     
     // Mock webview (captures messages sent TO the webview)
-    let botPanelHandler = null;
     const mockWebview = {
         postMessage: (msg) => {
             sentMessages.push(msg);
         },
         asWebviewUri: (uri) => uri,
         onDidReceiveMessage: (handler) => {
-            // BotPanel will register its handler here - store it
-            botPanelHandler = handler;
-            // Return our wrapper handler that intercepts sendToChat
-            messageHandler = async (message) => {
-                // Intercept sendToChat before it reaches BotPanel
-                if (message.command === 'sendToChat') {
-                    submittedToChat.push({
-                        content: message.content,
-                        timestamp: Date.now()
-                    });
-                    // Don't call BotPanel's handler - we've mocked it
-                    mockWebview.postMessage({
-                        command: 'submitResult',
-                        status: 'success',
-                        message: 'Instructions submitted to chat (mocked)'
-                    });
-                    return;
-                }
-                // For executeCommand, handle it ourselves using backendPanel
-                if (message.command === 'executeCommand' && message.commandText) {
+            messageHandler = handler;
+            return { dispose: () => {} };
+        }
+    };
+    
+    // Mock VS Code panel  
+    const mockVscodePanel = {
+        webview: mockWebview,
+        onDidDispose: () => ({ dispose: () => {} }),
+        onDidChangeViewState: () => ({ dispose: () => {} }),
+        reveal: () => {},
+        visible: true,
+        dispose: () => {}
+    };
+    
+    const handleMessage = async (message) => {
+        switch (message.command) {
+            // Intercept sendToChat before it reaches BotPanel
+            case 'sendToChat':
+                console.log('SUBMITTED TO CHAT (MOCKED):');
+                submittedToChat.push({
+                    content: message.content,
+                    timestamp: Date.now()
+                });
+                // Don't call BotPanel's handler - we've mocked it
+                mockWebview.postMessage({
+                    command: 'submitResult',
+                    status: 'success',
+                    message: 'Instructions submitted to chat (mocked)'
+                });                
+                break;
+            case 'executeCommand':
+                if (message.commandText) {
                     executedCommands.push(message.commandText);
                     try {
                         const result = await backendPanel.execute(message.commandText);
+                        // Check if backend returned an error (status: 'error')
                         if (result && result.status === 'error') {
                             mockWebview.postMessage({
                                 command: 'commandError',
@@ -133,36 +148,21 @@ function createTestBotPanel() {
                             error: error.message
                         });
                     }
-                    return;
                 }
-                // For other commands, forward to BotPanel's handler
-                if (botPanelHandler) {
-                    await botPanelHandler(message);
-                }
-            };
-            return { dispose: () => {} };
+                break;
+            case 'refresh':
+                // Mimic refresh behavior if needed
+                break;
+            default:
+                console.log(`[Test] Unhandled message command: ${message.command}`);
         }
     };
     
-    // Mock VS Code panel - must have all methods/properties that BotPanel uses
-    const mockVscodePanel = {
-        webview: mockWebview,
-        title: 'Bot Panel',
-        visible: true,
-        onDidDispose: function(callback, thisArg, disposables) {
-            return { dispose: () => {} };
-        },
-        onDidChangeViewState: function(callback, thisArg, disposables) {
-            return { dispose: () => {} };
-        },
-        reveal: function() {},
-        dispose: function() {}
-    };
-    
-    // Create BotPanel instance with mocked panel
-    // BotPanel constructor: (panel, workspaceRoot, extensionUri)
-    // BotPanel will register its handler via onDidReceiveMessage above
+        
     const botPanel = new BotPanel(mockVscodePanel, repoRoot, null);
+
+    // Register the handler (mirrors onDidReceiveMessage in bot_panel.js)    
+    botPanel._panel.webview.onDidReceiveMessage(handleMessage);    
     
     return {
         botPanel,
@@ -175,26 +175,34 @@ function createTestBotPanel() {
             if (messageHandler) {
                 await messageHandler(message);
             }
+        },
+        
+        dispose: () => {
+            botPanel.dispose();
         }
     };
 }
 
-// Cleanup after all tests
-after(() => {
-    if (backendPanel) {
-        backendPanel.cleanup();
-    }
-    // Clean up temp workspace and restore environment
-    try {
-        if (fs.existsSync(tempWorkspaceDir)) {
-            fs.rmSync(tempWorkspaceDir, { recursive: true, force: true });
-        }
-    } catch (err) {
-        console.warn('Failed to clean up temp workspace:', err.message);
-    }
-    // Restore WORKING_AREA to original or unset
-    delete process.env.WORKING_AREA;
-});
+// after(() => {
+//     if (backendPanel) {
+//         backendPanel.cleanup();
+//         backendPanel = null;
+//     }
+//     if (testPanel) {
+//         testPanel.dispose();
+//         testPanel = null;
+//     }
+//     // Clean up temp workspace and restore environment
+//     try {
+//         if (fs.existsSync(tempWorkspaceDir)) {
+//             fs.rmSync(tempWorkspaceDir, { recursive: true, force: true });
+//         }
+//     } catch (err) {
+//         console.warn('Failed to clean up temp workspace:', err.message);
+//     }
+//     // Restore WORKING_AREA to original or unset
+//     delete process.env.WORKING_AREA;
+// });
 
 
 test('TestDisplayBaseInstructions', { concurrency: false }, async (t) => {
@@ -248,7 +256,7 @@ test('TestDisplayStrategyInstructions', { concurrency: false }, async (t) => {
 
 test('TestSubmitInstructionsToAIAgent', { concurrency: false }, async (t) => {
     
-    await t.test('test_instructions_view_has_submit_button', async () => {
+    await t.test('test_instructions_view_has_submit_button', async () => {        
         // Execute shape.clarify which returns instructions in the response
         const result = await backendPanel.execute('shape.clarify');
         
@@ -273,21 +281,10 @@ test('TestSubmitInstructionsToAIAgent', { concurrency: false }, async (t) => {
         // test_submit_button_triggers_sendToChat_mocked test below which uses mocked panel
     });
     
-    await t.test('test_submit_button_triggers_sendToChat_mocked', async () => {
-        const testPanel = createTestBotPanel();
-        
-        // Execute action to get instructions via backend
-        await backendPanel.execute('shape.clarify');
-        
-        // Wait a bit for BotPanel to initialize _botView
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Create InstructionsSection with mocked webview
-        const view = new InstructionsSection(
-            testPanel.botPanel._botView || botPath,
-            testPanel.panel.webview
-        );
-        await view.render();
+    await t.test('test_submit_button_triggers_sendToChat_mocked', async (t) => {
+        // Wait for BotPanel's async update to complete or else the test will fail due to test class ending before
+        // the async update finishes: 'Promise resolution is still pending but the event loop has already resolved'       
+        await testPanel.botPanel._update();    
         
         // Simulate clicking submit button by sending sendToChat message to the mocked panel
         await testPanel.postMessageFromWebview({
@@ -394,12 +391,20 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
 });
 
 after(() => {
-    // Cleanup backend panel to prevent hanging promises
-    if (backendPanel) {
+    // Cleanup backend panel to prevent hanging promises    
+    if (backendPanel) {        
         backendPanel.cleanup();
         backendPanel = null;
+    }
+    if (cli) {
+        cli.cleanup();
         cli = null;
     }
+    if (testPanel) {    
+        testPanel.dispose();
+        testPanel = null;
+    }
+    
     // Clean up temp workspace and restore environment
     try {
         if (fs.existsSync(tempWorkspaceDir)) {
@@ -409,5 +414,5 @@ after(() => {
         console.warn('Failed to clean up temp workspace:', err.message);
     }
     // Restore WORKING_AREA to original or unset
-    delete process.env.WORKING_AREA;
+    delete process.env.WORKING_AREA;    
 });
