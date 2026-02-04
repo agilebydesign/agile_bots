@@ -15,20 +15,26 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v6.2.0
+      with:
+        python-version: '>=3.13'
+        pip-install: -r requirements.txt
       
     - name: Install Node.js
       uses: actions/setup-node@v4
 
     - name: Install npm dependencies
       run: npm install
-      
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
 
     - name: Run NPM Tests
-      run: npm run test
+      run: npm test
+
+    - name: Test Report
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      with:
+        name: Node Tests            # Name of the check run which will be created
+        path: test/test_reports/test_results.xml    # Path to test results
+        reporter: jest-junit        # Format of test results
