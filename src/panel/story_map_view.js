@@ -193,8 +193,11 @@ class StoryMapView extends PanelView {
                     </button>
                 </div>
                 
+                <!-- Separator between Create/Delete and Scope/Submit groups -->
+                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
+                
                 <!-- Scope buttons group with space for additional scope buttons -->
-                <div style="display: flex; align-items: center; gap: 2px; margin-left: 10px;">
+                <div style="display: flex; align-items: center; gap: 2px;">
                     <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
                         <img src="${scopeToIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Scope To" />
                     </button>
@@ -234,25 +237,28 @@ class StoryMapView extends PanelView {
                         <img id="btn-submit-current-icon" src="${refreshIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Current" />
                     </button>
                 </div>
+                
+                <!-- Separator between Scope/Submit and Related Files groups -->
+                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
                 </div>
                 
                 <!-- Right side: Related Files button group -->
-                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 0px; margin-left: auto; padding-left: 10px;">
+                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
                     <button id="btn-open-graph" 
                             onclick="event.stopPropagation(); handleOpenGraph();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 52px; height: 52px; flex-shrink: 0;" 
                             onmouseover="this.style.opacity='0.7'" 
                             onmouseout="this.style.opacity='1'" 
                             title="Open story graph with selected node expanded">
-                        <img src="${jsonIconPath}" style="width: 60px; height: 60px; object-fit: contain; display: block; flex-shrink: 0;" alt="Graph" />
+                        <img src="${jsonIconPath}" style="width: 48px; height: 48px; object-fit: contain; display: block;" alt="Graph" />
                     </button>
                     <button id="btn-open-all" 
                             onclick="event.stopPropagation(); handleOpenAll();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease;" 
+                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px; flex-shrink: 0;" 
                             onmouseover="this.style.opacity='0.7'" 
                             onmouseout="this.style.opacity='1'" 
                             title="Open all related files in split editors">
-                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="All" />
+                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
                     </button>
                 </div>
             </div>
