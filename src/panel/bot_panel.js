@@ -1015,6 +1015,25 @@ class BotPanel {
                 });
             }
             return;
+          case "saveStrategyMultiDecision":
+            if (message.criteriaKey && message.selectedOptions) {
+              this._log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
+              // Build decisions object with array of selected options
+              const multiDecisions = {};
+              multiDecisions[message.criteriaKey] = message.selectedOptions;
+              const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
+              const multiCmd = `save --decisions '${multiDecisionsJson}'`;
+              this._botView?.execute(multiCmd)
+                .then(() => {
+                  this._log(`[BotPanel] saveStrategyMultiDecision success`);
+                  vscode.window.showInformationMessage('Strategy decisions saved successfully');
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] saveStrategyMultiDecision ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to save strategy decisions: ${error.message}`);
+                });
+            }
+            return;
           case "saveStrategyAssumptions":
             if (message.assumptions) {
               this._log(`[BotPanel] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
@@ -4026,6 +4045,29 @@ class BotPanel {
                 command: 'saveStrategyDecision',
                 criteriaKey: criteriaKey,
                 selectedOption: selectedOption
+            });
+        };
+        
+        // Multi-select version: collects all checked checkboxes with given name
+        window.saveStrategyMultiDecision = function(criteriaKey, inputName) {
+            console.log('[WebView] saveStrategyMultiDecision triggered:', criteriaKey, inputName);
+            const checkboxes = document.querySelectorAll('input[name="' + inputName + '"]:checked');
+            const selectedOptions = [];
+            checkboxes.forEach(cb => {
+                // Get the option text from the label's span
+                const label = cb.closest('label');
+                if (label) {
+                    const span = label.querySelector('span');
+                    if (span) {
+                        selectedOptions.push(span.textContent);
+                    }
+                }
+            });
+            console.log('[WebView] Saving multi-select decision:', criteriaKey, selectedOptions);
+            vscode.postMessage({
+                command: 'saveStrategyMultiDecision',
+                criteriaKey: criteriaKey,
+                selectedOptions: selectedOptions
             });
         };
         

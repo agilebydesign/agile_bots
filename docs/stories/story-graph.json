@@ -25,98 +25,108 @@
                   "sequential_order": 0.0,
                   "connector": "and",
                   "story_type": "user",
-                  "users": [
-                    "MCP Server Generator"
-                  ],
+                  "users": [],
                   "test_class": "TestGenerateBotTools",
                   "scenarios": [
                     {
-                      "name": "Generator creates bot tool for test_bot",
+                      "name": "Generator fails when bot config malformed",
                       "sequential_order": 1.0,
                       "type": "",
                       "background": [],
-                      "test_method": "test_generator_creates_bot_tool_for_test_bot",
-                      "steps": "Given A bot configuration file with a working directory and behaviors\nAnd A bot that has been initialized with that config file\nWhen Generator processes Bot Config\nThen Generator creates 1 bot tool instance"
-                    }
-                  ],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN Generator processes Bot Config",
-                      "text": "WHEN Generator processes Bot Config",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN Generator creates 1 bot tool instance",
-                      "text": "THEN Generator creates 1 bot tool instance",
-                      "sequential_order": 2.0
-                    }
-                  ],
-                  "behavior": "code"
-                },
-                {
-                  "name": "Generate Behavior Tools",
-                  "sequential_order": 1.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "MCP Server Generator"
-                  ],
-                  "test_class": "TestGenerateBehaviorTools",
-                  "scenarios": [
-                    {
-                      "name": "Generator creates behavior tools for test_bot with 4 behaviors",
-                      "sequential_order": 1.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_generator_creates_behavior_tools_for_test_bot_with_4_behaviors",
-                      "steps": "Given A bot configuration file with a working directory and behaviors\nAnd A bot that has been initialized with that config file\nWhen Generator processes Bot Config\nThen Generator creates 4 behavior tool instances"
-                    }
-                  ],
-                  "acceptance_criteria": [
-                    {
-                      "name": "WHEN Generator processes Bot Config",
-                      "text": "WHEN Generator processes Bot Config",
-                      "sequential_order": 1.0
-                    },
-                    {
-                      "name": "THEN Generator creates behavior tool instances for each behavior",
-                      "text": "THEN Generator creates behavior tool instances for each behavior",
-                      "sequential_order": 2.0
-                    }
-                  ],
-                  "behavior": "code"
-                },
-                {
-                  "name": "Generate MCP Bot Server",
-                  "sequential_order": 2.0,
-                  "connector": "and",
-                  "story_type": "user",
-                  "users": [
-                    "MCP Server Generator"
-                  ],
-                  "test_class": "TestGenerateMCPBotServer",
-                  "scenarios": [
-                    {
-                      "name": "Generator creates MCP server for test_bot",
-                      "sequential_order": 2.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_generator_creates_mcp_server_for_test_bot",
-                      "steps": "Given A bot configuration file with a working directory and behaviors\nAnd A bot that has been initialized with that config file\nWhen MCP Server Generator receives Bot Config\nThen Generator creates MCP Server instance with unique server name"
-                    },
-                    {
-                      "name": "Generator fails when Bot Config is missing",
-                      "sequential_order": 5.0,
-                      "type": "",
-                      "background": [],
-                      "test_method": "test_generator_fails_when_bot_config_missing",
-                      "steps": "Given A bot directory exists\nAnd Bot Config does NOT exist\nWhen MCP Server Generator attempts to receive Bot Config\nThen Generator raises FileNotFoundError and does not create MCP Server instance"
-                    },
-                    {
-                      "name": "Generator fails when Bot Config is malformed",
-                      "sequential_order": 6.0,
-                      "type": "",
-                      "background": [],
+                      "examples": [
+                        {
+                          "columns": [
+                            "epic_name",
+                            "story_name",
+                            "test_class",
+                            "acceptance_criteria",
+                            "expected_behavior",
+                            "action",
+                            "expected_instructions_contain",
+                            "scenario",
+                            "test_method"
+                          ],
+                          "rows": [
+                            [
+                              "File Management",
+                              "Upload File",
+                              "test_file_upload.py",
+                              "File size validated; File type checked; Upload progress tracked",
+                              "code",
+                              "build",
+                              "code behavior; build action; file upload functionality; implement production code",
+                              "User uploads valid file and sees success confirmation",
+                              "test_user_uploads_valid_file_and_sees_success_confirmation"
+                            ],
+                            [
+                              "File Management",
+                              "Upload File",
+                              "test_file_upload.py",
+                              "File size validated; File type checked; Upload progress tracked",
+                              "code",
+                              "build",
+                              "code behavior; build action; file upload functionality; implement production code",
+                              "User uploads oversized file and sees size limit error",
+                              "test_user_uploads_oversized_file_and_sees_size_limit_error"
+                            ],
+                            [
+                              "File Management",
+                              "Upload File",
+                              "test_file_upload.py",
+                              "File size validated; File type checked; Upload progress tracked",
+                              "code",
+                              "build",
+                              "code behavior; build action; file upload functionality; implement production code",
+                              "User uploads invalid file type and sees type error",
+                              "test_user_uploads_invalid_file_type_and_sees_type_error"
+                            ],
+                            [
+                              "File Management",
+                              "Upload File",
+                              "test_file_upload.py",
+                              "File size validated; File type checked; Upload progress tracked",
+                              "code",
+                              "build",
+                              "code behavior; build action; file upload functionality; implement production code",
+                              "User cancels upload mid-transfer and sees cancellation confirmation",
+                              "test_user_cancels_upload_mid_transfer_and_sees_cancellation_confirmation"
+                            ],
+                            [
+                              "File Management",
+                              "Upload File",
+                              "test_file_upload.py",
+                              "File size validated; File type checked; Upload progress tracked",
+                              "code",
+                              "build",
+                              "code behavior; build action; file upload functionality; implement production code",
+                              "Upload fails with network error and user sees retry option",
+                              "test_upload_fails_with_network_error_and_user_sees_retry_option"
+                            ],
+                            [
+                              "File Management",
+                              "Download File",
+                              "test_file_download.py",
+                              "Download initiated; Progress displayed",
+                              "test",
+                              "build",
+                              "test behavior; build action; file download test coverage; implement test methods for scenarios",
+                              "User downloads file successfully and sees progress",
+                              "test_user_downloads_file_successfully_and_sees_progress"
+                            ],
+                            [
+                              "File Management",
+                              "Download File",
+                              "test_file_download.py",
+                              "Download initiated; Progress displayed",
+                              "test",
+                              "build",
+                              "test behavior; build action; file download test coverage; implement test methods for scenarios",
+                              "User downloads file with network interruption and retries",
+                              "test_user_downloads_file_with_network_interruption_and_retries"
+                            ]
+                          ]
+                        }
+                      ],
                       "test_method": "test_generator_fails_when_bot_config_malformed",
                       "steps": "Given A bot directory exists\nAnd Bot Config file exists with invalid JSON syntax\nWhen MCP Server Generator attempts to receive Bot Config\nThen Generator raises JSONDecodeError and does not create MCP Server instance"
                     }
@@ -9239,66 +9249,68 @@
                           "background": [],
                           "test_method": "test_user_moves_node_optimistic_update_subepic",
                           "steps": "Given Story Map contains <parent_node_type> named <parent_node_name>\nAnd <parent_node_type> contains <node_type> named <node_name> at position <original_position>\nAnd Panel is displaying story map\nWhen User drags <node_type> <node_name> to new position <target_position>\nThen Panel moves <node_type> <node_name> to position <target_position> in DOM immediately\nAnd Panel displays <status_indicator> in header\nAnd Panel shows operation count <operation_count>\nWhen Panel waits <debounce_time> after last change\nThen Panel executes move command to Backend\nAnd Backend moves <node_type> <node_name> from position <original_position> to <target_position>\nAnd Backend writes changes to story-graph.json\nWhen Backend completes save successfully\nThen Panel shows <success_indicator>\nAnd Panel shows <success_message>\nAnd Panel auto-hides status after <auto_hide_time>\nWhen User reloads Panel\nThen Panel loads story-graph.json\nAnd Panel displays <node_type> <node_name> at position <target_position>",
-                          "examples": {
-                            "columns": [
-                              "parent_node_type",
-                              "parent_node_name",
-                              "node_type",
-                              "node_name",
-                              "original_position",
-                              "target_position",
-                              "status_indicator",
-                              "operation_count",
-                              "debounce_time",
-                              "success_indicator",
-                              "success_message",
-                              "auto_hide_time"
-                            ],
-                            "rows": [
-                              [
-                                "Epic",
-                                "Invoke Bot",
-                                "SubEpic",
-                                "Edit Story Map",
-                                1,
-                                3,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                          "examples": [
+                            {
+                              "columns": [
+                                "parent_node_type",
+                                "parent_node_name",
+                                "node_type",
+                                "node_name",
+                                "original_position",
+                                "target_position",
+                                "status_indicator",
+                                "operation_count",
+                                "debounce_time",
+                                "success_indicator",
+                                "success_message",
+                                "auto_hide_time"
                               ],
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                0,
-                                5,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
-                              ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Scenario",
-                                "User moves node and sees optimistic update",
-                                0,
-                                2,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                              "rows": [
+                                [
+                                  "Epic",
+                                  "Invoke Bot",
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  1,
+                                  3,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  0,
+                                  5,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Scenario",
+                                  "User moves node and sees optimistic update",
+                                  0,
+                                  2,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "User renames node and sees optimistic update with async save",
@@ -9307,62 +9319,64 @@
                           "background": [],
                           "test_method": "test_user_renames_node_optimistic_update_subepic",
                           "steps": "Given Story Map contains <parent_node_type> named <parent_node_name>\nAnd <parent_node_type> contains <node_type> named <original_name>\nAnd Panel is displaying story map\nWhen User renames <node_type> from <original_name> to <new_name>\nThen Panel updates <node_type> name to <new_name> in DOM immediately\nAnd Panel displays <status_indicator> in header\nAnd Panel shows operation count <operation_count>\nWhen Panel waits <debounce_time> after last change\nThen Panel executes rename command to Backend\nAnd Backend renames <node_type> from <original_name> to <new_name>\nAnd Backend writes changes to story-graph.json\nWhen Backend completes save successfully\nThen Panel shows <success_indicator>\nAnd Panel shows <success_message>\nAnd Panel auto-hides status after <auto_hide_time>\nWhen User reloads Panel\nThen Panel loads story-graph.json\nAnd Panel displays <node_type> named <new_name>",
-                          "examples": {
-                            "columns": [
-                              "parent_node_type",
-                              "parent_node_name",
-                              "node_type",
-                              "original_name",
-                              "new_name",
-                              "status_indicator",
-                              "operation_count",
-                              "debounce_time",
-                              "success_indicator",
-                              "success_message",
-                              "auto_hide_time"
-                            ],
-                            "rows": [
-                              [
-                                "Epic",
-                                "Invoke Bot",
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Modify Story Map",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                          "examples": [
+                            {
+                              "columns": [
+                                "parent_node_type",
+                                "parent_node_name",
+                                "node_type",
+                                "original_name",
+                                "new_name",
+                                "status_indicator",
+                                "operation_count",
+                                "debounce_time",
+                                "success_indicator",
+                                "success_message",
+                                "auto_hide_time"
                               ],
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Persist Story Map Changes Async",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
-                              ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Scenario",
-                                "User moves node",
-                                "User drags and drops node to reorder",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                              "rows": [
+                                [
+                                  "Epic",
+                                  "Invoke Bot",
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Modify Story Map",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Persist Story Map Changes Async",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Scenario",
+                                  "User moves node",
+                                  "User drags and drops node to reorder",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "User deletes node and sees optimistic update with async save",
@@ -9371,62 +9385,64 @@
                           "background": [],
                           "test_method": "test_user_deletes_node_optimistic_update_story",
                           "steps": "Given Story Map contains <parent_node_type> named <parent_node_name>\nAnd <parent_node_type> contains <node_type> named <node_name> at position <node_position>\nAnd Panel is displaying story map\nWhen User clicks delete on <node_type> <node_name>\nThen Panel removes <node_type> <node_name> from DOM immediately\nAnd Panel displays <status_indicator> in header\nAnd Panel shows operation count <operation_count>\nWhen Panel waits <debounce_time> after last change\nThen Panel executes delete command to Backend\nAnd Backend deletes <node_type> <node_name> from <parent_node_type>\nAnd Backend writes changes to story-graph.json\nWhen Backend completes save successfully\nThen Panel shows <success_indicator>\nAnd Panel shows <success_message>\nAnd Panel auto-hides status after <auto_hide_time>\nWhen User reloads Panel\nThen Panel loads story-graph.json\nAnd Panel confirms <node_type> <node_name> no longer exists",
-                          "examples": {
-                            "columns": [
-                              "parent_node_type",
-                              "parent_node_name",
-                              "node_type",
-                              "node_name",
-                              "node_position",
-                              "status_indicator",
-                              "operation_count",
-                              "debounce_time",
-                              "success_indicator",
-                              "success_message",
-                              "auto_hide_time"
-                            ],
-                            "rows": [
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Deprecated Story Example",
-                                8,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                          "examples": [
+                            {
+                              "columns": [
+                                "parent_node_type",
+                                "parent_node_name",
+                                "node_type",
+                                "node_name",
+                                "node_position",
+                                "status_indicator",
+                                "operation_count",
+                                "debounce_time",
+                                "success_indicator",
+                                "success_message",
+                                "auto_hide_time"
                               ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Scenario",
-                                "Obsolete test scenario",
-                                5,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
-                              ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Acceptance Criterion",
-                                "Outdated AC for feature",
-                                15,
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                              "rows": [
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Deprecated Story Example",
+                                  8,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Scenario",
+                                  "Obsolete test scenario",
+                                  5,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Acceptance Criterion",
+                                  "Outdated AC for feature",
+                                  15,
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "User creates node and sees optimistic update with async save",
@@ -9435,58 +9451,60 @@
                           "background": [],
                           "test_method": "test_user_creates_node_optimistic_update_subepic",
                           "steps": "Given Story Map contains <parent_node_type> named <parent_node_name>\nAnd Panel is displaying story map\nWhen User clicks create new <node_type> under <parent_node_type>\nAnd User enters <node_type> name <new_node_name>\nThen Panel adds <node_type> <new_node_name> to DOM immediately\nAnd Panel displays <status_indicator> in header\nAnd Panel shows operation count <operation_count>\nWhen Panel waits <debounce_time> after last change\nThen Panel executes create command to Backend\nAnd Backend creates <node_type> <new_node_name> under <parent_node_type>\nAnd Backend writes changes to story-graph.json\nWhen Backend completes save successfully\nThen Panel shows <success_indicator>\nAnd Panel shows <success_message>\nAnd Panel auto-hides status after <auto_hide_time>\nWhen User reloads Panel\nThen Panel loads story-graph.json\nAnd Panel displays <node_type> <new_node_name> under <parent_node_type>",
-                          "examples": {
-                            "columns": [
-                              "parent_node_type",
-                              "parent_node_name",
-                              "node_type",
-                              "new_node_name",
-                              "status_indicator",
-                              "operation_count",
-                              "debounce_time",
-                              "success_indicator",
-                              "success_message",
-                              "auto_hide_time"
-                            ],
-                            "rows": [
-                              [
-                                "Epic",
-                                "Invoke Bot",
-                                "SubEpic",
-                                "Export Story Map",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                          "examples": [
+                            {
+                              "columns": [
+                                "parent_node_type",
+                                "parent_node_name",
+                                "node_type",
+                                "new_node_name",
+                                "status_indicator",
+                                "operation_count",
+                                "debounce_time",
+                                "success_indicator",
+                                "success_message",
+                                "auto_hide_time"
                               ],
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Undo Story Map Changes",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
-                              ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Scenario",
-                                "User creates SubEpic and saves",
-                                "spinner icon",
-                                "1 operation",
-                                "500ms",
-                                "green checkmark",
-                                "Saved",
-                                "2 seconds"
+                              "rows": [
+                                [
+                                  "Epic",
+                                  "Invoke Bot",
+                                  "SubEpic",
+                                  "Export Story Map",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Undo Story Map Changes",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Scenario",
+                                  "User creates SubEpic and saves",
+                                  "spinner icon",
+                                  "1 operation",
+                                  "500ms",
+                                  "green checkmark",
+                                  "Saved",
+                                  "2 seconds"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "User makes multiple rapid changes and sees batched async save",
@@ -9495,67 +9513,69 @@
                           "background": [],
                           "test_method": "test_user_makes_multiple_rapid_changes_batched_async_save",
                           "steps": "Given Story Map contains Epic <epic_name> with SubEpic <sub_epic_name>\nAnd SubEpic contains Story <story_name_a> at position <pos_a>\nAnd SubEpic contains Story <story_name_b> at position <pos_b>\nAnd SubEpic contains Story <story_name_c> at position <pos_c>\nAnd Panel is displaying story map\nWhen User moves <story_name_a> to position <new_pos_a>\nAnd User renames <story_name_b> to <new_name_b> within <batch_window>\nAnd User deletes <story_name_c> within <batch_window>\nThen Panel updates all changes in DOM immediately\nAnd Panel displays <status_indicator> in header\nAnd Panel shows <batch_message>\nWhen Panel waits <debounce_time> after last change\nThen Panel executes <operation_count> commands sequentially to Backend\nAnd Backend processes all operations\nAnd Backend writes changes to story-graph.json\nWhen Backend completes all saves successfully\nThen Panel shows <success_indicator>\nAnd Panel shows <success_message>\nWhen User reloads Panel\nThen Panel loads story-graph.json\nAnd Panel displays <story_name_a> at position <new_pos_a>\nAnd Panel displays Story named <new_name_b>\nAnd Panel confirms <story_name_c> no longer exists",
-                          "examples": {
-                            "columns": [
-                              "epic_name",
-                              "sub_epic_name",
-                              "story_name_a",
-                              "pos_a",
-                              "new_pos_a",
-                              "story_name_b",
-                              "new_name_b",
-                              "pos_b",
-                              "story_name_c",
-                              "pos_c",
-                              "batch_window",
-                              "status_indicator",
-                              "batch_message",
-                              "debounce_time",
-                              "operation_count",
-                              "success_indicator",
-                              "success_message"
-                            ],
-                            "rows": [
-                              [
-                                "Invoke Bot",
-                                "Edit Story Map",
-                                "Save Story Map Changes Asynchronously",
-                                0,
-                                2,
-                                "Filter Scope",
-                                "Apply Scope Filter",
-                                1,
-                                "Deprecated Feature X",
-                                3,
-                                "500ms",
-                                "spinner icon",
-                                "Saving 3 changes...",
-                                "500ms",
-                                "3",
-                                "green checkmark",
-                                "Saved"
+                          "examples": [
+                            {
+                              "columns": [
+                                "epic_name",
+                                "sub_epic_name",
+                                "story_name_a",
+                                "pos_a",
+                                "new_pos_a",
+                                "story_name_b",
+                                "new_name_b",
+                                "pos_b",
+                                "story_name_c",
+                                "pos_c",
+                                "batch_window",
+                                "status_indicator",
+                                "batch_message",
+                                "debounce_time",
+                                "operation_count",
+                                "success_indicator",
+                                "success_message"
                               ],
-                              [
-                                "Invoke Bot",
-                                "Navigate Behavior Actions",
-                                "Display Current Behavior State",
-                                0,
-                                1,
-                                "Navigate to Next Action",
-                                "Advance to Next Action",
-                                1,
-                                "Old Navigation Test",
-                                2,
-                                "500ms",
-                                "spinner icon",
-                                "Saving 3 changes...",
-                                "500ms",
-                                "3",
-                                "green checkmark",
-                                "Saved"
+                              "rows": [
+                                [
+                                  "Invoke Bot",
+                                  "Edit Story Map",
+                                  "Save Story Map Changes Asynchronously",
+                                  0,
+                                  2,
+                                  "Filter Scope",
+                                  "Apply Scope Filter",
+                                  1,
+                                  "Deprecated Feature X",
+                                  3,
+                                  "500ms",
+                                  "spinner icon",
+                                  "Saving 3 changes...",
+                                  "500ms",
+                                  "3",
+                                  "green checkmark",
+                                  "Saved"
+                                ],
+                                [
+                                  "Invoke Bot",
+                                  "Navigate Behavior Actions",
+                                  "Display Current Behavior State",
+                                  0,
+                                  1,
+                                  "Navigate to Next Action",
+                                  "Advance to Next Action",
+                                  1,
+                                  "Old Navigation Test",
+                                  2,
+                                  "500ms",
+                                  "spinner icon",
+                                  "Saving 3 changes...",
+                                  "500ms",
+                                  "3",
+                                  "green checkmark",
+                                  "Saved"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "User sees error handling when async save fails",
@@ -9564,66 +9584,68 @@
                           "background": [],
                           "test_method": "test_user_sees_error_handling_validation_error_story",
                           "steps": "Given Story Map contains <parent_node_type> named <parent_node_name>\nAnd <parent_node_type> contains <node_type> named <original_name>\nAnd Panel is displaying story map\nWhen User renames <node_type> to <invalid_name>\nThen Panel updates <node_type> name to <invalid_name> in DOM immediately\nAnd Panel displays <status_indicator> in header\nWhen Panel waits <debounce_time> after last change\nThen Panel executes rename command to Backend\nWhen Backend returns <error_type> error with message <error_message>\nThen Panel shows <error_indicator>\nAnd Panel shows <error_display_message>\nAnd Panel makes error indicator clickable\nAnd Panel does not auto-hide error\nAnd Panel restores original name <original_name> in DOM\nWhen User clicks error indicator\nThen Panel displays error dialog\nAnd Panel shows error details: <error_details>",
-                          "examples": {
-                            "columns": [
-                              "parent_node_type",
-                              "parent_node_name",
-                              "node_type",
-                              "original_name",
-                              "invalid_name",
-                              "status_indicator",
-                              "debounce_time",
-                              "error_type",
-                              "error_message",
-                              "error_indicator",
-                              "error_display_message",
-                              "error_details"
-                            ],
-                            "rows": [
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "",
-                                "spinner icon",
-                                "500ms",
-                                "validation",
-                                "Story name cannot be empty",
-                                "red X icon",
-                                "Save failed - click for details",
-                                "ValidationError: Story name is required and cannot be empty string"
+                          "examples": [
+                            {
+                              "columns": [
+                                "parent_node_type",
+                                "parent_node_name",
+                                "node_type",
+                                "original_name",
+                                "invalid_name",
+                                "status_indicator",
+                                "debounce_time",
+                                "error_type",
+                                "error_message",
+                                "error_indicator",
+                                "error_display_message",
+                                "error_details"
                               ],
-                              [
-                                "Story",
-                                "Save Story Map Changes Asynchronously",
-                                "Scenario",
-                                "User moves node",
-                                "User moves node (contains 🎯 invalid emoji)",
-                                "spinner icon",
-                                "500ms",
-                                "validation",
-                                "Scenario name contains invalid characters",
-                                "red X icon",
-                                "Save failed - click for details",
-                                "ValidationError: Scenario name cannot contain emoji or special unicode characters"
-                              ],
-                              [
-                                "SubEpic",
-                                "Edit Story Map",
-                                "Story",
-                                "Filter Scope",
-                                "Navigate Behavior Actions",
-                                "spinner icon",
-                                "500ms",
-                                "hierarchy",
-                                "Duplicate story name in parent SubEpic",
-                                "red X icon",
-                                "Save failed - click for details",
-                                "HierarchyError: Story 'Navigate Behavior Actions' already exists in SubEpic 'Edit Story Map'"
+                              "rows": [
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "",
+                                  "spinner icon",
+                                  "500ms",
+                                  "validation",
+                                  "Story name cannot be empty",
+                                  "red X icon",
+                                  "Save failed - click for details",
+                                  "ValidationError: Story name is required and cannot be empty string"
+                                ],
+                                [
+                                  "Story",
+                                  "Save Story Map Changes Asynchronously",
+                                  "Scenario",
+                                  "User moves node",
+                                  "User moves node (contains 🎯 invalid emoji)",
+                                  "spinner icon",
+                                  "500ms",
+                                  "validation",
+                                  "Scenario name contains invalid characters",
+                                  "red X icon",
+                                  "Save failed - click for details",
+                                  "ValidationError: Scenario name cannot contain emoji or special unicode characters"
+                                ],
+                                [
+                                  "SubEpic",
+                                  "Edit Story Map",
+                                  "Story",
+                                  "Filter Scope",
+                                  "Navigate Behavior Actions",
+                                  "spinner icon",
+                                  "500ms",
+                                  "hierarchy",
+                                  "Duplicate story name in parent SubEpic",
+                                  "red X icon",
+                                  "Save failed - click for details",
+                                  "HierarchyError: Story 'Navigate Behavior Actions' already exists in SubEpic 'Edit Story Map'"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         }
                       ],
                       "acceptance_criteria": [
@@ -10110,19 +10132,20 @@
                           "background": [],
                           "test_method": "test_determine_behavior_for_story_and_get_instructions",
                           "steps": "Given Bot has story map loaded with epic <epic_name>\nAnd Epic contains story <story_name>\nAnd Story has acceptance criteria <acceptance_criteria>\nAnd Story has scenarios <scenarios>\nAnd Story has test class <test_class>\nAnd Story has test methods <test_methods>\nWhen Bot determines behavior for the story\nThen Bot returns behavior <expected_behavior>\nWhen User calls story.get_required_behavior_instructions with action <action>\nThen Bot is set to behavior <expected_behavior>\nAnd Bot is set to action <action>\nAnd Instructions for <expected_behavior> behavior and <action> action are returned\nAnd Instructions contain required sections for <expected_behavior> behavior",
-                          "examples": {
-                            "columns": [
-                              "epic_name",
-                              "story_name",
-                              "test_class",
-                              "acceptance_criteria",
-                              "expected_behavior",
-                              "action",
-                              "expected_instructions_contain",
-                              "scenario",
-                              "test_method"
-                            ],
-                            "rows": [
+                          "examples": [
+                            {
+                              "columns": [
+                                "epic_name",
+                                "story_name",
+                                "test_class",
+                                "acceptance_criteria",
+                                "expected_behavior",
+                                "action",
+                                "expected_instructions_contain",
+                                "scenario",
+                                "test_method"
+                              ],
+                              "rows": [
                               [
                                 "File Management",
                                 "Upload File",
@@ -10367,6 +10390,7 @@
                               ]
                             ]
                           }
+                        ]
                         },
                         {
                           "name": "Determine Behavior For Sub Epic",
@@ -11123,24 +11147,26 @@
                           "background": [],
                           "test_method": "test_display_behavior_needed_via_cli_and_get_instructions",
                           "steps": "Given CLI has story map loaded with <node_type> <epic_name>\nWhen User requests behavior for <epic_name> using JSON format\nThen CLI returns JSON with behavior <expected_behavior>",
-                          "examples": {
-                            "columns": [
-                              "node_type",
-                              "epic_name",
-                              "expected_behavior",
-                              "action",
-                              "expected_instructions_contain"
-                            ],
-                            "rows": [
-                              [
-                                "epic",
-                                "Product Catalog",
-                                "shape",
-                                "build",
-                                "shape behavior; build action; product catalog domain concepts; add sub-epics and stories"
+                          "examples": [
+                            {
+                              "columns": [
+                                "node_type",
+                                "epic_name",
+                                "expected_behavior",
+                                "action",
+                                "expected_instructions_contain"
+                              ],
+                              "rows": [
+                                [
+                                  "epic",
+                                  "Product Catalog",
+                                  "shape",
+                                  "build",
+                                  "shape behavior; build action; product catalog domain concepts; add sub-epics and stories"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "Panel submit button displays behavior-specific icon and submits instructions",
@@ -11149,52 +11175,54 @@
                           "background": [],
                           "test_method": "test_submit_button_icon_changes_based_on_behavior_needed",
                           "steps": "Given User has selected a <node_type> <node_name> in the panel\nAnd Node has behavior <behavior> needed\nWhen Panel renders the submit button\nThen Submit button displays <icon_file> icon indicating <behavior> behavior\nWhen User hovers over the submit button\nThen Submit button shows tooltip <tooltip_text>\nWhen User clicks the submit button\nThen Panel submits node with action \"build\"\nAnd Node calls get_required_behavior_instructions with action \"build\"\nAnd Bot is set to behavior <behavior>\nAnd Bot is set to action \"build\"\nAnd Instructions for <behavior> behavior and \"build\" action are returned",
-                          "examples": {
-                            "columns": [
-                              "node_type",
-                              "node_name",
-                              "behavior",
-                              "icon_file",
-                              "tooltip_text"
-                            ],
-                            "rows": [
-                              [
-                                "epic",
-                                "Product Catalog",
-                                "shape",
-                                "submit_subepic.png",
-                                "Submit shape instructions for epic"
+                          "examples": [
+                            {
+                              "columns": [
+                                "node_type",
+                                "node_name",
+                                "behavior",
+                                "icon_file",
+                                "tooltip_text"
                               ],
-                              [
-                                "sub-epic",
-                                "Report Export",
-                                "exploration",
-                                "submit_story.png",
-                                "Submit exploration instructions for sub-epic"
-                              ],
-                              [
-                                "story",
-                                "Create User",
-                                "scenario",
-                                "submit_ac.png",
-                                "Submit scenario instructions for story"
-                              ],
-                              [
-                                "story",
-                                "Delete File",
-                                "test",
-                                "submit_tests.png",
-                                "Submit test instructions for story"
-                              ],
-                              [
-                                "story",
-                                "Upload File",
-                                "code",
-                                "submit_code.png",
-                                "Submit code instructions for story"
+                              "rows": [
+                                [
+                                  "epic",
+                                  "Product Catalog",
+                                  "shape",
+                                  "submit_subepic.png",
+                                  "Submit shape instructions for epic"
+                                ],
+                                [
+                                  "sub-epic",
+                                  "Report Export",
+                                  "exploration",
+                                  "submit_story.png",
+                                  "Submit exploration instructions for sub-epic"
+                                ],
+                                [
+                                  "story",
+                                  "Create User",
+                                  "scenario",
+                                  "submit_ac.png",
+                                  "Submit scenario instructions for story"
+                                ],
+                                [
+                                  "story",
+                                  "Delete File",
+                                  "test",
+                                  "submit_tests.png",
+                                  "Submit test instructions for story"
+                                ],
+                                [
+                                  "story",
+                                  "Upload File",
+                                  "code",
+                                  "submit_code.png",
+                                  "Submit code instructions for story"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         }
                       ],
                       "acceptance_criteria": [
@@ -11222,22 +11250,24 @@
                           "background": [],
                           "test_method": "test_submit_current_behavior_action_for_selected_node",
                           "steps": "Given Bot has story map loaded with node <node_name>\nAnd Bot has current behavior <behavior>\nAnd Bot has current action <action>\nWhen User calls bot.story_graph.\"<node_path>\".submit_current_instructions\nThen Bot submits instructions using current behavior <behavior> and action <action>\nAnd Scope is set to node <node_name>",
-                          "examples": {
-                            "columns": [
-                              "node_name",
-                              "node_path",
-                              "behavior",
-                              "action"
-                            ],
-                            "rows": [
-                              [
-                                "Upload File",
-                                "File Management.Upload File",
-                                "code",
-                                "build"
+                          "examples": [
+                            {
+                              "columns": [
+                                "node_name",
+                                "node_path",
+                                "behavior",
+                                "action"
+                              ],
+                              "rows": [
+                                [
+                                  "Upload File",
+                                  "File Management.Upload File",
+                                  "code",
+                                  "build"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "Panel submit button uses current behavior action and submits instructions",
@@ -11246,64 +11276,66 @@
                           "background": [],
                           "test_method": "test_panel_submit_button_uses_current_behavior_action_and_submits_instructions",
                           "steps": "Given User has selected a <node_type> <node_name> in the panel\nAnd Bot has current behavior <behavior>\nAnd Bot has current action <action>\nAnd Panel displays behavior <behavior> and action <action> for selected node\nWhen Panel renders the submit button\nThen Submit button displays <icon_file> icon indicating <behavior> behavior\nWhen User hovers over the submit button\nThen Submit button shows tooltip <tooltip_text>\nWhen User clicks the submit button\nThen Panel calls node.get_required_behavior_instructions with action <action>\nAnd Instructions for <behavior> behavior and <action> action are returned\nAnd Panel sets scope to selected <node_type> <node_name>\nAnd Scope is set to <node_type> <node_name>",
-                          "examples": {
-                            "columns": [
-                              "node_type",
-                              "node_name",
-                              "behavior",
-                              "action",
-                              "icon_file",
-                              "tooltip_text",
-                              "node_path"
-                            ],
-                            "rows": [
-                              [
-                                "epic",
-                                "Product Catalog",
-                                "shape",
-                                "build",
-                                "submit_subepic.png",
-                                "Submit shape instructions for epic",
-                                "Product Catalog"
+                          "examples": [
+                            {
+                              "columns": [
+                                "node_type",
+                                "node_name",
+                                "behavior",
+                                "action",
+                                "icon_file",
+                                "tooltip_text",
+                                "node_path"
                               ],
-                              [
-                                "sub-epic",
-                                "Report Export",
-                                "explore",
-                                "build",
-                                "submit_story.png",
-                                "Submit exploration instructions for sub-epic",
-                                "Test Epic.Report Export"
-                              ],
-                              [
-                                "story",
-                                "Create User",
-                                "scenario",
-                                "build",
-                                "submit_ac.png",
-                                "Submit scenario instructions for story",
-                                "Test Epic.Test SubEpic.Create User"
-                              ],
-                              [
-                                "story",
-                                "Delete File",
-                                "test",
-                                "validate",
-                                "submit_tests.png",
-                                "Submit test instructions for story",
-                                "Test Epic.Test SubEpic.Delete File"
-                              ],
-                              [
-                                "story",
-                                "Upload File",
-                                "code",
-                                "build",
-                                "submit_code.png",
-                                "Submit code instructions for story",
-                                "Test Epic.Test SubEpic.Upload File"
+                              "rows": [
+                                [
+                                  "epic",
+                                  "Product Catalog",
+                                  "shape",
+                                  "build",
+                                  "submit_subepic.png",
+                                  "Submit shape instructions for epic",
+                                  "Product Catalog"
+                                ],
+                                [
+                                  "sub-epic",
+                                  "Report Export",
+                                  "explore",
+                                  "build",
+                                  "submit_story.png",
+                                  "Submit exploration instructions for sub-epic",
+                                  "Test Epic.Report Export"
+                                ],
+                                [
+                                  "story",
+                                  "Create User",
+                                  "scenario",
+                                  "build",
+                                  "submit_ac.png",
+                                  "Submit scenario instructions for story",
+                                  "Test Epic.Test SubEpic.Create User"
+                                ],
+                                [
+                                  "story",
+                                  "Delete File",
+                                  "test",
+                                  "validate",
+                                  "submit_tests.png",
+                                  "Submit test instructions for story",
+                                  "Test Epic.Test SubEpic.Delete File"
+                                ],
+                                [
+                                  "story",
+                                  "Upload File",
+                                  "code",
+                                  "build",
+                                  "submit_code.png",
+                                  "Submit code instructions for story",
+                                  "Test Epic.Test SubEpic.Upload File"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         },
                         {
                           "name": "Submit Current Instructions Via CLI JSON Format",
@@ -11312,22 +11344,24 @@
                           "background": [],
                           "test_method": "test_submit_current_instructions_via_cli_json_format",
                           "steps": "Given CLI has story map loaded with node <node_name>\nAnd Bot has current behavior <behavior>\nAnd Bot has current action <action>\nWhen User executes CLI command story_graph.\"<node_path>\".submit_current_instructions\nThen CLI returns JSON with submit result\nAnd Bot submits instructions using current behavior <behavior> and action <action>\nAnd Scope is set to node <node_name>",
-                          "examples": {
-                            "columns": [
-                              "node_name",
-                              "node_path",
-                              "behavior",
-                              "action"
-                            ],
-                            "rows": [
-                              [
-                                "Upload File",
-                                "File Management.Upload File",
-                                "code",
-                                "build"
+                          "examples": [
+                            {
+                              "columns": [
+                                "node_name",
+                                "node_path",
+                                "behavior",
+                                "action"
+                              ],
+                              "rows": [
+                                [
+                                  "Upload File",
+                                  "File Management.Upload File",
+                                  "code",
+                                  "build"
+                                ]
                               ]
-                            ]
-                          }
+                            }
+                          ]
                         }
                       ],
                       "acceptance_criteria": [

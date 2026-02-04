@@ -142,25 +142,34 @@ class Scenario(ScenarioBase):
         return self.data.get('background', [])
     
     @property
-    def examples(self) -> Optional[Dict[str, Any]]:
+    def examples(self) -> Optional[Any]:
         return self.data.get('examples')
     
     @property
     def examples_columns(self) -> List[str]:
-        if self.examples:
-            return self.examples.get('columns', [])
+        for table in self._normalized_examples():
+            columns = table.get('columns') or table.get('headers')
+            if columns:
+                return columns
         return []
     
     @property
     def examples_rows(self) -> List[List[str]]:
-        if self.examples:
-            return self.examples.get('rows', [])
+        for table in self._normalized_examples():
+            columns = table.get('columns') or table.get('headers')
+            rows = table.get('rows', [])
+            if columns and rows:
+                return rows
         return []
     
     @property
     def has_examples(self) -> bool:
         """Check if this scenario has examples (data-driven testing)."""
-        return self.examples is not None and len(self.examples.get('columns', [])) > 0
+        for table in self._normalized_examples():
+            columns = table.get('columns') or table.get('headers')
+            if columns:
+                return True
+        return False
     
     @property
     def test_method(self) -> Optional[str]:
@@ -169,6 +178,16 @@ class Scenario(ScenarioBase):
     def map_location(self, field: str = 'name') -> str:
         story_location = self.story.map_location('scenarios')
         return f"{story_location}[{self.scenario_idx}].{field}"
+
+    def _normalized_examples(self) -> List[Dict[str, Any]]:
+        examples = self.data.get('examples')
+        if not examples:
+            return []
+        if isinstance(examples, dict):
+            return [examples]
+        if isinstance(examples, list):
+            return [tbl for tbl in examples if isinstance(tbl, dict)]
+        return []
 
 # ScenarioOutline class removed - use Scenario with optional examples field instead
 

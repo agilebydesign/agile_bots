@@ -69,34 +69,36 @@
                         "Then <expected_outcome> equals \"<variable_expected_result>\"",
                         "And <another_outcome> is \"<variable_result>\""
                       ],
-                      "examples": {
-                        "columns": [
-                          "variable_path",
-                          "variable_file_path",
-                          "variable_parameter",
-                          "variable_value",
-                          "variable_expected_result",
-                          "variable_result"
-                        ],
-                        "rows": [
-                          [
-                            "value1",
-                            "value2",
-                            "value3",
-                            "value4",
-                            "result1",
-                            "result2"
+                      "examples": [
+                        {
+                          "columns": [
+                            "variable_path",
+                            "variable_file_path",
+                            "variable_parameter",
+                            "variable_value",
+                            "variable_expected_result",
+                            "variable_result"
                           ],
-                          [
-                            "value5",
-                            "value6",
-                            "value7",
-                            "value8",
-                            "result3",
-                            "result4"
+                          "rows": [
+                            [
+                              "value1",
+                              "value2",
+                              "value3",
+                              "value4",
+                              "result1",
+                              "result2"
+                            ],
+                            [
+                              "value5",
+                              "value6",
+                              "value7",
+                              "value8",
+                              "result3",
+                              "result4"
+                            ]
                           ]
-                        ]
-                      }
+                        }
+                      ]
                     }
                   ]
                 }

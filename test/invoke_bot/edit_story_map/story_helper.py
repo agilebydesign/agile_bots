@@ -81,13 +81,15 @@ class StoryTestHelper(BaseHelper):
                                                         "When story graph is loaded from \"<file_path>\"",
                                                         "Then story map contains \"<expected_epics>\" epics"
                                                     ],
-                                                    "examples": {
-                                                        "columns": ["file_path", "expected_epics"],
-                                                        "rows": [
-                                                            ["story-graph.json", "2"],
-                                                            ["story-graph-v2.json", "3"]
-                                                        ]
-                                                    }
+                                                    "examples": [
+                                                        {
+                                                            "columns": ["file_path", "expected_epics"],
+                                                            "rows": [
+                                                                ["story-graph.json", "2"],
+                                                                ["story-graph-v2.json", "3"]
+                                                            ]
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }

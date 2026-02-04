@@ -1,8 +1,6 @@
 {
-  "type": "story",
-  "value": [
-    "Set File Filter"
-  ],
+  "type": "showAll",
+  "value": [],
   "exclude": [],
   "skiprule": []
 }

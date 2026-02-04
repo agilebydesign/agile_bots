@@ -1,4 +1,4 @@
-﻿
+
 import json
 from cli.adapters import JSONAdapter
 from actions.strategy.strategy_action import StrategyAction
