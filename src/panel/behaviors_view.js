@@ -358,7 +358,7 @@ class BehaviorsView extends PanelView {
         // Log inputs
         const fs = require('fs');
         const path = require('path');
-        const logPath = 'c:\\dev\\agile_bots\\render-action-debug.log';
+        const logPath = '.\\logs\\render-action-debug.log';
         const timestamp = new Date().toISOString();
         
         const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] renderAction called\n` +
