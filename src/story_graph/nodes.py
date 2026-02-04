@@ -1474,7 +1474,7 @@ class Scenario(StoryNode):
     sequential_order: float
     type: str = ''
     background: List[str] = field(default_factory=list)
-    examples: Optional[Dict[str, Any]] = None
+    examples: Optional[List[Dict[str, Any]]] = None
     test_method: Optional[str] = None
     _parent: Optional[StoryNode] = field(default=None, repr=False)
 
@@ -1482,7 +1482,21 @@ class Scenario(StoryNode):
         super().__post_init__()
         if self.sequential_order is None:
             raise ValueError('Scenario requires sequential_order')
+        # Normalize examples to a list of table dicts for consistency
+        self.examples = self._normalize_examples_data(self.examples)
         self._children: List['StoryNode'] = []
+
+    @staticmethod
+    def _normalize_examples_data(examples: Any) -> Optional[List[Dict[str, Any]]]:
+        """Normalize examples into a list of table dicts (columns/rows)."""
+        if not examples:
+            return None
+        if isinstance(examples, dict):
+            return [examples]
+        if isinstance(examples, list):
+            tables = [tbl for tbl in examples if isinstance(tbl, dict)]
+            return tables or None
+        return None
 
     @property
     def children(self) -> List['StoryNode']:
@@ -1495,21 +1509,32 @@ class Scenario(StoryNode):
     @property
     def examples_columns(self) -> List[str]:
         """Return columns from examples table, or empty list if no examples."""
-        if self.examples:
-            return self.examples.get('columns', [])
+        for table in self.examples or []:
+            columns = table.get('columns') or table.get('headers')
+            if columns:
+                return columns
         return []
 
     @property
     def examples_rows(self) -> List[List[str]]:
         """Return rows from examples table, or empty list if no examples."""
-        if self.examples:
-            return self.examples.get('rows', [])
+        for table in self.examples or []:
+            columns = table.get('columns') or table.get('headers')
+            rows = table.get('rows', [])
+            if columns and rows:
+                return rows
         return []
 
     @property
     def has_examples(self) -> bool:
         """Check if this scenario has examples (data-driven testing)."""
-        return self.examples is not None and len(self.examples.get('columns', [])) > 0
+        if not self.examples:
+            return False
+        for table in self.examples:
+            columns = table.get('columns') or table.get('headers')
+            if columns:
+                return True
+        return False
 
     @property
     def default_test_method(self) -> str:
@@ -1965,7 +1990,7 @@ class StoryMap:
         if scenario.examples:
             result['examples'] = scenario.examples
         return result
-    
+
     def _acceptance_criteria_to_dict(self, ac: AcceptanceCriteria) -> Dict[str, Any]:
         return {
             'name': ac.name,

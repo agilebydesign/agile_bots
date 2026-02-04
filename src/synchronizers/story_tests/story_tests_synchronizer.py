@@ -5,9 +5,39 @@ Renders pytest test files from story graph JSON.
 Generates test files organized by sub-epic with test classes matching stories.
 """
 from pathlib import Path
-from typing import Dict, Any, Optional, Union, List
+from typing import Dict, Any, Optional, Union, List, Tuple
 import json
 import re
+
+
+def _extract_examples_table(examples_data: Any) -> Tuple[List[str], List[List[Any]]]:
+    """Return the first examples table found as (columns, rows)."""
+    if not examples_data:
+        return [], []
+
+    tables: List[Dict[str, Any]] = []
+    if isinstance(examples_data, dict):
+        tables = [examples_data]
+    elif isinstance(examples_data, list):
+        tables = [tbl for tbl in examples_data if isinstance(tbl, dict)]
+
+    for table in tables:
+        columns = table.get('columns') or table.get('headers') or []
+        rows = table.get('rows', [])
+        if columns and rows:
+            return columns, rows
+
+    # Backward compatibility: list of row dicts without explicit columns
+    if isinstance(examples_data, list) and examples_data and all(isinstance(row, dict) for row in examples_data):
+        columns: List[str] = []
+        for row in examples_data:
+            for key in row.keys():
+                if key not in columns:
+                    columns.append(key)
+        rows = [[row.get(col, '') for col in columns] for row in examples_data]
+        return columns, rows
+
+    return [], []
 
 
 def format_test_method_from_scenario(scenario, scenario_name, test_method_name, background_steps=None):
@@ -45,11 +75,10 @@ def format_test_method_from_scenario_outline(scenario_outline, scenario_name, te
     """Format a parametrized test method from a scenario outline."""
     steps = scenario_outline.get('steps', [])
     scenario_type = scenario_outline.get('type', 'happy_path')
-    examples = scenario_outline.get('examples', {})
+    examples = scenario_outline.get('examples')
     
-    # Extract columns and rows
-    columns = examples.get('columns', [])
-    rows = examples.get('rows', [])
+    # Extract columns and rows (supports list-of-table format)
+    columns, rows = _extract_examples_table(examples)
     
     # Format docstring
     docstring = f'        """{scenario_name} ({scenario_type})."""'

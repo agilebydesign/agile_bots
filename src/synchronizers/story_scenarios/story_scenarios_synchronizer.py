@@ -256,7 +256,19 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
             if headers and rows:
                 examples_block = format_examples_table(headers, rows, description)
         elif isinstance(examples_data, list) and examples_data:
-            if all(isinstance(row, dict) for row in examples_data):
+            # New preferred format: list of tables with columns/rows
+            table_like = [tbl for tbl in examples_data if isinstance(tbl, dict)]
+            if table_like and any(tbl.get('columns') or tbl.get('headers') for tbl in table_like):
+                tables = []
+                for table in table_like:
+                    headers = table.get('headers') or table.get('columns')
+                    rows = table.get('rows', [])
+                    description = table.get('description', '')
+                    if headers and rows:
+                        tables.append(format_examples_table(headers, rows, description))
+                if tables:
+                    examples_block = "\n".join(tables)
+            elif all(isinstance(row, dict) for row in examples_data):
                 # Build a single table using all keys across rows (preserve first-seen order)
                 columns = []
                 for row in examples_data:
