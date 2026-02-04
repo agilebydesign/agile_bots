@@ -2303,6 +2303,8 @@ class BotPanel {
                 const nodePath = target.getAttribute('data-path');
                 const fileLink = target.getAttribute('data-file-link');
                 const behavior = target.getAttribute('data-behavior-needed') || null;
+                const behaviorsAttr = target.getAttribute('data-behaviors-needed');
+                const behaviors = behaviorsAttr ? JSON.parse(behaviorsAttr) : (behavior ? [behavior] : []);
                 
                 console.log('[WebView]   nodeType:', nodeType);
                 console.log('[WebView]   nodeName:', nodeName);
@@ -2312,6 +2314,7 @@ class BotPanel {
                 console.log('[WebView]   nodePath:', nodePath);
                 console.log('[WebView]   fileLink:', fileLink);
                 console.log('[WebView]   behavior (from DOM):', behavior);
+                console.log('[WebView]   behaviors (from DOM):', behaviors);
                 
                 vscode.postMessage({
                     command: 'logToFile',
@@ -2330,7 +2333,8 @@ class BotPanel {
                         hasStories: hasStories,
                         hasNestedSubEpics: hasNestedSubEpics,
                         path: nodePath,
-                        behavior: behavior
+                        behavior: behavior,
+                        behaviors: behaviors
                     };
                     console.log('[WebView]   Calling selectNode with options:', JSON.stringify(options, null, 2));
                     window.selectNode(nodeType, nodeName, options);
@@ -3543,6 +3547,55 @@ class BotPanel {
                 }
             }
             
+            // Update btn-submit-alt button (shows when there are multiple behaviors_needed)
+            const btnSubmitAlt = document.getElementById('btn-submit-alt');
+            const behaviorsNeeded = window.selectedNode.behaviorsNeeded || [];
+            console.log('[SUBMIT BUTTON DEBUG] behaviorsNeeded:', behaviorsNeeded);
+            
+            if (btnSubmitAlt && behaviorsNeeded.length > 1 && window.selectedNode.type !== 'root') {
+                const altBehavior = behaviorsNeeded[1]; // Second behavior option
+                const nodeType = window.selectedNode.type;
+                const btnSubmitAltIcon = document.getElementById('btn-submit-alt-icon');
+                
+                // Map behavior to icon and tooltip for alt button
+                const altBehaviorMap = {
+                    'shape': {
+                        icon: btnSubmitAlt.getAttribute('data-shape-icon'),
+                        tooltip: 'Submit shape instructions for ' + nodeType
+                    },
+                    'exploration': {
+                        icon: btnSubmitAlt.getAttribute('data-exploration-icon'),
+                        tooltip: 'Submit exploration instructions for ' + nodeType
+                    },
+                    'scenarios': {
+                        icon: btnSubmitAlt.getAttribute('data-scenarios-icon'),
+                        tooltip: 'Submit scenarios instructions for ' + nodeType
+                    },
+                    'tests': {
+                        icon: btnSubmitAlt.getAttribute('data-tests-icon'),
+                        tooltip: 'Submit tests instructions for ' + nodeType
+                    },
+                    'code': {
+                        icon: btnSubmitAlt.getAttribute('data-code-icon'),
+                        tooltip: 'Submit code instructions for ' + nodeType
+                    }
+                };
+                
+                const altBehaviorConfig = altBehaviorMap[altBehavior];
+                if (altBehaviorConfig && btnSubmitAltIcon) {
+                    btnSubmitAltIcon.src = altBehaviorConfig.icon;
+                    btnSubmitAlt.title = altBehaviorConfig.tooltip;
+                    btnSubmitAlt.style.display = 'block';
+                    // Store alt behavior for handleSubmitAlt
+                    btnSubmitAlt.setAttribute('data-current-behavior', altBehavior);
+                    console.log('[SUBMIT BUTTON DEBUG] Alt button shown for behavior:', altBehavior);
+                } else {
+                    btnSubmitAlt.style.display = 'none';
+                }
+            } else if (btnSubmitAlt) {
+                btnSubmitAlt.style.display = 'none';
+            }
+            
             // Update btn-submit-current button (shows beside btn-submit)
             const btnSubmitCurrent = document.getElementById('btn-submit-current');
             if (btnSubmitCurrent && window.selectedNode.type !== 'root' && currentBehavior) {
@@ -3617,6 +3670,7 @@ class BotPanel {
             
             // Store both current behavior and behavior_needed
             const behavior = window.currentBehavior || options.behavior || null;
+            const behaviors = options.behaviors || (options.behavior ? [options.behavior] : []);
             
             window.selectedNode = {
                 type: type,
@@ -3624,6 +3678,7 @@ class BotPanel {
                 path: options.path || null,
                 behavior: behavior, // Current behavior in progress
                 behaviorNeeded: options.behavior || null, // Required next behavior from story graph
+                behaviorsNeeded: behaviors, // List of applicable behaviors (may have multiple for empty nodes)
                 canHaveSubEpic: options.canHaveSubEpic || false,
                 canHaveStory: options.canHaveStory || false,
                 canHaveTests: options.canHaveTests || false,
@@ -3861,6 +3916,44 @@ class BotPanel {
             vscode.postMessage({
                 command: 'logToFile',
                 message: '[WebView] SUBMIT: Command sent: ' + commandText
+            });
+        };
+        
+        window.handleSubmitAlt = function() {
+            console.log('[WebView] ========== handleSubmitAlt CALLED ==========');
+            console.log('[WebView] handleSubmitAlt called for node:', window.selectedNode);
+            
+            if (!window.selectedNode || !window.selectedNode.name) {
+                console.error('[WebView] ERROR: No node selected for submit alt');
+                return;
+            }
+            
+            const behaviorsNeeded = window.selectedNode.behaviorsNeeded || [];
+            if (behaviorsNeeded.length < 2) {
+                console.error('[WebView] ERROR: No alternate behavior available');
+                return;
+            }
+            
+            const altBehavior = behaviorsNeeded[1]; // Second behavior option
+            const nodeName = window.selectedNode.name;
+            const nodePath = window.selectedNode.path;
+            
+            console.log('[WebView] Submit Alt: Submitting', altBehavior, 'behavior instructions for', nodeName);
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] SUBMIT ALT: Submitting ' + altBehavior + ' behavior instructions for node=' + nodeName
+            });
+            
+            // Navigate to the alt behavior first, then submit
+            const action = 'build';
+            const commandText = nodePath 
+                ? nodePath + '.submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"'
+                : 'story_graph."' + nodeName + '".submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"';
+            
+            console.log('[WebView] Executing command:', commandText);
+            vscode.postMessage({
+                command: 'executeCommand',
+                commandText: commandText
             });
         };
         

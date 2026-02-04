@@ -469,6 +469,22 @@
               ]
             }
           ]
+        },
+        {
+          "name": "Child1",
+          "sequential_order": 2.0,
+          "behavior": null,
+          "domain_concepts": [],
+          "sub_epics": [],
+          "story_groups": []
+        },
+        {
+          "name": "Child2",
+          "sequential_order": 3.0,
+          "behavior": null,
+          "domain_concepts": [],
+          "sub_epics": [],
+          "story_groups": []
         }
       ],
       "story_groups": []
@@ -18276,7 +18292,41 @@
           "behavior": null,
           "domain_concepts": [],
           "sub_epics": [],
-          "story_groups": []
+          "story_groups": [
+            {
+              "name": "",
+              "sequential_order": 0.0,
+              "type": "and",
+              "connector": null,
+              "behavior": null,
+              "stories": [
+                {
+                  "name": "Story1",
+                  "sequential_order": 0.0,
+                  "connector": null,
+                  "story_type": "user",
+                  "users": [],
+                  "test_class": null,
+                  "scenarios": [],
+                  "acceptance_criteria": [],
+                  "behavior": null,
+                  "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Child1\\📄 Story1.md"
+                },
+                {
+                  "name": "Story2",
+                  "sequential_order": 1.0,
+                  "connector": null,
+                  "story_type": "user",
+                  "users": [],
+                  "test_class": null,
+                  "scenarios": [],
+                  "acceptance_criteria": [],
+                  "behavior": null,
+                  "file_link": "C:\\dev\\agile_bots\\docs\\stories\\map\\Invoke Bot\\Child1\\📄 Story2.md"
+                }
+              ]
+            }
+          ]
         }
       ],
       "story_groups": []

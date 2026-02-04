@@ -132,6 +132,7 @@ class JSONStoryGraph(JSONAdapter):
         result = {
             'name': sub_epic.name,
             'behavior_needed': sub_epic.behavior_needed,
+            'behaviors_needed': sub_epic.behaviors_needed if hasattr(sub_epic, 'behaviors_needed') else [sub_epic.behavior_needed],
             'test_file': sub_epic.test_file if hasattr(sub_epic, 'test_file') else None,
             'test_class': sub_epic.test_class if hasattr(sub_epic, 'test_class') else None,
             'sub_epics': [],
@@ -170,6 +171,7 @@ class JSONStoryGraph(JSONAdapter):
         return {
             'name': story.name,
             'behavior_needed': story.behavior_needed,
+            'behaviors_needed': story.behaviors_needed if hasattr(story, 'behaviors_needed') else [story.behavior_needed],
             'test_file': story.test_file if hasattr(story, 'test_file') else None,
             'test_class': story.test_class if hasattr(story, 'test_class') else None,
             'acceptance_criteria': [self._serialize_ac(ac) for ac in story.acceptance_criteria],
