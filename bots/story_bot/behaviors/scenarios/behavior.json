@@ -1,6 +1,6 @@
 {
   "behaviorName": "specification_scenarios",
-  "order": 5,
+  "order": 4,
   "description": "Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story",
   "goal": "Specify stories with detailed, testable scenarios using plain English",
   "inputs": "Acceptance criteria from exploration, integration contracts, domain language/concepts",

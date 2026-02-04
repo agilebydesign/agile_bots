@@ -203,17 +203,12 @@ class StoryMapView extends PanelView {
                             style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
                             onmouseover="this.style.opacity='0.7'" 
                             onmouseout="this.style.opacity='1'" 
-                            title="Submit shape instructions for epic"
+                            title=""
                             data-shape-icon="${submitShapeIconPath}"
                             data-exploration-icon="${submitExploreIconPath}"
                             data-scenarios-icon="${submitScenarioIconPath}"
                             data-tests-icon="${submitTestIconPath}"
-                            data-code-icon="${submitCodeIconPath}"
-                            data-shape-tooltip="Submit shape instructions for epic"
-                            data-exploration-tooltip="Submit exploration instructions for sub-epic"
-                            data-scenarios-tooltip="Submit scenarios instructions for story"
-                            data-tests-tooltip="Submit tests instructions for story"
-                            data-code-tooltip="Submit code instructions for story">
+                            data-code-icon="${submitCodeIconPath}">
                         <img id="btn-submit-icon" src="${submitShapeIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit" />
                     </button>
                     <button id="btn-submit-current" 
