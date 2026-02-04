@@ -73,7 +73,11 @@ class StoryNode(ABC):
 
     def _scope_command_for_node(self) -> str:
         """Get scope command string for this node type."""
-        if isinstance(self, Story):
+        if isinstance(self, Scenario):
+            return f"story {self.name}"
+        elif isinstance(self, Story):
+            return f"story {self.name}"
+        elif isinstance(self, StoryGroup):
             return f"story {self.name}"
         elif isinstance(self, SubEpic):
             return f"subepic {self.name}"
