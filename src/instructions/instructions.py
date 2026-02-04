@@ -39,22 +39,18 @@ class Instructions:
     @property
     def context_sources_text(self) -> List[str]:
         if not self._bot_paths:
-            return [
-                "**Look for context in the following locations:**",
-                "- in this message and chat history",
-                "- in `{project_area}/docs/context/`",
-                "- generated files in `{project_area}/docs/stories/`",
-                "  clarification.json, strategy.json"
-            ]
+            raise ValueError("bot_paths not set. Pass bot_paths to Instructions constructor.")
         
         workspace = str(self._bot_paths.workspace_directory)
         workspace = workspace.replace('\\', '/')
         return [
             "**Look for context in the following locations:**",
             "- in this message and chat history",
-            f"- in `{workspace}/docs/context/`",
-            f"- generated files in `{workspace}/docs/stories/`",
-            "  clarification.json, strategy.json"
+            f"- `{workspace}/docs/stories/story-graph.json` - the story graph and related  knowledge built so far",
+            f"- `{workspace}/docs/stories/strategy.json` - strategy decisions made",
+            f"- `{workspace}/docs/stories/clarification.json` - clarification answers",
+            f"- `{workspace}/test/` and `{workspace}/src/` - existing code and tests",
+            f"- any folder named `context/` anywhere in `{workspace}/` - additional context files"
         ]
     
     def write_display_to_file(self, filename: str = 'status.md') -> Path:

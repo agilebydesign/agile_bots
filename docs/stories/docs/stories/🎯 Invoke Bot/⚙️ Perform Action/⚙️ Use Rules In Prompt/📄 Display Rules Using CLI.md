@@ -31,7 +31,7 @@ THEN: CLI output contains formatted rules digest
 
 
 <a id="scenario-validation-output-includes-rules-content"></a>
-### Scenario: [Validation output includes rules content](#scenario-validation-output-includes-rules-content) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_use_rules_in_prompt.py#L201)
+### Scenario: [Validation output includes rules content](#scenario-validation-output-includes-rules-content) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_use_rules_in_prompt.py#L194)
 
 **Steps:**
 ```gherkin

@@ -31,8 +31,8 @@ Change Workspace Path panel functionality for the mob minion system.
 
 ## Scenarios
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-user-changes-workspace-and-panel-displays-new-state"></a>
+### Scenario: [User changes workspace and panel displays new state](#scenario-user-changes-workspace-and-panel-displays-new-state) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -45,8 +45,8 @@ And Panel refreshes all sections with project_b data
 ```
 
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-user-changes-to-nonexistent-directory-shows-error"></a>
+### Scenario: [User changes to nonexistent directory shows error](#scenario-user-changes-to-nonexistent-directory-shows-error) (error_case)
 
 **Steps:**
 ```gherkin
@@ -58,8 +58,8 @@ And Panel retains previous valid workspace
 ```
 
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-workspace-path-persists-after-panel-refresh"></a>
+### Scenario: [Workspace path persists after panel refresh](#scenario-workspace-path-persists-after-panel-refresh) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -69,5 +69,19 @@ And Panel displays project_b workspace and state
 And User refreshes panel
 Then Panel displays c:/dev/project_b as current workspace
 And Workspace path was persisted and restored
+```
+
+
+<a id="scenario-set-path-by-dragging-folder-to-panel"></a>
+### Scenario: [Set path by dragging folder to panel](#scenario-set-path-by-dragging-folder-to-panel) (happy_path)
+
+**Steps:**
+```gherkin
+Given Panel is open showing workspace at c:/dev/project_a
+And Folder c:/dev/project_b exists in VS Code explorer
+When User drags folder c:/dev/project_b from explorer to workspace text entry
+Then Workspace text entry displays c:/dev/project_b
+And Panel displays c:/dev/project_b as current workspace
+And Panel displays behavior action state from project_b
 ```
 
