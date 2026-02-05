@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Every piece of knowledge should have a single, authoritative representation (DRY principle). Extract repeated logic into reusable functions and use abstraction to capture common patterns.",
   "examples": [
     {
@@ -23,10 +23,10 @@
           "- Tests verify behavior, not implementation details",
           "",
           "Test Duplication Patterns to Extract:",
-          "- Repeated test setup → create fixtures/factories",
-          "- Common test assertions → create verification helpers (verify_*)",
-          "- Test data creation → create builders or test_helpers",
-          "- Workflow verification → create state helpers",
+          "- Repeated test setup â†’ create fixtures/factories",
+          "- Common test assertions â†’ create verification helpers (verify_*)",
+          "- Test data creation â†’ create builders or test_helpers",
+          "- Workflow verification â†’ create state helpers",
           "- Example: verify_action_tracks_start(action, expected_state)"
         ]
       },
@@ -64,5 +64,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.duplication_scanner.DuplicationScanner"
+  "scanner": "scanners.duplication_scanner.DuplicationScanner"
 }
+

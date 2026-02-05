@@ -14,6 +14,7 @@
 		}
 	],
 	"settings": {
+		"jest.enable": false,
 		"python.languageServer": "None",
 		"testing.automaticallyOpenPeekView": "failureInVisibleDocument",
 		"workbench.colorTheme": "Cursor Dark High Contrast",

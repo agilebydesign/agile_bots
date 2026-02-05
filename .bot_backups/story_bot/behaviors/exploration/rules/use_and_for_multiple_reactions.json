@@ -1,6 +1,6 @@
-{
+﻿{
     "priority":  4,
-    "description":  "Use \u0027And\u0027 to chain multiple system reactions to a single event. When system responds with more than one action, connect them with And. Example: When user submits → Then system validates And system saves And system sends notification.",
+    "description":  "Use \u0027And\u0027 to chain multiple system reactions to a single event. When system responds with more than one action, connect them with And. Example: When user submits â†’ Then system validates And system saves And system sends notification.",
     "do":  {
                "description":  "Chain multiple reactions with And. Example: Then system validates And system saves And system notifies",
                "guidance":  [
@@ -52,5 +52,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.reaction_chaining_scanner.ReactionChainingScanner"
+    "scanner":  "scanners.reaction_chaining_scanner.ReactionChainingScanner"
 }

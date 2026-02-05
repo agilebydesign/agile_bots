@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  1,
     "description":  "Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).",
     "do":  {
@@ -58,5 +58,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
+    "scanner":  "scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
 }

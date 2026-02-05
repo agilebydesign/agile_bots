@@ -16,15 +16,10 @@ Deploy MCP BOT Server functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Generation Complete
-
   **then** Generator deploys/starts generated MCP Server
-
   **and** Server initializes in separate thread
-
   **and** Server registers with MCP Protocol Handler using unique server name
-
   **and** Server publishes tool catalog to AI Chat
-
   **and** Each tool entry includes name, description, trigger patterns, parameters
 
 ## Scenarios

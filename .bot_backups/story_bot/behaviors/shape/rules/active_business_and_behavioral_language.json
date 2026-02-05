@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  2,
     "description":  "Use active business language focused on user/system behavior. Describe what actors do with clear action verbs, not technical implementation or passive constructions.",
     "do":  {
@@ -50,7 +50,7 @@
                             ]
            },
     "dont":  {
-                 "description":  "Don\u0027t use passive voice or technical implementation language. Example: \u0027Order is submitted\u0027 (passive voice, unclear actor) → \u0027User submits order\u0027 (active voice, clear actor)",
+                 "description":  "Don\u0027t use passive voice or technical implementation language. Example: \u0027Order is submitted\u0027 (passive voice, unclear actor) â†’ \u0027User submits order\u0027 (active voice, clear actor)",
                  "guidance":  [
                                   {
                                       "description":  "Don\u0027t describe behaviors passively or vaguely - always use active voice that clearly identifies who performs the action. Wrong: \u0027Order is submitted\u0027 (passive - by whom?). Correct: \u0027User --\u003e submits order\u0027 (active, clear actor).",
@@ -90,5 +90,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.active_language_scanner.ActiveLanguageScanner"
+    "scanner":  "scanners.active_language_scanner.ActiveLanguageScanner"
 }

@@ -1,8 +1,8 @@
-{
+﻿{
     "priority": 7,
-    "description": "Write atomic acceptance criteria. Avoid repeating common WHEN/THEN/AND blocks across multiple AC. State general case once, then only state what differs in variations. Example: WHEN node moves → general behavior, WHEN position specified → only state position difference.",
+    "description": "Write atomic acceptance criteria. Avoid repeating common WHEN/THEN/AND blocks across multiple AC. State general case once, then only state what differs in variations. Example: WHEN node moves â†’ general behavior, WHEN position specified â†’ only state position difference.",
     "do": {
-        "description": "Write one AC for general case, additional AC only state what changes. Example: WHEN moves → removes/adds/resequences; WHEN position specified → adds at position instead of last",
+        "description": "Write one AC for general case, additional AC only state what changes. Example: WHEN moves â†’ removes/adds/resequences; WHEN position specified â†’ adds at position instead of last",
         "guidance": [
             {
                 "description": "State general behavior once in first acceptance criteria",
@@ -71,5 +71,6 @@
             }
         ]
     },
-    "scanner": "agile_bot.bots.base_bot.scanners.atomic_ac_scanner.AtomicACScanner"
+    "scanner": "scanners.atomic_ac_scanner.AtomicACScanner"
 }
+

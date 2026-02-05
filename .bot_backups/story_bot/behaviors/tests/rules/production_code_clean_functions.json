@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  4,
     "description":  "Production code functions should do ONE thing, be under 20 lines, and have one level of abstraction. No hidden side effects. Name reveals complete behavior. Extract multiple concerns into separate functions. Example: load_config(), validate_config(), apply_config() - each does one thing",
     "do":  {
@@ -73,8 +73,9 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.single_responsibility_scanner.SingleResponsibilityScanner"
+    "scanner":  "scanners.single_responsibility_scanner.SingleResponsibilityScanner"
 }
+
 
 
 

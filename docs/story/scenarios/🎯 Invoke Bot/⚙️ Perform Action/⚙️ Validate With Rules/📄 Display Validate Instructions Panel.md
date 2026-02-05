@@ -16,11 +16,9 @@ Display Validate Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Current action is validate
-
   **then** System displays rules list
 
 - **When** User clicks rule file link
-
   **then** System opens rule file in editor
 
 ## Scenarios

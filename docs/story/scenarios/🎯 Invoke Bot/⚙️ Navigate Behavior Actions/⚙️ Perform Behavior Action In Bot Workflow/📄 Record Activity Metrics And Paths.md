@@ -16,11 +16,8 @@ Record Activity Metrics And Paths functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Activity is tracked
-
   **then** Metrics include file counts and content types
-
   **and** Paths include file paths not content
-
   **and** Activity log captures metrics and paths
 
 ## Scenarios

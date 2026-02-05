@@ -16,35 +16,25 @@ Navigate Behavior Action Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks back button
-
   **then** System  sets previous action as current
-
   **and** System displays previous action in-progress indicator
-
   **and** System reruns previous action details
 
 - **When** User clicks next button
-
   **then** System sets next action as current
-
   **and** System displays next action in-progress indicator
-
   **and** System reruns next action details
 
 - **When** User clicks current button
-
   **then** System reruns current action details
 
 - **When** User is on the last operation of an action
-
   **then** System moves to the next action and selects its first operation
 
 - **When** User is on the last action of a behavior
-
   **then** System moves to the next behavior and selects its first action and first operation
 
 - **When** User is on the last behavior of a bot
-
   **then** System disables next behavior navigation
 
 ## Scenarios

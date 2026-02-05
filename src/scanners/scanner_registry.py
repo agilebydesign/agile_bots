@@ -20,19 +20,19 @@ class LanguageAgnosticScanner(Scanner):
         if not file_path:
             # Default to Python for non-file contexts
             if not self._python_instance:
-                self._python_instance = self._python_scanner_class(self._rule)
+                self._python_instance = self._python_scanner_class(self.rule)
             return self._python_instance
         
         file_ext = file_path.suffix.lower()
         
         if file_ext == '.js':
             if not self._js_instance:
-                self._js_instance = self._js_scanner_class(self._rule)
+                self._js_instance = self._js_scanner_class(self.rule)
             return self._js_instance
         else:
             # Default to Python for .py and other files
             if not self._python_instance:
-                self._python_instance = self._python_scanner_class(self._rule)
+                self._python_instance = self._python_scanner_class(self.rule)
             return self._python_instance
     
     def scan_file_with_context(self, context):
@@ -61,19 +61,19 @@ class LanguageAgnosticScanner(Scanner):
         # Scan Python files with Python scanner
         if py_files and self._python_scanner_class:
             if not self._python_instance:
-                self._python_instance = self._python_scanner_class(self._rule)
+                self._python_instance = self._python_scanner_class(self.rule)
             violations.extend(self._python_instance.scan_with_context(context))
         
         # Scan JavaScript files with JS scanner  
         if js_files and self._js_scanner_class:
             if not self._js_instance:
-                self._js_instance = self._js_scanner_class(self._rule)
+                self._js_instance = self._js_scanner_class(self.rule)
             violations.extend(self._js_instance.scan_with_context(context))
         
         # If no specific files, default to Python scanner
         if not py_files and not js_files:
             if not self._python_instance:
-                self._python_instance = self._python_scanner_class(self._rule)
+                self._python_instance = self._python_scanner_class(self.rule)
             violations.extend(self._python_instance.scan_with_context(context))
         
         return violations

@@ -16,9 +16,7 @@ Track Action Start functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Action starts execution
-
   **then** Activity entry is created with timestamp and action state
-
   **and** Entry appended to activity_log.json
 
 ## Scenarios

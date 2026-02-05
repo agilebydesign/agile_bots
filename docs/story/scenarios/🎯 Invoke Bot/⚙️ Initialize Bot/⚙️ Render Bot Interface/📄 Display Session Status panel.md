@@ -16,19 +16,12 @@ Display Session Status panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks refresh button
-
   **then** System displays bot name
-
   **and** System displays updated workspace path
-
   **and** System displays updated bot path
-
   **and** System displays updated available botss
-
   **and** System displays updated behavior action section
-
   **and** System displays updated scope section
-
   **and** System displays updated instructions section
 
 ## Scenarios

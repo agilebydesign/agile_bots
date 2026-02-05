@@ -2955,7 +2955,7 @@
                             "story_type": "user",
                             "test_class": "TestExecuteActionScopedToStoryNode",
                             "acceptance_criteria": [
-                              "WHEN Story Graph Node executes action with valid parameters\nTHEN node validates action exists\nAND node invokes bot to execute action with scope context\nAND node validates graph structure remains valid after execution\nExample: bot.story_graph.epics[\"epic name\"].executeAction(\"build\", {\"output\": \"docs/stories\"})",
+                              "WHEN Story Graph Node executes action with valid parameters\nTHEN node validates action exists\nAND node invokes bot to execute action with scope context\nAND node validates graph structure remains valid after execution\nExample: bot.story_graph.epics[\"epic name\"].executeAction(\"build\", {\"output\": \"docs/story\"})",
                               "WHEN Story Graph Node executes action with invalid parameters\nTHEN node invokes bot to execute action with scope context\nAND bot validates action parameters are invalid\nAND returns error with parameter requirements"
                             ],
                             "scenario_outlines": [
@@ -2987,7 +2987,7 @@
                                       "Epic",
                                       "User Management",
                                       "build",
-                                      "{\"output\": \"docs/stories\"}"
+                                      "{\"output\": \"docs/story\"}"
                                     ],
                                     [
                                       "SubEpic",
@@ -3125,7 +3125,7 @@
                                 "test_method": "test_persist_valid_modifications",
                                 "background": [
                                   "Given Story Graph is initialized",
-                                  "And Story Graph file is at \"docs/stories/story-graph.json\""
+                                  "And Story Graph file is at \"docs/story/story-graph.json\""
                                 ],
                                 "steps": [
                                   "Given Story Graph has <initial_node_count> nodes",
@@ -3263,7 +3263,7 @@
                                 "test_method": "test_persistence_failure_rollback",
                                 "background": [
                                   "Given Story Graph is initialized",
-                                  "And Story Graph file is at \"docs/stories/story-graph.json\""
+                                  "And Story Graph file is at \"docs/story/story-graph.json\""
                                 ],
                                 "steps": [
                                   "Given Story Graph has valid structure with state: <initial_state>",
@@ -3837,7 +3837,7 @@
                             "steps": [
                               "Given Production story_bot clarify action",
                               "When do_execute is called with key_questions_answered and evidence_provided",
-                              "Then clarification.json file is created in docs/stories/ folder",
+                              "Then clarification.json file is created in docs/story/ folder",
                               "Then And file contains behavior section with key_questions and evidence"
                             ],
                             "test_method": "test_save_clarification_data_when_parameters_provided"
@@ -4037,7 +4037,7 @@
                             "steps": [
                               "Given Production story_bot strategy action",
                               "When do_execute is called with decisions_made and assumptions_made",
-                              "Then strategy.json file is created in docs/stories/ folder",
+                              "Then strategy.json file is created in docs/story/ folder",
                               "Then And file contains behavior section with decisions_made and assumptions_made"
                             ],
                             "test_method": "test_save_strategy_data_when_parameters_provided"
@@ -10822,7 +10822,7 @@
                                   {
                                     "title": "Folder links open in explorer",
                                     "steps": [
-                                      "Given Epic has matching folder in docs/stories/map",
+                                      "Given Epic has matching folder in docs/story/map",
                                       "And Sub-epic has matching folder",
                                       "When User clicks epic name link",
                                       "Then VS Code reveals folder in explorer view",
@@ -14180,7 +14180,7 @@
                             "story_type": "user",
                             "test_class": "TestSubmitActionScopedToStoryScope",
                             "acceptance_criteria": [
-                              "WHEN User executes action with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Manage Story Graph\".build.output.\"docs/stories\"\nTHEN CLI parses notation to scope\nAND resolves and validates scope exists\nAND validates action exists\nAND executes action with scope context\nAND outputs result",
+                              "WHEN User executes action with dot notation\nEXAMPLE: cli.story_graph.\"Invoke Bot\".\"Manage Story Graph\".build.output.\"docs/story\"\nTHEN CLI parses notation to scope\nAND resolves and validates scope exists\nAND validates action exists\nAND executes action with scope context\nAND outputs result",
                               "WHEN User enters non-existent scope path\nTHEN CLI identifies scope does not exist [ - see previous acceptance criteria]\nAND outputs error with valid paths",
                               "WHEN Action execution causes the story_graph to change\nTHEN CLI validates graph structure\nAND outputs success message"
                             ],
@@ -14193,12 +14193,12 @@
                                 "steps": [
                                   "And Story Graph has Epic \"Invoke Bot\" with SubEpic \"Manage Story Graph\"",
                                   "And SubEpic \"Manage Story Graph\" has action \"build\" available",
-                                  "When User executes CLI command: story_graph.\"Invoke Bot\".\"Manage Story Graph\".build.output.\"docs/stories\"",
+                                  "When User executes CLI command: story_graph.\"Invoke Bot\".\"Manage Story Graph\".build.output.\"docs/story\"",
                                   "Then CLI parses dot notation to scope \"Manage Story Graph\"",
                                   "And CLI resolves scope \"Manage Story Graph\" successfully",
                                   "And CLI validates scope exists",
                                   "And CLI validates action \"build\" exists for scope",
-                                  "And CLI parses parameters: output=\"docs/stories\"",
+                                  "And CLI parses parameters: output=\"docs/story\"",
                                   "And CLI executes action \"build\" with scope context \"Manage Story Graph\"",
                                   "And CLI outputs action result",
                                   "And CLI outputs success message: \"Action 'build' completed for scope 'Manage Story Graph'\""

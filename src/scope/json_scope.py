@@ -1,5 +1,7 @@
 
 import json
+import re
+from typing import Optional
 from pathlib import Path
 from cli.adapters import JSONAdapter
 from scope.scope import Scope
@@ -119,23 +121,41 @@ class JSONScope(JSONAdapter):
         test_dir = self.scope.workspace_directory / self.scope.bot_paths.test_path
         # Use centralized path resolution - scenarios are in the scenarios behavior folder
         scenarios_path = self.scope.bot_paths.story_graph_paths.scenarios_path
+        exploration_path = self.scope.bot_paths.story_graph_paths.behavior_path('exploration')
         
         for epic in epics:
             epic_folder = scenarios_path / f"🎯 {epic['name']}"
-            if epic_folder.exists() and epic_folder.is_dir():
+            exploration_doc = self._get_exploration_doc_path(exploration_path, epic['name'])
+            if exploration_doc or (epic_folder.exists() and epic_folder.is_dir()):
                 if 'links' not in epic:
                     epic['links'] = []
                 epic['links'].append({
                     'text': 'docs',
-                    'url': str(epic_folder),
+                    'url': str(exploration_doc or epic_folder),
                     'icon': 'document'
                 })
             
             if 'sub_epics' in epic:
                 for sub_epic in epic['sub_epics']:
-                    self._enrich_sub_epic_with_links(sub_epic, test_dir, scenarios_path, epic['name'], enrich_scenarios=enrich_scenarios)
+                    self._enrich_sub_epic_with_links(
+                        sub_epic,
+                        test_dir,
+                        scenarios_path,
+                        epic['name'],
+                        parent_sub_epic_name=None,
+                        enrich_scenarios=enrich_scenarios
+                    )
     
-    def _enrich_sub_epic_with_links(self, sub_epic: dict, test_dir: Path, scenarios_path: Path, epic_name: str, parent_path: str = None, enrich_scenarios: bool = True):
+    def _enrich_sub_epic_with_links(
+        self,
+        sub_epic: dict,
+        test_dir: Path,
+        scenarios_path: Path,
+        epic_name: str,
+        parent_path: str = None,
+        parent_sub_epic_name: Optional[str] = None,
+        enrich_scenarios: bool = True
+    ):
         if parent_path:
             sub_epic_doc_folder = Path(parent_path) / f"⚙️ {sub_epic['name']}"
         else:
@@ -153,22 +173,55 @@ class JSONScope(JSONAdapter):
                     'icon': 'test_tube'
                 })
         
-        if sub_epic_doc_folder.exists() and sub_epic_doc_folder.is_dir():
+        exploration_path = self.scope.bot_paths.story_graph_paths.behavior_path('exploration') if self.scope.bot_paths else None
+        exploration_doc = self._get_first_exploration_doc(
+            exploration_path,
+            [sub_epic['name'], parent_sub_epic_name, epic_name]
+        )
+        if exploration_doc or (sub_epic_doc_folder.exists() and sub_epic_doc_folder.is_dir()):
             sub_epic['links'].append({
                 'text': 'docs',
-                'url': str(sub_epic_doc_folder),
+                'url': str(exploration_doc or sub_epic_doc_folder),
                 'icon': 'document'
             })
         
         if 'sub_epics' in sub_epic:
             for nested_sub_epic in sub_epic['sub_epics']:
-                self._enrich_sub_epic_with_links(nested_sub_epic, test_dir, scenarios_path, epic_name, str(sub_epic_doc_folder), enrich_scenarios=enrich_scenarios)
+                self._enrich_sub_epic_with_links(
+                    nested_sub_epic,
+                    test_dir,
+                    scenarios_path,
+                    epic_name,
+                    str(sub_epic_doc_folder),
+                    parent_sub_epic_name=sub_epic['name'],
+                    enrich_scenarios=enrich_scenarios
+                )
         
         if 'story_groups' in sub_epic:
             for story_group in sub_epic['story_groups']:
                 if 'stories' in story_group:
                     for story in story_group['stories']:
                         self._enrich_story_with_links(story, test_dir, sub_epic_doc_folder, sub_epic.get('test_file'), enrich_scenarios=enrich_scenarios)
+
+    def _get_exploration_doc_path(self, exploration_path: Optional[Path], node_name: str) -> Optional[Path]:
+        if not exploration_path:
+            return None
+        slug = re.sub(r'[^a-z0-9]+', '-', node_name.lower()).strip('-')
+        if not slug:
+            return None
+        candidate = exploration_path / f"{slug}-exploration.md"
+        return candidate if candidate.exists() else None
+
+    def _get_first_exploration_doc(self, exploration_path: Optional[Path], node_names: list) -> Optional[Path]:
+        if not exploration_path:
+            return None
+        for name in node_names:
+            if not name:
+                continue
+            candidate = self._get_exploration_doc_path(exploration_path, name)
+            if candidate:
+                return candidate
+        return None
     
     def _enrich_story_with_links(self, story: dict, test_dir: Path, parent_doc_folder: Path, parent_test_file: str, enrich_scenarios: bool = True):
         if 'links' not in story:

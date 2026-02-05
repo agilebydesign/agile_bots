@@ -16,11 +16,8 @@ Switch Bot panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User switches bot
-
   **then** System displays updated bot name
-
   **and** System displays behavior action section for new bot
-
   **and** System displays behavior action stateof workspace for new bot
 
 ## Scenarios

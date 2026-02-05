@@ -1,11 +1,11 @@
-{
-  "description": "Use one word per concept across the entire codebase. Pick consistent terms (get/fetch/retrieve → choose one) and follow domain language for business concepts.",
+﻿{
+  "description": "Use one word per concept across the entire codebase. Pick consistent terms (get/fetch/retrieve â†’ choose one) and follow domain language for business concepts.",
   "examples": [
     {
       "do": {
         "description": "Maintain consistent naming patterns across codebase",
         "content": [
-          "Pick one term per concept (get/fetch/retrieve → choose one)",
+          "Pick one term per concept (get/fetch/retrieve â†’ choose one)",
           "Use consistent naming patterns for similar operations",
           "Follow domain language for business concepts",
           "Establish team conventions and stick to them",
@@ -17,8 +17,8 @@
           "",
           "Consistency Requirements:",
           "- One word per concept throughout codebase",
-          "- Same operation = same verb (get, fetch, retrieve → pick one)",
-          "- Same concept = same noun (user, account, member → pick one)",
+          "- Same operation = same verb (get, fetch, retrieve â†’ pick one)",
+          "- Same concept = same noun (user, account, member â†’ pick one)",
           "- Follow established conventions in existing code",
           "- Use domain language consistently"
         ]
@@ -52,5 +52,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.consistent_naming_scanner.ConsistentNamingScanner"
+  "scanner": "scanners.consistent_naming_scanner.ConsistentNamingScanner"
 }
+

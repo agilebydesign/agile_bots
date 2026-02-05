@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "Design exceptions based on how callers will handle them. Create exception types based on caller's needs, use special case objects for predictable failures, and wrap third-party exceptions at boundaries.",
   "examples": [
     {
@@ -59,5 +59,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.exception_classification_scanner.ExceptionClassificationScanner"
+  "scanner": "scanners.exception_classification_scanner.ExceptionClassificationScanner"
 }
+

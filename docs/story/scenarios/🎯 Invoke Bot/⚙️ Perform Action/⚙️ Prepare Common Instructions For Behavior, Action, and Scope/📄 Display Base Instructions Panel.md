@@ -16,11 +16,8 @@ Display Base Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User views panel
-
   **then** System displays base instructions section
-
   **and** System displays behavior name
-
   **and** System displays action name
 
 ## Scenarios

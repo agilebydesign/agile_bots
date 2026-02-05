@@ -1,5 +1,5 @@
-{
-  "description": "CRITICAL: Function signatures must be simple and intention-revealing. Prefer 0-2 parameters. NEVER pass Dict[str, Any] or List[str] for complex data - create typed objects instead. Examples: parameters dict → ParametersObject, files dict → FilesCollection, exclude list → ExcludePatterns.",
+﻿{
+  "description": "CRITICAL: Function signatures must be simple and intention-revealing. Prefer 0-2 parameters. NEVER pass Dict[str, Any] or List[str] for complex data - create typed objects instead. Examples: parameters dict â†’ ParametersObject, files dict â†’ FilesCollection, exclude list â†’ ExcludePatterns.",
   "examples": [
     {
       "do": {
@@ -31,23 +31,24 @@
           "Don't use output parameters (return values instead)",
           "",
           "Wrong Examples (poor parameters):",
-          "- process(data, true, false) → unclear what booleans mean",
-          "- createUser(name, email, role, active, verified, age, phone) → too many params",
-          "- calculate(input, result) where result is modified → use return value",
+          "- process(data, true, false) â†’ unclear what booleans mean",
+          "- createUser(name, email, role, active, verified, age, phone) â†’ too many params",
+          "- calculate(input, result) where result is modified â†’ use return value",
           "",
           "Parameter Problems (REFACTOR):",
-          "- Boolean flags indicating different behaviors → split into two functions",
-          "- More than 3 parameters → create parameter object",
-          "- Output parameters → return values or use immutable approach",
-          "- Unclear parameter order → use named parameters/object",
+          "- Boolean flags indicating different behaviors â†’ split into two functions",
+          "- More than 3 parameters â†’ create parameter object",
+          "- Output parameters â†’ return values or use immutable approach",
+          "- Unclear parameter order â†’ use named parameters/object",
           "",
           "Instead of:",
-          "- process(data, true) → processAndValidate(data) and process(data)",
-          "- create(a, b, c, d, e) → create({a, b, c, d, e})",
-          "- modify(input, output) → return modifiedValue(input)"
+          "- process(data, true) â†’ processAndValidate(data) and process(data)",
+          "- create(a, b, c, d, e) â†’ create({a, b, c, d, e})",
+          "- modify(input, output) â†’ return modifiedValue(input)"
         ]
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.clear_parameters_scanner.ClearParametersScanner"
+  "scanner": "scanners.clear_parameters_scanner.ClearParametersScanner"
 }
+

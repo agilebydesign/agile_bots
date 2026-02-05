@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "Names should provide appropriate context without redundancy. Use longer names for longer scopes and replace magic numbers with named constants.",
   "examples": [
     {
@@ -54,5 +54,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.meaningful_context_scanner.MeaningfulContextScanner"
+  "scanner": "scanners.meaningful_context_scanner.MeaningfulContextScanner"
 }
+

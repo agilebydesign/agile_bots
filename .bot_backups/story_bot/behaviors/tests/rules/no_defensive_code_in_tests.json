@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  3,
     "description":  "Tests must NEVER contain guard clauses, defensive conditionals, or fallback paths. We control test setup - if it\u0027s wrong, the test MUST fail immediately. Guard clauses hide problems. Tests should assume positive outcomes. Example: Just call the code directly, don\u0027t wrap in if-checks",
     "do":  {
@@ -61,8 +61,9 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.no_guard_clauses_scanner.NoGuardClausesScanner"
+    "scanner":  "scanners.no_guard_clauses_scanner.NoGuardClausesScanner"
 }
+
 
 
 

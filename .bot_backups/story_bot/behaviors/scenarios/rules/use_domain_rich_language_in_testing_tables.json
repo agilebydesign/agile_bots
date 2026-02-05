@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  9,
     "description":  "Use domain-rich language in testing tables. Replace generic JSON with concrete, descriptive language tied to domain concepts. Real data and examples for all inputs/outputs. Example: \u0027Payment with amount -50.00 (negative)\u0027 not \u0027{\"payment\": {\"amount\": -50}}\u0027.",
     "do":  {
@@ -49,5 +49,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.domain_rich_language_scanner.DomainRichLanguageScanner"
+    "scanner":  "scanners.domain_rich_language_scanner.DomainRichLanguageScanner"
 }

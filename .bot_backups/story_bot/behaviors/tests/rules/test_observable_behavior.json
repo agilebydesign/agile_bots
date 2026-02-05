@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  12,
     "description":  "Test observable behavior, not implementation details. Verify public API and visible state changes. Don\u0027t assert on private methods or internal flags. Example: assert agent.config_path.exists() (observable); not assert agent._internal_flag (private)",
     "do":  {
@@ -53,5 +53,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.observable_behavior_scanner.ObservableBehaviorScanner"
+    "scanner":  "scanners.observable_behavior_scanner.ObservableBehaviorScanner"
 }

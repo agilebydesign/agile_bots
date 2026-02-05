@@ -1,9 +1,10 @@
-﻿import logging
+import logging
 import traceback
 from pathlib import Path
 from typing import Dict, Any, List, TYPE_CHECKING
 from rules.rules import Rules, ValidationContext, ValidationCallbacks
 from actions.validate.validation_report_writer import ValidationReportWriter, StreamingValidationReportWriter
+from actions.validate.file_link_builder import FileLinkBuilder
 from bot.workspace import get_base_actions_directory
 from utils import read_json_file
 
@@ -121,4 +122,16 @@ class ValidationExecutor:
             action_instructions.extend(edit_instructions)
 
     def _build_instructions_dict(self, action_instructions, processed_rules, report_path, report_link):
-        return {'action': 'validate', 'behavior': self.behavior.name, 'base_instructions': action_instructions, 'validation_rules': processed_rules, 'content_to_validate': None, 'report_path': str(report_path), 'report_link': report_link}
+        return {'action': 'validate', 'behavior': self.behavior.name, 'base_instructions': action_instructions, 'validation_rules': processed_rules, 'content_to_validate': None, 'report_path': str(report_path), 'report_link': report_link, 'report_links': self._collect_report_links()}
+
+    def _collect_report_links(self) -> List[str]:
+        violations_dir = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations'
+        if not violations_dir.exists():
+            return []
+        report_files = sorted(
+            violations_dir.glob(f'{self.behavior.name}-validation-report-*.md'),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True
+        )
+        link_builder = FileLinkBuilder(self.behavior.bot_paths.workspace_directory)
+        return [link_builder.create_file_link(str(report_file)) for report_file in report_files]

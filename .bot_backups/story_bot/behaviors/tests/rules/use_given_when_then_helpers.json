@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  22,
     "description":  "Use reusable helper functions instead of inline code blocks of 4+ lines. Optimize for reusability, not exact step names. Place helpers at correct scope: story-level in class, sub-epic in module, epic in separate file. Example: given_config_exists(), when_agent_initialized(), then_agent_is_configured()",
     "do":  {
@@ -61,5 +61,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
+    "scanner":  "scanners.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner"
 }

@@ -1,6 +1,6 @@
-{
+﻿{
   "description": "CRITICAL: Code must use resource-oriented, object-oriented design. Use object-oriented classes (singular or collection) with responsibilities that encapsulate logic over manager/doer/loader patterns. Maximize encapsulation through collaborator relationships.",
-  "scanner": "agile_bot.bots.base_bot.scanners.resource_oriented_code_scanner.ResourceOrientedCodeScanner",
+  "scanner": "scanners.resource_oriented_code_scanner.ResourceOrientedCodeScanner",
   "examples": [
     {
       "do": {
@@ -64,5 +64,6 @@
     }
   ]
 }
+
 
 

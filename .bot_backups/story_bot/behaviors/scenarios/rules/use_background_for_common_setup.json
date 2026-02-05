@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  2,
     "description":  "Use Background for repeated Given steps across 3+ scenarios. Background contains only Given/And steps (no When/Then). Example: Background: Given user is logged in And character sheet exists (used by 5 scenarios).",
     "do":  {
@@ -36,5 +36,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.background_common_setup_scanner.BackgroundCommonSetupScanner"
+    "scanner":  "scanners.background_common_setup_scanner.BackgroundCommonSetupScanner"
 }

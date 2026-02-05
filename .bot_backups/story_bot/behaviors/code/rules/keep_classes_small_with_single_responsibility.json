@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Classes should be small (under 200-300 lines) with a single responsibility. Keep classes cohesive (methods/data interdependent), eliminate dead code, and favor many small focused classes over few large ones.",
   "examples": [
     {
@@ -55,6 +55,7 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.class_size_scanner.ClassSizeScanner"
+  "scanner": "scanners.class_size_scanner.ClassSizeScanner"
 }
+
 

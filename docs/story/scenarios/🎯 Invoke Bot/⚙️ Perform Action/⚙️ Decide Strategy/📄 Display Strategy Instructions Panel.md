@@ -16,25 +16,18 @@ Display Strategy Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Current action is strategy
-
   **then** System displays decision criteria with radio button options
-
   **and** System displays assumptions textarea
 
 - **When** Saved strategy exists
-
   **then** System displays selected option for each decision criterion
-
   **and** Assumptions textarea remains editable
-
   **and** Textarea is pre-filled with saved assumptions
 
 - **When** User edits assumptions textarea
-
   **then** System updates assumptions
 
 - **When** User is on non-strategy actions (clarify, build, validate, render)
-
   **then** System displays saved strategy decisions and criteria as read-only
 
 ## Scenarios

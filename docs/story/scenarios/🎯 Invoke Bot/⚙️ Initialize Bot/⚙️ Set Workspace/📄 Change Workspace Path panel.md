@@ -1,6 +1,6 @@
 # 📄 Change Workspace Path panel
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/initialize_bot/test_set_workspace.py#L176)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Initialize Bot](..) / [⚙️ Set Workspace](.)  
@@ -16,23 +16,19 @@ Change Workspace Path panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User changes workspace path
-
   **then** System displays updated workspace path
-
   **and** System displays behavior action state of new workspace
 
 - **When** User sets workspace path
-
   **then** System persists workspace path value
 
 - **When** Panel refreshes
-
   **then** System restores previously set workspace path
 
 ## Scenarios
 
 <a id="scenario-user-changes-workspace-and-panel-displays-new-state"></a>
-### Scenario: [User changes workspace and panel displays new state](#scenario-user-changes-workspace-and-panel-displays-new-state) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_set_workspace.py#L184)
+### Scenario: [User changes workspace and panel displays new state](#scenario-user-changes-workspace-and-panel-displays-new-state) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -46,7 +42,7 @@ And Panel refreshes all sections with project_b data
 
 
 <a id="scenario-user-changes-to-nonexistent-directory-shows-error"></a>
-### Scenario: [User changes to nonexistent directory shows error](#scenario-user-changes-to-nonexistent-directory-shows-error) (error_case)  | [Test](/test/invoke_bot/initialize_bot/test_set_workspace.py#L219)
+### Scenario: [User changes to nonexistent directory shows error](#scenario-user-changes-to-nonexistent-directory-shows-error) (error_case)
 
 **Steps:**
 ```gherkin
@@ -59,7 +55,7 @@ And Panel retains previous valid workspace
 
 
 <a id="scenario-workspace-path-persists-after-panel-refresh"></a>
-### Scenario: [Workspace path persists after panel refresh](#scenario-workspace-path-persists-after-panel-refresh) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_set_workspace.py#L242)
+### Scenario: [Workspace path persists after panel refresh](#scenario-workspace-path-persists-after-panel-refresh) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -73,7 +69,7 @@ And Workspace path was persisted and restored
 
 
 <a id="scenario-set-path-by-dragging-folder-to-panel"></a>
-### Scenario: [Set path by dragging folder to panel](#scenario-set-path-by-dragging-folder-to-panel) (happy_path)  | [Test](/test/invoke_bot/initialize_bot/test_set_workspace.py#L270)
+### Scenario: [Set path by dragging folder to panel](#scenario-set-path-by-dragging-folder-to-panel) (happy_path)
 
 **Steps:**
 ```gherkin
