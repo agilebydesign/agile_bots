@@ -16,87 +16,60 @@ Display Story Hierarchy Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User views story scope
-
   **then** System displays epic list collapsed
 
-- **When** User clicks collapsed epic expand icon
-
-  **and** epic has sub-epics
-
+- **When** User clicks collapsed epic expand icon AND epic has sub-epics
   **then** System expands epic showing sub-epics collapsed beneath it
 
-- **When** User clicks epic name
-
-  **and** matching epic folder exists
-
+- **When** User clicks epic name AND matching epic folder exists
   **then** System opens epic folder in IDE explorer
 
 - **When** Epic has test file
-
   **then** System displays test tube icon next to epic name
 
 - **When** User clicks epic test link
-
   **then** System opens test file in editor
 
-- **When** User clicks collapsed sub-epic expand icon
-
-  **and** matching sub-epic has stories
-
+- **When** User clicks collapsed sub-epic expand icon AND matching sub-epic has stories
   **then** System expands sub-epic showing stories collapsed beneath it
 
 - **When** Sub-epic has test file
-
   **then** System displays test tube icon next to sub-epic name
 
 - **When** User clicks sub-epic test link
-
   **then** System opens test file in editor
 
 - **When** User clicks sub-epic name
-
   **then** System opens sub-epic folder in IDE explorer
 
-- **When** User clicks collapsed story expand icon
-
-  **and** matching sub-epic has stories
-
+- **When** User clicks collapsed story expand icon AND matching sub-epic has stories
   **then** System expands story showing scenarios collapsed beneath it
 
 - **When** User clicks story name
-
   **then** System opens story markdown file in editor
 
 - **When** Story has test file
-
   **then** System displays test tube icon next to story name
 
 - **When** User clicks story test link
-
   **then** System opens test file at test class
 
 - **When** User clicks collapsed story expand icon
-
   **then** System expands story showing scenarios
 
 - **When** User clicks scenario name
-
   **then** System opens story markdown file at scenario anchor
 
 - **When** Scenario has test method
-
   **then** System displays test tube icon next to scenario name
 
 - **When** User clicks scenario test link
-
   **then** System opens test file at scenario test method line
 
 - **When** Test tube icon is displayed
-
   **then** System shows correct test tube image
 
 - **When** User clicks epic or sub-epic or story name
-
   **then** System opens corresponding file or folder
 
 ## Scenarios
@@ -234,7 +207,7 @@ And Scenario section is visible with heading
 
 **Steps:**
 ```gherkin
-Given Epic has matching folder in docs/stories/map
+Given Epic has matching folder in docs/story/map
 And Sub-epic has matching folder
 When User clicks epic name link
 Then VS Code reveals folder in explorer view

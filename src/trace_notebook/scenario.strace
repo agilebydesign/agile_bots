@@ -6,7 +6,7 @@
     "acceptance_criteria": "- hello\n",
     "behavior": "exploration",
     "test_class": "TestDisplayRulesUsingCLI",
-    "file": "docs/stories/story-graph.json",
+    "file": "docs/story/story-graph.json",
     "line": 16952
   },
   "scenarios": [
@@ -14,7 +14,7 @@
       "name": "Rules action shows rules digest in CLI output",
       "type": "happy_path",
       "steps": "GIVEN: CLI is at shape.validate (which shows rules)\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains formatted rules digest",
-      "file": "docs/stories/story-graph.json",
+      "file": "docs/story/story-graph.json",
       "line": 16962,
       "test": {
         "method": "test_rules_action_shows_rules_digest",
@@ -47,7 +47,7 @@
               "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
             }
           ],
-          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
+          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/story', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
         },
         {
           "symbol": "StateTestHelper.set_state",
@@ -340,7 +340,7 @@
       "name": "Validation output includes rules content",
       "type": "happy_path",
       "steps": "GIVEN: CLI is at shape.validate\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains validation rules",
-      "file": "docs/stories/story-graph.json",
+      "file": "docs/story/story-graph.json",
       "line": 16970,
       "test": {
         "method": "test_rules_output_includes_validation_content",
@@ -373,7 +373,7 @@
               "code": "    def load_story_graph_into_bot(self):\n        \"\"\"Load story graph into bot.story_graph for test access.\n        \n        Note: Bot now has a native story_graph property that loads from workspace.\n        This method forces a reload by clearing the cached instance.\n        \"\"\"\n        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'\n        if not story_graph_path.exists():\n            return None\n        \n        # Clear cached story_graph to force reload from file\n        self.bot._story_graph = None\n        \n        # Access the property which will lazy-load it\n        story_map = self.bot.story_graph\n        \n        return story_map"
             }
           ],
-          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
+          "code": "    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/story', filename: str = 'story-graph.json') -> Path:\n        \n        if graph_data is None:\n            graph_data = {'epics': []}\n        \n        docs_dir = self.parent.workspace / docs_path\n        docs_dir.mkdir(parents=True, exist_ok=True)\n        \n        story_graph_file = docs_dir / filename\n        story_graph_file.write_text(json.dumps(graph_data, indent=2), encoding='utf-8')\n        \n        self.load_story_graph_into_bot()\n        \n        return story_graph_file"
         },
         {
           "symbol": "StateTestHelper.set_state",
@@ -666,7 +666,7 @@
       "name": "User gets rules instructions for behavior",
       "type": "happy_path",
       "steps": "",
-      "file": "docs/stories/story-graph.json",
+      "file": "docs/story/story-graph.json",
       "line": 16978,
       "test": {
         "method": "test_user_gets_rules_instructions_for_behavior",
@@ -680,7 +680,7 @@
       "name": "User gets rules with message parameter",
       "type": "happy_path",
       "steps": "",
-      "file": "docs/stories/story-graph.json",
+      "file": "docs/story/story-graph.json",
       "line": 16986,
       "test": {
         "method": "test_user_gets_rules_with_message_parameter",
@@ -694,7 +694,7 @@
       "name": "User gets rules without message parameter",
       "type": "happy_path",
       "steps": "",
-      "file": "docs/stories/story-graph.json",
+      "file": "docs/story/story-graph.json",
       "line": 16994,
       "test": {
         "method": "test_user_gets_rules_without_message_parameter",

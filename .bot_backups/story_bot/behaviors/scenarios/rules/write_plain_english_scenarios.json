@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  6,
     "description":  "Write scenarios in plain English. NO variables, NO placeholders, NO Scenario Outlines, NO Examples tables at initial scenario writing stage. Example: \u0027Given user has typed request message start shaping\u0027 not \u0027Given user has typed \u003crequest_message\u003e\u0027.",
     "do":  {
@@ -39,5 +39,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.plain_english_scenarios_scanner.PlainEnglishScenariosScanner"
+    "scanner":  "scanners.plain_english_scenarios_scanner.PlainEnglishScenariosScanner"
 }

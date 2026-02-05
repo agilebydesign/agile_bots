@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  1,
     "description":  "When mapping stories, carefully distinguish between sequential spine (essential path) and optional paths, alternate routes, or additional functionality that is not strictly essential. Sequential stories form the mandatory flow; optional stories are alternatives, enhancements, or non-essential features.",
     "do":  {
@@ -89,5 +89,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.spine_optional_scanner.SpineOptionalScanner"
+    "scanner":  "scanners.spine_optional_scanner.SpineOptionalScanner"
 }

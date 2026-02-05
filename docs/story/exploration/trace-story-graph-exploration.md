@@ -1,7 +1,3 @@
-# Trace Story Graph - Increment Exploration
-
-**Navigation:** [📋 Story Map](../map/{story_map_filename}) | [📊 Increments](../increments/{increments_filename})
-
 
 
 

@@ -26,6 +26,6 @@ Save File Isolation functionality for the mob minion system.
 ```gherkin
 GIVEN: Bot initialized with tmp_path workspace
 WHEN: Saving any data
-THEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/stories
+THEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/story
 ```
 

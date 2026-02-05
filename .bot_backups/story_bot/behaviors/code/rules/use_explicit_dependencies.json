@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Make dependencies visible through constructor injection. Pass dependencies through constructors, make all dependencies explicit and visible, and use dependency injection for flexibility.",
   "examples": [
     {
@@ -65,5 +65,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
+  "scanner": "scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
 }
+

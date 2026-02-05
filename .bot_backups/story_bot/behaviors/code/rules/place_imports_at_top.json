@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "Place all import statements at the top of the file, after module docstrings and comments, but before any executable code. This improves readability and makes dependencies clear.",
   "examples": [
     {
@@ -60,8 +60,9 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.import_placement_scanner.ImportPlacementScanner"
+  "scanner": "scanners.import_placement_scanner.ImportPlacementScanner"
 }
+
 
 
 

@@ -16,27 +16,17 @@ Execute Behavior Action Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks behavior
-
   **then** System displays that behavior as current
-
   **and** System expands behavior
-
   **and** System expands first action to display operations
-
   **and** System sets first action as current
-
   **and** System sets first operation as current
-
   **and** System executes first operation of first action of that behavior
 
 - **When** User clicks action
-
   **then** System displays that action as current
-
   **and** System expands action to display operations
-
   **and** System sets first operation as current
-
   **and** System executes first operation of that action
 
 ## Scenarios

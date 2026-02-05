@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "Related code should be visually close. Group related concepts together, declare variables close to usage, and keep files under 500 lines when possible.",
   "examples": [
     {
@@ -63,5 +63,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.vertical_density_scanner.VerticalDensityScanner"
+  "scanner": "scanners.vertical_density_scanner.VerticalDensityScanner"
 }
+

@@ -16,9 +16,7 @@ Filter File Scope  By Files Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User types file pattern in filter
-
   **then** System displays filtered file list
-
   **and** System displays file list with monospace paths
 
 ## Scenarios

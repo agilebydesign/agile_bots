@@ -37,7 +37,7 @@ Then Instructions contain questions and evidence from production files
 ```gherkin
 Given Production story_bot clarify action
 When do_execute is called with key_questions_answered and evidence_provided
-Then clarification.json file is created in docs/stories/ folder
+Then clarification.json file is created in docs/story/ folder
 Then And file contains behavior section with key_questions and evidence
 ```
 
@@ -78,7 +78,7 @@ Then Questions and evidence are loaded correctly
 
 
 <a id="scenario-guardrails-loads-strategy-assumptions-from-workspace"></a>
-### Scenario: [Guardrails loads strategy assumptions from workspace](#scenario-guardrails-loads-strategy-assumptions-from-workspace) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L162)
+### Scenario: [Guardrails loads strategy assumptions from workspace](#scenario-guardrails-loads-strategy-assumptions-from-workspace) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L173)
 
 **Steps:**
 ```gherkin

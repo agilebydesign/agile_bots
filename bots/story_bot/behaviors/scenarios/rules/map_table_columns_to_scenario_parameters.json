@@ -1,6 +1,6 @@
 {
     "priority":  8,
-    "description":  "Map all table columns to scenario parameters bidirectionally. Every column header maps to a Background/When/Then parameter, and every parameter appears as a column. Example: \u0027{payment_system}\u0027 parameter → \u0027Payment System\u0027 column.",
+    "description":  "Map all table columns to scenario parameters bidirectionally. Every column header maps to a Background/When/Then parameter, and every parameter appears as a column. Keep tables minimal and domain-focused. Example: \u0027{payment_system}\u0027 parameter → \u0027Payment System\u0027 column.",
     "do":  {
                "description":  "Bidirectional mapping: column ↔ parameter. Example: \u0027Payment System\u0027 column maps to \u0027{payment_system}\u0027 parameter in Background",
                "guidance":  [
@@ -21,6 +21,18 @@
                                     "example":  [
                                                     "\u0027{violations_data}\u0027 → \u0027Violations Data\u0027 column",
                                                     "\u0027{report_format}\u0027 → \u0027Report Format\u0027 column"
+                                                ]
+                                },
+                                {
+                                    "description":  "Scenario-level fields (like test_method) belong in the Scenario table, not in steps",
+                                    "example":  [
+                                                    "Scenario table includes \u0027Test Method\u0027 column while steps remain free of \u0027{test_method}\u0027"
+                                                ]
+                                },
+                                {
+                                    "description":  "Do not add code-trace columns unless the scenario explicitly covers code tracing",
+                                    "example":  [
+                                                    "No \u0027Code File\u0027/\u0027Code Line\u0027 columns for non-trace scenarios"
                                                 ]
                                 }
                             ]
@@ -44,6 +56,12 @@
                                       "description":  "Don\u0027t use vague column names that don\u0027t map to parameters",
                                       "example":  [
                                                       "\u0027Input\u0027 column instead of \u0027Payment Data\u0027 matching \u0027{payment_data}\u0027 (WRONG)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t mirror the story title in example values",
+                                      "example":  [
+                                                      "Using \u0027Display Stories\u0027 as example data value (WRONG); use domain data like \u0027Wealth Transfer Overview\u0027 instead"
                                                   ]
                                   }
                               ]

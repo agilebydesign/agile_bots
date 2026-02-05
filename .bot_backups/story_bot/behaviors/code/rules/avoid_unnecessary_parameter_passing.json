@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "Don't pass parameters to internal methods when the value is already accessible through instance variables. Access instance properties directly instead of passing them around unnecessarily.",
   "examples": [
     {
@@ -53,6 +53,7 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
+  "scanner": "scanners.unnecessary_parameter_passing_scanner.UnnecessaryParameterPassingScanner"
 }
+
 

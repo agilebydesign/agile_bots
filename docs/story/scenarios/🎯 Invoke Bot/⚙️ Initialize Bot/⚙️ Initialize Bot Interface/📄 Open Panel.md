@@ -16,19 +16,12 @@ Open Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User activates panel command
-
   **then** System displays bot name
-
   **and** System displays workspace path
-
   **and** System displays bot path
-
   **and** System displays available botss
-
   **and** System displays behavior action section
-
   **and** System displays scope section
-
   **and** System displays instructions section
 
 ## Scenarios

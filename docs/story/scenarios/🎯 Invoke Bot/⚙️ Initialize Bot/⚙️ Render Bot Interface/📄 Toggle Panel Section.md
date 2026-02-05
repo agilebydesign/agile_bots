@@ -16,7 +16,6 @@ Toggle Panel Section functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks section header
-
   **then** System expands or collapses section
 
 ## Scenarios

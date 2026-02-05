@@ -16,15 +16,10 @@ Submit Behavior Rules Through Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks Get Rules button for a behavior
-
   **then** System executes behavior.rules command
-
   **and** System submits rules digest to AI chat
-
   **and** Rules include formatted descriptions with DO/DON'T sections
-
   **and** Rules include file paths for each rule
-
   **and** All behavior rules are included in digest
 
 ## Scenarios

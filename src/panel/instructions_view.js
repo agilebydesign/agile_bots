@@ -417,10 +417,11 @@ class InstructionsSection extends PanelView {
         }
 
         // 6. VALIDATE - Rules (ONLY show during validate action)
-        if (currentAction === 'validate' && (instructions.rules || instructions.validation_rules)) {
+        if (currentAction === 'validate' && (instructions.rules || instructions.validation_rules || instructions.report_link || instructions.report_links)) {
             restructured.validate_instructions = {
                 rules: instructions.rules || [],
-                validation_rules: instructions.validation_rules || []
+                validation_rules: instructions.validation_rules || [],
+                report_links: instructions.report_links || (instructions.report_link ? [instructions.report_link] : [])
             };
         }
 
@@ -1056,6 +1057,23 @@ class InstructionsSection extends PanelView {
 
         let html = '';
 
+        if (value.report_links && Array.isArray(value.report_links) && value.report_links.length > 0) {
+            html += '<div style="margin-bottom: 8px;">';
+            html += '<strong style="font-size: 14px;">Validation Reports</strong>';
+            html += '<div style="padding-left: 14px; margin-top: 4px;">';
+            html += `<div><strong>Latest:</strong> ${this._formatMarkdownLink(value.report_links[0])}</div>`;
+            if (value.report_links.length > 1) {
+                html += '<div style="margin-top: 4px;">All Reports:</div>';
+                html += '<ul style="padding-left: 16px; margin: 4px 0 0 0;">';
+                for (const reportLink of value.report_links) {
+                    html += `<li>${this._formatMarkdownLink(reportLink)}</li>`;
+                }
+                html += '</ul>';
+            }
+            html += '</div>';
+            html += '</div>';
+        }
+
         // Rules paths Section - collapsible
         if (value.rules && Array.isArray(value.rules) && value.rules.length > 0) {
             html += '<div class="collapsible-section" style="margin-bottom: 8px;">';
@@ -1103,6 +1121,19 @@ class InstructionsSection extends PanelView {
         }
 
         return html;
+    }
+
+    _formatMarkdownLink(markdownLink) {
+        if (!markdownLink || typeof markdownLink !== 'string') {
+            return this.escapeHtml(String(markdownLink || ''));
+        }
+        const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
+        if (!match) {
+            return `<code>${this.escapeHtml(markdownLink)}</code>`;
+        }
+        const label = match[1].replace(/^`|`$/g, '');
+        const href = match[2];
+        return `<a href="${this.escapeHtml(href)}">${this.escapeHtml(label)}</a>`;
     }
 
     _formatInstructionValue(value, borderColor) {

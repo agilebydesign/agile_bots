@@ -22,7 +22,7 @@ class BackgroundValidationHandler:
         context.timestamp = timestamp
         self._start_validation_thread(context, track_completion_fn, status_path)
         status_path_relative = status_path.relative_to(self.behavior.bot_paths.workspace_directory)
-        return self._build_background_response(status_path_relative, total_files)
+        return self._build_background_response(status_path_relative, total_files, timestamp)
 
     def _get_file_count(self, context: 'ValidateActionContext') -> int:
         try:
@@ -33,8 +33,7 @@ class BackgroundValidationHandler:
             return 0
 
     def _get_status_path(self, timestamp: str) -> Path:
-        docs_path = self.behavior.bot_paths.documentation_path
-        reports_dir = self.behavior.bot_paths.workspace_directory / docs_path / 'reports'
+        reports_dir = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations'
         reports_dir.mkdir(parents=True, exist_ok=True)
         return reports_dir / f'{self.behavior.name}-validation-status-{timestamp}.md'
 
@@ -64,8 +63,11 @@ class BackgroundValidationHandler:
         except Exception as status_err:
             logger.error(f'Could not write error to status file: {status_err}')
 
-    def _build_background_response(self, status_path_relative: Path, total_files: int) -> Dict[str, Any]:
-        return {'instructions': {'base_instructions': self._get_background_instructions(status_path_relative, total_files)}, '_background_execution': True, 'background': True, 'status_file': str(status_path_relative), 'total_files': total_files}
+    def _build_background_response(self, status_path_relative: Path, total_files: int, timestamp: str) -> Dict[str, Any]:
+        return {'instructions': {'base_instructions': self._get_background_instructions(status_path_relative, total_files, timestamp)}, '_background_execution': True, 'background': True, 'status_file': str(status_path_relative), 'total_files': total_files}
 
-    def _get_background_instructions(self, status_path_relative: Path, total_files: int) -> list:
-        return ['', '=' * 70, '**VALIDATION RUNNING IN BACKGROUND**', '=' * 70, '', '**CRITICAL: YOU MUST POLL THE STATUS FILE EVERY 10 SECONDS UNTIL VALIDATION COMPLETES**', '', f'Validation has been started in the background. It will scan {total_files} file(s).', '', '**Status File:**', f'  {status_path_relative}', '', '**AI ASSISTANT DIRECTIVES:**', '1. YOU MUST read the status file every 10 seconds to check progress', '2. YOU MUST report the current status summary to the user each time you check', '3. Continue polling every 10 seconds until validation is complete', '4. When complete, YOU MUST read and report the final summary from the status file', '5. Also check the full report at: docs/story/code-validation-report.md', '', 'The validation is running asynchronously and will update the status file in real-time.', 'The status file shows progress as scanners complete their work.', '', '**Status File Location:**', f'  {status_path_relative}', '', '**Report File Location (when complete):**', '  docs/story/code-validation-report.md', '', '=' * 70, '']
+    def _get_background_instructions(self, status_path_relative: Path, total_files: int, timestamp: str) -> list:
+        report_path = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations' / f'{self.behavior.name}-validation-report-{timestamp}.md'
+        report_path_relative = report_path.relative_to(self.behavior.bot_paths.workspace_directory)
+        report_line = f'  {report_path_relative}' if report_path_relative else '  (Report path will be generated on completion)'
+        return ['', '=' * 70, '**VALIDATION RUNNING IN BACKGROUND**', '=' * 70, '', '**CRITICAL: YOU MUST POLL THE STATUS FILE EVERY 10 SECONDS UNTIL VALIDATION COMPLETES**', '', f'Validation has been started in the background. It will scan {total_files} file(s).', '', '**Status File:**', f'  {status_path_relative}', '', '**AI ASSISTANT DIRECTIVES:**', '1. YOU MUST read the status file every 10 seconds to check progress', '2. YOU MUST report the current status summary to the user each time you check', '3. Continue polling every 10 seconds until validation is complete', '4. When complete, YOU MUST read and report the final summary from the status file', '5. Also check the full report at the path below', '', 'The validation is running asynchronously and will update the status file in real-time.', 'The status file shows progress as scanners complete their work.', '', '**Status File Location:**', f'  {status_path_relative}', '', '**Report File Location (when complete):**', report_line, '', '=' * 70, '']

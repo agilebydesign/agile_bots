@@ -1,8 +1,8 @@
-{
+﻿{
     "priority":  3,
-    "description":  "Alternate between actors every 1-2 steps. Scenarios should show back-and-forth interaction between user and system. Example: When user submits → Then system validates → When system displays → Then user confirms.",
+    "description":  "Alternate between actors every 1-2 steps. Scenarios should show back-and-forth interaction between user and system. Example: When user submits â†’ Then system validates â†’ When system displays â†’ Then user confirms.",
     "do":  {
-               "description":  "Alternate actors every 1-2 steps to show interaction flow. Example: When user → Then system; When system → Then actor",
+               "description":  "Alternate actors every 1-2 steps to show interaction flow. Example: When user â†’ Then system; When system â†’ Then actor",
                "guidance":  [
                                 {
                                     "description":  "When actor acts, system responds",
@@ -53,5 +53,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.actor_alternation_scanner.ActorAlternationScanner"
+    "scanner":  "scanners.actor_alternation_scanner.ActorAlternationScanner"
 }

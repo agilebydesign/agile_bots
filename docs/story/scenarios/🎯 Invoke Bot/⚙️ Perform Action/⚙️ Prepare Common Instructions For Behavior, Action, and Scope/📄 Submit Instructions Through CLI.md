@@ -16,9 +16,7 @@ Submit Instructions Through CLI functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User executes submit command
-
   **then** System tracks instruction submission
-
   **and** System returns success status with timestamp
 
 ## Scenarios

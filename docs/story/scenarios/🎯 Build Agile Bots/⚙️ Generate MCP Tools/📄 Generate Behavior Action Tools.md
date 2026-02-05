@@ -16,13 +16,9 @@ Generate Behavior Action Tools functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Generator processes Bot Config
-
   **then** Generator creates tool code for each (behavior, action) pair
-
   **and** Enumerates all behaviors and actions from Bot Config
-
   **and** For each pair, generates tool code with unique name, trigger words, forwarding logic
-
   **and** Tool catalog prepared with all generated tool instances
 
 ## Scenarios

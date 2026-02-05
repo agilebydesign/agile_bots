@@ -113,12 +113,15 @@ class RenderSpec:
         # Use centralized path as default fallback
         default_path = str(self._bot_paths.story_graph_paths.docs_root)
         config_path = self._config_data.get('path', default_path)
-        output_file = self._config_data.get('output', 'output.md')
-        if '{solution_name_slug}' in output_file:
-            output_file = self._resolve_solution_name_slug(output_file, input_path)
-        if '{scope}' in output_file:
-            output_file = self._resolve_scope_placeholder(output_file, scope)
-        return workspace_dir / config_path / output_file
+        output_file = self._config_data.get('output', '')
+        if output_file:
+            if '{solution_name_slug}' in output_file:
+                output_file = self._resolve_solution_name_slug(output_file, input_path)
+            if '{scope}' in output_file:
+                output_file = self._resolve_scope_placeholder(output_file, scope)
+            return workspace_dir / config_path / output_file
+        # If no output specified, just use the path (for folder-based synchronizers)
+        return workspace_dir / config_path
     
     def _resolve_scope_placeholder(self, output_file: str, scope: Optional[str] = None) -> str:
         """Replace {scope} placeholder with actual scope value or default."""

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  16,
     "description":  "Production code: make dependencies explicit through constructor injection. Pass all external dependencies as constructor parameters. No hidden global state. Tests easily inject test doubles. Example: Agent(config_loader=loader, domain_graph=graph)",
     "do":  {
@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
+    "scanner":  "scanners.explicit_dependencies_scanner.ExplicitDependenciesScanner"
 }

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  7,
     "description":  "Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/stories/scenarios.md.",
     "do":  {
@@ -35,5 +35,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner"
+    "scanner":  "scanners.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner"
 }

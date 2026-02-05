@@ -119,7 +119,9 @@ class ValidateRulesAction(Action):
             logger.error(f'Error running scanners: {e}')
             import traceback
             logger.error(traceback.format_exc())
-            return f'Error running scanners: {e}\n\nPlease review the validation report file in docs/story/reports/'
+            violations_dir = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations'
+            violations_dir_relative = violations_dir.relative_to(self.behavior.bot_paths.workspace_directory)
+            return f'Error running scanners: {e}\n\nPlease review the validation report files in `{violations_dir_relative}`.'
     
     def _format_scope_description(self, context: ValidateActionContext) -> str:
         if context.scope:

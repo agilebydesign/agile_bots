@@ -37,7 +37,7 @@ Then Instructions contain all required strategy fields
 ```gherkin
 Given Production story_bot strategy action
 When do_execute is called with decisions_made and assumptions_made
-Then strategy.json file is created in docs/stories/ folder
+Then strategy.json file is created in docs/story/ folder
 Then And file contains behavior section with decisions_made and assumptions_made
 ```
 

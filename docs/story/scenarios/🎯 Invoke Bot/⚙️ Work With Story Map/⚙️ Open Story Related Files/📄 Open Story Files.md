@@ -16,21 +16,18 @@ Open Story Files functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks graph link
-
   **then** System opens story-graph.json in editor
 
 - **When** User clicks map link
-
   **then** System opens story-map.drawio in diagram viewer
 
 - **When** System cannot open file
-
   **then** System displays error message
 
 ## Scenarios
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-user-opens-story-graph-json-file"></a>
+### Scenario: [User opens story graph JSON file](#scenario-user-opens-story-graph-json-file) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -41,8 +38,8 @@ And File is displayed with JSON syntax highlighting
 ```
 
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-user-opens-story-map-diagram"></a>
+### Scenario: [User opens story map diagram](#scenario-user-opens-story-map-diagram) (happy_path)
 
 **Steps:**
 ```gherkin
@@ -53,8 +50,8 @@ And Diagram is displayed with Draw.io extension
 ```
 
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-user-clicks-link-to-non-existent-file-shows-error"></a>
+### Scenario: [User clicks link to non-existent file shows error](#scenario-user-clicks-link-to-non-existent-file-shows-error) (error_case)
 
 **Steps:**
 ```gherkin
@@ -65,8 +62,8 @@ And Error message indicates file not found
 ```
 
 
-<a id="scenario-"></a>
-### Scenario: [](#scenario-) ()
+<a id="scenario-story-graph-and-map-links-always-visible-in-scope-header"></a>
+### Scenario: [Story graph and map links always visible in scope header](#scenario-story-graph-and-map-links-always-visible-in-scope-header) (happy_path)
 
 **Steps:**
 ```gherkin

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  21,
     "description":  "Use exact variable names from specification scenarios. When spec mentions agent_name, workspace_root, config_path - use those exact names in tests and production code. Example: agent_name = \u0027story_bot\u0027 (from spec), not name = \u0027story_bot\u0027",
     "do":  {
@@ -55,5 +55,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.exact_variable_names_scanner.ExactVariableNamesScanner"
+    "scanner":  "scanners.exact_variable_names_scanner.ExactVariableNamesScanner"
 }

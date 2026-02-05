@@ -15,22 +15,13 @@ Submit Instructions To AI Agent Panel functionality for the mob minion system.
 
 ### Behavioral Acceptance Criteria
 
-  **and** User clicks submit button
-
-  **then** System sends instructions to AI chat
-
 - **When** User clicks submit button
-
   **then** Submitted instructions include scope section
-
   **and** Scope section includes scope type (story/files/all)
-
   **and** Scope section includes scope filter values
-
   **and** Scope section includes complete story graph tree when scope is story-based
 
 - **When** User has answered clarify questions or made strategy decisions
-
   **then** Submitted instructions include all saved guardrails
 
 ## Scenarios

@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Functions should do one thing and do it well, with no hidden side effects. Each function must have a single, well-defined responsibility.",
   "examples": [
     {
@@ -11,9 +11,9 @@
           "Make side effects explicit in function names",
           "",
           "Correct Examples (single responsibility):",
-          "- Function validates input → separate from function that processes it",
-          "- Function calculates result → separate from function that logs/saves it",
-          "- Function reads data → separate from function that transforms it",
+          "- Function validates input â†’ separate from function that processes it",
+          "- Function calculates result â†’ separate from function that logs/saves it",
+          "- Function reads data â†’ separate from function that transforms it",
           "",
           "Single Responsibility Requirements:",
           "- Function performs ONE clear operation",
@@ -49,5 +49,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.single_responsibility_scanner.SingleResponsibilityScanner"
+  "scanner": "scanners.single_responsibility_scanner.SingleResponsibilityScanner"
 }
+

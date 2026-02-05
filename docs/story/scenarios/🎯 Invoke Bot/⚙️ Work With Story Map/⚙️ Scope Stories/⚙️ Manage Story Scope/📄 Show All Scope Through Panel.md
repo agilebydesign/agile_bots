@@ -16,15 +16,11 @@ Show All Scope Through Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User has filtered scope
-
   **then** System displays Show All button
 
 - **When** User clicks Show All button
-
   **then** System calls scope showall command via CLI
-
   **and** System clears scope filter
-
   **and** Panel displays complete unfiltered story hierarchy
 
 ## Scenarios

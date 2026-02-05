@@ -1,6 +1,6 @@
 # 📄 Clarify Requirements Using CLI
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L193)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L215)
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Perform Action](..) / [⚙️ Clarify Requirements](.)  
@@ -20,7 +20,7 @@ Clarify Requirements Using CLI functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-clarify-action-shows-questions-and-evidence-in-cli-output"></a>
-### Scenario: [Clarify action shows questions and evidence in CLI output](#scenario-clarify-action-shows-questions-and-evidence-in-cli-output) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L206)
+### Scenario: [Clarify action shows questions and evidence in CLI output](#scenario-clarify-action-shows-questions-and-evidence-in-cli-output) (happy_path)  | [Test](/test/invoke_bot/perform_action/test_clarify_requirements.py#L228)
 
 **Steps:**
 ```gherkin

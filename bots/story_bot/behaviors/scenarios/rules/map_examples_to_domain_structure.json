@@ -1,33 +1,41 @@
 {
   "name": "map_examples_to_domain_structure",
-  "description": "Example tables MUST mirror domain concept structure from story graph",
+  "description": "Example tables MUST mirror domain concept structure from story graph and stay domain-focused",
   "instructions": [
-    "When domain_concepts exist in the story graph, example tables MUST align with domain model relationships:",
+    "When domain_concepts exist in the story graph, example tables MUST align with domain model relationships and use domain data (not story-specific labels):",
     "",
     "1. **Identify Domain Entities:**",
     "   - Each domain concept becomes a table in the examples.tables array",
     "   - Responsibilities define columns for that entity's table",
     "   - Collaborator references appear as shared column values between tables",
+    "   - Use domain-specific sample names (e.g., Wealth Transfer, Account, Ledger) instead of the story name or feature label",
     "",
     "2. **Structure Example Tables:**",
     "   - Use examples.tables array with each table having: name, columns, rows",
     "   - Table name matches domain concept name",
-    "   - Link tables via shared column values (e.g., customer_name, account_number)",
+    "   - Link tables via shared column values (e.g., customer_id, account_number)",
+    "   - Prefer stable identifiers (id columns) over repeating long text in multiple tables",
+    "   - Keep examples minimal: include only entities/relations needed for the scenario",
     "",
     "3. **Data Alignment:**",
     "   - One-to-one: Related tables have matching row counts with shared key values",
     "   - One-to-many: Child table has multiple rows sharing the same key value",
+    "   - Many-to-many: Use a join table with both foreign keys",
+    "   - Optional relationships: Use nullable key values or separate optional rows",
+    "   - Composite keys: If needed, use multiple key columns (e.g., account_id + effective_date)",
     "",
     "4. **Example Pattern:**",
     "   Customer -> Account (1:1) -> Transaction (1:many)",
-    "   - Customer table: customer_name, customer_type, expected_outcome",
-    "   - Account table: customer_name, account_number, product_name, balance",
+    "   - Customer table: customer_id, customer_name, customer_type, expected_outcome",
+    "   - Account table: customer_id, account_number, product_name, balance",
     "   - Transaction table: account_number, transaction_id, amount, type"
   ],
   "applies_when": "domain_concepts array is present and non-empty in story graph nodes",
   "validation": [
     "Every relevant domain concept should have a corresponding table in examples.tables",
     "Shared columns must have matching values to link related tables",
-    "Table columns should reflect domain concept responsibilities"
+    "Table columns should reflect domain concept responsibilities",
+    "Examples must avoid using the story title as data values (use domain data instead)",
+    "Do not include code-trace tables unless the scenario explicitly tests code tracing"
   ]
 }

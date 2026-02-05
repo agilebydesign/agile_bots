@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Hide implementation details and expose minimal interface. Make fields private by default, expose behavior not data. NEVER pass raw dicts/lists that expose internal structure - use typed objects that encapsulate the data. Follow Law of Demeter (principle of least knowledge).",
   "examples": [
     {
@@ -57,5 +57,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.encapsulation_scanner.EncapsulationScanner"
+  "scanner": "scanners.encapsulation_scanner.EncapsulationScanner"
 }
+

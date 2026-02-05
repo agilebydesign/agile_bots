@@ -16,11 +16,8 @@ Generate Bot Tools functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** MCP Server Generator receives Bot Config
-
   **then** Generator generates unique MCP Server instance with Unique server name from bot name
-
   **and** Generated server includes Bot Config reference
-
   **and** Generated server leverages Specific Bot instantiation code
 
 ## Scenarios

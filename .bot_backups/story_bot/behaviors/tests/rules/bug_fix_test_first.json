@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  5,
     "description":  "When production code breaks, follow test-first workflow: write failing test, verify failure, fix code, verify success. Never fix bugs without a failing test first. Example: test_mcp_tool_initializes_bot() fails -\u003e fix initialization -\u003e test passes",
     "do":  {
@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner"
+    "scanner":  "scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner"
 }

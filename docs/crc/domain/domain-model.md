@@ -1,7 +1,7 @@
 # Domain Model Description: Agile Bots
 
 **File Name**: `agile-bots-domain-model-description.md`
-**Location**: `agile_bots/docs/stories/agile-bots-domain-model-description.md`
+**Location**: `agile_bots/docs/story/agile-bots-domain-model-description.md`
 
 ## Solution Purpose
 Domain model for Agile Bots

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  10,
     "description":  "Define fixtures in the test file, not separate conftest.py. Truly reusable fixtures (file ops, location helpers) go in base conftest.py. Example: @pytest.fixture def workspace_root(tmp_path): return tmp_path / \u0027workspace\u0027",
     "do":  {
@@ -48,5 +48,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.fixture_placement_scanner.FixturePlacementScanner"
+    "scanner":  "scanners.fixture_placement_scanner.FixturePlacementScanner"
 }

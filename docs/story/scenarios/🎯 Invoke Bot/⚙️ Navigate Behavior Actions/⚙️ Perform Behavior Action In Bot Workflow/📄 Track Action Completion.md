@@ -16,9 +16,7 @@ Track Action Completion functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Action completes execution
-
   **then** Activity entry is updated with outputs and duration
-
   **and** Entry appended to activity_log.json
 
 ## Scenarios

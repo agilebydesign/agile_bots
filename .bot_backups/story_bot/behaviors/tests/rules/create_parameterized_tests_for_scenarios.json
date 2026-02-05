@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  9,
     "description":  "If scenarios have Examples tables, create parameterized tests using @pytest.mark.parametrize. Each row becomes a test case. Don\u0027t write single tests that only test one example. Example: @pytest.mark.parametrize(\u0027input,expected\u0027, [(1, 2), (3, 4)])",
     "do":  {
@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.parameterized_tests_scanner.ParameterizedTestsScanner"
+    "scanner":  "scanners.parameterized_tests_scanner.ParameterizedTestsScanner"
 }

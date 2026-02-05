@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import re
 import sys
 import traceback
@@ -15,9 +15,8 @@ from actions.validate.file_link_builder import FileLinkBuilder
 from actions.validate.violation_formatter import ViolationFormatter
 logger = logging.getLogger(__name__)
 
-def ensure_reports_directory(bot_paths: BotPath, workspace_directory: Path) -> Path:
-    docs_path = bot_paths.documentation_path
-    docs_dir = workspace_directory / docs_path / 'reports'
+def ensure_reports_directory(bot_paths: BotPath, _workspace_directory: Path, behavior_name: str) -> Path:
+    docs_dir = bot_paths.story_graph_paths.behavior_path(behavior_name) / 'violations'
     docs_dir.mkdir(parents=True, exist_ok=True)
     return docs_dir
 
@@ -153,7 +152,7 @@ class StreamingValidationReportWriter:
         self._flush()
 
     def _get_status_path(self) -> str:
-        docs_dir = ensure_reports_directory(self.bot_paths, self.workspace_directory)
+        docs_dir = ensure_reports_directory(self.bot_paths, self.workspace_directory, self.behavior_name)
         status_file = docs_dir / f'{self.behavior_name}-validation-status-{self._timestamp}.md'
         return str(status_file)
 
@@ -242,7 +241,7 @@ class ValidationReportWriter:
         logger.error(f'Traceback:\n{traceback.format_exc()}')
 
     def get_report_path(self) -> Path:
-        docs_dir = ensure_reports_directory(self.bot_paths, self.workspace_directory)
+        docs_dir = ensure_reports_directory(self.bot_paths, self.workspace_directory, self.behavior_name)
         report_file = docs_dir / f'{self.behavior_name}-validation-report-{self._timestamp}.md'
         return report_file
 
