@@ -20,7 +20,7 @@ class StrategyTestHelper(BaseHelper):
         ensure BotTestHelper was initialized with a custom bot_directory parameter.
         
         Args:
-            behavior_name: Behavior name (e.g., 'shape', 'discovery')
+            behavior_name: Behavior name (e.g., 'shape', 'exploration')
             
         Returns:
             Path to assumptions file
@@ -155,7 +155,7 @@ class StrategyTestHelper(BaseHelper):
         """Assert strategy file contains behavior section with expected data.
         
         Args:
-            behavior_name: Behavior name (e.g., 'shape', 'discovery')
+            behavior_name: Behavior name (e.g., 'shape', 'exploration')
             expected_decisions: Expected decisions dict (optional)
             expected_assumptions: Expected assumptions list (optional)
         

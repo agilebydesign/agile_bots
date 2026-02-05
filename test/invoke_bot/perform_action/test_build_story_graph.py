@@ -85,7 +85,7 @@ class TestBuildStoryGraph:
         helper = BotTestHelper(tmp_path)
         
         existing_story_graph = helper.story.given_story_graph_dict(epic='mob')
-        stories_dir = helper.workspace / 'docs' / 'stories'
+        stories_dir = helper.workspace / 'docs' / 'story'
         story_graph_path = helper.files.given_file_created(stories_dir, 'story-graph.json', existing_story_graph)
         
         helper.bot.behaviors.navigate_to('prioritization')
@@ -100,7 +100,7 @@ class TestBuildStoryGraph:
         assert instructions.get('template_path'), "Instructions should contain 'template_path'"
         assert story_graph_path.exists(), f"Story graph file should exist: {story_graph_path}"
         path_str = str(config.get('path')).replace('\\', '/')
-        assert 'docs/stories' in path_str, f"Expected path to contain 'docs/stories', got '{config.get('path')}'"
+        assert 'docs/story' in path_str, f"Expected path to contain 'docs/story', got '{config.get('path')}'"
 
 
 # ============================================================================
@@ -190,7 +190,7 @@ class TestBuildStoryGraphUsingCLI:
         
         # Create existing story graph
         existing_story_graph = helper.domain.story.given_story_graph_dict(epic='mob')
-        stories_dir = helper.domain.workspace / 'docs' / 'stories'
+        stories_dir = helper.domain.workspace / 'docs' / 'story'
         helper.domain.files.given_file_created(stories_dir, 'story-graph.json', existing_story_graph)
         
         helper.domain.state.set_state('prioritization', 'validate')

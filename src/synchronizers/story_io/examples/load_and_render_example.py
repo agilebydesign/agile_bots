@@ -40,7 +40,7 @@ diagram._load_from_story_graph_format(adapted_data)
 
 # Render outline
 result = diagram.render_outline(
-    output_path='demo/cheap_wealth_online/docs/stories/story-map-outline.drawio'
+    output_path='demo/cheap_wealth_online/docs/story/story-map-outline.drawio'
 )
 
 print(f"Rendered to: {result['output_path']}")

@@ -1,7 +1,7 @@
 {
   "action": "build",
   "schema": "story-graph-design.json",
-  "graph_path": "docs/stories/story-graph.json",
+  "graph_path": "docs/story/story-graph.json",
   "instructions": [
     "Refine domain concepts with detailed OOP design patterns",
     "Preserve inheritance relationships from domain phase (inherits_from field)",

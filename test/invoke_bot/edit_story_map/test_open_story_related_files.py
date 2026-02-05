@@ -1154,8 +1154,8 @@ class TestEnrichScopeWithLinks:
         
         helper = BotTestHelper(tmp_path)
         
-        # Create docs folder for epic at docs/stories/map (the actual path structure)
-        epic_folder = helper.workspace / 'docs' / 'stories' / 'map' / '🎯 Work With Story Map'
+        # Create docs folder for epic at docs/story/scenarios (the actual path structure)
+        epic_folder = helper.workspace / 'docs' / 'story' / 'scenarios' / '🎯 Work With Story Map'
         epic_folder.mkdir(parents=True, exist_ok=True)
         helper.story.assert_file_exists(epic_folder, "Epic docs folder")
         

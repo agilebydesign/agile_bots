@@ -49,7 +49,7 @@ class TestSaveClarificationAnswers:
         )
         
         # Verify answers saved to TEST workspace (not production)
-        clarification_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        clarification_file = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         assert clarification_file.exists(), "clarification.json should be created in test workspace"
         
         saved_data = json.loads(clarification_file.read_text())
@@ -82,7 +82,7 @@ class TestSaveClarificationAnswers:
         helper.bot.save(answers=new_answers, evidence_provided=None, decisions=None, assumptions=None)
         
         # Verify merge behavior
-        clarification_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        clarification_file = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         saved_data = json.loads(clarification_file.read_text())
         
         merged_answers = saved_data['shape']['key_questions']['answers']
@@ -116,7 +116,7 @@ class TestSaveClarificationEvidence:
             assumptions=None
         )
         
-        clarification_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        clarification_file = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         saved_data = json.loads(clarification_file.read_text())
         
         assert 'shape' in saved_data
@@ -149,7 +149,7 @@ class TestSaveStrategyDecisions:
             assumptions=None
         )
         
-        strategy_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'strategy.json'
+        strategy_file = tmp_path / 'workspace' / 'docs' / 'story' / 'strategy.json'
         assert strategy_file.exists()
         
         saved_data = json.loads(strategy_file.read_text())
@@ -180,7 +180,7 @@ class TestSaveStrategyDecisions:
             assumptions=test_assumptions
         )
         
-        strategy_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'strategy.json'
+        strategy_file = tmp_path / 'workspace' / 'docs' / 'story' / 'strategy.json'
         saved_data = json.loads(strategy_file.read_text())
         
         assert 'shape' in saved_data
@@ -210,13 +210,13 @@ class TestSaveMultipleGuardrails:
         )
         
         # Verify clarifications
-        clarification_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        clarification_file = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         clarification_data = json.loads(clarification_file.read_text())
         assert clarification_data['shape']['key_questions']['answers']['What is scope?'] == "Full scope"
         assert clarification_data['shape']['evidence']['provided']['Requirements doc'] == ["req.md"]
         
         # Verify strategy
-        strategy_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'strategy.json'
+        strategy_file = tmp_path / 'workspace' / 'docs' / 'story' / 'strategy.json'
         strategy_data = json.loads(strategy_file.read_text())
         # Actual format: behavior_data['decisions'] and behavior_data['assumptions']
         assert strategy_data['shape']['decisions']['Approach'] == "Agile"
@@ -240,24 +240,24 @@ class TestSaveMultipleGuardrails:
             assumptions=None
         )
         
-        # Save data for 'discovery' behavior
-        helper.bot.behaviors.navigate_to('discovery')
+        # Save data for 'exploration' behavior
+        helper.bot.behaviors.navigate_to('exploration')
         helper.bot.save(
-            answers={"Discovery question": "Discovery answer"},
+            answers={"Exploration question": "Exploration answer"},
             evidence_provided=None,
             decisions=None,
             assumptions=None
         )
         
         # Verify both behaviors' data exists
-        clarification_file = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        clarification_file = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         saved_data = json.loads(clarification_file.read_text())
         
         assert 'shape' in saved_data
         assert saved_data['shape']['key_questions']['answers']['Shape question'] == "Shape answer"
         
-        assert 'discovery' in saved_data
-        assert saved_data['discovery']['key_questions']['answers']['Discovery question'] == "Discovery answer"
+        assert 'exploration' in saved_data
+        assert saved_data['exploration']['key_questions']['answers']['Exploration question'] == "Exploration answer"
 
 
 class TestSaveFileIsolation:
@@ -268,7 +268,7 @@ class TestSaveFileIsolation:
         SCENARIO: Save uses test workspace not production
         GIVEN: Bot initialized with tmp_path workspace
         WHEN: Saving any data
-        THEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/stories
+        THEN: Data saved to tmp_path workspace, NOT production agile_bots/docs/story
         """
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')
@@ -281,11 +281,11 @@ class TestSaveFileIsolation:
         )
         
         # Verify saved to TEST workspace
-        test_clarification = tmp_path / 'workspace' / 'docs' / 'stories' / 'clarification.json'
+        test_clarification = tmp_path / 'workspace' / 'docs' / 'story' / 'clarification.json'
         assert test_clarification.exists(), "Should save to test workspace"
         
         # Verify NOT saved to production workspace
-        production_clarification = Path(__file__).parent.parent.parent / 'docs' / 'stories' / 'clarification.json'
+        production_clarification = Path(__file__).parent.parent.parent / 'docs' / 'story' / 'clarification.json'
         if production_clarification.exists():
             prod_data = json.loads(production_clarification.read_text())
             # If production file exists, ensure our test data is NOT in it
@@ -335,14 +335,14 @@ class TestSubmitScopeInstructions:
             }
         ]
         
-        stories_dir = helper.workspace / 'docs' / 'stories'
+        stories_dir = helper.workspace / 'docs' / 'story'
         helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
         
         helper.bot.behaviors.navigate_to('shape')
         action = helper.bot.behaviors.current.actions.find_by_name('build')
         
         # Set scope to a specific story - apply it to the bot first
-        scope = Scope(workspace_directory=tmp_path, bot_paths=helper.bot.bot_paths)
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
         scope.filter(type=ScopeType.STORY, value=['Story1'])
         scope.apply_to_bot()
         context = ScopeActionContext(scope=scope)
@@ -445,14 +445,14 @@ class TestSubmitScopeInstructions:
             }
         ]
         
-        stories_dir = helper.workspace / 'docs' / 'stories'
+        stories_dir = helper.workspace / 'docs' / 'story'
         helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
         
         helper.bot.behaviors.navigate_to('shape')
         action = helper.bot.behaviors.current.actions.find_by_name('build')
         
         # Set scope to a specific story - apply it to the bot first
-        scope = Scope(workspace_directory=tmp_path, bot_paths=helper.bot.bot_paths)
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
         scope.filter(type=ScopeType.STORY, value=['Story1'])
         scope.apply_to_bot()
         context = ScopeActionContext(scope=scope)

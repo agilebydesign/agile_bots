@@ -2,8 +2,8 @@
   "name": "synchronize_story_scenarios",
   "description": "Synchronize story graph scenarios with rendered story documents",
   "input": [
-    "docs/stories/story-graph.json",
-    "docs/stories/{epic_name}/{sub_epic_name}/{story_name}.md"
+    "docs/story/story-graph.json",
+    "docs/story/scenarios/{epic_name}/{sub_epic_name}/{story_name}.md"
   ],
   "output": "Sync report and updated files if discrepancies found",
   "process": [

@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, List, TYPE_CHECKING
 if TYPE_CHECKING:
     from actions.render.render_spec import RenderSpec
@@ -78,7 +78,7 @@ class RenderInstructionBuilder:
         config_name = spec.name
         
         workspace = spec._bot_paths.workspace_directory if hasattr(spec, '_bot_paths') else None
-        path_prefix = spec.config_data.get('path', 'docs/stories')
+        path_prefix = spec.config_data.get('path', 'docs/story')
         
         if workspace:
             output_path = workspace / path_prefix / spec.output if spec.output else 'N/A'

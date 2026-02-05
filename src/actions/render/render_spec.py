@@ -98,16 +98,21 @@ class RenderSpec:
 
     def _resolve_input_path(self) -> Path:
         workspace_dir = self._bot_paths.workspace_directory
-        config_path = self._config_data.get('path', 'docs/stories')
+        # Use centralized path as default fallback
+        default_path = str(self._bot_paths.story_graph_paths.docs_root)
+        config_path = self._config_data.get('path', default_path)
         input_file = self._config_data.get('input', 'story-graph.json')
         input_path = workspace_dir / config_path / input_file
         if not input_path.exists():
-            input_path = workspace_dir / 'docs' / 'stories' / input_file
+            # Fall back to story graph location
+            input_path = self._bot_paths.story_graph_paths.story_graph_path
         return input_path
 
     def _resolve_output_path(self, input_path: Path, scope: Optional[str] = None) -> Path:
         workspace_dir = self._bot_paths.workspace_directory
-        config_path = self._config_data.get('path', 'docs/stories')
+        # Use centralized path as default fallback
+        default_path = str(self._bot_paths.story_graph_paths.docs_root)
+        config_path = self._config_data.get('path', default_path)
         output_file = self._config_data.get('output', 'output.md')
         if '{solution_name_slug}' in output_file:
             output_file = self._resolve_solution_name_slug(output_file, input_path)

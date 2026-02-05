@@ -54,7 +54,7 @@ class ActivityTestHelper(BaseHelper):
             from tinydb import TinyDB
             with TinyDB(log_file) as db:
                 db.insert({'action_state': 'story_bot.shape.render', 'timestamp': '09:00'})
-                db.insert({'action_state': 'story_bot.discovery.render', 'timestamp': '10:00'})
+                db.insert({'action_state': 'story_bot.exploration.render', 'timestamp': '10:00'})
         elif entries:
             from tinydb import TinyDB
             with TinyDB(log_file) as db:
@@ -193,7 +193,7 @@ class ActivityTestHelper(BaseHelper):
         with TinyDB(log_file) as db:
             if entries is None:
                 db.insert({'action_state': 'story_bot.shape.render', 'timestamp': '09:00'})
-                db.insert({'action_state': 'story_bot.discovery.render', 'timestamp': '10:00'})
+                db.insert({'action_state': 'story_bot.exploration.render', 'timestamp': '10:00'})
             else:
                 for entry in entries:
                     db.insert(entry)

@@ -365,6 +365,8 @@ class Action:
             context.scope.apply_to_bot()
         
         instructions = self.instructions.copy()
+        if hasattr(context, 'scope') and context.scope:
+            instructions._scope = context.scope.copy() if hasattr(context.scope, 'copy') else context.scope
         
         if self.action_config and 'instructions' in self.action_config:
             behavior_instructions = self.action_config.get('instructions', [])

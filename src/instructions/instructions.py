@@ -43,12 +43,17 @@ class Instructions:
         
         workspace = str(self._bot_paths.workspace_directory)
         workspace = workspace.replace('\\', '/')
+        story_graph_path = self._bot_paths.story_graph_paths.story_graph_path
+        docs_root = story_graph_path.parent
+        story_graph_path_text = str(story_graph_path).replace('\\', '/')
+        strategy_path_text = str(docs_root / 'strategy.json').replace('\\', '/')
+        clarification_path_text = str(docs_root / 'clarification.json').replace('\\', '/')
         return [
             "**Look for context in the following locations:**",
             "- in this message and chat history",
-            f"- `{workspace}/docs/stories/story-graph.json` - the story graph and related  knowledge built so far",
-            f"- `{workspace}/docs/stories/strategy.json` - strategy decisions made",
-            f"- `{workspace}/docs/stories/clarification.json` - clarification answers",
+            f"- `{story_graph_path_text}` - the story graph and related  knowledge built so far",
+            f"- `{strategy_path_text}` - strategy decisions made",
+            f"- `{clarification_path_text}` - clarification answers",
             f"- `{workspace}/test/` and `{workspace}/src/` - existing code and tests",
             f"- any folder named `context/` anywhere in `{workspace}/` - additional context files"
         ]

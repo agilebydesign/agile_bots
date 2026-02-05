@@ -251,16 +251,20 @@ class StoryMap:
         from pathlib import Path
         import json
         
-        if hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'bot_directory'):
-            bot_directory = Path(bot.bot_paths.bot_directory)
-        elif hasattr(bot, 'bot_directory'):
-            bot_directory = Path(bot.bot_directory)
+        # Use centralized path resolution when available
+        if hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'story_graph_paths'):
+            story_graph_path = bot.bot_paths.story_graph_paths.story_graph_path
+        elif hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'workspace_directory'):
+            from story_graph.story_graph_paths import StoryGraphPaths
+            bot_name = bot.bot_paths.bot_directory.name if hasattr(bot.bot_paths, 'bot_directory') else 'story'
+            paths = StoryGraphPaths(bot.bot_paths.workspace_directory, bot_name)
+            story_graph_path = paths.story_graph_path
         elif isinstance(bot, (str, Path)):
+            # Legacy path for when bot is just a directory path
             bot_directory = Path(bot)
+            story_graph_path = bot_directory / 'docs' / 'story' / 'story-graph.json'
         else:
-            raise TypeError(f"Expected bot with bot_paths.bot_directory, bot_directory attribute, or Path/str, got {type(bot)}")
-        
-        story_graph_path = bot_directory / 'docs' / 'stories' / 'story-graph.json'
+            raise TypeError(f"Expected bot with bot_paths.story_graph_paths, bot_paths.workspace_directory, or Path/str, got {type(bot)}")
         
         if not story_graph_path.exists():
             raise FileNotFoundError(f"Story graph not found at {story_graph_path}")

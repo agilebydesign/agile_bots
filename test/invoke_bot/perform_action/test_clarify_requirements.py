@@ -47,7 +47,7 @@ class TestClarifyRequirements:
         SCENARIO: Save clarification data when parameters are provided
         GIVEN: Production story_bot clarify action
         WHEN: do_execute is called with key_questions_answered and evidence_provided
-        THEN: clarification.json file is created in docs/stories/ folder
+        THEN: clarification.json file is created in docs/story/ folder
         AND: file contains behavior section with key_questions and evidence
         """
         # Given: Production story_bot clarify action
@@ -73,16 +73,16 @@ class TestClarifyRequirements:
     def test_preserve_existing_clarification_data_when_saving(self, tmp_path):
         """
         SCENARIO: Preserve existing clarification data when saving
-        GIVEN: clarification.json already exists with data for 'discovery' behavior
+        GIVEN: clarification.json already exists with data for 'exploration' behavior
         AND: Production story_bot clarify action for 'shape' behavior
         WHEN: do_execute is called with parameters
-        THEN: clarification.json contains both 'discovery' and 'shape' sections
-        AND: existing 'discovery' data is preserved
+        THEN: clarification.json contains both 'exploration' and 'shape' sections
+        AND: existing 'exploration' data is preserved
         """
-        # Given: Existing clarification.json with discovery data
+        # Given: Existing clarification.json with exploration data
         helper = BotTestHelper(tmp_path)
         existing_data = {
-            'discovery': {
+            'exploration': {
                 'key_questions': {
                     'questions': [],
                     'answers': {'scope': 'Component level'}
@@ -108,7 +108,7 @@ class TestClarifyRequirements:
         
         # Then: Both behaviors' data are preserved
         helper.clarify.assert_clarification_contains_behavior(
-            'discovery',
+            'exploration',
             expected_answers={'scope': 'Component level'},
             expected_evidence={'doc': 'requirements.md'}
         )

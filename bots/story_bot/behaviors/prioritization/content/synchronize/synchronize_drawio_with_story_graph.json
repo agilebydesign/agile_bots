@@ -8,12 +8,12 @@
       "renderer_command": "synchronize",
       "description": "Synchronize story graph from DrawIO and generate merge report",
       "parameters": {
-        "drawio_file": "{project_path}/docs/stories/story-map-increments.drawio",
-        "output": "{project_path}/docs/stories/story-graph-drawio-extracted.json",
-        "original": "{project_path}/docs/stories/story_graph_increments.json",
+        "drawio_file": "{project_path}/docs/story/prioritization/story-map-increments.drawio",
+        "output": "{project_path}/docs/story/prioritization/story-graph-drawio-extracted.json",
+        "original": "{project_path}/docs/story/story-graph.json",
         "type": "increments",
         "generate_report": true,
-        "report": "{project_path}/docs/stories/story-graph-drawio-extracted-merge-report.json"
+        "report": "{project_path}/docs/story/prioritization/story-graph-drawio-extracted-merge-report.json"
       }
     }
   ],
@@ -24,7 +24,7 @@
     "3. AI waits for user instructions to proceed with merge based on report",
     "4. Merge preserves Steps from original stories where matches are found",
     "5. New stories in extracted will have empty Steps array",
-    "6. User confirms merge before applying changes to story_graph_increments.json"
+    "6. User confirms merge before applying changes to story-graph.json"
   ]
 }
 

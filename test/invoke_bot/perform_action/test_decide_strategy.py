@@ -48,7 +48,7 @@ class TestDecideStrategy:
         SCENARIO: Save strategy data when parameters are provided
         GIVEN: Production story_bot strategy action
         WHEN: do_execute is called with decisions_made and assumptions_made
-        THEN: strategy.json file is created in docs/stories/ folder
+        THEN: strategy.json file is created in docs/story/ folder
         AND: file contains behavior section with decisions_made and assumptions_made
         """
         # Given: Production story_bot strategy action
@@ -82,16 +82,16 @@ class TestDecideStrategy:
     def test_preserve_existing_strategy_data_when_saving(self, tmp_path):
         """
         SCENARIO: Preserve existing strategy data when saving
-        GIVEN: strategy.json already exists with data for 'discovery' behavior
+        GIVEN: strategy.json already exists with data for 'exploration' behavior
         AND: Production story_bot strategy action for 'shape' behavior
         WHEN: do_execute is called with parameters
-        THEN: strategy.json contains both 'discovery' and 'shape' sections
-        AND: existing 'discovery' data is preserved
+        THEN: strategy.json contains both 'exploration' and 'shape' sections
+        AND: existing 'exploration' data is preserved
         """
-        # Given: Existing strategy.json with discovery data (actual format)
+        # Given: Existing strategy.json with exploration data (actual format)
         helper = BotTestHelper(tmp_path)
         existing_data = {
-            'discovery': {
+            'exploration': {
                 'decisions': {'scope': 'Component level'},
                 'assumptions': ['Stories follow user story format']
             }
@@ -117,7 +117,7 @@ class TestDecideStrategy:
         
         # Then: Both behaviors' data are preserved
         helper.strategy.assert_strategy_contains_behavior(
-            'discovery',
+            'exploration',
             expected_decisions={'scope': 'Component level'},
             expected_assumptions=['Stories follow user story format']
         )

@@ -1,7 +1,7 @@
 {
   "name": "render_crc_model_description",
   "type": "synchronizer",
-  "path": "docs/crc",
+  "path": "docs/crc/domain",
   "input": "story-graph.json",
   "synchronizer": "synchronizers.domain_model.DomainModelDescriptionSynchronizer",
   "output": "crc-model-description.md",

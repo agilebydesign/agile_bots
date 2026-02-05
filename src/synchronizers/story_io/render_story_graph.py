@@ -5,7 +5,7 @@ Usage:
     python render_story_graph.py <story_graph.json> [output.drawio]
 
 Example:
-    python render_story_graph.py demo/cheap_wealth_online/docs/stories/structured.json
+    python render_story_graph.py demo/cheap_wealth_online/docs/story/structured.json
 """
 
 import json
@@ -249,7 +249,7 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python render_story_graph.py <story_graph.json> [output.drawio]")
         print("\nExample:")
-        print("  python render_story_graph.py demo/cheap_wealth_online/docs/stories/structured.json")
+        print("  python render_story_graph.py demo/cheap_wealth_online/docs/story/structured.json")
         sys.exit(1)
     
     # Get input file

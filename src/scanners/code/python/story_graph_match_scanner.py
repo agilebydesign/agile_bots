@@ -112,7 +112,7 @@ The purpose of this action is to load behavior-specific rules into ai context fo
 **Look for context in the following locations:**
 - in this message and chat history
 - in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi0/workspace/docs/context/`
-- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi0/workspace/docs/stories/`
+- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi0/workspace/docs/story/`
   clarification.json, strategy.json
 
 CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.
@@ -291,7 +291,7 @@ The purpose of this action is to load behavior-specific rules into ai context fo
 **Look for context in the following locations:**
 - in this message and chat history
 - in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi2/workspace/docs/context/`
-- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi2/workspace/docs/stories/`
+- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_instructi2/workspace/docs/story/`
   clarification.json, strategy.json
 
 CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.
@@ -470,7 +470,7 @@ The purpose of this action is to load behavior-specific rules into ai context fo
 **Look for context in the following locations:**
 - in this message and chat history
 - in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_with_mess1/workspace/docs/context/`
-- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_with_mess1/workspace/docs/stories/`
+- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_with_mess1/workspace/docs/story/`
   clarification.json, strategy.json
 
 CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.
@@ -649,7 +649,7 @@ The purpose of this action is to load behavior-specific rules into ai context fo
 **Look for context in the following locations:**
 - in this message and chat history
 - in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m0/workspace/docs/context/`
-- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m0/workspace/docs/stories/`
+- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m0/workspace/docs/story/`
   clarification.json, strategy.json
 
 CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.
@@ -818,7 +818,7 @@ The purpose of this action is to load behavior-specific rules into ai context fo
 **Look for context in the following locations:**
 - in this message and chat history
 - in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m2/workspace/docs/context/`
-- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m2/workspace/docs/stories/`
+- generated files in `C:/Users/thoma/AppData/Local/Temp/pytest-of-thoma/pytest-3773/test_user_gets_rules_without_m2/workspace/docs/story/`
   clarification.json, strategy.json
 
 CRITICAL: This is the rules action - it loads rules for AI context. DO NOT run validation.

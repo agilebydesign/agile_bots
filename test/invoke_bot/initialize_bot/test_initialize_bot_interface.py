@@ -113,13 +113,13 @@ class TestInitializeCLISession:
         """
         # Given
         helper = helper_class(tmp_path)
-        helper.domain.state.set_state('discovery', 'validate')
+        helper.domain.state.set_state('exploration', 'validate')
         
         # When - Execute command to verify state loaded
-        cli_response = helper.cli_session.execute_command('discovery')
+        cli_response = helper.cli_session.execute_command('exploration')
         
         # Then - Bot at expected position
-        helper.domain.behaviors.assert_at_behavior_action('discovery', 'validate')
+        helper.domain.behaviors.assert_at_behavior_action('exploration', 'validate')
     
     @pytest.mark.parametrize("helper_class", [
         TTYBotTestHelper,
