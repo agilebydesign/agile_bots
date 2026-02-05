@@ -108,8 +108,8 @@ class TestLoadBotBehaviors:
     def test_load_behaviors_from_bot_config(self, tmp_path):
         """Scenario: Bot behaviors are loaded from BotConfig."""
         helper = BotTestHelper(tmp_path)
-        # story_bot has exactly 7 behaviors (sorted by their order property)
-        expected_behaviors = ['shape', 'prioritization', 'discovery', 'exploration', 'scenarios', 'tests', 'code']
+        # story_bot has exactly 6 behaviors (sorted by their order property)
+        expected_behaviors = ['shape', 'prioritization', 'exploration', 'scenarios', 'tests', 'code']
         assert helper.bot.behaviors.names == expected_behaviors, \
             f"Expected {expected_behaviors}, got {helper.bot.behaviors.names}"
     
@@ -510,7 +510,7 @@ class TestLoadBotBehaviorsUsingCLI:
         helper = helper_class(tmp_path)
         
         # Then
-        expected_behaviors = {'scenarios', 'tests', 'code', 'discovery', 'exploration', 'prioritization', 'shape'}
+        expected_behaviors = {'scenarios', 'tests', 'code', 'exploration', 'prioritization', 'shape'}
         assert set(helper.cli_session.bot.behaviors.names) == expected_behaviors
     
     @pytest.mark.parametrize("helper_class", [

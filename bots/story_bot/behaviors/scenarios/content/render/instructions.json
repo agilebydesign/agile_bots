@@ -1,7 +1,7 @@
 {
   "behaviorName": "specification_scenarios",
   "instructions": [
-    "Render individual story documents with scenarios added to docs/stories/map/{epic}/{sub-epic}/{story}.md structure.",
+    "Render individual story documents with scenarios added to docs/story/scenarios/{epic}/{sub-epic}/{story}.md structure.",
     "",
     "**IMPORTANT:** Check planning decision criteria for Scenario Outlines:",
     "- IF 'Yes': Include Scenario Outlines with Examples tables (data-driven tests)",

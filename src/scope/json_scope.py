@@ -48,8 +48,13 @@ class JSONScope(JSONAdapter):
                 # Only use cache when there's no active filter (showAll or story with no filter values)
                 has_active_filter = self.scope.type.value == 'story' and self.scope.value
                 
-                story_graph_path = self.scope.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
-                cache_path = self.scope.workspace_directory / 'docs' / 'stories' / '.story-graph-enriched-cache.json'
+                # Use centralized path resolution
+                if self.scope.bot_paths:
+                    story_graph_path = self.scope.bot_paths.story_graph_paths.story_graph_path
+                    cache_path = self.scope.bot_paths.story_graph_paths.story_graph_cache_path
+                else:
+                    story_graph_path = self.scope.workspace_directory / 'docs' / 'story' / 'story-graph.json'
+                    cache_path = self.scope.workspace_directory / 'docs' / 'story' / '.story-graph-enriched-cache.json'
                 
                 content = None
                 # CACHE DISABLED - Always regenerate to ensure behaviors are current
@@ -92,10 +97,10 @@ class JSONScope(JSONAdapter):
                 result['content'] = content
                 
                 if self.scope.bot_paths:
-                    from pathlib import Path
-                    docs_path = self.scope.bot_paths.documentation_path
-                    docs_stories = self.scope.workspace_directory / docs_path
-                    story_map_file = docs_stories / 'story-map' / 'story-map.md'
+                    # Use centralized path resolution for story map file
+                    story_graph_paths = self.scope.bot_paths.story_graph_paths
+                    # Story map is in the shape behavior folder
+                    story_map_file = story_graph_paths.behavior_path('shape') / 'story-map.md'
                     if story_map_file.exists():
                         result['graphLinks'].append({
                             'text': 'map',
@@ -112,11 +117,11 @@ class JSONScope(JSONAdapter):
             return
         
         test_dir = self.scope.workspace_directory / self.scope.bot_paths.test_path
-        docs_path = self.scope.bot_paths.documentation_path
-        docs_stories_map = self.scope.workspace_directory / docs_path / 'map'
+        # Use centralized path resolution - scenarios are in the scenarios behavior folder
+        scenarios_path = self.scope.bot_paths.story_graph_paths.scenarios_path
         
         for epic in epics:
-            epic_folder = docs_stories_map / f"🎯 {epic['name']}"
+            epic_folder = scenarios_path / f"🎯 {epic['name']}"
             if epic_folder.exists() and epic_folder.is_dir():
                 if 'links' not in epic:
                     epic['links'] = []
@@ -128,13 +133,13 @@ class JSONScope(JSONAdapter):
             
             if 'sub_epics' in epic:
                 for sub_epic in epic['sub_epics']:
-                    self._enrich_sub_epic_with_links(sub_epic, test_dir, docs_stories_map, epic['name'], enrich_scenarios=enrich_scenarios)
+                    self._enrich_sub_epic_with_links(sub_epic, test_dir, scenarios_path, epic['name'], enrich_scenarios=enrich_scenarios)
     
-    def _enrich_sub_epic_with_links(self, sub_epic: dict, test_dir: Path, docs_stories_map: Path, epic_name: str, parent_path: str = None, enrich_scenarios: bool = True):
+    def _enrich_sub_epic_with_links(self, sub_epic: dict, test_dir: Path, scenarios_path: Path, epic_name: str, parent_path: str = None, enrich_scenarios: bool = True):
         if parent_path:
             sub_epic_doc_folder = Path(parent_path) / f"⚙️ {sub_epic['name']}"
         else:
-            sub_epic_doc_folder = docs_stories_map / f"🎯 {epic_name}" / f"⚙️ {sub_epic['name']}"
+            sub_epic_doc_folder = scenarios_path / f"🎯 {epic_name}" / f"⚙️ {sub_epic['name']}"
         
         if 'links' not in sub_epic:
             sub_epic['links'] = []
@@ -157,7 +162,7 @@ class JSONScope(JSONAdapter):
         
         if 'sub_epics' in sub_epic:
             for nested_sub_epic in sub_epic['sub_epics']:
-                self._enrich_sub_epic_with_links(nested_sub_epic, test_dir, docs_stories_map, epic_name, str(sub_epic_doc_folder), enrich_scenarios=enrich_scenarios)
+                self._enrich_sub_epic_with_links(nested_sub_epic, test_dir, scenarios_path, epic_name, str(sub_epic_doc_folder), enrich_scenarios=enrich_scenarios)
         
         if 'story_groups' in sub_epic:
             for story_group in sub_epic['story_groups']:

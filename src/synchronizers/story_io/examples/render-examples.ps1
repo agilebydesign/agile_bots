@@ -1,4 +1,4 @@
-﻿# Render Examples - Story IO CLI
+# Render Examples - Story IO CLI
 # Examples showing how to render story graphs to DrawIO files
 
 # Get script directory and navigate to workspace root
@@ -23,7 +23,7 @@ Write-Host "`nExample 2: Render with increments" -ForegroundColor Cyan
 # Example 3: Render from different project
 Write-Host "`nExample 3: Render from different project" -ForegroundColor Cyan
 .\agile_bot\bots\story_bot\src\story_io\story-io.ps1 render-outline `
-    -StoryGraph "demo/cheap_wealth_online/docs/stories/structured.json" `
-    -Output "demo/cheap_wealth_online/docs/stories/story-map-outline.drawio"
+    -StoryGraph "demo/cheap_wealth_online/docs/story/structured.json" `
+    -Output "demo/cheap_wealth_online/docs/story/story-map-outline.drawio"
 
 Write-Host "`nAll render examples completed!" -ForegroundColor Green

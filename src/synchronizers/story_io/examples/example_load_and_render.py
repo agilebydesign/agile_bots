@@ -89,6 +89,6 @@ print(f"âœ“ Features rendered: {result['summary'].get('features', 0)}")
 # Option 2: Render directly from graph (simpler)
 # result = StoryIODiagram.render_outline_from_graph(
 #     story_graph=adapted_data,
-#     output_path='demo/cheap_wealth_online/docs/stories/story-map-outline.drawio'
+#     output_path='demo/cheap_wealth_online/docs/story/story-map-outline.drawio'
 # )
 

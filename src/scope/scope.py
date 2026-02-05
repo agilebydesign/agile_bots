@@ -267,7 +267,11 @@ class Scope:
         return cached
     
     def _get_story_graph_results(self):
-        story_graph_path = self.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
+        # Use centralized path resolution
+        if self.bot_paths:
+            story_graph_path = self.bot_paths.story_graph_paths.story_graph_path
+        else:
+            story_graph_path = self.workspace_directory / 'docs' / 'story' / 'story-graph.json'
         
         if not story_graph_path.exists():
             return None

@@ -163,7 +163,7 @@ class ClarifyTestHelper(BaseHelper):
         ensure BotTestHelper was initialized with a custom bot_directory parameter.
         
         Args:
-            behavior_name: Behavior name (e.g., 'shape', 'discovery')
+            behavior_name: Behavior name (e.g., 'shape', 'exploration')
             
         Returns:
             Tuple of (questions_file_path, evidence_file_path)
@@ -291,7 +291,7 @@ class ClarifyTestHelper(BaseHelper):
         """Assert clarification file contains behavior section with expected data.
         
         Args:
-            behavior_name: Behavior name (e.g., 'shape', 'discovery')
+            behavior_name: Behavior name (e.g., 'shape', 'exploration')
             expected_answers: Expected answers dict (optional)
             expected_evidence: Expected evidence dict (optional)
         """

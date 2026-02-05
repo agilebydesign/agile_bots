@@ -832,7 +832,7 @@ class StoryNode(ABC):
         if not self._bot or not hasattr(self._bot, 'bot_paths'):
             raise ValueError('Bot context required to open story graph')
         
-        story_graph_path = Path(self._bot.bot_paths.workspace_directory) / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self._bot.bot_paths.story_graph_paths.story_graph_path
         node_path = self._scope_command_for_node()
         
         # Try to find line number for this node in the JSON file
@@ -1698,15 +1698,22 @@ class StoryMap:
 
     @classmethod
     def from_bot(cls, bot: Any) -> 'StoryMap':
-        if hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'bot_directory'):
-            bot_directory = Path(bot.bot_paths.bot_directory)
-        elif hasattr(bot, 'bot_directory'):
-            bot_directory = Path(bot.bot_directory)
+        # Use centralized path resolution when bot_paths is available
+        if hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'story_graph_paths'):
+            story_graph_path = bot.bot_paths.story_graph_paths.story_graph_path
+        elif hasattr(bot, 'bot_paths') and hasattr(bot.bot_paths, 'workspace_directory'):
+            # Fallback for bots without story_graph_paths
+            from story_graph.story_graph_paths import StoryGraphPaths
+            bot_name = bot.bot_paths.bot_directory.name if hasattr(bot.bot_paths, 'bot_directory') else 'story'
+            paths = StoryGraphPaths(bot.bot_paths.workspace_directory, bot_name)
+            story_graph_path = paths.story_graph_path
         elif isinstance(bot, (str, Path)):
+            # Legacy path for when bot is just a directory path
             bot_directory = Path(bot)
+            story_graph_path = bot_directory / 'docs' / 'story' / 'story-graph.json'
         else:
-            raise TypeError(f'Expected bot with bot_paths.bot_directory, bot_directory attribute, or Path/str, got {type(bot)}')
-        story_graph_path = bot_directory / 'docs' / 'stories' / 'story-graph.json'
+            raise TypeError(f'Expected bot with bot_paths.story_graph_paths, bot_paths.workspace_directory, or Path/str, got {type(bot)}')
+        
         if not story_graph_path.exists():
             raise FileNotFoundError(f'Story graph not found at {story_graph_path}')
         
@@ -1736,7 +1743,8 @@ class StoryMap:
         # Regenerate story_graph dict from in-memory tree (only once, right before saving)
         self.story_graph['epics'] = [self._epic_to_dict(e) for e in self._epics_list]
         
-        story_graph_path = Path(self._bot.bot_paths.workspace_directory) / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self._bot.bot_paths.story_graph_paths.story_graph_path
+        story_graph_path.parent.mkdir(parents=True, exist_ok=True)
         with open(story_graph_path, 'w', encoding='utf-8') as f:
             json.dump(self.story_graph, f, indent=2, ensure_ascii=False)
         
@@ -2040,7 +2048,7 @@ class StoryMap:
         if not self._bot or not hasattr(self._bot, 'bot_paths'):
             return ''
         
-        # Build path: docs/stories/map/Epic/SubEpic/.../Story.md
+        # Build path: docs/story/scenarios/Epic/SubEpic/.../Story.md
         path_parts = []
         current = story
         
@@ -2053,9 +2061,8 @@ class StoryMap:
         # Add story name
         path_parts.append(f"📄 {story.name}.md")
         
-        # Build full path
-        from pathlib import Path
-        docs_path = Path(self._bot.bot_paths.workspace_directory) / 'docs' / 'stories' / 'map'
+        # Build full path using centralized path resolution
+        docs_path = self._bot.bot_paths.story_graph_paths.scenarios_path
         story_path = docs_path
         for part in path_parts:
             story_path = story_path / part

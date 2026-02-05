@@ -2,9 +2,12 @@ from pathlib import Path
 import os
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, TYPE_CHECKING
 from bot.workspace import get_workspace_directory, get_bot_directory, get_base_actions_directory, get_python_workspace_root
 from utils import read_json_file
+
+if TYPE_CHECKING:
+    from story_graph.story_graph_paths import StoryGraphPaths
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +41,7 @@ class BotPath:
                     self._workspace_directory = self._python_workspace_root
         self._base_actions_directory = self._load_base_actions_directory()
         self._documentation_path = self._load_documentation_path()
+        self._story_graph_paths: Optional['StoryGraphPaths'] = None
 
     def _load_workspace_from_config(self) -> Optional[Path]:
         """Load workspace directory from bot_config.json (mcp.env.WORKING_AREA)"""
@@ -99,12 +103,12 @@ class BotPath:
         if bot_config_path.exists():
             try:
                 config = read_json_file(bot_config_path)
-                docs_path = config.get('docs_path', 'docs/stories')
+                docs_path = config.get('docs_path', 'docs/story')
                 return Path(docs_path)
             except Exception as e:
                 logging.getLogger(__name__).debug(f'Failed to load documentation path from {bot_config_path}: {e}')
                 raise
-        return Path('docs/stories')
+        return Path('docs/story')
 
     @property
     def workspace_directory(self) -> Path:
@@ -130,6 +134,18 @@ class BotPath:
     @property
     def documentation_path(self) -> Path:
         return self._documentation_path
+
+    @property
+    def story_graph_paths(self) -> 'StoryGraphPaths':
+        """Centralized path resolver for story graph and documentation outputs."""
+        if self._story_graph_paths is None:
+            from story_graph.story_graph_paths import StoryGraphPaths
+            bot_name = self._bot_directory.name if self._bot_directory else 'story'
+            self._story_graph_paths = StoryGraphPaths(
+                self._workspace_directory,
+                bot_name
+            )
+        return self._story_graph_paths
 
     @property
     def test_path(self) -> Path:
@@ -179,10 +195,20 @@ class BotPath:
         # Update instance variable only - don't mutate global environment variable
         # This prevents tests from accidentally affecting other instances
         self._workspace_directory = resolved_path
+        # Invalidate cached story_graph_paths since workspace changed
+        self._story_graph_paths = None
         if persist:
             self._persist_workspace_directory(resolved_path)
         logger.info(f'Updated working directory to {resolved_path} (previous={previous})')
         return resolved_path
+
+    def ensure_documentation_folders(self, behaviors: list = None) -> None:
+        """Create documentation folders for the bot and its behaviors.
+        
+        Args:
+            behaviors: List of behavior names. If None, only creates docs root.
+        """
+        self.story_graph_paths.ensure_folders(behaviors)
 
     def is_path_like(self, value: str) -> bool:
         return '/' in value or '\\' in value or ('.' in value and any((value.endswith(ext) for ext in ('.py', '.md', '.json', '.txt', '.yaml', '.yml'))))

@@ -54,17 +54,17 @@ class TestManageBehaviors:
         """
         SCENARIO: Behaviors navigate to behavior updates current behavior
         GIVEN: Behaviors collection
-        WHEN: navigate_to('discovery') called
-        THEN: Current behavior updated to 'discovery'
+        WHEN: navigate_to('exploration') called
+        THEN: Current behavior updated to 'exploration'
         """
         helper = BotTestHelper(tmp_path)
         
-        # When: navigate_to('discovery') called
-        helper.bot.behaviors.navigate_to('discovery')
+        # When: navigate_to('exploration') called
+        helper.bot.behaviors.navigate_to('exploration')
         
-        # Then: Current behavior updated to complete 'discovery' behavior
-        helper.behaviors.assert_discovery_behavior_structure()
-        assert helper.bot.behaviors.current.name == 'discovery'
+        # Then: Current behavior updated to complete 'exploration' behavior
+        helper.behaviors.assert_exploration_behavior_structure()
+        assert helper.bot.behaviors.current.name == 'exploration'
         assert isinstance(helper.bot.behaviors.current.order, (int, float))
     
     def test_behaviors_close_current_marks_behavior_and_action_complete(self, tmp_path):
@@ -132,8 +132,8 @@ class TestManageBehaviors:
         """Scenario: All behaviors can be iterated."""
         helper = BotTestHelper(tmp_path)
         behavior_names = [b.name for b in helper.bot.behaviors]
-        # story_bot has exactly 7 behaviors (sorted by their order property)
-        expected_behaviors = ['shape', 'prioritization', 'discovery', 'exploration', 'scenarios', 'tests', 'code']
+        # story_bot has exactly 6 behaviors (sorted by their order property)
+        expected_behaviors = ['shape', 'prioritization', 'exploration', 'scenarios', 'tests', 'code']
         assert behavior_names == expected_behaviors, \
             f"Expected {expected_behaviors}, got {behavior_names}"
     
@@ -328,8 +328,8 @@ class TestNavigateToBehaviorActionAndExecute:
         # Then: They should have different action workflows
         assert shape_actions != tests_actions, "Shape and tests behaviors should have different action workflows"
         assert shape_actions == ['clarify', 'strategy', 'build', 'validate', 'render']
-        # Tests behavior has render before validate
-        assert tests_actions == ['clarify', 'strategy', 'build', 'render', 'validate']
+        # Tests behavior skips render
+        assert tests_actions == ['clarify', 'strategy', 'build', 'validate']
     
     def test_workflow_transitions_built_correctly_from_actions_workflow_json(self, tmp_path):
         """Scenario: Workflow transitions are built correctly from behavior.json"""
@@ -406,7 +406,7 @@ class TestNavigateSequentially:
         Scenario: bot.next() at final action advances to next behavior
         GIVEN: Bot is at render (final action of shape)
         WHEN: bot.next() is called
-        THEN: Bot advances to next behavior (discovery) first action (clarify)
+        THEN: Bot advances to next behavior first action (clarify)
         """
         # Given: Bot at render (final action of shape)
         helper = BotTestHelper(tmp_path)
@@ -417,7 +417,7 @@ class TestNavigateSequentially:
         # When: Call bot.next()
         result = helper.bot.next()
         
-        # Then: Advances to next behavior (discovery)
+        # Then: Advances to next behavior
         assert result['status'] in ['success', 'complete']
         if result['status'] == 'success':
             # Moved to next behavior
@@ -506,12 +506,12 @@ class TestNavigateSequentially:
         """
         Scenario: Can navigate to a specific behavior
         GIVEN: Bot exists with multiple behaviors
-        WHEN: behaviors.navigate_to('discovery') called
-        THEN: Current behavior is set to discovery
+        WHEN: behaviors.navigate_to('exploration') called
+        THEN: Current behavior is set to exploration
         """
         helper = BotTestHelper(tmp_path)
-        helper.bot.behaviors.navigate_to('discovery')
-        helper.behaviors.assert_current_behavior_and_action('discovery', helper.bot.behaviors.current.actions.current_action_name)
+        helper.bot.behaviors.navigate_to('exploration')
+        helper.behaviors.assert_current_behavior_and_action('exploration', helper.bot.behaviors.current.actions.current_action_name)
     
     def test_get_next_behavior(self, tmp_path):
         """
@@ -530,8 +530,8 @@ class TestNavigateSequentially:
         helper.behaviors.assert_behavior_complete_structure(
             behavior=next_behavior,
             expected_name='tests',
-            expected_order=6,
-            expected_actions=['clarify', 'strategy', 'build', 'render', 'validate'],
+            expected_order=5,
+            expected_actions=['clarify', 'strategy', 'build', 'validate'],
             expected_description='Write test files (.py, .js, etc.) with executable test code from scenarios/examples that validate story behavior'
         )
     
@@ -627,9 +627,9 @@ class TestManageBehaviorsUsingCLI:
         """
         helper = helper_class(tmp_path)
         
-        cli_response = helper.cli_session.execute_command('discovery')
+        cli_response = helper.cli_session.execute_command('exploration')
         
-        assert helper.cli_session.bot.behaviors.current.name == 'discovery'
+        assert helper.cli_session.bot.behaviors.current.name == 'exploration'
         assert cli_response is not None
     
     @pytest.mark.parametrize("helper_class", [TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper])
@@ -669,8 +669,8 @@ class TestManageBehaviorsUsingCLI:
         cli_response = helper.cli_session.execute_command('tree')
         
         assert cli_response is not None
-        # Verify all 7 behaviors present in bot
-        assert len(helper.cli_session.bot.behaviors.names) == 7
+        # Verify all 6 behaviors present in bot
+        assert len(helper.cli_session.bot.behaviors.names) == 6
     
     @pytest.mark.parametrize("helper_class", [TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper])
     def test_cli_find_action_by_name_via_command(self, tmp_path, helper_class):
@@ -803,7 +803,7 @@ class TestNavigateToBehaviorActionAndExecuteUsingCLI:
         # Workflows are different (tests has render before validate)
         assert shape_actions != tests_actions
         assert shape_actions == ['clarify', 'strategy', 'build', 'validate', 'render']
-        assert tests_actions == ['clarify', 'strategy', 'build', 'render', 'validate']
+        assert tests_actions == ['clarify', 'strategy', 'build', 'validate']
 
 
 # ============================================================================
@@ -904,9 +904,9 @@ class TestNavigateSequentiallyUsingCLI:
         """
         helper = helper_class(tmp_path)
         
-        cli_response = helper.cli_session.execute_command('discovery')
+        cli_response = helper.cli_session.execute_command('exploration')
         
-        assert helper.cli_session.bot.behaviors.current.name == 'discovery'
+        assert helper.cli_session.bot.behaviors.current.name == 'exploration'
     
     @pytest.mark.parametrize("helper_class", [TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper])
     def test_cli_back_command_navigates_to_previous_action(self, tmp_path, helper_class):

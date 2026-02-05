@@ -8,12 +8,12 @@
       "renderer_command": "sync-exploration",
       "description": "Synchronize exploration acceptance criteria from DrawIO and generate merge report",
       "parameters": {
-        "drawio_file": "{project_path}/docs/stories/story-map-explored-{scope}.drawio",
-        "output": "{project_path}/docs/stories/story-graph-drawio-extracted-exploration.json",
-        "original": "{project_path}/docs/stories/story-graph.json",
+        "drawio_file": "{project_path}/docs/story/exploration/story-map-explored-{scope}.drawio",
+        "output": "{project_path}/docs/story/exploration/story-graph-drawio-extracted-exploration.json",
+        "original": "{project_path}/docs/story/story-graph.json",
         "scope": "{scope}",
         "generate_report": true,
-        "report": "{project_path}/docs/stories/story-graph-drawio-extracted-exploration-merge-report.json"
+        "report": "{project_path}/docs/story/exploration/story-graph-drawio-extracted-exploration-merge-report.json"
       }
     }
   ],

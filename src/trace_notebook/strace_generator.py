@@ -367,7 +367,7 @@ class DynamicStraceGenerator:
                 except Exception:
                     continue
     
-    def find_story_by_test_class(self, test_class: str, story_graph_path: str = "docs/stories/story-graph.json") -> Optional[dict]:
+    def find_story_by_test_class(self, test_class: str, story_graph_path: str = "docs/story/story-graph.json") -> Optional[dict]:
         """Find a story in story-graph.json by its test_class.
         
         Returns the story dict with line numbers for story and each scenario.
@@ -433,7 +433,7 @@ class DynamicStraceGenerator:
         return None
     
     def generate_for_story(self, test_class: str, test_file: str, 
-                           story_graph_path: str = "docs/stories/story-graph.json") -> dict:
+                           story_graph_path: str = "docs/story/story-graph.json") -> dict:
         """Generate strace for an entire story with all its scenarios.
         
         Args:
@@ -491,7 +491,7 @@ class DynamicStraceGenerator:
                 "name": scenario_name,
                 "type": scenario.get('type', 'happy_path'),
                 "steps": steps,
-                "file": story.get('_file', 'docs/stories/story-graph.json'),
+                "file": story.get('_file', 'docs/story/story-graph.json'),
                 "line": scenario.get('_line', 1),
                 "test": {
                     "method": test_method,
@@ -780,7 +780,7 @@ def main():
     result = generator.generate_for_story(
         test_class=test_class,
         test_file=test_file,
-        story_graph_path="docs/stories/story-graph.json"
+        story_graph_path="docs/story/story-graph.json"
     )
     
     if "error" in result:
@@ -793,7 +793,7 @@ def main():
             test_method="test_rules_action_shows_rules_digest",
             scenario_name="Rules action shows rules digest in CLI output",
             scenario_steps="GIVEN: CLI is at shape.validate\nWHEN: user navigates\nTHEN: CLI shows output",
-            story_file="docs/stories/story-graph.json",
+            story_file="docs/story/story-graph.json",
             story_line=1
         )
         if "error" in result:

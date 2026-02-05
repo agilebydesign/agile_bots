@@ -42,7 +42,7 @@ def _setup_build_action_prerequisites(bot_directory: Path, behavior: str = 'expl
     config_file = kg_dir / 'story_graph_config.json'
     config_data = {
         'template': 'story_graph_template.md',
-        'output_path': 'docs/stories'
+        'output_path': 'docs/story'
     }
     config_file.write_text(json.dumps(config_data, indent=2), encoding='utf-8')
     
@@ -101,22 +101,26 @@ class BehaviorTestHelper(BaseHelper):
         assert action_names == ['clarify', 'strategy', 'build', 'validate', 'render'], \
             f"Expected ['clarify', 'strategy', 'build', 'validate', 'render'], got {action_names}"
     
-    def assert_discovery_behavior_structure(self):
+    def assert_exploration_behavior_structure(self):
         """
-        Assert discovery behavior is loaded with correct complete structure.
+        Assert exploration behavior is loaded with correct complete structure.
         
-        Discovery has exactly 5 actions in specific order.
+        Exploration has exactly 5 actions in specific order.
         """
-        discovery = self.parent.bot.behaviors.find_by_name('discovery')
-        assert discovery is not None, "Discovery behavior not found"
-        assert discovery.name == 'discovery'
-        assert isinstance(discovery.order, (int, float))
+        exploration = self.parent.bot.behaviors.find_by_name('exploration')
+        assert exploration is not None, "Exploration behavior not found"
+        assert exploration.name == 'exploration'
+        assert isinstance(exploration.order, (int, float))
         
         # Assert exact action count and names
-        action_names = discovery.actions.names
+        action_names = exploration.actions.names
         assert len(action_names) == 5, f"Expected 5 actions, got {len(action_names)}: {action_names}"
         assert action_names == ['clarify', 'strategy', 'build', 'validate', 'render'], \
             f"Expected ['clarify', 'strategy', 'build', 'validate', 'render'], got {action_names}"
+
+    def assert_discovery_behavior_structure(self):
+        """Backward-compatible alias for exploration behavior checks."""
+        self.assert_exploration_behavior_structure()
     
     def assert_current_behavior_and_action(self, behavior: str, action: str):
         """

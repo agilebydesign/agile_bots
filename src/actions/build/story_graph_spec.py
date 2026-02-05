@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 from typing import Dict, Any, Optional, TYPE_CHECKING
 from actions.build.story_graph_template import StoryGraphTemplate
 from story_graph.story_graph import StoryGraph
@@ -18,7 +18,9 @@ class StoryGraphSpec:
         self._load_config()
 
     def _get_default_config(self) -> dict:
-        return {'path': 'docs/stories', 'output': 'story-graph.json', 'template': None}
+        # Use centralized path as default
+        default_path = str(self._bot_paths.story_graph_paths.docs_root)
+        return {'path': default_path, 'output': 'story-graph.json', 'template': None}
 
     def _load_config(self):
         if not self._sg_dir.exists():
@@ -43,7 +45,9 @@ class StoryGraphSpec:
 
     @property
     def output_path(self) -> str:
-        return self._config_data.get('path', 'docs/stories')
+        # Use centralized path as default fallback
+        default_path = str(self._bot_paths.story_graph_paths.docs_root)
+        return self._config_data.get('path', default_path)
 
     @property
     def output_filename(self) -> str:
