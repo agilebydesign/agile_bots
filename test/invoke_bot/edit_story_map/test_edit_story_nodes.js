@@ -58,10 +58,10 @@ const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-test-
 
 // Create temp workspace for test data (story graphs, etc.)
 function setupTestWorkspace() {
-    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'stories'), { recursive: true });
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'story'), { recursive: true });
     
     // Create empty test story graph
-    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'story', 'story-graph.json');
     fs.writeFileSync(storyGraphPath, JSON.stringify({ epics: [] }, null, 2));
     
     // Set environment variable so Python backend uses temp workspace for data
