@@ -23,8 +23,8 @@ Write-Host "`nExample 3: Render with layout preservation" -ForegroundColor Cyan
 # Example 4: Render from different project
 Write-Host "`nExample 4: Render from different project" -ForegroundColor Cyan
 .\story-io.ps1 render-outline `
-    -StoryGraph "demo/cheap_wealth_online/docs/stories/structured.json" `
-    -Output "demo/cheap_wealth_online/docs/stories/story-map-outline.drawio"
+    -StoryGraph "demo/cheap_wealth_online/docs/story/structured.json" `
+    -Output "demo/cheap_wealth_online/docs/story/story-map-outline.drawio"
 
 # Example 5: Using absolute paths
 Write-Host "`nExample 5: Using absolute paths" -ForegroundColor Cyan

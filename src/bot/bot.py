@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 import json
@@ -107,7 +108,7 @@ class Bot:
         Raises:
             FileNotFoundError: If story-graph.json doesn't exist in workspace
         """
-        story_graph_path = self.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self.bot_paths.story_graph_paths.story_graph_path
         
         # Check if cache needs to be invalidated - compare story-graph.json mtime to cached mtime
         if self._story_graph is not None and story_graph_path.exists():
@@ -125,7 +126,7 @@ class Bot:
             if not story_graph_path.exists():
                 raise FileNotFoundError(
                     f'Story graph not found at {story_graph_path}. '
-                    f'Please create a story-graph.json file in the docs/stories directory.'
+                    f'Please create a story-graph.json file in the docs/story directory.'
                 )
             
             with open(story_graph_path, 'r', encoding='utf-8') as f:

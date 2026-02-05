@@ -43,14 +43,14 @@ class TestInjectContextIntoInstructions:
     def test_next_behavior_reminder_not_injected_when_no_next_behavior(self, tmp_path):
         """
         SCENARIO: Next behavior reminder is NOT injected when current behavior is last in sequence
-        GIVEN: discovery is the last behavior in bot_config.json
-        AND: render is the final action
-        WHEN: render action executes
+        GIVEN: code is the last behavior in bot_config.json
+        AND: validate is the final action
+        WHEN: validate action executes
         THEN: base_instructions do NOT include next behavior reminder
         """
         helper = BotTestHelper(tmp_path)
-        helper.bot.behaviors.navigate_to('discovery')
-        helper.bot.behaviors.current.actions.navigate_to('render')
+        helper.bot.behaviors.navigate_to('code')
+        helper.bot.behaviors.current.actions.navigate_to('validate')
         action = helper.bot.behaviors.current.actions.current
         instructions = getattr(action, 'instructions', None)
         base_instructions = getattr(instructions, 'base_instructions', instructions)
@@ -111,7 +111,7 @@ class TestExecuteEndToEndWorkflow:
         Complete workflow test progressing across multiple behaviors.
         
         Tests progression:
-        shape (all actions) -> discovery (partial actions) 
+        shape (all actions) -> next behavior (partial actions)
         """
         helper = BotTestHelper(tmp_path)
         
@@ -127,11 +127,11 @@ class TestExecuteEndToEndWorkflow:
             if action != 'render':
                 helper.bot.next()
         
-        # At shape.render now - calling next() should advance to discovery
+        # At shape.render now - calling next() should advance to next behavior
         result = helper.bot.next()
         
         # Verify we either:
-        # 1. Advanced to next behavior (discovery), OR
+        # 1. Advanced to next behavior, OR
         # 2. Got a completion message (no more behaviors configured)
         if result['status'] == 'success':
             # Advanced to next behavior
@@ -182,10 +182,10 @@ class TestTrackActivityForWorkspace:
     def test_activity_log_contains_correct_entry(self, tmp_path):
         """
         SCENARIO: Activity log contains correct entry
-        GIVEN: action 'gather_context' executes in behavior 'discovery'
+        GIVEN: action 'gather_context' executes in behavior 'shape'
         WHEN: Activity logger creates entry
         THEN: Activity log entry includes:
-          - action_state='story_bot.discovery.gather_context'
+          - action_state='story_bot.shape.gather_context'
           - timestamp
           - Full path includes bot_name.behavior.action
         """

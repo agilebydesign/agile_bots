@@ -1,5 +1,4 @@
 {
-  "python.defaultInterpreterPath": "C:\\Users\\thoma\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe",
   "python.languageServer": "Pylance",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.typeCheckingMode": "off",
@@ -10,18 +9,16 @@
     "test"
   ],
   "python.testing.cwd": "${workspaceFolder}",
-  "python.testing.autoTestDiscoverOnSaveEnabled": false,
-  
-  // Continuous test running settings
-  "testExplorer.onStart": null,
-  "testExplorer.onReload": null,
+  "python.testing.autoTestDiscoverOnSaveEnabled": true,
   
   "javascript.preferences.importModuleSpecifier": "relative",
   "javascript.updateImportsOnFileMove.enabled": "always",
   
-  "testExplorer.useNativeTesting": true,
   "testing.automaticallyOpenPeekView": "failureInVisibleDocument",
   "testing.openTesting": "neverOpen",
+  "nodejs-testing.include": [
+    "./test"
+  ],
   
   "workbench.colorTheme": "Cursor Dark High Contrast",
   "workbench.colorCustomizations": {

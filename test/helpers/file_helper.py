@@ -32,7 +32,7 @@ class FileTestHelper(BaseHelper):
             return directory
         
         elif directory_type == 'docs_stories':
-            docs_dir = directory / 'docs' / 'stories'
+            docs_dir = directory / 'docs' / 'story'
             docs_dir.mkdir(parents=True, exist_ok=True)
             return docs_dir
         
@@ -45,7 +45,7 @@ class FileTestHelper(BaseHelper):
             return kg_dir
         
         elif directory_type == 'docs':
-            docs_dir = directory / "docs" / "stories"
+            docs_dir = directory / "docs" / "story"
             docs_dir.mkdir(parents=True, exist_ok=True)
             return docs_dir
         

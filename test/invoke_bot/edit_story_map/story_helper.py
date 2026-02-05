@@ -15,7 +15,7 @@ class StoryTestHelper(BaseHelper):
         """Access bot instance for bot.story_graph API."""
         return self.parent.bot
     
-    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:
+    def create_story_graph(self, graph_data: dict = None, docs_path: str = 'docs/story', filename: str = 'story-graph.json') -> Path:
         
         if graph_data is None:
             graph_data = {'epics': []}
@@ -539,7 +539,7 @@ class StoryTestHelper(BaseHelper):
             assert item.map_location('sizing') == expected_sizing, \
                 f"Expected map_location('sizing') == '{expected_sizing}', got '{item.map_location('sizing')}'"
     
-    def given_story_graph(self, story_graph: dict = None, docs_path: str = 'docs/stories', filename: str = 'story-graph.json') -> Path:
+    def given_story_graph(self, story_graph: dict = None, docs_path: str = 'docs/story', filename: str = 'story-graph.json') -> Path:
         """Create story graph file in workspace."""
         if story_graph is None:
             story_graph = {'epics': []}
@@ -806,7 +806,7 @@ class StoryTestHelper(BaseHelper):
         Note: Bot now has a native story_graph property that loads from workspace.
         This method forces a reload by clearing the cached instance.
         """
-        story_graph_path = self.bot.bot_paths.workspace_directory / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self.bot.bot_paths.story_graph_paths.story_graph_path
         #comments
         if not story_graph_path.exists():
             return None
@@ -1133,7 +1133,7 @@ class StoryTestHelper(BaseHelper):
     
     def assert_story_graph_structure_valid(self):
         """Verify story graph structure is valid."""
-        story_graph_path = self.parent.workspace / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self.parent.workspace / 'docs' / 'story' / 'story-graph.json'
         assert story_graph_path.exists()
         story_graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
         assert 'epics' in story_graph_data
@@ -1234,7 +1234,7 @@ class StoryTestHelper(BaseHelper):
     
     def create_epic(self, epic_name: str) -> None:
         """Create a single epic with the given name. Appends to existing story graph if present."""
-        story_graph_path = self.parent.workspace / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = self.parent.workspace / 'docs' / 'story' / 'story-graph.json'
         
         # Ensure directory exists
         story_graph_path.parent.mkdir(parents=True, exist_ok=True)

@@ -89,7 +89,9 @@ class RenderOutputAction(Action):
                     render_template_paths.append(str(template_path.resolve()))
             
             if spec.output:
-                path_prefix = spec.config_data.get('path', 'docs/stories')
+                # Use centralized path as default fallback
+                default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
+                path_prefix = spec.config_data.get('path', default_path)
                 output_file_abs = workspace_dir / path_prefix / spec.output
                 render_output_paths.append(str(output_file_abs.resolve()))
         

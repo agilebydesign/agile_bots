@@ -1,7 +1,7 @@
 {
   "name": "render_walkthrough_realizations",
   "type": "template",
-  "path": "docs/crc",
+  "path": "docs/crc/walkthrough",
   "input": "story-graph.json",
   "template": "walkthrough-realizations-template.md",
   "output": "walkthrough-realizations.md",

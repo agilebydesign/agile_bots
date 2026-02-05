@@ -1,6 +1,6 @@
 {
   "name": "render_increments_backlog_txt",
-  "path": "docs/stories",
+  "path": "docs/story/prioritization",
   "renderer": "render_increments_backlog_txt.py",
   "template": "templates/story-map-increments-backlog.txt",
   "output": "story-map-increments-backlog.txt"

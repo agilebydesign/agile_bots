@@ -245,7 +245,7 @@ class TestExecuteActionsWithScope:
         
         # Create story graph file (validate requires it)
         story_graph = helper.story.given_story_graph_dict(epic='exploration')
-        stories_dir = helper.workspace / 'docs' / 'stories'
+        stories_dir = helper.workspace / 'docs' / 'story'
         helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
         
         helper.bot.behaviors.navigate_to('exploration')
@@ -323,7 +323,7 @@ class TestExecuteActionScopedToStoryNode:
     # Scenario: Execute action on node with valid parameters
     
     @pytest.mark.parametrize('node_type,node_name,action_name,parameters', [
-        ('Epic', 'User Management', 'build', '{"output": "docs/stories"}'),
+        ('Epic', 'User Management', 'build', '{"output": "docs/story"}'),
         ('SubEpic', 'Authentication', 'validate', '{"rules": "all"}'),
         ('Story', 'Login Form', 'render', '{"format": "markdown"}'),
     ])

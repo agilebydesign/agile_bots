@@ -1380,7 +1380,7 @@ class BotPanel {
         }
       } else if (command === 'openAllRelatedFiles') {
         // Open all files in separate split editors: graph + stories (column 1), tests (column 2), code (column 3)
-        const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/stories/story-graph.json');
+        const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/story/story-graph.json');
         
         this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
         this._log(`[BotPanel] nodePath: ${nodePath}`);
@@ -4056,7 +4056,7 @@ class BotPanel {
                 return window.botData.workspace_directory;
             }
             // Fallback: try to infer from story graph path
-            const storyGraphPath = 'docs/stories/story-graph.json';
+            const storyGraphPath = 'docs/story/story-graph.json';
             return ''; // Will be resolved relative to workspace root
         }
         
@@ -4083,7 +4083,7 @@ class BotPanel {
             }
             
             const workspaceDir = getWorkspaceDir();
-            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
             
             console.log('[WebView] Opening story graph:', storyGraphPath);
             console.log('[WebView] Node path:', window.selectedNode.path);
@@ -4134,7 +4134,7 @@ class BotPanel {
             
             const fileLink = getSelectedNodeFileLink();
             const workspaceDir = getWorkspaceDir();
-            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/stories/story-graph.json' : 'docs/stories/story-graph.json';
+            const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
             
             console.log('[WebView] handleOpenAll - selectedNode:', JSON.stringify(window.selectedNode));
             console.log('[WebView] handleOpenAll - workspaceDir:', workspaceDir);

@@ -112,7 +112,7 @@ def parse_test_file(file_path):
         return {}
 
 def main():
-    story_graph_path = Path('agile_bots/bots/base_bot/docs/stories/story-graph.json')
+    story_graph_path = Path('agile_bots/bots/base_bot/docs/story/story-graph.json')
     test_dir = Path('agile_bots/bots/base_bot/test')
     
     # Load story graph

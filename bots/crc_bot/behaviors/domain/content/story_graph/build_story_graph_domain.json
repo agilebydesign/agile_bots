@@ -1,6 +1,6 @@
 {
   "name": "build_story_graph_domain",
-  "path": "docs/stories/",
+  "path": "docs/story",
   "template": "story-graph-domain.json",
   "output": "story-graph.json"
 }

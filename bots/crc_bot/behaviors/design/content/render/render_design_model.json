@@ -1,6 +1,6 @@
 {
   "name": "render_crc_design_model",
-  "path": "docs/crc",
+  "path": "docs/crc/design",
   "input": "story-graph.json",
   "output": "crc-design-model.md",
   "template": "templates/design-model.md"

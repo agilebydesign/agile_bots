@@ -1,7 +1,7 @@
 {
   "name": "render_story_exploration_drawio",
   "description": "Render exploration story map to DrawIO diagram. Supports multiple scopes. Uses the main story-graph.json file (same file used by all behaviors).",
-  "path": "docs/stories",
+  "path": "docs/story/exploration",
   "input": "story-graph.json",
   "synchronizer": "synchronizers.story_io.DrawIOSynchronizer",
   "renderer_command": "render-exploration",

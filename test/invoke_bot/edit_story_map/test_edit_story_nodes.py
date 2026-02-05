@@ -312,7 +312,7 @@ class TestNavigateStoryGraph:
         """
         # Use custom bot directory to avoid modifying production bot
         helper = BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot')
-        stories_dir = helper.bot_directory / 'docs' / 'stories'
+        stories_dir = helper.bot_directory / 'docs' / 'story'
         stories_dir.mkdir(parents=True, exist_ok=True)
         story_graph = helper.story.given_story_graph_dict()
         story_graph_path = helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
@@ -326,7 +326,7 @@ class TestNavigateStoryGraph:
         # Given: Bot directory, docs directory, and story graph file are created
         # Use custom bot directory to avoid modifying production bot
         helper = BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot')
-        stories_dir = helper.bot_directory / 'docs' / 'stories'
+        stories_dir = helper.bot_directory / 'docs' / 'story'
         stories_dir.mkdir(parents=True, exist_ok=True)
         story_graph = helper.story.given_story_graph_dict()
         story_graph_path = helper.files.given_file_created(stories_dir, 'story-graph.json', story_graph)
@@ -2234,7 +2234,7 @@ class TestSaveStoryMapPreservesDomainConcepts:
         
         # Verify JSON file contains Epic2 with TestSubEpic
         import json
-        story_graph_path = helper.workspace / 'docs' / 'stories' / 'story-graph.json'
+        story_graph_path = helper.workspace / 'docs' / 'story' / 'story-graph.json'
         saved_data = json.loads(story_graph_path.read_text())
         epic2_data = next((e for e in saved_data['epics'] if e['name'] == 'Epic2'), None)
         assert epic2_data is not None, "Epic2 should exist in saved JSON"

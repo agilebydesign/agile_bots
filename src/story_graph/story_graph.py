@@ -21,14 +21,15 @@ class StoryGraph:
     def _determine_story_graph_path(self):
         if self._story_graph_spec:
             config_data = self._story_graph_spec.config_data
-            config_path_value = config_data.get('path', 'docs/stories')
+            # Use centralized path as default fallback
+            default_path = str(self._bot_paths.story_graph_paths.docs_root)
+            config_path_value = config_data.get('path', default_path)
             docs_path = Path(config_path_value.rstrip('/'))
             output_filename = config_data.get('output', 'story-graph.json')
             docs_dir = self._workspace_directory / docs_path
         else:
-            docs_path = self._bot_paths.documentation_path
-            output_filename = 'story-graph.json'
-            docs_dir = self._workspace_directory / docs_path
+            # Use centralized path resolution
+            return self._bot_paths.story_graph_paths.story_graph_path
         return docs_dir / output_filename
 
     def _load_story_graph_content(self):

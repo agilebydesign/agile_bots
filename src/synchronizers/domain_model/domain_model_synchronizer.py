@@ -188,7 +188,7 @@ class DomainModelDescriptionSynchronizer:
         content = f"""# Domain Model Description: {solution_name}
 
 **File Name**: `{solution_name_slug}-domain-model-description.md`
-**Location**: `{project_path.name}/docs/stories/{solution_name_slug}-domain-model-description.md`
+**Location**: `{project_path.name}/docs/story/{solution_name_slug}-domain-model-description.md`
 
 ## Solution Purpose
 {solution_purpose}

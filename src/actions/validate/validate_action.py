@@ -1,4 +1,4 @@
-﻿from typing import Dict, Any, List, Type
+from typing import Dict, Any, List, Type
 import logging
 from actions.action import Action
 from actions.action_context import ActionContext, ValidateActionContext
@@ -119,7 +119,7 @@ class ValidateRulesAction(Action):
             logger.error(f'Error running scanners: {e}')
             import traceback
             logger.error(traceback.format_exc())
-            return f'Error running scanners: {e}\n\nPlease review the validation report file in docs/stories/reports/'
+            return f'Error running scanners: {e}\n\nPlease review the validation report file in docs/story/reports/'
     
     def _format_scope_description(self, context: ValidateActionContext) -> str:
         if context.scope:

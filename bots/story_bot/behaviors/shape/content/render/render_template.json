@@ -1,1 +1,1 @@
-{"name": "render_template", "type": "template", "path": "docs/stories", "input": "story-graph.json", "template": "templates/test-template.md", "output": "test-output.md", "instructions": "Test template instructions"}
+{"name": "render_template", "type": "template", "path": "docs/story/shape", "input": "story-graph.json", "template": "templates/test-template.md", "output": "test-output.md", "instructions": "Test template instructions"}
