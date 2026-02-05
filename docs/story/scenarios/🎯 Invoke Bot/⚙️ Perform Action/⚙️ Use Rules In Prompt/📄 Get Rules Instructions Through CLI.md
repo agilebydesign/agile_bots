@@ -16,11 +16,8 @@ Get Rules Instructions Through CLI functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User navigates to behavior.rules
-
   **then** CLI displays formatted rules digest with descriptions and DO/DON'T sections
-
   **and** CLI includes rule names with their file paths
-
   **and** CLI includes all rules from the behavior
 
 ## Scenarios

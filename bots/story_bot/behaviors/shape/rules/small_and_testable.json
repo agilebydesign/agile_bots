@@ -1,7 +1,7 @@
-{
+﻿{
   "priority": 6,
   "description": "Stories must be testable as complete interactions and deliverable independently. Balance testability with maintaining value and behavioral focus - stories should be small enough to test but large enough to matter.",
-  "scanner": "agile_bot.bots.base_bot.scanners.implementation_details_scanner.ImplementationDetailsScanner",
+  "scanner": "scanners.implementation_details_scanner.ImplementationDetailsScanner",
   "do": {
     "description": "Create stories that can be tested and delivered independently. Example: 'Customer places order' (testable with clear acceptance criteria: order created, payment processed)",
     "guidance": [
@@ -11,7 +11,7 @@
       },
       {
         "description": "STORY vs STEP distinction - Story = User/system outcome (testable independently with clear acceptance criteria). Step = Implementation detail (not testable alone, verified as part of parent story test).",
-        "example": ["Story: 'User --> saves story graph' → Steps: 'converts format', 'serializes to JSON', 'writes file'", "Story: 'User --> renders diagram' → Steps: 'generates XML', 'calculates positions', 'applies styles'"]
+        "example": ["Story: 'User --> saves story graph' â†’ Steps: 'converts format', 'serializes to JSON', 'writes file'", "Story: 'User --> renders diagram' â†’ Steps: 'generates XML', 'calculates positions', 'applies styles'"]
       }
     ]
   },
@@ -29,3 +29,4 @@
     ]
   }
 }
+

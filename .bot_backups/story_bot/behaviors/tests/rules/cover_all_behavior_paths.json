@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  7,
     "description":  "Cover all behavior paths: normal (happy path), edge cases, and failure scenarios. Each distinct behavior needs its own focused test. Tests must be independent. Example: test_loads_valid_config(), test_loads_empty_config(), test_raises_error_when_file_missing()",
     "do":  {
@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.behavior_paths_scanner.BehaviorPathsScanner"
+    "scanner":  "scanners.behavior_paths_scanner.BehaviorPathsScanner"
 }

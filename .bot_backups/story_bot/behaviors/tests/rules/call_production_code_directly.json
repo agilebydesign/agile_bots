@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  6,
     "description":  "Call production code directly in tests. Let tests fail naturally if code doesn\u0027t exist. Don\u0027t comment out calls, mock business logic, or fake state. Only mock external boundaries. Example: agent = Agent(); agent.initialize() (not agent = Mock())",
     "do":  {
@@ -57,5 +57,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.real_implementations_scanner.RealImplementationsScanner"
+    "scanner":  "scanners.real_implementations_scanner.RealImplementationsScanner"
 }

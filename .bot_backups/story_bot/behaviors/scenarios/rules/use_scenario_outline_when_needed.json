@@ -1,8 +1,8 @@
-{
+﻿{
     "priority":  5,
-    "description":  "Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.",
+    "description":  "Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10â†’0, Rank 12â†’+1, Rank 14â†’+2.",
     "do":  {
-               "description":  "Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs",
+               "description":  "Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing inputâ†’output pairs",
                "guidance":  [
                                 {
                                     "description":  "Use for formula validation with concrete values",
@@ -35,5 +35,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.scenario_outline_scanner.ScenarioOutlineScanner"
+    "scanner":  "scanners.scenario_outline_scanner.ScenarioOutlineScanner"
 }

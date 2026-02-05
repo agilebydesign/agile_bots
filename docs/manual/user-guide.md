@@ -749,7 +749,7 @@ These files are created in your project workspace as you work:
 | `clarification.json` | Saved answers from Clarify actions |
 | `strategy.json` | Saved decisions from Strategy actions |
 | `scope.json` | Current filter/scope selection |
-| `docs/stories/` | Rendered story documentation |
+| `docs/story/` | Rendered story documentation |
 | `docs/crc/` | Rendered CRC model documentation |
 
 #### Bot Configuration Files

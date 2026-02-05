@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  3,
     "description":  "Each scenario\u0027s Steps start with Given for scenario-specific setup. Background is auto-applied first. Scenario Steps contain setup for THIS scenario only. Example: Background has common setup; Scenario Given has test-specific paths/data.",
     "do":  {
@@ -37,5 +37,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.scenario_specific_given_scanner.ScenarioSpecificGivenScanner"
+    "scanner":  "scanners.scenario_specific_given_scanner.ScenarioSpecificGivenScanner"
 }

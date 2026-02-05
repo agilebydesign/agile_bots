@@ -23,10 +23,8 @@ Render Story Graph using Story Graph API functionality for the mob minion system
   **and** the StoryRenderedNode iterates over it's node children to render themselves in turn
   **and** every node in the StoryMap is represented in the Diagram
   **and** the StoryRenderedNodes are saved as a StoryOutput file
-  **and** the StoryAdapter persists all positional data in a json file matching the rendered diagram
-
+  **and** the StoryAdapter persists all positional data in a json file matching the rendered diagram When the StoryIODiagram is finished rendering
   **and** the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original
-
   **then** the StoryRenderedNode will render itself again and update the StoryOutput as required
 
 ## Scenarios

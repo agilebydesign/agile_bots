@@ -161,8 +161,8 @@ These are **legacy files** for the default workflow. The two systems are complet
 
 | File | Location | Purpose |
 |------|----------|---------|
-| `story-graph.json` | `<workspace>/docs/stories/` | Main knowledge graph |
-| `context/` | `<workspace>/docs/stories/context/` | Session context files |
+| `story-graph.json` | `<workspace>/docs/story/` | Main knowledge graph |
+| `context/` | `<workspace>/docs/story/context/` | Session context files |
 | `guardrails/` | Per-behavior | Clarification, strategy data |
 
 ---
@@ -393,13 +393,13 @@ class BaseBotStateAdapter:
         }
     
     def _load_story_graph(self) -> Optional[Dict]:
-        path = self.workspace / "docs/stories/story-graph.json"
+        path = self.workspace / "docs/story/story-graph.json"
         if path.exists():
             return json.loads(path.read_text(encoding='utf-8'))
         return None
     
     def _collect_context(self) -> Dict[str, Any]:
-        context_dir = self.workspace / "docs/stories/context"
+        context_dir = self.workspace / "docs/story/context"
         return {
             "path": str(context_dir),
             "files": [str(f) for f in context_dir.glob("*")] if context_dir.exists() else []
@@ -740,7 +740,7 @@ def run_with_langgraph(botlangflow_name: str, params: dict):
 
 ```
 <workspace>/
-├── docs/stories/
+├── docs/story/
 │   ├── story-graph.json           # Main knowledge graph (unchanged)
 │   └── context/                    # Session context (unchanged)
 │

@@ -16,39 +16,30 @@ Filter Story Scope by Stories Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User types story name in filter
-
   **then** System refreshes story hierarchy based on new story scope
 
 - **When** Filter matches epic
-
   **then** System displays epic with all sub-epics and stories collapsed beneath it
 
 - **When** Filter matches sub-epic
-
   **then** System displays sub-epic with all stories collapsed beneath it
 
 - **When** Filter matches story
-
   **then** System displays that story with its acceptance criteria
 
 - **When** User clicks story with acceptance criteria
-
   **then** System expands story showing acceptance criteria list
 
 - **When** Filter matches multiple items
-
   **then** System displays all matches in hierarchical format preserving parent-child relationships
 
 - **When** User clicks clear filter button
-
   **then** System displays all stories
 
 - **When** User sets scope filter
-
   **then** System persists scope filter value
 
 - **When** Panel refreshes
-
   **then** System restores previously set scope filter
 
 ## Scenarios

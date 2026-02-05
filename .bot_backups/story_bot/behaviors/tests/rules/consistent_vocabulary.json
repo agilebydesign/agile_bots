@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  2,
     "description":  "Use ONE word per concept across entire codebase. Pick consistent vocabulary: create (not build/make/construct), verify (not check/assert/validate), load (not fetch/get/retrieve). Use intention-revealing names that describe behavior. Example: create_agent(), verify_initialized(), load_config() - same verbs everywhere",
     "do":  {
@@ -65,5 +65,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
+    "scanner":  "scanners.consistent_vocabulary_scanner.ConsistentVocabularyScanner"
 }

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  17,
     "description":  "Tests are self-documenting through code structure. Don\u0027t add verbose comments explaining failures. Imports, calls, and assertions show the API design. Let code speak for itself. Example: generator = MCPServerGenerator(bot_name, config_path); server = generator.generate_server()",
     "do":  {
@@ -60,5 +60,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.self_documenting_scanner.SelfDocumentingScanner"
+    "scanner":  "scanners.self_documenting_scanner.SelfDocumentingScanner"
 }

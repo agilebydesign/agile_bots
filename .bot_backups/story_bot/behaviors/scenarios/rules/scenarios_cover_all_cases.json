@@ -1,8 +1,8 @@
-{
+﻿{
     "priority":  4,
-    "description":  "Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.",
+    "description":  "Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input â†’ success; Boundary value â†’ validates; Invalid input â†’ error message.",
     "do":  {
-               "description":  "Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error",
+               "description":  "Cover all case types: happy path, edge cases, error cases. Example: User enters valid data â†’ success; User enters boundary â†’ validates; User enters invalid â†’ error",
                "guidance":  [
                                 {
                                     "description":  "Include happy path scenario",
@@ -41,5 +41,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner"
+    "scanner":  "scanners.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner"
 }

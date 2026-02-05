@@ -1,7 +1,7 @@
-{
+﻿{
   "priority": 1,
   "description": "Use verb-noun format consistently across all hierarchy levels. Actor --> verb noun [qualifiers]. Actor is documented separately, NOT in the name. Focus on specific actions with context.",
-  "scanner": "agile_bot.bots.base_bot.scanners.verb_noun_scanner.VerbNounScanner",
+  "scanner": "scanners.verb_noun_scanner.VerbNounScanner",
   "do": {
     "description": "Use specific verb-noun format with actor documented separately. Example: 'Places Order' with actor=Customer",
     "guidance": [
@@ -10,7 +10,7 @@
         "example": ["Epic: 'Manage Customer Orders', 'Process Online Payments'", "Sub-Epic: 'Place New Order', 'Validate Credit Card Payment'", "Story: 'User --> processes order payment'", "Story: 'System --> validates submitted payments'"]
       },
       {
-        "description": "Stories describe REAL ACTIONS that can be performed, organized by lifecycle: Load → Read → Edit → Render → Synchronize → Search → Save",
+        "description": "Stories describe REAL ACTIONS that can be performed, organized by lifecycle: Load â†’ Read â†’ Edit â†’ Render â†’ Synchronize â†’ Search â†’ Save",
         "example": ["System --> loads order data", "System --> validates payment", "System --> generates XML"]
       },
       {
@@ -24,7 +24,7 @@
     ]
   },
   "dont": {
-    "description": "Don't include actor in name or use generic operations. Example: 'Customer Places Order' (WRONG) → 'Places Order' with actor=Customer (CORRECT)",
+    "description": "Don't include actor in name or use generic operations. Example: 'Customer Places Order' (WRONG) â†’ 'Places Order' with actor=Customer (CORRECT)",
     "guidance": [
       {
         "description": "Never include actor name in the story/epic/sub-epic name - actor is documented separately in metadata. Wrong: 'Customer Places Order'. Correct: 'Places Order (actor: Customer)'.",
@@ -40,8 +40,9 @@
       },
       {
         "description": "Transform capabilities and structural descriptions into concrete actions",
-        "example": ["'Contains Logic' → System --> generates XML or System --> renders diagram", "'Tracks Count' → System --> reads count or System --> updates count", "'Represents X' → System --> creates X or System --> loads X"]
+        "example": ["'Contains Logic' â†’ System --> generates XML or System --> renders diagram", "'Tracks Count' â†’ System --> reads count or System --> updates count", "'Represents X' â†’ System --> creates X or System --> loads X"]
       }
     ]
   }
 }
+

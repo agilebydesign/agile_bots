@@ -16,17 +16,12 @@ Save Guardrails Through Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User fills in answers in panel form
-
   **then** System validates input format
-
   **and** System enables submit button
 
 - **When** User clicks submit for answers
-
   **then** System saves answers to clarification.json under current behavior
-
   **and** System merges with existing answers
-
   **and** System displays success message
 
 ## Scenarios

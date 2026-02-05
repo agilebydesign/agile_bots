@@ -16,13 +16,10 @@ Save Guardrails Through CLI functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** user runs save command with answers parameter
-
   **then** CLI saves answers to clarification.json under current behavior
-
   **and** CLI merges with existing answers
 
 - **When** user runs save command with decisions parameter
-
   **then** CLI saves decisions to strategy.json under current behavior
 
 ## Scenarios

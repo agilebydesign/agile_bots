@@ -16,43 +16,33 @@ Display Hierarchy In Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** User views panel
-
   **then** System displays behavior list with actions
 
 - **When** Action is current
-
   **then** System displays current action in-progress indicator
 
 - **When** Action is completed
-
   **then** System displays completed indicator
 
 - **When** Action is pending
-
   **then** System displays pending indicator
 
 - **When** User clicks collapsed behavior
-
   **then** System expands behavior showing actions
 
 - **When** User clicks expanded behavior
-
   **then** System collapses behavior hiding actions
 
 - **When** User clicks collapsed action
-
   **then** System expands action showing operations
 
 - **When** User clicks expanded action
-
   **then** System collapses action hiding operations
 
 - **When** User views behavior list
-
   **then** System displays all behaviors expandable regardless of current position
 
 - **When** User views behavior list
-
   **then** System displays behaviors in correct sequential order
 
 ## Scenarios

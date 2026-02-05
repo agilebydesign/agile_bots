@@ -16,21 +16,16 @@ Display Clarify Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Current action is clarify
-
   **then** System displays key questions with editable answer textareas
-
   **and** System displays evidence list
 
 - **When** User edits answer textarea
-
   **then** System updates answer
 
 - **When** saved key questions and answers exists
-
   **then** System displays saved key questions and answers
 
 - **When** User is on non-clarify actions and has previously made strategy decisions
-
   **then** System displays saved strategy decisions and criteria as read-only
 
 ## Scenarios

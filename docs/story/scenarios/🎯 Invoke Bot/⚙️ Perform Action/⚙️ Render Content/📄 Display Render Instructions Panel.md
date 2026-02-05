@@ -16,15 +16,11 @@ Display Render Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Current action is render
-
   **then** System displays config file paths as clickable links
-
   **and** System displays template file paths as clickable links
-
   **and** System displays output file paths as clickable links
 
 - **When** User clicks on any of these links
-
   **then** System opens the corresponding file in the editor
 
 ## Scenarios

@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  20,
     "description":  "Test structure matches story graph: file = sub-epic (test_\u003csub_epic\u003e.py), class = story (Test\u003cExactStoryName\u003e), method = scenario (test_\u003cscenario_snake_case\u003e). Classes in story map order. Example: test_generate_bot_tools.py, class TestGenerateBotTools, def test_generator_creates_tool_for_test_bot",
     "do":  {
@@ -63,5 +63,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
+    "scanner":  "scanners.class_based_organization_scanner.ClassBasedOrganizationScanner"
 }

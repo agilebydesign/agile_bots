@@ -16,7 +16,6 @@ Display Raw Format Instructions In Panel functionality for the mob minion system
 ### Behavioral Acceptance Criteria
 
 - **When** User clicks action instruction in Behavior Action Hierarchy
-
   **then** System displays entire instructions exactly as it should be sent to the AI chat
 
 ## Scenarios

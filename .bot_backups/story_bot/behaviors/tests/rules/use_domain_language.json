@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  1,
     "description":  "Use Ubiquitous Language (DDD): Same vocabulary in domain model, stories, scenarios, AND code. Class names = domain entities/nouns. Method names = domain responsibilities/verbs. Test names read like plain English stories. Example: test_agent_loads_configuration_when_file_exists (not test_agt_init_sets_vars)",
     "do":  {
@@ -78,8 +78,9 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.ubiquitous_language_scanner.UbiquitousLanguageScanner"
+    "scanner":  "scanners.ubiquitous_language_scanner.UbiquitousLanguageScanner"
 }
+
 
 
 

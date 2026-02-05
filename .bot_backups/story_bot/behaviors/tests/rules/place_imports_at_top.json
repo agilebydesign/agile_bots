@@ -1,4 +1,4 @@
-{
+﻿{
     "priority":  15,
     "description":  "Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass",
     "do":  {
@@ -58,5 +58,5 @@
                                   }
                               ]
              },
-    "scanner":  "agile_bot.bots.base_bot.scanners.import_placement_scanner.ImportPlacementScanner"
+    "scanner":  "scanners.import_placement_scanner.ImportPlacementScanner"
 }

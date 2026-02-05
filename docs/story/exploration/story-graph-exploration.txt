@@ -159,7 +159,7 @@
                         THEN node validates action exists
                         AND node invokes bot to execute action with scope context
                         AND node validates graph structure remains valid after execution
-                        Example: bot.story_graph.epics["epic name"].executeAction("build", {"output": "docs/stories"})
+                        Example: bot.story_graph.epics["epic name"].executeAction("build", {"output": "docs/story"})
 
                         WHEN Story Graph Node executes action with invalid parameters
                         THEN node invokes bot to execute action with scope context
@@ -440,7 +440,7 @@
                     (S) Submit Action Scoped To Story Scope
 
                         WHEN User executes action with dot notation
-                        EXAMPLE: cli.story_graph."Invoke Bot"."Manage Story Graph".build.output."docs/stories"
+                        EXAMPLE: cli.story_graph."Invoke Bot"."Manage Story Graph".build.output."docs/story"
                         THEN CLI parses notation to scope
                         AND resolves and validates scope exists
                         AND validates action exists

@@ -16,13 +16,9 @@ Display Build Instructions Panel functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Current action is build
-
   **then** System displays knowledge graph section with template path link
-
   **and** System displays knowledge graph output file link
-
   **and** System displays knowledge graph directory path
-
   **and** System displays rules list with clickable rule file links
 
 ## Scenarios

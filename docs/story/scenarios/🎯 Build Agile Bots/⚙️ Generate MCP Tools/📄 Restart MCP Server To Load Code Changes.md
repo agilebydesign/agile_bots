@@ -16,13 +16,9 @@ Restart MCP Server To Load Code Changes functionality for the mob minion system.
 ### Behavioral Acceptance Criteria
 
 - **When** Bot code changes are detected
-
   **then** MCP Server clears Python bytecode cache (__pycache__)
-
   **and** MCP Server restarts to load new code
-
   **and** Server restarts gracefully without losing state
-
   **and** Server re-registers with MCP Protocol Handler after restart
 
 ## Scenarios

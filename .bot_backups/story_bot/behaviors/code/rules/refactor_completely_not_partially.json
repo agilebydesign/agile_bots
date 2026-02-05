@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: When refactoring, replace old code completely - don't try to support both legacy and new patterns. Write new code, delete old code, fix tests. Clean breaks are better than compatibility bridges that create technical debt.",
   "examples": [
     {
@@ -110,5 +110,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.complete_refactoring_scanner.CompleteRefactoringScanner"
+  "scanner": "scanners.complete_refactoring_scanner.CompleteRefactoringScanner"
 }
+

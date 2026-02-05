@@ -1,10 +1,10 @@
-{
+﻿{
   "rule_name": "prefer_object_model_over_config",
   "description": "Use existing object model to access information instead of directly accessing configuration files",
   "severity": "error",
   "category": "architecture",
   "context": "when writing code",
-  "scanner": "agile_bot.bots.base_bot.scanners.prefer_object_model_over_config_scanner.PreferObjectModelOverConfigScanner",
+  "scanner": "scanners.prefer_object_model_over_config_scanner.PreferObjectModelOverConfigScanner",
   "rationale": "Objects provide encapsulation and abstraction. Accessing configuration files directly bypasses the object model, creates tight coupling, and makes code harder to maintain and test.",
   "examples": {
     "bad": [
@@ -63,4 +63,5 @@
   ],
   "fix_guidance": "Replace direct config access with object properties or methods. If the property doesn't exist on the object, add it to the object's interface rather than accessing config directly."
 }
+
 

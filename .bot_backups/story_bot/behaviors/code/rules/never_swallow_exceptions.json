@@ -1,4 +1,4 @@
-{
+﻿{
   "description": "CRITICAL: Never swallow exceptions silently. Empty catch blocks hide failures and make debugging impossible. Always log, handle, or rethrow exceptions with context.",
   "examples": [
     {
@@ -82,5 +82,6 @@
       }
     }
   ],
-  "scanner": "agile_bot.bots.base_bot.scanners.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
+  "scanner": "scanners.swallowed_exceptions_scanner.SwallowedExceptionsScanner"
 }
+

@@ -86,8 +86,8 @@ def _extract_story_names_from_epic(epic_data: Dict[str, Any]) -> Set[str]:
 
 class ScenariosOnStoryDocsScanner(StoryScanner):
     
-    def __init__(self):
-        super().__init__()
+    def __init__(self, rule):
+        super().__init__(rule)
         self._in_scope_story_names: Optional[Set[str]] = None
     
     def scan_with_context(self, context: 'ScanFilesContext') -> List[Dict[str, Any]]:

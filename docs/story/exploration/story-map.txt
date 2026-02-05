@@ -1,0 +1,27 @@
+(E) Invoke Bot
+    (E) Trace Story Graph
+        (E) Trace Story
+            (S) Developer --> Display Stories
+                (AC) Developer --> WHEN Developer opens strace file THEN story properties display (name, users, acceptance criteria) AND nested scenarios display under story
+            (S) Developer --> Edit Stories in Trace Editor
+                (AC) Developer --> WHEN Developer modifies story field THEN changes save to story-graph.json (on blur/Ctrl+S) AND JSON structure preserves
+            (S) Developer --> Open Story Source
+                (AC) Developer --> WHEN Developer clicks Open on story THEN story-graph.json opens at story name line
+        (E) Trace Scenario
+            (S) Developer --> Display Scenario Steps
+                (AC) Developer --> WHEN Developer views scenario THEN scenario steps display in given/when/then format
+            (S) Developer --> Display Test for Scenario
+                (AC) Developer --> WHEN Developer views scenario THEN linked test method and file path display
+            (S) Developer --> Edit Scenarios in Trace Editor
+                (AC) Developer --> WHEN Developer modifies scenario steps THEN changes save to story-graph.json (on blur/Ctrl+S)
+            (S) Developer --> Open Scenario Source
+                (AC) Developer --> WHEN Developer clicks Open on scenario THEN story-graph.json opens at scenario line
+        (E) Trace Code
+            (S) Developer --> Generate Code Trace
+                (AC) Developer --> WHEN Developer opens strace for test THEN call hierarchy generates from test method
+            (S) Developer --> Display Code Hierarchy
+                (AC) Developer --> WHEN trace generates THEN nested call tree displays with function/method names
+            (S) Developer --> Load Code Snippet
+                (AC) Developer --> WHEN Developer expands code node THEN lazy-loaded source displays with line numbers
+            (S) Developer --> Navigate to Source
+                (AC) Developer --> WHEN Developer clicks Open on code node THEN source file opens at specific line
