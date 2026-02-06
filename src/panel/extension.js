@@ -7,6 +7,7 @@
 
 const vscode = require("vscode");
 const BotPanel = require("./bot_panel.js");
+const BotPanelSidebarProvider = require("./bot_panel_sidebar.js");
 
 let outputChannel = null;
 
@@ -36,6 +37,21 @@ function activate(context) {
     outputChannel = vscode.window.createOutputChannel("Bot Panel");
     log("Activating Bot Panel extension");
     log("[PERF] Extension activation start");
+    
+    // Register the sidebar webview provider (shows in bottom panel next to Chat)
+    const sidebarProvider = new BotPanelSidebarProvider(context.extensionUri);
+    context.subscriptions.push(
+      vscode.window.registerWebviewViewProvider(
+        BotPanelSidebarProvider.viewType,
+        sidebarProvider,
+        {
+          webviewOptions: {
+            retainContextWhenHidden: true
+          }
+        }
+      )
+    );
+    log("Sidebar provider registered");
     
     // Register the view panel command - don't check workspace here, let command handle it
     const viewPanelCommand = vscode.commands.registerCommand(

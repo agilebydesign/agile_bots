@@ -148,6 +148,11 @@ class BotPanel {
         this._log('[BotPanel] *** MESSAGE HANDLER FIRED ***');
         this._log('[BotPanel] Received message from webview: ' + message.command + ' ' + JSON.stringify(message));
         switch (message.command) {
+          case "hidePanel":
+            // Close/dispose the panel - user can reopen via command
+            this._log('[BotPanel] Closing panel');
+            this._panel.dispose();
+            return;
           case "refresh":
             // Delete the enriched cache to force regeneration of test links
             const fs = require('fs');
@@ -1194,6 +1199,43 @@ class BotPanel {
     }
   }
 
+  /**
+   * Create a BotPanel instance for use in a sidebar WebviewView.
+   * Unlike createOrShow, this doesn't create a new WebviewPanel - it uses an existing WebviewView.
+   * 
+   * @param {vscode.WebviewView} webviewView - The sidebar webview view
+   * @param {string} workspaceRoot - Workspace root path
+   * @param {vscode.Uri} extensionUri - Extension URI for resources
+   * @returns {BotPanel} The BotPanel instance
+   */
+  static createForSidebar(webviewView, workspaceRoot, extensionUri) {
+    console.log("[BotPanel] Creating for sidebar view");
+    
+    // Create a wrapper object that mimics WebviewPanel interface
+    const panelWrapper = {
+      webview: webviewView.webview,
+      onDidDispose: webviewView.onDidDispose.bind(webviewView),
+      // WebviewView doesn't have these, so provide no-ops that return disposables
+      onDidChangeViewState: (callback, thisArg, disposables) => {
+        // WebviewView has onDidChangeVisibility instead
+        return webviewView.onDidChangeVisibility(() => {
+          // Create a fake event object
+          callback({ webviewView: webviewView });
+        }, thisArg, disposables);
+      },
+      reveal: () => {},
+      dispose: () => {}
+    };
+    
+    // Create new BotPanel instance using the wrapper
+    const botPanel = new BotPanel(panelWrapper, workspaceRoot, extensionUri);
+    
+    // Don't set as currentPanel - sidebar and editor panels can coexist
+    console.log("[BotPanel] Sidebar instance created successfully");
+    
+    return botPanel;
+  }
+
   _readPanelVersion() {
     try {
       // Try multiple locations for package.json
@@ -1603,6 +1645,13 @@ class BotPanel {
       // Fall back to full update on error
       return this._update();
     }
+  }
+
+  /**
+   * Public refresh method - can be called from external code (e.g., sidebar provider)
+   */
+  async refresh() {
+    return this._update();
   }
 
   async _update() {
@@ -2115,6 +2164,20 @@ class BotPanel {
             font-size: 20px;
             font-weight: 700;
             color: var(--text-color);
+        }
+        .main-header-collapse {
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 18px;
+            padding: 3px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 150ms ease;
+            margin-right: 4px;
+        }
+        .main-header-collapse:hover {
+            background-color: rgba(255, 140, 0, 0.1);
         }
         .main-header-refresh {
             background-color: transparent;
@@ -2855,7 +2918,8 @@ class BotPanel {
         };
         console.log('[WebView] window.testFunction defined:', typeof window.testFunction);
         
-        window.toggleSection = function(sectionId) {
+        // Hide panel - sends message to extension to collapse the panel
+        window.hidePanel = function() {\n            console.log('[hidePanel] Requesting panel collapse');\n            vscode.postMessage({ command: 'hidePanel' });\n        };\n        \n        window.toggleSection = function(sectionId) {
             console.log('[toggleSection] Called with sectionId:', sectionId);
             const content = document.getElementById(sectionId);
             console.log('[toggleSection] Content element:', content);
