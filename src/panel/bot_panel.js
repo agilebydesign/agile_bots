@@ -952,15 +952,18 @@ class BotPanel {
                   }
                   return this._updateWithCachedData().then(() => {
                     // After panel update, expand the instructions section for this action
-                    try {
-                      this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
-                      this._panel.webview.postMessage({
-                        command: 'expandInstructionsSection',
-                        actionName: message.actionName
-                      });
-                    } catch (postErr) {
-                      this._log(`[BotPanel] Error sending expandInstructionsSection: ${postErr.message}`);
-                    }
+                    // Use setTimeout to ensure DOM is ready after webview.html is set
+                    setTimeout(() => {
+                      try {
+                        this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
+                        this._panel.webview.postMessage({
+                          command: 'expandInstructionsSection',
+                          actionName: message.actionName
+                        });
+                      } catch (postErr) {
+                        this._log(`[BotPanel] Error sending expandInstructionsSection: ${postErr.message}`);
+                      }
+                    }, 100);
                   });
                 })
                 .catch((error) => {
@@ -2866,10 +2869,12 @@ class BotPanel {
                 if (isExpanded) {
                     // Collapsing
                     content.style.maxHeight = '0px';
+                    content.style.overflow = 'hidden';
                     content.style.display = 'none';
                 } else {
                     // Expanding
                     content.style.maxHeight = '2000px';
+                    content.style.overflow = 'visible';
                     content.style.display = 'block';
                 }
                 
@@ -2910,6 +2915,17 @@ class BotPanel {
                 return;
             }
             
+            // First, collapse all instruction sections (instr-section-*)
+            document.querySelectorAll('[id^="instr-section-"]').forEach(content => {
+                const section = content.closest('.collapsible-section');
+                if (section && section.classList.contains('expanded')) {
+                    content.style.maxHeight = '0px';
+                    content.style.overflow = 'hidden';
+                    content.style.display = 'none';
+                    section.classList.remove('expanded');
+                }
+            });
+            
             // Find the section by looking for header text containing the section name
             const headers = document.querySelectorAll('.collapsible-header');
             for (const header of headers) {
@@ -2926,6 +2942,7 @@ class BotPanel {
                             console.log('[expandInstructionsSection] Expanding section:', sectionName);
                             // Expand the section
                             content.style.maxHeight = '2000px';
+                            content.style.overflow = 'visible';
                             content.style.display = 'block';
                             section.classList.add('expanded');
                             
