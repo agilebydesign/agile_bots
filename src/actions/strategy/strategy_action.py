@@ -62,10 +62,14 @@ class StrategyAction(Action):
         if saved_assumptions:
             combined_assumptions['assumptions_made'] = saved_assumptions
         
+        transformed_strategy = {}
         if combined_strategy_criteria:
-            instructions.set('strategy_criteria', combined_strategy_criteria)
+            transformed_strategy['strategy_criteria'] = combined_strategy_criteria
         if combined_assumptions:
-            instructions.set('assumptions', combined_assumptions)
+            transformed_strategy['assumptions'] = combined_assumptions
+        
+        if transformed_strategy:
+            instructions.set('strategy', transformed_strategy)
     
         try:
             from actions.clarify.requirements_clarifications import RequirementsClarifications

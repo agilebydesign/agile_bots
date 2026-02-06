@@ -2409,8 +2409,31 @@ class BotPanel {
                         }
                     }, 100);
                 }
+                
+                // Restore scroll position after a short delay to ensure content is rendered
+                setTimeout(() => {
+                    if (window.restoreScrollPosition) {
+                        window.restoreScrollPosition();
+                    }
+                }, 150);
             } catch (err) {
                 console.error('[WebView] Error restoring state:', err);
+            }
+        });
+        
+        // Save scroll position when page loses visibility (e.g., when opening a file)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                if (window.saveScrollPosition) {
+                    window.saveScrollPosition();
+                }
+            } else if (document.visibilityState === 'visible') {
+                // Restore scroll position when becoming visible again
+                setTimeout(() => {
+                    if (window.restoreScrollPosition) {
+                        window.restoreScrollPosition();
+                    }
+                }, 50);
             }
         });
         
@@ -3113,6 +3136,8 @@ class BotPanel {
         
         window.openFile = function(filePath) {
             console.log('[WebView] openFile called with:', filePath);
+            // Save scroll position before opening file (which may cause focus change)
+            window.saveScrollPosition();
             vscode.postMessage({
                 command: 'logToFile',
                 message: '[WebView] openFile called with: ' + filePath
@@ -3121,6 +3146,22 @@ class BotPanel {
                 command: 'openFile',
                 filePath: filePath
             });
+        };
+        
+        // Scroll position preservation functions
+        window.saveScrollPosition = function() {
+            const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            sessionStorage.setItem('scrollPosition', scrollY.toString());
+            console.log('[WebView] Saved scroll position:', scrollY);
+        };
+        
+        window.restoreScrollPosition = function() {
+            const savedPosition = sessionStorage.getItem('scrollPosition');
+            if (savedPosition) {
+                const scrollY = parseInt(savedPosition, 10);
+                window.scrollTo(0, scrollY);
+                console.log('[WebView] Restored scroll position:', scrollY);
+            }
         };
         
         window.updateFilter = function(filterValue) {

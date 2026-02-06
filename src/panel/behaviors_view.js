@@ -127,11 +127,12 @@ class BehaviorsView extends PanelView {
         const pointerIconPath = getIcon('pointer.png');
         const rightIconPath = getIcon('right.png');
         const clipboardIconPath = getIcon('rules.png');
+        const submitIconPath = getIcon('submit.png');
         
         console.log(`[BehaviorsView] Branding: ${branding.getBranding()}, icon sample: ${plusIconPath}`);
         
         if (!behaviorsData || behaviorsData.length === 0) {
-            return this.renderEmpty(feedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath);
+            return this.renderEmpty(feedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath, submitIconPath);
         }
         
         const behaviorsHtml = behaviorsData.map((behavior, bIdx) => {
@@ -149,11 +150,32 @@ class BehaviorsView extends PanelView {
                 border-radius: 2px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 user-select: none;
             ">
-                <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
-                <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
+                <div style="display: flex; align-items: center;">
+                    <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
+                    ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
+                    <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
+                </div>
+                <button onclick="event.stopPropagation(); sendInstructionsToChat(event);" style="
+                    background: rgba(255, 140, 0, 0.15);
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.15s ease;
+                    width: 40px;
+                    height: 40px;
+                " 
+                onmouseover="this.style.backgroundColor='rgba(255, 140, 0, 0.3)'" 
+                onmouseout="this.style.backgroundColor='rgba(255, 140, 0, 0.15)'"
+                title="Submit instructions to chat">
+                    ${submitIconPath ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : '📤'}
+                </button>
             </div>
             <div id="behaviors-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
                 <div class="card-secondary" style="padding: 5px;">
@@ -218,7 +240,7 @@ class BehaviorsView extends PanelView {
      * @param {string} rightIconPath - Right icon path
      * @returns {string} HTML string
      */
-    renderEmpty(feedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath) {
+    renderEmpty(feedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath, submitIconPath) {
         return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">
@@ -230,11 +252,32 @@ class BehaviorsView extends PanelView {
                 border-radius: 2px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 user-select: none;
             ">
-                <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
-                <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
+                <div style="display: flex; align-items: center;">
+                    <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
+                    ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
+                    <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
+                </div>
+                <button onclick="event.stopPropagation(); sendInstructionsToChat(event);" style="
+                    background: rgba(255, 140, 0, 0.15);
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.15s ease;
+                    width: 40px;
+                    height: 40px;
+                " 
+                onmouseover="this.style.backgroundColor='rgba(255, 140, 0, 0.3)'" 
+                onmouseout="this.style.backgroundColor='rgba(255, 140, 0, 0.15)'"
+                title="Submit instructions to chat">
+                    ${submitIconPath ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : '📤'}
+                </button>
             </div>
             <div id="behaviors-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
                 <div class="card-secondary" style="padding: 5px;">
