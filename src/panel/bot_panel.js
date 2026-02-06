@@ -175,7 +175,27 @@ class BotPanel {
                 this._log(`[BotPanel] Warning: Could not clear story graph cache: ${err.message}`);
               }
               // Proceed with refresh after clearing cache
-              this._update().catch(err => console.error(`[BotPanel] Refresh error: ${err.message}`));
+              try {
+                await this._update();
+                // After refresh, re-expand the current action's section
+                const botData = this._botView?.botData;
+                const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
+                if (currentAction) {
+                  setTimeout(() => {
+                    try {
+                      this._log(`[BotPanel] Refresh: Re-expanding section for: ${currentAction}`);
+                      this._panel.webview.postMessage({
+                        command: 'expandInstructionsSection',
+                        actionName: currentAction
+                      });
+                    } catch (postErr) {
+                      this._log(`[BotPanel] Error sending expandInstructionsSection after refresh: ${postErr.message}`);
+                    }
+                  }, 200);
+                }
+              } catch (err) {
+                console.error(`[BotPanel] Refresh error: ${err.message}`);
+              }
             })();
             return;
           case "logToFile":
@@ -968,7 +988,7 @@ class BotPanel {
                       } catch (postErr) {
                         this._log(`[BotPanel] Error sending expandInstructionsSection: ${postErr.message}`);
                       }
-                    }, 100);
+                    }, 200);
                   });
                 })
                 .catch((error) => {
@@ -2960,6 +2980,7 @@ class BotPanel {
         };
         
         // Expand the instructions section for a specific action (clarify, strategy, build, validate)
+        // This should ALWAYS expand, never toggle - collapsing is only done by explicit user clicks
         window.expandInstructionsSection = function(actionName) {
             console.log('[expandInstructionsSection] Called with actionName:', actionName);
             if (!actionName) return;
@@ -2982,7 +3003,7 @@ class BotPanel {
             // First, collapse all instruction sections (instr-section-*)
             document.querySelectorAll('[id^="instr-section-"]').forEach(content => {
                 const section = content.closest('.collapsible-section');
-                if (section && section.classList.contains('expanded')) {
+                if (section) {
                     content.style.maxHeight = '0px';
                     content.style.overflow = 'hidden';
                     content.style.display = 'none';
@@ -3000,23 +3021,17 @@ class BotPanel {
                     const content = header.nextElementSibling;
                     
                     if (section && content && content.classList.contains('collapsible-content')) {
-                        const isExpanded = section.classList.contains('expanded');
+                        console.log('[expandInstructionsSection] Expanding section:', sectionName);
+                        // Always expand - we already collapsed all sections above
+                        content.style.maxHeight = '2000px';
+                        content.style.overflow = 'visible';
+                        content.style.display = 'block';
+                        section.classList.add('expanded');
                         
-                        if (!isExpanded) {
-                            console.log('[expandInstructionsSection] Expanding section:', sectionName);
-                            // Expand the section
-                            content.style.maxHeight = '2000px';
-                            content.style.overflow = 'visible';
-                            content.style.display = 'block';
-                            section.classList.add('expanded');
-                            
-                            // Update icon
-                            const icon = header.querySelector('.expand-icon');
-                            if (icon) {
-                                icon.textContent = '▸';
-                            }
-                        } else {
-                            console.log('[expandInstructionsSection] Section already expanded:', sectionName);
+                        // Update icon
+                        const icon = header.querySelector('.expand-icon');
+                        if (icon) {
+                            icon.textContent = '▸';
                         }
                         return; // Found and processed, exit
                     }
