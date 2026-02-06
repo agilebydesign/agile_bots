@@ -485,6 +485,130 @@ class TestDisplayBehaviorHierarchyEdgeCases {
     }
 }
 
+// ============================================================================
+// TEST: Action Click Expands Section
+// ============================================================================
+
+class TestActionClickExpandsSection {
+    
+    async testClickClarifyExpandsClarify() {
+        /**
+         * GIVEN: Bot at shape behavior
+         * WHEN: User clicks on clarify action
+         * THEN: Clarify section is expanded
+         */
+        const cli = helper._cli;
+        
+        // Navigate to shape.clarify
+        await cli.execute('shape.clarify');
+        const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
+        
+        assert.strictEqual(response.behaviors.current, 'shape',
+            'Should be at shape behavior');
+        assert.strictEqual(response.current_action, 'clarify',
+            'Should be at clarify action');
+        
+        const html = await helper.render_html();
+        
+        // Clarify should be expanded (visible in rendered HTML)
+        helper.assert_action_expanded(html, 'shape', 'clarify');
+    }
+    
+    async testClickStrategyExpandsStrategy() {
+        /**
+         * GIVEN: Bot at shape behavior
+         * WHEN: User clicks on strategy action
+         * THEN: Strategy section is expanded
+         */
+        const cli = helper._cli;
+        
+        // Navigate to shape.strategy
+        await cli.execute('shape.strategy');
+        const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
+        
+        assert.strictEqual(response.behaviors.current, 'shape',
+            'Should be at shape behavior');
+        assert.strictEqual(response.current_action, 'strategy',
+            'Should be at strategy action');
+        
+        const html = await helper.render_html();
+        
+        // Strategy should be expanded
+        helper.assert_action_expanded(html, 'shape', 'strategy');
+    }
+    
+    async testClickBuildExpandsBuild() {
+        /**
+         * GIVEN: Bot at shape behavior
+         * WHEN: User clicks on build action
+         * THEN: Build section is expanded
+         */
+        const cli = helper._cli;
+        
+        // Navigate to shape.build
+        await cli.execute('shape.build');
+        const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
+        
+        assert.strictEqual(response.behaviors.current, 'shape',
+            'Should be at shape behavior');
+        assert.strictEqual(response.current_action, 'build',
+            'Should be at build action');
+        
+        const html = await helper.render_html();
+        
+        // Build should be expanded
+        helper.assert_action_expanded(html, 'shape', 'build');
+    }
+    
+    async testClickValidateExpandsValidateWithSubsections() {
+        /**
+         * GIVEN: Bot at shape behavior
+         * WHEN: User clicks on validate action
+         * THEN: Validate section is expanded including all subsections
+         */
+        const cli = helper._cli;
+        
+        // Navigate to shape.validate
+        await cli.execute('shape.validate');
+        const statusResponse = await cli.execute('status');
+        const response = statusResponse.bot || statusResponse;
+        
+        assert.strictEqual(response.behaviors.current, 'shape',
+            'Should be at shape behavior');
+        assert.strictEqual(response.current_action, 'validate',
+            'Should be at validate action');
+        
+        const html = await helper.render_html();
+        
+        // Validate should be expanded
+        helper.assert_action_expanded(html, 'shape', 'validate');
+        
+        // Verify validate subsections are present (if any)
+        // The validate action may have operations as subsections
+        const shapeBehavior = response.behaviors.all_behaviors.find(b => b.name === 'shape');
+        if (shapeBehavior) {
+            // Actions may be in actions.all_actions or directly in actions array
+            const actionsArray = shapeBehavior.actions?.all_actions || shapeBehavior.actions || [];
+            if (Array.isArray(actionsArray)) {
+                const validateAction = actionsArray.find(a => (a.name || a.action_name) === 'validate');
+                if (validateAction && validateAction.operations) {
+                    // All operations should be visible in the expanded section
+                    for (const op of validateAction.operations) {
+                        const opName = op.name || op.operation_name;
+                        if (opName) {
+                            assert.ok(html.includes(opName),
+                                `Validate subsection "${opName}" should be visible`);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 test('TestNavigateBehaviorAction', { concurrency: false, timeout: 60000 }, async (t) => {
     const suite = new TestNavigateBehaviorAction();
@@ -620,6 +744,26 @@ test('TestDisplayBehaviorHierarchyEdgeCases', { concurrency: false }, async (t) 
     
     await t.test('testBehaviorWithNoActions', async () => {
         await suite.testBehaviorWithNoActions();
+    });
+});
+
+test('TestActionClickExpandsSection', { concurrency: false, timeout: 60000 }, async (t) => {
+    const suite = new TestActionClickExpandsSection();
+    
+    await t.test('testClickClarifyExpandsClarify', async () => {
+        await suite.testClickClarifyExpandsClarify();
+    });
+    
+    await t.test('testClickStrategyExpandsStrategy', async () => {
+        await suite.testClickStrategyExpandsStrategy();
+    });
+    
+    await t.test('testClickBuildExpandsBuild', async () => {
+        await suite.testClickBuildExpandsBuild();
+    });
+    
+    await t.test('testClickValidateExpandsValidateWithSubsections', async () => {
+        await suite.testClickValidateExpandsValidateWithSubsections();
     });
 });
 

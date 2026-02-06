@@ -150,10 +150,13 @@ class CLISession:
             return {'status': 'error', 'message': str(e)}
     
     def _execute_bot_attribute(self, verb: str, args: str) -> tuple:
+        # Check if verb is a navigation command that should include bot context in JSON response
+        is_navigation = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')
+        
         attr = getattr(self.bot, verb)
         if callable(attr):
             result = attr(args) if args else attr()
-            return result, False
+            return result, is_navigation
         
         from behaviors.behavior import Behavior
         if isinstance(attr, Behavior):
