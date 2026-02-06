@@ -19,11 +19,54 @@ Edit Example Cell Data functionality for the mob minion system.
 
 ## Scenarios
 
-### Scenario: Edit Example Cell Data (happy_path)
+<a id="scenario-edit-cell-saves-updated-value"></a>
+### Scenario: [Edit cell saves updated value](#scenario-edit-cell-saves-updated-value) (happy_path)
 
 **Steps:**
 ```gherkin
-Given system is ready
-When action executes
-Then action completes successfully
+Given examples table for Scenario "{scenario_name}" has cell value "{original_value}" in column "{column}"
+When Developer edits the cell to "{updated_value}" and saves
+Then the cell value updates to "{updated_value}" and the story data is saved
 ```
+
+**Examples:**
+
+| Scenario Name | Column | Original Value | Updated Value |
+| --- | --- | --- | --- |
+| Approve Transfer | Transfer Type | Wire | ACH |
+| Approve Transfer | Amount | 25000 | 30000 |
+
+
+<a id="scenario-escape-reverts-cell-value"></a>
+### Scenario: [Escape reverts cell value](#scenario-escape-reverts-cell-value) (edge_case)
+
+**Steps:**
+```gherkin
+Given examples table for Scenario "{scenario_name}" has cell value "{original_value}" in column "{column}"
+When Developer edits the cell to "{edited_value}" and presses Escape
+Then the cell reverts to "{original_value}" and no changes are saved
+```
+
+**Examples:**
+
+| Scenario Name | Column | Original Value | Edited Value |
+| --- | --- | --- | --- |
+| Approve Transfer | Transfer Type | Wire | ACH |
+
+
+<a id="scenario-long-cell-content-expands-size"></a>
+### Scenario: [Long cell content expands size](#scenario-long-cell-content-expands-size) (edge_case)
+
+**Steps:**
+```gherkin
+Given examples table for Scenario "{scenario_name}" has column "{column}"
+When Developer enters a long note "{cell_content}"
+Then the cell expands in width and height to fit the content
+```
+
+**Examples:**
+
+| Scenario Name | Column | Cell Content | Expected Behavior |
+| --- | --- | --- | --- |
+| Approve Transfer | Notes | Transfer requires secondary approval and compliance review | cell expands to fit content |
+

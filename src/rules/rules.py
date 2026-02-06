@@ -192,13 +192,14 @@ class ValidationContext:
 
     def get_last_report_timestamp(self) -> float:
         logger = logging.getLogger(__name__)
-        reports_dir = self.bot_paths.story_graph_paths.behavior_path(self.behavior_name) / 'violations'
+        behavior_name = self.behavior.name if self.behavior else 'common'
+        reports_dir = self.bot_paths.story_graph_paths.behavior_path(behavior_name) / 'violations'
         logger.info(f'Looking for previous reports in: {reports_dir}')
         if not reports_dir.exists():
             logger.info('Reports directory does not exist - returning 0.0')
             return 0.0
         
-        report_files = list(reports_dir.glob(f'{self.behavior_name}-validation-status-*.md'))
+        report_files = list(reports_dir.glob(f'{behavior_name}-validation-status-*.md'))
         logger.info(f'Found {len(report_files)} report files')
         if not report_files:
             logger.info('No report files found - returning 0.0')

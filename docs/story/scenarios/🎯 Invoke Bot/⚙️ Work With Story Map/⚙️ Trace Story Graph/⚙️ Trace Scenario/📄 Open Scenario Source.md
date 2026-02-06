@@ -24,10 +24,16 @@ Open Scenario Source functionality for the mob minion system.
 
 **Steps:**
 ```gherkin
-Given the trace editor shows a scenario
-When the Developer clicks Open on the scenario
-Then story-graph.json opens at the scenario line
+Given the trace editor shows Scenario "{scenario_name}"
+When Developer clicks Open on the scenario
+Then "{story_graph_file}" opens at "{expected_location}"
 ```
+
+**Examples:**
+
+| Scenario Name | Story Graph File | Expected Location |
+| --- | --- | --- |
+| Approve Transfer | story-graph.json | scenario line 10503 |
 
 
 <a id="scenario-scenario-names-with-punctuation-still-open-correctly"></a>
@@ -35,10 +41,16 @@ Then story-graph.json opens at the scenario line
 
 **Steps:**
 ```gherkin
-Given a scenario name includes spaces and punctuation
-When the Developer clicks Open on the scenario
-Then story-graph.json opens at the scenario line
+Given the trace editor shows Scenario "{scenario_name}"
+When Developer clicks Open on the scenario
+Then "{story_graph_file}" opens at "{expected_location}"
 ```
+
+**Examples:**
+
+| Scenario Name | Story Graph File | Expected Location |
+| --- | --- | --- |
+| Approve Transfer: Level-2? | story-graph.json | scenario line with special characters |
 
 
 <a id="scenario-missing-story-graph-shows-error-on-scenario-open"></a>
@@ -46,8 +58,14 @@ Then story-graph.json opens at the scenario line
 
 **Steps:**
 ```gherkin
-Given story-graph.json is missing
-When the Developer clicks Open on the scenario
-Then the trace editor shows an error and no file is opened
+Given story-graph.json has state "{story_graph_state}" and the trace editor shows Scenario "{scenario_name}"
+When Developer clicks Open on the scenario
+Then the trace editor shows error "{error_message}"
 ```
+
+**Examples:**
+
+| Scenario Name | Story Graph State | Error Message |
+| --- | --- | --- |
+| Approve Transfer | missing | story-graph.json not found |
 

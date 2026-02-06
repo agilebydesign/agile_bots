@@ -24,10 +24,16 @@ Display Scenario Steps functionality for the mob minion system.
 
 **Steps:**
 ```gherkin
-Given a story has a scenario with steps in story-graph.json
-When the Developer selects the scenario in the trace editor
-Then the steps display in given when then format
+Given Story "{story_name}" is loaded with Scenario "{scenario_name}" and steps "{scenario_steps}"
+When Developer selects Scenario "{scenario_name}" in the trace editor
+Then the steps display in "{expected_format}" format
 ```
+
+**Examples:**
+
+| Story Name | Scenario Name | Scenario Steps | Expected Format |
+| --- | --- | --- | --- |
+| Wealth Transfer Overview | Approve Transfer | Given account is verified; When transfer is submitted; Then approval is recorded | given/when/then |
 
 
 <a id="scenario-scenario-with-no-steps-shows-empty-state"></a>
@@ -35,10 +41,16 @@ Then the steps display in given when then format
 
 **Steps:**
 ```gherkin
-Given a story has a scenario with no steps in story-graph.json
-When the Developer selects the scenario in the trace editor
-Then the trace editor shows an empty steps state
+Given Story "{story_name}" is loaded with Scenario "{scenario_name}" and steps "{scenario_steps}"
+When Developer selects Scenario "{scenario_name}" in the trace editor
+Then the trace editor shows "{empty_state_message}"
 ```
+
+**Examples:**
+
+| Story Name | Scenario Name | Scenario Steps | Empty State Message |
+| --- | --- | --- | --- |
+| Wealth Transfer Overview | Pending Review | none | No steps available |
 
 
 <a id="scenario-unreadable-story-graph-shows-error"></a>
@@ -46,8 +58,14 @@ Then the trace editor shows an empty steps state
 
 **Steps:**
 ```gherkin
-Given story-graph.json cannot be parsed
-When the Developer selects the scenario in the trace editor
-Then the trace editor shows an error and no steps are displayed
+Given story-graph.json has state "{story_graph_state}"
+When Developer selects Scenario "{scenario_name}" in the trace editor
+Then the trace editor shows error "{error_message}"
 ```
+
+**Examples:**
+
+| Story Graph State | Scenario Name | Error Message |
+| --- | --- | --- |
+| invalid_json | Approve Transfer | Unable to load story-graph.json |
 

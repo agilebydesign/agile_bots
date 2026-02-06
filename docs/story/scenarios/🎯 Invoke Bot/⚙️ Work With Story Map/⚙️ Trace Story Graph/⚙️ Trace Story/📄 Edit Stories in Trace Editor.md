@@ -19,35 +19,59 @@ Edit Stories in Trace Editor functionality for the mob minion system.
 
 ## Scenarios
 
-<a id="scenario-story-field-edits-save-on-blur"></a>
-### Scenario: [Story field edits save on blur](#scenario-story-field-edits-save-on-blur) (happy_path)
+<a id="scenario-story-name-edit-saves-on-blur"></a>
+### Scenario: [Story name edit saves on blur](#scenario-story-name-edit-saves-on-blur) (happy_path)
 
 **Steps:**
 ```gherkin
-Given the trace editor shows a story from the strace file
-When the Developer edits the story name and leaves the field
-Then story-graph.json is updated with the new story name
+Given Story "{original_name}" is displayed in trace editor
+When Developer changes story name to "{updated_name}" and triggers save via {save_trigger}
+Then story-graph.json contains Story with name "{updated_name}"
+And Trace Editor shows save confirmation indicator
 ```
 
+**Examples:**
 
-<a id="scenario-unchanged-story-field-does-not-create-a-save"></a>
-### Scenario: [Unchanged story field does not create a save](#scenario-unchanged-story-field-does-not-create-a-save) (edge_case)
+| Original Name | Updated Name | Save Trigger |
+| --- | --- | --- |
+| Approve Wealth Transfer | Approve Wire Transfer | blur |
+| Reject Wealth Transfer | Reject Suspicious Transfer | Ctrl+S |
+
+
+<a id="scenario-unchanged-story-field-skips-save"></a>
+### Scenario: [Unchanged story field skips save](#scenario-unchanged-story-field-skips-save) (edge_case)
 
 **Steps:**
 ```gherkin
-Given the trace editor shows a story
-When the Developer focuses a story field and leaves it unchanged
-Then story-graph.json is not modified
+Given Story "{story_name}" is displayed in trace editor
+And field "{field_name}" has value "{current_value}"
+When Developer focuses field "{field_name}" and leaves without changes
+Then story-graph.json modification timestamp is unchanged
+And Trace Editor shows no save indicator
 ```
 
+**Examples:**
 
-<a id="scenario-read-only-story-graph-shows-save-error"></a>
-### Scenario: [Read-only story graph shows save error](#scenario-read-only-story-graph-shows-save-error) (error_case)
+| Story Name | Field Name | Current Value |
+| --- | --- | --- |
+| Approve Wealth Transfer | name | Approve Wealth Transfer |
+| Approve Wealth Transfer | users | Developer, Compliance Officer |
+
+
+<a id="scenario-read-only-file-shows-save-error-and-preserves-edits"></a>
+### Scenario: [Read-only file shows save error and preserves edits](#scenario-read-only-file-shows-save-error-and-preserves-edits) (error_case)
 
 **Steps:**
 ```gherkin
-Given story-graph.json is read-only
-When the Developer edits a story field and presses Ctrl+S
-Then the trace editor shows a save error and the file remains unchanged
+Given story-graph.json has file state "{file_state}"
+And Story "{story_name}" is displayed in trace editor
+When Developer changes story name to "{updated_name}" and triggers save via {save_trigger}
+Then Trace Editor shows error message "{error_message}"
+And story-graph.json still contains Story with name "{story_name}"
+And Trace Editor preserves "{updated_name}" in the editor field
 ```
 
+**Examples:**| File State | Story Name | Updated Name | Save Trigger | Error Message |
+| --- | --- | --- | --- | --- |
+| read-only | Approve Wealth Transfer | Approve Wire Transfer | Ctrl+S | Cannot save: story-graph.json is read-only |
+| locked by another process | Reject Wealth Transfer | Reject Transfer | blur | Cannot save: file is locked |
