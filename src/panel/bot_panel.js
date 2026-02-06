@@ -950,7 +950,18 @@ class BotPanel {
                   } else {
                     this._log(`[BotPanel] WARNING: No result.bot - not caching!`);
                   }
-                  return this._updateWithCachedData();
+                  return this._updateWithCachedData().then(() => {
+                    // After panel update, expand the instructions section for this action
+                    try {
+                      this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
+                      this._panel.webview.postMessage({
+                        command: 'expandInstructionsSection',
+                        actionName: message.actionName
+                      });
+                    } catch (postErr) {
+                      this._log(`[BotPanel] Error sending expandInstructionsSection: ${postErr.message}`);
+                    }
+                  });
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] navigateToAction ERROR: ${error.message}`);
@@ -2879,6 +2890,60 @@ class BotPanel {
             }
         };
         
+        // Expand the instructions section for a specific action (clarify, strategy, build, validate)
+        window.expandInstructionsSection = function(actionName) {
+            console.log('[expandInstructionsSection] Called with actionName:', actionName);
+            if (!actionName) return;
+            
+            // Map action names to section header text
+            const actionToSectionName = {
+                'clarify': 'Clarify',
+                'strategy': 'Strategy',
+                'build': 'Build',
+                'validate': 'Validate',
+                'render': 'Render'
+            };
+            
+            const sectionName = actionToSectionName[actionName];
+            if (!sectionName) {
+                console.log('[expandInstructionsSection] No section mapped for action:', actionName);
+                return;
+            }
+            
+            // Find the section by looking for header text containing the section name
+            const headers = document.querySelectorAll('.collapsible-header');
+            for (const header of headers) {
+                const headerText = header.textContent || '';
+                // Match section name but avoid matching subsections (e.g., "Clarify" but not "Base Instructions")
+                if (headerText.includes(sectionName) && !headerText.includes('Base')) {
+                    const section = header.closest('.collapsible-section');
+                    const content = header.nextElementSibling;
+                    
+                    if (section && content && content.classList.contains('collapsible-content')) {
+                        const isExpanded = section.classList.contains('expanded');
+                        
+                        if (!isExpanded) {
+                            console.log('[expandInstructionsSection] Expanding section:', sectionName);
+                            // Expand the section
+                            content.style.maxHeight = '2000px';
+                            content.style.display = 'block';
+                            section.classList.add('expanded');
+                            
+                            // Update icon
+                            const icon = header.querySelector('.expand-icon');
+                            if (icon) {
+                                icon.textContent = '▸';
+                            }
+                        } else {
+                            console.log('[expandInstructionsSection] Section already expanded:', sectionName);
+                        }
+                        return; // Found and processed, exit
+                    }
+                }
+            }
+            console.log('[expandInstructionsSection] Section not found for:', sectionName);
+        };
+        
         // Save/restore collapse state across panel refreshes
         window.getCollapseState = function() {
             const state = {};
@@ -4330,6 +4395,18 @@ class BotPanel {
                 const input = document.getElementById('workspacePathInput');
                 if (input) {
                     input.value = message.path;
+                }
+                return;
+            }
+            
+            if (message.command === 'expandInstructionsSection') {
+                console.log('[WebView] Received expandInstructionsSection message:', message.actionName);
+                try {
+                    if (message.actionName && typeof window.expandInstructionsSection === 'function') {
+                        window.expandInstructionsSection(message.actionName);
+                    }
+                } catch (err) {
+                    console.error('[WebView] Error in expandInstructionsSection handler:', err);
                 }
                 return;
             }

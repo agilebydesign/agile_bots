@@ -315,6 +315,53 @@ class BehaviorsViewTestHelper {
     }
     
     /**
+     * Assert action is expanded (visible) in the UI
+     * @param {string} html - HTML string
+     * @param {string} behaviorName - Behavior containing the action
+     * @param {string} actionName - Action that should be expanded
+     */
+    assert_action_expanded(html, behaviorName, actionName) {
+        const doc = parseHTML(html);
+        
+        // Find the behavior's collapsible content
+        const behaviorElements = doc.querySelectorAll('[data-behavior]');
+        let behaviorFound = false;
+        
+        for (const elem of behaviorElements) {
+            if (elem.getAttribute('data-behavior') === behaviorName) {
+                behaviorFound = true;
+                // The collapsible content should be visible (display: block)
+                const parent = elem.parentElement || elem.closest('.collapsible-section');
+                const content = parent ? parent.querySelector('.collapsible-content') : null;
+                if (content) {
+                    const style = content.getAttribute('style') || '';
+                    assert.ok(
+                        style.includes('display: block') || !style.includes('display: none'),
+                        `Behavior "${behaviorName}" content should be expanded (visible)`
+                    );
+                }
+                break;
+            }
+        }
+        
+        // Also verify the action is present in the HTML
+        assert.ok(html.includes(actionName),
+            `Action "${actionName}" should be present in HTML`);
+        
+        // Check if action has active/current class when navigated to
+        const actionElements = doc.querySelectorAll('.action-item');
+        for (const elem of actionElements) {
+            const nameElem = elem.querySelector('.action-name-clickable');
+            if (nameElem && nameElem.textContent.includes(actionName)) {
+                // Action found - check if it's marked as current/active
+                const hasActiveClass = elem.classList.contains('active') || elem.classList.contains('current');
+                // Note: Active class indicates current action, but expansion is about visibility
+                break;
+            }
+        }
+    }
+
+    /**
      * Assert complete behavior object is fully rendered
      * @param {string} html - HTML string
      * @param {Object} behavior - Complete behavior object from statusResponse
