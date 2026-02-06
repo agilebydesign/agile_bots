@@ -2,7 +2,7 @@
     "name": "bot-panel",
     "displayName": "Bot Panel",
     "description": "Visual dashboard for bot status showing workflow, scope, behaviors, and instructions",
-    "version": "0.1.744",
+    "version": "0.1.753",
     "publisher": "agilebot",
     "repository": "https://github.com/agilebydesign/agile_bots.git",    
     "engines": {
@@ -11,7 +11,9 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [],
+    "activationEvents": [
+        "onView:agilebot.botPanelView"
+    ],
     "main": "./extension.js",
     "contributes": {
         "commands": [
@@ -20,7 +22,25 @@
                 "title": "View Bot Panel",
                 "category": "AgileBot"
             }
-        ]
+        ],
+        "views": {
+            "agilebot-sidebar": [
+                {
+                    "type": "webview",
+                    "id": "agilebot.botPanelView",
+                    "name": "Bot Panel"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "agilebot-sidebar",
+                    "title": "AgileBot",
+                    "icon": "img/company_icon.png"
+                }
+            ]
+        }
     },
     "scripts": {
         "test": "node --test ../../test/panel/test_*.js",
