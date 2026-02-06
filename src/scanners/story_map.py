@@ -104,6 +104,39 @@ class StoryGroup(StoryNode):
         
         return children
 
+    @property
+    def behavior_needed(self) -> str:
+        """Determine the highest-priority behavior needed for this story group.
+
+        Priority order: code > tests > scenarios > exploration
+        If any child requires a higher-priority behavior, return that.
+        """
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
+        priorities = []
+        for child in self.children:
+            b = getattr(child, 'behavior_needed', None)
+            if b and b in hierarchy:
+                priorities.append(hierarchy.index(b))
+        if not priorities:
+            return 'exploration'
+        return hierarchy[min(priorities)]
+
+    @property
+    def behaviors_needed(self) -> List[str]:
+        """Return a deduplicated list of behaviors needed by children, ordered by priority."""
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
+        seen = []
+        for child in self.children:
+            child_beh = getattr(child, 'behaviors_needed', None)
+            if child_beh is None:
+                cb = getattr(child, 'behavior_needed', None)
+                child_beh = [cb] if cb else []
+            for b in child_beh:
+                if b and b not in seen:
+                    seen.append(b)
+        seen.sort(key=lambda x: hierarchy.index(x) if x in hierarchy else len(hierarchy))
+        return seen
+
 class ScenarioBase:
     
     @property
@@ -240,6 +273,25 @@ class Story(StoryNode):
         words = name.split()
         class_name = "".join(word.capitalize() for word in words)
         return f"Test{class_name}"
+
+    @property
+    def behavior_needed(self) -> str:
+        """Determine the behavior needed for this story based on scenarios.
+
+        Priority order: code > tests > scenarios > exploration
+        """
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
+        # Check if scenarios exist and have been shaped
+        scenarios = self.scenarios
+        if not scenarios:
+            return 'scenarios'
+        # All scenarios present means tests phase
+        return 'tests'
+
+    @property
+    def behaviors_needed(self) -> List[str]:
+        """Return behaviors needed for this story."""
+        return [self.behavior_needed]
 
 class StoryMap:
     

@@ -1247,6 +1247,54 @@ class StoryGroup(StoryNode):
     @property
     def children(self) -> List['StoryNode']:
         return self._children
+
+    @property
+    def behavior_needed(self) -> str:
+        """Determine the highest-priority behavior needed for this story group.
+
+        Priority order: code > tests > scenarios > exploration
+        If any child requires a higher-priority behavior, return that.
+        """
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
+        # collect child behaviors; if child lacks attribute, skip
+        priorities = []
+        for child in self._children:
+            try:
+                b = child.behavior_needed
+            except Exception:
+                # skip children that don't expose behavior_needed
+                continue
+            if b in hierarchy:
+                priorities.append(hierarchy.index(b))
+        if not priorities:
+            return 'exploration'
+        # return the most advanced (lowest index) behavior
+        min_idx = min(priorities)
+        return hierarchy[min_idx]
+
+    @property
+    def behaviors_needed(self) -> List[str]:
+        """Return a deduplicated list of behaviors needed by children, ordered by priority."""
+        hierarchy = ['code', 'tests', 'scenarios', 'exploration']
+        seen = []
+        for child in self._children:
+            try:
+                child_beh = getattr(child, 'behaviors_needed', None)
+            except Exception:
+                child_beh = None
+            if child_beh is None:
+                # try single behavior
+                try:
+                    cb = child.behavior_needed
+                    child_beh = [cb]
+                except Exception:
+                    child_beh = []
+            for b in child_beh:
+                if b not in seen:
+                    seen.append(b)
+        # sort seen by hierarchy
+        seen.sort(key=lambda x: hierarchy.index(x) if x in hierarchy else len(hierarchy))
+        return seen
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any], parent: Optional[StoryNode]=None, bot: Optional[Any]=None) -> 'StoryGroup':

@@ -1,1 +1,6 @@
-{"type": "story", "value": ["Display Increment Scope View"], "exclude": [], "skiprule": []}
+{
+  "type": "showAll",
+  "value": [],
+  "exclude": [],
+  "skiprule": []
+}
