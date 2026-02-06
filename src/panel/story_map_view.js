@@ -291,7 +291,7 @@ class StoryMapView extends PanelView {
         
         if (isIncrementView) {
             // Render increment columns view (read-only)
-            contentHtml = this.renderIncrementView(botData);
+            contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
         } else if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
@@ -2859,9 +2859,10 @@ ${clientScript}    </script>`;
      * Render increment view as columns.
      * 
      * @param {Object} botData - Bot data containing increments
+     * @param {string} documentIconPath - Path to document icon for stories
      * @returns {string} HTML string for increment columns
      */
-    renderIncrementView(botData) {
+    renderIncrementView(botData, documentIconPath) {
         const increments = botData?.scope?.content?.increments || botData?.increments || [];
         
         if (increments.length === 0) {
@@ -2873,8 +2874,13 @@ ${clientScript}    </script>`;
             `;
         }
         
-        // Render increments as columns
-        let html = '<div class="increment-columns" style="display: flex; gap: 16px; padding: 12px; overflow-x: auto;">';
+        // Build story icon HTML
+        const storyIcon = documentIconPath 
+            ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; flex-shrink: 0;" alt="Story" />`
+            : '';
+        
+        // Render increments as columns (horizontal row, scrollable)
+        let html = '<div class="increment-columns" style="display: flex; gap: 12px; padding: 12px; flex-wrap: nowrap; overflow-x: auto;">';
         
         for (const increment of increments) {
             const stories = increment.stories || [];
@@ -2885,21 +2891,21 @@ ${clientScript}    </script>`;
             
             html += `
                 <div class="increment-column" style="
-                    min-width: 200px;
-                    max-width: 300px;
-                    background: var(--card-background, rgba(255,255,255,0.05));
-                    border-radius: 8px;
-                    padding: 12px;
+                    width: 160px;
                     flex-shrink: 0;
+                    background: var(--card-background, rgba(255,255,255,0.05));
+                    border-radius: 6px;
+                    padding: 10px;
                 ">
                     <div style="
                         font-weight: 600;
-                        font-size: 14px;
-                        margin-bottom: 12px;
-                        padding-bottom: 8px;
+                        font-size: 13px;
+                        margin-bottom: 10px;
+                        padding-bottom: 6px;
                         border-bottom: 1px solid var(--text-color-faded, #666);
+                        word-wrap: break-word;
                     ">${this.escapeHtml(increment.name)}</div>
-                    <div class="increment-stories" style="display: flex; flex-direction: column; gap: 6px;">
+                    <div class="increment-stories" style="display: flex; flex-direction: column; gap: 4px;">
             `;
             
             if (sortedStories.length === 0) {
@@ -2909,12 +2915,13 @@ ${clientScript}    </script>`;
                     const storyName = typeof story === 'string' ? story : (story.name || 'Unnamed Story');
                     html += `
                         <div class="increment-story" style="
-                            padding: 6px 8px;
-                            background: var(--item-background, rgba(255,255,255,0.03));
-                            border-radius: 4px;
+                            display: flex;
+                            align-items: flex-start;
                             font-size: 12px;
-                            cursor: default;
-                        ">${this.escapeHtml(storyName)}</div>
+                            line-height: 1.3;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                        ">${storyIcon}<span style="flex: 1; word-wrap: break-word;">${this.escapeHtml(storyName)}</span></div>
                     `;
                 }
             }
