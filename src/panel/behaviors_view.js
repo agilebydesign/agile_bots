@@ -244,7 +244,7 @@ class BehaviorsView extends PanelView {
         return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">
-            <div class="collapsible-header" data-action="toggleSection" data-section-id="behaviors-content" style="
+            <div class="collapsible-header" style="
                 cursor: pointer;
                 padding: 4px 5px;
                 background-color: transparent;
@@ -255,12 +255,12 @@ class BehaviorsView extends PanelView {
                 justify-content: space-between;
                 user-select: none;
             ">
-                <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center;" onclick="toggleSection('behaviors-content')">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
                     <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
                 </div>
-                <button onclick="event.stopPropagation(); sendInstructionsToChat(event);" style="
+                <button onclick="sendInstructionsToChat(event)" style="
                     background: rgba(255, 140, 0, 0.15);
                     border: none;
                     border-radius: 8px;

@@ -24,10 +24,16 @@ Edit Scenarios in Trace Editor functionality for the mob minion system.
 
 **Steps:**
 ```gherkin
-Given a scenario is displayed in the trace editor
-When the Developer edits scenario steps and leaves the field
+Given Scenario "{scenario_name}" is displayed with steps "{original_steps}"
+When Developer edits the steps to "{updated_steps}" and triggers save via {save_trigger}
 Then story-graph.json is updated with the new steps
 ```
+
+**Examples:**
+
+| Scenario Name | Original Steps | Updated Steps | Save Trigger |
+| --- | --- | --- | --- |
+| Approve Transfer | Given account is verified; When transfer is submitted; Then approval is recorded | Given account is verified and funded; When transfer is submitted; Then approval is recorded | blur |
 
 
 <a id="scenario-scenario-step-edits-save-on-ctrls"></a>
@@ -35,10 +41,16 @@ Then story-graph.json is updated with the new steps
 
 **Steps:**
 ```gherkin
-Given a scenario is displayed in the trace editor
-When the Developer edits scenario steps and presses Ctrl+S
+Given Scenario "{scenario_name}" is displayed with steps "{original_steps}"
+When Developer edits the steps to "{updated_steps}" and triggers save via {save_trigger}
 Then story-graph.json is updated with the new steps
 ```
+
+**Examples:**
+
+| Scenario Name | Original Steps | Updated Steps | Save Trigger |
+| --- | --- | --- | --- |
+| Approve Transfer | Given account is verified; When transfer is submitted; Then approval is recorded | Given account is verified; When transfer is submitted; Then approval is recorded and logged | Ctrl+S |
 
 
 <a id="scenario-read-only-story-graph-shows-save-error-for-scenario-steps"></a>
@@ -46,8 +58,14 @@ Then story-graph.json is updated with the new steps
 
 **Steps:**
 ```gherkin
-Given story-graph.json is read-only
-When the Developer edits scenario steps and presses Ctrl+S
-Then the trace editor shows a save error and the file remains unchanged
+Given story-graph.json has state "{story_graph_state}" and Scenario "{scenario_name}" is displayed
+When Developer edits the steps and triggers save via {save_trigger}
+Then the trace editor shows error "{error_message}" and the file remains unchanged
 ```
+
+**Examples:**
+
+| Scenario Name | Story Graph State | Save Trigger | Error Message |
+| --- | --- | --- | --- |
+| Approve Transfer | read_only | Ctrl+S | Unable to save story-graph.json |
 
