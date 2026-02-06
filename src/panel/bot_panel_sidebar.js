@@ -45,10 +45,13 @@ class BotPanelSidebarProvider {
             this._extensionUri
         );
         
-        // Handle visibility changes
+        // Handle visibility changes - don't refresh on every visibility change
+        // as this resets scroll position. Only refresh if we haven't loaded yet.
+        let hasLoaded = false;
         webviewView.onDidChangeVisibility(() => {
-            if (webviewView.visible && this._botPanel) {
-                console.log("[BotPanelSidebar] View became visible, refreshing");
+            if (webviewView.visible && this._botPanel && !hasLoaded) {
+                console.log("[BotPanelSidebar] View became visible for first time, loading");
+                hasLoaded = true;
                 this._botPanel.refresh();
             }
         });
