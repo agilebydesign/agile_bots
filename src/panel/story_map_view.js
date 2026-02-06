@@ -284,8 +284,18 @@ class StoryMapView extends PanelView {
         const perfContentStart = performance.now();
         let contentHtml = '';
         let contentSummary = '';
-        if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
-            // content is an object with 'epics' property, not directly an array
+        
+        // Check if we should render Increment view instead of Hierarchy
+        const isIncrementView = this.currentViewMode === 'Increment';
+        log(`[StoryMapView] Rendering view mode: ${this.currentViewMode || 'Hierarchy'}`);
+        
+        if (isIncrementView) {
+            // Render increment columns view (read-only)
+            contentHtml = this.renderIncrementView(botData);
+            const increments = botData?.scope?.content?.increments || botData?.increments || [];
+            contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
+        } else if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
+            // Hierarchy view - content is an object with 'epics' property, not directly an array
             const epics = scopeData.content.epics || [];
             
             const perfRootNodeStart = performance.now();
@@ -2494,6 +2504,33 @@ class StoryMapView extends PanelView {
             '                    console.error(\'[handleCreateNode] storyMapSaveQueue not available\');\n' +
             '                }\n' +
             '            };\n' +
+            '            \n' +
+            '            // Toggle between Hierarchy and Increment views\n' +
+            '            window.toggleIncrementView = function() {\n' +
+            '                var btn = document.getElementById(\'btn-toggle-increment-view\');\n' +
+            '                if (!btn) {\n' +
+            '                    console.error(\'[toggleIncrementView] Toggle button not found\');\n' +
+            '                    return;\n' +
+            '                }\n' +
+            '                \n' +
+            '                var currentView = btn.getAttribute(\'data-current-view\') || \'Hierarchy\';\n' +
+            '                var newView = currentView === \'Hierarchy\' ? \'Increment\' : \'Hierarchy\';\n' +
+            '                \n' +
+            '                console.log(\'[toggleIncrementView] Switching from\', currentView, \'to\', newView);\n' +
+            '                \n' +
+            '                // Update button state\n' +
+            '                btn.setAttribute(\'data-current-view\', newView);\n' +
+            '                btn.textContent = currentView; // Button shows the OTHER view to switch to\n' +
+            '                btn.title = \'Switch to \' + currentView + \' view\';\n' +
+            '                \n' +
+            '                // Send message to extension to switch view\n' +
+            '                if (typeof vscode !== \'undefined\') {\n' +
+            '                    vscode.postMessage({\n' +
+            '                        command: \'toggleIncrementView\',\n' +
+            '                        currentView: newView\n' +
+            '                    });\n' +
+            '                }\n' +
+            '            };\n' +
             '        })();\n';
         
         const result = `
@@ -2514,6 +2551,24 @@ class StoryMapView extends PanelView {
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px;">Story Map</span>
+                    <button id="btn-toggle-increment-view" 
+                        data-current-view="${this.currentViewMode || 'Hierarchy'}"
+                        onclick="event.stopPropagation(); toggleIncrementView();" style="
+                        background: transparent;
+                        border: 1px solid var(--text-color-faded, #999);
+                        border-radius: 4px;
+                        padding: 2px 8px;
+                        margin-left: 12px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        color: var(--text-color, #fff);
+                        transition: opacity 0.15s ease;
+                    " 
+                    onmouseover="this.style.opacity='0.7'" 
+                    onmouseout="this.style.opacity='1'"
+                    title="Switch to ${(this.currentViewMode || 'Hierarchy') === 'Hierarchy' ? 'Increment' : 'Hierarchy'} view">
+                        ${(this.currentViewMode || 'Hierarchy') === 'Hierarchy' ? 'Increment' : 'Hierarchy'}
+                    </button>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;
@@ -2798,6 +2853,80 @@ ${clientScript}    </script>`;
             
             return html;
         }).join('');
+    }
+    
+    /**
+     * Render increment view as columns.
+     * 
+     * @param {Object} botData - Bot data containing increments
+     * @returns {string} HTML string for increment columns
+     */
+    renderIncrementView(botData) {
+        const increments = botData?.scope?.content?.increments || botData?.increments || [];
+        
+        if (increments.length === 0) {
+            return `
+                <div style="padding: 20px; text-align: center; color: var(--text-color-faded);">
+                    <p>No increments defined in story graph.</p>
+                    <p style="font-size: 12px;">Add increments to your story-graph.json to use the Increment view.</p>
+                </div>
+            `;
+        }
+        
+        // Render increments as columns
+        let html = '<div class="increment-columns" style="display: flex; gap: 16px; padding: 12px; overflow-x: auto;">';
+        
+        for (const increment of increments) {
+            const stories = increment.stories || [];
+            // Sort stories by sequential_order
+            const sortedStories = [...stories].sort((a, b) => 
+                (a.sequential_order || 0) - (b.sequential_order || 0)
+            );
+            
+            html += `
+                <div class="increment-column" style="
+                    min-width: 200px;
+                    max-width: 300px;
+                    background: var(--card-background, rgba(255,255,255,0.05));
+                    border-radius: 8px;
+                    padding: 12px;
+                    flex-shrink: 0;
+                ">
+                    <div style="
+                        font-weight: 600;
+                        font-size: 14px;
+                        margin-bottom: 12px;
+                        padding-bottom: 8px;
+                        border-bottom: 1px solid var(--text-color-faded, #666);
+                    ">${this.escapeHtml(increment.name)}</div>
+                    <div class="increment-stories" style="display: flex; flex-direction: column; gap: 6px;">
+            `;
+            
+            if (sortedStories.length === 0) {
+                html += `<div style="color: var(--text-color-faded); font-style: italic; font-size: 12px;">(no stories)</div>`;
+            } else {
+                for (const story of sortedStories) {
+                    const storyName = typeof story === 'string' ? story : (story.name || 'Unnamed Story');
+                    html += `
+                        <div class="increment-story" style="
+                            padding: 6px 8px;
+                            background: var(--item-background, rgba(255,255,255,0.03));
+                            border-radius: 4px;
+                            font-size: 12px;
+                            cursor: default;
+                        ">${this.escapeHtml(storyName)}</div>
+                    `;
+                }
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        return html;
     }
     
     /**

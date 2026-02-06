@@ -19,11 +19,54 @@ Open Source File functionality for the mob minion system.
 
 ## Scenarios
 
-### Scenario: Open Source File (happy_path)
+<a id="scenario-open-code-node-source-file"></a>
+### Scenario: [Open code node source file](#scenario-open-code-node-source-file) (happy_path)
 
 **Steps:**
 ```gherkin
-Given system is ready
-When action executes
-Then action completes successfully
+Given code node "{code_node}" has source file "{source_file}" at line {line_number}
+When Developer clicks Open on the code node
+Then the editor opens the file and navigates to line {line_number}
 ```
+
+**Examples:**
+
+| Code Node | Source File | Line Number | Expected Result |
+| --- | --- | --- | --- |
+| approve_transfer | src/transfers/transfer_service.py | 42 | file opens at line 42 |
+
+
+<a id="scenario-open-test-node-in-existing-tab-with-out-of-range-line"></a>
+### Scenario: [Open test node in existing tab with out-of-range line](#scenario-open-test-node-in-existing-tab-with-out-of-range-line) (edge_case)
+
+**Steps:**
+```gherkin
+Given test node "{test_node}" is already open in the editor
+And the test node points to line {line_number} in "{test_file}"
+When Developer clicks Open on the test node
+Then the editor focuses the existing tab, opens the file at the end, and shows a line not found warning
+```
+
+**Examples:**
+
+| Test Node | Test File | Line Number | Expected Result |
+| --- | --- | --- | --- |
+| test_approve_transfer | test/transfers/test_trace_story.py | 900 | focus existing tab, open at end, show warning |
+
+
+<a id="scenario-missing-source-file-shows-error"></a>
+### Scenario: [Missing source file shows error](#scenario-missing-source-file-shows-error) (error_case)
+
+**Steps:**
+```gherkin
+Given code node "{code_node}" has source file "{source_file}" with file state "{file_state}"
+When Developer clicks Open on the code node
+Then the trace editor shows error "{error_message}"
+```
+
+**Examples:**
+
+| Code Node | Source File | File State | Error Message |
+| --- | --- | --- | --- |
+| missing_transfer_file | src/transfers/missing.py | missing | File not found |
+

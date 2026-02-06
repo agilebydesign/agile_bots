@@ -9501,7 +9501,215 @@
               "name": "Edit Increments",
               "sequential_order": 3.0,
               "behavior": null,
-              "domain_concepts": [],
+              "domain_concepts": [
+                {
+                  "name": "Increments",
+                  "responsibilities": [
+                    {
+                      "name": "Contains collection of Increment",
+                      "collaborators": [
+                        "Increment"
+                      ]
+                    },
+                    {
+                      "name": "Get all increments",
+                      "collaborators": [
+                        "List[Increment]"
+                      ]
+                    },
+                    {
+                      "name": "Find increment by priority",
+                      "collaborators": [
+                        "Integer",
+                        "Increment"
+                      ]
+                    },
+                    {
+                      "name": "Find increment by name",
+                      "collaborators": [
+                        "String",
+                        "Increment"
+                      ]
+                    },
+                    {
+                      "name": "Get all stories across increments",
+                      "collaborators": [
+                        "List[Story]"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.increments",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                },
+                {
+                  "name": "Increment",
+                  "responsibilities": [
+                    {
+                      "name": "Has name",
+                      "collaborators": [
+                        "String"
+                      ]
+                    },
+                    {
+                      "name": "Has priority",
+                      "collaborators": [
+                        "Integer",
+                        "String"
+                      ]
+                    },
+                    {
+                      "name": "Contains stories",
+                      "collaborators": [
+                        "List[Story]"
+                      ]
+                    },
+                    {
+                      "name": "Get stories in natural order",
+                      "collaborators": [
+                        "List[Story]"
+                      ]
+                    },
+                    {
+                      "name": "Add story to increment",
+                      "collaborators": [
+                        "Story"
+                      ]
+                    },
+                    {
+                      "name": "Remove story from increment",
+                      "collaborators": [
+                        "Story"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.increment",
+                  "inherits_from": "StoryNode",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                },
+                {
+                  "name": "IncrementView",
+                  "responsibilities": [
+                    {
+                      "name": "Wraps Increments JSON",
+                      "collaborators": [
+                        "Increments JSON"
+                      ]
+                    },
+                    {
+                      "name": "Renders increment columns",
+                      "collaborators": [
+                        "Increment",
+                        "HTML"
+                      ]
+                    },
+                    {
+                      "name": "Displays increment name at column top",
+                      "collaborators": [
+                        "String",
+                        "HTML"
+                      ]
+                    },
+                    {
+                      "name": "Displays stories in natural order",
+                      "collaborators": [
+                        "List[Story]",
+                        "HTML"
+                      ]
+                    },
+                    {
+                      "name": "Read-only display mode",
+                      "collaborators": [
+                        "Boolean"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.increment_view",
+                  "inherits_from": "PanelView",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                },
+                {
+                  "name": "TTYIncrement",
+                  "responsibilities": [
+                    {
+                      "name": "Serialize increment to TTY",
+                      "collaborators": [
+                        "Increment",
+                        "TTY String"
+                      ]
+                    },
+                    {
+                      "name": "Format increment header",
+                      "collaborators": [
+                        "String",
+                        "TTY String"
+                      ]
+                    },
+                    {
+                      "name": "Format stories list",
+                      "collaborators": [
+                        "List[Story]",
+                        "TTY String"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.increment",
+                  "inherits_from": "TTYAdapter",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                },
+                {
+                  "name": "JSONIncrement",
+                  "responsibilities": [
+                    {
+                      "name": "Serialize increment to JSON",
+                      "collaborators": [
+                        "Increment",
+                        "JSON Object"
+                      ]
+                    },
+                    {
+                      "name": "Include name and priority",
+                      "collaborators": [
+                        "JSON"
+                      ]
+                    },
+                    {
+                      "name": "Include stories array",
+                      "collaborators": [
+                        "List[Story]",
+                        "JSON Array"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.increment",
+                  "inherits_from": "JSONAdapter",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                },
+                {
+                  "name": "ViewToggle",
+                  "responsibilities": [
+                    {
+                      "name": "Toggle between Hierarchy and Increment views",
+                      "collaborators": [
+                        "View State"
+                      ]
+                    },
+                    {
+                      "name": "Display current view label",
+                      "collaborators": [
+                        "String"
+                      ]
+                    },
+                    {
+                      "name": "Show tooltip for alternate view",
+                      "collaborators": [
+                        "String"
+                      ]
+                    }
+                  ],
+                  "module": "story_graph.view_toggle",
+                  "_source_path": "Invoke Bot.Work With Story Map.Edit Increments"
+                }
+              ],
               "test_file": "invoke_bot/edit_story_map/test_edit_increments.py",
               "sub_epics": [],
               "story_groups": [
@@ -9631,8 +9839,174 @@
                       "users": [
                         "User"
                       ],
-                      "test_class": "TestDisplayIncrementScopeView",
-                      "scenarios": [],
+                      "test_class": "TestDisplayIncrementScopeViewCLI",
+                      "scenarios": [
+                        {
+                          "name": "CLI returns simple Increments object with stories",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given story graph contains increments with stories assigned",
+                            "And CLI session is active"
+                          ],
+                          "test_method": "test_cli_returns_simple_increments_object_with_stories",
+                          "steps": "When User requests increment view via CLI\nThen CLI returns Increments object containing collection of Increment\nAnd each Increment contains name, priority, and stories array\nAnd stories array contains Story objects from StoryNode",
+                          "examples": [
+                            {
+                              "description": "Example 1: MVP Release with its Stories - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["MVP Release", "1"]]
+                            },
+                            {
+                              "description": "contains these Stories:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["MVP Release", "Create Profile", "1"],
+                                ["MVP Release", "Authenticate User", "2"]
+                              ]
+                            },
+                            {
+                              "description": "Example 2: Enhancement Release with its Stories - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Enhancement Release", "2"]]
+                            },
+                            {
+                              "description": "contains these Stories:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["Enhancement Release", "Add Payment Method", "1"],
+                                ["Enhancement Release", "View History", "2"]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "CLI displays increment list with stories in natural order",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given story graph contains increments with stories assigned",
+                            "And CLI session is active"
+                          ],
+                          "test_method": "test_cli_displays_increment_list_with_stories_in_natural_order",
+                          "steps": "When User enters increment view command\nThen CLI displays each increment with name as header\nAnd CLI lists stories in natural sequential order under each increment\nAnd output is simple list format without hierarchy nesting",
+                          "examples": [
+                            {
+                              "description": "Example 1: MVP Release displays its Stories - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["MVP Release", "1"]]
+                            },
+                            {
+                              "description": "displays these Stories in natural order:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["MVP Release", "Create Profile", "1"],
+                                ["MVP Release", "Authenticate User", "2"]
+                              ]
+                            },
+                            {
+                              "description": "producing this CLI output:",
+                              "headers": ["expected_output"],
+                              "rows": [["MVP Release:\\n  - Create Profile\\n  - Authenticate User"]]
+                            },
+                            {
+                              "description": "Example 2: Enhancement Release displays its Stories - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Enhancement Release", "2"]]
+                            },
+                            {
+                              "description": "displays these Stories in natural order:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["Enhancement Release", "Add Payment Method", "1"],
+                                ["Enhancement Release", "View History", "2"]
+                              ]
+                            },
+                            {
+                              "description": "producing this CLI output:",
+                              "headers": ["expected_output"],
+                              "rows": [["Enhancement Release:\\n  - Add Payment Method\\n  - View History"]]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "CLI displays empty increment with no stories message",
+                          "sequential_order": 3.0,
+                          "type": "edge_case",
+                          "background": [
+                            "Given story graph contains an increment with no stories assigned",
+                            "And CLI session is active"
+                          ],
+                          "test_method": "test_cli_displays_empty_increment_with_no_stories_message",
+                          "steps": "When User enters increment view command\nThen CLI displays increment name as header\nAnd CLI shows empty state message for increment with no stories",
+                          "examples": [
+                            {
+                              "description": "The Increment with no stories:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Backlog", "99"]]
+                            },
+                            {
+                              "description": "produces this CLI output:",
+                              "headers": ["expected_output"],
+                              "rows": [["Backlog:\\n  (no stories)"]]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "CLI returns Increments object using existing StoryNode domain objects",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given story graph contains increments referencing Story nodes",
+                            "And CLI session is active"
+                          ],
+                          "test_method": "test_cli_returns_increments_object_using_existing_storynode_domain_objects",
+                          "steps": "When User requests increment view via CLI\nThen CLI returns Increments collection\nAnd Increment.stories contains references to existing StoryNode objects\nAnd Story objects include standard StoryNode properties",
+                          "examples": {
+                            "description": "StoryNode integration",
+                            "headers": [
+                              "story_property",
+                              "source",
+                              "included_in_increment_view"
+                            ],
+                            "rows": [
+                              [
+                                "name",
+                                "StoryNode.name",
+                                "yes"
+                              ],
+                              [
+                                "test_class",
+                                "StoryNode.test_class",
+                                "yes"
+                              ],
+                              [
+                                "sequential_order",
+                                "StoryNode.sequential_order",
+                                "yes"
+                              ]
+                            ]
+                          }
+                        },
+                        {
+                          "name": "CLI displays message when no increments exist",
+                          "sequential_order": 5.0,
+                          "type": "error_case",
+                          "background": [
+                            "Given story graph contains no increments",
+                            "And CLI session is active"
+                          ],
+                          "test_method": "test_cli_displays_message_when_no_increments_exist",
+                          "steps": "When User requests increment view via CLI\nThen CLI displays no increments defined message\nAnd CLI returns empty Increments collection",
+                          "examples": [
+                            {
+                              "description": "Story graph with no Increments defined:",
+                              "headers": ["increment_count", "expected_message"],
+                              "rows": [["0", "No increments defined in story graph"]]
+                            }
+                          ]
+                        }
+                      ],
                       "acceptance_criteria": [],
                       "behavior": null
                     },
@@ -9669,7 +10043,154 @@
                         "User"
                       ],
                       "test_class": "TestDisplayIncrementScopeView",
-                      "scenarios": [],
+                      "scenarios": [
+                        {
+                          "name": "User toggles from Hierarchy view to Increment view",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given story graph contains increments with stories assigned",
+                            "And Panel is open in Hierarchy view"
+                          ],
+                          "test_method": "test_user_toggles_from_hierarchy_view_to_increment_view",
+                          "steps": "When User clicks toggle button beside filter in filter box title\nThen Panel switches from Hierarchy view to Increment view\nAnd toggle button shows Hierarchy label with tooltip Display Hierarchy view\nAnd Panel displays one column per increment with increment name at top",
+                          "examples": {
+                            "description": "View toggle behavior",
+                            "headers": [
+                              "initial_view",
+                              "toggle_action",
+                              "resulting_view",
+                              "toggle_label",
+                              "tooltip"
+                            ],
+                            "rows": [
+                              [
+                                "Hierarchy",
+                                "click toggle",
+                                "Increment",
+                                "Hierarchy",
+                                "Display Hierarchy view"
+                              ],
+                              [
+                                "Increment",
+                                "click toggle",
+                                "Hierarchy",
+                                "Increment",
+                                "Display Increment view"
+                              ]
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Increment view displays stories in natural order per column",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given story graph contains multiple increments with stories",
+                            "And Panel is in Increment view"
+                          ],
+                          "test_method": "test_increment_view_displays_stories_in_natural_order_per_column",
+                          "steps": "When Panel renders Increment view\nThen Panel shows one column per increment\nAnd each column has increment name at top\nAnd stories display in natural order one after another\nAnd view is read-only with no edit capability",
+                          "examples": [
+                            {
+                              "description": "Example 1: MVP Release column - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["MVP Release", "1"]]
+                            },
+                            {
+                              "description": "displays these Stories in natural order:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["MVP Release", "Create Profile", "1"],
+                                ["MVP Release", "Authenticate User", "2"],
+                                ["MVP Release", "Submit Application", "3"]
+                              ]
+                            },
+                            {
+                              "description": "Example 2: Enhancement Release column - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Enhancement Release", "2"]]
+                            },
+                            {
+                              "description": "displays these Stories in natural order:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["Enhancement Release", "Add Payment Method", "1"],
+                                ["Enhancement Release", "View History", "2"],
+                                ["Enhancement Release", "Export Report", "3"]
+                              ]
+                            },
+                            {
+                              "description": "Example 3: Future Release column - The Increment:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Future Release", "3"]]
+                            },
+                            {
+                              "description": "displays these Stories in natural order:",
+                              "headers": ["increment_name", "story_name", "sequential_order"],
+                              "rows": [
+                                ["Future Release", "Advanced Analytics", "1"],
+                                ["Future Release", "Custom Dashboard", "2"]
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Increment view displays empty column for increment with no stories",
+                          "sequential_order": 3.0,
+                          "type": "edge_case",
+                          "background": [
+                            "Given story graph contains an increment with no stories",
+                            "And Panel is in Increment view"
+                          ],
+                          "test_method": "test_increment_view_displays_empty_column_for_increment_with_no_stories",
+                          "steps": "When Panel renders Increment view\nThen Panel shows column for empty increment\nAnd column shows increment name at top\nAnd column shows empty state message",
+                          "examples": [
+                            {
+                              "description": "The Increment with no stories:",
+                              "headers": ["increment_name", "increment_priority"],
+                              "rows": [["Backlog", "99"]]
+                            },
+                            {
+                              "description": "displays this message in the column:",
+                              "headers": ["expected_message"],
+                              "rows": [["(no stories)"]]
+                            }
+                          ]
+                        },
+                        {
+                          "name": "Increment view is read-only with no edit controls",
+                          "sequential_order": 4.0,
+                          "type": "edge_case",
+                          "background": [
+                            "Given story graph contains increments with stories",
+                            "And Panel is in Increment view"
+                          ],
+                          "test_method": "test_increment_view_is_read_only_with_no_edit_controls",
+                          "steps": "When Panel renders Increment view\nThen Panel does not show create buttons\nAnd Panel does not show delete buttons\nAnd Panel does not show inline edit controls\nAnd stories are display-only",
+                          "examples": {
+                            "description": "Read-only increment view",
+                            "headers": [
+                              "hidden_control",
+                              "reason"
+                            ],
+                            "rows": [
+                              [
+                                "Create Epic button",
+                                "Increment view is read-only"
+                              ],
+                              [
+                                "Delete button",
+                                "Increment view is read-only"
+                              ],
+                              [
+                                "Inline name editor",
+                                "Increment view is read-only"
+                              ]
+                            ]
+                          }
+                        }
+                      ],
                       "acceptance_criteria": [],
                       "behavior": null
                     },
