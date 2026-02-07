@@ -1,32 +1,32 @@
 {
   "priority": 5,
-  "description": "Stories must deliver independent value as complete functional accomplishments. Balance value with testability - stories should be valuable enough to matter but small enough to deliver quickly. Not just data access or isolated operations.",
+  "description": "Stories must capture discrete behavior that can be described in system or business terms. Each story represents a distinct behavioral unit — not raw data access or isolated operations, but a recognizable action with a describable outcome.",
   "do": {
-    "description": "Create stories that deliver independent value. Example: 'User --> loads story graph' (value: see story structure)",
+    "description": "Create stories that capture discrete behavior describable in system/business terms. Example: 'User --> load story graph' (behavior: retrieve and display story structure)",
     "guidance": [
       {
-        "description": "Stories must deliver measurable value independently (INVEST principle) as complete functional accomplishments - order by user journey flow, not technical sequence. Keep valuable enough to matter but small enough to test and deliver. Accomplish something meaningful with clear business/user benefit and complete flow: start → process → outcome.",
-        "example": ["User --> loads story graph (value: see story structure)", "Developer --> edits epic name (value: update story map)", "User --> generates DrawIO diagram (value: visual diagram output)", "System --> initializes configuration on startup (value: system ready to use)"]
+        "description": "Each story must represent a discrete behavior — a recognizable action that can be described in business or system terms. Order by user journey flow, not technical sequence. The test: can you describe what this story DOES as a behavior someone would recognize? If yes, it's a valid story.",
+        "example": ["User --> load story graph (behavior: retrieve and display story structure)", "Developer --> edit epic name (behavior: modify story map element)", "User --> generate DrawIO diagram (behavior: produce visual diagram output)", "System --> initialize configuration on startup (behavior: prepare system for use)", "System --> display recipient bank details (behavior: show bank information after recipient selection)"]
       }
     ]
   },
   "dont": {
-    "description": "Don't create stories without independent value or complete outcomes. Example: 'System --> reads all epics from diagram' (no value - what happens with the data?)",
+    "description": "Don't create stories that are raw data operations with no describable behavior. Example: 'System --> read all epics from diagram' (no behavior - just data access, what happens next?)",
     "guidance": [
       {
-        "description": "Don't create data access operations without purpose or value - these lack independent value and complete outcomes",
-        "example": ["System --> reads all epics from diagram (no value - what happens with data?)", "System --> loads all features in graph epic (no outcome or benefit)", "System --> serializes components to JSON (no user value)", "System --> converts diagram to StoryGraph format (no benefit)", "System --> calculates component positions (no accomplishment)"]
+        "description": "Don't create raw data access operations that lack describable behavior — these are implementation steps, not stories",
+        "example": ["System --> read all epics from diagram (no behavior - just data access, then what?)", "System --> load all features in graph epic (no describable outcome)", "System --> serialize components to JSON (implementation step, not behavior)", "System --> convert diagram to StoryGraph format (data transformation, not behavior)", "System --> calculate component positions (computation, not behavior)"]
       },
       {
-        "description": "Don't create stories too large to deliver - maintain testability by splitting large workflows into smaller valuable stories",
-        "example": ["User --> manages entire order lifecycle (too large, many flows - split)", "System --> processes complete checkout workflow (too large, multiple flows - split)"]
+        "description": "Don't create stories too large to describe as a single behavior - split into discrete behavioral units",
+        "example": ["User --> manage entire order lifecycle (multiple behaviors bundled - split)", "System --> process complete checkout workflow (multiple behaviors bundled - split)"]
       },
       {
         "description": "Don't order stories by technical sequence instead of user journey flow - stories should follow the user's journey, not implementation order"
       },
       {
-        "description": "No value indicators to reject - these patterns indicate stories lack independent value",
-        "example": ["Just reads/loads data without outcome", "Just converts/formats data without purpose", "Just calculates/computes without result"]
+        "description": "No-behavior indicators to reject - these patterns indicate stories lack describable behavior",
+        "example": ["Just reads/loads data without describable outcome", "Just converts/formats data as an implementation step", "Just calculates/computes as an intermediate operation"]
       }
     ]
   }

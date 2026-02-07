@@ -1,6 +1,6 @@
 {
   "priority": 13,
-  "description": "Consolidate similar stories that differ superficially. When multiple stories use the same logic and only differ in data values or enumeration, combine them into a single parameterized story.",
+  "description": "Consolidate similar stories that differ superficially. When multiple stories use the same logic and only differ in data values or enumeration, combine them into a single parameterized story. NOTE: This rule operates on a different axis than P14 (Expand System Stories). P13 eliminates data-value duplication (same behavior, different input values). P14 decomposes by system component interactions (different behaviors within one story). Apply P13 first to consolidate data variations, then apply P14 to expand the consolidated story by component behavior if needed.",
   "scanners": [],
   "do": {
     "description": "Identify and consolidate stories that differ only superficially (data values, enumeration)",

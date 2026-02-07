@@ -138,11 +138,25 @@ class BehaviorsView extends PanelView {
         const behaviorsHtml = behaviorsData.map((behavior, bIdx) => {
             return this.renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath);
         }).join('');
-        
+
+        // Prepare prompt content (so header submit button can reuse same behavior/instructions payload)
+        let promptContentStr = '';
+        try {
+            const instructions = botData?.instructions || {};
+            if (instructions.display_content) {
+                promptContentStr = Array.isArray(instructions.display_content) ? instructions.display_content.join('\n') : instructions.display_content;
+            } else if (instructions.base_instructions) {
+                promptContentStr = Array.isArray(instructions.base_instructions) ? instructions.base_instructions.join('\n') : instructions.base_instructions;
+            }
+        } catch (e) {
+            console.warn('[BehaviorsView] Failed to build promptContentStr', e);
+            promptContentStr = '';
+        }
+
         return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">
-            <div class="collapsible-header" data-action="toggleSection" data-section-id="behaviors-content" style="
+            <div class="collapsible-header" style="
                 cursor: pointer;
                 padding: 4px 5px;
                 background-color: transparent;
@@ -153,12 +167,12 @@ class BehaviorsView extends PanelView {
                 justify-content: space-between;
                 user-select: none;
             ">
-                <div style="display: flex; align-items: center;">
+                <div style="display: flex; align-items: center;" onclick="toggleSection('behaviors-content')">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Behavior Icon" />` : '')}
                     <span style="font-weight: 600; font-size: 20px;">Behavior Action Status</span>
                 </div>
-                <button onclick="event.stopPropagation(); sendInstructionsToChat(event);" style="
+                <button id="submit-to-chat-btn" onclick="sendInstructionsToChat(event)" style="
                     background: rgba(255, 140, 0, 0.15);
                     border: none;
                     border-radius: 8px;
@@ -176,6 +190,9 @@ class BehaviorsView extends PanelView {
                 title="Submit instructions to chat">
                     ${submitIconPath ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : '📤'}
                 </button>
+                <script>
+                    window._promptContent = ${JSON.stringify(promptContentStr)};
+                </script>
             </div>
             <div id="behaviors-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
                 <div class="card-secondary" style="padding: 5px;">
