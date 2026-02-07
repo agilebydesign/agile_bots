@@ -1,6 +1,8 @@
 name: Smoke Test
 env:
   pytest_report_path: 'test/test_reports/python_test_results.xml'
+  node_title: 'Node/JS Tests'
+  python_title: 'Python Tests'
   
 on:
   push:
@@ -41,8 +43,8 @@ jobs:
         name: Node Tests            # Name of the check run which will be created
         path: test/test_reports/test_results.xml    # Path to test results
         reporter: jest-junit        # Format of test results
-        badge-title: 'Node/JS Tests'
-        report-title: 'Node/JS Tests'
+        badge-title: ${{ env.node_title }}
+        report-title: ${{ env.node_title }}
 
     - name: Run Python Tests
       if: ${{ !cancelled() }}       # run this step even if previous step failed
@@ -55,6 +57,6 @@ jobs:
         name: Python Tests            # Name of the check run which will be created
         path: ${{ env.pytest_report_path }}    # Path to test results
         reporter: python-xunit        # Format of test results
-        badge-title: 'Python Tests'
-        report-title: 'Python Tests'
+        badge-title: ${{ env.python_title }}
+        report-title: ${{ env.python_title }}
 
