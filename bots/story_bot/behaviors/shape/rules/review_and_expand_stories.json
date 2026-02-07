@@ -1,6 +1,6 @@
 {
   "priority": 14,
-  "description": "Review and expand stories based on new approach granularity. When planning decisions specify 'System stories' or detailed component interactions, MUST break down existing stories into component-interaction stories. The story count WILL increase.",
+  "description": "Review and expand stories based on new approach granularity. When planning decisions specify 'System stories' or detailed component interactions, MUST break down existing stories into component-interaction stories. The story count WILL increase. NOTE: This rule operates on a different axis than P13 (Consolidate Superficial Stories). P14 decomposes by system component behavior (different behaviors within one story). P13 eliminates data-value duplication (same behavior, different input values). Apply P13 first to consolidate data variations, then apply P14 to expand by component behavior.",
   "scanners": [],
   "do": {
     "description": "Break down stories into component interactions when System or Technology or Infrastructure approach is selected",
