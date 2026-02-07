@@ -262,8 +262,32 @@ class BotPanel {
               } else {
                 const fileExtension = cleanPath.split('.').pop().toLowerCase();
                 const binaryOrSpecialExtensions = ['drawio', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'];
+                // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+                const useVscodeOpenExtensions = ['json'];
+                
+                // Check file size - use vscode.open for large files (>10MB) to avoid VS Code text editor limit
+                const MAX_TEXT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+                let fileSize = 0;
+                try {
+                  if (fs.existsSync(absolutePath)) {
+                    fileSize = fs.statSync(absolutePath).size;
+                  }
+                } catch (e) {
+                  // Ignore errors, proceed with default handling
+                }
                 
                 if (binaryOrSpecialExtensions.includes(fileExtension)) {
+                  vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
+                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  });
+                } else if (useVscodeOpenExtensions.includes(fileExtension)) {
+                  // Use vscode.open for JSON to avoid showTextDocument bugs
+                  vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
+                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  });
+                } else if (fileSize > MAX_TEXT_FILE_SIZE) {
+                  // Large file - use vscode.open to avoid text editor memory limit
+                  this._log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                   });
@@ -346,9 +370,17 @@ class BotPanel {
               };
               const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.One;
               
-              vscode.window.showTextDocument(fileUri, { viewColumn: targetColumn, preserveFocus: false }).catch((error) => {
-                vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
-              });
+              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+              const fileExtension = cleanPath.split('.').pop().toLowerCase();
+              if (fileExtension === 'json') {
+                vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                });
+              } else {
+                vscode.window.showTextDocument(fileUri, { viewColumn: targetColumn, preserveFocus: false }).catch((error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                });
+              }
             }
             return;
           case "openFileWithState":
@@ -368,8 +400,14 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // If state has a direct line number, open without document search
-              if (message.state && message.state.lineNumber) {
+              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+              const fileExtension = cleanPath.split('.').pop().toLowerCase();
+              if (fileExtension === 'json') {
+                // JSON files must use vscode.open - can't use showTextDocument
+                vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                });
+              } else if (message.state && message.state.lineNumber) {
                 const options = {
                   viewColumn: vscode.ViewColumn.One,
                   selection: new vscode.Range(message.state.lineNumber - 1, 0, message.state.lineNumber - 1, 0),
@@ -1339,6 +1377,14 @@ class BotPanel {
           return;
         }
         const fileUri = vscode.Uri.file(absolutePath);
+        
+        // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+        const fileExtension = filePath.split('.').pop().toLowerCase();
+        if (fileExtension === 'json') {
+          await vscode.commands.executeCommand('vscode.open', fileUri);
+          return;
+        }
+        
         const doc = await vscode.workspace.openTextDocument(fileUri);
         // Open as a new tab (preview: false) without taking focus (preserveFocus: true)
         const openOptions = { 
@@ -1391,13 +1437,20 @@ class BotPanel {
                 : path.join(workspaceRoot, testFilePath);
               
               const fileUri = vscode.Uri.file(absolutePath);
-              const doc = await vscode.workspace.openTextDocument(fileUri);
               
-              // Open in Column One
-              await vscode.window.showTextDocument(doc, {
-                viewColumn: vscode.ViewColumn.One,
-                preserveFocus: false
-              });
+              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+              const fileExtension = testFilePath.split('.').pop().toLowerCase();
+              if (fileExtension === 'json') {
+                await vscode.commands.executeCommand('vscode.open', fileUri);
+              } else {
+                const doc = await vscode.workspace.openTextDocument(fileUri);
+              
+                // Open in Column One
+                await vscode.window.showTextDocument(doc, {
+                  viewColumn: vscode.ViewColumn.One,
+                  preserveFocus: false
+                });
+              }
               
               // TODO: Implement fold/unfold logic to expand test_class/test_method and collapse others
               // This would require using VS Code's folding API or commands
@@ -1449,15 +1502,20 @@ class BotPanel {
               const fileUri = vscode.Uri.file(absolutePath);
               
               // Check if file exists before trying to open
-              const fs = require('fs');
               if (fs.existsSync(absolutePath)) {
-                const doc = await vscode.workspace.openTextDocument(fileUri);
+                // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+                const fileExtension = codeFilePath.split('.').pop().toLowerCase();
+                if (fileExtension === 'json') {
+                  await vscode.commands.executeCommand('vscode.open', fileUri);
+                } else {
+                  const doc = await vscode.workspace.openTextDocument(fileUri);
                 
-                // Open in Column One
-                await vscode.window.showTextDocument(doc, {
-                  viewColumn: vscode.ViewColumn.One,
-                  preserveFocus: false
-                });
+                  // Open in Column One
+                  await vscode.window.showTextDocument(doc, {
+                    viewColumn: vscode.ViewColumn.One,
+                    preserveFocus: false
+                  });
+                }
               } else {
                 this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
               }
@@ -1491,39 +1549,9 @@ class BotPanel {
         const fileUri = vscode.Uri.file(absolutePath);
         
         try {
-          const doc = await vscode.workspace.openTextDocument(fileUri);
-          let lineNumber = null;
-          
-          // Search for the node by name in the JSON to position cursor
-          if (nodeName) {
-            const text = doc.getText();
-            const lines = text.split('\n');
-            
-            // Search for the node by name and type
-            for (let i = 0; i < lines.length; i++) {
-              const line = lines[i];
-              // Match node name in JSON (accounting for escaped quotes)
-              const namePattern = new RegExp(`"name"\\s*:\\s*"${nodeName.replace(/"/g, '\\"')}"`);
-              if (namePattern.test(line)) {
-                lineNumber = i + 1; // VS Code uses 1-based line numbers
-                break;
-              }
-            }
-          }
-          
-          const options = lineNumber 
-            ? { 
-                viewColumn: vscode.ViewColumn.One,
-                preview: false,
-                selection: new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0)
-              }
-            : { 
-                viewColumn: vscode.ViewColumn.One,
-                preview: false
-              };
-          
-          await vscode.window.showTextDocument(doc, options);
-          this._log(`[BotPanel] Story graph opened in column 1${lineNumber ? ` at line ${lineNumber}` : ''}`);
+          // Story graph is a JSON file - use vscode.open to avoid VS Code's 15MB text editor bug
+          await vscode.commands.executeCommand('vscode.open', fileUri);
+          this._log(`[BotPanel] Story graph opened in column 1`);
         } catch (error) {
           this._log(`[BotPanel] Error opening story graph: ${error.message}`);
           vscode.window.showErrorMessage(`Failed to open story graph: ${error.message}`);
@@ -1559,18 +1587,24 @@ class BotPanel {
               : path.join(workspaceRoot, testFilePath);
             
             const fileUri = vscode.Uri.file(absolutePath);
-            const doc = await vscode.workspace.openTextDocument(fileUri);
             
-            await vscode.window.showTextDocument(doc, {
-              viewColumn: vscode.ViewColumn.Two,
-              preview: false,
-              preserveFocus: true
-            });
+            // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+            const fileExtension = testFilePath.split('.').pop().toLowerCase();
+            if (fileExtension === 'json') {
+              await vscode.commands.executeCommand('vscode.open', fileUri);
+            } else {
+              const doc = await vscode.workspace.openTextDocument(fileUri);
+            
+              await vscode.window.showTextDocument(doc, {
+                viewColumn: vscode.ViewColumn.Two,
+                preview: false,
+                preserveFocus: true
+              });
+            }
           }
           this._log(`[BotPanel] Opened ${test_files.length} test files`);
           
           // Open code files in Column 3 (check if they exist first)
-          const fs = require('fs');
           let openedCodeCount = 0;
           for (const codeFilePath of code_files) {
             const absolutePath = path.isAbsolute(codeFilePath)
@@ -1579,14 +1613,22 @@ class BotPanel {
             
             if (fs.existsSync(absolutePath)) {
               const fileUri = vscode.Uri.file(absolutePath);
-              const doc = await vscode.workspace.openTextDocument(fileUri);
               
-              await vscode.window.showTextDocument(doc, {
-                viewColumn: vscode.ViewColumn.Three,
-                preview: false,
-                preserveFocus: true
-              });
-              openedCodeCount++;
+              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+              const fileExtension = codeFilePath.split('.').pop().toLowerCase();
+              if (fileExtension === 'json') {
+                await vscode.commands.executeCommand('vscode.open', fileUri);
+                openedCodeCount++;
+              } else {
+                const doc = await vscode.workspace.openTextDocument(fileUri);
+              
+                await vscode.window.showTextDocument(doc, {
+                  viewColumn: vscode.ViewColumn.Three,
+                  preview: false,
+                  preserveFocus: true
+                });
+                openedCodeCount++;
+              }
             } else {
               this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
             }
@@ -3153,10 +3195,18 @@ class BotPanel {
             }
         };
         
-        window.openFile = function(filePath) {
+        window.openFile = function(filePath, event) {
+            // Prevent default link behavior (scroll to top)
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             console.log('[WebView] openFile called with:', filePath);
             // Save scroll position before opening file (which may cause focus change)
-            window.saveScrollPosition();
+            const savedScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            sessionStorage.setItem('scrollPosition', savedScrollY.toString());
+            console.log('[WebView] Saved scroll position before file open:', savedScrollY);
+            
             vscode.postMessage({
                 command: 'logToFile',
                 message: '[WebView] openFile called with: ' + filePath
@@ -3165,6 +3215,13 @@ class BotPanel {
                 command: 'openFile',
                 filePath: filePath
             });
+            
+            // Ensure scroll position is preserved after message sending (prevents any DOM reflow issues)
+            setTimeout(() => {
+                window.scrollTo(0, savedScrollY);
+            }, 0);
+            
+            return false;
         };
         
         // Scroll position preservation functions
