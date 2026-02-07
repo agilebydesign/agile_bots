@@ -28,13 +28,30 @@ jobs:
     - name: Install npm dependencies
       run: npm install
 
-    - name: Run NPM Tests
+    - name: Run Node Tests
       run: npm test
 
-    - name: Test Report
+    - name: Node Test Report
       uses: dorny/test-reporter@v2
       if: ${{ !cancelled() }}       # run this step even if previous step failed
       with:
         name: Node Tests            # Name of the check run which will be created
         path: test/test_reports/test_results.xml    # Path to test results
         reporter: jest-junit        # Format of test results
+        badge-title: 'Node/JS Tests'
+        report-title: 'Node/JS Tests'
+
+    - name: Run Python Tests
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      run: pytest --junit-xml=test/test_reports/python_test_results.xml
+
+    - name: Python Test Report
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      with:
+        name: Python Tests            # Name of the check run which will be created
+        path: test/test_reports/python_test_results.xml    # Path to test results
+        reporter: python-xunit        # Format of test results
+        badge-title: 'Python Tests'
+        report-title: 'Python Tests'
+
