@@ -1,1 +1,0 @@
-{"name": "render_domain_model_description", "type": "synchronizer", "path": "docs/story/shape", "input": "story-graph.json", "synchronizer": "synchronizers.domain_model.DomainModelDescriptionSynchronizer", "output": "domain-model-description.md", "instructions": "Generate domain model description"}
