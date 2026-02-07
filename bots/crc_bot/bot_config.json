@@ -56,7 +56,7 @@
   ],
   "mcp": {
     "env": {
-      "WORKING_AREA": "C:\\dev\\onboarding_demo"
+      "WORKING_AREA": "C:\\dev\\agile_bot_demos\\us_wires"
     }
   }
 }

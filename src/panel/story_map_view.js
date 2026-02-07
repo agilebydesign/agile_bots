@@ -2585,7 +2585,7 @@ class StoryMapView extends PanelView {
                     title="Show all scope (scope showall)">
                         <img src="${showAllIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Show All" />
                     </button>` : ''}
-                    ${hasFilter && clearIconPath ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
+                    ${clearIconPath ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
                         background: transparent;
                         border: none;
                         padding: 4px 8px;
@@ -2599,7 +2599,7 @@ class StoryMapView extends PanelView {
                     onmouseout="this.style.opacity='1'"
                     title="Clear scope filter (show all)">
                         <img src="${clearIconPath}" style="width: 24px; height: 24px; object-fit: contain;" alt="Clear Filter" />
-                    </button>` : hasFilter ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
+                    </button>` : `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
                         background: transparent;
                         border: none;
                         padding: 4px 8px;
@@ -2613,7 +2613,7 @@ class StoryMapView extends PanelView {
                     onmouseout="this.style.opacity='1'"
                     title="Clear scope filter (show all)">
                         ✕
-                    </button>` : ''}
+                    </button>`}
                 </div>
                 <div onclick="event.stopPropagation();" style="display: flex; align-items: center; gap: 8px;">
                     ${linksHtml}

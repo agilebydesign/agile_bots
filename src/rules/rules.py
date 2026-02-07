@@ -486,7 +486,7 @@ class Rules:
                 scanner_status_summary.append(f'  [SKIP] {rule.rule_file}: Skipped by --skiprule')
                 continue
             logger.info(f'Processing rule {idx}/{len(rules_list)}: {rule.rule_file}')
-            rule_result = {'rule_file': rule.rule_file, 'rule_content': rule.rule_content, 'scanner_status': {}}
+            rule_result = {'rule_file': rule.rule_file, 'rule_file_path': str(rule.rule_file_path), 'rule_content': rule.rule_content, 'scanner_status': {}}
             try:
                 status_line = self._process_rule(rule, rule_result, context, logger, files, changed_files, all_files)
                 scanner_status_summary.append(status_line)

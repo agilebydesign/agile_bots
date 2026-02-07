@@ -908,7 +908,7 @@ class InstructionsSection extends PanelView {
             html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(mergedItem.path_dir)}">`;
             html += `<span class="label">Path:</span>`;
             const jsEscapedPath = mergedItem.path_dir.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}'); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(mergedItem.path_dir)}</a></span>`;
+            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(mergedItem.path_dir)}</a></span>`;
             html += '</div>';
         }
         // Existing - Yes/No
@@ -941,7 +941,7 @@ class InstructionsSection extends PanelView {
         if (!fullPath) return '';
         const fileName = fullPath.split(/[\/\\]/).pop();
         const jsEscapedPath = fullPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        return '<a href="#" onclick="openFile(\'' + jsEscapedPath + '\'); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">' + this.escapeHtml(fileName) + '</a>';
+        return '<a href="#" onclick="openFile(\'' + jsEscapedPath + '\', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">' + this.escapeHtml(fileName) + '</a>';
     }
 
     _formatRenderInstructions(value) {
@@ -1034,7 +1034,7 @@ class InstructionsSection extends PanelView {
             html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(dirPath)}">`;
             html += `<span class="label">Path:</span>`;
             const jsEscapedPath = dirPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}'); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(dirPath)}</a></span>`;
+            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(dirPath)}</a></span>`;
             html += '</div>';
     }
     
@@ -1133,7 +1133,9 @@ class InstructionsSection extends PanelView {
         }
         const label = match[1].replace(/^`|`$/g, '');
         const href = match[2];
-        return `<a href="${this.escapeHtml(href)}">${this.escapeHtml(label)}</a>`;
+        // Use onclick with openFile and return false to prevent default navigation (scroll to top)
+        const jsEscapedPath = href.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(label)}</a>`;
     }
 
     _formatInstructionValue(value, borderColor) {

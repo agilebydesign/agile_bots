@@ -63,6 +63,10 @@ class Rule:
         return self._rule_file
 
     @property
+    def rule_file_path(self) -> Path:
+        return self._rule_file_path
+
+    @property
     def behavior_name(self) -> str:
         return self._behavior_name
 

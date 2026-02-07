@@ -211,16 +211,18 @@ class BuildStoryGraphAction(Action):
         if 'rules' in instructions._data and instructions._data['rules']:
             all_rules = instructions._data['rules']
             rule_files = []
-            bots_dir = self.behavior.bot_paths.python_workspace_root / 'agile_bots' / 'bots'
             
             for rule in all_rules:
                 rule_path = None
                 if isinstance(rule, dict):
-                    rule_file = rule.get('rule_file', '')
-                    if rule_file:
-                        rule_path = str(bots_dir / rule_file)
+                    # Use the full path if available, otherwise fall back to rule_file
+                    rule_path = rule.get('rule_file_path', '')
+                    if not rule_path:
+                        rule_file = rule.get('rule_file', '')
+                        if rule_file:
+                            rule_path = str(bot_dir / 'behaviors' / self.behavior.name / 'rules' / rule_file)
                 elif isinstance(rule, str):
-                    rule_path = str(bots_dir / rule)
+                    rule_path = rule
                 
                 if rule_path:
                     rule_files.append(rule_path)
