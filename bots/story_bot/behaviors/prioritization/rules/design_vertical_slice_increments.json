@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  2,
     "description":  "Create increments that are vertical slices that deliver end-to-end working flows across multiple features/epics, NOT horizontal layers that complete one feature/epic at a time. Each increment must demonstrate complete working flow from start to finish.",
     "do":  {

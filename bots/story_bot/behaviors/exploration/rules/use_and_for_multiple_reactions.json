@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  4,
     "description":  "Use \u0027And\u0027 to chain multiple system reactions to a single event. When system responds with more than one action, connect them with And. Example: When user submits â†’ Then system validates And system saves And system sends notification.",
     "do":  {

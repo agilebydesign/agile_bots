@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  2,
     "description":  "Use active business language focused on user/system behavior. Describe what actors do with clear action verbs, not technical implementation or passive constructions.",
     "do":  {

@@ -109,7 +109,7 @@ def get_common_background(scenarios_list):
     return common
 
 
-def format_examples_table(headers, rows, description='', indent_level=0):
+def format_examples_table(headers, rows, name='', indent_level=0, collaboration=''):
     """
     Format examples data into markdown table(s).
     
@@ -120,8 +120,9 @@ def format_examples_table(headers, rows, description='', indent_level=0):
     Args:
         headers: List of column headers
         rows: List of row data (simple arrays or dicts with values/children)
-        description: Optional table description
+        name: Optional table name (domain concept name)
         indent_level: Indentation level for nested tables
+        collaboration: Optional collaboration sentence from domain responsibilities
     
     Returns:
         Formatted markdown string with table(s)
@@ -132,11 +133,18 @@ def format_examples_table(headers, rows, description='', indent_level=0):
     indent = "  " * indent_level
     result_parts = []
     
-    # Add description if provided
-    if description and indent_level == 0:
-        result_parts.append(f"\n**Examples:** *{description}*\n")
-    elif description:
-        result_parts.append(f"\n{indent}*{description}*\n")
+    # Build table header with name and optional collaboration sentence
+    # Format: "ConceptName (collaboration sentence):" or just "ConceptName:"
+    if name:
+        if collaboration:
+            header_text = f"{name} ({collaboration})"
+        else:
+            header_text = name
+        
+        if indent_level == 0:
+            result_parts.append(f"\n**{header_text}:**\n")
+        else:
+            result_parts.append(f"\n{indent}**{header_text}:**\n")
     elif indent_level == 0:
         result_parts.append("\n**Examples:**\n")
     
@@ -166,14 +174,16 @@ def format_examples_table(headers, rows, description='', indent_level=0):
                 if isinstance(value, dict) and 'headers' in value and 'rows' in value:
                     child_headers = value.get('headers', [])
                     child_rows = value.get('rows', [])
-                    child_desc = value.get('description', '')
+                    child_name = value.get('name', value.get('description', ''))
                     
                     if child_headers and child_rows:
+                        child_collaboration = value.get('collaboration', '')
                         nested_table = format_examples_table(
                             child_headers, 
                             child_rows, 
-                            child_desc, 
-                            indent_level + 1
+                            child_name, 
+                            indent_level + 1,
+                            child_collaboration
                         )
                         nested_tables.append(nested_table)
         elif isinstance(row, list):
@@ -251,10 +261,11 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
             # Check for headers+rows format (story-graph.json format)
             headers = examples_data.get('headers') or examples_data.get('columns')
             rows = examples_data.get('rows', [])
-            description = examples_data.get('description', '')
+            name = examples_data.get('name', examples_data.get('description', ''))
+            collaboration = examples_data.get('collaboration', '')
             
             if headers and rows:
-                examples_block = format_examples_table(headers, rows, description)
+                examples_block = format_examples_table(headers, rows, name, 0, collaboration)
         elif isinstance(examples_data, list) and examples_data:
             # New preferred format: list of tables with columns/rows
             table_like = [tbl for tbl in examples_data if isinstance(tbl, dict)]
@@ -263,9 +274,10 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
                 for table in table_like:
                     headers = table.get('headers') or table.get('columns')
                     rows = table.get('rows', [])
-                    description = table.get('description', '')
+                    name = table.get('name', table.get('description', ''))
+                    collaboration = table.get('collaboration', '')
                     if headers and rows:
-                        tables.append(format_examples_table(headers, rows, description))
+                        tables.append(format_examples_table(headers, rows, name, 0, collaboration))
                 if tables:
                     examples_block = "\n".join(tables)
             elif all(isinstance(row, dict) for row in examples_data):

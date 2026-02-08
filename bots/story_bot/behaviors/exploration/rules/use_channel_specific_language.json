@@ -1,4 +1,4 @@
-﻿{
+{
     "priority": 8,
     "description": "Use channel-specific language with concrete examples. For Domain/API: show actual method calls. For CLI: show actual command syntax. For Panel/UI: show actual interactions and display elements. Don't use generic 'Bot does X' or 'System does Y' - be specific to the channel.",
     "do": {

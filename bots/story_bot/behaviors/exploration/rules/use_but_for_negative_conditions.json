@@ -1,4 +1,4 @@
-﻿{
+{
     "priority": 9,
     "description": "Use BUT to explicitly state negative conditions and constraints. When system prevents an action, validates a boundary, or enforces a rule, use BUT to state what does NOT happen. Example: WHEN invalid input THEN error AND returns message BUT does not save data.",
     "do": {

@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  9,
     "description":  "Ensure increments remain vertical slices (end-to-end flows across multiple epics/features, NOT horizontal layers). Each increment must deliver a complete working flow.",
     "do":  {

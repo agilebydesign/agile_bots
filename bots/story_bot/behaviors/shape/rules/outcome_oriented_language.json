@@ -1,4 +1,4 @@
-﻿{
+{
   "priority": 3,
   "description": "Use outcome-oriented language over mechanism-oriented language. Focus on what is created or achieved, not how it's shown or communicated.",
   "scanner": "scanners.communication_verb_scanner.CommunicationVerbScanner",

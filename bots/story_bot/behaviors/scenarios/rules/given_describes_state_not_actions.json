@@ -1,5 +1,5 @@
 {
-    "priority":  1,
+    "priority":  3,
     "description":  "Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).",
     "do":  {
                "description":  "Given describes state/preconditions only. Example: \u0027Given user is logged in\u0027 (state), \u0027Given character sheet exists\u0027 (precondition)",
@@ -58,5 +58,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.given_state_not_actions_scanner.GivenStateNotActionsScanner"
+    "scanner":  "scanners.scenarios.given_state_not_actions_scanner.GivenStateNotActionsScanner"
 }

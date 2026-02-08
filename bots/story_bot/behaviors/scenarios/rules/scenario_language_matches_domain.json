@@ -1,0 +1,73 @@
+{
+    "priority": 1,
+    "description": "Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.",
+    "do": {
+        "description": "Use domain language in scenario steps - reference domain concepts by name.",
+        "guidance": [
+            {
+                "description": "Reference domain concepts in Given steps (state, not actions)",
+                "example": [
+                    "DOMAIN MODEL:",
+                    "  Enterprise (enterprise_id, name)",
+                    "    └── User (user_id, name, role)",
+                    "    └── Recipient (recipient_id, name, bank_info)",
+                    "",
+                    "Given an Enterprise with active Recipients",
+                    "And a User with wire payment permissions"
+                ]
+            },
+            {
+                "description": "Reference domain concepts in When steps (domain actions)",
+                "example": [
+                    "When the User selects a Recipient",
+                    "And enters the PaymentAmount"
+                ]
+            },
+            {
+                "description": "Reference domain concepts in Then steps (domain outcomes)",
+                "example": [
+                    "Then the WirePayment is created with status pending",
+                    "And the Recipient receives notification"
+                ]
+            }
+        ]
+    },
+    "dont": {
+        "description": "Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.",
+        "guidance": [
+            {
+                "description": "Don't use UI/technical terms in Given steps",
+                "example": [
+                    "Given the recipient list page is loaded",
+                    "Given the user has clicked the wire button",
+                    "Given the dropdown shows recipients"
+                ]
+            },
+            {
+                "description": "Don't use UI actions on UI elements in When steps",
+                "example": [
+                    "When the user clicks the dropdown",
+                    "And types in the input field",
+                    "When user clicks the table row"
+                ]
+            },
+            {
+                "description": "Don't use UI verification in Then steps",
+                "example": [
+                    "Then the success message is displayed",
+                    "And the green checkmark appears",
+                    "Then the modal displays account info"
+                ]
+            },
+            {
+                "description": "Don't use generic terms when domain concepts exist",
+                "example": [
+                    "Given the user has items",
+                    "When they select an item",
+                    "Then the thing is processed"
+                ]
+            }
+        ]
+    },
+    "scanner": "scanners.scenarios.scenario_language_scanner.ScenarioLanguageScanner"
+}

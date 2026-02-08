@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  11,
     "description":  "Write tests against the REAL expected API BEFORE implementing code. Tests MUST fail initially. Set up real test data and call real API. Failure reveals complete API design. Example: project = Project(path=path); project.initialize() (doesn\u0027t exist yet -\u003e fails -\u003e drives implementation)",
     "do":  {

@@ -1,0 +1,95 @@
+{
+    "priority": 4,
+    "description": "Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Scenario Steps = scenario-specific setup. Background auto-applies first, then scenario-specific Given. Don't repeat Background in Steps, don't put scenario-specific data in Background.",
+    "do": {
+        "description": "Use Background for shared context (3+ scenarios), Scenario Steps for test-specific setup.",
+        "guidance": [
+            {
+                "description": "Use Background when 3+ scenarios share same Given steps",
+                "example": [
+                    "Background:",
+                    "  Given user is logged in",
+                    "  And character sheet exists",
+                    "",
+                    "(Used by 5 scenarios - all need logged-in user with character sheet)"
+                ]
+            },
+            {
+                "description": "Background contains only Given/And - state setup, no actions",
+                "example": [
+                    "Background:",
+                    "  Given Agent is initialized with agent_name='story_bot'",
+                    "  And Project is finished initializing",
+                    "",
+                    "(State only - no When/Then, no action verbs)"
+                ]
+            },
+            {
+                "description": "Scenario Steps start with scenario-specific Given setup",
+                "example": [
+                    "Background:",
+                    "  Given Agent is initialized (common to all)",
+                    "",
+                    "Scenario: Test valid project",
+                    "  Steps:",
+                    "    Given test project area is set up at test_data/projects/valid-project",
+                    "    And valid base agent.json exists at test_data/agents/base/agent.json",
+                    "    When Agent loads project",
+                    "    Then Agent validates successfully",
+                    "",
+                    "Scenario: Test invalid project",
+                    "  Steps:",
+                    "    Given test project area is set up at test_data/projects/invalid-project",
+                    "    And agent.json is missing required fields",
+                    "    When Agent loads project",
+                    "    Then Agent reports validation errors"
+                ]
+            },
+            {
+                "description": "Variable-dependent setup goes in scenario Steps, not Background",
+                "example": [
+                    "Background: Given Agent initialized (common)",
+                    "Steps: Given test data at {specific_path} (scenario-specific)",
+                    "",
+                    "The path varies per scenario, so it belongs in Steps"
+                ]
+            }
+        ]
+    },
+    "dont": {
+        "description": "Don't include When/Then in Background, don't repeat Background in Steps, don't put scenario-specific setup in Background.",
+        "guidance": [
+            {
+                "description": "Don't include actions or When/Then in Background",
+                "example": [
+                    "Background: Given user logs in (WRONG - 'logs in' is action)",
+                    "Background: When user clicks button (WRONG - When in Background)",
+                    "Background: Then system is ready (WRONG - Then in Background)"
+                ]
+            },
+            {
+                "description": "Don't put scenario-specific setup in Background",
+                "example": [
+                    "Background: Given test project at test_data/projects/valid-project",
+                    "(WRONG - specific path only used by one scenario)",
+                    "",
+                    "Background: Given payment amount is $500.00",
+                    "(WRONG - specific amount varies per test)"
+                ]
+            },
+            {
+                "description": "Don't repeat Background steps in scenario Steps",
+                "example": [
+                    "Background: Given Agent is initialized",
+                    "",
+                    "Scenario: Test project",
+                    "  Steps:",
+                    "    Given Agent is initialized  <-- WRONG - already in Background",
+                    "    Given test project at path/to/project",
+                    "    When Agent loads project..."
+                ]
+            }
+        ]
+    },
+    "scanner": "scanners.scenarios.background_common_setup_scanner.BackgroundCommonSetupScanner"
+}

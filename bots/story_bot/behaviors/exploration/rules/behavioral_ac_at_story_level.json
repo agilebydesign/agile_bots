@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  4,
     "description":  "Behavioral AC belongs at story level in story-graph.json. Use When/Then format (NO Given - save for scenarios). AC should describe behavioral outcomes, not technical implementation. Example: \"WHEN user enters name THEN system saves to character sheet\"",
     "do":  {
