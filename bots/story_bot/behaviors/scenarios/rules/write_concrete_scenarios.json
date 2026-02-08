@@ -1,0 +1,116 @@
+{
+    "priority": 7,
+    "description": "Write scenarios in plain English with concrete, real values. Use actual constants where known, not placeholders. Describe stub return values explicitly. Every scenario with Given/When/Then MUST include examples table with actual data.",
+    "do": {
+        "description": "Plain English scenarios with concrete values, actual constants, explicit stub descriptions, and required examples.",
+        "guidance": [
+            {
+                "description": "Use concrete values, not placeholders",
+                "example": [
+                    "Given user has typed request message 'start shaping'",
+                    "When AI Chat processes request",
+                    "Then AI Chat identifies story shaping keywords",
+                    "",
+                    "(Specific message 'start shaping', not '{request_message}')"
+                ]
+            },
+            {
+                "description": "Write readable, human-understandable steps",
+                "example": [
+                    "Given user has attached documents to chat window",
+                    "And user has typed request message 'start shaping'",
+                    "",
+                    "(Plain English anyone can understand)"
+                ]
+            },
+            {
+                "description": "Always include examples table with actual data for every scenario that has Given/When/Then steps",
+                "example": [
+                    "Examples:",
+                    "| request_message | expected_keywords |",
+                    "| start shaping   | story, shaping    |",
+                    "| build story     | build, story      |",
+                    "",
+                    "(Concrete examples showing input→output)"
+                ]
+            },
+            {
+                "description": "Use actual constants for fixed paths and structures",
+                "example": [
+                    "Given Common payment rules at 'payment_rules/common/'",
+                    "Given Payment config at 'payment_configs/{payment_system}/config.json'",
+                    "",
+                    "(Fixed path 'payment_rules/common/' not '{common_rules_path}')"
+                ]
+            },
+            {
+                "description": "Describe stub return values explicitly in Givens",
+                "example": [
+                    "Given Payment validators are stubbed to return:",
+                    "  '{\"violations\": [{\"rule\": \"amount_positive\", \"severity\": \"error\"}], \"validators_executed\": 1}'",
+                    "",
+                    "(Explicit stub behavior with actual JSON)"
+                ]
+            },
+            {
+                "description": "Use actual class names and file paths",
+                "example": [
+                    "Payment Validators: PositiveAmountValidator, CardExpiryValidator",
+                    "Rule File: payment_rules/validate_positive_amount.json",
+                    "",
+                    "(Real class names and paths, not placeholders)"
+                ]
+            }
+        ]
+    },
+    "dont": {
+        "description": "Don't use variables/placeholders, don't omit examples, don't parameterize constants or hide stub behavior.",
+        "guidance": [
+            {
+                "description": "Don't use angle-bracket variables",
+                "example": [
+                    "Given user has typed request message '<request_message>' (WRONG - has variable)",
+                    "",
+                    "CORRECT: Given user has typed request message 'start shaping'"
+                ]
+            },
+            {
+                "description": "Don't omit examples when scenarios have steps",
+                "example": [
+                    "Given user has typed request message 'start shaping'",
+                    "When AI Chat processes request",
+                    "Then AI Chat identifies keywords",
+                    "",
+                    "(WRONG - no examples table provided)"
+                ]
+            },
+            {
+                "description": "Don't parameterize fixed values",
+                "example": [
+                    "Given Common rules at '{common_rules_path}'",
+                    "(WRONG - always 'payment_rules/common/')",
+                    "",
+                    "CORRECT: Given Common rules at 'payment_rules/common/'"
+                ]
+            },
+            {
+                "description": "Don't parameterize inputs that are stubbed",
+                "example": [
+                    "Given Payment data '{payment_data}' And validators are stubbed",
+                    "(WRONG - data doesn't matter if stubbed)",
+                    "",
+                    "If validators are stubbed, the input data is irrelevant"
+                ]
+            },
+            {
+                "description": "Don't hide stub behavior",
+                "example": [
+                    "Given Payment validators are configured (WRONG - doesn't show what stubs return)",
+                    "",
+                    "CORRECT: Given Payment validators are stubbed to return '{...actual JSON...}'"
+                ]
+            }
+        ]
+    },
+    "scanner": "scanners.scenarios.plain_english_scenarios_scanner.PlainEnglishScenariosScanner"
+}

@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  2,
     "description":  "Stories should have 4-9 acceptance criteria. Fewer than 4 suggests incomplete exploration; more than 9 suggests story is too large and should be split. Example: Story with 6 AC (right-sized), Story with 2 AC (under-explored), Story with 15 AC (too large).",
     "do":  {

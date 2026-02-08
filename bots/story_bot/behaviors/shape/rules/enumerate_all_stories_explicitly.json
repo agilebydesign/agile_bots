@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  10,
     "description":  "Enumerate ALL stories for increment(s) in focus explicitly (no ~X stories notation). Use story counts (~X stories) only for other increments. When applying new approach (System stories, component interactions), MUST expand existing stories into component-level stories.",
     "do":  {

@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  14,
     "description":  "Tests must match specification scenarios exactly. Test names, steps, and assertions verify exactly what the scenario states. Use exact variable names and terminology from specification. Example: agent_name=\u0027story_bot\u0027 (from spec), not name=\u0027bot\u0027",
     "do":  {

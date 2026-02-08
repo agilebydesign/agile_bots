@@ -1,0 +1,239 @@
+{
+    "priority": 2,
+    "description": "Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Connected parent-child tables using responsibility sentences from the domain model. Concrete values with domain context, not generic JSON or placeholders.",
+    "do": {
+        "description": "Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences.",
+        "guidance": [
+            {
+                "description": "Example tables use concept name with collaboration sentences from domain responsibilities",
+                "example": [
+                    "Scenario: User selects recipient for wire payment",
+                    "  Given an Enterprise with multiple Recipients",
+                    "  And each Recipient has an Account at a BeneficiaryBank",
+                    "  When the User selects a Recipient",
+                    "  Then the Recipient details are displayed",
+                    "",
+                    "NOUNS IN SCENARIO: Enterprise, Recipients, Account, BeneficiaryBank, User",
+                    "",
+                    "DOMAIN MODEL RESPONSIBILITIES:",
+                    "  Recipient: 'holds beneficiary name and bank details' -> collaborators: [BeneficiaryBank]",
+                    "  Enterprise: 'creates()' -> collaborators: [Recipient]",
+                    "",
+                    "EXAMPLE TABLES (name = concept, collaboration = responsibility sentence):",
+                    "",
+                    "Enterprise (collaboration: null - root concept):",
+                    "| enterprise_id | name           |",
+                    "| ENT-001       | Acme Corp      |",
+                    "",
+                    "Recipient (collaboration: 'creates()' from Enterprise):",
+                    "| enterprise_id | recipient_id | recipient_name    | recipient_status |",
+                    "| ENT-001       | RCP-001      | Global Supplies   | active           |",
+                    "| ENT-001       | RCP-002      | Tech Partners Inc | active           |",
+                    "",
+                    "BeneficiaryBank (collaboration: 'holds beneficiary name and bank details'):",
+                    "| recipient_id | account_number | account_masked | beneficiarybank_name |",
+                    "| RCP-001      | 1234567890     | ****7890       | First National Bank  |",
+                    "| RCP-002      | 9876543210     | ****3210       | Commerce Bank        |"
+                ]
+            },
+            {
+                "description": "Example table name is the concept name, collaboration field stores the connecting responsibility",
+                "example": [
+                    "Scenario mentions BOTH Enterprise AND Account:",
+                    "  Given an Enterprise with Accounts",
+                    "  When viewing Account transactions...",
+                    "",
+                    "DOMAIN MODEL:",
+                    "  Account: 'owned by enterprise' -> collaborators: [Enterprise]",
+                    "",
+                    "JSON STRUCTURE:",
+                    "{",
+                    "  'name': 'Enterprise',",
+                    "  'columns': ['enterprise_id', 'name'],",
+                    "  'rows': [['ENT-001', 'Acme Corp']]",
+                    "},",
+                    "{",
+                    "  'name': 'Account',",
+                    "  'collaboration': 'owned by enterprise',",
+                    "  'columns': ['enterprise_id', 'account_id', 'account_number', 'balance'],",
+                    "  'rows': [['ENT-001', 'ACC-001', '4532-8821', '25,000.00'], ...]",
+                    "}",
+                    "",
+                    "RENDERED OUTPUT:",
+                    "Enterprise:",
+                    "| enterprise_id | name      |",
+                    "| ENT-001       | Acme Corp |",
+                    "",
+                    "Account (owned by enterprise):",
+                    "| enterprise_id | account_id | account_number | balance    |",
+                    "| ENT-001       | ACC-001    | 4532-8821      | 25,000.00  |"
+                ]
+            },
+            {
+                "description": "Use domain terminology for column names",
+                "example": [
+                    "DOMAIN MODEL:",
+                    "  Recipient (recipient_id, name, status)",
+                    "  Account (account_number, masked_number)",
+                    "  BeneficiaryBank (bank_name, routing_number)",
+                    "",
+                    "Recipient:",
+                    "| recipient_id | recipient_name | recipient_status |",
+                    "| RCP-001      | Global Supply  | active           |",
+                    "",
+                    "with Account:",
+                    "| recipient_id | account_number | account_masked |",
+                    "| RCP-001      | 1234567890     | ****7890       |",
+                    "",
+                    "at BeneficiaryBank:",
+                    "| account_number | beneficiarybank_name | beneficiarybank_routing |",
+                    "| 1234567890     | First National Bank  | 021000021               |"
+                ]
+            },
+            {
+                "description": "Describe actual problems in domain terms with concrete values",
+                "example": [
+                    "'Payment with amount -50.00' (negative amount violates validation rule)",
+                    "'Credit card 4111-1111-1111-1111 expiry 01/2020' (expired card)",
+                    "",
+                    "rule_name='validate_positive_amount', line_number=2,",
+                    "violation_message='Payment amount must be positive'"
+                ]
+            },
+            {
+                "description": "Show complete expected structures with real values",
+                "example": [
+                    "{\"violations\": [{\"rule_name\": \"validate_positive_amount\", \"line_number\": 2, \"severity\": \"error\"}]}",
+                    "",
+                    "NOT: {\"violations\": [...]} (placeholder)"
+                ]
+            },
+            {
+                "description": "Connect parent-child using domain responsibility as collaboration field",
+                "example": [
+                    "Example 1: Premium customer with 2 accounts",
+                    "",
+                    "DOMAIN MODEL:",
+                    "  Customer: 'has accounts' -> collaborators: [Account]",
+                    "",
+                    "JSON STRUCTURE:",
+                    "[",
+                    "  { 'name': 'Customer', 'columns': [...], 'rows': [...] },",
+                    "  { 'name': 'Account', 'collaboration': 'has accounts', 'columns': [...], 'rows': [...] }",
+                    "]",
+                    "",
+                    "RENDERED OUTPUT:",
+                    "Customer:",
+                    "| customer_id | name       | segment |",
+                    "| CUST-001    | Jane Smith | Premium |",
+                    "",
+                    "Account (has accounts):",
+                    "| customer_id | account_number | product  | balance   |",
+                    "| CUST-001    | ACC-1001       | Checking | 2,500.00  |",
+                    "| CUST-001    | ACC-1002       | Savings  | 15,000.00 |",
+                    "",
+                    "(Name is concept name, collaboration is the responsibility sentence connecting to parent)"
+                ]
+            }
+        ]
+    },
+    "dont": {
+        "description": "Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, or invented terminology.",
+        "guidance": [
+            {
+                "description": "Don't use UI element names as columns",
+                "example": [
+                    "| dropdown_selection | checkbox_state | button_enabled |",
+                    "| list_row | modal_visible | input_value |",
+                    "",
+                    "(UI elements, not domain concepts)"
+                ]
+            },
+            {
+                "description": "Don't omit concepts that the scenario explicitly mentions",
+                "example": [
+                    "SCENARIO TEXT mentions:",
+                    "  'Given an Enterprise with Recipients and Accounts'",
+                    "",
+                    "| recipient_id | account_id |",
+                    "(missing enterprise that scenario mentions)"
+                ]
+            },
+            {
+                "description": "Don't use flat tables with all IDs - model relationships with connected tables",
+                "example": [
+                    "DOMAIN has: Enterprise -> Recipient -> Account",
+                    "",
+                    "| enterprise_id | recipient_id | account_id |",
+                    "| ENT-001       | RCP-001      | ACC-001    |",
+                    "(flat table loses relationship structure)"
+                ]
+            },
+            {
+                "description": "Don't invent column names not in domain",
+                "example": [
+                    "DOMAIN has: Recipient, Account, BeneficiaryBank",
+                    "",
+                    "| payee | bank_account | financial_institution |",
+                    "| acct_num | display_number |",
+                    "(invented terms not from domain model)"
+                ]
+            },
+            {
+                "description": "Don't use raw JSON without explanation",
+                "example": [
+                    "{\"payment\": {\"amount\": -50}} (WRONG - doesn't explain what's wrong)",
+                    "",
+                    "CORRECT: 'Payment with amount -50.00 (negative amount violates rule)'"
+                ]
+            },
+            {
+                "description": "Don't use abstract descriptions or placeholders",
+                "example": [
+                    "'Payment with invalid data' (WRONG - what makes it invalid?)",
+                    "'Violation detected' (WRONG - what violation?)",
+                    "'{violations}' (WRONG - doesn't show actual structure)"
+                ]
+            },
+            {
+                "description": "Don't use example name as connecting sentence - use collaboration field instead",
+                "example": [
+                    "WRONG - using 'name' field as connecting sentence:",
+                    "{",
+                    "  'name': 'has these Entitlements',  <- BAD: name should be concept",
+                    "  'columns': ['user_id', 'entitlement_name'],",
+                    "  'rows': [...]",
+                    "}",
+                    "",
+                    "CORRECT - name is concept, collaboration is responsibility:",
+                    "{",
+                    "  'name': 'Entitlement',  <- GOOD: concept name",
+                    "  'collaboration': 'assigned entitlements for wire functions',  <- GOOD: from domain",
+                    "  'columns': ['user_id', 'entitlement_name'],",
+                    "  'rows': [...]",
+                    "}"
+                ]
+            },
+            {
+                "description": "Don't disconnect examples into lookup tables",
+                "example": [
+                    "WRONG - lookup table style (all parents, then all children separately):",
+                    "",
+                    "Customers:",
+                    "| customer_id | name       |",
+                    "| CUST-001    | Jane Smith |",
+                    "| CUST-002    | Bob Jones  |",
+                    "",
+                    "Accounts:",
+                    "| customer_id | account_number | balance  |",
+                    "| CUST-001    | ACC-1001       | 2,500.00 |",
+                    "| CUST-001    | ACC-1002       | 5,000.00 |",
+                    "| CUST-002    | ACC-2001       | 500.00   |",
+                    "",
+                    "(Disconnected! Have to mentally join to see Jane has 2 accounts)"
+                ]
+            }
+        ]
+    },
+    "scanner": "scanners.scenarios.example_table_scanner.ExampleTableScanner"
+}

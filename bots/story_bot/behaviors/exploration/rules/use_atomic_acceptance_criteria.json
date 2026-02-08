@@ -1,4 +1,4 @@
-﻿{
+{
     "priority": 7,
     "description": "Write atomic acceptance criteria. Avoid repeating common WHEN/THEN/AND blocks across multiple AC. State general case once, then only state what differs in variations. Example: WHEN node moves â†’ general behavior, WHEN position specified â†’ only state position difference.",
     "do": {

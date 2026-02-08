@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  6,
     "description":  "Enumerate ALL acceptance criteria permutations. Apply exhaustive logic decomposition at AC level. Example: Valid input AC, Invalid input AC, Boundary AC, Error AC - cover all paths.",
     "do":  {

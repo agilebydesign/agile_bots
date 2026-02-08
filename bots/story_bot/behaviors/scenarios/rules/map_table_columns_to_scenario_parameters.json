@@ -1,5 +1,5 @@
 {
-    "priority":  8,
+    "priority":  9,
     "description":  "Map all table columns to scenario parameters bidirectionally. Every column header maps to a Background/When/Then parameter, and every parameter appears as a column. Keep tables minimal and domain-focused. Example: \u0027{payment_system}\u0027 parameter → \u0027Payment System\u0027 column.",
     "do":  {
                "description":  "Bidirectional mapping: column ↔ parameter. Example: \u0027Payment System\u0027 column maps to \u0027{payment_system}\u0027 parameter in Background",

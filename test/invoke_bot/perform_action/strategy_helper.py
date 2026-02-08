@@ -105,13 +105,17 @@ class StrategyTestHelper(BaseHelper):
         base_instructions = instructions.get('base_instructions', [])
         assert base_instructions, "base_instructions should be present"
         
-        # Check StrategyAction-specific fields
-        strategy_criteria = instructions.get('strategy_criteria')
+        # Check StrategyAction-specific fields (nested under 'strategy' key)
+        strategy = instructions.get('strategy')
+        assert strategy is not None, "strategy should be set"
+        assert isinstance(strategy, dict), "strategy should be a dict"
+        
+        strategy_criteria = strategy.get('strategy_criteria')
         assert strategy_criteria is not None, "strategy_criteria should be set"
         assert isinstance(strategy_criteria, dict), "strategy_criteria should be a dict"
         
         # assumptions is a dict with 'typical_assumptions' and 'assumptions_made'
-        assumptions = instructions.get('assumptions')
+        assumptions = strategy.get('assumptions')
         assert assumptions is not None, "assumptions should be set"
         assert isinstance(assumptions, dict), "assumptions should be a dict"
         assert 'typical_assumptions' in assumptions, "assumptions should have 'typical_assumptions'"

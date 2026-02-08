@@ -44,6 +44,8 @@
     "**/node_modules": true
   },
   
+  "files.trimTrailingWhitespace": false,
+  
   "search.exclude": {
     "**/node_modules": true,
     "**/__pycache__": true,
