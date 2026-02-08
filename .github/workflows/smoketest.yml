@@ -1,4 +1,9 @@
 name: Smoke Test
+env:
+  pytest_report_path: 'test/test_reports/python_test_results.xml'
+  node_title: 'Node/JS Tests'
+  python_title: 'Python Tests'
+  
 on:
   push:
     branches: [ "main" ]
@@ -20,7 +25,7 @@ jobs:
       uses: actions/setup-python@v6.2.0
       with:
         python-version: '>=3.13'
-        pip-install: -r requirements.txt
+        pip-install: -r requirements-dev.txt
       
     - name: Install Node.js
       uses: actions/setup-node@v4
@@ -28,13 +33,30 @@ jobs:
     - name: Install npm dependencies
       run: npm install
 
-    - name: Run NPM Tests
+    - name: Run Node Tests
       run: npm test
 
-    - name: Test Report
+    - name: Node Test Report
       uses: dorny/test-reporter@v2
       if: ${{ !cancelled() }}       # run this step even if previous step failed
       with:
         name: Node Tests            # Name of the check run which will be created
         path: test/test_reports/test_results.xml    # Path to test results
         reporter: jest-junit        # Format of test results
+        badge-title: ${{ env.node_title }}
+        report-title: ${{ env.node_title }}
+
+    - name: Run Python Tests
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      run: pytest --junit-xml=${{ env.pytest_report_path }}
+
+    - name: Python Test Report
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}       # run this step even if previous step failed
+      with:
+        name: Python Tests            # Name of the check run which will be created
+        path: ${{ env.pytest_report_path }}    # Path to test results
+        reporter: python-xunit        # Format of test results
+        badge-title: ${{ env.python_title }}
+        report-title: ${{ env.python_title }}
+
