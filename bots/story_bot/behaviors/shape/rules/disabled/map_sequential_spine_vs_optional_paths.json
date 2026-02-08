@@ -1,4 +1,4 @@
-﻿{
+{
   "description": "When mapping stories, carefully distinguish between sequential spine (essential path) and optional paths, alternate routes, or additional functionality that is not strictly essential. Sequential stories form the mandatory flow; optional stories are alternatives, enhancements, or non-essential features.",
   "do": {
     "examples": [

@@ -380,7 +380,8 @@ class DomainModelOutlineSynchronizer:
                 for resp in concept.get('responsibilities', []):
                     collaborators = resp.get('collaborators', [])
                     collab_str = ",".join(collaborators) if collaborators else ""
-                    outline_lines.append(f"    {resp.get('name', '')}: {collab_str}")
+                    # Add two trailing spaces for Markdown line breaks
+                    outline_lines.append(f"    {resp.get('name', '')}: {collab_str}  ")
                 outline_lines.append("")
             
             outline_lines.append("")  # Extra blank line between modules

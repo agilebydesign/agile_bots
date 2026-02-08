@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  13,
     "description":  "Extract duplicate test setup to reusable helper functions. Keep test bodies focused on specific behavior. Example: create_agent_with_config(), create_config_file(), verify_agent_initialized() - reusable across tests",
     "do":  {

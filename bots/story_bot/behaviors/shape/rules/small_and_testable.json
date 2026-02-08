@@ -1,4 +1,4 @@
-﻿{
+{
   "priority": 6,
   "description": "Stories must be testable as complete interactions and deliverable independently. Balance testability with maintaining value and behavioral focus - stories should be small enough to test but large enough to matter.",
   "scanner": "scanners.implementation_details_scanner.ImplementationDetailsScanner",

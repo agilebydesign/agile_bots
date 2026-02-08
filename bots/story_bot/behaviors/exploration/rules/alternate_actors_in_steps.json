@@ -1,4 +1,4 @@
-﻿{
+{
     "priority":  3,
     "description":  "Alternate between actors every 1-2 steps. Scenarios should show back-and-forth interaction between user and system. Example: When user submits â†’ Then system validates â†’ When system displays â†’ Then user confirms.",
     "do":  {

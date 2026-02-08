@@ -147,6 +147,17 @@ class ScenarioBase:
         return steps_value if isinstance(steps_value, list) else []
     
     @property
+    def all_steps(self) -> List[str]:
+        """Return background + scenario-specific steps combined.
+        
+        This ensures domain concepts mentioned in background (e.g., User, Entitlement)
+        are included when scanning for concepts that should appear in examples.
+        """
+        background = self.data.get('background', [])
+        steps = self.steps
+        return background + steps
+    
+    @property
     def default_test_method(self) -> str:
         scenario_name = self.name
         if not scenario_name:
