@@ -437,7 +437,7 @@ def find_js_file_with_test_method(py_test_file_path: Path, test_method_name: str
 
 # Test file discovery for multi-language, multi-file test links (e.g. test_some_sub_epic.py, test_some_sub_epic_e2e.js)
 
-TEST_FILE_EXTENSIONS = ('.py', '.js', '.ts', '.mjs', '.cjs', '.spec.js', '.spec.ts', '.e2e.js', '.e2e.ts')
+TEST_FILE_EXTENSIONS = ('.py', '.js', '.ts', '.tsx', '.jsx', '.mjs', '.cjs', '.spec.js', '.spec.ts', '.spec.tsx', '.test.ts', '.test.tsx', '.e2e.js', '.e2e.ts')
 
 
 def name_to_test_stem(name: str) -> str:
