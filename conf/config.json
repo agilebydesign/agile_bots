@@ -1,5 +1,5 @@
 {
-    "branding": "ABD",
+    "branding": "ACE",
     "brands": {
         "ABD": {
             "path": "",
@@ -18,6 +18,15 @@
             "textColor": "#000000",
             "textColorFaded": "#E88A8E",
             "fontWeight": "600"
+        },
+        "ACE": {
+            "path": "ace",
+            "title": "Agile Context Engine",
+            "color": "#569CD6",
+            "background": "#1E1E1E",
+            "textColor": "#CCCCCC",
+            "textColorFaded": "#6B6B6B",
+            "fontWeight": "400"
         }
     }
 }

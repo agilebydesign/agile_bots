@@ -2048,6 +2048,14 @@
                           "background": [],
                           "test_method": "test_panel_applies_scotia_branding_when_config_specifies_scotia_brand",
                           "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'Scotia'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Branding module caches config for subsequent calls\nAND: Panel logs 'Scotia' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #FFFFFF (light background)\nAND: Panel injects --text-color as #000000\nAND: Panel injects --accent-color as #EC111A (Scotia red)\nAND: Panel injects --font-weight-normal as 600\nAND: Panel sets --hover-bg to dark overlay for light background\nWHEN: Header view renders\nTHEN: Header displays 'Scotia Bots' as product name\nAND: Header applies Scotia red to title style\nAND: Header loads images from img/scotia/ subdirectory"
+                        },
+                        {
+                          "name": "Panel applies ACE branding when config specifies ACE brand",
+                          "sequential_order": 3.0,
+                          "type": "happy",
+                          "background": [],
+                          "test_method": "test_panel_applies_ace_branding_when_config_specifies_ace_brand",
+                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'ACE'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Panel logs 'ACE' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #1E1E1E (VS Code dark grey)\nAND: Panel injects --text-color as #D4D4D4 (VS Code light grey)\nAND: Panel injects --accent-color as #569CD6 (VS Code blue)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Context Engine' as product name\nAND: Header applies VS Code blue to title style\nAND: Header loads images from img/ace/ subdirectory"
                         }
                       ],
                       "acceptance_criteria": [
