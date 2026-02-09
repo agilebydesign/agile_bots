@@ -467,6 +467,29 @@ Then action completes successfully
     
     path_line = ' / '.join(path_parts)
     
+    # Format context_source reference (if present)
+    context_source = story.get('context_source', {})
+    source_section = ""
+    if context_source:
+        source_file = context_source.get('file', '')
+        source_section_name = context_source.get('section', '')
+        if source_file or source_section_name:
+            source_section = "\n---\n\n## Source Reference\n\n"
+            if source_file:
+                # Create relative link to context folder (5 levels up from scenario file)
+                # Scenario: docs/story/scenarios/Epic/SubEpic/Story.md
+                # Context:  context/file.md
+                context_path = f"../../../../../context/{source_file}"
+                # Create section anchor if section name exists (lowercase, hyphenated)
+                if source_section_name:
+                    section_anchor = source_section_name.lower().replace(' ', '-').replace('(', '').replace(')', '')
+                    section_anchor = re.sub(r'[^\w\-]', '', section_anchor)
+                    source_section += f"**File:** [{source_file}]({context_path}#{section_anchor})\n"
+                else:
+                    source_section += f"**File:** [{source_file}]({context_path})\n"
+            if source_section_name:
+                source_section += f"**Section:** {source_section_name}\n"
+
     content = f"""# 📄 {story_name}
 
 **Navigation:** [📄‹ Story Map](../../../../story-map.drawio){test_file_link}
@@ -489,7 +512,7 @@ Then action completes successfully
 {background_section}## Scenarios
 
 {scenarios_formatted}
-"""
+{source_section}"""
     return content
 
 
