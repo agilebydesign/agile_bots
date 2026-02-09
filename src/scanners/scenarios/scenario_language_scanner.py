@@ -103,7 +103,7 @@ class ScenarioLanguageScanner(ScenarioScannerBase):
                     f'Domain concepts include: {", ".join(sample_concepts)}'
                 ),
                 location=scenario.map_location('steps'),
-                severity='warning'
+                severity='error'
             ).to_dict()
             violations.append(violation)
         

@@ -32,10 +32,10 @@
                             ]
            },
     "dont":  {
-                 "description":  "Don\u0027t describe actions or functionality in Given. Example: \u0027Given user logs in\u0027 (action - wrong), \u0027Given system validates input\u0027 (functionality - wrong)",
+                 "description":  "Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)",
                  "guidance":  [
                                   {
-                                      "description":  "Don\u0027t use action verbs in Given - clicking, sending, calling are When actions",
+                                      "description":  "Don't use action verbs in Given - clicking, sending, calling are When actions",
                                       "example":  [
                                                       "Given user clicks button (WRONG)",
                                                       "Given system sends message (WRONG)",
@@ -44,16 +44,28 @@
                                                   ]
                                   },
                                   {
-                                      "description":  "Don\u0027t describe functionality being tested in Given - that\u0027s what Then is for",
+                                      "description":  "Don't describe UI position/navigation as state - 'is on page' is navigation, not domain state",
+                                      "example":  [
+                                                      "Given User is on PaymentDetails step (WRONG - navigation, not state)",
+                                                      "Given User is viewing the form (WRONG - UI position)",
+                                                      "Given User is at Step 2 (WRONG - navigation position)",
+                                                      "",
+                                                      "CORRECT: Given {WirePayment} creation is in progress",
+                                                      "CORRECT: Given {PaymentDetails} requires {Account} selection",
+                                                      "CORRECT: Given {User} has initiated {WirePayment} with {Recipient}"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don't describe functionality being tested in Given - that's what Then is for",
                                       "example":  [
                                                       "Given activity log tracks: timestamp, action_state (WRONG - this is functionality to test in Then)"
                                                   ]
                                   },
                                   {
-                                      "description":  "Don\u0027t use past tense actions in Given",
+                                      "description":  "Don't use past tense actions in Given",
                                       "example":  [
-                                                      "Given Tool has invoked method (WRONG - \u0027invoked\u0027 is action)",
-                                                      "Given user has clicked (WRONG - \u0027clicked\u0027 is action)"
+                                                      "Given Tool has invoked method (WRONG - 'invoked' is action)",
+                                                      "Given user has clicked (WRONG - 'clicked' is action)"
                                                   ]
                                   }
                               ]

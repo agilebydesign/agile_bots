@@ -7,6 +7,7 @@ from actions.validate.validation_report_writer import ValidationReportWriter, St
 from actions.validate.file_link_builder import FileLinkBuilder
 from bot.workspace import get_base_actions_directory
 from utils import read_json_file
+from scanners.schema_violation_scanner import SchemaViolationScanner
 
 if TYPE_CHECKING:
     from action_context import ValidateActionContext
@@ -55,6 +56,12 @@ class ValidationExecutor:
         writer = ValidationReportWriter(self.behavior.name, self.behavior.bot_paths, streaming_writer.timestamp)
         report_path = writer.get_report_path()
         report_link = writer.get_report_hyperlink()
+        
+        # Run schema validation first - add violations to top of report
+        schema_violations = self._run_schema_validation(validation_context)
+        if schema_violations:
+            self._add_schema_violations_to_instructions(action_instructions, schema_violations)
+        
         if not self.rules:
             return self._build_no_rules_result(action_instructions, report_path, report_link)
         processed_rules = self.rules.validate(validation_context)
@@ -62,7 +69,7 @@ class ValidationExecutor:
         self._add_scanner_status_to_instructions(action_instructions, scanner_status_info)
         self._add_violation_summary_to_instructions(action_instructions, self.rules.violation_summary)
         action_instructions.append(f'\nValidation report: {report_link}')
-        return {'instructions': self._build_instructions_dict(action_instructions, processed_rules, report_path, report_link)}
+        return {'instructions': self._build_instructions_dict(action_instructions, processed_rules, report_path, report_link, schema_violations)}
 
     def _get_action_instructions(self) -> List[str]:
         base_actions_path = get_base_actions_directory()
@@ -121,8 +128,74 @@ class ValidationExecutor:
             edit_instructions = ['Based on code scanner diagnostics, edit the story graph to fix violations:', *violation_summary, 'Review each violation and update the story graph accordingly.']
             action_instructions.extend(edit_instructions)
 
-    def _build_instructions_dict(self, action_instructions, processed_rules, report_path, report_link):
-        return {'action': 'validate', 'behavior': self.behavior.name, 'base_instructions': action_instructions, 'validation_rules': processed_rules, 'content_to_validate': None, 'report_path': str(report_path), 'report_link': report_link, 'report_links': self._collect_report_links()}
+    def _run_schema_validation(self, validation_context: ValidationContext) -> List[Dict[str, Any]]:
+        """Run schema validation to detect fields not conforming to behavior template."""
+        logger = logging.getLogger(__name__)
+        try:
+            scanner = SchemaViolationScanner(self.behavior, self.behavior.bot_paths)
+            story_graph_content = validation_context.story_graph
+            
+            if not story_graph_content:
+                logger.info("No story graph content to validate for schema")
+                return []
+            
+            violations = scanner.scan(story_graph_content)
+            
+            if violations:
+                logger.info(f"Schema validation found {len(violations)} violation(s)")
+            else:
+                logger.info("Schema validation passed - no violations found")
+            
+            return [v.to_dict() for v in violations]
+        except Exception as e:
+            logger.error(f"Error running schema validation: {e}")
+            return []
+
+    def _add_schema_violations_to_instructions(self, action_instructions: List[str], schema_violations: List[Dict[str, Any]]):
+        """Add schema violations to the TOP of the validation instructions."""
+        if not schema_violations:
+            return
+        
+        # Insert at the beginning of instructions - these are critical
+        header_lines = [
+            "",
+            "## âš ï¸ SCHEMA VIOLATIONS (MUST FIX FIRST)",
+            "",
+            f"Found {len(schema_violations)} field(s) that violate the template schema for **{self.behavior.name}** behavior.",
+            "",
+            "These fields are NOT allowed in this phase. Remove or relocate them:",
+            ""
+        ]
+        
+        for i, v in enumerate(schema_violations, 1):
+            header_lines.append(f"**{i}. `{v['field_name']}`**")
+            header_lines.append(f"   - Path: `{v['path']}`")
+            header_lines.append(f"   - {v['message']}")
+            header_lines.append("")
+        
+        header_lines.extend([
+            "---",
+            ""
+        ])
+        
+        # Insert at position 0 (before other instructions)
+        for line in reversed(header_lines):
+            action_instructions.insert(0, line)
+
+    def _build_instructions_dict(self, action_instructions, processed_rules, report_path, report_link, schema_violations=None):
+        result = {
+            'action': 'validate', 
+            'behavior': self.behavior.name, 
+            'base_instructions': action_instructions, 
+            'validation_rules': processed_rules, 
+            'content_to_validate': None, 
+            'report_path': str(report_path), 
+            'report_link': report_link, 
+            'report_links': self._collect_report_links()
+        }
+        if schema_violations:
+            result['schema_violations'] = schema_violations
+        return result
 
     def _collect_report_links(self) -> List[str]:
         violations_dir = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations'
