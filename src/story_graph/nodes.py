@@ -694,70 +694,75 @@ class StoryNode(ABC):
             'count': len(opened_files)
         }
     
+    def _get_matching_test_files_for_story(self, sub_epic: 'SubEpic', workspace_dir: Path, test_dir: Path) -> List[str]:
+        """Return workspace-relative paths for all test files matching this sub-epic (multi-language, multi-file)."""
+        from utils import find_matching_test_files, name_to_test_stem
+        primary = getattr(sub_epic, 'test_file', None) or ''
+        if primary:
+            p = Path(primary)
+            pattern = p.stem
+            under_path = str(p.parent) if str(p.parent) != '.' else None
+        else:
+            pattern = name_to_test_stem(sub_epic.name or '')
+            under_path = None
+        matching_rel = find_matching_test_files(test_dir, pattern, under_path)
+        # Paths relative to workspace for panel (test/...)
+        return [f"test/{r}".replace('\\', '/') for r in matching_rel]
+
     def openTest(self) -> dict:
         """Open test files for this node and all children recursively.
-        
-        Returns:
-            dict with status and list of opened test files with scope information
+        Supports multiple languages and multiple test files per scenario (e.g. test_foo.py, test_foo_e2e.js).
+        Returns dict with status and list of opened test files (workspace-relative paths).
         """
         opened_files = []
-        
+        workspace_dir = Path(self._bot.bot_paths.workspace_directory) if self._bot and hasattr(self._bot, 'bot_paths') else Path('.')
+        test_dir = workspace_dir / getattr(self._bot.bot_paths, 'test_path', Path('test')) if self._bot and hasattr(self._bot, 'bot_paths') else workspace_dir / 'test'
+
         if isinstance(self, Story):
-            # Single story - test_file comes from parent sub-epic, not the story itself
-            test_file = None
-            if self._parent:
-                # Get test_file from parent sub-epic
-                parent = self._parent
-                while parent:
-                    if isinstance(parent, SubEpic):
-                        test_file = parent.test_file if hasattr(parent, 'test_file') else None
-                        break
-                    parent = parent._parent if hasattr(parent, '_parent') else None
-            
-            if test_file:
-                opened_files.append({
-                    'file': test_file,
-                    'test_class': self.test_class,
-                    'scenarios': [
-                        {
-                            'name': s.name,
-                            'test_method': s.test_method
-                        }
-                        for s in self.scenarios if s.test_method
-                    ]
-                })
+            parent = self._parent
+            sub_epic = None
+            while parent:
+                if isinstance(parent, SubEpic):
+                    sub_epic = parent
+                    break
+                parent = parent._parent if hasattr(parent, '_parent') else None
+            if sub_epic:
+                all_paths = self._get_matching_test_files_for_story(sub_epic, workspace_dir, test_dir)
+                for i, file_rel in enumerate(all_paths):
+                    info = {'file': file_rel}
+                    if i == 0:
+                        info['test_class'] = self.test_class
+                        info['scenarios'] = [
+                            {'name': s.name, 'test_method': s.test_method}
+                            for s in self.scenarios if s.test_method
+                        ]
+                    opened_files.append(info)
         elif isinstance(self, (Epic, SubEpic)):
-            # Epic or SubEpic - recursively open all test files
             for child in self.children:
                 if isinstance(child, Story):
-                    # test_file ALWAYS comes from parent sub-epic, never from the story itself
-                    test_file = None
-                    # Find the SubEpic that contains this Story
                     parent = child._parent
+                    sub_epic = None
                     while parent:
                         if isinstance(parent, SubEpic):
-                            test_file = parent.test_file if hasattr(parent, 'test_file') else None
+                            sub_epic = parent
                             break
                         parent = parent._parent if hasattr(parent, '_parent') else None
-                    
-                    if test_file:
-                        opened_files.append({
-                            'file': test_file,
-                            'test_class': child.test_class,
-                            'scenarios': [
-                                {
-                                    'name': s.name,
-                                    'test_method': s.test_method
-                                }
-                                for s in child.scenarios if s.test_method
-                            ]
-                        })
+                    if sub_epic:
+                        all_paths = self._get_matching_test_files_for_story(sub_epic, workspace_dir, test_dir)
+                        for i, file_rel in enumerate(all_paths):
+                            info = {'file': file_rel}
+                            if i == 0:
+                                info['test_class'] = child.test_class
+                                info['scenarios'] = [
+                                    {'name': s.name, 'test_method': s.test_method}
+                                    for s in child.scenarios if s.test_method
+                                ]
+                            opened_files.append(info)
                 elif isinstance(child, (Epic, SubEpic)):
-                    # Recursively get test files from nested epics/sub-epics
                     result = child.openTest()
                     if result.get('files'):
                         opened_files.extend(result['files'])
-        
+
         return {
             'status': 'success',
             'node': self.name,

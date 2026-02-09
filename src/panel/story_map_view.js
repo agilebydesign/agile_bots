@@ -2732,9 +2732,11 @@ ${clientScript}    </script>`;
                     ? `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" data-file-link="${this.escapeHtml(subEpicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
                     : `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
                 
-                // Only render test tube icon for test links
-                const subEpicTestIcon = (subEpicTestLink && testTubeIconPath)
-                    ? ` <span onclick="openFile('${this.escapeForJs(subEpicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
+                // Only render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick HTML parse errors)
+                const subEpicTestIcon = testTubeIconPath && (subEpic.test_files?.length > 0 || subEpicTestLink)
+                    ? (subEpic.test_files && subEpic.test_files.length > 0
+                        ? ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
+                        : ` <span onclick="openFile('${this.escapeForJs(subEpicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
                     : '';
                 
                 // No inline action buttons (all actions are in the toolbar)
@@ -2790,11 +2792,15 @@ ${clientScript}    </script>`;
                                     html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 }
                                 
-                                // Render test tube icon for test link
-                                if (story.links && story.links.length > 0) {
-                                    const testLink = story.links.find(l => l.icon === 'test_tube');
-                                    if (testLink && testTubeIconPath) {
-                                        html += ` <span onclick="openFile('${this.escapeForJs(testLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                // Render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick parse errors)
+                                if (testTubeIconPath && (story.test_files?.length > 0 || (story.links && story.links.find(l => l.icon === 'test_tube')))) {
+                                    if (story.test_files && story.test_files.length > 0) {
+                                        html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(story.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                    } else {
+                                        const testLink = story.links.find(l => l.icon === 'test_tube');
+                                        if (testLink) {
+                                            html += ` <span onclick="openFile('${this.escapeForJs(testLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                        }
                                     }
                                 }
                                 
@@ -2826,10 +2832,13 @@ ${clientScript}    </script>`;
                                             html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
                                         }
                                         
-                                        // Render test tube icon for test link (separate from scenario name link)
-                                        // Scenarios have test_method, backend sets test_file with full path + anchor when test_method exists
-                                        if (scenario.test_file && testTubeIconPath) {
-                                            html += ` <span onclick="openFile('${this.escapeForJs(scenario.test_file)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                        // Render test tube icon: open all matching test files when test_files set, else single test_file (data attr avoids JSON-in-onclick parse errors)
+                                        if (testTubeIconPath && (scenario.test_files?.length > 0 || scenario.test_file)) {
+                                            if (scenario.test_files && scenario.test_files.length > 0) {
+                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                            } else {
+                                                html += ` <span onclick="openFile('${this.escapeForJs(scenario.test_file)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                            }
                                         }
                                         
                                         html += '</div>';

@@ -5940,7 +5940,7 @@
               }
             }
           ],
-          "test_file": "test/invoke_bot/edit_story_map/",
+          "test_file": "invoke_bot/edit_story_map/",
           "sub_epics": [
             {
               "name": "Scope Files",
@@ -6190,7 +6190,7 @@
                   "sequential_order": 0.0,
                   "behavior": null,
                   "domain_concepts": [],
-                  "test_file": "test/invoke_bot/edit_story_map/test_display_scope.py",
+                  "test_file": "invoke_bot/edit_story_map/test_display_scope.py",
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -7126,7 +7126,7 @@
                   "sequential_order": 2.0,
                   "behavior": null,
                   "domain_concepts": [],
-                  "test_file": "test/invoke_bot/edit_story_map/test_set_story_filter.py",
+                  "test_file": "invoke_bot/edit_story_map/test_set_story_filter.py",
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -10426,7 +10426,7 @@
               "sequential_order": 4.0,
               "behavior": null,
               "domain_concepts": [],
-              "test_file": "test/invoke_bot/edit_story_map/test_submit_scoped_action.py",
+              "test_file": "invoke_bot/edit_story_map/test_submit_scoped_action.py",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -11756,10 +11756,10 @@
             },
             {
               "name": "Open Story Related Files",
-              "sequential_order": 6.0,
+              "sequential_order": 5.0,
               "behavior": null,
               "domain_concepts": [],
-              "test_file": "test/invoke_bot/edit_story_map/test_open_story_related_files.py",
+              "test_file": "invoke_bot/edit_story_map/test_open_story_related_files.py",
               "sub_epics": [],
               "story_groups": [
                 {
@@ -12043,7 +12043,7 @@
             },
             {
               "name": "Trace Story Graph",
-              "sequential_order": 5.0,
+              "sequential_order": 6.0,
               "behavior": null,
               "domain_concepts": [],
               "sub_epics": [
@@ -13806,20 +13806,12 @@
                 }
               ],
               "story_groups": []
-            },
-            {
-              "name": "Child1",
-              "sequential_order": 8.0,
-              "behavior": null,
-              "domain_concepts": [],
-              "sub_epics": [],
-              "story_groups": []
             }
           ],
           "story_groups": [
             {
               "name": "",
-              "sequential_order": 5.0,
+              "sequential_order": 7.0,
               "type": "and",
               "connector": null,
               "behavior": null,
