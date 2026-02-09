@@ -342,6 +342,41 @@ class BotPanel {
               }
             }
             return;
+          case "openFiles":
+            this._log('[BotPanel] openFiles message received with ' + (message.filePaths && message.filePaths.length) + ' paths');
+            if (message.filePaths && Array.isArray(message.filePaths) && message.filePaths.length > 0) {
+              for (const filePath of message.filePaths) {
+                if (!filePath) continue;
+                const rawPath = filePath.split('#')[0];
+                const fragment = filePath.includes('#') ? filePath.split('#')[1] : null;
+                let lineNumber = null;
+                if (fragment && fragment.startsWith('L')) {
+                  lineNumber = parseInt(fragment.substring(1));
+                }
+                let absolutePath;
+                if (rawPath.startsWith('file://')) {
+                  absolutePath = vscode.Uri.parse(rawPath).fsPath;
+                } else {
+                  const decoded = decodeURIComponent(rawPath);
+                  absolutePath = path.isAbsolute(decoded) ? decoded : path.join(this._workspaceRoot, decoded);
+                }
+                const fileUri = vscode.Uri.file(absolutePath);
+                const fs = require('fs');
+                if (!fs.existsSync(absolutePath) || fs.statSync(absolutePath).isDirectory()) continue;
+                const fileExtension = rawPath.split('.').pop().toLowerCase();
+                const useVscodeOpenExtensions = ['json'];
+                if (useVscodeOpenExtensions.includes(fileExtension)) {
+                  vscode.commands.executeCommand('vscode.open', fileUri).catch(() => {});
+                } else {
+                  const openOptions = { viewColumn: vscode.ViewColumn.One, preserveFocus: false, preview: false };
+                  if (lineNumber) {
+                    openOptions.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
+                  }
+                  vscode.window.showTextDocument(fileUri, openOptions).catch(() => {});
+                }
+              }
+            }
+            return;
           case "openFileInColumn":
             this._log('[BotPanel] openFileInColumn message received');
             if (message.filePath) {
@@ -401,9 +436,79 @@ class BotPanel {
               const fileUri = vscode.Uri.file(absolutePath);
               
               // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+              // But if we have a selectedNode, we need to search and select it
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
-              if (fileExtension === 'json') {
-                // JSON files must use vscode.open - can't use showTextDocument
+              if (fileExtension === 'json' && message.state && message.state.selectedNode) {
+                // JSON with selectedNode - need to search document for node
+                vscode.workspace.openTextDocument(fileUri).then(
+                  (doc) => {
+                    const node = message.state.selectedNode;
+                    const text = doc.getText();
+                    const lines = text.split('\n');
+                    
+                    let nameLineIndex = -1;
+                    const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
+                    
+                    for (let i = 0; i < lines.length; i++) {
+                      if (namePattern.test(lines[i])) {
+                        nameLineIndex = i;
+                        break;
+                      }
+                    }
+                    
+                    let options = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
+                    
+                    if (nameLineIndex >= 0) {
+                      // Find the opening brace of this object (search backwards)
+                      let startLine = nameLineIndex;
+                      for (let i = nameLineIndex - 1; i >= 0; i--) {
+                        const line = lines[i].trim();
+                        if (line === '{' || line.endsWith('{')) {
+                          startLine = i;
+                          break;
+                        }
+                        if (line.startsWith('}') || line === '},') {
+                          break;
+                        }
+                      }
+                      
+                      // Find the matching closing brace (count braces forward)
+                      let braceCount = 0;
+                      let endLine = nameLineIndex;
+                      let started = false;
+                      
+                      for (let i = startLine; i < lines.length; i++) {
+                        const line = lines[i];
+                        for (const char of line) {
+                          if (char === '{') {
+                            braceCount++;
+                            started = true;
+                          } else if (char === '}') {
+                            braceCount--;
+                            if (started && braceCount === 0) {
+                              endLine = i;
+                              break;
+                            }
+                          }
+                        }
+                        if (started && braceCount === 0) break;
+                      }
+                      
+                      // Select from start of opening brace line to end of closing brace line
+                      const endLineLength = lines[endLine] ? lines[endLine].length : 0;
+                      options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
+                    }
+                    
+                    vscode.window.showTextDocument(doc, options).then(() => {
+                      this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
+                    });
+                  }
+                ).catch((error) => {
+                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                });
+              } else if (fileExtension === 'json') {
+                // JSON files without selectedNode - just open
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                 });
@@ -3221,6 +3326,30 @@ class BotPanel {
                 window.scrollTo(0, savedScrollY);
             }, 0);
             
+            return false;
+        };
+        window.openFiles = function(filePaths, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (!filePaths || !Array.isArray(filePaths) || filePaths.length === 0) return false;
+            const savedScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            sessionStorage.setItem('scrollPosition', savedScrollY.toString());
+            vscode.postMessage({ command: 'openFiles', filePaths: filePaths });
+            setTimeout(() => { window.scrollTo(0, savedScrollY); }, 0);
+            return false;
+        };
+        window.openFilesFromEl = function(el, event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            const raw = el && el.getAttribute && el.getAttribute('data-test-files');
+            if (raw) {
+                try {
+                    window.openFiles(JSON.parse(raw));
+                } catch (e) {
+                    console.error('[WebView] openFilesFromEl parse error:', e);
+                }
+            }
             return false;
         };
         
