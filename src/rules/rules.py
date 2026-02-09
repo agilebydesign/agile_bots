@@ -506,8 +506,10 @@ class Rules:
                 logger.info(status_line)
             logger.info('=== END SCANNER STATUS ===')
     
+    JS_EXTENSIONS = {'.js', '.ts', '.mjs', '.cjs'}
+
     def _detect_target_language(self, files: Dict[str, List[Path]]) -> Optional[str]:
-        """Detect if all files are of a single language type."""
+        """Detect if all files are of a single language type. Returns None for mixed so both scanners run."""
         all_files = []
         for file_list in files.values():
             all_files.extend(file_list)
@@ -517,14 +519,14 @@ class Rules:
         
         extensions = set(f.suffix.lower() for f in all_files)
         
-        # If all files are .js, target JavaScript only
-        if extensions == {'.js'}:
+        # All files are JavaScript/TypeScript -> use JS scanner only
+        if extensions and extensions <= self.JS_EXTENSIONS:
             return 'javascript'
         
-        # If all files are .py, target Python only  
+        # All files are Python -> use Python scanner only
         if extensions == {'.py'}:
             return 'python'
         
-        # Mixed or unknown - load both languages
+        # Mixed (.py and .js/.ts etc.) or unknown -> keep language-agnostic (both scanners)
         return None
 

@@ -1,10 +1,12 @@
-﻿import logging
+import logging
 from pathlib import Path
 from typing import List, Optional
 from bot_path import BotPath
 
 class FileDiscovery:
     EXCLUDED_FILES = {'__init__.py'}
+    # Extensions for code behavior: Python and JavaScript/TypeScript (client and server)
+    CODE_EXTENSIONS = ('.py', '.js', '.ts', '.mjs', '.cjs')
 
     def __init__(self, bot_paths: Optional[BotPath]=None, behavior_name: Optional[str]=None, exclude_patterns: List[str]=None):
         self.bot_paths = bot_paths
@@ -72,33 +74,42 @@ class FileDiscovery:
             logging.getLogger(__name__).debug(f'Path comparison failed (ValueError): {e}')
             raise
 
-    def expand_directory_to_files(self, dir_path: Path) -> List[Path]:
+    def _extensions_for_dir(self, dir_name: str) -> tuple:
+        """Return file extensions to discover. For src/test (code) include Python and JS/TS."""
+        if dir_name in ('src', 'test'):
+            return self.CODE_EXTENSIONS
+        return ('.py',)
+
+    def expand_directory_to_files(self, dir_path: Path, dir_name: Optional[str] = None) -> List[Path]:
         abs_dir_path = dir_path.resolve()
         abs_dir_str = str(abs_dir_path).replace('\\', '/')
+        extensions = self._extensions_for_dir(dir_name or '') if dir_name else self.CODE_EXTENSIONS
         result = []
-        for f in dir_path.rglob('*.py'):
-            if not self.should_include_file(f):
-                continue
-            f_abs_str = str(f.resolve()).replace('\\', '/')
-            if f_abs_str.startswith(abs_dir_str + '/') or f_abs_str == abs_dir_str:
-                result.append(f)
+        for ext in extensions:
+            for f in dir_path.rglob('*' + ext):
+                if not self.should_include_file(f):
+                    continue
+                f_abs_str = str(f.resolve()).replace('\\', '/')
+                if f_abs_str.startswith(abs_dir_str + '/') or f_abs_str == abs_dir_str:
+                    result.append(f)
         return result
 
     def discover_files_from_directory(self, dir_name: str) -> List[Path]:
         if not self.bot_paths:
             return []
         search_dir = self.bot_paths.workspace_directory / dir_name
-        return self._collect_py_files_in_dir(search_dir)
+        return self._collect_files_in_dir(search_dir, self._extensions_for_dir(dir_name))
 
-    def _collect_py_files_in_dir(self, search_dir: Path) -> List[Path]:
+    def _collect_files_in_dir(self, search_dir: Path, extensions: tuple) -> List[Path]:
         abs_dir_str = str(search_dir.resolve()).replace('\\', '/')
         discovered = []
-        for f in search_dir.rglob('*.py'):
-            if not self.should_include_file(f):
-                continue
-            f_abs_str = str(f.resolve()).replace('\\', '/')
-            if f_abs_str.startswith(abs_dir_str + '/') or f_abs_str == abs_dir_str:
-                discovered.append(f)
+        for ext in extensions:
+            for f in search_dir.rglob('*' + ext):
+                if not self.should_include_file(f):
+                    continue
+                f_abs_str = str(f.resolve()).replace('\\', '/')
+                if f_abs_str.startswith(abs_dir_str + '/') or f_abs_str == abs_dir_str:
+                    discovered.append(f)
         return discovered
 
     def auto_discover_files(self, key: str) -> List[str]:
@@ -106,7 +117,11 @@ class FileDiscovery:
             return []
         dir_name = self._behavior_to_directory() if self.behavior_name else key
         search_dir = self.bot_paths.workspace_directory / dir_name
-        return [str(f) for f in search_dir.rglob('*.py') if self.should_include_file(f)]
+        extensions = self._extensions_for_dir(dir_name)
+        result = []
+        for ext in extensions:
+            result.extend(str(f) for f in search_dir.rglob('*' + ext) if self.should_include_file(f))
+        return result
 
     def _behavior_to_directory(self) -> Optional[str]:
         if not self.behavior_name:
