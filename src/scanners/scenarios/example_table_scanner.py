@@ -75,6 +75,12 @@ class ExampleTableScanner(ScenarioScannerBase):
                 scenario, concept_names, domain_concepts, node
             )
             violations.extend(naming_violations)
+            
+            # Check for implementation ID columns that should be hidden
+            id_violations = self._check_implementation_id_columns(
+                scenario, node
+            )
+            violations.extend(id_violations)
         
         return violations
     
@@ -108,7 +114,7 @@ class ExampleTableScanner(ScenarioScannerBase):
                     f'Consider domain terms like: {", ".join(suggestions[:5])}'
                 ),
                 location=scenario.map_location('examples'),
-                severity='warning'
+                severity='error'
             ).to_dict()
             violations.append(violation)
         
@@ -160,7 +166,7 @@ class ExampleTableScanner(ScenarioScannerBase):
                     f'Add columns like: {", ".join([f"{c}_id" for c in sorted(missing_concepts)[:3]])}'
                 ),
                 location=scenario.map_location('examples'),
-                severity='warning'
+                severity='error'
             ).to_dict()
             violations.append(violation)
         
@@ -237,7 +243,7 @@ class ExampleTableScanner(ScenarioScannerBase):
                     f'Since the scenario discusses these concepts, examples should include them.'
                 ),
                 location=scenario.map_location('examples'),
-                severity='warning'
+                severity='error'
             ).to_dict()
             violations.append(violation)
         return violations
@@ -367,7 +373,7 @@ class ExampleTableScanner(ScenarioScannerBase):
                         f'the connecting sentence to "collaboration" field to reflect domain responsibilities.'
                     ),
                     location=scenario.map_location('examples'),
-                    severity='warning'
+                    severity='error'
                 ).to_dict()
                 violations.append(violation)
             
@@ -416,3 +422,50 @@ class ExampleTableScanner(ScenarioScannerBase):
                 return word.rstrip('s')
         
         return 'ConceptName'
+
+    def _check_implementation_id_columns(
+        self,
+        scenario: Scenario,
+        story: Story
+    ) -> List[Dict[str, Any]]:
+        """
+        Check for ID columns that are implementation concerns.
+        
+        ID columns used only for linking tables (foreign keys) should be hidden.
+        Table relationships are expressed via collaboration field and ordering.
+        """
+        violations = []
+        columns = scenario.examples_columns
+        if not columns:
+            return violations
+        
+        # Patterns that indicate implementation ID columns
+        id_patterns = [
+            r'^[a-z]+_id$',           # user_id, enterprise_id, recipient_id
+            r'^id$',                   # just 'id'
+            r'_id$',                   # anything ending in _id
+            r'^[A-Z]{2,}[-_]\d+$',    # Patterns like ENT-001, USR-001 (values, not columns)
+        ]
+        
+        import re
+        id_columns = []
+        for col in columns:
+            col_lower = col.lower()
+            for pattern in id_patterns:
+                if re.match(pattern, col_lower):
+                    id_columns.append(col)
+                    break
+        
+        if id_columns:
+            violation = Violation(
+                rule=self.rule,
+                violation_message=(
+                    f'ID columns are implementation concerns and should be hidden: {id_columns}. '
+                    f'Table relationships are expressed via collaboration field and table ordering, not foreign keys.'
+                ),
+                location=scenario.map_location('examples'),
+                severity='error'
+            ).to_dict()
+            violations.append(violation)
+        
+        return violations

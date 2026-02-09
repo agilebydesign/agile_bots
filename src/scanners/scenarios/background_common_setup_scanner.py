@@ -1,14 +1,16 @@
 """
 Background Common Setup Scanner
 
-Rule: use_background_for_common_setup
+Rule: background_vs_scenario_setup
 
 Validates that:
 1. Background only contains Given/And steps (no When/Then)
 2. Background is only used when 3+ scenarios share common setup
 3. Suggests Background when scenarios repeat the same Given steps
+4. Background steps must use parameters from example tables (no hardcoded values)
 """
 
+import re
 from typing import List, Dict, Any, Optional
 from scanners.story_scanner import StoryScanner
 from scanners.story_map import StoryNode, Story
@@ -31,6 +33,11 @@ class BackgroundCommonSetupScanner(StoryScanner):
                     violations.append(violation)
                 
                 violation = self._check_background_scenario_specific(background, scenarios, node)
+                if violation:
+                    violations.append(violation)
+                
+                # Check for hardcoded values in background (no parameters)
+                violation = self._check_background_missing_parameters(background, scenarios, node)
                 if violation:
                     violations.append(violation)
             
@@ -61,7 +68,56 @@ class BackgroundCommonSetupScanner(StoryScanner):
                 rule=self.rule,
                 violation_message=f'Background exists but story has only {len(scenarios)} scenario(s) - Background should only be used when 3+ scenarios share common setup',
                 location=location,
-                severity='warning'
+                severity='error'
+            ).to_dict()
+        
+        return None
+    
+    def _check_background_missing_parameters(self, background: List[str], scenarios: List[Dict[str, Any]], node: StoryNode) -> Optional[Dict[str, Any]]:
+        """Check if background steps are missing {Concept} references (hardcoded values)."""
+        # Get all available example table names (these are the concepts)
+        available_concepts = set()
+        for scenario in scenarios:
+            examples = scenario.get('examples', [])
+            for example in examples:
+                name = example.get('name', '')
+                if name:
+                    available_concepts.add(name.lower())
+        
+        # Check each background step for {Concept} notation
+        hardcoded_steps = []
+        for step in background:
+            # Skip if step already has {Concept} parameters
+            if '{' in step and '}' in step:
+                continue
+            
+            # Check for common domain concepts that should use {Concept} notation
+            step_lower = step.lower()
+            
+            # Check for domain terms that typically need {Concept} reference
+            domain_terms = [
+                'user',
+                'enterprise', 
+                'entitlement',
+                'account',
+                'recipient',
+                'payment',
+            ]
+            
+            for term in domain_terms:
+                if term in step_lower and term in available_concepts:
+                    # Step mentions a domain term and corresponding table exists
+                    # but step doesn't use {Concept} notation
+                    hardcoded_steps.append(step)
+                    break
+        
+        if hardcoded_steps:
+            location = f"{node.map_location()}.background"
+            return Violation(
+                rule=self.rule,
+                violation_message=f'Background steps have hardcoded values - use {{Concept}} notation: {hardcoded_steps[:2]}... Example: Given {{User}} is logged in, And {{User}} is entitled to {{Entitlement}}',
+                location=location,
+                severity='error'
             ).to_dict()
         
         return None

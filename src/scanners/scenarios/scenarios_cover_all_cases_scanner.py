@@ -51,7 +51,7 @@ class ScenariosCoverAllCasesScanner(StoryScanner):
                         rule=self.rule,
                         violation_message='Story has no edge case scenario - add scenarios covering boundary values and edge conditions',
                         location=node.map_location(),
-                        severity='warning'
+                        severity='error'
                     ).to_dict()
                     violations.append(violation)
                 
@@ -60,7 +60,7 @@ class ScenariosCoverAllCasesScanner(StoryScanner):
                         rule=self.rule,
                         violation_message='Story has no error case scenario - add scenarios covering invalid inputs and error conditions',
                         location=node.map_location(),
-                        severity='warning'
+                        severity='error'
                     ).to_dict()
                     violations.append(violation)
         
