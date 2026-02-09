@@ -415,24 +415,6 @@ class BehaviorsView extends PanelView {
      * @returns {string} HTML string
      */
     renderAction(action, bIdx, aIdx, behaviorName, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath) {
-        // Log inputs
-        const fs = require('fs');
-        const path = require('path');
-        const logPath = '.\\logs\\render-action-debug.log';
-        const timestamp = new Date().toISOString();
-        
-        const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] renderAction called\n` +
-            `  bIdx: ${bIdx}, aIdx: ${aIdx}\n` +
-            `  action raw: ${JSON.stringify(action)}\n` +
-            `  behaviorName (passed in): "${behaviorName}"\n` +
-            `  behaviorName type: ${typeof behaviorName}\n`;
-        
-        try {
-            fs.appendFileSync(logPath, logEntry);
-        } catch (err) {
-            console.error('[BehaviorsView] Failed to write to log file:', err);
-        }
-        
         const isCurrent = action.isCurrent || action.is_current || false;
         const isCompleted = action.isCompleted || action.is_completed || false;
         const actionMarker = isCurrent
@@ -444,27 +426,9 @@ class BehaviorsView extends PanelView {
         const actionTooltip = action.description ? this.escapeHtml(action.description) : '';
         const actionName = this.escapeHtml(action.action_name || action.name || '');
         
-        // Log escaped values
-        const logEntry2 = `  actionName (escaped): "${actionName}"\n` +
-            `  onclick will be: navigateToAction('${behaviorName}', '${actionName}')\n`;
-        
-        try {
-            fs.appendFileSync(logPath, logEntry2);
-        } catch (err) {
-            console.error('[BehaviorsView] Failed to write to log file:', err);
-        }
-        
         const actionActiveClass = isCurrent ? ' active' : '';
         const actionNameJs = this.escapeForJs(action.action_name || action.name || '');
         const actionHtml = `<div class="collapsible-header action-item card-item${actionActiveClass}" title="${actionTooltip}"><span class="action-name-clickable" style="cursor: pointer; text-decoration: underline;" data-action="navigateToAction" data-behavior-name="${behaviorName}" data-action-name="${actionNameJs}">${actionMarker}${actionName}</span></div>`;
-        
-        // Log final HTML
-        const logEntry3 = `  Generated HTML: ${actionHtml.substring(0, 200)}...\n`;
-        try {
-            fs.appendFileSync(logPath, logEntry3);
-        } catch (err) {
-            console.error('[BehaviorsView] Failed to write to log file:', err);
-        }
         
         return actionHtml;
     }
