@@ -1632,125 +1632,204 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
         }
       } else if (command === 'openAllRelatedFiles') {
-        // Open all files in separate split editors: graph + stories (column 1), tests (column 2), code (column 3)
+        // Use internal helper methods
         const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/story/story-graph.json');
+        const testFiles = message.testFiles || [];
+        const storyFiles = message.storyFiles || [];
+        const selectedNode = message.selectedNode;
         
         this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
-        this._log(`[BotPanel] nodePath: ${nodePath}`);
-        this._log(`[BotPanel] graphPath: ${graphPath}`);
         
-        // Open story graph in column 1 (leftmost) - using exact same logic as openFileWithState
-        const rawPath = graphPath;
-        const cleanPath = rawPath.split('#')[0];
-        let absolutePath;
-        if (cleanPath.startsWith('file://')) {
-          absolutePath = vscode.Uri.parse(cleanPath).fsPath;
+        // 1. Open story graph with node selected
+        await this._openGraphWithNodeSelected(graphPath, selectedNode);
+        
+        if (nodeType === 'sub-epic' || nodeType === 'epic') {
+          // For sub-epics/epics: open exploration doc (sub-epic's own file link) + all child story files
+          if (singleFileLink) {
+            this._log(`[BotPanel] Opening exploration file for sub-epic "${nodeName}": ${singleFileLink}`);
+            await this._openStoryFile(singleFileLink);
+          }
+          this._log(`[BotPanel] Opening ${storyFiles.length} story files for sub-epic "${nodeName}"`);
+          for (const storyFilePath of storyFiles) {
+            await this._openStoryFile(storyFilePath);
+          }
         } else {
-          const decoded = decodeURIComponent(cleanPath);
-          absolutePath = path.isAbsolute(decoded) 
-            ? decoded 
-            : path.join(workspaceRoot, decoded);
+          // 2. Open single story file
+          if (singleFileLink) {
+            await this._openStoryFile(singleFileLink);
+          }
         }
-        const fileUri = vscode.Uri.file(absolutePath);
         
+        // 3. Open test files
+        if (testFiles.length > 0) {
+          await this._openTestFiles(testFiles);
+        }
+        
+        // 4. Activate the story graph tab as the last step
+        const graphAbsPath = path.isAbsolute(graphPath) ? graphPath : path.join(workspaceRoot, graphPath);
+        const graphUri = vscode.Uri.file(graphAbsPath);
         try {
-          // Story graph is a JSON file - use vscode.open to avoid VS Code's 15MB text editor bug
-          await vscode.commands.executeCommand('vscode.open', fileUri);
-          this._log(`[BotPanel] Story graph opened in column 1`);
-        } catch (error) {
-          this._log(`[BotPanel] Error opening story graph: ${error.message}`);
-          vscode.window.showErrorMessage(`Failed to open story graph: ${error.message}`);
+          const graphDoc = await vscode.workspace.openTextDocument(graphUri);
+          await vscode.window.showTextDocument(graphDoc, { viewColumn: vscode.ViewColumn.One, preview: false, preserveFocus: false });
+        } catch (e) {
+          this._log(`[BotPanel] Could not re-activate story graph tab: ${e.message}`);
         }
-        
-        // Call the bot's openAll() method to get all related files
-        try {
-          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openAll()`);
-          
-          if (!result || result.status !== 'success') {
-            throw new Error('openAll() returned invalid result');
-          }
-          
-          const { story_files = [], test_files = [], code_files = [] } = result;
-          this._log(`[BotPanel] openAll() returned: ${story_files.length} stories, ${test_files.length} tests, ${code_files.length} code files`);
-          
-          // Open story files in Column 1 (left panel with graph)
-          if (singleFileLink && !story_files.includes(singleFileLink)) {
-            await openInColumn(singleFileLink, vscode.ViewColumn.One);
-          }
-          for (const filePath of story_files) {
-            if (filePath.endsWith('.md')) {
-              await openInColumn(filePath, vscode.ViewColumn.One);
-            }
-          }
-          this._log(`[BotPanel] Opened ${story_files.length} story files`);
-          
-          // Open test files in Column 2
-          for (const testFileInfo of test_files) {
-            const testFilePath = testFileInfo.file;
-            const absolutePath = path.isAbsolute(testFilePath)
-              ? testFilePath
-              : path.join(workspaceRoot, testFilePath);
-            
-            const fileUri = vscode.Uri.file(absolutePath);
-            
-            // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
-            const fileExtension = testFilePath.split('.').pop().toLowerCase();
-            if (fileExtension === 'json') {
-              await vscode.commands.executeCommand('vscode.open', fileUri);
-            } else {
-              const doc = await vscode.workspace.openTextDocument(fileUri);
-            
-              await vscode.window.showTextDocument(doc, {
-                viewColumn: vscode.ViewColumn.Two,
-                preview: false,
-                preserveFocus: true
-              });
-            }
-          }
-          this._log(`[BotPanel] Opened ${test_files.length} test files`);
-          
-          // Open code files in Column 3 (check if they exist first)
-          let openedCodeCount = 0;
-          for (const codeFilePath of code_files) {
-            const absolutePath = path.isAbsolute(codeFilePath)
-              ? codeFilePath
-              : path.join(workspaceRoot, codeFilePath);
-            
-            if (fs.existsSync(absolutePath)) {
-              const fileUri = vscode.Uri.file(absolutePath);
-              
-              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
-              const fileExtension = codeFilePath.split('.').pop().toLowerCase();
-              if (fileExtension === 'json') {
-                await vscode.commands.executeCommand('vscode.open', fileUri);
-                openedCodeCount++;
-              } else {
-                const doc = await vscode.workspace.openTextDocument(fileUri);
-              
-                await vscode.window.showTextDocument(doc, {
-                  viewColumn: vscode.ViewColumn.Three,
-                  preview: false,
-                  preserveFocus: true
-                });
-                openedCodeCount++;
-              }
-            } else {
-              this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
-            }
-          }
-          this._log(`[BotPanel] Opened ${openedCodeCount} code files`);
-          
-        } catch (error) {
-          this._log(`[BotPanel] Error opening all files: ${error.message}`);
-          this._log(`[BotPanel] Error stack: ${error.stack}`);
-        }
-        
-        this._log(`[BotPanel] Opened all related files for ${nodeType} "${nodeName}" in separate split editors`);
       }
     } catch (error) {
       this._log(`[BotPanel] ERROR in _handleOpenRelatedFiles: ${error.message}`);
       vscode.window.showErrorMessage(`Failed to open related files: ${error.message}`);
     }
+  }
+
+  /**
+   * Open story graph JSON file with a specific node selected and scrolled into view.
+   * @param {string} graphPath - Path to story-graph.json
+   * @param {object} selectedNode - Node to select (with name, type, path properties)
+   */
+  async _openGraphWithNodeSelected(graphPath, selectedNode) {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const absolutePath = path.isAbsolute(graphPath) 
+      ? graphPath 
+      : path.join(this._workspaceRoot, graphPath);
+    const fileUri = vscode.Uri.file(absolutePath);
+    
+    if (!selectedNode || !selectedNode.name) {
+      // No node to select, just open the file
+      await vscode.commands.executeCommand('vscode.open', fileUri);
+      return;
+    }
+    
+    // Open and search for node
+    const doc = await vscode.workspace.openTextDocument(fileUri);
+    const text = doc.getText();
+    const lines = text.split('\n');
+    
+    // Find the line with "name": "NodeName"
+    let nameLineIndex = -1;
+    const escapedName = selectedNode.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (namePattern.test(lines[i])) {
+        nameLineIndex = i;
+        break;
+      }
+    }
+    
+    let options = { viewColumn: vscode.ViewColumn.One, preview: false, preserveFocus: false };
+    
+    if (nameLineIndex >= 0) {
+      // Find the opening brace of this object
+      let startLine = nameLineIndex;
+      for (let i = nameLineIndex - 1; i >= 0; i--) {
+        const line = lines[i].trim();
+        if (line === '{' || line.endsWith('{')) {
+          startLine = i;
+          break;
+        }
+        if (line.startsWith('}') || line === '},') break;
+      }
+      
+      // Find the matching closing brace
+      let braceCount = 0;
+      let endLine = nameLineIndex;
+      let started = false;
+      
+      for (let i = startLine; i < lines.length; i++) {
+        for (const char of lines[i]) {
+          if (char === '{') { braceCount++; started = true; }
+          else if (char === '}') {
+            braceCount--;
+            if (started && braceCount === 0) { endLine = i; break; }
+          }
+        }
+        if (started && braceCount === 0) break;
+      }
+      
+      const endLineLength = lines[endLine] ? lines[endLine].length : 0;
+      options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
+    }
+    
+    await vscode.window.showTextDocument(doc, options);
+    this._log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
+  }
+
+  /**
+   * Open a story markdown file.
+   * @param {string} filePath - Path to the story .md file
+   */
+  async _openStoryFile(filePath) {
+    const fs = require('fs');
+    const path = require('path');
+    
+    if (!filePath) return;
+    
+    const cleanPath = filePath.split('#')[0];
+    const absolutePath = path.isAbsolute(cleanPath) 
+      ? cleanPath 
+      : path.join(this._workspaceRoot, cleanPath);
+    
+    if (!fs.existsSync(absolutePath)) {
+      this._log(`[BotPanel] Story file not found: ${absolutePath}`);
+      return;
+    }
+    
+    const fileUri = vscode.Uri.file(absolutePath);
+    const doc = await vscode.workspace.openTextDocument(fileUri);
+    await vscode.window.showTextDocument(doc, {
+      viewColumn: vscode.ViewColumn.One,
+      preview: false,
+      preserveFocus: true
+    });
+    this._log(`[BotPanel] Story file opened: ${filePath}`);
+  }
+
+  /**
+   * Open test files in a split editor.
+   * @param {string[]} testFiles - Array of test file paths
+   */
+  async _openTestFiles(testFiles) {
+    const fs = require('fs');
+    const path = require('path');
+    
+    for (const testFilePath of testFiles) {
+      try {
+        const cleanPath = testFilePath.split('#')[0];
+        const fragment = testFilePath.includes('#') ? testFilePath.split('#')[1] : null;
+        let lineNumber = null;
+        if (fragment && fragment.startsWith('L')) {
+          lineNumber = parseInt(fragment.substring(1));
+        }
+        
+        const absolutePath = path.isAbsolute(cleanPath) 
+          ? cleanPath 
+          : path.join(this._workspaceRoot, cleanPath);
+        
+        if (!fs.existsSync(absolutePath)) {
+          this._log(`[BotPanel] Test file not found: ${absolutePath}`);
+          continue;
+        }
+        
+        const fileUri = vscode.Uri.file(absolutePath);
+        const doc = await vscode.workspace.openTextDocument(fileUri);
+        
+        const options = {
+          viewColumn: vscode.ViewColumn.One,
+          preview: false,
+          preserveFocus: true
+        };
+        if (lineNumber) {
+          options.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
+        }
+        
+        await vscode.window.showTextDocument(doc, options);
+      } catch (error) {
+        this._log(`[BotPanel] Error opening test file ${testFilePath}: ${error.message}`);
+      }
+    }
+    this._log(`[BotPanel] Opened ${testFiles.length} test files`);
   }
 
   dispose() {
@@ -4543,15 +4622,76 @@ class BotPanel {
             const workspaceDir = getWorkspaceDir();
             const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
             
-            console.log('[WebView] handleOpenAll - selectedNode:', JSON.stringify(window.selectedNode));
-            console.log('[WebView] handleOpenAll - workspaceDir:', workspaceDir);
-            console.log('[WebView] handleOpenAll - storyGraphPath:', storyGraphPath);
-            console.log('[WebView] handleOpenAll - fileLink:', fileLink);
+            // Find the selected node element in DOM by iterating (querySelector fails with quoted paths)
+            let testFiles = [];
+            let storyFiles = [];
+            const selectedNodePath = window.selectedNode.path;
+            const nodeType = window.selectedNode.type;
             
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] handleOpenAll: node=' + window.selectedNode.name + ', type=' + window.selectedNode.type + ', path=' + window.selectedNode.path + ', workspace=' + workspaceDir
-            });
+            if (selectedNodePath) {
+                const allNodes = document.querySelectorAll('.story-node[data-path]');
+                let nodeEl = null;
+                for (const el of allNodes) {
+                    if (el.getAttribute('data-path') === selectedNodePath) {
+                        nodeEl = el;
+                        break;
+                    }
+                }
+                
+                if (nodeEl) {
+                    if (nodeType === 'sub-epic' || nodeType === 'epic') {
+                        // For sub-epics/epics: collect story files and test files from ALL child stories
+                        // The collapsible content div is a sibling of the node's parent div
+                        const parentDiv = nodeEl.closest('div');
+                        const collapsibleDiv = parentDiv ? parentDiv.nextElementSibling : null;
+                        
+                        if (collapsibleDiv && collapsibleDiv.classList.contains('collapsible-content')) {
+                            // Collect all story file links from child story nodes
+                            const childStoryNodes = collapsibleDiv.querySelectorAll('.story-node[data-node-type="story"]');
+                            childStoryNodes.forEach(function(storyEl) {
+                                const link = storyEl.getAttribute('data-file-link');
+                                if (link) {
+                                    storyFiles.push(link);
+                                }
+                            });
+                            
+                            // Collect all test files from child elements
+                            const testFileEls = collapsibleDiv.querySelectorAll('[data-test-files]');
+                            testFileEls.forEach(function(el) {
+                                try {
+                                    var files = JSON.parse(el.getAttribute('data-test-files'));
+                                    if (Array.isArray(files)) {
+                                        files.forEach(function(f) {
+                                            if (testFiles.indexOf(f) === -1) testFiles.push(f);
+                                        });
+                                    }
+                                } catch (e) {
+                                    console.error('[WebView] Error parsing child test_files:', e);
+                                }
+                            });
+                        }
+                        console.log('[WebView] Sub-epic/epic: found', storyFiles.length, 'story files and', testFiles.length, 'test files');
+                    } else {
+                        // For stories/scenarios: get test files from sibling element
+                        if (nodeEl.parentElement) {
+                            const testFilesEl = nodeEl.parentElement.querySelector('[data-test-files]');
+                            if (testFilesEl) {
+                                try {
+                                    testFiles = JSON.parse(testFilesEl.getAttribute('data-test-files'));
+                                    console.log('[WebView] Found test_files from DOM:', testFiles);
+                                } catch (e) {
+                                    console.error('[WebView] Error parsing test_files:', e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            console.log('[WebView] handleOpenAll - selectedNode:', JSON.stringify(window.selectedNode));
+            console.log('[WebView] handleOpenAll - fileLink:', fileLink);
+            console.log('[WebView] handleOpenAll - storyFiles:', storyFiles);
+            console.log('[WebView] handleOpenAll - testFiles:', testFiles);
             
             // Open all files in split editors
             vscode.postMessage({
@@ -4560,7 +4700,10 @@ class BotPanel {
                 nodeName: window.selectedNode.name,
                 nodePath: window.selectedNode.path,
                 singleFileLink: fileLink,
-                storyGraphPath: storyGraphPath
+                storyFiles: storyFiles,
+                testFiles: testFiles,
+                storyGraphPath: storyGraphPath,
+                selectedNode: window.selectedNode  // Pass full node for story graph positioning
             });
         };
         

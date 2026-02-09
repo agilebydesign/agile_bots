@@ -697,11 +697,19 @@ class StoryNode(ABC):
     def _get_matching_test_files_for_story(self, sub_epic: 'SubEpic', workspace_dir: Path, test_dir: Path) -> List[str]:
         """Return workspace-relative paths for all test files matching this sub-epic (multi-language, multi-file)."""
         from utils import find_matching_test_files, name_to_test_stem
+        import re
         primary = getattr(sub_epic, 'test_file', None) or ''
         if primary:
             p = Path(primary)
-            pattern = p.stem
-            under_path = str(p.parent) if str(p.parent) != '.' else None
+            stem = p.stem
+            # Strip tier suffix (_server, _client, _e2e) and test suffix (.test, .spec) for pattern matching
+            # e.g. "select-recipient_e2e.spec" -> "select-recipient"
+            pattern = re.sub(r'(_server|_client|_e2e)?(\.test|\.spec)?$', '', stem)
+            parent_str = str(p.parent)
+            # Strip leading 'test/' or 'test\\' from parent path since we search relative to test_dir
+            if parent_str.startswith('test/') or parent_str.startswith('test\\'):
+                parent_str = parent_str[5:]
+            under_path = parent_str if parent_str and parent_str != '.' else None
         else:
             pattern = name_to_test_stem(sub_epic.name or '')
             under_path = None
@@ -772,10 +780,10 @@ class StoryNode(ABC):
         }
     
     def openAll(self) -> dict:
-        """Open all related files for this node: story files, test files, and inferred code files.
+        """Open all related files for this node: story files, test files, exploration docs, and inferred code files.
         
         Returns:
-            dict with story_files, test_files, and code_files lists
+            dict with story_files, test_files, exploration_docs, and code_files lists
         """
         import re
         from pathlib import Path
@@ -787,6 +795,29 @@ class StoryNode(ABC):
         # Get test files
         test_result = self.openTest()
         test_files = test_result.get('files', [])
+        
+        # Get exploration docs (for sub-epics)
+        exploration_docs = []
+        if self._bot and hasattr(self._bot, 'bot_paths'):
+            exploration_path = self._bot.bot_paths.story_graph_paths.behavior_path('exploration')
+            if exploration_path and exploration_path.exists():
+                # Collect exploration docs for this node and ancestors
+                node_names = [self.name]
+                # Walk up the parent chain to collect names
+                parent = getattr(self, '_parent', None)
+                while parent:
+                    if hasattr(parent, 'name'):
+                        node_names.append(parent.name)
+                    parent = getattr(parent, '_parent', None)
+                
+                # Check each node name for an exploration doc
+                for name in node_names:
+                    if name:
+                        slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+                        if slug:
+                            candidate = exploration_path / f"{slug}-exploration.md"
+                            if candidate.exists() and str(candidate) not in exploration_docs:
+                                exploration_docs.append(str(candidate))
         
         # Infer code files from test files
         code_files = []
@@ -822,8 +853,9 @@ class StoryNode(ABC):
             'node_type': self.node_type,
             'story_files': story_files,
             'test_files': test_files,
+            'exploration_docs': exploration_docs,
             'code_files': code_files,
-            'total_count': len(story_files) + len(test_files) + len(code_files)
+            'total_count': len(story_files) + len(test_files) + len(exploration_docs) + len(code_files)
         }
     
     def openStoryGraph(self) -> dict:
