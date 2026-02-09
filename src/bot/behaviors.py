@@ -16,18 +16,13 @@ logger = logging.getLogger(__name__)
 class Behaviors:
 
     def __init__(self, bot_name: str, bot_paths: BotPath, allowed_behaviors: Optional[List[str]] = None):
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_path.parent.mkdir(parents=True, exist_ok=True); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behaviors.py:18','message':'Behaviors.__init__ entry','data':{'bot_name':bot_name},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self.bot_name = bot_name
         self.bot_paths = bot_paths
         self._allowed_behaviors = allowed_behaviors
         self._behaviors: List['Behavior'] = []
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behaviors.py:22','message':'Before _discover_behaviors','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self._discover_behaviors()
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behaviors.py:22','message':'After _discover_behaviors','data':{'behavior_count':len(self._behaviors)},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self._current_index: Optional[int] = None
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behaviors.py:24','message':'Before load_state','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self.load_state()
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behaviors.py:24','message':'After load_state - Behaviors.__init__ exit','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
 
     def _load_behavior_from_dir(self, item: Path) -> tuple:
         behavior_json_path = item / 'behavior.json'

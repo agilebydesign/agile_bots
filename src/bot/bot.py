@@ -28,27 +28,22 @@ class Bot:
     _active_bot_name: Optional[str] = None
 
     def __init__(self, bot_name: str, bot_directory: Path, config_path: Path, workspace_path: Path=None):
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_path.parent.mkdir(parents=True, exist_ok=True); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:24','message':'Bot.__init__ entry','data':{'bot_name':bot_name,'bot_directory_param':str(bot_directory),'bot_directory_name':bot_directory.name if bot_directory else None},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self.name = bot_name
         self.bot_name = bot_name
         self.config_path = Path(config_path)
         
         Bot._active_bot_instance = self
         Bot._active_bot_name = bot_name
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:28','message':'Before BotPaths creation','data':{'bot_directory_to_pass':str(bot_directory)},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         
         # Pass workspace_path to BotPath - BotPath will load from bot_config.json if None
         # Tests can pass workspace_path explicitly to override without persisting
         self.bot_paths = BotPath(workspace_path=workspace_path, bot_directory=bot_directory)
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:28','message':'After BotPaths creation','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         bot_config_path = self.bot_paths.bot_directory / 'bot_config.json'
         if not bot_config_path.exists():
             raise FileNotFoundError(f'Bot config not found at {bot_config_path}')
         self._config = read_json_file(bot_config_path)
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:33','message':'Before Behaviors creation','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         allowed_behaviors = self._config.get('behaviors')
         self.behaviors = Behaviors(bot_name, self.bot_paths, allowed_behaviors=allowed_behaviors)
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:33','message':'After Behaviors creation','data':{'behavior_count':len(self.behaviors._behaviors) if self.behaviors else 0},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
         self.behaviors._bot_instance = self
         for behavior in self.behaviors:
             behavior.bot = self
@@ -59,8 +54,6 @@ class Bot:
         
         self._story_graph = None
         self._story_graph_file_mtime = None  # Track story-graph.json mtime when cache was loaded
-        
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'bot.py:37','message':'Bot.__init__ exit','data':{},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H1'})+'\n'); log_file.close()
 
     @property
     def base_actions_path(self) -> Path:

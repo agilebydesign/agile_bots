@@ -1,9 +1,29 @@
 {
     "priority": 2,
-    "description": "Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Connected parent-child tables using responsibility sentences from the domain model. Concrete values with domain context, not generic JSON or placeholders.",
+    "description": "Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders.",
     "do": {
-        "description": "Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences.",
+        "description": "Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs.",
         "guidance": [
+            {
+                "description": "Omit ID columns - they are implementation concerns. Table relationships are expressed via collaboration field and ordering.",
+                "example": [
+                    "WRONG - IDs clutter the scenario with implementation details:",
+                    "| enterprise_id | recipient_id | recipient_name | recipient_status |",
+                    "| ENT-001       | RCP-001      | Global Supply  | Active           |",
+                    "",
+                    "CORRECT - Domain attributes only, relationships via collaboration:",
+                    "Enterprise:",
+                    "| enterprise_name | wire_service_enabled |",
+                    "| Acme Corp       | Yes                  |",
+                    "",
+                    "Recipient (creates()):",
+                    "| recipient_name  | recipient_status |",
+                    "| Global Supply   | Active           |",
+                    "| Tech Partners   | Active           |",
+                    "",
+                    "(Table order + collaboration field shows Enterprise creates Recipients)"
+                ]
+            },
             {
                 "description": "Example tables use concept name with collaboration sentences from domain responsibilities",
                 "example": [
@@ -157,6 +177,28 @@
                     "",
                     "| recipient_id | account_id |",
                     "(missing enterprise that scenario mentions)"
+                ]
+            },
+            {
+                "description": "Don't include ID columns for linking tables - IDs are implementation concerns",
+                "example": [
+                    "WRONG - IDs clutter scenarios with database-level details:",
+                    "| user_id | user_name | enterprise_id |",
+                    "| USR-001 | Jane Doe  | ENT-001       |",
+                    "",
+                    "| enterprise_id | recipient_id | recipient_name |",
+                    "| ENT-001       | RCP-001      | Global Supply  |",
+                    "",
+                    "CORRECT - Domain names only, tables connected by ordering:",
+                    "User:",
+                    "| user_name | user_role     |",
+                    "| Jane Doe  | Wire Operator |",
+                    "",
+                    "Recipient (creates()):",
+                    "| recipient_name | recipient_status |",
+                    "| Global Supply  | Active           |",
+                    "",
+                    "(IDs like user_id, enterprise_id, recipient_id are hidden - tests don't need them)"
                 ]
             },
             {

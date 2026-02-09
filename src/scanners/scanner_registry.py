@@ -24,8 +24,8 @@ class LanguageAgnosticScanner(Scanner):
             return self._python_instance
         
         file_ext = file_path.suffix.lower()
-        
-        if file_ext == '.js':
+        js_extensions = ('.js', '.ts', '.mjs', '.cjs')
+        if file_ext in js_extensions:
             if not self._js_instance:
                 self._js_instance = self._js_scanner_class(self.rule)
             return self._js_instance
@@ -37,45 +37,33 @@ class LanguageAgnosticScanner(Scanner):
     
     def scan_file_with_context(self, context):
         """Delegate to appropriate scanner based on file extension."""
-        scanner = self._get_scanner_for_file(context.path)
+        file_path = getattr(context, 'file_path', None) or getattr(context, 'path', None)
+        scanner = self._get_scanner_for_file(file_path)
         if scanner:
             return scanner.scan_file_with_context(context)
         return []
     
     def scan_with_context(self, context):
-        """Delegate to appropriate scanner based on file extensions in context."""
-        # Group files by extension
-        py_files = []
-        js_files = []
-        
-        if hasattr(context, 'files') and context.files:
-            if hasattr(context.files, 'paths'):
-                for file_path in context.files.paths:
-                    if file_path.suffix == '.js':
-                        js_files.append(file_path)
-                    else:
-                        py_files.append(file_path)
-        
+        """Delegate to language-specific scanner per file: .js/.ts/.mjs/.cjs use JS scanner, others use Python."""
+        from scanners.resources.scan_context import FileScanContext
         violations = []
-        
-        # Scan Python files with Python scanner
-        if py_files and self._python_scanner_class:
+        file_list = getattr(context.files, 'all_files', []) if getattr(context, 'files', None) else []
+        for file_path in file_list or []:
+            if not file_path or not file_path.exists() or not file_path.is_file():
+                continue
+            file_context = FileScanContext(story_graph=context.story_graph, file_path=file_path)
+            scanner = self._get_scanner_for_file(file_path)
+            if scanner:
+                file_violations = scanner.scan_file_with_context(file_context)
+                if file_violations:
+                    violations.extend(file_violations if isinstance(file_violations, list) else [file_violations])
+                if getattr(context, 'on_file_scanned', None):
+                    lst = file_violations if isinstance(file_violations, list) else ([file_violations] if file_violations else [])
+                    context.on_file_scanned(file_path, lst, self.rule)
+        if not file_list and self._python_scanner_class:
             if not self._python_instance:
                 self._python_instance = self._python_scanner_class(self.rule)
             violations.extend(self._python_instance.scan_with_context(context))
-        
-        # Scan JavaScript files with JS scanner  
-        if js_files and self._js_scanner_class:
-            if not self._js_instance:
-                self._js_instance = self._js_scanner_class(self.rule)
-            violations.extend(self._js_instance.scan_with_context(context))
-        
-        # If no specific files, default to Python scanner
-        if not py_files and not js_files:
-            if not self._python_instance:
-                self._python_instance = self._python_scanner_class(self.rule)
-            violations.extend(self._python_instance.scan_with_context(context))
-        
         return violations
 
 

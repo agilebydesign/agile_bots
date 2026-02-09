@@ -233,15 +233,29 @@ class JSCodeScanner(Scanner):
         message: str,
         details: Dict[str, Any] = None
     ) -> Dict[str, Any]:
-        """Create a violation dictionary."""
+        """Create a violation dictionary (legacy format with file key)."""
         violation = {
             'file': str(file_path),
             'line_number': line_number,
             'violation_message': message,
-            'rule_name': self._rule.name if hasattr(self, '_rule') else 'unknown'
+            'rule_name': self.rule.name if hasattr(self, 'rule') and self.rule else 'unknown'
         }
-        
         if details:
             violation['details'] = details
-        
         return violation
+
+    def _violation_to_dict(
+        self,
+        violation_message: str,
+        file_path: Path,
+        line_number: Optional[int] = None,
+        severity: str = 'warning'
+    ) -> Dict[str, Any]:
+        """Create a violation dict using scanners.violation.Violation (same format as Python scanners)."""
+        return Violation(
+            rule=self.rule,
+            violation_message=violation_message,
+            line_number=line_number,
+            location=str(file_path) if file_path else None,
+            severity=severity
+        ).to_dict()

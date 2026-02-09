@@ -75,8 +75,32 @@ class GivenStateNotActionsScanner(StoryScanner):
             'saves', 'saved', 'writes', 'wrote', 'reads', 'read'
         ]
         
+        # UI/page state phrases that are actually navigation actions, not true state
+        ui_action_patterns = [
+            r'\bis on (?:the )?(?:page|step|screen|view|form|section)',
+            r'\bis at (?:the )?(?:page|step|screen|view|form|section)',
+            r'\bis viewing (?:the )?',
+            r'\bnavigates? to\b',
+            r'\bhas navigated to\b',
+            r'\bis on \w+Details\b',  # e.g., "is on PaymentDetails"
+            r'\bis on \w+Step\b',  # e.g., "is on Step 2"
+            r'\bis on Step \d+\b',
+        ]
+        
         step_lower = step.lower()
         
+        # Check for UI/page action patterns
+        for pattern in ui_action_patterns:
+            if re.search(pattern, step_lower):
+                location = f"{node.map_location()}.scenarios[{scenario_idx}].steps[{step_idx}]"
+                return Violation(
+                    rule=self.rule,
+                    violation_message=f'Given step "{step}" describes navigation/UI position, not domain state. Describe what data EXISTS, not where user IS. E.g., "Given {'{'}WirePayment{'}'} creation is in progress" instead of "Given User is on PaymentDetails step".',
+                    location=location,
+                    severity='error'
+                ).to_dict()
+        
+        # Check for action verbs
         for verb in action_verbs:
             if verb in step_lower:
                 if re.search(rf'\b{verb}\b', step_lower):

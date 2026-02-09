@@ -15,6 +15,15 @@ import re
 
 
 class PlainEnglishScenariosScanner(StoryScanner):
+    """Validates scenarios use domain-parameterized language, not arbitrary template placeholders.
+    
+    ALLOWS:
+    - {DomainConcept} notation for parameterized domain concepts
+    - Examples tables (now required by write_concrete_scenarios rule)
+    
+    REJECTS:
+    - <variable> angle-bracket placeholders (non-domain style)
+    """
     
     def scan_story_node(self, node: StoryNode) -> List[Dict[str, Any]]:
         violations = []
@@ -26,17 +35,18 @@ class PlainEnglishScenariosScanner(StoryScanner):
             for scenario_idx, scenario in enumerate(scenarios):
                 scenario_text = self._get_scenario_text(scenario)
                 
+                # Only check for angle-bracket variables (not curly-brace domain parameters)
                 violation = self._check_variables(scenario_text, node, scenario_idx)
                 if violation:
                     violations.append(violation)
                 
+                # Scenario Outline is still not preferred (use individual scenarios with examples)
                 violation = self._check_scenario_outline(scenario_text, node, scenario_idx)
                 if violation:
                     violations.append(violation)
                 
-                violation = self._check_examples_table(scenario, node, scenario_idx)
-                if violation:
-                    violations.append(violation)
+                # NOTE: Examples tables are now REQUIRED by write_concrete_scenarios rule
+                # Do NOT check for examples as violations
         
         return violations
     
@@ -78,15 +88,5 @@ class PlainEnglishScenariosScanner(StoryScanner):
         
         return None
     
-    def _check_examples_table(self, scenario: Dict[str, Any], node: StoryNode, scenario_idx: int) -> Optional[Dict[str, Any]]:
-        if isinstance(scenario, dict):
-            if 'examples' in scenario or 'Examples:' in str(scenario):
-                location = f"{node.map_location()}.scenarios[{scenario_idx}]"
-                return Violation(
-                    rule=self.rule,
-                    violation_message='Scenario contains Examples table - use plain English scenarios instead',
-                    location=location,
-                    severity='error'
-                ).to_dict()
-        
-        return None
+    # _check_examples_table REMOVED - Examples tables are now REQUIRED by write_concrete_scenarios rule
+    # Every {parameter} in Background/Steps MUST have corresponding example table with concrete data
