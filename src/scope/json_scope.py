@@ -269,25 +269,25 @@ class JSONScope(JSONAdapter):
         test_class = story.get('test_class')
         story['test_files'] = parent_test_files  # all matching test files (multi-language) for "open all"
         
-        # Only add test icon if we have both test_file and test_class with a valid file AND the class exists
-        if test_file and test_class:
-            test_file_path = test_dir / test_file
-            if test_file_path.exists():
-                # Use JS-specific function for .js files, Python AST for .py files
-                if test_file_path.suffix == '.js':
-                    from utils import find_js_test_class_line
-                    line_number = find_js_test_class_line(test_file_path, test_class)
-                else:
-                    from utils import find_test_class_line
-                    line_number = find_test_class_line(test_file_path, test_class)
-                
-                if line_number:
-                    test_url = f"{test_file_path}#L{line_number}"
-                    story['links'].append({
-                        'text': 'test',
-                        'url': test_url,
-                        'icon': 'test_tube'
-                    })
+        # Create test links for ALL matching test files (front, back, e2e)
+        if test_class and parent_test_files:
+            from utils import find_js_test_class_line, find_test_class_line
+            for test_file_rel in parent_test_files:
+                test_file_path = Path(test_file_rel)
+                if test_file_path.exists():
+                    # Use JS-specific function for .js/.ts/.tsx files, Python AST for .py files
+                    if test_file_path.suffix in ('.js', '.ts', '.tsx'):
+                        line_number = find_js_test_class_line(test_file_path, test_class)
+                    else:
+                        line_number = find_test_class_line(test_file_path, test_class)
+                    
+                    if line_number:
+                        test_url = f"{test_file_path}#L{line_number}"
+                        story['links'].append({
+                            'text': 'test',
+                            'url': test_url,
+                            'icon': 'test_tube'
+                        })
         
         # Only enrich scenarios if requested (skip for 'scope showall' to avoid expensive AST parsing)
         if enrich_scenarios and 'scenarios' in story:
