@@ -181,7 +181,7 @@ class BotHeaderView extends PanelView {
                         : this.currentBot === 'crc_bot' && crcIconPath
                         ? `<img src="${crcIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="CRC Bot Icon" />`
                         : ''}
-                    <span style="font-weight: 600; font-size: 20px;">${safeBotName}</span>
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">${safeBotName}</span>
                 </div>
                 <div class="bot-links" onclick="event.stopPropagation();" style="gap: 6px;">
                     ${botLinksHtml}

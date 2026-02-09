@@ -137,7 +137,7 @@ class InstructionsSection extends PanelView {
                 user-select: none;
             ">
                 <span class="expand-icon">▸</span>
-                <span style="font-weight: 600; font-size: 20px;">Instructions</span>
+                <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Instructions</span>
             </div>
             <div id="instructions-content" class="collapsible-content" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.3s ease;">
                 <div class="card-secondary" style="padding: 8px 10px; color: var(--text-color-faded);">
@@ -538,7 +538,7 @@ class InstructionsSection extends PanelView {
                 <div style="display: flex; align-items: center;" onclick="toggleSection('instructions-content')">
                     <span class="expand-icon">▸</span>
                     ${clipboardIconPath ? `<img src="${clipboardIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Instructions Icon" />` : ''}
-                    <span style="font-weight: 600; font-size: 20px;">Instructions</span>
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Instructions</span>
                 </div>
                 <button id="submit-to-chat-btn" onclick="sendInstructionsToChat(event)" style="
                     background: rgba(255, 140, 0, 0.15);
