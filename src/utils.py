@@ -3,7 +3,7 @@ import json
 import sys
 import ast
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 def read_json_file(file_path: Path) -> Dict[str, Any]:
     if not file_path.exists():
@@ -433,3 +433,65 @@ def find_js_file_with_test_method(py_test_file_path: Path, test_method_name: str
             return js_file, line_number
     
     return None, None
+
+
+# Test file discovery for multi-language, multi-file test links (e.g. test_some_sub_epic.py, test_some_sub_epic_e2e.js)
+
+TEST_FILE_EXTENSIONS = ('.py', '.js', '.ts', '.mjs', '.cjs', '.spec.js', '.spec.ts', '.e2e.js', '.e2e.ts')
+
+
+def name_to_test_stem(name: str) -> str:
+    """Convert a node name (e.g. 'Test Some Sub Epic' or 'Some Sub Epic') to a test file stem like test_some_sub_epic."""
+    if not name or not name.strip():
+        return ''
+    s = name.strip().lower()
+    # Optional: strip leading "test " so "Test Some Sub Epic" and "Some Sub Epic" both yield test_some_sub_epic
+    if s.startswith('test '):
+        s = s[5:].strip()
+    s = re.sub(r'[^a-z0-9]+', '_', s).strip('_')
+    if not s:
+        return ''
+    return f'test_{s}' if not s.startswith('test_') else s
+
+
+def find_matching_test_files(
+    test_dir: Path,
+    pattern: str,
+    under_path: Optional[str] = None,
+) -> List[str]:
+    """Find all test files whose stem starts with pattern, in multiple languages (.py, .js, .ts, etc.).
+
+    Args:
+        test_dir: Root test directory (e.g. workspace / 'test').
+        pattern: File stem prefix to match (e.g. 'test_some_sub_epic').
+        under_path: If set, search only under this path relative to test_dir (e.g. 'invoke_bot/perform_action').
+
+    Returns:
+        List of paths relative to test_dir (e.g. ['invoke_bot/perform_action/test_some_sub_epic.py', ...]).
+    """
+    if not pattern:
+        return []
+    search_dir = test_dir / under_path if under_path else test_dir
+    if not search_dir.exists() or not search_dir.is_dir():
+        return []
+    seen_stems = set()
+    result: List[str] = []
+    # When under_path is set, search only that directory; else search recursively under test_dir
+    for ext in TEST_FILE_EXTENSIONS:
+        iterator = search_dir.glob(f'*{ext}') if under_path else search_dir.rglob(f'*{ext}')
+        for path in iterator:
+            if not path.is_file():
+                continue
+            stem = path.stem
+            if not stem.startswith(pattern):
+                continue
+            # Prefer one file per stem (e.g. .py over .pyc) and avoid duplicates
+            rel = path.relative_to(test_dir)
+            rel_str = str(rel).replace('\\', '/')
+            if rel_str in seen_stems:
+                continue
+            seen_stems.add(rel_str)
+            result.append(rel_str)
+    # Sort for stable order (e.g. .py first, then .js)
+    result.sort()
+    return result

@@ -164,6 +164,22 @@ class JSONScope(JSONAdapter):
         if 'links' not in sub_epic:
             sub_epic['links'] = []
         
+        # Multi-language, multi-file test discovery: find all files that partially match (e.g. test_some_sub_epic*.py, *.js)
+        from utils import find_matching_test_files, name_to_test_stem
+        import re
+        primary_test_file = sub_epic.get('test_file') or ''
+        if primary_test_file:
+            p = Path(primary_test_file)
+            stem = p.stem
+            # Strip tier suffix (_server, _client, _e2e) and test suffix (.test, .spec) for pattern matching
+            # e.g. "select-recipient_e2e.spec" -> "select-recipient"
+            pattern = re.sub(r'(_server|_client|_e2e)?(\.test|\.spec)?$', '', stem)
+            under_path = str(p.parent) if str(p.parent) != '.' else None
+        else:
+            pattern = name_to_test_stem(sub_epic.get('name') or '')
+            under_path = None
+        matching_rel = find_matching_test_files(test_dir, pattern, under_path or None)
+        sub_epic['test_files'] = [str(test_dir / r) for r in matching_rel]
         if 'test_file' in sub_epic and sub_epic['test_file']:
             test_file_path = test_dir / sub_epic['test_file']
             if test_file_path.exists():
@@ -201,7 +217,12 @@ class JSONScope(JSONAdapter):
             for story_group in sub_epic['story_groups']:
                 if 'stories' in story_group:
                     for story in story_group['stories']:
-                        self._enrich_story_with_links(story, test_dir, sub_epic_doc_folder, sub_epic.get('test_file'), enrich_scenarios=enrich_scenarios)
+                        self._enrich_story_with_links(
+                            story, test_dir, sub_epic_doc_folder,
+                            sub_epic.get('test_file'),
+                            sub_epic.get('test_files') or [],
+                            enrich_scenarios=enrich_scenarios
+                        )
 
     def _get_exploration_doc_path(self, exploration_path: Optional[Path], node_name: str) -> Optional[Path]:
         if not exploration_path:
@@ -223,7 +244,15 @@ class JSONScope(JSONAdapter):
                 return candidate
         return None
     
-    def _enrich_story_with_links(self, story: dict, test_dir: Path, parent_doc_folder: Path, parent_test_file: str, enrich_scenarios: bool = True):
+    def _enrich_story_with_links(
+        self,
+        story: dict,
+        test_dir: Path,
+        parent_doc_folder: Path,
+        parent_test_file: str,
+        parent_test_files: list,
+        enrich_scenarios: bool = True,
+    ):
         if 'links' not in story:
             story['links'] = []
         
@@ -238,6 +267,7 @@ class JSONScope(JSONAdapter):
         # test_file ALWAYS comes from parent sub-epic, never from the story itself
         test_file = parent_test_file
         test_class = story.get('test_class')
+        story['test_files'] = parent_test_files  # all matching test files (multi-language) for "open all"
         
         # Only add test icon if we have both test_file and test_class with a valid file AND the class exists
         if test_file and test_class:
@@ -262,11 +292,18 @@ class JSONScope(JSONAdapter):
         # Only enrich scenarios if requested (skip for 'scope showall' to avoid expensive AST parsing)
         if enrich_scenarios and 'scenarios' in story:
             for scenario in story['scenarios']:
-                self._enrich_scenario_with_links(scenario, test_dir, test_file, test_class)
+                self._enrich_scenario_with_links(scenario, test_dir, test_file, test_class, parent_test_files)
     
-    def _enrich_scenario_with_links(self, scenario: dict, test_dir: Path, story_test_file: str, story_test_class: str):
+    def _enrich_scenario_with_links(
+        self,
+        scenario: dict,
+        test_dir: Path,
+        story_test_file: str,
+        story_test_class: str,
+        story_test_files: list,
+    ):
         test_method = scenario.get('test_method')
-        
+        scenario['test_files'] = story_test_files  # all matching test files for "open all"
         if story_test_file and test_method:
             test_file_path = test_dir / story_test_file
             if test_file_path.exists():
@@ -277,12 +314,8 @@ class JSONScope(JSONAdapter):
                 else:
                     from utils import find_test_method_line
                     line_number = find_test_method_line(test_file_path, test_method)
-                
                 if line_number:
-                    test_url = f"{test_file_path}#L{line_number}"
-                    scenario['test_file'] = test_url
-                else:
-                    pass
+                    scenario['test_file'] = f"{test_file_path}#L{line_number}"
     
     def deserialize(self, data: str) -> dict:
         return json.loads(data)
