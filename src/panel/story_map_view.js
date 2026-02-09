@@ -2550,7 +2550,7 @@ class StoryMapView extends PanelView {
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
-                    <span style="font-weight: 600; font-size: 20px;">Story Map</span>
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
                     <button id="btn-toggle-increment-view" 
                         data-current-view="${this.currentViewMode || 'Hierarchy'}"
                         onclick="event.stopPropagation(); toggleIncrementView();" style="
