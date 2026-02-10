@@ -1,9 +1,9 @@
 {
-    "branding": "ACE",
+    "branding": "ABD",
     "brands": {
         "ABD": {
             "path": "",
-            "title": "Agile Bots",
+            "title": "Agile Context Engine",
             "color": "#FF8C00",
             "background": "#000000",
             "textColor": "#FFFFFF",
@@ -12,7 +12,7 @@
         },
         "Scotia": {
             "path": "scotia",
-            "title": "Scotia Bots",
+            "title": "Scotia Context Engine",
             "color": "#EC111A",
             "background": "#FFFFFF",
             "textColor": "#000000",

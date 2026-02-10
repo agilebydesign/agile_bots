@@ -2656,10 +2656,13 @@ class BotPanel {
                     }, 100);
                 }
                 
-                // Restore scroll position after a short delay to ensure content is rendered
+                // Restore scroll position and expand clarify boxes after content is rendered
                 setTimeout(() => {
                     if (window.restoreScrollPosition) {
                         window.restoreScrollPosition();
+                    }
+                    if (window.expandClarifyBoxes) {
+                        window.expandClarifyBoxes();
                     }
                 }, 150);
             } catch (err) {
@@ -3229,6 +3232,10 @@ class BotPanel {
                     content.style.maxHeight = '2000px';
                     content.style.overflow = 'visible';
                     content.style.display = 'block';
+                    // Expand clarify boxes once visible (they need layout to compute scrollHeight)
+                    if (content.querySelector('[id^="clarify-answer-"]')) {
+                        setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
+                    }
                 }
                 
                 // Toggle expanded class (CSS handles icon rotation - ▸ rotates 90deg when expanded)
@@ -3296,6 +3303,11 @@ class BotPanel {
                         content.style.overflow = 'visible';
                         content.style.display = 'block';
                         section.classList.add('expanded');
+                        
+                        // Expand clarify boxes once visible (need layout for scrollHeight)
+                        if (sectionName === 'Clarify' && content.querySelector('[id^="clarify-answer-"]')) {
+                            setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
+                        }
                         
                         // Update icon
                         const icon = header.querySelector('.expand-icon');
@@ -3431,6 +3443,20 @@ class BotPanel {
                 }
             }
             return false;
+        };
+        
+        // Expand clarification answer boxes to show full content (no scroll) on load/refresh
+        window.expandClarifyBoxes = function() {
+            const textareas = document.querySelectorAll('[id^="clarify-answer-"]');
+            textareas.forEach((ta) => {
+                if (ta.getAttribute('data-collapsed') === 'false') {
+                    ta.style.overflow = 'hidden';
+                    ta.style.height = '0px';
+                    const h = ta.scrollHeight;
+                    ta.style.height = Math.max(60, h) + 'px';
+                    ta.style.overflow = 'visible';
+                }
+            });
         };
         
         // Scroll position preservation functions
