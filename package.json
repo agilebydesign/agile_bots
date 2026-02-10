@@ -30,6 +30,7 @@
     "@types/chai": "^5.2.3",
     "@types/mocha": "^10.0.10",
     "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
     "chai": "^6.2.2",
     "esprima": "^4.0.1",
     "glob": "^13.0.0",

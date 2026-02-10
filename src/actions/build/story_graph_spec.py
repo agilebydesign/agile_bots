@@ -27,6 +27,15 @@ class StoryGraphSpec:
             self._config_data = self._get_default_config()
             self._config_path = None
             return
+        
+        # Pick the correct file
+        build_config = self._sg_dir / 'build_story_graph_outline.json'
+        if build_config.exists():
+            self._config_data = read_json_file(build_config)
+            self._config_path = build_config
+            return
+        
+        # Fall back to any other JSON file (on mac this picks instructions.json instead of build_story_graph_outline.json)
         config_files = list(self._sg_dir.glob('*.json'))
         if not config_files:
             self._config_data = self._get_default_config()
