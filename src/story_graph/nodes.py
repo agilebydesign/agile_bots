@@ -779,6 +779,257 @@ class StoryNode(ABC):
             'count': len(opened_files)
         }
     
+    def openCode(self) -> dict:
+        """Open source code files referenced by the test file for this node.
+        
+        Traces imports in the test file and resolves them to actual source files 
+        under src/ in the workspace. Filters out stdlib, third-party libs, 
+        and test helpers.
+        
+        Scope varies by node type:
+        - Scenario: top-level imports + imports within the specific test_method only
+        - Story: top-level imports + all imports within the test_class
+        - SubEpic: all imports in the entire test_file
+        - Epic: all imports from all test_files recursively
+        
+        Returns:
+            dict with status and list of resolved source file paths (workspace-relative)
+        """
+        import ast
+        from pathlib import Path
+        
+        if not self._bot or not hasattr(self._bot, 'bot_paths'):
+            return {
+                'status': 'success',
+                'node': self.name,
+                'node_type': self.node_type,
+                'files': [],
+                'count': 0
+            }
+        
+        workspace_dir = Path(self._bot.bot_paths.workspace_directory)
+        src_dir = workspace_dir / 'src'
+        
+        if not src_dir.exists():
+            return {
+                'status': 'success',
+                'node': self.name,
+                'node_type': self.node_type,
+                'files': [],
+                'count': 0
+            }
+        
+        # Collect top-level package names that exist under src/
+        src_packages = set()
+        for item in src_dir.iterdir():
+            if item.is_dir() and not item.name.startswith(('__', '.')):
+                src_packages.add(item.name)
+            elif item.is_file() and item.suffix == '.py' and item.name != '__init__.py':
+                src_packages.add(item.stem)
+        
+        # Determine scope(s) based on node type
+        scopes = self._get_code_scopes()
+        
+        code_files = []
+        seen_code_files = set()
+        
+        for scope in scopes:
+            test_file_rel = scope['test_file']
+            test_file_path = workspace_dir / test_file_rel
+            if not test_file_path.exists():
+                continue
+            
+            try:
+                source_code = test_file_path.read_text(encoding='utf-8')
+                tree = ast.parse(source_code)
+            except (SyntaxError, UnicodeDecodeError):
+                continue
+            
+            # Collect imports scoped to the appropriate level
+            imports = self._collect_scoped_imports(
+                tree,
+                test_class=scope.get('test_class'),
+                test_methods=scope.get('test_methods')
+            )
+            
+            # Filter imports to only workspace src/ modules and resolve to files
+            for module_name in imports:
+                top_package = module_name.split('.')[0]
+                if top_package not in src_packages:
+                    continue
+                
+                resolved = self._resolve_module_to_file(src_dir, module_name)
+                if resolved:
+                    rel_path = str(resolved.relative_to(workspace_dir)).replace('\\', '/')
+                    if rel_path not in seen_code_files:
+                        seen_code_files.add(rel_path)
+                        code_files.append(rel_path)
+        
+        return {
+            'status': 'success',
+            'node': self.name,
+            'node_type': self.node_type,
+            'files': code_files,
+            'count': len(code_files)
+        }
+    
+    def _get_code_scopes(self) -> list:
+        """Return list of scope dicts for import tracing, based on node type.
+        
+        Each scope has:
+            test_file: workspace-relative path to test file (e.g. 'test/invoke_bot/...')
+            test_class: class name to scope to (None = entire file)
+            test_methods: list of method names to scope to (None = entire class)
+        """
+        if isinstance(self, Scenario):
+            # Scenario: scope to specific test_method within test_class
+            story = self._parent
+            while story and not isinstance(story, Story):
+                story = story._parent if hasattr(story, '_parent') else None
+            
+            sub_epic = (story._parent if story else self._parent)
+            while sub_epic and not isinstance(sub_epic, SubEpic):
+                sub_epic = sub_epic._parent if hasattr(sub_epic, '_parent') else None
+            
+            if sub_epic and hasattr(sub_epic, 'test_file') and sub_epic.test_file:
+                test_file = sub_epic.test_file
+                if not test_file.startswith('test/') and not test_file.startswith('test\\'):
+                    test_file = f'test/{test_file}'
+                return [{
+                    'test_file': test_file,
+                    'test_class': story.test_class if story else None,
+                    'test_methods': [self.test_method] if self.test_method else None
+                }]
+            return []
+        
+        elif isinstance(self, Story):
+            # Story: scope to entire test_class (all methods)
+            sub_epic = self._parent
+            while sub_epic and not isinstance(sub_epic, SubEpic):
+                sub_epic = sub_epic._parent if hasattr(sub_epic, '_parent') else None
+            
+            if sub_epic and hasattr(sub_epic, 'test_file') and sub_epic.test_file:
+                test_file = sub_epic.test_file
+                if not test_file.startswith('test/') and not test_file.startswith('test\\'):
+                    test_file = f'test/{test_file}'
+                return [{
+                    'test_file': test_file,
+                    'test_class': self.test_class,
+                    'test_methods': None
+                }]
+            return []
+        
+        elif isinstance(self, SubEpic):
+            # SubEpic: scope to entire test_file, plus recurse into child sub-epics
+            scopes = []
+            if hasattr(self, 'test_file') and self.test_file:
+                test_file = self.test_file
+                if not test_file.startswith('test/') and not test_file.startswith('test\\'):
+                    test_file = f'test/{test_file}'
+                scopes.append({
+                    'test_file': test_file,
+                    'test_class': None,
+                    'test_methods': None
+                })
+            for child in self._children:
+                if isinstance(child, SubEpic):
+                    scopes.extend(child._get_code_scopes())
+            return scopes
+        
+        elif isinstance(self, Epic):
+            # Epic: recurse into all children
+            scopes = []
+            for child in self._children:
+                if isinstance(child, (SubEpic, Epic)):
+                    scopes.extend(child._get_code_scopes())
+            return scopes
+        
+        return []
+    
+    @staticmethod
+    def _collect_scoped_imports(tree, test_class=None, test_methods=None) -> set:
+        """Collect imports from AST tree, scoped to the appropriate level.
+        
+        - No test_class: ALL imports in the entire file
+        - test_class, no test_methods: top-level imports + all imports within test_class
+        - test_class AND test_methods: top-level imports + imports only within those methods
+        """
+        import ast
+        imports = set()
+        
+        # Always collect top-level (module-level) imports
+        for node in ast.iter_child_nodes(tree):
+            StoryNode._collect_imports_from_node(node, imports)
+        
+        if test_class:
+            # Find the test class
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef) and node.name == test_class:
+                    if test_methods:
+                        # Scenario scope: only imports from specific methods 
+                        # (plus any class-body-level imports)
+                        for item in ast.iter_child_nodes(node):
+                            if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                                if item.name in test_methods:
+                                    for sub in ast.walk(item):
+                                        StoryNode._collect_imports_from_node(sub, imports)
+                            else:
+                                # Class-body-level imports (not inside a method)
+                                StoryNode._collect_imports_from_node(item, imports)
+                    else:
+                        # Story scope: all imports from the entire class
+                        for item in ast.walk(node):
+                            StoryNode._collect_imports_from_node(item, imports)
+                    break
+        else:
+            # SubEpic/Epic scope: ALL imports in the file
+            for node in ast.walk(tree):
+                StoryNode._collect_imports_from_node(node, imports)
+        
+        return imports
+    
+    @staticmethod
+    def _collect_imports_from_node(node, imports: set):
+        """Extract module names from import/from-import AST nodes."""
+        import ast
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                imports.add(alias.name)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imports.add(node.module)
+    
+    @staticmethod
+    def _resolve_module_to_file(src_dir, module_name: str):
+        """Resolve a dotted module name to an actual file under src_dir.
+        
+        Tries: src/a/b/c.py, then src/a/b/c/__init__.py, then parent module.
+        """
+        from pathlib import Path
+        parts = module_name.split('.')
+        
+        # Try as a .py file: src/actions/action_context.py
+        candidate = src_dir / Path(*parts)
+        py_file = candidate.with_suffix('.py')
+        if py_file.exists():
+            return py_file
+        
+        # Try as a package: src/scope/__init__.py
+        init_file = candidate / '__init__.py'
+        if init_file.exists():
+            return init_file
+        
+        # Try parent module if the last part might be a class/function name
+        if len(parts) > 1:
+            parent_candidate = src_dir / Path(*parts[:-1])
+            parent_py = parent_candidate.with_suffix('.py')
+            if parent_py.exists():
+                return parent_py
+            parent_init = parent_candidate / '__init__.py'
+            if parent_init.exists():
+                return parent_init
+        
+        return None
+
     def openAll(self) -> dict:
         """Open all related files for this node: story files, test files, exploration docs, and inferred code files.
         
@@ -819,33 +1070,9 @@ class StoryNode(ABC):
                             if candidate.exists() and str(candidate) not in exploration_docs:
                                 exploration_docs.append(str(candidate))
         
-        # Infer code files from test files
-        code_files = []
-        seen_code_files = set()  # Track unique code files
-        
-        for test_file_info in test_files:
-            test_file = test_file_info.get('file', '')
-            if not test_file:
-                continue
-                
-            # Infer code file path: replace "test/" with "src/" and remove "test_" prefix
-            code_file = test_file
-            
-            # Replace test/ with src/ (handle both forward and backslashes)
-            code_file = re.sub(r'[\\/]test[\\/]', '/src/', code_file)
-            code_file = re.sub(r'^test[\\/]', 'src/', code_file)
-            
-            # Remove test_ prefix from filename
-            parts = code_file.split('/')
-            filename = parts[-1]
-            if filename.startswith('test_'):
-                parts[-1] = filename[5:]  # Remove "test_" prefix
-                code_file = '/'.join(parts)
-            
-            # Only add if not already seen
-            if code_file not in seen_code_files:
-                seen_code_files.add(code_file)
-                code_files.append(code_file)
+        # Get inferred code files
+        code_result = self.openCode()
+        code_files = code_result.get('files', [])
         
         return {
             'status': 'success',
