@@ -426,26 +426,45 @@ class TestOpenAllRelatedFiles:
         assert result['count'] == 1
         helper.story.assert_file_exists(result['files'][0]['file'], "Test file")
     
-    def test_code_button_infers_and_opens_code_files(self, tmp_path):
+    def test_code_button_traces_imports_to_find_code_files(self, tmp_path):
         """
-        SCENARIO: Code button infers and opens code files
-        GIVEN: User has selected a story graph node with test files
-        WHEN: User clicks Code button
-        THEN: System infers code files from test file paths (replace test/ with src/ or remove test_ prefix)
-        AND: System opens inferred code files
-        AND: System expands classes/methods referenced in tests
-        AND: System collapses other code
+        SCENARIO: Code button traces imports in test file to find code files
+        GIVEN: User has selected a story node with test_class
+        WHEN: User clicks Code button (openCode on story)
+        THEN: System parses the test file AST for imports within the test_class
+        AND: System resolves imports to workspace src/ modules
+        AND: System returns only workspace code files (not stdlib, not third-party)
         """
         helper = BotTestHelper(tmp_path)
-        helper.story.create_test_file(
-            'invoke_bot/edit_story_map/test_open_story_related_files.py',
-            'TestOpenAllRelatedFiles',
-            ['test_graph_button_opens_story_graph_with_selected_node_expanded']
-        )
-        # Create code file for inference test
-        code_file = helper.workspace / "src" / "story_graph" / "nodes.py"
-        code_file.parent.mkdir(parents=True, exist_ok=True)
-        code_file.write_text("class StoryNode:\n    def openStoryGraph(self): pass")
+        
+        # Create test file with imports - some at module level, some inside the class
+        test_file_content = '''import pytest
+from pathlib import Path
+import json
+
+class TestOpenAllRelatedFiles:
+    def test_graph_button_opens_story_graph(self):
+        from story_graph.nodes import StoryNode
+        node = StoryNode()
+        assert node is not None
+
+    def test_opens_code_files(self):
+        from panel.bot_panel import BotPanel
+        panel = BotPanel()
+        assert panel is not None
+'''
+        test_file = helper.workspace / "test" / "invoke_bot" / "edit_story_map" / "test_open_story_related_files.py"
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        test_file.write_text(test_file_content, encoding='utf-8')
+        
+        # Create src/ modules that the imports reference
+        story_graph_file = helper.workspace / "src" / "story_graph" / "nodes.py"
+        story_graph_file.parent.mkdir(parents=True, exist_ok=True)
+        story_graph_file.write_text("class StoryNode:\n    pass\n")
+        
+        panel_file = helper.workspace / "src" / "panel" / "bot_panel.py"
+        panel_file.parent.mkdir(parents=True, exist_ok=True)
+        panel_file.write_text("class BotPanel:\n    pass\n")
         
         story_graph_data = {
             "epics": [
@@ -455,7 +474,7 @@ class TestOpenAllRelatedFiles:
                         {
                             "name": "Open Story Related Files",
                             "sequential_order": 1.0,
-                            "test_file": "test/invoke_bot/edit_story_map/test_open_story_related_files.py",
+                            "test_file": "invoke_bot/edit_story_map/test_open_story_related_files.py",
                             "sub_epics": [],
                             "story_groups": [
                                 {
@@ -476,37 +495,228 @@ class TestOpenAllRelatedFiles:
         helper.story.create_story_graph(story_graph_data)
         
         story_node = helper.bot.story_graph["Work With Story Map"]["Open Story Related Files"]["Open All Related Files"]
-        helper.story.create_story_files_for_node(story_node)
-        test_result = story_node.openTest()
         
-        assert test_result['status'] == 'success'
-        assert len(test_result['files']) == 1
-        test_file_path = test_result['files'][0]['file']
+        # Story-level openCode() traces imports within the test_class
+        code_result = story_node.openCode()
         
-        helper.story.assert_file_exists(test_file_path, "Test file")
+        assert code_result['status'] == 'success'
+        assert code_result['node'] == 'Open All Related Files'
+        assert code_result['node_type'] == 'story'
+        assert code_result['count'] == 2
+        assert len(code_result['files']) == 2
         
-        inferred_code_file = str(test_file_path).replace('test/', 'src/').replace('test_', '')
-        assert code_file.exists() or Path(inferred_code_file).exists()
+        # Both workspace src/ imports should be resolved
+        assert 'src/story_graph/nodes.py' in code_result['files']
+        assert 'src/panel/bot_panel.py' in code_result['files']
+        
+        # stdlib imports (pytest, pathlib, json) should NOT be included
+        for f in code_result['files']:
+            assert 'pytest' not in f
+            assert 'pathlib' not in f
+            assert 'json' not in f
+    
+    def test_scenario_code_traces_only_its_test_method_imports(self, tmp_path):
+        """
+        SCENARIO: Scenario openCode traces only imports from its test_method
+        GIVEN: Story with two scenarios referencing different code
+        WHEN: openCode() is called on a single scenario
+        THEN: System returns only code files imported within that scenario's test_method
+        AND: System does NOT return code files from other test methods
+        """
+        helper = BotTestHelper(tmp_path)
+        
+        # Test file where each method imports different modules
+        test_file_content = '''import pytest
+
+class TestInjectContext:
+    def test_action_loads_context(self):
+        from actions.action_context import ScopeActionContext
+        ctx = ScopeActionContext()
+
+    def test_scope_appears_in_instructions(self):
+        from scope import Scope
+        s = Scope()
+'''
+        test_file = helper.workspace / "test" / "invoke_bot" / "perform_action" / "test_inject.py"
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        test_file.write_text(test_file_content, encoding='utf-8')
+        
+        # Create src/ modules
+        action_ctx = helper.workspace / "src" / "actions" / "action_context.py"
+        action_ctx.parent.mkdir(parents=True, exist_ok=True)
+        action_ctx.write_text("class ScopeActionContext:\n    pass\n")
+        
+        scope_init = helper.workspace / "src" / "scope" / "__init__.py"
+        scope_init.parent.mkdir(parents=True, exist_ok=True)
+        scope_init.write_text("class Scope:\n    pass\n")
+        
+        story_graph_data = {
+            "epics": [
+                {
+                    "name": "Invoke Bot",
+                    "sub_epics": [
+                        {
+                            "name": "Perform Action",
+                            "sequential_order": 1.0,
+                            "test_file": "invoke_bot/perform_action/test_inject.py",
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "stories": [
+                                        {
+                                            "name": "Inject Context",
+                                            "sequential_order": 1.0,
+                                            "test_class": "TestInjectContext",
+                                            "scenarios": [
+                                                {
+                                                    "name": "Action loads context",
+                                                    "sequential_order": 1.0,
+                                                    "test_method": "test_action_loads_context"
+                                                },
+                                                {
+                                                    "name": "Scope appears in instructions",
+                                                    "sequential_order": 2.0,
+                                                    "test_method": "test_scope_appears_in_instructions"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(story_graph_data)
+        
+        story_node = helper.bot.story_graph["Invoke Bot"]["Perform Action"]["Inject Context"]
+        scenario_1 = story_node["Action loads context"]
+        scenario_2 = story_node["Scope appears in instructions"]
+        
+        # Scenario 1 should only find actions.action_context
+        result_1 = scenario_1.openCode()
+        assert result_1['count'] == 1
+        assert 'src/actions/action_context.py' in result_1['files']
+        assert 'src/scope/__init__.py' not in result_1['files']
+        
+        # Scenario 2 should only find scope
+        result_2 = scenario_2.openCode()
+        assert result_2['count'] == 1
+        assert 'src/scope/__init__.py' in result_2['files']
+        assert 'src/actions/action_context.py' not in result_2['files']
+        
+        # Story-level openCode() should find BOTH (entire class scope)
+        story_result = story_node.openCode()
+        assert story_result['count'] == 2
+        assert 'src/actions/action_context.py' in story_result['files']
+        assert 'src/scope/__init__.py' in story_result['files']
+    
+    def test_sub_epic_code_traces_entire_test_file(self, tmp_path):
+        """
+        SCENARIO: SubEpic openCode traces all imports from entire test file
+        GIVEN: SubEpic with test_file containing multiple test classes
+        WHEN: openCode() is called on the sub-epic
+        THEN: System returns code files from ALL imports in the file (not just one class)
+        """
+        helper = BotTestHelper(tmp_path)
+        
+        test_file_content = '''import pytest
+from actions.action_context import ScopeActionContext
+
+class TestClassOne:
+    def test_one(self):
+        from scope import Scope
+        s = Scope()
+
+class TestClassTwo:
+    def test_two(self):
+        from panel.bot_panel import BotPanel
+        p = BotPanel()
+'''
+        test_file = helper.workspace / "test" / "invoke_bot" / "test_all_imports.py"
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        test_file.write_text(test_file_content, encoding='utf-8')
+        
+        # Create src/ modules
+        for mod_path, content in [
+            ("actions/action_context.py", "class ScopeActionContext: pass\n"),
+            ("scope/__init__.py", "class Scope: pass\n"),
+            ("panel/bot_panel.py", "class BotPanel: pass\n"),
+        ]:
+            f = helper.workspace / "src" / mod_path
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(content)
+        
+        story_graph_data = {
+            "epics": [
+                {
+                    "name": "Invoke Bot",
+                    "sub_epics": [
+                        {
+                            "name": "All Imports",
+                            "sequential_order": 1.0,
+                            "test_file": "invoke_bot/test_all_imports.py",
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "stories": [
+                                        {
+                                            "name": "Story One",
+                                            "sequential_order": 1.0,
+                                            "test_class": "TestClassOne"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(story_graph_data)
+        
+        sub_epic = helper.bot.story_graph["Invoke Bot"]["All Imports"]
+        
+        # SubEpic-level openCode() should trace ALL imports in the file
+        result = sub_epic.openCode()
+        assert result['count'] == 3
+        assert 'src/actions/action_context.py' in result['files']
+        assert 'src/scope/__init__.py' in result['files']
+        assert 'src/panel/bot_panel.py' in result['files']
     
     def test_all_button_opens_files_in_split_editors(self, tmp_path):
         """
         SCENARIO: All button opens files in split editors
         GIVEN: User has selected a story graph node
         WHEN: User clicks All button
-        THEN: System opens story-graph.json in leftmost split editor
-        AND: System opens story markdown files in next split editor to the right
-        AND: System opens test files in next split editor to the right
-        AND: System opens code files in rightmost split editor
-        AND: System applies Graph button behavior to story graph (collapse all, expand selected)
-        AND: System applies Test button behavior to test files (expand scope, collapse others)
-        AND: System applies Code button behavior to code files (expand referenced, collapse others)
+        THEN: System opens story-graph.json in editor
+        AND: System opens exploration file for sub-epic or epic if it exists
+        AND: System opens story markdown files for all stories under selected node
+        AND: System opens test files for all stories under selected node
+        AND: System opens all code files traced from imports in test files
+        AND: System activates story-graph.json tab as the last step
         """
         helper = BotTestHelper(tmp_path)
-        helper.story.create_test_file(
-            'invoke_bot/edit_story_map/test_open_story_related_files.py',
-            'TestOpenAllRelatedFiles',
-            ['test_graph_button_opens_story_graph_with_selected_node_expanded']
-        )
+        
+        # Create test file with imports that reference workspace src/ modules
+        test_file_content = '''import pytest
+from pathlib import Path
+
+class TestOpenAllRelatedFiles:
+    def test_graph_button_opens_story_graph_with_selected_node_expanded(self):
+        from story_graph.nodes import StoryNode
+        node = StoryNode()
+        assert node is not None
+'''
+        test_file = helper.workspace / "test" / "invoke_bot" / "edit_story_map" / "test_open_story_related_files.py"
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        test_file.write_text(test_file_content, encoding='utf-8')
+        
+        # Create src/ module that the import references
+        code_file = helper.workspace / "src" / "story_graph" / "nodes.py"
+        code_file.parent.mkdir(parents=True, exist_ok=True)
+        code_file.write_text("class StoryNode:\n    pass\n")
         
         story_graph_data = {
             "epics": [
@@ -516,7 +726,7 @@ class TestOpenAllRelatedFiles:
                         {
                             "name": "Open Story Related Files",
                             "sequential_order": 1.0,
-                            "test_file": "test/invoke_bot/edit_story_map/test_open_story_related_files.py",
+                            "test_file": "invoke_bot/edit_story_map/test_open_story_related_files.py",
                             "sub_epics": [],
                             "story_groups": [
                                 {
@@ -539,25 +749,33 @@ class TestOpenAllRelatedFiles:
         story_node = helper.bot.story_graph["Work With Story Map"]["Open Story Related Files"]["Open All Related Files"]
         helper.story.create_story_files_for_node(story_node)
         sub_epic_node = helper.bot.story_graph["Work With Story Map"]["Open Story Related Files"]
-        calculated_file_link = story_node.file_link
         
+        # openAll() opens: story graph, exploration files, story files, test files, and code files
+        all_result = story_node.openAll()
+        
+        assert all_result['status'] == 'success'
+        assert all_result['node'] == 'Open All Related Files'
+        
+        # Story graph path is available via openStoryGraph
         graph_result = story_node.openStoryGraph()
-        story_result = story_node.openStoryFile()
-        test_result = story_node.openTest()
-        
         assert graph_result['status'] == 'success'
         assert graph_result['story_graph_path'] == str(story_graph_file)
         helper.story.assert_file_exists(graph_result['story_graph_path'], "Story graph file")
         
-        assert story_result['status'] == 'success'
-        assert len(story_result['files']) == 1
-        assert story_result['files'][0] == calculated_file_link
-        helper.story.assert_file_exists(story_result['files'][0], "Story file")
+        # Story files for all stories under the node are returned
+        assert len(all_result['story_files']) >= 1
+        for story_file in all_result['story_files']:
+            helper.story.assert_file_exists(story_file, "Story file")
         
-        assert test_result['status'] == 'success'
-        assert len(test_result['files']) == 1
-        assert test_result['files'][0]['file'] == sub_epic_node.test_file
-        helper.story.assert_file_exists(test_result['files'][0]['file'], "Test file")
+        # Test files are returned
+        assert len(all_result['test_files']) >= 1
+        helper.story.assert_file_exists(all_result['test_files'][0]['file'], "Test file")
+        
+        # Code files traced from imports in test files are returned
+        assert len(all_result['code_files']) >= 1
+        assert 'src/story_graph/nodes.py' in all_result['code_files']
+        traced_code_file = helper.workspace / all_result['code_files'][0]
+        assert traced_code_file.exists(), f"Traced code file should exist: {traced_code_file}"
     
     def test_open_story_graph_returns_path_and_line_number(self, tmp_path):
         """
