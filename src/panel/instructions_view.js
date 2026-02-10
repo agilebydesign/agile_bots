@@ -666,13 +666,17 @@ class InstructionsSection extends PanelView {
                 if (questionText) {
                     const hasAnswer = answerText && answerText.trim().length > 0;
                     const isLongAnswer = hasAnswer && answerText.length > 100;
-                    const collapsedHeight = '60px';
+                    // Always show full answer without scrolling: estimate height from line count (~22px per line)
+                    const lineCount = (answerText.match(/\n/g) || []).length + 1;
+                    const expandedHeightPx = Math.min(500, Math.max(60, lineCount * 22));
+                    const heightStyle = hasAnswer ? `${expandedHeightPx}px` : 'auto';
+                    const overflowStyle = 'visible';
                     html += `<div class="input-container qa-container" style="margin-top: ${idx > 0 ? '12px' : '0'}; position: relative;">`;
                     html += `<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;">`;
                     html += `<span style="flex: 1; padding-right: 8px;">${this.escapeHtml(questionText)}</span>`;
-                    html += `<button onclick="toggleQAExpand(${idx})" id="qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">${isLongAnswer ? '▼' : '▲'}</button>`;
+                    html += `<button onclick="toggleQAExpand(${idx})" id="qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button>`;
                     html += `</div>`;
-                    html += `<textarea id="clarify-answer-${idx}" data-question="${this.escapeForAttribute(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${isLongAnswer ? collapsedHeight : 'auto'}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${isLongAnswer ? 'hidden' : 'visible'};" data-collapsed="${isLongAnswer ? 'true' : 'false'}">${this.escapeHtml(answerText)}</textarea>`;
+                    html += `<textarea id="clarify-answer-${idx}" data-question="${this.escapeForAttribute(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${heightStyle}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${overflowStyle};" data-collapsed="false">${this.escapeHtml(answerText)}</textarea>`;
                     html += `</div>`;
                 }
             });
