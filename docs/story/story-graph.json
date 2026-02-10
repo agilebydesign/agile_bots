@@ -11807,7 +11807,7 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_all_button_opens_files_in_split_editors",
-                          "steps": "GIVEN: User has selected a story graph node\nWHEN: User clicks All button\nTHEN: System opens story-graph.json in leftmost split editor\nAND: System opens story markdown files in next split editor to the right\nAND: System opens test files in next split editor to the right\nAND: System opens code files in rightmost split editor\nAND: System applies Graph button behavior to story graph (collapse all, expand selected)\nAND: System applies Test button behavior to test files (expand scope, collapse others)\nAND: System applies Code button behavior to code files (expand referenced, collapse others)"
+                          "steps": "GIVEN: User has selected a story graph node\nWHEN: User clicks All button\nTHEN: System opens story-graph.json in editor\nAND: System opens exploration file for sub-epic or epic if it exists\nAND: System opens story markdown files for all stories under selected node\nAND: System opens test files for all stories under selected node\nAND: System opens all code files related to opened test files\nAND: System activates story-graph.json tab as the last step"
                         },
                         {
                           "name": "CLI openStoryFile opens story markdown files",
@@ -11856,8 +11856,8 @@
                           "sequential_order": 4.0
                         },
                         {
-                          "name": "WHEN user clicks All button\nTHEN system opens all files in separate split editors AND system arranges story graph leftmost AND system arranges scenarios in next split AND system arranges tests in next split AND system arranges code in rightmost split",
-                          "text": "WHEN user clicks All button\nTHEN system opens all files in separate split editors AND system arranges story graph leftmost AND system arranges scenarios in next split AND system arranges tests in next split AND system arranges code in rightmost split",
+                          "name": "WHEN user clicks All button\nTHEN system opens story-graph.json in editor AND system opens exploration file for sub-epic or epic if it exists AND system opens story markdown files for all stories under selected node AND system opens test files for all stories under selected node AND system opens all code files related to opened test files AND system activates story-graph.json tab as last step",
+                          "text": "WHEN user clicks All button\nTHEN system opens story-graph.json in editor AND system opens exploration file for sub-epic or epic if it exists AND system opens story markdown files for all stories under selected node AND system opens test files for all stories under selected node AND system opens all code files related to opened test files AND system activates story-graph.json tab as last step",
                           "sequential_order": 5.0
                         },
                         {
