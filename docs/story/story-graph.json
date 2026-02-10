@@ -15952,7 +15952,7 @@
                       "name": "Inject Context Into Instructions",
                       "sequential_order": 0.0,
                       "connector": "or",
-                      "story_type": "user",
+                      "story_type": "user", 
                       "users": [
                         "Bot Behavior"
                       ],

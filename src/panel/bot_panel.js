@@ -1567,65 +1567,35 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open test files: ${error.message}`);
         }
       } else if (command === 'openCodeFiles') {
-        // Infer and open code files from test files
-        this._log(`[BotPanel] Opening code files inferred from tests for ${nodeType} "${nodeName}"`);
+        // Trace imports in test files to find and open code files
+        this._log(`[BotPanel] Opening code files traced from tests for ${nodeType} "${nodeName}"`);
         
         try {
-          // First get test files
-          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
+          const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openCode()`);
           if (result && result.files && Array.isArray(result.files)) {
-            const inferredCodeFiles = new Set(); // Use Set to avoid duplicates
-            
-            // Infer code files from test files
-            for (const testFileInfo of result.files) {
-              const testFilePath = testFileInfo.file;
-              
-              // Infer code file path: replace "test/" with "src/" and remove "test_" prefix
-              let codeFilePath = testFilePath;
-              
-              // Replace test/ with src/
-              codeFilePath = codeFilePath.replace(/[\\/]test[\\/]/g, '/src/');
-              codeFilePath = codeFilePath.replace(/^test[\\/]/g, 'src/');
-              
-              // Remove test_ prefix from filename
-              const parts = codeFilePath.split(/[\\/]/);
-              const filename = parts[parts.length - 1];
-              if (filename.startsWith('test_')) {
-                parts[parts.length - 1] = filename.substring(5); // Remove "test_"
-                codeFilePath = parts.join('/');
-              }
-              
-              inferredCodeFiles.add(codeFilePath);
-            }
-            
-            // Open each inferred code file
-            for (const codeFilePath of inferredCodeFiles) {
+            for (const codeFilePath of result.files) {
               const absolutePath = path.isAbsolute(codeFilePath)
                 ? codeFilePath
                 : path.join(workspaceRoot, codeFilePath);
               
-              const fileUri = vscode.Uri.file(absolutePath);
-              
-              // Check if file exists before trying to open
               if (fs.existsSync(absolutePath)) {
-                // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+                const fileUri = vscode.Uri.file(absolutePath);
                 const fileExtension = codeFilePath.split('.').pop().toLowerCase();
                 if (fileExtension === 'json') {
                   await vscode.commands.executeCommand('vscode.open', fileUri);
                 } else {
                   const doc = await vscode.workspace.openTextDocument(fileUri);
-                
-                  // Open in Column One
                   await vscode.window.showTextDocument(doc, {
                     viewColumn: vscode.ViewColumn.One,
                     preserveFocus: false
                   });
                 }
+                this._log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
               } else {
-                this._log(`[BotPanel] Inferred code file does not exist: ${codeFilePath}`);
+                this._log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
               }
             }
-            this._log(`[BotPanel] Opened ${inferredCodeFiles.size} inferred code files`);
+            this._log(`[BotPanel] Opened ${result.files.length} traced code files`);
           }
         } catch (error) {
           this._log(`[BotPanel] Error opening code files: ${error.message}`);
@@ -1663,6 +1633,37 @@ class BotPanel {
         // 3. Open test files
         if (testFiles.length > 0) {
           await this._openTestFiles(testFiles);
+        }
+        
+        // 3.5. Open code files traced from imports in test files
+        try {
+          const codeResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openCode()`);
+          if (codeResult && codeResult.files && Array.isArray(codeResult.files)) {
+            for (const codeFilePath of codeResult.files) {
+              const absolutePath = path.isAbsolute(codeFilePath)
+                ? codeFilePath
+                : path.join(workspaceRoot, codeFilePath);
+              if (fs.existsSync(absolutePath)) {
+                const fileUri = vscode.Uri.file(absolutePath);
+                const fileExtension = codeFilePath.split('.').pop().toLowerCase();
+                if (fileExtension === 'json') {
+                  await vscode.commands.executeCommand('vscode.open', fileUri);
+                } else {
+                  const doc = await vscode.workspace.openTextDocument(fileUri);
+                  await vscode.window.showTextDocument(doc, {
+                    viewColumn: vscode.ViewColumn.One,
+                    preserveFocus: false
+                  });
+                }
+                this._log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
+              } else {
+                this._log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
+              }
+            }
+            this._log(`[BotPanel] Opened ${codeResult.files.length} traced code files`);
+          }
+        } catch (codeErr) {
+          this._log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
         }
         
         // 4. Activate the story graph tab as the last step
