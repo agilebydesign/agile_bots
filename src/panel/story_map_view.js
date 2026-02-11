@@ -2736,7 +2736,7 @@ ${clientScript}    </script>`;
                 const subEpicTestIcon = testTubeIconPath && (subEpic.test_files?.length > 0 || subEpicTestLink)
                     ? (subEpic.test_files && subEpic.test_files.length > 0
                         ? ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                        : ` <span onclick="openFile('${this.escapeForJs(subEpicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
+                        : ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([subEpicTestLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
                     : '';
                 
                 // No inline action buttons (all actions are in the toolbar)
@@ -2799,7 +2799,7 @@ ${clientScript}    </script>`;
                                     } else {
                                         const testLink = story.links.find(l => l.icon === 'test_tube');
                                         if (testLink) {
-                                            html += ` <span onclick="openFile('${this.escapeForJs(testLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                            html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([testLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                         }
                                     }
                                 }
@@ -2837,7 +2837,7 @@ ${clientScript}    </script>`;
                                             if (scenario.test_files && scenario.test_files.length > 0) {
                                                 html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                             } else {
-                                                html += ` <span onclick="openFile('${this.escapeForJs(scenario.test_file)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([scenario.test_file]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                             }
                                         }
                                         

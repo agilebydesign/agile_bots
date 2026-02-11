@@ -1202,3 +1202,356 @@ class TestSubmitCurrentBehaviorActionForSelectedNode:
         assert scope_after.type.value == scope_type_before, f"Expected scope type '{scope_type_before}', got '{scope_after.type.value}'"
         assert list(scope_after.value) == scope_value_before, f"Expected scope value {scope_value_before}, got {list(scope_after.value)}"
 
+
+# ============================================================================
+# Copy Story Node To Clipboard (Story under Act With Selected Node)
+# ============================================================================
+
+class TestCopyStoryNodeToClipboard:
+    """Story: Copy Story Node To Clipboard. Domain logic for copy name and copy JSON."""
+
+    def test_copy_name_returns_node_name(self, tmp_path):
+        """
+        SCENARIO: StoryNode copy_name returns node name for clipboard
+        GIVEN: StoryMap is loaded with at least one Epic containing a SubEpic
+        AND: Bot has that StoryMap loaded
+        WHEN: copy_name is invoked on that SubEpic StoryNode
+        THEN: StoryNode.copy_name returns status success
+        AND: result is the node name
+        AND: the result can be written to system clipboard by the panel
+        """
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "Invoke Bot",
+                    "sub_epics": [
+                        {
+                            "name": "Act With Selected Node",
+                            "sequential_order": 0,
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "name": "",
+                                    "sequential_order": 0,
+                                    "type": "and",
+                                    "connector": None,
+                                    "stories": [
+                                        {
+                                            "name": "Copy Story Node To Clipboard",
+                                            "sequential_order": 0,
+                                            "connector": None,
+                                            "story_type": "user",
+                                            "users": [],
+                                            "scenarios": [
+                                                {
+                                                    "name": "User copies node name",
+                                                    "sequential_order": 0,
+                                                    "type": "happy_path",
+                                                    "background": [],
+                                                    "steps": ""
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(graph_data)
+        epic = helper.bot.story_map.epics["Invoke Bot"]
+        sub_epic = epic["Act With Selected Node"]
+        story = sub_epic["Copy Story Node To Clipboard"]
+
+        for node, expected_name in [
+            (epic, "Invoke Bot"),
+            (sub_epic, "Act With Selected Node"),
+            (story, "Copy Story Node To Clipboard"),
+        ]:
+            result = node.copy_name()
+            assert result["status"] == "success"
+            assert result["result"] == expected_name
+        if story.children:
+            scenario = story.children[0]
+            result = scenario.copy_name()
+            assert result["status"] == "success"
+            assert result["result"] == "User copies node name"
+
+    def test_copy_json_returns_node_as_story_graph_json(self, tmp_path):
+        """
+        SCENARIO: StoryNode copy_json returns node as story-graph JSON
+        GIVEN: StoryMap is loaded with an Epic and a SubEpic with known structure
+        AND: Bot has that StoryMap loaded
+        WHEN: copy_json is invoked on that SubEpic StoryNode
+        THEN: StoryNode.copy_json returns status success
+        AND: result is a dict with the same shape as the node in story-graph.json
+        AND: the result can be serialized to JSON and written to system clipboard by the panel
+        """
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "Epic A",
+                    "sequential_order": 0,
+                    "behavior": None,
+                    "sub_epics": [
+                        {
+                            "name": "SubEpic B",
+                            "sequential_order": 0,
+                            "behavior": None,
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "name": "",
+                                    "sequential_order": 0,
+                                    "type": "and",
+                                    "connector": None,
+                                    "stories": [
+                                        {
+                                            "name": "Story C",
+                                            "sequential_order": 0,
+                                            "connector": None,
+                                            "story_type": "user",
+                                            "users": [],
+                                            "scenarios": [],
+                                            "behavior": None
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(graph_data)
+        story_map = helper.bot.story_map
+        sub_epic = story_map.epics["Epic A"]["SubEpic B"]
+
+        result = sub_epic.copy_json()
+        assert result["status"] == "success"
+        d = result["result"]
+        assert isinstance(d, dict)
+        assert d["name"] == "SubEpic B"
+        assert "sub_epics" in d or "story_groups" in d
+        assert json.loads(json.dumps(d)) == d
+
+    def test_copy_json_for_story_includes_scenarios(self, tmp_path):
+        """copy_json for a Story node includes scenarios and acceptance_criteria in same shape as file."""
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "E1",
+                    "sub_epics": [],
+                    "story_groups": [
+                        {
+                            "name": "",
+                            "sequential_order": 0,
+                            "type": "and",
+                            "connector": None,
+                            "stories": [
+                                {
+                                    "name": "S1",
+                                    "sequential_order": 0,
+                                    "connector": None,
+                                    "story_type": "user",
+                                    "users": [],
+                                    "scenarios": [
+                                        {
+                                            "name": "Scenario one",
+                                            "sequential_order": 0,
+                                            "type": "happy_path",
+                                            "background": [],
+                                            "steps": "Given x\nWhen y\nThen z"
+                                        }
+                                    ],
+                                    "acceptance_criteria": [],
+                                    "behavior": None
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(graph_data)
+        story = helper.bot.story_map.epics["E1"].children[0].children[0]
+
+        result = story.copy_json()
+        assert result["status"] == "success"
+        d = result["result"]
+        assert d["name"] == "S1"
+        assert len(d["scenarios"]) == 1
+        assert d["scenarios"][0]["name"] == "Scenario one"
+        assert "steps" in d["scenarios"][0]
+
+    def test_node_to_dict_serializes_each_node_type(self, tmp_path):
+        """StoryMap.node_to_dict dispatches correctly for Epic, SubEpic, Story, Scenario."""
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "Epic",
+                    "sequential_order": 0,
+                    "sub_epics": [
+                        {
+                            "name": "SubEpic",
+                            "sequential_order": 0,
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "name": "",
+                                    "sequential_order": 0,
+                                    "type": "and",
+                                    "connector": None,
+                                    "stories": [
+                                        {
+                                            "name": "Story",
+                                            "sequential_order": 0,
+                                            "connector": None,
+                                            "story_type": "user",
+                                            "users": [],
+                                            "scenarios": [
+                                                {
+                                                    "name": "Scenario",
+                                                    "sequential_order": 0,
+                                                    "type": "happy_path",
+                                                    "background": [],
+                                                    "steps": ""
+                                                }
+                                            ],
+                                            "behavior": None
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(graph_data)
+        story_map = helper.bot.story_map
+        epic = story_map.epics["Epic"]
+        sub_epic = epic["SubEpic"]
+        story = sub_epic["Story"]
+
+        for node in (epic, sub_epic, story):
+            d = story_map.node_to_dict(node)
+            assert isinstance(d, dict)
+            assert d["name"] == node.name
+        if story.children:
+            scenario = story.children[0]
+            d = story_map.node_to_dict(scenario)
+            assert isinstance(d, dict)
+            assert d["name"] == scenario.name
+
+    def test_copy_json_without_bot_context_raises(self, tmp_path):
+        """copy_json without bot context raises ValueError."""
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [{"name": "E1", "sub_epics": [], "story_groups": [{"name": "", "sequential_order": 0, "type": "and", "connector": None, "stories": []}]}]
+        }
+        helper.story.create_story_graph(graph_data)
+        epic = helper.bot.story_map.epics["E1"]
+        epic._bot = None
+        with pytest.raises(ValueError, match="Cannot serialize node without bot context"):
+            epic.copy_json()
+
+
+class TestCopyStoryNodeToClipboardCLI:
+    """
+    Story: Copy Story Node To Clipboard (CLI)
+    CLI focus: story_graph.<path>.copy_name and copy_json return result in response.
+    """
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_cli_copy_name_returns_node_name(self, tmp_path, helper_class):
+        """
+        SCENARIO: CLI resolves story_graph path and copy_name returns node name
+        GIVEN: StoryMap is loaded with Epic "Invoke Bot" and SubEpic "Manage Bot"
+        AND: Bot has that StoryMap loaded
+        WHEN: User executes CLI command story_graph."Invoke Bot"."Manage Bot".copy_name
+        THEN: CLI returns success
+        AND: response result is the SubEpic node name "Manage Bot"
+        """
+        helper = helper_class(tmp_path)
+        helper.domain.story.create_story_graph_with_child("Epic", "Invoke Bot", "Manage Bot")
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph."Invoke Bot"."Manage Bot".copy_name'
+        )
+
+        output = cli_response.output
+        if output.strip().startswith("{"):
+            data = json.loads(output)
+            assert data.get("status") == "success"
+            assert data.get("result") == "Manage Bot"
+        else:
+            assert "success" in output.lower()
+            assert "Manage Bot" in output
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_cli_copy_json_returns_node_dict(self, tmp_path, helper_class):
+        """
+        SCENARIO: CLI resolves story_graph path and copy_json returns node dict
+        GIVEN: StoryMap is loaded with Epic "Invoke Bot" and SubEpic "Manage Bot"
+        AND: Bot has that StoryMap loaded
+        WHEN: User executes CLI command story_graph."Invoke Bot"."Manage Bot".copy_json
+        THEN: CLI returns success
+        AND: response result is a dict with name "Manage Bot" and story-graph shape for that node
+        """
+        helper = helper_class(tmp_path)
+        helper.domain.story.create_story_graph_with_child("Epic", "Invoke Bot", "Manage Bot")
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph."Invoke Bot"."Manage Bot".copy_json'
+        )
+
+        output = cli_response.output
+        if output.strip().startswith("{"):
+            data = json.loads(output)
+            assert data.get("status") == "success"
+            result = data.get("result")
+            assert isinstance(result, dict)
+            assert result.get("name") == "Manage Bot"
+        else:
+            assert "success" in output.lower()
+            assert "Manage Bot" in output
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper
+    ])
+    def test_cli_copy_name_nonexistent_node_outputs_error(self, tmp_path, helper_class):
+        """
+        SCENARIO: CLI copy_name on non-existent node path returns error
+        GIVEN: StoryMap is loaded with Epic "Invoke Bot" and SubEpic "Manage Bot"
+        AND: Bot has that StoryMap loaded
+        WHEN: User executes CLI command story_graph."Invoke Bot"."Non-existent Node".copy_name
+        THEN: CLI returns error
+        AND: output indicates node not found or path invalid
+        AND: no result is written to clipboard
+        """
+        helper = helper_class(tmp_path)
+        helper.domain.story.create_story_graph_with_child("Epic", "Invoke Bot", "Manage Bot")
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph."Invoke Bot"."Non-existent Node".copy_name'
+        )
+
+        assert "not found" in cli_response.output or "error" in cli_response.output.lower()
+        assert "Non-existent Node" in cli_response.output

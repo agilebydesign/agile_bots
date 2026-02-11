@@ -220,6 +220,27 @@ class BotPanel {
               fs.appendFileSync(logPath, `[${timestamp}] ${message.message}\n`);
             }
             return;
+          case "copyNodeToClipboard":
+            (async () => {
+              const nodePath = message.nodePath;
+              const action = message.action; // 'name' or 'json'
+              if (!nodePath || !action) return;
+              const method = action === 'json' ? 'copy_json' : 'copy_name';
+              const command = nodePath + '.' + method;
+              try {
+                const response = await this._botView.execute(command);
+                const result = response && (response.result !== undefined ? response.result : response);
+                const text = action === 'json'
+                  ? (typeof result === 'string' ? result : JSON.stringify(result, null, 2))
+                  : String(result != null ? result : '');
+                await vscode.env.clipboard.writeText(text);
+                vscode.window.setStatusBarMessage(action === 'json' ? 'Node JSON copied to clipboard' : 'Node name copied to clipboard', 2000);
+              } catch (err) {
+                this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
+                vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+              }
+            })();
+            return;
           case "openFile":
             this._log('[BotPanel] openFile message received with filePath: ' + message.filePath);
             if (message.filePath) {
@@ -2853,6 +2874,50 @@ class BotPanel {
                 e.preventDefault();
             }
         }, true); // Use capture phase to catch all double-clicks
+        
+        // Right-click context menu on story nodes: Copy node name / Copy full JSON (event -> CLI -> bot)
+        document.addEventListener('contextmenu', function(e) {
+            let target = e.target;
+            while (target && !target.classList.contains('story-node')) {
+                target = target.parentElement;
+            }
+            if (!target || !target.classList.contains('story-node')) return;
+            const nodePath = target.getAttribute('data-path');
+            if (!nodePath) return;
+            e.preventDefault();
+            e.stopPropagation();
+            // Remove any existing copy menu
+            const existing = document.getElementById('story-node-copy-menu');
+            if (existing) existing.remove();
+            const menu = document.createElement('div');
+            menu.id = 'story-node-copy-menu';
+            menu.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;background:var(--vscode-dropdown-background);border:1px solid var(--vscode-dropdown-border);border-radius:4px;padding:4px 0;z-index:10001;min-width:160px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
+            const items = [
+                { label: 'Copy node name', action: 'name' },
+                { label: 'Copy full JSON', action: 'json' }
+            ];
+            items.forEach(function(item) {
+                const div = document.createElement('div');
+                div.textContent = item.label;
+                div.style.cssText = 'padding:6px 12px;cursor:pointer;font-size:12px;';
+                div.onmouseover = function() { div.style.backgroundColor = 'var(--vscode-list-hoverBackground)'; };
+                div.onmouseout = function() { div.style.backgroundColor = ''; };
+                div.onclick = function(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    menu.remove();
+                    document.removeEventListener('click', closeMenu);
+                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: item.action });
+                };
+                menu.appendChild(div);
+            });
+            function closeMenu() {
+                if (menu.parentNode) menu.remove();
+                document.removeEventListener('click', closeMenu);
+            }
+            document.body.appendChild(menu);
+            setTimeout(function() { document.addEventListener('click', closeMenu); }, 0);
+        }, true);
         
         // Handle drag and drop for moving nodes
         let draggedNode = null;

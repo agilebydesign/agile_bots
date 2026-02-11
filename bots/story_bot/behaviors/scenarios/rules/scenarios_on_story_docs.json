@@ -19,16 +19,16 @@
         ]
     },
     "dont": {
-        "description": "Don\u0027t create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)",
+        "description": "Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)",
         "guidance": [
             {
-                "description": "Don\u0027t create feature specification documents",
+                "description": "Dont create feature specification documents",
                 "example": [
                     "docs/story/Epic/Feature/Feature Specification.md (WRONG - scenarios go in story-graph.json)"
                 ]
             },
             {
-                "description": "Don\u0027t create separate scenario markdown files",
+                "description": "Dont create separate scenario markdown files",
                 "example": [
                     "docs/story/scenarios.md (WRONG - scenarios go in story-graph.json)"
                 ]
