@@ -15803,7 +15803,7 @@
           "test_file": "invoke_bot/perform_action/",
           "sub_epics": [
             {
-              "name": "Synchronize Graph with Rendered Content",
+              "name": "Synchronized Graph with Rendered Diagram Content",
               "sequential_order": 0.0,
               "behavior": null,
               "domain_concepts": [],
@@ -15827,12 +15827,66 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML", "text": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML", "sequential_order": 1.0},
-                        {"name": "When layout data from previous render exists then system applies saved positions to preserve user arrangement and new nodes get default spacing", "text": "When layout data from previous render exists then system applies saved positions to preserve user arrangement and new nodes get default spacing", "sequential_order": 2.0},
-                        {"name": "When render completes then system writes DrawIO file to specified path and summary reports epics and sub_epic_count and diagram_generated", "text": "When render completes then system writes DrawIO file to specified path and summary reports epics and sub_epic_count and diagram_generated", "sequential_order": 3.0},
-                        {"name": "When story graph has E epics S sub-epics and N stories then rendered diagram contains exactly E epic cells S sub-epic cells and N story cells and summary reports epics E and sub_epic_count S", "text": "When story graph has E epics S sub-epics and N stories then rendered diagram contains exactly E epic cells S sub-epic cells and N story cells and summary reports epics E and sub_epic_count S", "sequential_order": 4.0},
-                        {"name": "When stories and sub-epics have sequential_order then diagram orders sub-epics left to right and stories within each group by sequential_order with and-groups horizontal and or-groups vertical", "text": "When stories and sub-epics have sequential_order then diagram orders sub-epics left to right and stories within each group by sequential_order with and-groups horizontal and or-groups vertical", "sequential_order": 5.0},
-                        {"name": "When layout data exists then system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants", "text": "When layout data exists then system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants", "sequential_order": 6.0}
+                        {
+                          "name": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML",
+                          "text": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When diagram is first rendered (no layout data) then epics at top at fixed Y; epic width equals combined width of sub-epics; sub-epics below epic; sub-epic width equals combined width of stories; stories left-to-right with spacing; actors above stories; epic-level and sub-epic-level actors above containers",
+                          "text": "When diagram is first rendered (no layout data) then epics at top at fixed Y; epic width equals combined width of sub-epics; sub-epics below epic; sub-epic width equals combined width of stories; stories left-to-right with spacing; actors above stories; epic-level and sub-epic-level actors above containers",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When layout data from previous render exists then system applies saved positions for epics and sub-epics; story positions from sequential order (left-to-right preserved); new stories that would overlap go below them for manual positioning; other new nodes get default spacing",
+                          "text": "When layout data from previous render exists then system applies saved positions for epics and sub-epics; story positions from sequential order (left-to-right preserved); new stories that would overlap go below them for manual positioning; other new nodes get default spacing",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When render completes then system writes DrawIO file to specified path and summary reports epics count and sub_epic_count and diagram_generated",
+                          "text": "When render completes then system writes DrawIO file to specified path and summary reports epics count and sub_epic_count and diagram_generated",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "When story graph has E epics S sub-epics and N stories then diagram contains exactly E epic cells S sub-epic cells N story cells and summary reports epics E and sub_epic_count S",
+                          "text": "When story graph has E epics S sub-epics and N stories then diagram contains exactly E epic cells S sub-epic cells N story cells and summary reports epics E and sub_epic_count S",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "When stories and sub-epics have sequential_order then diagram orders sub-epics left-to-right and stories within each sub-epic by sequential_order",
+                          "text": "When stories and sub-epics have sequential_order then diagram orders sub-epics left-to-right and stories within each sub-epic by sequential_order",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "When story has story_type user (or none) then system renders story cell with yellow fill (#fff2cc) stroke (#d6b656) and black text",
+                          "text": "When story has story_type user (or none) then system renders story cell with yellow fill (#fff2cc) stroke (#d6b656) and black text",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "When story has story_type system then system renders story cell with dark blue fill (#1a237e) stroke (#0d47a1) and white text",
+                          "text": "When story has story_type system then system renders story cell with dark blue fill (#1a237e) stroke (#0d47a1) and white text",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "When story has story_type technical then system renders story cell with black fill (#000000) stroke (#333333) and white text",
+                          "text": "When story has story_type technical then system renders story cell with black fill (#000000) stroke (#333333) and white text",
+                          "sequential_order": 9.0
+                        },
+                        {
+                          "name": "When epic cells are rendered then system uses rounded shape fill (#e1d5e7) stroke (#9673a6) and black text",
+                          "text": "When epic cells are rendered then system uses rounded shape fill (#e1d5e7) stroke (#9673a6) and black text",
+                          "sequential_order": 10.0
+                        },
+                        {
+                          "name": "When sub-epic cells are rendered then system uses rounded shape fill (#d5e8d4) stroke (#82b366) and black text",
+                          "text": "When sub-epic cells are rendered then system uses rounded shape fill (#d5e8d4) stroke (#82b366) and black text",
+                          "sequential_order": 11.0
+                        },
+                        {
+                          "name": "When actor (user) labels are rendered then system uses fixed-aspect cell fill (#dae8fc) stroke (#6c8ebf) and black text (8px)",
+                          "text": "When actor (user) labels are rendered then system uses fixed-aspect cell fill (#dae8fc) stroke (#6c8ebf) and black text (8px)",
+                          "sequential_order": 12.0
+                        }
                       ],
                       "behavior": null
                     },
@@ -15847,11 +15901,31 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments", "text": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments", "sequential_order": 1.0},
-                        {"name": "When story graph has increments with priority then system preserves priority order in diagram and lane Y positions derived from outline bottom and lane height", "text": "When story graph has increments with priority then system preserves priority order in diagram and lane Y positions derived from outline bottom and lane height", "sequential_order": 2.0},
-                        {"name": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane positions computed or from layout", "text": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane positions computed or from layout", "sequential_order": 3.0},
-                        {"name": "When render completes then system writes DrawIO file and summary includes increment count", "text": "When render completes then system writes DrawIO file and summary includes increment count", "sequential_order": 4.0},
-                        {"name": "When increment cells are rendered then style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)", "text": "When increment cells are rendered then style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)", "sequential_order": 5.0}
+                        {
+                          "name": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes; epic width spans sub-epics; sub-epic width spans stories; stories assigned to lanes from story graph increments[]; actors above stories within each lane; story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline",
+                          "text": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes; epic width spans sub-epics; sub-epic width spans stories; stories assigned to lanes from story graph increments[]; actors above stories within each lane; story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When story graph has increments with priority then system preserves priority order in diagram (lane order equals increment order) and lane Y positions derived from outline bottom and lane height",
+                          "text": "When story graph has increments with priority then system preserves priority order in diagram (lane order equals increment order) and lane Y positions derived from outline bottom and lane height",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane Y positions computed from outline bottom and lane height (saved layout for increment lanes not applied on re-render)",
+                          "text": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane Y positions computed from outline bottom and lane height (saved layout for increment lanes not applied on re-render)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When render completes then system writes DrawIO file and summary includes increment count",
+                          "text": "When render completes then system writes DrawIO file and summary includes increment count",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "When increment lane cells are rendered then system uses fill (#f5f5f5) stroke (#666666) bold text and black font; style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)",
+                          "text": "When increment lane cells are rendered then system uses fill (#f5f5f5) stroke (#666666) bold text and black font; style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)",
+                          "sequential_order": 5.0
+                        }
                       ],
                       "behavior": null
                     },
@@ -15866,10 +15940,26 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user requests exploration diagram then system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes", "text": "When user requests exploration diagram then system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes", "sequential_order": 1.0},
-                        {"name": "When story has acceptance criteria then system creates wider AC boxes below story and extracts step text from AC", "text": "When story has acceptance criteria then system creates wider AC boxes below story and extracts step text from AC", "sequential_order": 2.0},
-                        {"name": "When layout data exists then system preserves positions of story and AC boxes", "text": "When layout data exists then system preserves positions of story and AC boxes", "sequential_order": 3.0},
-                        {"name": "When render completes then output DrawIO contains both story cells and AC cells with correct containment", "text": "When render completes then output DrawIO contains both story cells and AC cells with correct containment", "sequential_order": 4.0}
+                        {
+                          "name": "When user requests exploration diagram then system renders epics sub-epics and stories with same layout as outline (epic spans sub-epics; sub-epic spans stories; stories left-to-right); story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline; acceptance criteria boxes below each story with AC; AC text formatted When/Then in boxes",
+                          "text": "When user requests exploration diagram then system renders epics sub-epics and stories with same layout as outline (epic spans sub-epics; sub-epic spans stories; stories left-to-right); story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline; acceptance criteria boxes below each story with AC; AC text formatted When/Then in boxes",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When story has acceptance criteria then system creates wider AC boxes below story; AC boxes use rectangular shape fill (#fff2cc) stroke (#d6b656) left-aligned 8px text; extracts step text from AC; actors remain above stories as in outline mode",
+                          "text": "When story has acceptance criteria then system creates wider AC boxes below story; AC boxes use rectangular shape fill (#fff2cc) stroke (#d6b656) left-aligned 8px text; extracts step text from AC; actors remain above stories as in outline mode",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When layout data exists then system preserves positions of story and AC boxes",
+                          "text": "When layout data exists then system preserves positions of story and AC boxes",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When render completes then output DrawIO contains both story cells and AC cells with correct containment",
+                          "text": "When render completes then output DrawIO contains both story cells and AC cells with correct containment",
+                          "sequential_order": 4.0
+                        }
                       ],
                       "behavior": null
                     },
@@ -15884,16 +15974,56 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment", "text": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment", "sequential_order": 1.0},
-                        {"name": "When original story graph path is provided then system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories", "text": "When original story graph path is provided then system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories", "sequential_order": 2.0},
-                        {"name": "When merge report exists and user runs merge then system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories", "text": "When merge report exists and user runs merge then system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories", "sequential_order": 3.0},
-                        {"name": "When user renames or reorders nodes in DrawIO then extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ", "text": "When user renames or reorders nodes in DrawIO then extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ", "sequential_order": 4.0},
-                        {"name": "When user deletes nodes in DrawIO then extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics", "text": "When user deletes nodes in DrawIO then extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics", "sequential_order": 5.0},
-                        {"name": "When sync runs then system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render", "text": "When sync runs then system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render", "sequential_order": 6.0},
-                        {"name": "When user moves a story in DrawIO and saves then sync extracts new position and assigns sequential_order from left-to-right and vertical position and merge updates sequential_order for matched story", "text": "When user moves a story in DrawIO and saves then sync extracts new position and assigns sequential_order from left-to-right and vertical position and merge updates sequential_order for matched story", "sequential_order": 7.0},
-                        {"name": "When user deletes one story cell then extracted graph omits that story and merge report lists it in removed_stories and merge output still contains original structure with only matched stories updated", "text": "When user deletes one story cell then extracted graph omits that story and merge report lists it in removed_stories and merge output still contains original structure with only matched stories updated", "sequential_order": 8.0},
-                        {"name": "When user deletes a sub-epic box then extracted graph omits that sub-epic and its stories are reassigned by containment and large_deletions includes missing_sub_epics for that sub-epic", "text": "When user deletes a sub-epic box then extracted graph omits that sub-epic and its stories are reassigned by containment and large_deletions includes missing_sub_epics for that sub-epic", "sequential_order": 9.0},
-                        {"name": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and merge report lists those stories as removed and large_deletions includes missing_epics", "text": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and merge report lists those stories as removed and large_deletions includes missing_epics", "sequential_order": 10.0}
+                        {
+                          "name": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by containment (story center inside sub-epic box) and each sub-epic has one story group with all its stories and assigns sequential order from top-to-bottom then left-to-right",
+                          "text": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by containment (story center inside sub-epic box) and each sub-epic has one story group with all its stories and assigns sequential order from top-to-bottom then left-to-right",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When the diagram update report is run for a story graph then system generates report comparing extracted diagram to original story graph and report lists exact matches fuzzy matches new stories and removed stories",
+                          "text": "When the diagram update report is run for a story graph then system generates report comparing extracted diagram to original story graph and report lists exact matches fuzzy matches new stories and removed stories",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When the story graph is updated from the DrawIO diagram (outline) then system applies report changes to the story graph",
+                          "text": "When the story graph is updated from the DrawIO diagram (outline) then system applies report changes to the story graph",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When user renames or reorders epics sub-epics or stories in DrawIO then extracted graph reflects new names and order and diagram update report flags renames as fuzzy matches when names differ",
+                          "text": "When user renames or reorders epics sub-epics or stories in DrawIO then extracted graph reflects new names and order and diagram update report flags renames as fuzzy matches when names differ",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "When user deletes nodes in DrawIO then extracted graph omits those nodes and diagram update report lists them as removed and large deletion detection flags entire missing epics or sub-epics",
+                          "text": "When user deletes nodes in DrawIO then extracted graph omits those nodes and diagram update report lists them as removed and large deletion detection flags entire missing epics or sub-epics",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "When sync runs then system persists layout data to a JSON file alongside the diagram and layout stores position and size for each epic sub-epic and story for use on next render",
+                          "text": "When sync runs then system persists layout data to a JSON file alongside the diagram and layout stores position and size for each epic sub-epic and story for use on next render",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "When user moves a story in DrawIO and saves then sync extracts new position and recomputes sequential order from left-to-right and vertical position and merge updates the matched story with new order",
+                          "text": "When user moves a story in DrawIO and saves then sync extracts new position and recomputes sequential order from left-to-right and vertical position and merge updates the matched story with new order",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "When user deletes one story cell then extracted graph omits that story and diagram update report lists it as removed and merged output keeps original structure with only matched stories updated and if many stories from one epic are missing the report flags that epic",
+                          "text": "When user deletes one story cell then extracted graph omits that story and diagram update report lists it as removed and merged output keeps original structure with only matched stories updated and if many stories from one epic are missing the report flags that epic",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "When user deletes a sub-epic box then extracted graph omits that sub-epic and stories under it are reassigned by where they sit (inside another sub-epic box or at epic level) and diagram update report flags the missing sub-epic in large_deletions",
+                          "text": "When user deletes a sub-epic box then extracted graph omits that sub-epic and stories under it are reassigned by where they sit (inside another sub-epic box or at epic level) and diagram update report flags the missing sub-epic in large_deletions",
+                          "sequential_order": 9.0
+                        },
+                        {
+                          "name": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and diagram update report lists those stories as removed and large_deletions includes missing_epics",
+                          "text": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and diagram update report lists those stories as removed and large_deletions includes missing_epics",
+                          "sequential_order": 10.0
+                        }
                       ],
                       "behavior": null
                     },
@@ -15908,15 +16038,56 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user synchronizes from DrawIO increments file then system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories to increments by story Y vs increment Y and priority is position order name is cell value", "text": "When user synchronizes from DrawIO increments file then system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories to increments by story Y vs increment Y and priority is position order name is cell value", "sequential_order": 1.0},
-                        {"name": "When original story graph is provided then system generates merge report with exact matches fuzzy matches new stories and removed stories and extracted increments reflect DrawIO lane positions", "text": "When original story graph is provided then system generates merge report with exact matches fuzzy matches new stories and removed stories and extracted increments reflect DrawIO lane positions", "sequential_order": 2.0},
-                        {"name": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership by Y position", "text": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership by Y position", "sequential_order": 3.0},
-                        {"name": "When merge runs then system preserves original acceptance criteria and steps and updates story fields from extracted within existing increments and adds extracted increments not in original and does not remove increments or replace which stories belong to which increment", "text": "When merge runs then system preserves original acceptance criteria and steps and updates story fields from extracted within existing increments and adds extracted increments not in original and does not remove increments or replace which stories belong to which increment", "sequential_order": 4.0},
-                        {"name": "When sync runs then system writes extracted JSON with epics and increments and optional merge report when original provided", "text": "When sync runs then system writes extracted JSON with epics and increments and optional merge report when original provided", "sequential_order": 5.0},
-                        {"name": "When user adds an increment lane then extracted has one more increment by Y order and merge adds it as new name", "text": "When user adds an increment lane then extracted has one more increment by Y order and merge adds it as new name", "sequential_order": 6.0},
-                        {"name": "When user removes an increment lane then extracted has fewer increments merge does not remove increments so removed lane name stays in merged stories in deleted lane reassign by Y to closest remaining in extracted", "text": "When user removes an increment lane then extracted has fewer increments merge does not remove increments so removed lane name stays in merged stories in deleted lane reassign by Y to closest remaining in extracted", "sequential_order": 7.0},
-                        {"name": "When user renames an increment then extracted has new name merge adds it by name and does not remove old name so merged can contain both original and renamed until rename strategy is defined", "text": "When user renames an increment then extracted has new name merge adds it by name and does not remove old name so merged can contain both original and renamed until rename strategy is defined", "sequential_order": 8.0},
-                        {"name": "When distinguishing original vs new increment then system uses name only same label means same increment no duplicate add different label means add as new cannot distinguish rename from new without stable id or position matching", "text": "When distinguishing original vs new increment then system uses name only same label means same increment no duplicate add different label means add as new cannot distinguish rename from new without stable id or position matching", "sequential_order": 9.0}
+                        {
+                          "name": "When user synchronizes from DrawIO increments file then system extracts increment lanes from the left side of the diagram (by style) sorted top to bottom and assigns stories to increments by vertical position (story assigned to nearest lane within 100px) and each lane gets position-based priority and its name from the cell label and writes extracted JSON; optionally generates diagram update report when original story graph provided",
+                          "text": "When user synchronizes from DrawIO increments file then system extracts increment lanes from the left side of the diagram (by style) sorted top to bottom and assigns stories to increments by vertical position (story assigned to nearest lane within 100px) and each lane gets position-based priority and its name from the cell label and writes extracted JSON; optionally generates diagram update report when original story graph provided",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When the diagram update report is run for a story graph (increments view) then system generates report (story-level: exact matches fuzzy matches new stories removed stories); increment membership in extracted reflects DrawIO lane positions",
+                          "text": "When the diagram update report is run for a story graph (increments view) then system generates report (story-level: exact matches fuzzy matches new stories removed stories); increment membership in extracted reflects DrawIO lane positions",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership (by Y position)",
+                          "text": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership (by Y position)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When the story graph is updated from the DrawIO diagram (increments view) then system preserves original acceptance criteria and steps and updates story fields (users sequential_order) from extracted within existing increments and matches increments by position (first extracted lane to first original lane etc); applies renames; appends extra lanes as new; does not remove increments or replace which stories belong to which increment",
+                          "text": "When the story graph is updated from the DrawIO diagram (increments view) then system preserves original acceptance criteria and steps and updates story fields (users sequential_order) from extracted within existing increments and matches increments by position (first extracted lane to first original lane etc); applies renames; appends extra lanes as new; does not remove increments or replace which stories belong to which increment",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "When user adds a new increment lane at the bottom in DrawIO then extracted graph has one more increment and merge appends it as new",
+                          "text": "When user adds a new increment lane at the bottom in DrawIO then extracted graph has one more increment and merge appends it as new",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "When user removes an increment lane then extracted has fewer lanes; merge does not remove increments so the removed lane stays in merged with its original stories; stories from the deleted lane are reassigned to the nearest remaining lane in the extracted diagram",
+                          "text": "When user removes an increment lane then extracted has fewer lanes; merge does not remove increments so the removed lane stays in merged with its original stories; stories from the deleted lane are reassigned to the nearest remaining lane in the extracted diagram",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "When user renames an increment lane then merge treats the lane at that position as the same increment and updates its name (position-based matching)",
+                          "text": "When user renames an increment lane then merge treats the lane at that position as the same increment and updates its name (position-based matching)",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "When extracted has more lanes than original then extra lanes are appended as new increments",
+                          "text": "When extracted has more lanes than original then extra lanes are appended as new increments",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "When extracted has fewer lanes than original then original lanes beyond that point remain unchanged (merge does not remove)",
+                          "text": "When extracted has fewer lanes than original then original lanes beyond that point remain unchanged (merge does not remove)",
+                          "sequential_order": 9.0
+                        },
+                        {
+                          "name": "KNOWN: inserting a new lane between two existing lanes may be misinterpreted without stable IDs",
+                          "text": "KNOWN: inserting a new lane between two existing lanes may be misinterpreted without stable IDs",
+                          "sequential_order": 10.0
+                        }
                       ],
                       "behavior": null
                     },
@@ -15931,11 +16102,31 @@
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [
-                        {"name": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps", "text": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps", "sequential_order": 1.0},
-                        {"name": "When AC box text is When/Then format then system extracts step description and associates with story", "text": "When AC box text is When/Then format then system extracts step description and associates with story", "sequential_order": 2.0},
-                        {"name": "When merge runs then system preserves original scenario steps and acceptance criteria and does not overwrite AC from extracted", "text": "When merge runs then system preserves original scenario steps and acceptance criteria and does not overwrite AC from extracted", "sequential_order": 3.0},
-                        {"name": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and merge report reflects structural changes", "text": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and merge report reflects structural changes", "sequential_order": 4.0},
-                        {"name": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells", "text": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells", "sequential_order": 5.0}
+                        {
+                          "name": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps",
+                          "text": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "When AC box text is When/Then format then system extracts step description and associates with story",
+                          "text": "When AC box text is When/Then format then system extracts step description and associates with story",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "When the story graph is updated from the DrawIO diagram (exploration view) then system applies report changes and preserves acceptance criteria and steps from original for matched stories (does not overwrite AC from extracted)",
+                          "text": "When the story graph is updated from the DrawIO diagram (exploration view) then system applies report changes and preserves acceptance criteria and steps from original for matched stories (does not overwrite AC from extracted)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and diagram update report reflects structural changes",
+                          "text": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and diagram update report reflects structural changes",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells",
+                          "text": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells",
+                          "sequential_order": 5.0
+                        }
                       ],
                       "behavior": null
                     }
@@ -19029,194 +19220,6 @@
                   ]
                 }
               ]
-            },
-            {
-              "name": "Synchronize Graph From Rendered",
-              "sequential_order": 8.0,
-              "behavior": null,
-              "domain_concepts": [],
-              "test_file": "invoke_bot/perform_action/test_synchronize_graph_from_rendered.py",
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "behavior": null,
-                  "stories": [
-                    {
-                      "name": "Detect Story Graph Changes From Diagram",
-                      "sequential_order": 1.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestDetectStoryGraphChangesFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User makes changes to StoryOutput diagram\nTHEN the StoryMap hanging off StoryOutput reflects those changes in its object model\nAND the changes are visible when accessing the StoryMap directly via API\nAND the StoryRenderedNodes maintain parent/child relationships matching the modified structure",
-                          "text": "WHEN User makes changes to StoryOutput diagram\nTHEN the StoryMap hanging off StoryOutput reflects those changes in its object model\nAND the changes are visible when accessing the StoryMap directly via API\nAND the StoryRenderedNodes maintain parent/child relationships matching the modified structure",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN User hits synchronize button\nTHEN Synchronizer compares StoryOutput's StoryMap against Bot's story_graph\nAND Synchronizer identifies all differences (added nodes, deleted nodes, renamed nodes, moved nodes)\nAND Synchronizer generates batch of change operations grouped by change type\nAND Synchronizer calculates dependencies between changes (e.g., must create parent before child)",
-                          "text": "WHEN User hits synchronize button\nTHEN Synchronizer compares StoryOutput's StoryMap against Bot's story_graph\nAND Synchronizer identifies all differences (added nodes, deleted nodes, renamed nodes, moved nodes)\nAND Synchronizer generates batch of change operations grouped by change type\nAND Synchronizer calculates dependencies between changes (e.g., must create parent before child)",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Create Child Story Node From Diagram",
-                      "sequential_order": 2.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestCreateChildStoryNodeFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot's StoryMap reads batch of add operations from Synchronizer\nTHEN Bot's StoryMap creates new child nodes at correct hierarchy positions\nAND new nodes include all properties from diagram's StoryMap (name, type, sequential order)\nAND Bot's StoryMap resequences existing siblings when inserting at specific positions\nAND parent-child relationships match diagram's StoryMap structure",
-                          "text": "WHEN Bot's StoryMap reads batch of add operations from Synchronizer\nTHEN Bot's StoryMap creates new child nodes at correct hierarchy positions\nAND new nodes include all properties from diagram's StoryMap (name, type, sequential order)\nAND Bot's StoryMap resequences existing siblings when inserting at specific positions\nAND parent-child relationships match diagram's StoryMap structure",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads Epic add child SubEpic operation\nTHEN Bot's StoryMap adds Sub-Epic to Epic's children\nAND sequential order matches position from diagram's StoryMap",
-                          "text": "WHEN Bot's StoryMap reads Epic add child SubEpic operation\nTHEN Bot's StoryMap adds Sub-Epic to Epic's children\nAND sequential order matches position from diagram's StoryMap",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads SubEpic add child SubEpic operation (no Story children)\nTHEN Bot's StoryMap adds SubEpic to parent SubEpic's children",
-                          "text": "WHEN Bot's StoryMap reads SubEpic add child SubEpic operation (no Story children)\nTHEN Bot's StoryMap adds SubEpic to parent SubEpic's children",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads SubEpic add Story operation (no SubEpic children)\nTHEN Bot's StoryMap creates default StoryGroup under Sub-Epic if needed\nAND Bot's StoryMap adds Story to Story Group\nAND story properties match diagram's StoryMap",
-                          "text": "WHEN Bot's StoryMap reads SubEpic add Story operation (no SubEpic children)\nTHEN Bot's StoryMap creates default StoryGroup under Sub-Epic if needed\nAND Bot's StoryMap adds Story to Story Group\nAND story properties match diagram's StoryMap",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads SubEpic add SubEpic operation (has existing Story children)\nTHEN Bot's StoryMap identifies SubEpic already contains Stories\nAND Bot's StoryMap reports error indicating cannot create SubEpic under SubEpic with Stories\nBUT Bot's StoryMap does not apply the invalid add operation",
-                          "text": "WHEN Bot's StoryMap reads SubEpic add SubEpic operation (has existing Story children)\nTHEN Bot's StoryMap identifies SubEpic already contains Stories\nAND Bot's StoryMap reports error indicating cannot create SubEpic under SubEpic with Stories\nBUT Bot's StoryMap does not apply the invalid add operation",
-                          "sequential_order": 5.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads SubEpic add Story operation (has existing SubEpic children)\nTHEN Bot's StoryMap identifies SubEpic already contains Sub-Epics\nAND Bot's StoryMap reports error indicating cannot create Story under SubEpic with Sub-Epics\nBUT Bot's StoryMap does not apply the invalid add operation",
-                          "text": "WHEN Bot's StoryMap reads SubEpic add Story operation (has existing SubEpic children)\nTHEN Bot's StoryMap identifies SubEpic already contains Sub-Epics\nAND Bot's StoryMap reports error indicating cannot create Story under SubEpic with Sub-Epics\nBUT Bot's StoryMap does not apply the invalid add operation",
-                          "sequential_order": 6.0
-                        },
-                        {
-                          "name": "WHEN both Bot's StoryMap and diagram's StoryMap implement same interface\nTHEN both expose load() method\nAND both expose save() method\nAND both expose update() method\nAND interface enables bidirectional synchronization",
-                          "text": "WHEN both Bot's StoryMap and diagram's StoryMap implement same interface\nTHEN both expose load() method\nAND both expose save() method\nAND both expose update() method\nAND interface enables bidirectional synchronization",
-                          "sequential_order": 7.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Delete Story Node From Diagram",
-                      "sequential_order": 3.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestDeleteStoryNodeFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot's StoryMap reads batch of delete operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from story_graph\nAND Bot's StoryMap resequences remaining siblings after deletion\nAND Bot's StoryMap handles cascade deletes (removing node removes all descendants)\nBUT Bot's StoryMap preserves scenarios and steps from deleted stories in archive/backup",
-                          "text": "WHEN Bot's StoryMap reads batch of delete operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from story_graph\nAND Bot's StoryMap resequences remaining siblings after deletion\nAND Bot's StoryMap handles cascade deletes (removing node removes all descendants)\nBUT Bot's StoryMap preserves scenarios and steps from deleted stories in archive/backup",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads delete operation for node with children\nTHEN Bot's StoryMap removes node and all descendants recursively\nAND Bot's StoryMap logs all deleted nodes for audit trail",
-                          "text": "WHEN Bot's StoryMap reads delete operation for node with children\nTHEN Bot's StoryMap removes node and all descendants recursively\nAND Bot's StoryMap logs all deleted nodes for audit trail",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Update Story Node Name From Diagram",
-                      "sequential_order": 4.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestUpdateStoryNodeNameFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot's StoryMap reads batch of rename operations from Synchronizer\nTHEN Bot's StoryMap updates node names to match diagram's StoryMap names\nAND Bot's StoryMap validates no duplicate names at same hierarchy level\nAND Bot's StoryMap updates all references to renamed nodes",
-                          "text": "WHEN Bot's StoryMap reads batch of rename operations from Synchronizer\nTHEN Bot's StoryMap updates node names to match diagram's StoryMap names\nAND Bot's StoryMap validates no duplicate names at same hierarchy level\nAND Bot's StoryMap updates all references to renamed nodes",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads rename operation that creates duplicate name at same level\nTHEN Bot's StoryMap identifies duplicate name\nAND Bot's StoryMap reports error\nBUT Bot's StoryMap does not apply conflicting rename",
-                          "text": "WHEN Bot's StoryMap reads rename operation that creates duplicate name at same level\nTHEN Bot's StoryMap identifies duplicate name\nAND Bot's StoryMap reports error\nBUT Bot's StoryMap does not apply conflicting rename",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Move Story Node From Diagram",
-                      "sequential_order": 5.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestMoveStoryNodeFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot's StoryMap reads batch of move/reorder operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from old parent\nAND Bot's StoryMap adds nodes to new parent at correct position\nAND Bot's StoryMap updates sequential_order values to match diagram's StoryMap ordering\nAND Bot's StoryMap resequences siblings in both old and new parent locations",
-                          "text": "WHEN Bot's StoryMap reads batch of move/reorder operations from Synchronizer\nTHEN Bot's StoryMap removes nodes from old parent\nAND Bot's StoryMap adds nodes to new parent at correct position\nAND Bot's StoryMap updates sequential_order values to match diagram's StoryMap ordering\nAND Bot's StoryMap resequences siblings in both old and new parent locations",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap reads move operation to new parent with specified position\nTHEN Bot's StoryMap inserts at specified position\nAND Bot's StoryMap resequences existing siblings at or after position",
-                          "text": "WHEN Bot's StoryMap reads move operation to new parent with specified position\nTHEN Bot's StoryMap inserts at specified position\nAND Bot's StoryMap resequences existing siblings at or after position",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Persist Story Graph Changes From Diagram",
-                      "sequential_order": 6.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestPersistStoryGraphChangesFromDiagram",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Bot's StoryMap completes reading and applying all batches successfully\nTHEN Bot's StoryMap structure matches diagram's StoryMap structure\nAND all node names, types, hierarchy, and ordering match\nAND Bot's StoryMap logs summary (nodes added, deleted, renamed, moved)\nAND Bot's StoryMap persists updated story_graph to file using save() method",
-                          "text": "WHEN Bot's StoryMap completes reading and applying all batches successfully\nTHEN Bot's StoryMap structure matches diagram's StoryMap structure\nAND all node names, types, hierarchy, and ordering match\nAND Bot's StoryMap logs summary (nodes added, deleted, renamed, moved)\nAND Bot's StoryMap persists updated story_graph to file using save() method",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN Bot's StoryMap encounters errors during batch application\nTHEN Bot's StoryMap identifies which operation failed and why\nAND Bot's StoryMap rolls back incomplete batch to maintain consistency\nAND Bot's StoryMap reports error details to user\nBUT Bot's StoryMap does not apply partial changes that leave story_graph in inconsistent state",
-                          "text": "WHEN Bot's StoryMap encounters errors during batch application\nTHEN Bot's StoryMap identifies which operation failed and why\nAND Bot's StoryMap rolls back incomplete batch to maintain consistency\nAND Bot's StoryMap reports error details to user\nBUT Bot's StoryMap does not apply partial changes that leave story_graph in inconsistent state",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    }
-                  ]
-                }
-              ]
             }
           ],
           "story_groups": []
@@ -20067,12 +20070,12 @@
       "priority": 16,
       "description": "Story graph API actions for building and rendering",
       "stories": [
-        "Render Content.Synchronize Graph with Rendered Content.Render story map",
-        "Render Content.Synchronize Graph with Rendered Content.Render story map increments",
-        "Render Content.Synchronize Graph with Rendered Content.Render story map with acceptance criteria",
-        "Render Content.Synchronize Graph with Rendered Content.Update graph from story map",
-        "Render Content.Synchronize Graph with Rendered Content.Update graph from map increments",
-        "Render Content.Synchronize Graph with Rendered Content.Update story graph from map acceptance criteria",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map increments",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map with acceptance criteria",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Update graph from story map",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Update graph from map increments",
+        "Render Content.Synchronized Graph with Rendered Diagram Content.Update story graph from map acceptance criteria",
         "Build Story Graph Using API",
         "Build Story Graph With CLI",
         "Render Output",
