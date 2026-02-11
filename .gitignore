@@ -87,6 +87,8 @@ activity_log.json
 behavior_action_state.json
 *validation-report*.md
 *validation-status*.md
+docs/story/scenarios/**/*.md
+scenarios/
 
 # Cache
 .cache/
