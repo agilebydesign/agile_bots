@@ -163,8 +163,14 @@ The following behaviors are derived from the synchronizer and renderer implement
 
 ### Render story map – layout file and re-render
 
-- **Layout file (from sync):** When synchronizing from DrawIO, layout is persisted to `{output_path.stem}-layout.json`. Keys: `EPIC|{name}`; `SUB_EPIC|{epic}|{sub_epic}` (sync uses SUB_EPIC; renderer expects FEATURE for sub-epics – consistency required for round-trip); `{epic}|{sub_epic}|{story}` for story x,y; user keys for epic/feature/story-level users. Values include x, y, and where applicable width, height.
+- **Layout file (from sync):** When synchronizing from DrawIO, layout is persisted to `{output_path.stem}-layout.json`. Keys: `EPIC|{name}`; `SUB_EPIC|{epic}|{sub_epic}` (sync uses SUB_EPIC; renderer expects FEATURE for sub-epics – see Known gaps); `{epic}|{sub_epic}|{story}` for story x,y; user keys for epic/feature/story-level users. Values include x, y, and where applicable width, height.
 - **Re-render with layout:** When rendering with layout_data loaded from that file, epic and feature positions/sizes from layout are used; new epics/features/stories get default spacing.
+
+### Render story map with acceptance criteria (exploration mode)
+
+- **Scope:** Only stories that have acceptance_criteria are included in the exploration diagram; epics and sub-epics without any such stories are omitted.
+- **Layout:** Uses same structure as outline (story_groups, sequential_order) but with AC boxes below each story; AC boxes have minimum width 250px; When/Then formatting in HTML; steps sorted by sequential_order when present.
+- **Layout data:** When layout data exists, positions for story and AC boxes are applied (keys include story and AC cell id or name-based keys).
 
 ### Update graph from story map – extract and merge
 
@@ -200,11 +206,24 @@ The following behaviors are derived from the synchronizer and renderer implement
 
 ---
 
+## Known gaps and consistency requirements
+
+These must hold for correct round-trip and merge behavior; current code may not satisfy all.
+
+| Area | Requirement | Current state |
+|------|--------------|---------------|
+| **Layout keys** | Sub-epic layout key must be the same for save (sync) and load (render). | Sync writes `SUB_EPIC|epic|sub_epic`; renderer reads `FEATURE|epic|sub_epic`. Round-trip sub-epic positions are not applied until aligned. |
+| **Increment cell style** | Increment labels in DrawIO must be detectable by the extractor. | Renderer uses strokeColor=#666666; extractor looks for strokeColor=#f8f7f7 and x &lt; 0. Align for round-trip. |
+| **Merge – stories** | Merge can either update-in-place or replace structure. | Merge never removes stories or epics/sub-epics; only adds new increments by name and updates story fields for matches. |
+| **Merge – increments** | Applying DrawIO increment membership to merged graph. | Merge does not replace which stories belong to which increment; it only adds new named increments. Increment membership from DrawIO is in extracted only. |
+| **Merge – AC** | Whether AC edits in DrawIO should flow into merged graph. | Merge preserves original acceptance_criteria; it does not overwrite from extracted. |
+| **Increment identity** | Distinguish renamed vs new increment. | By name only; rename is treated as add (merged graph can contain both old and new names). |
+
+---
+
 ## Source Material
 
 - Story graph: `docs/story/story-graph.json` (Invoke Bot > Perform Action > Synchronize Graph with Rendered Content)
-- Synchronizer implementation: `src/synchronizers/story_io/` (story_io_renderer.py, story_io_synchronizer.py, story_map_drawio_synchronizer.py, story_io_diagram.py)
-- Layout keys: renderer uses `EPIC|name`, `FEATURE|epic|sub_epic`; sync saves `EPIC|name`, `SUB_EPIC|epic|sub_epic` – round-trip requires consistent key handling.
-- Increment style: renderer uses strokeColor=#666666 for increment labels; extractor get_increments_and_boundaries looks for strokeColor=#f8f7f7 and x &lt; 0 – must align for round-trip.
+- Synchronizer: `src/synchronizers/story_io/` (story_io_renderer.py, story_io_synchronizer.py, story_map_drawio_synchronizer.py, story_io_diagram.py)
 - Examples: `src/synchronizers/story_io/examples/render-examples.ps1`, `sync-examples.ps1`
 - Tests: `src/synchronizers/story_io/test_increment_priority.py`, `test_increment_full_cycle.py`
