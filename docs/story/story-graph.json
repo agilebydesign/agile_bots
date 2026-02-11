@@ -11749,6 +11749,63 @@
                       "acceptance_criteria": [],
                       "behavior": null,
                       "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\📄 Set scope to selected Increment.md"
+                    },
+                    {
+                      "name": "Copy Story Node To Clipboard",
+                      "sequential_order": 4.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestCopyStoryNodeToClipboard",
+                      "scenarios": [
+                        {
+                          "name": "StoryNode copy_name returns node name for clipboard",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_copy_name_returns_node_name",
+                          "steps": "GIVEN: StoryMap is loaded with at least one Epic containing a SubEpic\nAND: Bot has that StoryMap loaded\nWHEN: copy_name is invoked on that SubEpic StoryNode\nTHEN: StoryNode.copy_name returns status success\nAND: result is the node name\nAND: the result can be written to system clipboard by the panel"
+                        },
+                        {
+                          "name": "StoryNode copy_json returns node as story-graph JSON",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_copy_json_returns_node_as_story_graph_json",
+                          "steps": "GIVEN: StoryMap is loaded with an Epic and a SubEpic with known structure\nAND: Bot has that StoryMap loaded\nWHEN: copy_json is invoked on that SubEpic StoryNode\nTHEN: StoryNode.copy_json returns status success\nAND: result is a dict with the same shape as the node in story-graph.json\nAND: the result can be serialized to JSON and written to system clipboard by the panel"
+                        },
+                        {
+                          "name": "CLI resolves story_graph path and copy_name returns node name",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_copy_name_returns_node_name",
+                          "steps": "GIVEN: StoryMap is loaded with Epic \"Invoke Bot\" and SubEpic \"Manage Bot\"\nAND: Bot has that StoryMap loaded\nWHEN: User executes CLI command story_graph.\"Invoke Bot\".\"Manage Bot\".copy_name\nTHEN: CLI returns success\nAND: response result is the SubEpic node name \"Manage Bot\""
+                        },
+                        {
+                          "name": "CLI resolves story_graph path and copy_json returns node dict",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_copy_json_returns_node_dict",
+                          "steps": "GIVEN: StoryMap is loaded with Epic \"Invoke Bot\" and SubEpic \"Manage Bot\"\nAND: Bot has that StoryMap loaded\nWHEN: User executes CLI command story_graph.\"Invoke Bot\".\"Manage Bot\".copy_json\nTHEN: CLI returns success\nAND: response result is a dict with name \"Manage Bot\" and story-graph shape for that node"
+                        },
+                        {
+                          "name": "CLI copy_name on non-existent node path returns error",
+                          "sequential_order": 5.0,
+                          "type": "error_case",
+                          "background": [],
+                          "test_method": "test_cli_copy_name_nonexistent_node_outputs_error",
+                          "steps": "GIVEN: StoryMap is loaded with Epic \"Invoke Bot\" and SubEpic \"Manage Bot\"\nAND: Bot has that StoryMap loaded\nWHEN: User executes CLI command story_graph.\"Invoke Bot\".\"Non-existent Node\".copy_name\nTHEN: CLI returns error\nAND: output indicates node not found or path invalid\nAND: no result is written to clipboard"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        "Right-click on a story node shows context menu with Copy node name and Copy full JSON",
+                        "Copy node name writes node name to system clipboard via event -> CLI -> bot.copy_name",
+                        "Copy full JSON writes node JSON (story-graph shape) to system clipboard via event -> CLI -> bot.copy_json"
+                      ],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Copy Story Node To Clipboard.md"
                     }
                   ]
                 }
@@ -15952,7 +16009,7 @@
                       "name": "Inject Context Into Instructions",
                       "sequential_order": 0.0,
                       "connector": "or",
-                      "story_type": "user", 
+                      "story_type": "user",
                       "users": [
                         "Bot Behavior"
                       ],

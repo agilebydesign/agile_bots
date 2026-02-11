@@ -180,6 +180,18 @@ class StoryNode(ABC):
         
         return {'node_type': node_type, 'old_name': old_name, 'new_name': name, 'operation': 'rename'}
 
+    def copy_name(self) -> dict:
+        """Return node name for clipboard. Used by panel context menu (event -> CLI -> bot)."""
+        return {'status': 'success', 'result': self.name}
+
+    def copy_json(self) -> dict:
+        """Return this node as story-graph JSON for clipboard. Used by panel context menu (event -> CLI -> bot)."""
+        if not self._bot or not hasattr(self._bot, 'story_map'):
+            raise ValueError('Cannot serialize node without bot context')
+        story_map = self._bot.story_map
+        node_dict = story_map.node_to_dict(self)
+        return {'status': 'success', 'result': node_dict}
+
     def delete(self, cascade: bool = True) -> dict:
         """Delete this node. Always cascades to delete all children."""
         import time
@@ -2353,6 +2365,22 @@ class StoryMap:
             'text': ac.text,
             'sequential_order': ac.sequential_order
         }
+
+    def node_to_dict(self, node: StoryNode) -> Dict[str, Any]:
+        """Serialize any story node to its story-graph JSON shape (for copy_json)."""
+        if isinstance(node, Epic):
+            return self._epic_to_dict(node)
+        if isinstance(node, SubEpic):
+            return self._sub_epic_to_dict(node)
+        if isinstance(node, StoryGroup):
+            return self._story_group_to_dict(node)
+        if isinstance(node, Story):
+            return self._story_to_dict(node)
+        if isinstance(node, Scenario):
+            return self._scenario_to_dict(node)
+        if isinstance(node, AcceptanceCriteria):
+            return self._acceptance_criteria_to_dict(node)
+        raise ValueError(f'Unknown node type: {type(node).__name__}')
     
     
     def _calculate_story_file_link(self, story: Story) -> str:
