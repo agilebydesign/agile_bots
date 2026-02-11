@@ -25,3 +25,51 @@
                 (AC) Developer --> WHEN Developer expands code node THEN lazy-loaded source displays with line numbers
             (S) Developer --> Navigate to Source
                 (AC) Developer --> WHEN Developer clicks Open on code node THEN source file opens at specific line
+(E) Invoke Bot
+    (E) Perform Action
+        (E) Synchronize Graph with Rendered Content
+            (S) Bot Behavior --> Render story map
+                (AC) Bot Behavior --> WHEN user requests outline diagram from story graph THEN system renders epics sub-epics and stories to DrawIO file AND each node has position and size and output is valid DrawIO XML
+                (AC) Bot Behavior --> WHEN layout data from previous render exists THEN system applies saved positions to preserve user arrangement and new nodes get default spacing
+                (AC) Bot Behavior --> WHEN render completes THEN system writes DrawIO file to specified path and summary reports epic and story counts
+                (AC) Bot Behavior --> WHEN story graph has E epics S sub-epics and N stories THEN diagram contains exactly E epic cells S sub-epic cells N story cells and summary reports epics E and sub_epic_count S
+                (AC) Bot Behavior --> WHEN stories and sub-epics have sequential_order THEN diagram orders sub-epics left to right and stories by sequential_order with and-groups horizontal and or-groups vertical
+                (AC) Bot Behavior --> WHEN layout data exists THEN system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants
+            (S) Bot Behavior --> Render story map increments
+                (AC) Bot Behavior --> WHEN user requests increments diagram from story graph THEN system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments
+                (AC) Bot Behavior --> WHEN story graph has increments with priority THEN system preserves priority order and lane Y from outline bottom and lane height
+                (AC) Bot Behavior --> WHEN layout data exists for increments view THEN system applies saved positions for epics and sub-epics and increment lane positions computed or from layout
+                (AC) Bot Behavior --> WHEN render completes THEN system writes DrawIO file and summary includes increment count
+                (AC) Bot Behavior --> WHEN increment cells are rendered THEN style and position allow extractor to detect them for round-trip sync
+            (S) Bot Behavior --> Render story map with acceptance criteria
+                (AC) Bot Behavior --> WHEN user requests exploration diagram THEN system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes
+                (AC) Bot Behavior --> WHEN story has acceptance criteria THEN system creates wider AC boxes below story and extracts step text from AC
+                (AC) Bot Behavior --> WHEN layout data exists THEN system preserves positions of story and AC boxes
+                (AC) Bot Behavior --> WHEN render completes THEN output DrawIO contains both story cells and AC cells with correct containment
+            (S) Bot Behavior --> Update graph from story map
+                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO outline file THEN system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment
+                (AC) Bot Behavior --> WHEN original story graph path is provided THEN system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories
+                (AC) Bot Behavior --> WHEN merge report exists and user runs merge THEN system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories
+                (AC) Bot Behavior --> WHEN user renames or reorders nodes in DrawIO THEN extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ
+                (AC) Bot Behavior --> WHEN user deletes nodes in DrawIO THEN extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics
+                (AC) Bot Behavior --> WHEN sync runs THEN system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render
+                (AC) Bot Behavior --> WHEN user moves a story in DrawIO and saves THEN sync extracts new position and sequential_order from position and merge updates sequential_order for matched story
+                (AC) Bot Behavior --> WHEN user deletes one story cell THEN extracted omits that story and merge report removed_stories and merge keeps original structure with only matched stories updated
+                (AC) Bot Behavior --> WHEN user deletes a sub-epic box THEN extracted omits that sub-epic and stories reassigned by containment and large_deletions includes missing_sub_epics
+                (AC) Bot Behavior --> WHEN user deletes an epic box THEN extracted omits that epic and all its sub-epics and stories and merge report removed and large_deletions includes missing_epics
+            (S) Bot Behavior --> Update graph from map increments
+                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO increments file THEN system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories by story Y vs increment Y and priority is position order name is cell value
+                (AC) Bot Behavior --> WHEN original story graph is provided THEN system generates merge report for epics and for increments
+                (AC) Bot Behavior --> WHEN user moves stories between increments in DrawIO THEN extracted graph reflects new increment membership by Y position
+                (AC) Bot Behavior --> WHEN merge runs THEN system preserves AC and steps and matches increments by name only and adds new names and does not remove increments from merged graph
+                (AC) Bot Behavior --> WHEN sync runs THEN system writes extracted JSON with epics and increments and optional merge report when original provided
+                (AC) Bot Behavior --> WHEN user adds an increment lane THEN extracted has one more by Y order and merge adds it as new name
+                (AC) Bot Behavior --> WHEN user removes an increment lane THEN extracted has fewer merge does not remove so removed name stays in merged stories in deleted lane reassign by Y to closest remaining
+                (AC) Bot Behavior --> WHEN user renames an increment THEN extracted has new name merge adds it and does not remove old name so merged can contain both until rename strategy defined
+                (AC) Bot Behavior --> WHEN distinguishing original vs new increment THEN system uses name only same label same increment no duplicate add different label add as new cannot distinguish rename from new without stable id or position matching
+            (S) Bot Behavior --> Update story graph from map acceptance criteria
+                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO exploration file THEN system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps
+                (AC) Bot Behavior --> WHEN AC box text is When/Then format THEN system extracts step description and associates with story
+                (AC) Bot Behavior --> WHEN merge runs THEN system preserves original scenario steps and updates AC text from extracted where matched
+                (AC) Bot Behavior --> WHEN user adds or removes AC boxes in DrawIO THEN extracted graph reflects new or removed AC and merge report reflects structural changes
+                (AC) Bot Behavior --> WHEN sync runs THEN system assigns AC cells to stories by vertical position and containment below story cells

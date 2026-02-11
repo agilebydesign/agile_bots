@@ -11800,9 +11800,21 @@
                         }
                       ],
                       "acceptance_criteria": [
-                        "Right-click on a story node shows context menu with Copy node name and Copy full JSON",
-                        "Copy node name writes node name to system clipboard via event -> CLI -> bot.copy_name",
-                        "Copy full JSON writes node JSON (story-graph shape) to system clipboard via event -> CLI -> bot.copy_json"
+                        {
+                          "name": "Right-click on a story node shows context menu with Copy node name and Copy full JSON",
+                          "text": "Right-click on a story node shows context menu with Copy node name and Copy full JSON",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "Copy node name writes node name to system clipboard via event -> CLI -> bot.copy_name",
+                          "text": "Copy node name writes node name to system clipboard via event -> CLI -> bot.copy_name",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "Copy full JSON writes node JSON (story-graph shape) to system clipboard via event -> CLI -> bot.copy_json",
+                          "text": "Copy full JSON writes node JSON (story-graph shape) to system clipboard via event -> CLI -> bot.copy_json",
+                          "sequential_order": 3.0
+                        }
                       ],
                       "behavior": null,
                       "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Copy Story Node To Clipboard.md"
@@ -15791,8 +15803,149 @@
           "test_file": "invoke_bot/perform_action/",
           "sub_epics": [
             {
-              "name": "Prepare Common Instructions For Behavior, Action, and Scope",
+              "name": "Synchronize Graph with Rendered Content",
               "sequential_order": 0.0,
+              "behavior": null,
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": null,
+                  "behavior": null,
+                  "stories": [
+                    {
+                      "name": "Render story map",
+                      "sequential_order": 1.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML", "text": "When user requests outline diagram from story graph then system renders epics sub-epics and stories to DrawIO file and each node has position and size and output is valid DrawIO XML", "sequential_order": 1.0},
+                        {"name": "When layout data from previous render exists then system applies saved positions to preserve user arrangement and new nodes get default spacing", "text": "When layout data from previous render exists then system applies saved positions to preserve user arrangement and new nodes get default spacing", "sequential_order": 2.0},
+                        {"name": "When render completes then system writes DrawIO file to specified path and summary reports epic and story counts", "text": "When render completes then system writes DrawIO file to specified path and summary reports epic and story counts", "sequential_order": 3.0},
+                        {"name": "When story graph has E epics S sub-epics and N stories then rendered diagram contains exactly E epic cells S sub-epic cells and N story cells and summary reports epics E and sub_epic_count S", "text": "When story graph has E epics S sub-epics and N stories then rendered diagram contains exactly E epic cells S sub-epic cells and N story cells and summary reports epics E and sub_epic_count S", "sequential_order": 4.0},
+                        {"name": "When stories and sub-epics have sequential_order then diagram orders sub-epics left to right and stories within each group by sequential_order with and-groups horizontal and or-groups vertical", "text": "When stories and sub-epics have sequential_order then diagram orders sub-epics left to right and stories within each group by sequential_order with and-groups horizontal and or-groups vertical", "sequential_order": 5.0},
+                        {"name": "When layout data exists then system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants", "text": "When layout data exists then system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants", "sequential_order": 6.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Render story map increments",
+                      "sequential_order": 2.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments", "text": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments", "sequential_order": 1.0},
+                        {"name": "When story graph has increments with priority then system preserves priority order in diagram and lane Y positions derived from outline bottom and lane height", "text": "When story graph has increments with priority then system preserves priority order in diagram and lane Y positions derived from outline bottom and lane height", "sequential_order": 2.0},
+                        {"name": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane positions computed or from layout", "text": "When layout data exists for increments view then system applies saved positions for epics and sub-epics and increment lane positions computed or from layout", "sequential_order": 3.0},
+                        {"name": "When render completes then system writes DrawIO file and summary includes increment count", "text": "When render completes then system writes DrawIO file and summary includes increment count", "sequential_order": 4.0},
+                        {"name": "When increment cells are rendered then style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)", "text": "When increment cells are rendered then style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)", "sequential_order": 5.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Render story map with acceptance criteria",
+                      "sequential_order": 3.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user requests exploration diagram then system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes", "text": "When user requests exploration diagram then system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes", "sequential_order": 1.0},
+                        {"name": "When story has acceptance criteria then system creates wider AC boxes below story and extracts step text from AC", "text": "When story has acceptance criteria then system creates wider AC boxes below story and extracts step text from AC", "sequential_order": 2.0},
+                        {"name": "When layout data exists then system preserves positions of story and AC boxes", "text": "When layout data exists then system preserves positions of story and AC boxes", "sequential_order": 3.0},
+                        {"name": "When render completes then output DrawIO contains both story cells and AC cells with correct containment", "text": "When render completes then output DrawIO contains both story cells and AC cells with correct containment", "sequential_order": 4.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Update graph from story map",
+                      "sequential_order": 4.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment", "text": "When user synchronizes from DrawIO outline file then system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment", "sequential_order": 1.0},
+                        {"name": "When original story graph path is provided then system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories", "text": "When original story graph path is provided then system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories", "sequential_order": 2.0},
+                        {"name": "When merge report exists and user runs merge then system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories", "text": "When merge report exists and user runs merge then system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories", "sequential_order": 3.0},
+                        {"name": "When user renames or reorders nodes in DrawIO then extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ", "text": "When user renames or reorders nodes in DrawIO then extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ", "sequential_order": 4.0},
+                        {"name": "When user deletes nodes in DrawIO then extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics", "text": "When user deletes nodes in DrawIO then extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics", "sequential_order": 5.0},
+                        {"name": "When sync runs then system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render", "text": "When sync runs then system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render", "sequential_order": 6.0},
+                        {"name": "When user moves a story in DrawIO and saves then sync extracts new position and assigns sequential_order from left-to-right and vertical position and merge updates sequential_order for matched story", "text": "When user moves a story in DrawIO and saves then sync extracts new position and assigns sequential_order from left-to-right and vertical position and merge updates sequential_order for matched story", "sequential_order": 7.0},
+                        {"name": "When user deletes one story cell then extracted graph omits that story and merge report lists it in removed_stories and merge output still contains original structure with only matched stories updated", "text": "When user deletes one story cell then extracted graph omits that story and merge report lists it in removed_stories and merge output still contains original structure with only matched stories updated", "sequential_order": 8.0},
+                        {"name": "When user deletes a sub-epic box then extracted graph omits that sub-epic and its stories are reassigned by containment and large_deletions includes missing_sub_epics for that sub-epic", "text": "When user deletes a sub-epic box then extracted graph omits that sub-epic and its stories are reassigned by containment and large_deletions includes missing_sub_epics for that sub-epic", "sequential_order": 9.0},
+                        {"name": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and merge report lists those stories as removed and large_deletions includes missing_epics", "text": "When user deletes an epic box then extracted graph omits that epic and all its sub-epics and stories and merge report lists those stories as removed and large_deletions includes missing_epics", "sequential_order": 10.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Update graph from map increments",
+                      "sequential_order": 5.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user synchronizes from DrawIO increments file then system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories to increments by story Y vs increment Y and priority is position order name is cell value", "text": "When user synchronizes from DrawIO increments file then system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories to increments by story Y vs increment Y and priority is position order name is cell value", "sequential_order": 1.0},
+                        {"name": "When original story graph is provided then system generates merge report for epics and for increments", "text": "When original story graph is provided then system generates merge report for epics and for increments", "sequential_order": 2.0},
+                        {"name": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership by Y position", "text": "When user moves stories between increments in DrawIO then extracted graph reflects new increment membership by Y position", "sequential_order": 3.0},
+                        {"name": "When merge runs then system preserves original acceptance criteria and steps and matches increments by name only and adds extracted increments not in original and does not remove increments from merged graph", "text": "When merge runs then system preserves original acceptance criteria and steps and matches increments by name only and adds extracted increments not in original and does not remove increments from merged graph", "sequential_order": 4.0},
+                        {"name": "When sync runs then system writes extracted JSON with epics and increments and optional merge report when original provided", "text": "When sync runs then system writes extracted JSON with epics and increments and optional merge report when original provided", "sequential_order": 5.0},
+                        {"name": "When user adds an increment lane then extracted has one more increment by Y order and merge adds it as new name", "text": "When user adds an increment lane then extracted has one more increment by Y order and merge adds it as new name", "sequential_order": 6.0},
+                        {"name": "When user removes an increment lane then extracted has fewer increments merge does not remove increments so removed lane name stays in merged stories in deleted lane reassign by Y to closest remaining in extracted", "text": "When user removes an increment lane then extracted has fewer increments merge does not remove increments so removed lane name stays in merged stories in deleted lane reassign by Y to closest remaining in extracted", "sequential_order": 7.0},
+                        {"name": "When user renames an increment then extracted has new name merge adds it by name and does not remove old name so merged can contain both original and renamed until rename strategy is defined", "text": "When user renames an increment then extracted has new name merge adds it by name and does not remove old name so merged can contain both original and renamed until rename strategy is defined", "sequential_order": 8.0},
+                        {"name": "When distinguishing original vs new increment then system uses name only same label means same increment no duplicate add different label means add as new cannot distinguish rename from new without stable id or position matching", "text": "When distinguishing original vs new increment then system uses name only same label means same increment no duplicate add different label means add as new cannot distinguish rename from new without stable id or position matching", "sequential_order": 9.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Update story graph from map acceptance criteria",
+                      "sequential_order": 6.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps", "text": "When user synchronizes from DrawIO exploration file then system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps", "sequential_order": 1.0},
+                        {"name": "When AC box text is When/Then format then system extracts step description and associates with story", "text": "When AC box text is When/Then format then system extracts step description and associates with story", "sequential_order": 2.0},
+                        {"name": "When merge runs then system preserves original scenario steps and updates AC text from extracted where matched", "text": "When merge runs then system preserves original scenario steps and updates AC text from extracted where matched", "sequential_order": 3.0},
+                        {"name": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and merge report reflects structural changes", "text": "When user adds or removes AC boxes in DrawIO then extracted graph reflects new or removed AC and merge report reflects structural changes", "sequential_order": 4.0},
+                        {"name": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells", "text": "When sync runs then system assigns AC cells to stories by vertical position and containment below story cells", "sequential_order": 5.0}
+                      ],
+                      "behavior": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Prepare Common Instructions For Behavior, Action, and Scope",
+              "sequential_order": 1.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -16466,7 +16619,7 @@
             },
             {
               "name": "Clarify Requirements",
-              "sequential_order": 1.0,
+              "sequential_order": 2.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -16885,7 +17038,7 @@
             },
             {
               "name": "Decide Strategy",
-              "sequential_order": 2.0,
+              "sequential_order": 3.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -17322,7 +17475,7 @@
             },
             {
               "name": "Build Story Graph",
-              "sequential_order": 3.0,
+              "sequential_order": 4.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -17695,383 +17848,6 @@
                           "sequential_order": 1.0
                         }
                       ],
-                      "behavior": null
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Validate With Rules",
-              "sequential_order": 4.0,
-              "behavior": null,
-              "domain_concepts": [
-                {
-                  "name": "ValidateRulesAction",
-                  "responsibilities": [
-                    {
-                      "name": "Inject common bot rules",
-                      "collaborators": [
-                        "Base Bot",
-                        "Rules",
-                        "Common Rules"
-                      ]
-                    },
-                    {
-                      "name": "Inject behavior specific rules",
-                      "collaborators": [
-                        "Behavior",
-                        "Rules",
-                        "Behavior Rules"
-                      ]
-                    },
-                    {
-                      "name": "Load + inject content for validation",
-                      "collaborators": [
-                        "Behavior",
-                        "Content",
-                        "Knowledge Graph",
-                        "Rendered Outputs"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                },
-                {
-                  "name": "TTYValidateRules",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize validate action to TTY",
-                      "collaborators": [
-                        "ValidateRulesAction",
-                        "TTY String"
-                      ]
-                    },
-                    {
-                      "name": "Format validation results",
-                      "collaborators": [
-                        "Violations",
-                        "TTY String"
-                      ]
-                    },
-                    {
-                      "name": "Wraps domain action",
-                      "collaborators": [
-                        "ValidateRulesAction"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "inherits_from": "TTYProgressAdapter",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                },
-                {
-                  "name": "JSONValidateRules",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize validate action to JSON",
-                      "collaborators": [
-                        "ValidateRulesAction",
-                        "JSON String"
-                      ]
-                    },
-                    {
-                      "name": "Include violations and fixes",
-                      "collaborators": [
-                        "Violations",
-                        "Suggestions",
-                        "JSON"
-                      ]
-                    },
-                    {
-                      "name": "Wraps domain action",
-                      "collaborators": [
-                        "ValidateRulesAction"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "inherits_from": "JSONProgressAdapter",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                },
-                {
-                  "name": "MarkdownValidateRules",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize validate action to Markdown",
-                      "collaborators": [
-                        "ValidateRulesAction",
-                        "Markdown String"
-                      ]
-                    },
-                    {
-                      "name": "Format validation report",
-                      "collaborators": [
-                        "Violations",
-                        "Suggestions",
-                        "Markdown"
-                      ]
-                    },
-                    {
-                      "name": "Wraps domain action",
-                      "collaborators": [
-                        "ValidateRulesAction"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "inherits_from": "MarkdownProgressAdapter",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                },
-                {
-                  "name": "ValidateInstructionsSection",
-                  "responsibilities": [
-                    {
-                      "name": "Wraps validate subsection",
-                      "collaborators": [
-                        "ValidateDataSubSection"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "inherits_from": "InstructionsSection",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                },
-                {
-                  "name": "ValidateDataSubSection",
-                  "responsibilities": [
-                    {
-                      "name": "Wraps validate JSON",
-                      "collaborators": [
-                        "Validate JSON"
-                      ]
-                    },
-                    {
-                      "name": "Displays rules",
-                      "collaborators": [
-                        "List",
-                        "Rule JSON"
-                      ]
-                    },
-                    {
-                      "name": "Displays rule descriptions",
-                      "collaborators": [
-                        "String",
-                        "Rule JSON"
-                      ]
-                    },
-                    {
-                      "name": "Displays rule examples",
-                      "collaborators": [
-                        "List",
-                        "Rule JSON"
-                      ]
-                    },
-                    {
-                      "name": "Opens rule file",
-                      "collaborators": [
-                        "CLI",
-                        "Path JSON"
-                      ]
-                    }
-                  ],
-                  "module": "actions.validate",
-                  "inherits_from": "SubSectionView",
-                  "_source_path": "Invoke Bot.Invoke Bot Directly"
-                }
-              ],
-              "test_file": "invoke_bot/perform_action/test_validate_with_rules.py",
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "behavior": null,
-                  "stories": [
-                    {
-                      "name": "Validate Rules",
-                      "sequential_order": 0.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestValidateRules",
-                      "scenarios": [
-                        {
-                          "name": "Story graph validation includes rule content in instructions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_story_graph_rules_formatted_in_instructions",
-                          "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                        },
-                        {
-                          "name": "File validation includes rule content in instructions",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_file_rules_formatted_in_instructions",
-                          "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
-                        },
-                        {
-                          "name": "Story graph scanners receive scoped story_graph data",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_story_graph_scanner_receives_story_graph_data",
-                          "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
-                        },
-                        {
-                          "name": "File scanners receive scoped file paths",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_file_scanner_receives_file_data",
-                          "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Validate Rules Using CLI",
-                      "sequential_order": 1.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestValidateRulesUsingCLI",
-                      "scenarios": [
-                        {
-                          "name": "Validate action shows rules in CLI output",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_validate_action_shows_rules_in_output",
-                          "steps": "GIVEN: CLI is at shape.validate\nAND: Story graph exists\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains rule descriptions and DO/DON'T sections"
-                        },
-                        {
-                          "name": "Code validate action shows file rules in CLI output",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_validate_code_shows_file_rules",
-                          "steps": "GIVEN: CLI is at code.validate\nAND: Story graph exists\nWHEN: user navigates to code.validate\nTHEN: CLI output contains file validation rules"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Display Validation Results Through CLI",
-                      "sequential_order": 2.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestDisplayValidationResultsThroughCLI",
-                      "scenarios": [
-                        {
-                          "name": "Display validation violations",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_display_validation_violations",
-                          "steps": "GIVEN: Validation has run\nWHEN: user views validate instructions\nTHEN: CLI displays violation report"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Display Validation Scanners Through CLI",
-                      "sequential_order": 3.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestDisplayValidationScannersThroughCLI",
-                      "scenarios": [
-                        {
-                          "name": "Display discovered scanners",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_display_discovered_scanners",
-                          "steps": "GIVEN: Validation scanners exist\nWHEN: user views validate instructions\nTHEN: CLI displays list of available scanners"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Display Validate Instructions Panel",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestDisplayValidateInstructions",
-                      "scenarios": [
-                        {
-                          "name": "",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Bot is at shape.validate\nWhen Panel displays instructions section\nThen Panel displays validation rules list\nAnd Each rule has clickable file link"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel displays validate instructions with rules\nWhen User clicks rule file link\nThen VS Code opens validation rule file in editor"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Current action is validate\nTHEN System displays rules list",
-                          "text": "WHEN Current action is validate\nTHEN System displays rules list",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN User clicks rule file link\nTHEN System opens rule file in editor",
-                          "text": "WHEN User clicks rule file link\nTHEN System opens rule file in editor",
-                          "sequential_order": 2.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Get Validate Instructions Through CLI",
-                      "sequential_order": 5.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestGetValidateInstructionsThroughCLI",
-                      "scenarios": [
-                        {
-                          "name": "Get validate instructions with rules",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_get_validate_instructions_with_rules",
-                          "steps": "GIVEN: CLI is at shape.validate.instructions\nWHEN: user enters 'shape.validate.instructions'\nTHEN: CLI displays validation rules and scanners"
-                        }
-                      ],
-                      "acceptance_criteria": [],
                       "behavior": null
                     }
                   ]
@@ -18511,25 +18287,6 @@
                       "behavior": null
                     },
                     {
-                      "name": "Render Story Graph using Story Graph API",
-                      "sequential_order": 5.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestRenderStoryGraphUsingStoryGraphAPI",
-                      "scenarios": [],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                          "text": "WHEN a StoryAdapter renders an StoryOutput\nTHEN the StoryAdapter retrieves the StoryMap from the Bot\nAND the StoryAdapter parses each node in StoryMap\nAND creates a matching StoryRenderedNode for each StoryNode in the StoryMap\nAND the StoryRenderedNode renders itself on the Diagram using the StoryAdapter\nUSING formatting and positional rules associated with it's node type from the StoryAdapter\nAND the StoryRenderedNode iterates over it's node children to render themselves in turn\nAND every node in the StoryMap is represented in the Diagram\nAND the StoryRenderedNodes are saved as a StoryOutput file\nAND the StoryAdapter persists all positional data in a json file matching the rendered diagram When the StoryIODiagram is finished rendering\nThen all of the StoryRenderedNode are accessible using the same StoryMap API as the original object model\nAND the original StoryMap's parent/child relationship and all original data will be accessed exactly like the original\nAnd additional data will also be accessible, including formatting data, sizing and positional information When the bot, cli or another API makes a change to a StoryRenderedNode on the StoryOutput\nTHEN the StoryRenderedNode will render itself again and update the StoryOutput as required",
-                          "sequential_order": 1.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
                       "name": "Display Render Instructions Panel",
                       "sequential_order": 6.0,
                       "connector": "and",
@@ -18583,8 +18340,385 @@
               ]
             },
             {
-              "name": "Use Rules In Prompt",
+              "name": "Validate With Rules",
               "sequential_order": 6.0,
+              "behavior": null,
+              "domain_concepts": [
+                {
+                  "name": "ValidateRulesAction",
+                  "responsibilities": [
+                    {
+                      "name": "Inject common bot rules",
+                      "collaborators": [
+                        "Base Bot",
+                        "Rules",
+                        "Common Rules"
+                      ]
+                    },
+                    {
+                      "name": "Inject behavior specific rules",
+                      "collaborators": [
+                        "Behavior",
+                        "Rules",
+                        "Behavior Rules"
+                      ]
+                    },
+                    {
+                      "name": "Load + inject content for validation",
+                      "collaborators": [
+                        "Behavior",
+                        "Content",
+                        "Knowledge Graph",
+                        "Rendered Outputs"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                },
+                {
+                  "name": "TTYValidateRules",
+                  "responsibilities": [
+                    {
+                      "name": "Serialize validate action to TTY",
+                      "collaborators": [
+                        "ValidateRulesAction",
+                        "TTY String"
+                      ]
+                    },
+                    {
+                      "name": "Format validation results",
+                      "collaborators": [
+                        "Violations",
+                        "TTY String"
+                      ]
+                    },
+                    {
+                      "name": "Wraps domain action",
+                      "collaborators": [
+                        "ValidateRulesAction"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "inherits_from": "TTYProgressAdapter",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                },
+                {
+                  "name": "JSONValidateRules",
+                  "responsibilities": [
+                    {
+                      "name": "Serialize validate action to JSON",
+                      "collaborators": [
+                        "ValidateRulesAction",
+                        "JSON String"
+                      ]
+                    },
+                    {
+                      "name": "Include violations and fixes",
+                      "collaborators": [
+                        "Violations",
+                        "Suggestions",
+                        "JSON"
+                      ]
+                    },
+                    {
+                      "name": "Wraps domain action",
+                      "collaborators": [
+                        "ValidateRulesAction"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "inherits_from": "JSONProgressAdapter",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                },
+                {
+                  "name": "MarkdownValidateRules",
+                  "responsibilities": [
+                    {
+                      "name": "Serialize validate action to Markdown",
+                      "collaborators": [
+                        "ValidateRulesAction",
+                        "Markdown String"
+                      ]
+                    },
+                    {
+                      "name": "Format validation report",
+                      "collaborators": [
+                        "Violations",
+                        "Suggestions",
+                        "Markdown"
+                      ]
+                    },
+                    {
+                      "name": "Wraps domain action",
+                      "collaborators": [
+                        "ValidateRulesAction"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "inherits_from": "MarkdownProgressAdapter",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                },
+                {
+                  "name": "ValidateInstructionsSection",
+                  "responsibilities": [
+                    {
+                      "name": "Wraps validate subsection",
+                      "collaborators": [
+                        "ValidateDataSubSection"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "inherits_from": "InstructionsSection",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                },
+                {
+                  "name": "ValidateDataSubSection",
+                  "responsibilities": [
+                    {
+                      "name": "Wraps validate JSON",
+                      "collaborators": [
+                        "Validate JSON"
+                      ]
+                    },
+                    {
+                      "name": "Displays rules",
+                      "collaborators": [
+                        "List",
+                        "Rule JSON"
+                      ]
+                    },
+                    {
+                      "name": "Displays rule descriptions",
+                      "collaborators": [
+                        "String",
+                        "Rule JSON"
+                      ]
+                    },
+                    {
+                      "name": "Displays rule examples",
+                      "collaborators": [
+                        "List",
+                        "Rule JSON"
+                      ]
+                    },
+                    {
+                      "name": "Opens rule file",
+                      "collaborators": [
+                        "CLI",
+                        "Path JSON"
+                      ]
+                    }
+                  ],
+                  "module": "actions.validate",
+                  "inherits_from": "SubSectionView",
+                  "_source_path": "Invoke Bot.Invoke Bot Directly"
+                }
+              ],
+              "test_file": "invoke_bot/perform_action/test_validate_with_rules.py",
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": null,
+                  "behavior": null,
+                  "stories": [
+                    {
+                      "name": "Validate Rules",
+                      "sequential_order": 0.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": "TestValidateRules",
+                      "scenarios": [
+                        {
+                          "name": "Story graph validation includes rule content in instructions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_story_graph_rules_formatted_in_instructions",
+                          "steps": "Given Production story_bot with shape behavior (validates story graph)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                        },
+                        {
+                          "name": "File validation includes rule content in instructions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_file_rules_formatted_in_instructions",
+                          "steps": "Given Production story_bot with code behavior (validates files)\nWhen Validate action executes\nThen Instructions contain rule descriptions, DO/DON'T sections, and priorities from rule files\nThen And Story graph file exists"
+                        },
+                        {
+                          "name": "Story graph scanners receive scoped story_graph data",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_story_graph_scanner_receives_story_graph_data",
+                          "steps": "Given Story graph with multiple epics (\"Build Knowledge\", \"Epic B\")\nWhen Validate action executes with scope\nThen Scanner receives filtered story graph (only \"Build Knowledge\" epic)\nThen And Scope filtered to \"Build Knowledge\" epic\nThen And Production story_bot with shape behavior\nThen And Scanner executes successfully\nThen And Instructions contain \"Build Knowledge\" in scope description"
+                        },
+                        {
+                          "name": "File scanners receive scoped file paths",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_file_scanner_receives_file_data",
+                          "steps": "Given Multiple Python files (test_foo.py, test_bar.py, main.py)\nWhen Validate action executes with scope\nThen Scanner receives filtered files (only test_foo.py, test_bar.py)\nThen And Scope filtered to test files only (**/test*.py)\nThen And Production story_bot with code behavior\nThen And Scanner executes successfully\nThen And Instructions reference test file scope"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Validate Rules Using CLI",
+                      "sequential_order": 1.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestValidateRulesUsingCLI",
+                      "scenarios": [
+                        {
+                          "name": "Validate action shows rules in CLI output",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_validate_action_shows_rules_in_output",
+                          "steps": "GIVEN: CLI is at shape.validate\nAND: Story graph exists\nWHEN: user navigates to shape.validate\nTHEN: CLI output contains rule descriptions and DO/DON'T sections"
+                        },
+                        {
+                          "name": "Code validate action shows file rules in CLI output",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_validate_code_shows_file_rules",
+                          "steps": "GIVEN: CLI is at code.validate\nAND: Story graph exists\nWHEN: user navigates to code.validate\nTHEN: CLI output contains file validation rules"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Display Validation Results Through CLI",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestDisplayValidationResultsThroughCLI",
+                      "scenarios": [
+                        {
+                          "name": "Display validation violations",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_display_validation_violations",
+                          "steps": "GIVEN: Validation has run\nWHEN: user views validate instructions\nTHEN: CLI displays violation report"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Display Validation Scanners Through CLI",
+                      "sequential_order": 3.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestDisplayValidationScannersThroughCLI",
+                      "scenarios": [
+                        {
+                          "name": "Display discovered scanners",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_display_discovered_scanners",
+                          "steps": "GIVEN: Validation scanners exist\nWHEN: user views validate instructions\nTHEN: CLI displays list of available scanners"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Display Validate Instructions Panel",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestDisplayValidateInstructions",
+                      "scenarios": [
+                        {
+                          "name": "",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Bot is at shape.validate\nWhen Panel displays instructions section\nThen Panel displays validation rules list\nAnd Each rule has clickable file link"
+                        },
+                        {
+                          "name": "",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays validate instructions with rules\nWhen User clicks rule file link\nThen VS Code opens validation rule file in editor"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Current action is validate\nTHEN System displays rules list",
+                          "text": "WHEN Current action is validate\nTHEN System displays rules list",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User clicks rule file link\nTHEN System opens rule file in editor",
+                          "text": "WHEN User clicks rule file link\nTHEN System opens rule file in editor",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Get Validate Instructions Through CLI",
+                      "sequential_order": 5.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestGetValidateInstructionsThroughCLI",
+                      "scenarios": [
+                        {
+                          "name": "Get validate instructions with rules",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_get_validate_instructions_with_rules",
+                          "steps": "GIVEN: CLI is at shape.validate.instructions\nWHEN: user enters 'shape.validate.instructions'\nTHEN: CLI displays validation rules and scanners"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Use Rules In Prompt",
+              "sequential_order": 7.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -18898,7 +19032,7 @@
             },
             {
               "name": "Synchronize Graph From Rendered",
-              "sequential_order": 7.0,
+              "sequential_order": 8.0,
               "behavior": null,
               "domain_concepts": [],
               "test_file": "invoke_bot/perform_action/test_synchronize_graph_from_rendered.py",
@@ -19933,7 +20067,12 @@
       "priority": 16,
       "description": "Story graph API actions for building and rendering",
       "stories": [
-        "Render Story Graph using Story Graph API",
+        "Render Content.Synchronize Graph with Rendered Content.Render story map",
+        "Render Content.Synchronize Graph with Rendered Content.Render story map increments",
+        "Render Content.Synchronize Graph with Rendered Content.Render story map with acceptance criteria",
+        "Render Content.Synchronize Graph with Rendered Content.Update graph from story map",
+        "Render Content.Synchronize Graph with Rendered Content.Update graph from map increments",
+        "Render Content.Synchronize Graph with Rendered Content.Update story graph from map acceptance criteria",
         "Build Story Graph Using API",
         "Build Story Graph With CLI",
         "Render Output",
