@@ -45,8 +45,8 @@ class BotTestHelper:
             self.bot_directory = bot_directory
             self.bot_directory.mkdir(parents=True, exist_ok=True)
         else:
-            repo_root = Path(__file__).parent.parent.parent.parent
-            self.bot_directory = repo_root / 'agile_bots' / 'bots' / 'story_bot'
+            repo_root = Path(__file__).parent.parent.parent
+            self.bot_directory = repo_root / 'bots' / 'story_bot'
         
         self.workspace = workspace_directory if workspace_directory is not None else tmp_path / 'workspace'
         self.workspace.mkdir(parents=True, exist_ok=True)
