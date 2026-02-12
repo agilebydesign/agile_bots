@@ -1,0 +1,136 @@
+{
+  "_comment": "Domain concepts for sub-epic 'Synchronized Graph with Rendered Diagram Content'. Merge into story-graph.json under the sub_epic whose name is 'Synchronized Graph with Rendered Diagram Content' -> domain_concepts array.",
+  "scope_sub_epic": "Synchronized Graph with Rendered Diagram Content",
+  "domain_concepts": [
+    {
+      "name": "DrawIOElement (Base)",
+      "responsibilities": [
+        { "name": "Get/Set position and size", "collaborators": ["Position", "Boundary", "DrawIO Cell"] },
+        { "name": "Read from DrawIO XML", "collaborators": ["File Path", "mxCell Element", "DrawIO Tree"] },
+        { "name": "Write to DrawIO XML", "collaborators": ["mxCell Element", "DrawIO Tree"] },
+        { "name": "Cell style (fill, stroke, text)", "collaborators": ["Style String", "DrawIO Cell"] },
+        { "name": "Identity for matching on re-extract", "collaborators": ["Cell Id", "String"] }
+      ],
+      "module": "synchronizers.story_io",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOStoryNode (Base)",
+      "responsibilities": [
+        { "name": "Serializes (DrawIO)", "collaborators": ["DrawIOStoryNodeSerializer", "DrawIO XML"] },
+        { "name": "Get/Update name", "collaborators": ["String", "DrawIO Cell"] },
+        { "name": "Get node type", "collaborators": ["String"] },
+        { "name": "Get node ID", "collaborators": ["String", "StoryNode", "StoryNodeNavigator"] },
+        { "name": "Get parent", "collaborators": ["StoryNode"] },
+        { "name": "Get sequential order", "collaborators": ["StoryNodeNavigator", "Float"] },
+        { "name": "Contains children", "collaborators": ["StoryNodeChildren"] },
+        { "name": "Delete self", "collaborators": ["DrawIOStoryNodeSerializer"] },
+        { "name": "Delete with children", "collaborators": ["DrawIOStoryNodeSerializer", "StoryNodeChildren"] },
+        { "name": "Move, rename (emulate base StoryNode API)", "collaborators": ["New Parent", "Position", "DrawIO Tree"] },
+        { "name": "Generate own slice of update report", "collaborators": ["Other StoryNode", "UpdateReport"] },
+        { "name": "Apply update from other node (recursive)", "collaborators": ["Other StoryNode", "UpdateReport"] }
+      ],
+      "module": "synchronizers.story_io",
+      "inherits_from": "DrawIOElement, StoryNode (Base)",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOStoryNodeSerializer",
+      "responsibilities": [
+        { "name": "Create node in DrawIO", "collaborators": ["File", "DrawIOStoryNode", "mxCell"] },
+        { "name": "Load node from DrawIO", "collaborators": ["File", "DrawIOStoryNode", "mxCell"] },
+        { "name": "Update node in DrawIO", "collaborators": ["File", "DrawIOStoryNode"] },
+        { "name": "Delete node from DrawIO", "collaborators": ["File", "DrawIOStoryNode"] },
+        { "name": "From DrawIO XML", "collaborators": ["DrawIO XML", "DrawIOStoryNode"] },
+        { "name": "To DrawIO XML", "collaborators": ["DrawIOStoryNode", "DrawIO XML"] }
+      ],
+      "module": "synchronizers.story_io",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOEpic",
+      "responsibilities": [
+        { "name": "Get all stories (via children)", "collaborators": ["List[DrawIOStory]", "List[SubEpic]"] },
+        { "name": "Get sub-epics", "collaborators": ["List[DrawIOSubEpic]"] },
+        { "name": "Generate update report for this epic subtree", "collaborators": ["Other Epic", "StoryMap", "UpdateReport"] },
+        { "name": "Update from other epic (recursive)", "collaborators": ["Other Epic", "UpdateReport"] }
+      ],
+      "module": "synchronizers.story_io",
+      "inherits_from": "DrawIOStoryNode (Base)",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOSubEpic",
+      "responsibilities": [
+        { "name": "Get stories", "collaborators": ["List[DrawIOStory]"] },
+        { "name": "Generate update report for this sub-epic subtree", "collaborators": ["Other SubEpic", "UpdateReport"] },
+        { "name": "Update from other sub-epic (recursive)", "collaborators": ["Other SubEpic", "UpdateReport"] }
+      ],
+      "module": "synchronizers.story_io",
+      "inherits_from": "DrawIOStoryNode (Base)",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOStory",
+      "responsibilities": [
+        { "name": "Get story type (user/system/technical) from style", "collaborators": ["String", "DrawIO Cell"] },
+        { "name": "Get users", "collaborators": ["List[StoryUser]"] },
+        { "name": "Generate update report for this story", "collaborators": ["Other Story", "UpdateReport"] },
+        { "name": "Update from other story", "collaborators": ["Other Story", "UpdateReport"] }
+      ],
+      "module": "synchronizers.story_io",
+      "inherits_from": "DrawIOStoryNode (Base)",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "DrawIOStoryMap",
+      "responsibilities": [
+        { "name": "Diagram type (outline, increments, acceptance_criteria)", "collaborators": ["DiagramType", "String"] },
+        { "name": "Load from DrawIO file", "collaborators": ["File Path", "DrawIOStoryMap"] },
+        { "name": "Save to DrawIO file", "collaborators": ["File Path", "DrawIO XML"] },
+        { "name": "Walk nodes", "collaborators": ["StoryNode", "Iterator[StoryNode]"] },
+        { "name": "Get epics / sub-epics / stories", "collaborators": ["List[Epic]", "List[SubEpic]", "List[Story]"] },
+        { "name": "Find by name, find node by path", "collaborators": ["Name", "Path String", "StoryNode"] },
+        { "name": "Generate update report", "collaborators": ["StoryMap", "UpdateReport"] },
+        { "name": "Update from other (with optional report)", "collaborators": ["StoryMap", "UpdateReport"] },
+        { "name": "Render from StoryMap (based on diagramType)", "collaborators": ["StoryMap", "DiagramType", "LayoutData", "DrawIO XML"] },
+        { "name": "Apply layout data (saved positions) during render", "collaborators": ["LayoutData", "DrawIOStoryNode"] },
+        { "name": "Default layout when no layout data", "collaborators": ["DrawIOStoryNode", "Spacing"] },
+        { "name": "Own layout data (positions and sizes for rendered nodes)", "collaborators": ["LayoutData", "DrawIOStoryNode"] },
+        { "name": "Persist layout data alongside diagram file", "collaborators": ["LayoutData", "File Path"] },
+        { "name": "Load layout data for re-render", "collaborators": ["File Path", "LayoutData"] },
+        { "name": "Assign stories to sub-epics by containment on load", "collaborators": ["Story Center", "SubEpic Boundary"] },
+        { "name": "Assign sequential order from position on load", "collaborators": ["DrawIOStoryNode", "Float"] },
+        { "name": "Extract layout (position/size per node) on load", "collaborators": ["DrawIO XML", "LayoutData"] }
+      ],
+      "module": "synchronizers.story_io",
+      "inherits_from": "StoryMap",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "UpdateReport",
+      "responsibilities": [
+        { "name": "Exact matches", "collaborators": ["List[Match Entry]"] },
+        { "name": "Fuzzy matches", "collaborators": ["List[Match Entry]", "Confidence"] },
+        { "name": "New stories (in source)", "collaborators": ["List[Story Entry]"] },
+        { "name": "Removed stories (in target)", "collaborators": ["List[Story Entry]"] },
+        { "name": "Large deletions", "collaborators": ["Missing Epics", "Missing Sub-Epics"] },
+        { "name": "Serialize to/from JSON", "collaborators": ["File Path", "Report JSON"] }
+      ],
+      "module": "synchronizers.story_io",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    },
+    {
+      "name": "LayoutData",
+      "responsibilities": [
+        { "name": "Store position and size per node", "collaborators": ["Node Id", "Position", "Boundary"] },
+        { "name": "Load from file", "collaborators": ["File Path", "LayoutData"] },
+        { "name": "Save to file", "collaborators": ["File Path"] },
+        { "name": "Apply to diagram render", "collaborators": ["DrawIOStoryMap", "Diagram"] },
+        { "name": "Extract from diagram (on sync)", "collaborators": ["DrawIO Tree", "LayoutData"] }
+      ],
+      "module": "synchronizers.story_io",
+      "_source_path": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content"
+    }
+  ]
+}
