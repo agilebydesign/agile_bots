@@ -1,0 +1,1508 @@
+{
+  "EPIC|Build Agile Bots": {
+    "x": 20,
+    "y": 120,
+    "width": 500,
+    "height": 60
+  },
+  "SUB_EPIC|Generate MCP Tools": {
+    "x": 25,
+    "y": 195,
+    "width": 240,
+    "height": 60
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Generate Bot Tools": {
+    "x": 30,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Generate Behavior Action Tools": {
+    "x": 90,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Deploy MCP BOT Server": {
+    "x": 150,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Restart MCP Server To Load Code Changes": {
+    "x": 210,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Generate CLI": {
+    "x": 275,
+    "y": 195,
+    "width": 240,
+    "height": 60
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Command Definitions": {
+    "x": 280,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate CLI Entry Point": {
+    "x": 340,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Cursor Commands": {
+    "x": 400,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Help Documentation": {
+    "x": 460,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "EPIC|Invoke Bot": {
+    "x": 530,
+    "y": 120,
+    "width": 12590,
+    "height": 60
+  },
+  "SUB_EPIC|Initialize Bot": {
+    "x": 535,
+    "y": 195,
+    "width": 1420,
+    "height": 60
+  },
+  "SUB_EPIC|Load Bot, Behavior, and Actions": {
+    "x": 540,
+    "y": 270,
+    "width": 540,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Resolve Bot Path": {
+    "x": 545,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Resolve Bot Path Using CLI": {
+    "x": 605,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Switch Registered Bots in CLI": {
+    "x": 665,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Switch Bot panel": {
+    "x": 725,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Load Bot Behaviors": {
+    "x": 785,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Load Actions": {
+    "x": 845,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Load Bot Using CLI": {
+    "x": 905,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Load Bot Behaviors Using CLI": {
+    "x": 965,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Load Bot, Behavior, and Actions|Load Actions Using CLI": {
+    "x": 1025,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Initialize Bot Interface": {
+    "x": 1090,
+    "y": 270,
+    "width": 300,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Initialize Bot Interface|Detect CLI Mode": {
+    "x": 1095,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Initialize Bot Interface|Initialize CLI Session": {
+    "x": 1155,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Initialize Bot Interface|Open Panel": {
+    "x": 1215,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Initialize Bot Interface|Apply Visual Branding": {
+    "x": 1275,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Initialize Bot Interface|Exit CLI REPL": {
+    "x": 1335,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Render Bot Interface": {
+    "x": 1400,
+    "y": 270,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display CLI Header": {
+    "x": 1405,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display CLI Bot Command in Navigation Menu Footer": {
+    "x": 1465,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display Piped Mode Instructions for AI Agents": {
+    "x": 1525,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display Headless Mode Status in CLI": {
+    "x": 1585,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display Session Status panel": {
+    "x": 1645,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Toggle Panel Section": {
+    "x": 1705,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Set Workspace": {
+    "x": 1770,
+    "y": 270,
+    "width": 180,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Set Workspace|Manage Bot Registry": {
+    "x": 1775,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Workspace|Load and Display Workspace Context in CLI": {
+    "x": 1835,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Workspace|Change Workspace Path panel": {
+    "x": 1895,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Work With Story Map": {
+    "x": 1965,
+    "y": 195,
+    "width": 5910,
+    "height": 60
+  },
+  "SUB_EPIC|Scope Files": {
+    "x": 1970,
+    "y": 270,
+    "width": 740,
+    "height": 60
+  },
+  "SUB_EPIC|Set File Filter": {
+    "x": 1975,
+    "y": 345,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Set File Filter|Add Filter Part To File Scope": {
+    "x": 1980,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set File Filter|Add Filter Part To File Scope CLI": {
+    "x": 2040,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set File Filter|Add Filter Part To File Scope Panel": {
+    "x": 2100,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set File Filter|Remove Filter Part From File Scope": {
+    "x": 2160,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set File Filter|Remove Filter Part From File Scope CLI": {
+    "x": 2220,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set File Filter|Remove Filter Part From File Scope Panel": {
+    "x": 2280,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Filter File Scope": {
+    "x": 2345,
+    "y": 345,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter File Scope  By Files": {
+    "x": 2350,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter File Scope  By Files CLI": {
+    "x": 2410,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter File Scope  By Files Panel": {
+    "x": 2470,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter File Scope By Stories Panel": {
+    "x": 2530,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter File Scope By Stories CLI": {
+    "x": 2590,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter File Scope|Filter Scope By Files Using CLI": {
+    "x": 2650,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Scope Stories": {
+    "x": 2720,
+    "y": 270,
+    "width": 1830,
+    "height": 60
+  },
+  "SUB_EPIC|Filter Scope of Stories": {
+    "x": 2725,
+    "y": 345,
+    "width": 540,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Stories": {
+    "x": 2730,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Scope By Stories Using CLI": {
+    "x": 2790,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope by Stories Panel": {
+    "x": 2850,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Files": {
+    "x": 2910,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Files CLI": {
+    "x": 2970,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Files Panel": {
+    "x": 3030,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Increments": {
+    "x": 3090,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Increments CLI": {
+    "x": 3150,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Filter Scope of Stories|Filter Story Scope By Increments Panel": {
+    "x": 3210,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Manage Story Scope": {
+    "x": 3275,
+    "y": 345,
+    "width": 540,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Create Scope": {
+    "x": 3280,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Create Scope Using CLI": {
+    "x": 3340,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Display Scope Using CLI": {
+    "x": 3400,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Clear Scope": {
+    "x": 3460,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Show All Scope Through Panel": {
+    "x": 3520,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Execute Actions With Scope Using CLI": {
+    "x": 3580,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Persist Scope": {
+    "x": 3640,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Execute Action Scoped To Story Node": {
+    "x": 3700,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Manage Story Scope|Execute Actions With Scope": {
+    "x": 3760,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Set Scope Using Filter Parts": {
+    "x": 3825,
+    "y": 345,
+    "width": 720,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Filter Part To Story Scope": {
+    "x": 3830,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Filter Part To Story Scope using CLI": {
+    "x": 3890,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Filter Part To Story Scope In Panel": {
+    "x": 3950,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Filter Part From Story Scope": {
+    "x": 4010,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Filter Part From Story Scope using CLI": {
+    "x": 4070,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Filter Part From Story Scope In Panel": {
+    "x": 4130,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Increment Filter Part To Story Scope": {
+    "x": 4190,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Increment Filter Part To Story Scope Panel": {
+    "x": 4250,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Add Increment Filter Part To Story Scope CLI": {
+    "x": 4310,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Increment Filter Part From Story Scope": {
+    "x": 4370,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Increment Filter Part From Story Scope CLI": {
+    "x": 4430,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Set Scope Using Filter Parts|Remove Increment Filter Part From Story Scope Panel": {
+    "x": 4490,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Edit Story Map": {
+    "x": 4560,
+    "y": 270,
+    "width": 1140,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph": {
+    "x": 4565,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph Using CLI": {
+    "x": 4625,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Display Story Hierarchy Panel": {
+    "x": 4685,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node": {
+    "x": 4745,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent Panel": {
+    "x": 4805,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent CLI": {
+    "x": 4865,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Epic": {
+    "x": 4925,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node": {
+    "x": 4985,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent CLI": {
+    "x": 5045,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent Panel": {
+    "x": 5105,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node To Parent": {
+    "x": 5165,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node  CLI": {
+    "x": 5225,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node Panel": {
+    "x": 5285,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node name  CLI": {
+    "x": 5345,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node name Panel": {
+    "x": 5405,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node Name": {
+    "x": 5465,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Save Story Map Changes Asynchronously": {
+    "x": 5525,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes Panel": {
+    "x": 5585,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes  CLI": {
+    "x": 5645,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Edit Increments": {
+    "x": 5710,
+    "y": 270,
+    "width": 840,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Edit Increments|Add Increment": {
+    "x": 5715,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Add Increment Panel": {
+    "x": 5775,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Add Increment CLI": {
+    "x": 5835,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Delete Increment": {
+    "x": 5895,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Delete Increment CLI": {
+    "x": 5955,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Delete Increment Panel": {
+    "x": 6015,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Move Story to Increment": {
+    "x": 6075,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Move Story to Increment CLI": {
+    "x": 6135,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Move Story to Increment Panel": {
+    "x": 6195,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Display Increment Scope View CLI": {
+    "x": 6255,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Show All Increment Scope Through CLI": {
+    "x": 6315,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Show All Increment Scope": {
+    "x": 6375,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Display Increment Scope View": {
+    "x": 6435,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Edit Increments|Show All Increment Scope Through Panel": {
+    "x": 6495,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Act With Selected Node": {
+    "x": 6560,
+    "y": 270,
+    "width": 300,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Set scope to selected story node": {
+    "x": 6565,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Submit action for selected story node": {
+    "x": 6625,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Submit Current Behavior Action For Selected Node": {
+    "x": 6685,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Set scope to selected Increment": {
+    "x": 6745,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Copy Story Node To Clipboard": {
+    "x": 6805,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Open Story Related Files": {
+    "x": 6870,
+    "y": 270,
+    "width": 180,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Open Story Related Files|Open All Related Files": {
+    "x": 6875,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Open Story Related Files|Enrich Scope With Links": {
+    "x": 6935,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Open Story Related Files|Open Story Files": {
+    "x": 6995,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Trace Story Graph": {
+    "x": 7060,
+    "y": 270,
+    "width": 810,
+    "height": 60
+  },
+  "SUB_EPIC|Trace Story": {
+    "x": 7065,
+    "y": 345,
+    "width": 120,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Trace Story|Display Stories": {
+    "x": 7070,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Story|Edit Stories in Trace Editor": {
+    "x": 7130,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Trace Scenario": {
+    "x": 7195,
+    "y": 345,
+    "width": 420,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Trace Scenario|Display Scenario Steps": {
+    "x": 7200,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Edit Scenarios in Trace Editor": {
+    "x": 7260,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Open Scenario Source": {
+    "x": 7320,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Display Examples Table": {
+    "x": 7380,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Add / Remove Examples": {
+    "x": 7440,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Edit Example": {
+    "x": 7500,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Scenario|Edit Example Cell Data": {
+    "x": 7560,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Trace Code": {
+    "x": 7625,
+    "y": 345,
+    "width": 240,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Trace Code|Display Code Trace": {
+    "x": 7630,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Code|Edit Code Step": {
+    "x": 7690,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Code|Open Source File": {
+    "x": 7750,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Trace Code|Navigate Code Trace": {
+    "x": 7810,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Navigate Behavior Actions": {
+    "x": 7885,
+    "y": 195,
+    "width": 1590,
+    "height": 60
+  },
+  "SUB_EPIC|Navigate Behavior And Actions": {
+    "x": 7890,
+    "y": 270,
+    "width": 480,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially": {
+    "x": 7895,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate To First Behavior Action": {
+    "x": 7955,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Using CLI Dot Notation": {
+    "x": 8015,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially Using CLI Commands": {
+    "x": 8075,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Behavior Action Panel": {
+    "x": 8135,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Manage Behaviors Using CLI": {
+    "x": 8195,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate To Behavior Action And Execute Using CLI": {
+    "x": 8255,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially Using CLI": {
+    "x": 8315,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Perform Behavior Action In Bot Workflow": {
+    "x": 8380,
+    "y": 270,
+    "width": 660,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute Behavior Action": {
+    "x": 8385,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute Behavior Action Panel": {
+    "x": 8445,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Update and Find Current Behavior": {
+    "x": 8505,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Persist Behavior Action State": {
+    "x": 8565,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Activity For Workspace": {
+    "x": 8625,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Action Start": {
+    "x": 8685,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Action Completion": {
+    "x": 8745,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Proceed across End To End Workflow": {
+    "x": 8805,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Record Activity Metrics And Paths": {
+    "x": 8865,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Re-execute Current Operation Using CLI": {
+    "x": 8925,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute End To End Workflow Using CLI": {
+    "x": 8985,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Display Behavior Action State": {
+    "x": 9050,
+    "y": 270,
+    "width": 420,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display Bot Hierarchy Tree with Progress Indicators CLI": {
+    "x": 9055,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Show Remaining Actions After Completion": {
+    "x": 9115,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display Current Position in CLI": {
+    "x": 9175,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display CLI Navigation Menu Footer": {
+    "x": 9235,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display Hierarchy In Panel": {
+    "x": 9295,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Manage Behavior Action State Using CLI": {
+    "x": 9355,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display Context Using CLI": {
+    "x": 9415,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Perform Action": {
+    "x": 9485,
+    "y": 195,
+    "width": 3260,
+    "height": 60
+  },
+  "SUB_EPIC|Prepare Common Instructions For Behavior, Action, and Scope": {
+    "x": 9490,
+    "y": 270,
+    "width": 840,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Inject Context Into Instructions": {
+    "x": 9495,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Get Action Instructions Through CLI": {
+    "x": 9555,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Submit Instructions Through CLI": {
+    "x": 9615,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Display Base Instructions Panel": {
+    "x": 9675,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Display Raw Format Instructions In Panel": {
+    "x": 9735,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Clarification Answers": {
+    "x": 9795,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Clarification Evidence": {
+    "x": 9855,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Strategy Decisions": {
+    "x": 9915,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Multiple Guardrails Together": {
+    "x": 9975,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save File Isolation": {
+    "x": 10035,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Guardrails Through Panel": {
+    "x": 10095,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Submit Scope Instructions": {
+    "x": 10155,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Handle Operation Errors and Validation in CLI": {
+    "x": 10215,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Guardrails Through CLI": {
+    "x": 10275,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Clarify Requirements": {
+    "x": 10340,
+    "y": 270,
+    "width": 300,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Clarify Requirements": {
+    "x": 10345,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Clarify Requirements Using CLI": {
+    "x": 10405,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Display Clarification Data Through CLI": {
+    "x": 10465,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Display Clarify Instructions Panel": {
+    "x": 10525,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Get Clarify Instructions Through CLI": {
+    "x": 10585,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Decide Strategy": {
+    "x": 10650,
+    "y": 270,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Decide Strategy|Decide Strategy": {
+    "x": 10655,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Decide Strategy|Decide Strategy Using CLI": {
+    "x": 10715,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Decide Strategy|Display Strategy Data Through CLI": {
+    "x": 10775,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Decide Strategy|Display Strategy Instructions Panel": {
+    "x": 10835,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Decide Strategy|Submit Instructions To AI Agent Panel": {
+    "x": 10895,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Decide Strategy|Get Strategy Instructions Through CLI": {
+    "x": 10955,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Build Story Graph": {
+    "x": 11020,
+    "y": 270,
+    "width": 300,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Build Story Graph|Build Story Graph": {
+    "x": 11025,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Build Story Graph|Build Story Graph Using CLI": {
+    "x": 11085,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Build Story Graph|Get Build Instructions Through CLI": {
+    "x": 11145,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Build Story Graph|Build Story Graph Using API": {
+    "x": 11205,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Build Story Graph|Display Build Instructions Panel": {
+    "x": 11265,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Render Content": {
+    "x": 11330,
+    "y": 270,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Render Content|Render Output": {
+    "x": 11335,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Content|Render Output Using CLI": {
+    "x": 11395,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Content|Display Synchronizer Output Through CLI": {
+    "x": 11455,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Content|Display Render Configurations Through CLI": {
+    "x": 11515,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Content|Get Render Instructions Through CLI": {
+    "x": 11575,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Render Content|Display Render Instructions Panel": {
+    "x": 11635,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Synchronized Graph with Rendered Diagram Content": {
+    "x": 11700,
+    "y": 270,
+    "width": 420,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Render story map": {
+    "x": 11705,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Render story map increments": {
+    "x": 11765,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Render story map with acceptance criteria": {
+    "x": 11825,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Update graph from story map": {
+    "x": 11885,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Update graph from map increments": {
+    "x": 11945,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Update story graph from map acceptance criteria": {
+    "x": 12005,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Render action diagram section": {
+    "x": 12065,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Validate With Rules": {
+    "x": 12130,
+    "y": 270,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Validate With Rules|Validate Rules": {
+    "x": 12135,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Validate With Rules|Validate Rules Using CLI": {
+    "x": 12195,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Validate With Rules|Display Validation Results Through CLI": {
+    "x": 12255,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Validate With Rules|Display Validation Scanners Through CLI": {
+    "x": 12315,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Validate With Rules|Display Validate Instructions Panel": {
+    "x": 12375,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Validate With Rules|Get Validate Instructions Through CLI": {
+    "x": 12435,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Use Rules In Prompt": {
+    "x": 12500,
+    "y": 270,
+    "width": 240,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Use Rules In Prompt|Display Rules": {
+    "x": 12505,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Use Rules In Prompt|Display Rules Using CLI": {
+    "x": 12565,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Use Rules In Prompt|Submit Behavior Rules Through Panel": {
+    "x": 12625,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Use Rules In Prompt|Get Rules Instructions Through CLI": {
+    "x": 12685,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "SUB_EPIC|Get Help": {
+    "x": 12755,
+    "y": 195,
+    "width": 360,
+    "height": 60
+  },
+  "STORY|Invoke Bot|Get Help|Get Help": {
+    "x": 12760,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Get Help|Display Parameter Help Using CLI": {
+    "x": 12820,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Get Help|Display Action Help Using CLI": {
+    "x": 12880,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Get Help|Display Command Examples Using CLI": {
+    "x": 12940,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Get Help|Get Help Using CLI": {
+    "x": 13000,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  },
+  "STORY|Invoke Bot|Get Help|Display Help Using CLI": {
+    "x": 13060,
+    "y": 495,
+    "width": 50,
+    "height": 50
+  }
+}

@@ -1,7 +1,9 @@
 {
   "shape": {
     "decisions": {
-      "flow_scope_and_granularity": "Intra-system level",
+      "flow_scope_and_granularity": [
+        "Intra-system level - Focus on interactions within a single system, Useful for Solutions with significant backend or service flows."
+      ],
       "drill_down_approach": "Dig deep on behavioral complexity",
       "depth_of_shaping": "Decompose -> Discover all stories listed",
       "drill_down_limits": "Approximate story limit: 10-15 stories",

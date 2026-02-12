@@ -1,29 +1,29 @@
 """
 Story IO Domain Model
 
-Object-oriented representation of story maps with rendering and synchronization capabilities.
+DrawIO story map rendering and synchronization using the domain model.
 """
 
-from .story_io_component import StoryIOComponent
-from .story_io_diagram import StoryIODiagram
-from .story_io_epic import Epic
-from .story_io_feature import Feature
-from .story_io_story import Story
-from .story_io_user import User
-from .story_io_increment import Increment
 from .story_io_position import Position, Boundary
 from .story_io_synchronizer import DrawIOSynchronizer
+from .drawio_story_map import DrawIOStoryMap
+from .drawio_story_node import DrawIOEpic, DrawIOSubEpic, DrawIOStory, DrawIOIncrementLane
+from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
+from .drawio_element import DrawIOElement
+from .layout_data import LayoutData
+from .update_report import UpdateReport
 
 __all__ = [
-    'StoryIOComponent',
-    'StoryIODiagram',
-    'Epic',
-    'Feature',
-    'Story',
-    'User',
-    'Increment',
     'Boundary',
     'Position',
     'DrawIOSynchronizer',
+    'DrawIOStoryMap',
+    'DrawIOEpic',
+    'DrawIOSubEpic',
+    'DrawIOStory',
+    'DrawIOIncrementLane',
+    'DrawIOStoryNodeSerializer',
+    'DrawIOElement',
+    'LayoutData',
+    'UpdateReport',
 ]
-

@@ -388,25 +388,25 @@ def given_panel_in_increment_view(helper):
 
 def when_user_requests_increment_view_via_cli(helper, story_graph):
     """Request increment view via CLI."""
-    from synchronizers.story_io.story_io_increment import get_increments_view
+    from synchronizers.story_io.increment_views import get_increments_view
     return get_increments_view(story_graph)
 
 
 def when_user_enters_increment_view_command(helper, story_graph):
     """Enter increment view command via CLI."""
-    from synchronizers.story_io.story_io_increment import format_increments_for_cli
+    from synchronizers.story_io.increment_views import format_increments_for_cli
     return format_increments_for_cli(story_graph)
 
 
 def when_user_clicks_view_toggle(panel_state):
     """Click view toggle button."""
-    from synchronizers.story_io.story_io_increment import toggle_view
+    from synchronizers.story_io.increment_views import toggle_view
     return toggle_view(panel_state)
 
 
 def when_panel_renders_increment_view(panel_state):
     """Render increment view in panel."""
-    from synchronizers.story_io.story_io_increment import render_increment_view
+    from synchronizers.story_io.increment_views import render_increment_view
     return render_increment_view(panel_state)
 
 

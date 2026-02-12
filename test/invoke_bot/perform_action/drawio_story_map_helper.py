@@ -54,6 +54,86 @@ class DrawIOStoryMapTestHelper(BaseHelper):
             epics.append({"name": f"Epic {e+1}", "sequential_order": float(e + 1), "sub_epics": sub_epics})
         return {"epics": epics}
 
+    def create_story_map_data_with_nested_sub_epics(self, depth=3):
+        """Create story map data with sub-epics nested to the specified depth.
+        
+        depth=2: Epic -> SubEpic -> Stories (standard)
+        depth=3: Epic -> SubEpic -> SubEpic -> Stories
+        depth=4: Epic -> SubEpic -> SubEpic -> SubEpic -> Stories
+        """
+        def build_sub_epic(name, order, remaining_depth):
+            if remaining_depth <= 1:
+                # Leaf: contains stories
+                return {
+                    "name": name,
+                    "sequential_order": order,
+                    "sub_epics": [],
+                    "story_groups": [{
+                        "type": "and",
+                        "connector": None,
+                        "stories": [
+                            {"name": f"{name} Story A", "sequential_order": 1.0, "story_type": "user", "users": [], "acceptance_criteria": []},
+                            {"name": f"{name} Story B", "sequential_order": 2.0, "story_type": "system", "users": [], "acceptance_criteria": []}
+                        ]
+                    }]
+                }
+            # Branch: contains nested sub-epics
+            return {
+                "name": name,
+                "sequential_order": order,
+                "sub_epics": [
+                    build_sub_epic(f"{name} Child 1", 1.0, remaining_depth - 1),
+                    build_sub_epic(f"{name} Child 2", 2.0, remaining_depth - 1)
+                ],
+                "story_groups": []
+            }
+
+        return {
+            "epics": [{
+                "name": "Nested Epic",
+                "sequential_order": 1.0,
+                "sub_epics": [
+                    build_sub_epic("Top SubEpic", 1.0, depth - 1)
+                ]
+            }]
+        }
+
+    def create_story_map_data_with_users(self):
+        """Story map where stories have assigned users (actors).
+
+        Used to verify that actor elements are rendered in the correct
+        position relative to their story card.
+        """
+        return {
+            "epics": [
+                {
+                    "name": "Invoke Bot",
+                    "sequential_order": 1.0,
+                    "sub_epics": [
+                        {
+                            "name": "Initialize Bot",
+                            "sequential_order": 1.0,
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "type": "and",
+                                    "connector": None,
+                                    "stories": [
+                                        {"name": "Load Config", "sequential_order": 1.0, "story_type": "user",
+                                         "users": ["Developer", "Admin"],
+                                         "acceptance_criteria": []},
+                                        {"name": "Register Behaviors", "sequential_order": 2.0, "story_type": "system",
+                                         "users": ["Bot Engine"],
+                                         "acceptance_criteria": []}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
     def create_story_map_data_with_story_type(self, story_type):
         data = self.create_simple_story_map_data()
         data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'] = [

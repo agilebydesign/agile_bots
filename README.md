@@ -1,21 +1,42 @@
-# Agile Bots
+# Agile Context Engine
 
-**AI-powered bots that inject Agile delivery, product, and engineering best practices directly into your workflow.**
+**An opinionated context engine that injects agile delivery, product, and engineering best practices directly into AI-assisted development workflows.**
 
-## Overview
+## Context-Driven Development
 
-Agile Bots enables **Agile-AI Augmented Delivery** through a VS Code/Cursor plugin that steer your AI agent through agile workflows that inject prompts with context, strategies, and best practices. Agile bots generates and synchronizes common agile artifacts (eg stories, tests, code) while preventing the most common AI mistakes.
+Every few years, a practice emerges that reshapes how we build software. Test-Driven Development made testing a first-class design activity. Behavior-Driven Development gave teams a shared language for system behavior. Now, with AI deeply embedded in how we write, review, and reason about code, a new practice is taking hold: **Context-Driven Development (CDD)**.
 
-Integrating "agile"* practices with AI- assisted delivery can have a dramatic impact on pace, quality, cost, and outcomes. 
+Context-Driven Development is the practice of creating structured, version-controlled context that gives everyone involved in building software — engineers, product managers, QA, and AI tools — a shared source of truth. Rather than letting AI assistants guess at intent from code alone, CDD keeps assumptions, constraints, decisions, and domain knowledge close to the work, available at the moment a decision is made. When context is clear, current, and close to the code, AI suggestions stay grounded, teams stay aligned, and rework drops dramatically. For more on the emerging CDD practice, see [cdd.dev](https://cdd.dev/).
 
-This initial release includes **StoryBot** and **CRC Bot**, two complementary tools that:
-- **StoryBot** guides AI through story mapping → story exploration → story specifications → automated tests → code
-- **CRCBot** guides AI through domain modeling → technical design → Model walkthroughs to validate how objects message each other 
-- Inject context, templates, and practice guidance into every AI prompt
-- Validate AI output with automated scanners that check for anti-patterns
-- Keep all artifacts (stories, diagrams, tests, code) synchronized 
+At the heart of CDD is the role of the **Context Engineer** — the practitioner who designs, curates, and manages the information ecosystem that AI systems operate within. Where prompt engineering focuses on crafting individual instructions, context engineering is the architectural discipline of ensuring the right knowledge, rules, strategies, and evidence reach the AI at precisely the right time. It is the difference between asking a good question and building a system that consistently asks the right questions, with the right supporting context, at scale.
 
-> *We use the term "Agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CICD/DevOps. We're not talking about cargo cult adoption of Scrum, SAFe, or other random initials.*
+## What is a Context Engine?
+
+A **context engine** is the operational system that sits between practitioners and their AI tools, managing the flow of information so that every AI interaction is grounded in relevant, structured context. At a high level, a context engine consists of several key capabilities:
+
+- **Context Retrieval** — Gathering relevant knowledge from structured sources (knowledge graphs, project artifacts, domain models, prior decisions) at the moment it's needed
+- **Context Aggregation** — Organizing disparate information — requirements, strategies, rules, evidence — into a coherent, structured format
+- **Prompt Construction** — Weaving aggregated context together with templates, practice guidance, and the current task to build rich, grounded AI prompts
+- **Validation & Feedback** — Checking AI output against configurable rules and best practices, feeding results back to refine future interactions
+- **Artifact Synchronization** — Keeping all generated artifacts (documents, diagrams, tests, code) aligned as the underlying context evolves
+
+A well-built context engine transforms AI-assisted development from an ad-hoc, prompt-by-prompt exercise into a systematic, repeatable practice where quality and consistency are engineered in, not hoped for.
+
+## The Agile Context Engine (ACE)
+
+The **Agile Context Engine (ACE)** is an opinionated context engine built on agile principles, methods, and practices. While context engines can be built around any methodology, ACE is grounded in the pragmatic application of story mapping, BDD, test-driven development, domain-driven design, clean code principles, and continuous delivery — the practices that have proven to accelerate delivery while maintaining quality.
+
+ACE operates through a guided workflow system — **clarify → strategy → build → validate → render** — that progressively refines work from vision to working code. At every step, ACE injects relevant context, practice guidance, and validation rules into AI prompts, ensuring that AI-generated output meets the same standards you'd expect from a skilled practitioner.
+
+This initial release includes two bots that embody ACE's approach:
+
+- **StoryBot** guides AI through story mapping → story exploration → story specifications → automated tests → code, injecting agile best practices at every stage
+- **CRC Bot** guides AI through domain modeling → technical design → model walkthroughs, applying responsibility-driven design and domain-driven design principles
+- **Future bots** will extend ACE into architecture-driven delivery, validated learning, and more
+
+Each bot validates AI output with automated scanners, keeps all artifacts synchronized, and provides multiple interfaces (CLI, VS Code panel, MCP protocol) so you can work the way you prefer.
+
+> *ACE uses "agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CI/CD/DevOps. We're not talking about cargo cult adoption of Scrum, SAFe, or other random initials.*
 
 ## 📖 **USER MANUAL - START HERE**
 
@@ -28,7 +49,7 @@ This initial release includes **StoryBot** and **CRC Bot**, two complementary to
 
 **👉 [READ THE COMPLETE USER GUIDE](docs/manual/user-guide.md) 👈**
 
-**New to Agile Bots?** The user guide contains everything you need:
+**New to ACE?** The user guide contains everything you need:
 - Step-by-step tutorials for StoryBot and CRC Bot
 - Complete workflow explanations (Clarify → Strategy → Build → Validate → Render)
 - CLI and panel interface guides
@@ -57,7 +78,7 @@ Overcoming AI's limitations through expert-led prompting is manual, repetitive, 
 
 ## Core Principles & Features
 
-Agile Bots helps with five core agile principles that accelerate delivery:
+ACE helps with five core agile principles that accelerate delivery:
 
 ### 🎯 **Focus**
 We work on a small number of small, highest priority increments to completion, delivering maximum value
@@ -315,7 +336,7 @@ crc_bot_cli --help
 
 ## What Makes This Different
 
-Rather than hiring Agile by Design, or any other Agile coaches to help train you on Agile methods and approaches, just install this in Visual Studio or Cursor, use Agile Bots to inject Agile instructions into your AI prompting and you'll never have to speak to another Agile coach again.
+Rather than hiring Agile by Design, or any other Agile coaches to help train you on Agile methods and approaches, just install this in Visual Studio or Cursor, use ACE to inject Agile instructions into your AI prompting and you'll never have to speak to another Agile coach again.
 
 In all seriousness, if you are tired of fighting with your AI assistant to deliver well-crafted, simple, story-driven, testable code, then give this tool a try.
 

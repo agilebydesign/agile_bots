@@ -1,14 +1,14 @@
 """
 DrawIO Synchronizer
 
-Handles synchronization of story diagrams from DrawIO XML format.
+Uses the DrawIOStoryMap domain model for rendering. Extraction and
+merge operations delegate to story_map_drawio_synchronizer functions.
 """
 
 from pathlib import Path
 from typing import Dict, Any, Optional, Union
+import json
 
-# Import the existing synchronizer functions
-# story_map_drawio_synchronizer is in the same directory (story_io/)
 from .story_map_drawio_synchronizer import (
     synchronize_story_graph_from_drawio_outline,
     synchronize_story_graph_from_drawio_increments,
@@ -18,114 +18,95 @@ from .story_map_drawio_synchronizer import (
 
 
 class DrawIOSynchronizer:
-    """Synchronizer for extracting story diagrams from DrawIO XML format."""
-    
-    def render(self, input_path: Union[str, Path], output_path: Union[str, Path], 
+    """Synchronizer for story diagrams using the DrawIOStoryMap domain model."""
+
+    def render(self, input_path: Union[str, Path], output_path: Union[str, Path],
                renderer_command: Optional[str] = None, **kwargs) -> Dict[str, Any]:
-        from .story_io_diagram import StoryIODiagram
-        
+        from .drawio_story_map import DrawIOStoryMap
+        from .layout_data import LayoutData
+        from story_graph.nodes import StoryMap
+
         input_path = Path(input_path)
         output_path = Path(output_path)
-        
-        # Filter out project_path if present (not used by DrawIO synchronizer)
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k != 'project_path'}
-        
-        if renderer_command == 'render-outline' or renderer_command is None:
-            return StoryIODiagram.render_outline_from_graph(input_path, output_path, **filtered_kwargs)
-        elif renderer_command == 'render-increments':
-            return StoryIODiagram.render_increments_from_graph(input_path, output_path, **filtered_kwargs)
+
+        # Load story graph
+        with open(input_path, 'r', encoding='utf-8') as f:
+            graph_data = json.load(f)
+
+        story_map = StoryMap(graph_data)
+
+        # Load layout data if it exists alongside the output
+        layout_path = output_path.parent / f"{output_path.stem}-layout.json"
+        layout_data = LayoutData.load(layout_path) if layout_path.exists() else None
+
+        # Render via domain model
+        drawio_map = DrawIOStoryMap()
+
+        if renderer_command == 'render-increments':
+            increments = graph_data.get('increments', [])
+            summary = drawio_map.render_increments_from_story_map(
+                story_map, increments, layout_data)
         elif renderer_command == 'render-exploration':
-            return StoryIODiagram.render_exploration_from_graph(input_path, output_path, **filtered_kwargs)
+            scope = kwargs.get('scope')
+            summary = drawio_map.render_exploration_from_story_map(
+                story_map, layout_data, scope=scope)
         else:
-            raise ValueError(f"Unknown renderer_command: {renderer_command}")
-    
+            summary = drawio_map.render_from_story_map(story_map, layout_data)
+
+        # Save diagram
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        drawio_map.save(output_path)
+
+        # Save layout data for future re-renders
+        layout = drawio_map.extract_layout()
+        layout.save(output_path.parent / f"{output_path.stem}-layout.json")
+
+        return {
+            "output_path": str(output_path),
+            "summary": summary,
+        }
+
     def synchronize_outline(self, drawio_path: Path,
                            original_path: Optional[Path] = None,
                            output_path: Optional[Path] = None) -> Dict[str, Any]:
-        """
-        Synchronize story graph from DrawIO outline file.
-        
-        Args:
-            drawio_path: Path to DrawIO outline file
-            original_path: Optional path to original story graph for comparison
-            output_path: Optional path to write extracted JSON
-        
-        Returns:
-            Extracted story graph data
-        """
         if output_path is None:
             output_path = drawio_path.parent / "story-graph-drawio-extracted.json"
-        
+
         return synchronize_story_graph_from_drawio_outline(
             drawio_path=drawio_path,
             output_path=output_path,
             original_path=original_path
         )
-    
+
     def synchronize_increments(self, drawio_path: Path,
                               original_path: Optional[Path] = None,
                               output_path: Optional[Path] = None) -> Dict[str, Any]:
-        """
-        Synchronize story graph from DrawIO increments file.
-        
-        Args:
-            drawio_path: Path to DrawIO file with increments
-            original_path: Optional path to original story graph for comparison
-            output_path: Optional path to write extracted JSON
-        
-        Returns:
-            Extracted story graph data
-        """
         if output_path is None:
             output_path = drawio_path.parent / "story-graph-drawio-extracted.json"
-        
+
         return synchronize_story_graph_from_drawio_increments(
             drawio_path=drawio_path,
             output_path=output_path,
             original_path=original_path
         )
-    
+
     def generate_merge_report(self, extracted_path: Union[str, Path],
                               original_path: Union[str, Path],
                               report_path: Optional[Union[str, Path]] = None) -> Dict[str, Any]:
-        """
-        Generate a merge report comparing extracted and original story graphs.
-        
-        Args:
-            extracted_path: Path to extracted story graph JSON
-            original_path: Path to original story graph JSON
-            report_path: Optional path to write report JSON
-        
-        Returns:
-            Dictionary containing merge report data
-        """
         extracted_path = Path(extracted_path)
         original_path = Path(original_path)
         if report_path:
             report_path = Path(report_path)
-        
+
         return generate_merge_report(extracted_path, original_path, report_path)
-    
+
     def merge_story_graphs(self, extracted_path: Union[str, Path],
                           original_path: Union[str, Path],
                           report_path: Union[str, Path],
                           output_path: Union[str, Path]) -> Dict[str, Any]:
-        """
-        Merge extracted story graph with original, preserving Steps from original.
-        
-        Args:
-            extracted_path: Path to extracted story graph JSON
-            original_path: Path to original story graph JSON
-            report_path: Path to merge report JSON
-            output_path: Path to write merged story graph JSON
-        
-        Returns:
-            Dictionary containing merged story graph
-        """
         extracted_path = Path(extracted_path)
         original_path = Path(original_path)
         report_path = Path(report_path)
         output_path = Path(output_path)
-        
-        return merge_story_graphs(extracted_path, original_path, report_path, output_path)
 
+        return merge_story_graphs(extracted_path, original_path, report_path, output_path)

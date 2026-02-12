@@ -13,6 +13,7 @@ from pathlib import Path
 from helpers.bot_test_helper import BotTestHelper
 from helpers.cli_bot_test_helper import CLIBotTestHelper
 from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
+from synchronizers.story_io.drawio_story_node import DrawIOSubEpic
 from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
 from story_graph.nodes import StoryMap
@@ -29,7 +30,7 @@ class TestRenderStoryMap:
 
         epics = drawio_story_map.get_epics()
         assert len(epics) == 1
-        assert epics[0].position.y == 120
+        assert epics[0].position.y == 10
 
         sub_epics = epics[0].get_sub_epics()
         assert epics[0].boundary.width >= sum(se.boundary.width for se in sub_epics)
@@ -149,6 +150,387 @@ class TestRenderStoryMap:
         assert summary == {'epics': 0, 'sub_epic_count': 0, 'diagram_generated': True}
 
 
+class TestRenderStoryMapNestedSubEpics:
+
+    def test_render_3_level_nested_sub_epics_creates_sub_epic_inside_sub_epic(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=3)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        summary = drawio_story_map.render_from_story_map(story_map, layout_data=None)
+
+        assert summary['diagram_generated'] is True
+        epics = drawio_story_map.get_epics()
+        assert len(epics) == 1
+        # Top-level sub-epic under the epic
+        top_sub_epics = epics[0].get_sub_epics()
+        assert len(top_sub_epics) == 1
+        # Nested sub-epics under the top sub-epic
+        nested_sub_epics = top_sub_epics[0].get_sub_epics()
+        assert len(nested_sub_epics) == 2
+        # Leaf sub-epics contain stories
+        for nested_se in nested_sub_epics:
+            stories = nested_se.get_stories()
+            assert len(stories) == 2, f"Leaf sub-epic '{nested_se.name}' should have 2 stories"
+
+    def test_render_4_level_nested_sub_epics_recurses_to_all_depths(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=4)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        summary = drawio_story_map.render_from_story_map(story_map, layout_data=None)
+
+        assert summary['diagram_generated'] is True
+        # Should have all stories at the deepest level
+        all_stories = drawio_story_map.get_stories()
+        # depth=4: 1 top -> 2 mid -> 4 leaf sub-epics, each with 2 stories = 8 stories
+        assert len(all_stories) == 8, f"Expected 8 stories at depth 4, got {len(all_stories)}"
+
+    def test_nested_sub_epics_have_increasing_y_positions_per_depth(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=3)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_story_map.render_from_story_map(story_map, layout_data=None)
+
+        epic = drawio_story_map.get_epics()[0]
+        top_se = epic.get_sub_epics()[0]
+        nested_se = top_se.get_sub_epics()[0]
+        leaf_story = nested_se.get_stories()[0]
+
+        # Each level should be deeper (higher y)
+        assert top_se.position.y > epic.position.y, "Top sub-epic should be below epic"
+        assert nested_se.position.y > top_se.position.y, "Nested sub-epic should be below top sub-epic"
+        assert leaf_story.position.y > nested_se.position.y, "Story should be below its sub-epic"
+
+    def test_parent_sub_epic_width_encompasses_all_nested_children(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=3)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_story_map.render_from_story_map(story_map, layout_data=None)
+
+        epic = drawio_story_map.get_epics()[0]
+        top_se = epic.get_sub_epics()[0]
+        nested_ses = top_se.get_sub_epics()
+
+        # Parent sub-epic should be at least as wide as the sum of its nested children
+        children_width = sum(se.boundary.width for se in nested_ses)
+        assert top_se.boundary.width >= children_width, \
+            f"Parent sub-epic width {top_se.boundary.width} should encompass children width {children_width}"
+
+    def test_render_and_save_nested_sub_epics_produces_valid_drawio(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=3)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_story_map.render_from_story_map(story_map, layout_data=None)
+        output_file = tmp_path / 'nested-story-map.drawio'
+        drawio_story_map.save(output_file)
+
+        assert output_file.exists()
+        content = output_file.read_text(encoding='utf-8')
+        assert '<mxfile' in content
+        # All sub-epic names should be in the output
+        assert 'Top SubEpic' in content
+        assert 'Top SubEpic Child 1' in content
+        assert 'Top SubEpic Child 2' in content
+
+    def test_extract_to_json_preserves_nested_sub_epic_structure(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=3)
+        story_map = StoryMap(data)
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_story_map.render_from_story_map(story_map, layout_data=None)
+        output_file = tmp_path / 'extracted.json'
+        drawio_story_map.save_as_json(output_file)
+
+        extracted = json.loads(output_file.read_text(encoding='utf-8'))
+        top_se = extracted['epics'][0]['sub_epics'][0]
+        assert len(top_se['sub_epics']) == 2, "Should preserve 2 nested sub-epics"
+        assert top_se['story_groups'] == [] or len(top_se['story_groups'][0].get('stories', [])) == 0, \
+            "Branch sub-epic should not have stories"
+        for nested in top_se['sub_epics']:
+            stories = nested['story_groups'][0]['stories']
+            assert len(stories) == 2, "Leaf sub-epics should have 2 stories each"
+
+
+class TestDomainModelDynamicYPositioning:
+    """Tests that DrawIOStoryMap (domain model) produces correct nested
+    sub-epic rendering with parent containers spanning their children."""
+
+    def _render_nested(self, depth=3):
+        """Render a nested graph through DrawIOStoryMap and return epics."""
+        helper = BotTestHelper(Path(__file__).parent)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=depth)
+        story_map = StoryMap(data)
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_from_story_map(story_map)
+        return drawio_map
+
+    def test_parent_and_leaf_sub_epics_both_rendered(self):
+        dm = self._render_nested(depth=3)
+        epics = dm.get_epics()
+        top_se = epics[0].get_sub_epics()[0]
+        # top_se is the parent; its children are the leaves
+        children = top_se.get_sub_epics()
+        assert len(children) == 2, f"Parent should have 2 child sub-epics, got {len(children)}"
+        # All three are rendered (parent + 2 children)
+        all_nodes = top_se.collect_all_nodes()
+        se_nodes = [n for n in all_nodes if isinstance(n, DrawIOSubEpic)]
+        assert len(se_nodes) == 3, f"Should have 3 sub-epic nodes total, got {len(se_nodes)}"
+
+    def test_nested_sub_epics_at_different_y_levels(self):
+        dm = self._render_nested(depth=3)
+        epics = dm.get_epics()
+        top_se = epics[0].get_sub_epics()[0]
+        children = top_se.get_sub_epics()
+        assert len(children) >= 2
+
+        parent_y = top_se.position.y
+        child_y = children[0].position.y
+        assert child_y > parent_y, \
+            f"Child Y ({child_y}) should be below parent Y ({parent_y})"
+        # Siblings at same level
+        assert children[0].position.y == children[1].position.y
+
+    def test_stories_positioned_below_deepest_sub_epic(self):
+        dm = self._render_nested(depth=3)
+        # Collect all sub-epics recursively (top-level + nested)
+        all_se_nodes = [n for n in dm._collect_all_nodes() if isinstance(n, DrawIOSubEpic)]
+        stories = dm.get_stories()
+        max_se_y = max(se.position.y for se in all_se_nodes)
+        min_story_y = min(s.position.y for s in stories)
+        assert min_story_y > max_se_y, \
+            f"Stories Y ({min_story_y}) should be below deepest sub-epic Y ({max_se_y})"
+
+    def test_4_level_depth_produces_3_distinct_sub_epic_y_levels(self):
+        dm = self._render_nested(depth=4)
+        all_se_nodes = [n for n in dm._collect_all_nodes() if isinstance(n, DrawIOSubEpic)]
+        y_levels = sorted(set(se.position.y for se in all_se_nodes))
+        assert len(y_levels) == 3, \
+            f"depth=4 should produce 3 sub-epic Y levels, got {len(y_levels)}: {y_levels}"
+
+    def test_parent_sub_epic_width_spans_children(self):
+        dm = self._render_nested(depth=3)
+        top_se = dm.get_epics()[0].get_sub_epics()[0]
+        children = top_se.get_sub_epics()
+        children_left = min(c.position.x for c in children)
+        children_right = max(c.boundary.right for c in children)
+        assert top_se.position.x <= children_left
+        assert top_se.boundary.right >= children_right
+
+    def test_flat_graph_sub_epic_at_standard_y(self):
+        data = {"epics": [{"name": "E1", "sequential_order": 1.0, "sub_epics": [
+            {"name": "SE1", "sequential_order": 1.0, "sub_epics": [],
+             "story_groups": [{"type": "and", "connector": None, "stories": [
+                 {"name": "S1", "sequential_order": 1.0, "story_type": "user", "users": []}
+             ]}]}
+        ]}]}
+        story_map = StoryMap(data)
+        dm = DrawIOStoryMap()
+        dm.render_from_story_map(story_map)
+        ses = dm.get_sub_epics()
+        assert len(ses) == 1
+        # SUB_EPIC_Y_OFFSET from epic = 40, epic Y = 10 → sub-epic Y = 50
+        assert ses[0].position.y == 50, f"Flat sub-epic Y should be 50, got {ses[0].position.y}"
+
+
+class TestDiagramVisualIntegrity:
+    """Tests that rendered diagrams are visually correct in Draw.io.
+
+    These catch layout bugs that produce broken visuals even when the
+    data model is structurally correct:
+    - Text overflowing cell boundaries (missing whiteSpace/html styles)
+    - Missing font sizes (Draw.io defaults are too large for cards)
+    - Actors appearing inside sub-epic headers instead of near stories
+    - Containers that don't fully wrap their children
+    - Sibling elements overlapping each other
+    """
+
+    def _render_simple(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        story_map = StoryMap(helper.drawio_story_map.create_simple_story_map_data())
+        dm = DrawIOStoryMap(diagram_type='outline')
+        dm.render_from_story_map(story_map, layout_data=None)
+        return dm
+
+    def _render_with_users(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        story_map = StoryMap(helper.drawio_story_map.create_story_map_data_with_users())
+        dm = DrawIOStoryMap(diagram_type='outline')
+        dm.render_from_story_map(story_map, layout_data=None)
+        return dm
+
+    def _render_nested(self, tmp_path, depth=3):
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_nested_sub_epics(depth=depth)
+        story_map = StoryMap(data)
+        dm = DrawIOStoryMap(diagram_type='outline')
+        dm.render_from_story_map(story_map, layout_data=None)
+        return dm
+
+    # ---- Style integrity (catches text overflow / font size bugs) ----
+
+    def test_all_cells_in_output_xml_include_text_wrapping(self, tmp_path):
+        """Every mxCell style must include whiteSpace=wrap and html=1 so
+        text wraps inside cell boundaries instead of overflowing."""
+        import xml.etree.ElementTree as ET
+
+        dm = self._render_simple(tmp_path)
+        output_file = tmp_path / 'visual-test.drawio'
+        dm.save(output_file)
+
+        tree = ET.parse(str(output_file))
+        for cell in tree.iter('mxCell'):
+            style = cell.get('style', '')
+            if not style or cell.get('vertex') != '1':
+                continue
+            assert 'whiteSpace=wrap' in style, \
+                f"Cell '{cell.get('value')}' missing whiteSpace=wrap in style: {style}"
+            assert 'html=1' in style, \
+                f"Cell '{cell.get('value')}' missing html=1 in style: {style}"
+            assert 'overflow=hidden' in style, \
+                f"Cell '{cell.get('value')}' missing overflow=hidden in style: {style}"
+
+    def test_all_cells_in_output_xml_have_explicit_font_size(self, tmp_path):
+        """Every styled mxCell must declare fontSize explicitly so Draw.io
+        doesn't fall back to its default (too large for story cards)."""
+        import xml.etree.ElementTree as ET
+
+        dm = self._render_simple(tmp_path)
+        output_file = tmp_path / 'font-test.drawio'
+        dm.save(output_file)
+
+        tree = ET.parse(str(output_file))
+        for cell in tree.iter('mxCell'):
+            style = cell.get('style', '')
+            if not style or cell.get('vertex') != '1':
+                continue
+            assert 'fontSize=' in style, \
+                f"Cell '{cell.get('value')}' missing explicit fontSize in style: {style}"
+
+    # ---- Actor positioning (catches actors-in-header bug) ----
+
+    def test_actors_positioned_below_their_story_card_not_above(self, tmp_path):
+        """Actor elements must sit below their parent story card.
+        If actors are above (negative Y offset), they land inside
+        the sub-epic header area and look like sub-epic labels."""
+        dm = self._render_with_users(tmp_path)
+        stories = dm.get_stories()
+        assert len(stories) >= 1, "Need stories to test actor positioning"
+
+        for story in stories:
+            story_bottom = story.position.y + story.boundary.height
+            for actor in story._actor_elements:
+                assert actor.position.y >= story_bottom, \
+                    (f"Actor '{actor.value}' at y={actor.position.y} is above "
+                     f"story '{story.name}' bottom at y={story_bottom}. "
+                     f"Actors must be below their story card, not inside the parent header.")
+
+    def test_actors_do_not_overlap_sub_epic_header_area(self, tmp_path):
+        """Actor elements must not be positioned within the first 30px of
+        their enclosing sub-epic (the label/header area)."""
+        dm = self._render_with_users(tmp_path)
+
+        for sub_epic in dm.get_sub_epics():
+            header_bottom = sub_epic.position.y + 30
+            for story in sub_epic.get_stories():
+                for actor in story._actor_elements:
+                    assert actor.position.y > header_bottom, \
+                        (f"Actor '{actor.value}' at y={actor.position.y} overlaps "
+                         f"sub-epic '{sub_epic.name}' header area (y < {header_bottom})")
+
+    def test_stories_with_users_produce_actor_elements(self, tmp_path):
+        """Stories that have assigned users must create corresponding
+        actor elements. Without this, actor layout is never tested."""
+        dm = self._render_with_users(tmp_path)
+        stories = dm.get_stories()
+
+        actors_found = sum(len(s._actor_elements) for s in stories)
+        assert actors_found >= 3, \
+            f"Expected at least 3 actors (Developer, Admin, Bot Engine), got {actors_found}"
+
+    # ---- Geometric containment (catches container-too-small bugs) ----
+
+    def test_epic_boundary_geometrically_contains_all_sub_epics(self, tmp_path):
+        """Epic container must fully contain every sub-epic boundary.
+        A 'contains' check catches containers that are too short or narrow."""
+        dm = self._render_simple(tmp_path)
+
+        for epic in dm.get_epics():
+            for se in epic.get_sub_epics():
+                assert epic.boundary.contains_boundary(se.boundary), \
+                    (f"Epic '{epic.name}' boundary {epic.boundary} does not contain "
+                     f"sub-epic '{se.name}' boundary {se.boundary}")
+
+    def test_sub_epic_boundary_geometrically_contains_all_stories(self, tmp_path):
+        """Sub-epic container must fully contain every story boundary."""
+        dm = self._render_simple(tmp_path)
+
+        for se in dm.get_sub_epics():
+            for story in se.get_stories():
+                assert se.boundary.contains_boundary(story.boundary), \
+                    (f"Sub-epic '{se.name}' boundary {se.boundary} does not contain "
+                     f"story '{story.name}' boundary {story.boundary}")
+
+    def test_nested_containers_contain_all_descendants_at_every_depth(self, tmp_path):
+        """For nested sub-epics (depth=3), every parent container must
+        fully contain all its direct children at every level."""
+        dm = self._render_nested(tmp_path, depth=3)
+
+        epic = dm.get_epics()[0]
+        top_se = epic.get_sub_epics()[0]
+        assert epic.boundary.contains_boundary(top_se.boundary), \
+            "Epic must contain top-level sub-epic"
+
+        for nested_se in top_se.get_sub_epics():
+            assert top_se.boundary.contains_boundary(nested_se.boundary), \
+                f"Top sub-epic must contain nested sub-epic '{nested_se.name}'"
+            for story in nested_se.get_stories():
+                assert nested_se.boundary.contains_boundary(story.boundary), \
+                    f"Nested sub-epic '{nested_se.name}' must contain story '{story.name}'"
+
+    # ---- Overlap detection (catches siblings piled on top of each other) ----
+
+    def test_sibling_stories_do_not_overlap_horizontally(self, tmp_path):
+        """Stories within the same sub-epic must not overlap.
+        Catches bugs where all stories share the same X position."""
+        dm = self._render_simple(tmp_path)
+
+        for se in dm.get_sub_epics():
+            stories = se.get_stories()
+            for i in range(len(stories)):
+                for j in range(i + 1, len(stories)):
+                    a, b = stories[i], stories[j]
+                    assert not a.boundary.overlaps(b.boundary), \
+                        (f"Stories '{a.name}' and '{b.name}' overlap: "
+                         f"{a.boundary} vs {b.boundary}")
+
+    def test_sibling_sub_epics_do_not_overlap_horizontally(self, tmp_path):
+        """Sub-epics within the same epic must not overlap."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_counts(1, 3, 7)
+        story_map = StoryMap(data)
+        dm = DrawIOStoryMap(diagram_type='outline')
+        dm.render_from_story_map(story_map, layout_data=None)
+
+        for epic in dm.get_epics():
+            sub_epics = epic.get_sub_epics()
+            for i in range(len(sub_epics)):
+                for j in range(i + 1, len(sub_epics)):
+                    a, b = sub_epics[i], sub_epics[j]
+                    assert not a.boundary.overlaps(b.boundary), \
+                        (f"Sub-epics '{a.name}' and '{b.name}' overlap: "
+                         f"{a.boundary} vs {b.boundary}")
+
+
 class TestRenderStoryMapIncrements:
 
     def test_render_increments_diagram_with_stories_assigned_to_increment_lanes(self, tmp_path):
@@ -157,10 +539,12 @@ class TestRenderStoryMapIncrements:
         story_map = StoryMap(data)
 
         drawio_story_map = DrawIOStoryMap(diagram_type='increments')
-        summary = drawio_story_map.render_from_story_map(story_map, layout_data=None)
+        summary = drawio_story_map.render_increments_from_story_map(
+            story_map, data.get('increments', []), layout_data=None)
 
         assert len(drawio_story_map.get_epics()) >= 1
         assert len(drawio_story_map.get_stories()) >= 1
+        assert summary.get('increments') == 2
 
     def test_increment_lanes_ordered_by_priority_with_y_positions_from_outline_bottom(self, tmp_path):
         helper = BotTestHelper(tmp_path)
@@ -168,7 +552,8 @@ class TestRenderStoryMapIncrements:
         story_map = StoryMap(data)
 
         drawio_story_map = DrawIOStoryMap(diagram_type='increments')
-        drawio_story_map.render_from_story_map(story_map, layout_data=None)
+        drawio_story_map.render_increments_from_story_map(
+            story_map, data.get('increments', []), layout_data=None)
 
         assert len(drawio_story_map.get_epics()) >= 1
 
