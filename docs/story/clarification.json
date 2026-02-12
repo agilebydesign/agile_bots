@@ -86,5 +86,60 @@
         "Open Story Files"
       ]
     }
+  },
+  "tests": {
+    "key_questions": {
+      "answers": {
+        "What test framework should be used (pytest-bdd, pytest, etc.)?": "TWO test frameworks: (1) Python: pytest (standard pytest, NOT pytest-bdd) for domain/CLI tests. Evidence from pyproject.toml shows pytest>=7.0.0. (2) JavaScript: Node.js built-in test runner (node --test) for panel tests. Evidence from src/panel/package.json shows scripts: 'node --test ../../test/panel/test_*.js' with jsdom>=27.4.0 for DOM testing.",
+        "Should tests use real implementations or mocks (e2e vs unit tests)?": "Real implementations (unit/integration tests). From strategy.json: 'bulk of business logic tests done against the domain layer objects directly' and 'Should tests use real implementations by default' and 'Only mock when explicitly asked for e2e tests or for uncontrollable external dependencies'. T",
+        "What fixtures or helpers are needed for test setup?": "EXTEND EXISTING HELPER PATTERN: test/helpers/ has shared helpers (base_helper.py, bot_test_helper.py, file_helper.py, state_helper.py) and test/invoke_bot/edit_story_map/ has local story_helper.py. For DrawIOStoryMap tests, create test/invoke_bot/perform_action/drawio_story_map_helper.py extending BaseHelper with methods like: create_drawio_xml(), create_layout_data(), load_drawio_story_map(), assert_render_output(), assert_update_report(). Use existing BotTestHelper(tmp_path) pattern with helper.bot, helper.workspace properties. See test/invoke_bot/perform_action/render_helper.py for similar render action helpers.",
+        "Are there any specific test data requirements beyond what's in Examples tables?": "Test DrawIO XML files and StoryMap JSON files. The scenarios test rendering (StoryMap -> DrawIO) and extraction (DrawIO -> StoryMap) workflows. We'll need: sample story-graph.json files with known structure (1 epic, 1-2 sub-epics, 2-3 stories), sample DrawIO XML files with known nodes/positions for extraction tests, layout data JSON files for re-render tests, UpdateReport JSON structures for merge tests. The Examples tables provide the logical test data (epic counts, story types, styles), but we need concrete XML/JSON file fixtures.\n\nDO THIS IN  TEMP WOEKSPACE FOLDER DO NOT OVWEWRITE BOT WORKSPACE DATA!",
+        "What is the expected test file structure and location?": "TWO test locations: (1) Python domain tests: test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py with classes TestRenderStoryMap, TestUpdateGraphFromStoryMap, etc. (one class per story, one method per scenario). (2) Node panel tests: test/panel/test_render_action_diagram_section.js for the 'Render action diagram section' story - tests panel rendering of Diagram section with links, staleness indicators, Refresh/Generate report buttons, and report file display.",
+        "Are there any existing test patterns or conventions to follow?": "YES - FOLLOW EXISTING PATTERNS: (1) Test structure: test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py with class TestRenderStoryMap, TestUpdateGraphFromStoryMap, etc. (2) Helper pattern: Create test/invoke_bot/perform_action/drawio_story_map_helper.py extending BaseHelper(parent) with helper methods. (3) Test setup: Use BotTestHelper(tmp_path) as entry point, access via helper.bot, helper.workspace. (4) See test/invoke_bot/perform_action/test_render_content.py for similar render action test pattern. (5) Node tests: test/panel/test_*.js with jsdom for DOM testing, test:watch and test:verbose scripts. (6) Strategy: domain layer unit tests (bulk), minimal CLI happy path tests, separate JS panel UI tests (rendering and button layout).",
+        "What Node tests are needed for the Render action diagram section story?": "Node tests in test/panel/test_render_action_diagram_section.js should test: (1) Diagram section displays with links to DrawIO file and UpdateReport file when they exist, (2) Stale diagram indicator and Refresh button appear when DrawIO file modified after last sync, (3) Pending changes indicator and Generate report button appear when diagram save time newer than last refresh time, (4) Report file link opens file in editor and Update button is shown after report generated, (5) Missing diagram file shows appropriate indicator with no Refresh/Generate report buttons, (6) After clicking Update button the story graph is updated from diagram. Use jsdom to test DOM rendering, button presence/absence, link targets, visual indicators (stale/pending classes or text), and button click handlers."
+      }
+    },
+    "evidence": {
+      "required": [
+        "Feature files (.feature) from specification_examples stage",
+        "Examples tables with test data",
+        "Structured.json with scenarios and examples",
+        "Existing test code or test patterns",
+        "Test framework documentation"
+      ],
+      "provided": {
+        "story_graph_json": "C:/dev/agile_bots/docs/story/story-graph.json - acceptance criteria and scenarios",
+        "domain_walkthrough": "C:/dev/agile_bots/docs/crc/walkthrough/drawio-story-map-walkthrough-realizations.md - object flows and walkthroughs",
+        "domain_concepts": "C:/dev/agile_bots/docs/crc/domain/synchronized-graph-domain-concepts.json - CRC cards for new classes",
+        "pytest_ini": "C:/dev/agile_bots/pytest.ini",
+        "pyproject_toml": "C:/dev/agile_bots/pyproject.toml",
+        "panel_package_json": "C:/dev/agile_bots/src/panel/package.json",
+        "old_synchronizers_for_reference_only": "src/synchronizers/story_io/ - OLD code to be REPLACED (reference for algorithms only)",
+        "strategy_json": "C:/dev/agile_bots/docs/story/strategy.json"
+      }
+    },
+    "context": [
+      "Test directory structure: test/invoke_bot/ has epic folders (edit_story_map/, get_help/, initialize_bot/, navigate_behavior_actions/, perform_action/) matching story hierarchy",
+      "Panel test directory: src/panel/package.json defines test/panel/ with test_*.js pattern",
+      "EXISTING test structure: test/helpers/ has 20+ shared helpers (base_helper.py, bot_test_helper.py, cli_bot_test_helper.py, json_bot_test_helper.py, pipe_bot_test_helper.py, tty_bot_test_helper.py, file_helper.py, state_helper.py, story_helper.py, etc.)",
+      "EXISTING local helpers: test/invoke_bot/perform_action/ has render_helper.py, build_helper.py, clarify_helper.py, strategy_helper.py, validate_helper.py, instructions_helper.py, rules_helper.py, guardrails_helper.py",
+      "Pattern: Each sub-epic folder has test_*.py files AND local *_helper.py files extending BaseHelper",
+      "Node test framework: Built-in Node.js test runner (node --test) with jsdom>=27.4.0 for DOM testing",
+      "Panel test scripts: npm test (run once), npm run test:watch (continuous), npm run test:verbose (detailed output)",
+      "CRITICAL CONTEXT: We are building NEW code to replace existing synchronizers. The existing code (StoryIODiagram, DrawIORenderer, DrawIOSynchronizer, story_io_component.py) is for REQUIREMENTS UNDERSTANDING ONLY - it will be REPLACED with new implementations based on domain model walkthrough and acceptance criteria",
+      "NEW code to implement and test: DrawIOStoryMap (container), DrawIOElement/DrawIOStoryNode (hierarchy), UpdateReport (typed report), LayoutData (typed layout), DrawIOStoryNodeSerializer (serialization), DrawIOEpic/DrawIOSubEpic/DrawIOStory (domain nodes)",
+      "Domain model sources: docs/crc/walkthrough/drawio-story-map-walkthrough-realizations.md (object flows), docs/crc/domain/synchronized-graph-domain-concepts.json (CRC cards), docs/story/story-graph.json (acceptance criteria and scenarios)",
+      "We can borrow algorithms or logic from old synchronizers code, but the NEW model and stories must guide implementation - not the old architecture",
+      "Story scope: 'Synchronized Graph with Rendered Diagram Content' - tests render (StoryMap to DrawIO), extract (DrawIO to StoryMap), update reports, layout preservation, AND panel UI for Render action diagram section",
+      "From strategy.json: focus on domain layer unit tests, minimal CLI happy path tests, separate JS tests for panel UI (rendering and button layout)",
+      "Tests must use ASCII-only characters (no Unicode)",
+      "Tests should call production code directly - let tests fail naturally if code doesn't exist",
+      "Panel tests focus on DOM rendering, button presence/absence, link functionality, visual indicators for diagram staleness/pending changes",
+      "ACTUAL test structure discovered: test/invoke_bot/ has 4 epic folders with 50+ test files, test/helpers/ has 20+ shared helpers, each sub-epic has local helpers",
+      "Test pattern: BotTestHelper(tmp_path) -> helper.bot, helper.workspace, helper.render, helper.story, helper.state, etc.",
+      "Helper pattern: Extend BaseHelper(parent) with domain-specific methods, access parent.bot and parent.workspace",
+      "For DrawIOStoryMap tests: Create drawio_story_map_helper.py in test/invoke_bot/perform_action/ following render_helper.py pattern",
+      "Test file location: test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py (matches sub-epic name)"
+    ]
   }
 }

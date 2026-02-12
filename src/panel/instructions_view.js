@@ -414,6 +414,11 @@ class InstructionsSection extends PanelView {
                 render_template_paths: instructions.render_template_paths || [],
                 render_output_paths: instructions.render_output_paths || []
             };
+            if (instructions.diagrams && instructions.diagrams.length > 0) {
+                restructured.diagram_instructions = {
+                    diagrams: instructions.diagrams
+                };
+            }
         }
 
         // 6. VALIDATE - Rules (ONLY show during validate action)
@@ -435,6 +440,7 @@ class InstructionsSection extends PanelView {
             'strategy_instructions': { name: 'Strategy', color: '#c586c0', icon: '', iconPath: lightbulbIconPath, defaultExpanded: false },
             'build_instructions': { name: 'Build', color: '#4ec9b0', icon: '', iconPath: bullseyeIconPath, defaultExpanded: false },
             'render_instructions': { name: 'Render', color: '#ce9178', icon: '', iconPath: documentIconPath, defaultExpanded: false },
+            'diagram_instructions': { name: 'Diagrams', color: '#9cdcfe', icon: '', iconPath: documentIconPath, defaultExpanded: true },
             'validate_instructions': { name: 'Validate', color: '#dcdcaa', icon: '', iconPath: lightbulbHeadIconPath, defaultExpanded: false }
         };
 
@@ -477,6 +483,8 @@ class InstructionsSection extends PanelView {
                 contentHtml = this._formatBuildInstructions(value);
             } else if (key === 'render_instructions') {
                 contentHtml = this._formatRenderInstructions(value);
+            } else if (key === 'diagram_instructions') {
+                contentHtml = this._formatDiagramInstructions(value);
             } else if (key === 'validate_instructions') {
                 contentHtml = this._formatValidateInstructions(value);
             } else {
@@ -1006,6 +1014,13 @@ class InstructionsSection extends PanelView {
         }
 
         return html;
+    }
+
+    _formatDiagramInstructions(value) {
+        if (!value || !value.diagrams) return '';
+        const DiagramSectionView = require('./diagram_section_view');
+        const view = new DiagramSectionView(value.diagrams);
+        return view.renderSection();
     }
 
     _formatRenderConfig(config) {
