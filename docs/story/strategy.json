@@ -22,27 +22,56 @@
   "scenarios": {
     "decisions": {
       "examples_representation": "Verification Data Table",
-      "scenario_outline": "Scenario Outline with Examples"
+      "scenario_outline": "Scenario Outline with Examples",
+      "scenario_coverage": [
+        "Happy Path",
+        "Edge Cases"
+      ]
     },
     "assumptions": [
       "One story is specified at a time",
       "Acceptance criteria must be testable, unambiguous, and executable",
       "Gherkin syntax or structured language (Given/When/Then) is preferred",
       "Scenarios are written in plain English. When using Scenario Outline, variables are clearly marked and defined in Examples tables with actual test data.",
-      "Specification drives both design and test \u2014 not written after implementation",
-      "Scenarios must cover both behavior and domain policy",
       "Examples tables when used must include ALL variables used in scenario steps",
       "Examples tables when used must have exact values for both input AND output variables",
       "Every variable when used in scenario steps must have a corresponding column in Examples table",
       "Examples tables when used must have actual test data, not placeholders",
       "Output/expected result variables must be included in Examples tables when used",
-      "Examples drive both design and test \u2014 not written after implementation"
+      "scnarios follow this pattern",
+      "bulk of business logic tests done against the domain layer objects directly",
+      "minimal happy path testing done with separate tgests that go theoiugh CLI",
+      "JS nodetest for panel test focus on rendering and button layout"
     ]
   },
   "walkthrough": {
     "decisions": {
-      "walkthrough_depth": "{\"value\":\"mixed\",\"description\":\"Variable depth - detailed for risky areas, high-level for proven areas\",\"when_to_use\":\"Mixed complexity across system, focus effort where it matters\"}"
+      "walkthrough_depth": "{\"value\":\"mixed\",\"description\":\"Variable depth - detailed for risky areas, high-level for proven areas\",\"when_to_use\":\"Mixed complexity across system, focus effort where it matters\"}",
+      "walkthrough_purpose": [
+        "{\"value\":\"architecture_complexity\",\"description\":\"Validate model supports new frameworks, libraries, or architectural patterns\",\"when_to_use\":\"New frameworks being introduced, unfamiliar libraries, novel architectural patterns, design pattern uncertainty\"}"
+      ],
+      "walkthrough_purpose_reasoning": "CRC model proposes unified OOP hierarchy (DrawIOStoryMap inherits StoryMap, recursive report/update) but current implementation is procedural (StoryIODiagram, DrawIORenderer, DrawIOSynchronizer, standalone functions). The functionality is proven; the architecture is the risk.",
+      "detailed_walks": [
+        "Render story map \u2014 Scenario 1 (render outline default layout)",
+        "Update graph from story map \u2014 Scenario 1 (rename/add/remove stories)",
+        "Recursive report generation pattern (Epic \u2192 SubEpic \u2192 Story delegation)"
+      ],
+      "high_level_walks": [
+        "Render story map increments \u2014 diagramType branching",
+        "Render story map with acceptance criteria \u2014 AC box extension",
+        "Render action diagram section \u2014 behavior-to-diagram mapping"
+      ],
+      "key_validation_questions": [
+        "Does unified API work when data backends differ (XML vs JSON)?",
+        "Is recursive per-node report/update viable vs flat comparison?",
+        "Where does DrawIOStoryNodeSerializer sit \u2014 can one class handle render and load?",
+        "What happens to StoryIODiagram \u2014 replaced or wrapped?",
+        "How do ~2000 lines of story_map_drawio_synchronizer.py map to new classes?"
+      ],
+      "risk_assessment": "HIGH: DrawIOStoryMap (central, doesn't exist), DrawIOStoryNode hierarchy (unified API missing), Recursive report/update (currently flat). MEDIUM: UpdateReport (dict\u2192class), DrawIOStoryNodeSerializer (split across renderer/synchronizer). LOW: LayoutData (dict wrapper), render layout rules (proven), behavior-to-diagram mapping (config)."
     },
-    "assumptions": []
+    "assumptions": [
+      "validate the use of  diff story map / story node extension using consosutient model"
+    ]
   }
 }

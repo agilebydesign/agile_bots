@@ -119,7 +119,7 @@ class TableColumnParameterScanner(ScenarioScannerBase):
     def _get_all_table_names(self, scenario: Scenario) -> Set[str]:
         """Get all table names from example tables."""
         names = set()
-        for example in scenario.examples:
+        for example in scenario.examples or []:
             name = example.get('name', '')
             if name:
                 names.add(name)

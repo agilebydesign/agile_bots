@@ -1,0 +1,48 @@
+think through a domain model that adds to out current @docs/crc/domain/crc-model-outline.md 
+
+-- > each format (drawio, MD, txt, mermaid , etc) follows a similart model
+
+BaseStoryNode
+      StoryNode <---- our current code API to read write stries in json *maybe call it JsonmStoryNode?
+      DrawIoStoryNode <-- identical API but reads and writes a stroy map and its pieces to Drawio, can also read a a drawio story map
+    MermaidStoryNode same but mermaid
+
+All DrawIO, Mermaid, also exentrd from MtermaidAdapter, DwarioAdapter, etc
+
+
+these have base ligic to read and wrote to those formats
+
+we need the CRC outline to support DrawIOStoryMap.update(StoryMap)
+
+
+where StoryMap could be anything that extends from baseStoryMap *whiche xtends from baseStoryNode BTW( 
+
+so we could DrawIOStoryMap.update(StoryGraph(
+
+or MermaidStoryMap.update(DraioStoryMap)
+
+
+if a user updatresa a diagram we wqanrt to
+
+StroyGraph.update(DrawioStoryMap)
+
+given the object oriented nature of story We would want this update function to basically be and work on every in the graph
+
+so StoryGraophEPic.update(DrawIOEpic)
+
+would update as well as any changes to stories scenarios or whatever else is inside 
+
+
+all versions need to emulate the base stroynode api
+
+including supporitng move, rename, dleete, etc
+
+we also need to support the idea of creating a rendered say drawio diagram changing it then updaring tyhe stroy graph, providing somewarnings iftings go wrong and vchanging the storey grtaph then renrendeing and for diagram s not lsiing any positining snd only adding remoiving oir chamngind
+
+currently this functiuonality is captured here
+ the code is TERRIBLE
+
+a vibe code emss but you can see the features
+
+      
+
