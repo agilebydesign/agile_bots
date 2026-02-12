@@ -8,5 +8,5 @@
   "output": "story-map-outline.drawio",
   "drawio_file": "story-map-outline.drawio",
   "force_outline": true,
-  "instructions": "Render story-graph.json to DrawIO format using the story_io CLI. Execute: python -m agile_bot.bots.story_bot.src.synchronizers.story_io.story_io_cli render-outline --story-graph {project_path}/docs/story/story-graph.json --drawio-file {project_path}/docs/story/shape/story-map-outline.drawio --output {project_path}/docs/story/shape/story-map-outline.drawio --force-outline"
+  "instructions": "Render story-graph.json to DrawIO outline format via DrawIOStoryMap domain model."
 }

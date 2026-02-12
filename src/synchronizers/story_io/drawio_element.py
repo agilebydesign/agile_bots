@@ -4,14 +4,14 @@ from .story_io_position import Position, Boundary
 
 
 STYLE_DEFAULTS = {
-    'epic': {'fill': '#e1d5e7', 'stroke': '#9673a6', 'font_color': 'black', 'shape': 'rounded'},
-    'sub_epic': {'fill': '#d5e8d4', 'stroke': '#82b366', 'font_color': 'black', 'shape': 'rounded'},
-    'story_user': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': 'black'},
-    'story_system': {'fill': '#1a237e', 'stroke': '#0d47a1', 'font_color': 'white'},
-    'story_technical': {'fill': '#000000', 'stroke': '#333333', 'font_color': 'white'},
-    'actor': {'fill': '#dae8fc', 'stroke': '#6c8ebf', 'font_color': 'black', 'font_size': 8, 'shape': 'fixed-aspect'},
-    'acceptance_criteria': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': 'black', 'font_size': 8, 'align': 'left'},
-    'increment_lane': {'fill': '#f5f5f5', 'stroke': '#666666', 'font_color': 'black', 'font_style': 'bold'},
+    'epic': {'fill': '#e1d5e7', 'stroke': '#9673a6', 'font_color': '#000000', 'shape': 'rounded'},
+    'sub_epic': {'fill': '#d5e8d4', 'stroke': '#82b366', 'font_color': '#000000', 'shape': 'rounded'},
+    'story_user': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': '#000000', 'font_size': 8, 'aspect': 'fixed'},
+    'story_system': {'fill': '#1a237e', 'stroke': '#0d47a1', 'font_color': '#ffffff', 'font_size': 8, 'aspect': 'fixed'},
+    'story_technical': {'fill': '#000000', 'stroke': '#333333', 'font_color': '#ffffff', 'font_size': 8, 'aspect': 'fixed'},
+    'actor': {'fill': '#dae8fc', 'stroke': '#6c8ebf', 'font_color': '#000000', 'font_size': 8, 'aspect': 'fixed'},
+    'acceptance_criteria': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': '#000000', 'font_size': 8, 'align': 'left'},
+    'increment_lane': {'fill': '#f5f5f5', 'stroke': '#666666', 'font_color': '#000000', 'font_size': 11, 'font_style': 'bold'},
 }
 
 
@@ -27,6 +27,7 @@ class DrawIOElement:
         self._font_color: Optional[str] = None
         self._font_size: Optional[int] = None
         self._shape: Optional[str] = None
+        self._aspect: Optional[str] = None
         self._align: Optional[str] = None
         self._font_style: Optional[str] = None
 
@@ -71,7 +72,7 @@ class DrawIOElement:
 
     def set_style(self, fill: str = None, stroke: str = None, font_color: str = None,
                   shape: str = None, font_size: int = None, align: str = None,
-                  font_style: str = None):
+                  font_style: str = None, aspect: str = None):
         if fill is not None:
             self._fill = fill
         if stroke is not None:
@@ -86,17 +87,22 @@ class DrawIOElement:
             self._align = align
         if font_style is not None:
             self._font_style = font_style
+        if aspect is not None:
+            self._aspect = aspect
 
     def apply_style_for_type(self, element_type: str):
         style = STYLE_DEFAULTS.get(element_type, {})
         self.set_style(**style)
 
     def to_style_string(self) -> str:
+        """Generate Draw.io style string matching reference diagram format."""
         parts = []
         if self._shape == 'rounded':
             parts.append('rounded=1')
-        if self._shape == 'fixed-aspect':
-            parts.append('shape=mxgraph.basic.rect;fixedSize=1')
+        parts.append('whiteSpace=wrap')
+        parts.append('html=1')
+        if self._aspect == 'fixed':
+            parts.append('aspect=fixed')
         if self._fill:
             parts.append(f'fillColor={self._fill}')
         if self._stroke:

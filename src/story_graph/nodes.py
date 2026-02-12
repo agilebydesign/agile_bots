@@ -1350,6 +1350,31 @@ class SubEpic(StoryNode):
         return sub_epic
 
     @property
+    def sub_epics(self) -> List['SubEpic']:
+        return [child for child in self._children if isinstance(child, SubEpic)]
+
+    @property
+    def stories(self) -> List['Story']:
+        """Direct story children (extracted from StoryGroups)."""
+        result = []
+        for child in self._children:
+            if isinstance(child, Story):
+                result.append(child)
+            elif isinstance(child, StoryGroup):
+                result.extend(child.children)
+        return result
+
+    @property
+    def all_stories(self) -> List['Story']:
+        """All stories recursively through nested sub-epics."""
+        if self.has_subepics:
+            stories = []
+            for nested_se in self.sub_epics:
+                stories.extend(nested_se.all_stories)
+            return stories
+        return self.stories
+
+    @property
     def has_subepics(self) -> bool:
         return any(isinstance(child, SubEpic) for child in self._children)
 
