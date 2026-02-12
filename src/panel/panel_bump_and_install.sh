@@ -100,8 +100,7 @@ echo -e "\033[0;32m      Done: Extension packaged: bot-panel-$NEW_VERSION.vsix\0
 
 # Uninstall old extension
 echo -e "\033[0;36m[3/4] Uninstalling old extension...\033[0m"
-code --uninstall-extension agilebot.bot-panel > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! code --uninstall-extension agilebot.bot-panel > /dev/null 2>&1; then
     echo -e "\033[0;33m      Warning: Uninstall warning (may not be installed)\033[0m"
 else
     echo -e "\033[0;32m      Done: Old extension uninstalled\033[0m"
@@ -114,8 +113,7 @@ if [ ! -f "$VSIX_PATH" ]; then
     echo -e "\033[0;31m      ERROR: VSIX file not found: $VSIX_PATH\033[0m"
     exit 1
 fi
-code --install-extension "$VSIX_PATH" --force > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+if ! code --install-extension "$VSIX_PATH" --force > /dev/null 2>&1; then
     echo -e "\033[0;31m      ERROR: Installation failed!\033[0m"
     exit 1
 fi

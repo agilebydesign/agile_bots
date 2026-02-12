@@ -24,6 +24,7 @@ This initial release includes **StoryBot** and **CRC Bot**, two complementary to
 2. [GitHub Copilot Account](https://github.com/features/copilot)
 3. [Python](https://www.python.org/downloads/)
 4. [Git for Windows](https://git-scm.com/install/windows) [Windows Only]
+5. [NodeJS](https://nodejs.org/en/download)
 
 **👉 [READ THE COMPLETE USER GUIDE](docs/manual/user-guide.md) 👈**
 

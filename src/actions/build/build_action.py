@@ -116,11 +116,13 @@ class BuildStoryGraphAction(Action):
                     if template_path.is_absolute():
                         try:
                             rel_path = template_path.relative_to(bot_dir)
-                            template_reference = f"{self.behavior.bot_name}/{str(rel_path).replace('\\', '/')}"
+                            rel_path_str = str(rel_path).replace('\\', '/')
+                            template_reference = f"{self.behavior.bot_name}/{rel_path_str}"
                         except ValueError:
                             template_reference = f"{self.behavior.bot_name}/behaviors/{self.behavior.name}/content/story_graph/{template_path.name}"
                     else:
-                        template_reference = f"{self.behavior.bot_name}/{str(template_path).replace('\\', '/')}"
+                        template_path_str = str(template_path).replace('\\', '/')
+                        template_reference = f"{self.behavior.bot_name}/{template_path_str}"
                 except Exception:
                     template_reference = f"{self.behavior.bot_name}/behaviors/{self.behavior.name}/content/story_graph/{template_path.name if template_path else 'template.json'}"
             else:
