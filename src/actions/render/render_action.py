@@ -152,6 +152,154 @@ class RenderOutputAction(Action):
                 synchronizers.append(spec.synchronizer)
         return synchronizers
 
+    def _get_drawio_specs_with_paths(self) -> list:
+        """Get drawio render specs paired with their resolved diagram paths."""
+        workspace_dir = self.behavior.bot_paths.workspace_directory
+        result = []
+        for spec in self._render_specs:
+            if not spec.output or not spec.output.endswith('.drawio'):
+                continue
+            default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
+            path_prefix = spec.config_data.get('path', default_path)
+            diagram_path = workspace_dir / path_prefix / spec.output
+            result.append((spec, diagram_path))
+        return result
+
+    def renderDiagram(self) -> Dict[str, Any]:
+        """Re-render all DrawIO diagrams from story graph.
+        CLI: <behavior>.render.renderDiagram
+        """
+        drawio_specs = self._get_drawio_specs_with_paths()
+        if not drawio_specs:
+            return {'status': 'error', 'message': 'No DrawIO render specs configured'}
+
+        specs_only = [spec for spec, _ in drawio_specs]
+        self._execute_synchronizers(specs_only)
+
+        results = []
+        for spec, diagram_path in drawio_specs:
+            results.append({
+                'diagram': spec.output,
+                'status': spec.execution_status,
+                'path': str(diagram_path)
+            })
+
+        rendered_count = sum(1 for r in results if r['status'] == 'executed')
+        return {
+            'status': 'success',
+            'message': f'Rendered {rendered_count} diagram(s)',
+            'results': results
+        }
+
+    def generateReport(self) -> Dict[str, Any]:
+        """Extract from DrawIO diagrams and generate update reports.
+        CLI: <behavior>.render.generateReport
+        """
+        from synchronizers.story_io.story_map_drawio_synchronizer import (
+            synchronize_story_graph_from_drawio_outline,
+            synchronize_story_graph_from_drawio_increments,
+            generate_merge_report
+        )
+        import shutil
+
+        story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
+        results = []
+
+        for spec, diagram_path in self._get_drawio_specs_with_paths():
+            if not diagram_path.exists():
+                continue
+
+            extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
+
+            try:
+                if 'increment' in diagram_path.stem:
+                    synchronize_story_graph_from_drawio_increments(
+                        drawio_path=diagram_path,
+                        output_path=extracted_path,
+                        original_path=story_graph_path
+                    )
+                else:
+                    synchronize_story_graph_from_drawio_outline(
+                        drawio_path=diagram_path,
+                        output_path=extracted_path,
+                        original_path=story_graph_path
+                    )
+
+                merge_report_path = extracted_path.parent / f"{extracted_path.stem}-merge-report.json"
+                update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
+
+                if merge_report_path.exists():
+                    shutil.copy2(str(merge_report_path), str(update_report_path))
+                elif story_graph_path.exists():
+                    generate_merge_report(extracted_path, story_graph_path, update_report_path)
+
+                results.append({
+                    'diagram': spec.output,
+                    'status': 'success',
+                    'report_path': str(update_report_path)
+                })
+            except Exception as e:
+                logger.error(f'Failed to generate report for {spec.output}: {e}')
+                results.append({
+                    'diagram': spec.output,
+                    'status': 'error',
+                    'message': str(e)
+                })
+
+        return {
+            'status': 'success',
+            'message': f'Generated {len(results)} report(s)',
+            'results': results
+        }
+
+    def updateFromDiagram(self) -> Dict[str, Any]:
+        """Apply update reports to merge diagram changes into story graph.
+        CLI: <behavior>.render.updateFromDiagram
+        """
+        from synchronizers.story_io.story_map_drawio_synchronizer import merge_story_graphs
+
+        story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
+        results = []
+
+        for spec, diagram_path in self._get_drawio_specs_with_paths():
+            extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
+            update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
+
+            if not extracted_path.exists() or not update_report_path.exists():
+                continue
+
+            try:
+                result = merge_story_graphs(
+                    extracted_path=extracted_path,
+                    original_path=story_graph_path,
+                    report_path=update_report_path,
+                    output_path=story_graph_path
+                )
+                results.append({
+                    'diagram': spec.output,
+                    'status': 'success',
+                    'result': result
+                })
+            except Exception as e:
+                logger.error(f'Failed to update from {spec.output}: {e}')
+                results.append({
+                    'diagram': spec.output,
+                    'status': 'error',
+                    'message': str(e)
+                })
+
+        if not results:
+            return {
+                'status': 'error',
+                'message': 'No diagrams with reports found. Run generateReport first.'
+            }
+
+        return {
+            'status': 'success',
+            'message': f'Updated story graph from {len(results)} diagram(s)',
+            'results': results
+        }
+
     def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
         diagrams = []
         for spec in render_specs:
@@ -165,8 +313,17 @@ class RenderOutputAction(Action):
             diagram_path = workspace_dir / path_prefix / output_name
             layout_path = diagram_path.with_suffix('.drawio').with_name(
                 diagram_path.stem + '-layout.json')
-            report_path = diagram_path.with_suffix('.drawio').with_name(
+            update_report_path = diagram_path.with_suffix('.drawio').with_name(
                 diagram_path.stem + '-update-report.json')
+            # Also check for merge report (written by synchronizer)
+            extracted_stem = diagram_path.stem + '-extracted'
+            merge_report_path = diagram_path.parent / (extracted_stem + '-merge-report.json')
+            # Prefer update-report (written by generate_diagram_report), fall back to merge-report
+            report_path = None
+            if update_report_path.exists():
+                report_path = str(update_report_path.resolve())
+            elif merge_report_path.exists():
+                report_path = str(merge_report_path.resolve())
             last_sync_time = None
             if layout_path.exists():
                 last_sync_time = layout_path.stat().st_mtime
@@ -178,7 +335,7 @@ class RenderOutputAction(Action):
                 'exists': diagram_path.exists(),
                 'last_sync_time': last_sync_time,
                 'file_modified_time': file_modified_time,
-                'report_path': str(report_path.resolve()) if report_path.exists() else None
+                'report_path': report_path
             })
         return diagrams
 

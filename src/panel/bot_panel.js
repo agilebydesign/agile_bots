@@ -368,8 +368,10 @@ class BotPanel {
             if (message.filePaths && Array.isArray(message.filePaths) && message.filePaths.length > 0) {
               for (const filePath of message.filePaths) {
                 if (!filePath) continue;
-                const rawPath = filePath.split('#')[0];
-                const fragment = filePath.includes('#') ? filePath.split('#')[1] : null;
+                const pathStr = typeof filePath === 'string' ? filePath : (filePath.url || filePath.file || '');
+                if (!pathStr) continue;
+                const rawPath = pathStr.split('#')[0];
+                const fragment = pathStr.includes('#') ? pathStr.split('#')[1] : null;
                 let lineNumber = null;
                 if (fragment && fragment.startsWith('L')) {
                   lineNumber = parseInt(fragment.substring(1));
@@ -381,20 +383,15 @@ class BotPanel {
                   const decoded = decodeURIComponent(rawPath);
                   absolutePath = path.isAbsolute(decoded) ? decoded : path.join(this._workspaceRoot, decoded);
                 }
-                const fileUri = vscode.Uri.file(absolutePath);
                 const fs = require('fs');
                 if (!fs.existsSync(absolutePath) || fs.statSync(absolutePath).isDirectory()) continue;
                 const fileExtension = rawPath.split('.').pop().toLowerCase();
-                const useVscodeOpenExtensions = ['json'];
-                if (useVscodeOpenExtensions.includes(fileExtension)) {
-                  vscode.commands.executeCommand('vscode.open', fileUri).catch(() => {});
-                } else {
-                  const openOptions = { viewColumn: vscode.ViewColumn.One, preserveFocus: false, preview: false };
-                  if (lineNumber) {
-                    openOptions.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
-                  }
-                  vscode.window.showTextDocument(fileUri, openOptions).catch(() => {});
-                }
+                const uri = lineNumber
+                  ? vscode.Uri.file(absolutePath).with({ fragment: `L${lineNumber}` })
+                  : vscode.Uri.file(absolutePath);
+                vscode.commands.executeCommand('vscode.open', uri).catch((err) => {
+                  this._log(`[BotPanel] openFiles failed for ${pathStr}: ${err.message}`);
+                });
               }
             }
             return;
@@ -456,78 +453,44 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
-              // But if we have a selectedNode, we need to search and select it
+              // Use vscode.open for JSON files (not openTextDocument) to avoid extension sync / text editor limits
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json' && message.state && message.state.selectedNode) {
-                // JSON with selectedNode - need to search document for node
-                vscode.workspace.openTextDocument(fileUri).then(
-                  (doc) => {
-                    const node = message.state.selectedNode;
-                    const text = doc.getText();
-                    const lines = text.split('\n');
-                    
-                    let nameLineIndex = -1;
-                    const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
-                    
-                    for (let i = 0; i < lines.length; i++) {
-                      if (namePattern.test(lines[i])) {
-                        nameLineIndex = i;
+                // JSON with selectedNode: read via fs, find line, open with vscode.open + fragment
+                const node = message.state.selectedNode;
+                let startLine = 0;
+                try {
+                  const fs = require('fs');
+                  const text = fs.readFileSync(absolutePath, 'utf8');
+                  const lines = text.split('\n');
+                  const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                  const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
+                  let nameLineIndex = -1;
+                  for (let i = 0; i < lines.length; i++) {
+                    if (namePattern.test(lines[i])) {
+                      nameLineIndex = i;
+                      break;
+                    }
+                  }
+                  if (nameLineIndex >= 0) {
+                    startLine = nameLineIndex;
+                    for (let i = nameLineIndex - 1; i >= 0; i--) {
+                      const line = lines[i].trim();
+                      if (line === '{' || line.endsWith('{')) {
+                        startLine = i;
                         break;
                       }
+                      if (line.startsWith('}') || line === '},') break;
                     }
-                    
-                    let options = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
-                    
-                    if (nameLineIndex >= 0) {
-                      // Find the opening brace of this object (search backwards)
-                      let startLine = nameLineIndex;
-                      for (let i = nameLineIndex - 1; i >= 0; i--) {
-                        const line = lines[i].trim();
-                        if (line === '{' || line.endsWith('{')) {
-                          startLine = i;
-                          break;
-                        }
-                        if (line.startsWith('}') || line === '},') {
-                          break;
-                        }
-                      }
-                      
-                      // Find the matching closing brace (count braces forward)
-                      let braceCount = 0;
-                      let endLine = nameLineIndex;
-                      let started = false;
-                      
-                      for (let i = startLine; i < lines.length; i++) {
-                        const line = lines[i];
-                        for (const char of line) {
-                          if (char === '{') {
-                            braceCount++;
-                            started = true;
-                          } else if (char === '}') {
-                            braceCount--;
-                            if (started && braceCount === 0) {
-                              endLine = i;
-                              break;
-                            }
-                          }
-                        }
-                        if (started && braceCount === 0) break;
-                      }
-                      
-                      // Select from start of opening brace line to end of closing brace line
-                      const endLineLength = lines[endLine] ? lines[endLine].length : 0;
-                      options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
-                    }
-                    
-                    vscode.window.showTextDocument(doc, options).then(() => {
-                      this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
-                    });
                   }
-                ).catch((error) => {
+                } catch (e) {
+                  this._log(`[BotPanel] Could not search for node: ${e.message}`);
+                }
+                const uriWithFragment = vscode.Uri.file(absolutePath).with({ fragment: `L${startLine + 1}` });
+                vscode.commands.executeCommand('vscode.open', uriWithFragment).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                 });
+                this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
               } else if (fileExtension === 'json') {
                 // JSON files without selectedNode - just open
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
@@ -1323,6 +1286,90 @@ class BotPanel {
                 });
             }
             return;
+          case "renderDiagram": {
+            const behaviorName = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
+            if (!behaviorName) {
+              vscode.window.showErrorMessage('No current behavior set');
+              return;
+            }
+            const renderCmd = `${behaviorName}.render.renderDiagram`;
+            this._log(`[BotPanel] renderDiagram -> ${renderCmd}`);
+            vscode.window.withProgress({
+              location: vscode.ProgressLocation.Notification,
+              title: 'Rendering diagram...',
+              cancellable: false
+            }, async () => {
+              try {
+                const result = await this._botView.execute(renderCmd);
+                if (result?.status === 'success') {
+                  vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
+                } else {
+                  vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
+                }
+                await this._update();
+              } catch (error) {
+                this._log(`[BotPanel] renderDiagram ERROR: ${error.message}`);
+                vscode.window.showErrorMessage(`Failed to render diagram: ${error.message}`);
+              }
+            });
+            return;
+          }
+          case "generateDiagramReport": {
+            const behaviorName2 = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
+            if (!behaviorName2) {
+              vscode.window.showErrorMessage('No current behavior set');
+              return;
+            }
+            const reportCmd = `${behaviorName2}.render.generateReport`;
+            this._log(`[BotPanel] generateDiagramReport -> ${reportCmd}`);
+            vscode.window.withProgress({
+              location: vscode.ProgressLocation.Notification,
+              title: 'Generating update report from diagram...',
+              cancellable: false
+            }, async () => {
+              try {
+                const result = await this._botView.execute(reportCmd);
+                if (result?.status === 'success') {
+                  vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                } else {
+                  vscode.window.showErrorMessage(result?.message || 'Failed to generate report');
+                }
+                await this._update();
+              } catch (error) {
+                this._log(`[BotPanel] generateDiagramReport ERROR: ${error.message}`);
+                vscode.window.showErrorMessage(`Failed to generate report: ${error.message}`);
+              }
+            });
+            return;
+          }
+          case "updateFromDiagram": {
+            const behaviorName3 = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
+            if (!behaviorName3) {
+              vscode.window.showErrorMessage('No current behavior set');
+              return;
+            }
+            const updateCmd = `${behaviorName3}.render.updateFromDiagram`;
+            this._log(`[BotPanel] updateFromDiagram -> ${updateCmd}`);
+            vscode.window.withProgress({
+              location: vscode.ProgressLocation.Notification,
+              title: 'Updating story graph from diagram...',
+              cancellable: false
+            }, async () => {
+              try {
+                const result = await this._botView.execute(updateCmd);
+                if (result?.status === 'success') {
+                  vscode.window.showInformationMessage(result.message || 'Story graph updated successfully');
+                } else {
+                  vscode.window.showErrorMessage(result?.message || 'Failed to update story graph');
+                }
+                await this._update();
+              } catch (error) {
+                this._log(`[BotPanel] updateFromDiagram ERROR: ${error.message}`);
+                vscode.window.showErrorMessage(`Failed to update from diagram: ${error.message}`);
+              }
+            });
+            return;
+          }
           case "saveStrategyAssumptions":
             if (message.assumptions) {
               this._log(`[BotPanel] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
@@ -1548,40 +1595,14 @@ class BotPanel {
           }
         }
       } else if (command === 'openTestFiles') {
-        // Open test files with scope expanded
-        // Query story graph for test_file and test_class
+        // Open test files - use vscode.open (not openTextDocument) to avoid extension sync issues
         this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
         
         try {
           const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
           if (result && result.files && Array.isArray(result.files)) {
-            // Open each test file with scope information
-            for (const testFileInfo of result.files) {
-              const testFilePath = testFileInfo.file;
-              const absolutePath = path.isAbsolute(testFilePath)
-                ? testFilePath
-                : path.join(workspaceRoot, testFilePath);
-              
-              const fileUri = vscode.Uri.file(absolutePath);
-              
-              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
-              const fileExtension = testFilePath.split('.').pop().toLowerCase();
-              if (fileExtension === 'json') {
-                await vscode.commands.executeCommand('vscode.open', fileUri);
-              } else {
-                const doc = await vscode.workspace.openTextDocument(fileUri);
-              
-                // Open in Column One
-                await vscode.window.showTextDocument(doc, {
-                  viewColumn: vscode.ViewColumn.One,
-                  preserveFocus: false
-                });
-              }
-              
-              // TODO: Implement fold/unfold logic to expand test_class/test_method and collapse others
-              // This would require using VS Code's folding API or commands
-            }
-            this._log(`[BotPanel] Opened ${result.files.length} test files`);
+            const paths = result.files.map(f => (typeof f === 'string' ? f : f.file)).filter(Boolean);
+            await this._openTestFiles(paths);
           }
         } catch (error) {
           this._log(`[BotPanel] Error getting test files: ${error.message}`);
@@ -1687,12 +1708,10 @@ class BotPanel {
           this._log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
         }
         
-        // 4. Activate the story graph tab as the last step
+        // 4. Activate the story graph tab as the last step (use vscode.open for JSON, not openTextDocument)
         const graphAbsPath = path.isAbsolute(graphPath) ? graphPath : path.join(workspaceRoot, graphPath);
-        const graphUri = vscode.Uri.file(graphAbsPath);
         try {
-          const graphDoc = await vscode.workspace.openTextDocument(graphUri);
-          await vscode.window.showTextDocument(graphDoc, { viewColumn: vscode.ViewColumn.One, preview: false, preserveFocus: false });
+          await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(graphAbsPath));
         } catch (e) {
           this._log(`[BotPanel] Could not re-activate story graph tab: ${e.message}`);
         }
@@ -1715,66 +1734,45 @@ class BotPanel {
     const absolutePath = path.isAbsolute(graphPath) 
       ? graphPath 
       : path.join(this._workspaceRoot, graphPath);
-    const fileUri = vscode.Uri.file(absolutePath);
     
+    // Use vscode.open for JSON (not openTextDocument) to avoid extension sync / text editor limits
     if (!selectedNode || !selectedNode.name) {
-      // No node to select, just open the file
-      await vscode.commands.executeCommand('vscode.open', fileUri);
+      await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(absolutePath));
       return;
     }
     
-    // Open and search for node
-    const doc = await vscode.workspace.openTextDocument(fileUri);
-    const text = doc.getText();
-    const lines = text.split('\n');
-    
-    // Find the line with "name": "NodeName"
-    let nameLineIndex = -1;
-    const escapedName = selectedNode.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
-    
-    for (let i = 0; i < lines.length; i++) {
-      if (namePattern.test(lines[i])) {
-        nameLineIndex = i;
-        break;
-      }
-    }
-    
-    let options = { viewColumn: vscode.ViewColumn.One, preview: false, preserveFocus: false };
-    
-    if (nameLineIndex >= 0) {
-      // Find the opening brace of this object
-      let startLine = nameLineIndex;
-      for (let i = nameLineIndex - 1; i >= 0; i--) {
-        const line = lines[i].trim();
-        if (line === '{' || line.endsWith('{')) {
-          startLine = i;
+    // Read file via fs to find node line - avoids openTextDocument which fails for large JSON
+    let startLine = 0;
+    try {
+      const text = fs.readFileSync(absolutePath, 'utf8');
+      const lines = text.split('\n');
+      const escapedName = selectedNode.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const namePattern = new RegExp(`"name"\\s*:\\s*"${escapedName}"`);
+      
+      let nameLineIndex = -1;
+      for (let i = 0; i < lines.length; i++) {
+        if (namePattern.test(lines[i])) {
+          nameLineIndex = i;
           break;
         }
-        if (line.startsWith('}') || line === '},') break;
       }
       
-      // Find the matching closing brace
-      let braceCount = 0;
-      let endLine = nameLineIndex;
-      let started = false;
-      
-      for (let i = startLine; i < lines.length; i++) {
-        for (const char of lines[i]) {
-          if (char === '{') { braceCount++; started = true; }
-          else if (char === '}') {
-            braceCount--;
-            if (started && braceCount === 0) { endLine = i; break; }
+      if (nameLineIndex >= 0) {
+        for (let i = nameLineIndex - 1; i >= 0; i--) {
+          const line = lines[i].trim();
+          if (line === '{' || line.endsWith('{')) {
+            startLine = i;
+            break;
           }
+          if (line.startsWith('}') || line === '},') break;
         }
-        if (started && braceCount === 0) break;
       }
-      
-      const endLineLength = lines[endLine] ? lines[endLine].length : 0;
-      options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
+    } catch (e) {
+      this._log(`[BotPanel] Could not search for node in graph: ${e.message}`);
     }
     
-    await vscode.window.showTextDocument(doc, options);
+    const uri = vscode.Uri.file(absolutePath).with({ fragment: `L${startLine + 1}` });
+    await vscode.commands.executeCommand('vscode.open', uri);
     this._log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
   }
 
@@ -1818,8 +1816,10 @@ class BotPanel {
     
     for (const testFilePath of testFiles) {
       try {
-        const cleanPath = testFilePath.split('#')[0];
-        const fragment = testFilePath.includes('#') ? testFilePath.split('#')[1] : null;
+        const pathStr = typeof testFilePath === 'string' ? testFilePath : (testFilePath.url || testFilePath.file || '');
+        if (!pathStr) continue;
+        const cleanPath = pathStr.split('#')[0];
+        const fragment = pathStr.includes('#') ? pathStr.split('#')[1] : null;
         let lineNumber = null;
         if (fragment && fragment.startsWith('L')) {
           lineNumber = parseInt(fragment.substring(1));
@@ -1834,19 +1834,10 @@ class BotPanel {
           continue;
         }
         
-        const fileUri = vscode.Uri.file(absolutePath);
-        const doc = await vscode.workspace.openTextDocument(fileUri);
-        
-        const options = {
-          viewColumn: vscode.ViewColumn.One,
-          preview: false,
-          preserveFocus: true
-        };
-        if (lineNumber) {
-          options.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
-        }
-        
-        await vscode.window.showTextDocument(doc, options);
+        const uri = lineNumber
+          ? vscode.Uri.file(absolutePath).with({ fragment: `L${lineNumber}` })
+          : vscode.Uri.file(absolutePath);
+        await vscode.commands.executeCommand('vscode.open', uri);
       } catch (error) {
         this._log(`[BotPanel] Error opening test file ${testFilePath}: ${error.message}`);
       }
