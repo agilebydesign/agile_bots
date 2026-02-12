@@ -19953,7 +19953,7 @@
                           "sequential_order": 2,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_collect_diagram_data_detects_stale_diagram",
                           "steps": "Given {DrawIOStoryMap} exists at a file path\nAnd diagram file was last synchronized at {LayoutData} sync time\nAnd diagram file has been modified after that sync time\nWhen render action displays the Diagram section\nThen system visually indicates that diagram is stale\nAnd a Refresh button is shown\nWhen user clicks Refresh\nThen system re-extracts from diagram and updates last-refresh time for that diagram"
                         },
                         {
@@ -19961,7 +19961,7 @@
                           "sequential_order": 3,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_generate_diagram_report_extracts_from_drawio_and_writes_report",
                           "steps": "Given {DrawIOStoryMap} has a stored last-refresh date per diagram\nAnd diagram file save time is newer than last-refresh date\nWhen render action displays the Diagram section\nThen system indicates pending changes for that diagram\nAnd a Generate report button is shown\nWhen user clicks Generate report\nThen system calls {StoryMap}.generateUpdateReport({DrawIOStoryMap}) and writes {UpdateReport} to file\nAnd Diagram section shows link to the report file"
                         },
                         {
@@ -19969,7 +19969,7 @@
                           "sequential_order": 4,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_update_from_diagram_applies_report_to_story_graph",
                           "steps": "Given an {UpdateReport} has been generated for a {DrawIOStoryMap} and {StoryMap}\nAnd report file path is known\nWhen user clicks the report link in Diagram section\nThen system opens the report file in the editor like other files\nWhen user clicks Update\nThen system calls {StoryMap}.update({DrawIOStoryMap}, {UpdateReport})\nAnd story graph is updated from diagram\nWhen update completes\nThen user may delete the report file"
                         },
                         {
@@ -19977,7 +19977,7 @@
                           "sequential_order": 5,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_end_to_end_render_then_generate_report_then_update",
                           "steps": "Given {UpdateReport} contains exact and fuzzy matches from {DrawIOStoryMap} vs {StoryMap}\nAnd {StoryMap} has epics with parent and sequential_order and children\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen each updated {StoryNode} has parent from diagram containment\nAnd each updated {StoryNode} has sequential_order from diagram position\nAnd {LayoutData} is persisted for re-render"
                         },
                         {
@@ -19985,7 +19985,7 @@
                           "sequential_order": 6,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_generate_diagram_report_returns_error_for_missing_diagram",
                           "steps": "Given {DrawIOStoryMap} file path is configured but file does not exist\nWhen render action displays the Diagram section\nThen Diagram section shows missing diagram indicator for that file\nAnd no Refresh or Generate report buttons are shown"
                         }
                       ],

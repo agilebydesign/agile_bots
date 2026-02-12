@@ -1,1 +1,8 @@
-{"type": "showAll", "value": [], "exclude": [], "skiprule": []}
+{
+  "type": "story",
+  "value": [
+    "Render action diagram section"
+  ],
+  "exclude": [],
+  "skiprule": []
+}
