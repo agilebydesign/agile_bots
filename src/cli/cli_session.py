@@ -123,6 +123,12 @@ class CLISession:
         if hasattr(self.bot, verb):
             return self._execute_bot_attribute(verb, args)
         
+        # Handle function-call syntax on bot: render_diagram("path"), generate_diagram_report("path")
+        if '(' in verb:
+            func_name = verb.split('(', 1)[0]
+            if hasattr(self.bot, func_name):
+                return self._execute_bot_function_call(command)
+        
         # Check if command has -- style parameters (e.g., --scope-type=files)
         # If so, route to behavior action instead of domain navigator
         has_dash_params = '--' in command
@@ -149,6 +155,29 @@ class CLISession:
         except ValueError as e:
             return {'status': 'error', 'message': str(e)}
     
+    def _execute_bot_function_call(self, command: str) -> tuple:
+        """Execute a function call on the bot: render_diagram("path"), update_from_diagram("a", "b")"""
+        import ast
+        # Use the original command (not lowered verb) to preserve path casing
+        paren_idx = command.index('(')
+        func_name = command[:paren_idx].strip()
+        args_str = command[paren_idx:]
+
+        attr = getattr(self.bot, func_name)
+        if not callable(attr):
+            return {'status': 'error', 'message': f'{func_name} is not callable'}, False
+
+        try:
+            parsed_args = ast.literal_eval(args_str)
+            if not isinstance(parsed_args, tuple):
+                parsed_args = (parsed_args,)
+            result = attr(*parsed_args)
+        except (ValueError, SyntaxError):
+            raw_arg = args_str.strip('()\'" ')
+            result = attr(raw_arg)
+
+        return result, False
+
     def _execute_bot_attribute(self, verb: str, args: str) -> tuple:
         # Check if verb is a navigation command that should include bot context in JSON response
         is_navigation = verb in ('next', 'back', 'current', 'scope', 'path', 'workspace')

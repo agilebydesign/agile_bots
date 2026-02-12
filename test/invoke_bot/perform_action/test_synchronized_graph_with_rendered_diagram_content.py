@@ -11,6 +11,7 @@ import json
 import pytest
 from pathlib import Path
 from helpers.bot_test_helper import BotTestHelper
+from helpers.cli_bot_test_helper import CLIBotTestHelper
 from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
 from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
@@ -449,13 +450,202 @@ class TestUpdateStoryGraphFromMapAcceptanceCriteria:
 
 class TestRenderActionDiagramSection:
 
-    def test_render_action_shows_existing_render_section_without_drawio_config_and_separate_diagram_section(self, tmp_path):
-        helper = BotTestHelper(tmp_path)
+    def _setup_workspace_with_story_graph(self, helper):
+        """Write story graph to the bot's expected story graph path."""
+        story_graph_path = helper.bot.bot_paths.story_graph_paths.story_graph_path
+        story_graph_path.parent.mkdir(parents=True, exist_ok=True)
+        data = helper.drawio_story_map.create_simple_story_map_data()
+        story_graph_path.write_text(json.dumps(data, indent=2), encoding='utf-8')
+        return story_graph_path
+
+    def _setup_render_action(self, helper):
+        """Navigate to shape.render and return the render action object."""
         helper.bot.behaviors.navigate_to('shape')
         helper.state.set_state('shape', 'render')
-        action_obj = helper.bot.behaviors.current.actions.find_by_name('render')
+        return helper.bot.behaviors.current.actions.find_by_name('render')
+
+    def test_render_action_shows_existing_render_section_without_drawio_config_and_separate_diagram_section(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        action_obj = self._setup_render_action(helper)
 
         instructions = action_obj.do_execute()
 
         base_instructions = instructions.get('base_instructions', [])
         assert len(base_instructions) > 0
+
+    def test_render_diagram_creates_drawio_file_from_story_graph(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        result = action_obj.renderDiagram()
+
+        assert result['status'] == 'success'
+        assert len(result['results']) >= 1
+        for r in result['results']:
+            diagram_path = Path(r['path'])
+            assert diagram_path.exists(), f"Diagram file should exist at {diagram_path}"
+            content = diagram_path.read_text(encoding='utf-8')
+            assert '<mxfile' in content, "Diagram should contain valid DrawIO XML"
+
+    def test_generate_report_extracts_from_drawio_and_writes_report(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # First render the diagram so it exists
+        action_obj.renderDiagram()
+
+        result = action_obj.generateReport()
+
+        assert result['status'] == 'success'
+        assert len(result['results']) >= 1
+        for r in result['results']:
+            if r['status'] == 'success':
+                report_path = Path(r['report_path'])
+                assert report_path.exists(), f"Report file should exist at {report_path}"
+                report_data = json.loads(report_path.read_text(encoding='utf-8'))
+                assert isinstance(report_data, dict), "Report should be valid JSON dict"
+
+    def test_generate_report_also_writes_extracted_json(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # Render first
+        action_obj.renderDiagram()
+        action_obj.generateReport()
+
+        # Check extracted JSON exists for each drawio spec
+        for spec, diagram_path in action_obj._get_drawio_specs_with_paths():
+            if diagram_path.exists():
+                extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
+                assert extracted_path.exists(), "Extracted JSON should be written alongside diagram"
+                extracted_data = json.loads(extracted_path.read_text(encoding='utf-8'))
+                assert 'epics' in extracted_data
+
+    def test_update_from_diagram_applies_report_to_story_graph(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        story_graph_path = self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # Render -> Generate Report -> Update
+        action_obj.renderDiagram()
+        action_obj.generateReport()
+        update_result = action_obj.updateFromDiagram()
+
+        assert update_result['status'] == 'success'
+        updated_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
+        assert 'epics' in updated_data
+
+    def test_update_from_diagram_returns_error_without_prior_report(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # Render diagram but don't generate report
+        action_obj.renderDiagram()
+        result = action_obj.updateFromDiagram()
+
+        assert result['status'] == 'error'
+
+    def test_collect_diagram_data_detects_stale_diagram(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # Create a drawio output file and an older layout file
+        docs_dir = helper.bot.bot_paths.story_graph_paths.docs_root
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        render_specs = action_obj.render_specs
+        drawio_specs = [s for s in render_specs if s.output and s.output.endswith('.drawio')]
+        if drawio_specs:
+            workspace_dir = helper.bot.bot_paths.workspace_directory
+            spec = drawio_specs[0]
+            default_path = str(helper.bot.bot_paths.story_graph_paths.docs_root)
+            path_prefix = spec.config_data.get('path', default_path)
+            diagram_path = workspace_dir / path_prefix / spec.output
+            diagram_path.parent.mkdir(parents=True, exist_ok=True)
+            diagram_path.write_text('<mxfile/>', encoding='utf-8')
+            layout_path = diagram_path.parent / (diagram_path.stem + '-layout.json')
+            layout_path.write_text('{}', encoding='utf-8')
+            # Make layout older than diagram by touching diagram
+            import time
+            time.sleep(0.05)
+            diagram_path.write_text('<mxfile/>', encoding='utf-8')
+
+            diagrams = action_obj._collect_diagram_data(render_specs, workspace_dir)
+            stale_diagrams = [d for d in diagrams
+                              if d.get('file_modified_time') and d.get('last_sync_time')
+                              and d['file_modified_time'] > d['last_sync_time']]
+            assert len(stale_diagrams) >= 1, "Should detect at least one stale diagram"
+
+    def test_collect_diagram_data_finds_update_report(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        render_specs = action_obj.render_specs
+        drawio_specs = [s for s in render_specs if s.output and s.output.endswith('.drawio')]
+        if drawio_specs:
+            workspace_dir = helper.bot.bot_paths.workspace_directory
+            spec = drawio_specs[0]
+            default_path = str(helper.bot.bot_paths.story_graph_paths.docs_root)
+            path_prefix = spec.config_data.get('path', default_path)
+            diagram_path = workspace_dir / path_prefix / spec.output
+            diagram_path.parent.mkdir(parents=True, exist_ok=True)
+            diagram_path.write_text('<mxfile/>', encoding='utf-8')
+            # Create an update report file
+            report_path = diagram_path.parent / (diagram_path.stem + '-update-report.json')
+            report_path.write_text('{"exact_matches": []}', encoding='utf-8')
+
+            diagrams = action_obj._collect_diagram_data(render_specs, workspace_dir)
+            diagrams_with_report = [d for d in diagrams if d.get('report_path')]
+            assert len(diagrams_with_report) >= 1, "Should find update report"
+
+    def test_end_to_end_render_then_generate_report_then_update(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        story_graph_path = self._setup_workspace_with_story_graph(helper)
+        action_obj = self._setup_render_action(helper)
+
+        # Step 1: Render diagrams from story graph
+        render_result = action_obj.renderDiagram()
+        assert render_result['status'] == 'success'
+
+        # Step 2: Generate reports (extracts from rendered diagrams, compares with story graph)
+        report_result = action_obj.generateReport()
+        assert report_result['status'] == 'success'
+        assert len(report_result['results']) >= 1
+
+        # Step 3: Update story graph from diagrams
+        update_result = action_obj.updateFromDiagram()
+        assert update_result['status'] == 'success'
+
+        # Story graph should still be valid JSON with epics
+        final_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
+        assert 'epics' in final_data
+        assert len(final_data['epics']) >= 1
+
+    def test_cli_render_diagram_routes_through_cli_session(self, tmp_path):
+        """CLI integration test: shape.render.renderDiagram through CLI command parsing."""
+        from cli.cli_session import CLISession
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+
+        session = CLISession(helper.bot, helper.workspace)
+        response = session.execute_command('shape.render.renderDiagram')
+
+        assert response.status != 'error', f"CLI should succeed, got: {response.output}"
+
+    def test_cli_generate_report_routes_through_cli_session(self, tmp_path):
+        """CLI integration test: shape.render.generateReport through CLI command parsing."""
+        from cli.cli_session import CLISession
+        helper = BotTestHelper(tmp_path)
+        self._setup_workspace_with_story_graph(helper)
+
+        session = CLISession(helper.bot, helper.workspace)
+        # Render first so diagrams exist
+        session.execute_command('shape.render.renderDiagram')
+        response = session.execute_command('shape.render.generateReport')
+
+        assert response.status != 'error', f"CLI should succeed, got: {response.output}"
