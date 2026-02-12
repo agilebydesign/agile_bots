@@ -101,6 +101,10 @@ class RenderOutputAction(Action):
             instructions._data['render_template_paths'] = render_template_paths
         if render_output_paths:
             instructions._data['render_output_paths'] = render_output_paths
+        
+        diagrams = self._collect_diagram_data(render_specs, workspace_dir)
+        if diagrams:
+            instructions._data['diagrams'] = diagrams
     
     def do_execute(self, context: ScopeActionContext = None):
         render_instructions = self._config_loader.load_render_instructions()
@@ -147,6 +151,36 @@ class RenderOutputAction(Action):
             if spec.synchronizer:
                 synchronizers.append(spec.synchronizer)
         return synchronizers
+
+    def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
+        diagrams = []
+        for spec in render_specs:
+            if not spec.output:
+                continue
+            output_name = spec.output
+            if not output_name.endswith('.drawio'):
+                continue
+            default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
+            path_prefix = spec.config_data.get('path', default_path)
+            diagram_path = workspace_dir / path_prefix / output_name
+            layout_path = diagram_path.with_suffix('.drawio').with_name(
+                diagram_path.stem + '-layout.json')
+            report_path = diagram_path.with_suffix('.drawio').with_name(
+                diagram_path.stem + '-update-report.json')
+            last_sync_time = None
+            if layout_path.exists():
+                last_sync_time = layout_path.stat().st_mtime
+            file_modified_time = None
+            if diagram_path.exists():
+                file_modified_time = diagram_path.stat().st_mtime
+            diagrams.append({
+                'file_path': str(diagram_path.resolve()),
+                'exists': diagram_path.exists(),
+                'last_sync_time': last_sync_time,
+                'file_modified_time': file_modified_time,
+                'report_path': str(report_path.resolve()) if report_path.exists() else None
+            })
+        return diagrams
 
     def inject_next_action_instructions(self):
         return 'Proceed to validate action'

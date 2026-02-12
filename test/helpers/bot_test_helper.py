@@ -22,6 +22,7 @@ from invoke_bot.perform_action.validate_helper import ValidateTestHelper
 from invoke_bot.perform_action.rules_helper import RulesTestHelper
 from invoke_bot.perform_action.render_helper import RenderTestHelper
 from invoke_bot.perform_action.instructions_helper import InstructionsTestHelper
+from invoke_bot.perform_action.drawio_story_map_helper import DrawIOStoryMapTestHelper
 class BotTestHelper:
     """
     Test helper that provides production story_bot and workspace.
@@ -102,6 +103,7 @@ class BotTestHelper:
         self.activity = ActivityTestHelper(parent=self)
         self.story = StoryTestHelper(parent=self)
         self.scope = ScopeTestHelper(parent=self)
+        self.drawio_story_map = DrawIOStoryMapTestHelper(parent=self)
         self.instructions = InstructionsTestHelper(parent=self)
         self.files = FileTestHelper(parent=self)
     

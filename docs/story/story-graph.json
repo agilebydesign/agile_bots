@@ -18202,6 +18202,7 @@
               "name": "Synchronized Graph with Rendered Diagram Content",
               "sequential_order": 5,
               "behavior": null,
+              "test_file": "invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py",
               "domain_concepts": [
                 {
                   "name": "DrawIOElement (Base)",
@@ -19065,14 +19066,14 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestRenderStoryMap",
                       "scenarios": [
                         {
                           "name": "Render outline diagram from StoryMap with default layout",
                           "sequential_order": 1,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_outline_diagram_from_story_map_with_default_layout",
                           "steps": "Given {StoryMap} has {StoryMap.epics} with {DrawIOStoryNode.sequential_order} and nested {DrawIOSubEpic} and {DrawIOStory} nodes\nAnd no {LayoutData} exists for this diagram\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStoryMap} positions {DrawIOEpic} at top at fixed Y\nAnd {DrawIOEpic} width equals combined width of its {DrawIOSubEpic} children\nAnd {DrawIOSubEpic} positioned below {DrawIOEpic}\nAnd {DrawIOSubEpic} width equals combined width of its {DrawIOStory} children\nAnd {DrawIOStory} cells arranged left-to-right by {DrawIOStoryNode.sequential_order} with spacing\nAnd actor labels positioned above {DrawIOStory} cells\nAnd output is valid DrawIO XML written to {DrawIOStoryMap} file path",
                           "examples": null
                         },
@@ -19081,7 +19082,7 @@
                           "sequential_order": 2,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_outline_diagram_from_story_map_with_saved_layout_data",
                           "steps": "Given {StoryMap} has {StoryMap.epics} with {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory} nodes\nAnd {LayoutData} exists with saved positions for each {DrawIOStoryNode}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStoryMap} applies {LayoutData} saved positions for {DrawIOEpic} and {DrawIOSubEpic}\nAnd {DrawIOStory} positions derived from {DrawIOStoryNode.sequential_order} left-to-right\nAnd new {DrawIOStory} that would overlap existing nodes positioned below for manual placement\nAnd other new {DrawIOStoryNode} get default spacing",
                           "examples": null
                         },
@@ -19090,7 +19091,7 @@
                           "sequential_order": 3,
                           "type": "outline",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_diagram_contains_correct_count_of_cells_matching_story_map_structure",
                           "steps": "Given {StoryMap} has {StoryMap.epics} E epics and S {DrawIOSubEpic} and N {DrawIOStory}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStoryMap} contains exactly E {DrawIOEpic} cells and S {DrawIOSubEpic} cells and N {DrawIOStory} cells\nAnd summary reports epics E and sub_epic_count S and diagram_generated true",
                           "examples": [
                             {
@@ -19121,7 +19122,7 @@
                           "sequential_order": 4,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_sub_epics_and_stories_ordered_by_sequential_order",
                           "steps": "Given {StoryMap} has {DrawIOSubEpic} with {DrawIOStoryNode.sequential_order} values\nAnd each {DrawIOSubEpic} has {DrawIOStory} with {DrawIOStoryNode.sequential_order} values\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOSubEpic} cells ordered left-to-right by {DrawIOStoryNode.sequential_order}\nAnd {DrawIOStory} cells within each {DrawIOSubEpic} ordered left-to-right by {DrawIOStoryNode.sequential_order}",
                           "examples": null
                         },
@@ -19130,7 +19131,7 @@
                           "sequential_order": 5,
                           "type": "outline",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_drawio_story_map_styles_story_cells_by_story_type",
                           "steps": "Given {StoryMap} has a {DrawIOStory} with {DrawIOStory.story_type}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStory} cell has fill {DrawIOElement.fill} and stroke {DrawIOElement.stroke} and font color {DrawIOElement.font_color}",
                           "examples": [
                             {
@@ -19176,7 +19177,7 @@
                           "sequential_order": 6,
                           "type": "outline",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_drawio_story_map_styles_container_and_label_cells_by_node_type",
                           "steps": "Given {StoryMap} has a {DrawIOStoryNode} of type {DrawIOStoryNode.node_type}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOElement} cell has shape {DrawIOElement.shape} and fill {DrawIOElement.fill} and stroke {DrawIOElement.stroke} and font color {DrawIOElement.font_color}",
                           "examples": [
                             {
@@ -19220,7 +19221,7 @@
                           "sequential_order": 7,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_completes_and_writes_drawio_file_to_specified_path",
                           "steps": "Given {StoryMap} has been loaded from story graph\nAnd output file path is specified for {DrawIOStoryMap}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStoryMap} is written to the specified file path\nAnd summary reports epics count and sub_epic_count and diagram_generated",
                           "examples": null
                         },
@@ -19229,7 +19230,7 @@
                           "sequential_order": 8,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_outline_from_empty_story_map_produces_empty_diagram",
                           "steps": "Given {StoryMap} has no {StoryMap.epics}\nWhen {DrawIOStoryMap} renders outline from {StoryMap}\nThen {DrawIOStoryMap} contains zero {DrawIOEpic} cells\nAnd summary reports epics 0 and sub_epic_count 0 and diagram_generated true",
                           "examples": null
                         }
@@ -19306,14 +19307,14 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestRenderStoryMapIncrements",
                       "scenarios": [
                         {
                           "name": "Render increments diagram with stories assigned to increment lanes",
                           "sequential_order": 1,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_increments_diagram_with_stories_assigned_to_increment_lanes",
                           "steps": "Given {StoryMap} has {StoryMap.epics} with {DrawIOSubEpic} and {DrawIOStory} nodes\nAnd {StoryMap} has increments with stories assigned to each increment\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} spanning {DrawIOSubEpic} spanning {DrawIOStory}\nAnd increment lanes rendered with {DrawIOStory} cells assigned to lanes from story graph increments\nAnd actor labels positioned above {DrawIOStory} within each lane\nAnd {DrawIOStory} cells styled per story_type as in outline",
                           "examples": null
                         },
@@ -19322,7 +19323,7 @@
                           "sequential_order": 2,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_increment_lanes_ordered_by_priority_with_y_positions_from_outline_bottom",
                           "steps": "Given {StoryMap} has increments with priority values\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen lane order equals increment priority order\nAnd lane Y positions derived from outline bottom and lane height",
                           "examples": null
                         },
@@ -19331,7 +19332,7 @@
                           "sequential_order": 3,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_re_render_increments_with_existing_layout_data_recomputes_lane_positions",
                           "steps": "Given {StoryMap} has increments with {DrawIOStory} assigned\nAnd {LayoutData} exists with saved positions for {DrawIOEpic} and {DrawIOSubEpic}\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} applies {LayoutData} saved positions for {DrawIOEpic} and {DrawIOSubEpic}\nAnd increment lane Y positions computed from outline bottom and lane height\nAnd saved layout for increment lanes not applied on re-render",
                           "examples": null
                         },
@@ -19340,7 +19341,7 @@
                           "sequential_order": 4,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_increments_completes_and_summary_includes_increment_count",
                           "steps": "Given {StoryMap} has increments\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} is written to file\nAnd summary includes increment count",
                           "examples": null
                         },
@@ -19349,7 +19350,7 @@
                           "sequential_order": 5,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_increment_lane_cells_styled_for_extractor_detection",
                           "steps": "Given {StoryMap} has increments\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen increment lane {DrawIOElement} cells have fill #f5f5f5 and stroke #666666 and bold text and black font\nAnd lane cell style has strokeColor and x less than 0 consistent with {DrawIOStoryMap}.get_increments_and_boundaries",
                           "examples": null
                         },
@@ -19358,7 +19359,7 @@
                           "sequential_order": 6,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_increments_with_no_increments_defined_produces_outline_only_diagram",
                           "steps": "Given {StoryMap} has {StoryMap.epics} but no increments defined\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory} without increment lanes\nAnd summary reports increment count 0",
                           "examples": null
                         }
@@ -19400,7 +19401,7 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestRenderStoryMapWithAcceptanceCriteria",
                       "scenarios": [
                         {
                           "name": "Render exploration diagram with AC boxes below stories",
@@ -19409,7 +19410,7 @@
                           "background": [
                             "Given {StoryMap} has {DrawIOStory} with acceptance_criteria"
                           ],
-                          "test_method": null,
+                          "test_method": "test_render_exploration_diagram_with_ac_boxes_below_stories",
                           "steps": "When {DrawIOStoryMap} renders exploration from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} spanning {DrawIOSubEpic} spanning {DrawIOStory} with same layout as outline\nAnd {DrawIOStory} cells styled per story_type as in outline\nAnd acceptance criteria {DrawIOElement} boxes rendered below each {DrawIOStory}\nAnd AC text formatted as When/Then in boxes\nAnd actor labels positioned above {DrawIOStory} as in outline",
                           "examples": null
                         },
@@ -19420,7 +19421,7 @@
                           "background": [
                             "Given {StoryMap} has {DrawIOStory} with acceptance_criteria"
                           ],
-                          "test_method": null,
+                          "test_method": "test_ac_boxes_styled_and_positioned_below_story_with_extracted_step_text",
                           "steps": "When {DrawIOStoryMap} renders exploration from {StoryMap}\nThen AC {DrawIOElement} boxes created wider than {DrawIOStory} cell\nAnd AC boxes use rectangular shape with fill #fff2cc and stroke #d6b656 and left-aligned 8px text\nAnd step text extracted from each acceptance_criteria entry",
                           "examples": null
                         },
@@ -19431,7 +19432,7 @@
                           "background": [
                             "Given {StoryMap} has {DrawIOStory} with acceptance_criteria"
                           ],
-                          "test_method": null,
+                          "test_method": "test_re_render_exploration_with_layout_data_preserves_story_and_ac_box_positions",
                           "steps": "And {LayoutData} exists with saved positions for {DrawIOStory} and AC boxes\nWhen {DrawIOStoryMap} renders exploration from {StoryMap}\nThen {DrawIOStoryMap} applies {LayoutData} saved positions for {DrawIOStory} and AC {DrawIOElement} boxes",
                           "examples": null
                         },
@@ -19442,7 +19443,7 @@
                           "background": [
                             "Given {StoryMap} has {DrawIOStory} with acceptance_criteria"
                           ],
-                          "test_method": null,
+                          "test_method": "test_exploration_render_output_contains_story_and_ac_cells_with_correct_containment",
                           "steps": "When {DrawIOStoryMap} renders exploration from {StoryMap}\nThen output {DrawIOStoryMap} contains both {DrawIOStory} cells and AC {DrawIOElement} cells\nAnd AC cells are contained within their parent {DrawIOStory} sub-tree in DrawIO XML",
                           "examples": null
                         },
@@ -19453,7 +19454,7 @@
                           "background": [
                             "Given {StoryMap} has {DrawIOStory} with acceptance_criteria"
                           ],
-                          "test_method": null,
+                          "test_method": "test_story_with_no_acceptance_criteria_renders_without_ac_boxes",
                           "steps": "And {StoryMap} also has a {DrawIOStory} with no acceptance_criteria\nWhen {DrawIOStoryMap} renders exploration from {StoryMap}\nThen {DrawIOStory} without acceptance_criteria has no AC {DrawIOElement} boxes below it\nAnd {DrawIOStory} with acceptance_criteria still has AC boxes rendered",
                           "examples": null
                         }
@@ -19490,14 +19491,14 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestUpdateGraphFromStoryMap",
                       "scenarios": [
                         {
                           "name": "Extract outline assigns stories to sub-epics by containment and sequential order",
                           "sequential_order": 1,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_extract_outline_assigns_stories_to_sub_epics_by_containment_and_sequential_order",
                           "steps": "Given {DrawIOStoryMap} outline file contains {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory} cells\nWhen {DrawIOStoryMap} extracts outline from {DrawIOStoryMap}\nThen {DrawIOStoryMap} assigns each {DrawIOStory} to a {DrawIOSubEpic} by containment (story center inside sub-epic box)\nAnd each {DrawIOSubEpic} has one story group with all its {DrawIOStory} nodes\nAnd {DrawIOStoryMap} assigns {DrawIOStoryNode.sequential_order} from top-to-bottom then left-to-right\nAnd extracted JSON is written to file",
                           "examples": null
                         },
@@ -19506,7 +19507,7 @@
                           "sequential_order": 2,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_update_report_lists_exact_fuzzy_new_and_removed_stories",
                           "steps": "Given {DrawIOStoryMap} has been extracted from diagram\nAnd original {StoryMap} exists\nWhen {DrawIOStoryMap}.generateUpdateReport({StoryMap}) runs\nThen {UpdateReport} lists exact matches where {DrawIOStoryNode} name equals {StoryMap} node name\nAnd {UpdateReport} lists fuzzy matches where names differ but match with confidence\nAnd {UpdateReport} lists new stories present in {DrawIOStoryMap} but not in {StoryMap}\nAnd {UpdateReport} lists removed stories present in {StoryMap} but not in {DrawIOStoryMap}",
                           "examples": null
                         },
@@ -19515,7 +19516,7 @@
                           "sequential_order": 3,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_story_map_updated_from_outline_diagram_applies_report_changes",
                           "steps": "Given {UpdateReport} has been generated from {DrawIOStoryMap} vs {StoryMap}\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen {StoryMap} applies exact match updates from {UpdateReport}\nAnd {StoryMap} applies fuzzy match renames from {UpdateReport}\nAnd new stories added to {StoryMap}\nAnd removed stories flagged in {StoryMap}",
                           "examples": null
                         },
@@ -19524,7 +19525,7 @@
                           "sequential_order": 4,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_renamed_or_reordered_nodes_flagged_as_fuzzy_matches_in_update_report",
                           "steps": "Given {DrawIOStoryMap} has a {DrawIOStoryNode} with name changed from original\nAnd {StoryMap} has the original {DrawIOStoryNode} name\nWhen {DrawIOStoryMap}.generateUpdateReport({StoryMap}) runs\nThen {UpdateReport} flags the renamed node as a fuzzy match\nAnd {UpdateReport} records both old and new name",
                           "examples": null
                         },
@@ -19533,7 +19534,7 @@
                           "sequential_order": 5,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_deleted_nodes_listed_as_removed_and_large_deletions_flagged",
                           "steps": "Given {DrawIOStoryMap} has nodes removed by user\nAnd {StoryMap} has the original nodes\nWhen {DrawIOStoryMap}.generateUpdateReport({StoryMap}) runs\nThen {UpdateReport} lists deleted nodes as removed\nAnd {UpdateReport}.large_deletions flags entire missing {DrawIOEpic} or {DrawIOSubEpic}",
                           "examples": null
                         },
@@ -19542,7 +19543,7 @@
                           "sequential_order": 6,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_sync_persists_layout_data_alongside_diagram",
                           "steps": "Given {DrawIOStoryMap} has been extracted from diagram\nWhen sync completes\nThen {LayoutData} persisted to JSON file alongside the diagram\nAnd {LayoutData} stores position and size for each {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory}\nAnd {LayoutData} available for next render",
                           "examples": null
                         },
@@ -19551,7 +19552,7 @@
                           "sequential_order": 7,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_moved_story_gets_recomputed_sequential_order_from_new_position",
                           "steps": "Given {DrawIOStory} has been moved to a new position in {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts from {DrawIOStoryMap}\nThen {DrawIOStoryMap} recomputes {DrawIOStoryNode.sequential_order} from left-to-right and vertical position\nAnd {UpdateReport} matches the moved {DrawIOStory} to original\nAnd merged output updates the matched {DrawIOStory} with new order",
                           "examples": null
                         },
@@ -19560,7 +19561,7 @@
                           "sequential_order": 8,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_single_story_deleted_keeps_original_structure_and_flags_if_many_missing",
                           "steps": "Given one {DrawIOStory} cell has been removed from {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts from {DrawIOStoryMap}\nThen extracted graph omits that {DrawIOStory}\nAnd {UpdateReport} lists it as removed\nAnd merged output keeps original {StoryMap} structure with only matched stories updated\nAnd if many {DrawIOStory} from one {DrawIOEpic} are missing the {UpdateReport} flags that {DrawIOEpic}",
                           "examples": null
                         },
@@ -19569,7 +19570,7 @@
                           "sequential_order": 9,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_deleted_sub_epic_reassigns_its_stories_by_position",
                           "steps": "Given a {DrawIOSubEpic} box has been removed from {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts from {DrawIOStoryMap}\nThen extracted graph omits that {DrawIOSubEpic}\nAnd {DrawIOStory} nodes under it are reassigned by where they sit (inside another {DrawIOSubEpic} box or at {DrawIOEpic} level)\nAnd {UpdateReport} flags the missing {DrawIOSubEpic} in large_deletions",
                           "examples": null
                         },
@@ -19578,7 +19579,7 @@
                           "sequential_order": 10,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_deleted_epic_removes_all_children_and_flags_large_deletions",
                           "steps": "Given a {DrawIOEpic} box has been removed from {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts from {DrawIOStoryMap}\nThen extracted graph omits that {DrawIOEpic} and all its {DrawIOSubEpic} and {DrawIOStory}\nAnd {UpdateReport} lists those stories as removed\nAnd {UpdateReport}.large_deletions includes missing_epics",
                           "examples": null
                         },
@@ -19587,7 +19588,7 @@
                           "sequential_order": 11,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_extract_from_empty_or_malformed_drawio_file_produces_error",
                           "steps": "Given {DrawIOStoryMap} file contains no valid {DrawIOEpic} or {DrawIOSubEpic} cells\nWhen {DrawIOStoryMap} extracts outline from {DrawIOStoryMap}\nThen {DrawIOStoryMap} reports extraction error with zero nodes found\nAnd no extracted JSON is written",
                           "examples": null
                         }
@@ -19654,14 +19655,14 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestUpdateGraphFromMapIncrements",
                       "scenarios": [
                         {
                           "name": "Extract increments assigns stories to lanes by Y position with priority from order",
                           "sequential_order": 1,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_extract_increments_assigns_stories_to_lanes_by_y_position_with_priority_from_order",
                           "steps": "Given {DrawIOStoryMap} increments file contains increment lane cells and {DrawIOStory} cells\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nThen {DrawIOStoryMap} identifies increment lanes from left side of diagram by style sorted top to bottom\nAnd each {DrawIOStory} assigned to nearest lane within 100px by Y position\nAnd each lane gets position-based priority and name from cell label\nAnd extracted JSON written to file",
                           "examples": null
                         },
@@ -19831,7 +19832,7 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestUpdateStoryGraphFromMapAcceptanceCriteria",
                       "scenarios": [
                         {
                           "name": "Extract exploration maps AC boxes to stories by position and containment",
@@ -19840,7 +19841,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_extract_exploration_maps_ac_boxes_to_stories_by_position_and_containment",
                           "steps": "When {DrawIOStoryMap} extracts exploration from {DrawIOStoryMap}\nThen {DrawIOStoryMap} assigns AC cells to {DrawIOStory} by vertical position and containment below story cells\nAnd AC text mapped back to story acceptance_criteria or steps",
                           "examples": null
                         },
@@ -19937,14 +19938,14 @@
                       "users": [
                         "Bot Behavior"
                       ],
-                      "test_class": null,
+                      "test_class": "TestRenderActionDiagramSection",
                       "scenarios": [
                         {
                           "name": "Render action shows existing render section without DrawIO config and separate Diagram section",
                           "sequential_order": 1,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_render_action_shows_existing_render_section_without_drawio_config_and_separate_diagram_section",
                           "steps": "Given user is on the render action\nAnd {StoryMap} has been loaded from story graph\nWhen render action displays its sections\nThen existing render section shows all current render content except DrawIO diagram config and output\nAnd a Diagram section is shown separately\nAnd Diagram section links to each {DrawIOStoryMap} diagram file\nAnd Diagram section links to generated {UpdateReport} file when one exists"
                         },
                         {

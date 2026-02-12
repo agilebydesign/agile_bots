@@ -1,0 +1,121 @@
+from dataclasses import dataclass, field
+from typing import Optional, Dict, Any
+from .story_io_position import Position, Boundary
+
+
+STYLE_DEFAULTS = {
+    'epic': {'fill': '#e1d5e7', 'stroke': '#9673a6', 'font_color': 'black', 'shape': 'rounded'},
+    'sub_epic': {'fill': '#d5e8d4', 'stroke': '#82b366', 'font_color': 'black', 'shape': 'rounded'},
+    'story_user': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': 'black'},
+    'story_system': {'fill': '#1a237e', 'stroke': '#0d47a1', 'font_color': 'white'},
+    'story_technical': {'fill': '#000000', 'stroke': '#333333', 'font_color': 'white'},
+    'actor': {'fill': '#dae8fc', 'stroke': '#6c8ebf', 'font_color': 'black', 'font_size': 8, 'shape': 'fixed-aspect'},
+    'acceptance_criteria': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': 'black', 'font_size': 8, 'align': 'left'},
+    'increment_lane': {'fill': '#f5f5f5', 'stroke': '#666666', 'font_color': 'black', 'font_style': 'bold'},
+}
+
+
+class DrawIOElement:
+
+    def __init__(self, cell_id: str, value: str = ''):
+        self._cell_id = cell_id
+        self._value = value
+        self._position = Position(0, 0)
+        self._boundary = Boundary(0, 0, 0, 0)
+        self._fill: Optional[str] = None
+        self._stroke: Optional[str] = None
+        self._font_color: Optional[str] = None
+        self._font_size: Optional[int] = None
+        self._shape: Optional[str] = None
+        self._align: Optional[str] = None
+        self._font_style: Optional[str] = None
+
+    @property
+    def cell_id(self) -> str:
+        return self._cell_id
+
+    @property
+    def value(self) -> str:
+        return self._value
+
+    @property
+    def position(self) -> Position:
+        return self._position
+
+    @property
+    def boundary(self) -> Boundary:
+        return self._boundary
+
+    @property
+    def fill(self) -> Optional[str]:
+        return self._fill
+
+    @property
+    def stroke(self) -> Optional[str]:
+        return self._stroke
+
+    @property
+    def font_color(self) -> Optional[str]:
+        return self._font_color
+
+    @property
+    def shape(self) -> Optional[str]:
+        return self._shape
+
+    def set_position(self, x: float, y: float):
+        self._position = Position(x, y)
+        self._boundary = Boundary(x, y, self._boundary.width, self._boundary.height)
+
+    def set_size(self, width: float, height: float):
+        self._boundary = Boundary(self._position.x, self._position.y, width, height)
+
+    def set_style(self, fill: str = None, stroke: str = None, font_color: str = None,
+                  shape: str = None, font_size: int = None, align: str = None,
+                  font_style: str = None):
+        if fill is not None:
+            self._fill = fill
+        if stroke is not None:
+            self._stroke = stroke
+        if font_color is not None:
+            self._font_color = font_color
+        if shape is not None:
+            self._shape = shape
+        if font_size is not None:
+            self._font_size = font_size
+        if align is not None:
+            self._align = align
+        if font_style is not None:
+            self._font_style = font_style
+
+    def apply_style_for_type(self, element_type: str):
+        style = STYLE_DEFAULTS.get(element_type, {})
+        self.set_style(**style)
+
+    def to_style_string(self) -> str:
+        parts = []
+        if self._shape == 'rounded':
+            parts.append('rounded=1')
+        if self._shape == 'fixed-aspect':
+            parts.append('shape=mxgraph.basic.rect;fixedSize=1')
+        if self._fill:
+            parts.append(f'fillColor={self._fill}')
+        if self._stroke:
+            parts.append(f'strokeColor={self._stroke}')
+        if self._font_color:
+            parts.append(f'fontColor={self._font_color}')
+        if self._font_size:
+            parts.append(f'fontSize={self._font_size}')
+        if self._align:
+            parts.append(f'align={self._align}')
+        if self._font_style == 'bold':
+            parts.append('fontStyle=1')
+        return ';'.join(parts) + ';'
+
+    @classmethod
+    def from_style_string(cls, style_string: str) -> Dict[str, str]:
+        result = {}
+        for part in style_string.split(';'):
+            if '=' in part:
+                key, val = part.split('=', 1)
+                result[key] = val
+        return result
