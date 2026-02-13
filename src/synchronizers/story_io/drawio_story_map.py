@@ -316,10 +316,16 @@ class DrawIOStoryMap(StoryMap):
             cell_id = node.cell_id
             if '/' not in cell_id:
                 continue
-            parent_path = cell_id.rsplit('/', 1)[0]
-            parent_node = nodes_by_id.get(parent_path)
-            if parent_node and parent_node is not node:
-                parent_node.add_child(node)
+            found = False
+            parts = cell_id.split('/')
+            for cut in range(len(parts) - 1, 0, -1):
+                candidate = '/'.join(parts[:cut])
+                parent_node = nodes_by_id.get(candidate)
+                if parent_node and parent_node is not node:
+                    parent_node.add_child(node)
+                    found = True
+                    break
+            if found:
                 continue
             pid = parent_map.get(cell_id, '')
             parent_from_attr = nodes_by_id.get(pid)

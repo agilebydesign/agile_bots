@@ -1,6 +1,5 @@
 from typing import List, Optional, Any
 from dataclasses import dataclass, field
-from difflib import SequenceMatcher
 from story_graph.nodes import StoryNode, Epic, SubEpic, Story, StoryGroup
 from story_graph.domain import DomainConcept, StoryUser
 from .drawio_element import DrawIOElement, STYLE_DEFAULTS
@@ -227,21 +226,23 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
         return nodes
 
     def generate_update_report_for_epic_subtree(self, original_epic, report: UpdateReport):
-        extracted_sub_epics = self.get_sub_epics()
-        original_sub_epics = original_epic.sub_epics
-        matched_originals = set()
-        for extracted_se in extracted_sub_epics:
-            for idx, orig_se in enumerate(original_sub_epics):
-                if idx not in matched_originals and extracted_se.name.lower() == orig_se.name.lower():
-                    matched_originals.add(idx)
-                    extracted_se.generate_update_report_for_sub_epic_subtree(orig_se, report)
-                    break
+        extracted_sub_epics = sorted(self.get_sub_epics(), key=lambda s: s.sequential_order or 0)
+        original_sub_epics = sorted(original_epic.sub_epics, key=lambda s: getattr(s, 'sequential_order', 0) or 0)
+
+        for i, ext_se in enumerate(extracted_sub_epics):
+            if i < len(original_sub_epics):
+                orig_se = original_sub_epics[i]
+                if ext_se.name != orig_se.name:
+                    report.add_rename(ext_se.name, orig_se.name, confidence=1.0, parent=self.name)
+                else:
+                    report.add_exact_match(ext_se.name, orig_se.name, parent=self.name)
+                ext_se.generate_update_report_for_sub_epic_subtree(orig_se, report)
             else:
-                for story in extracted_se.get_stories():
-                    report.add_new_story(story.name, parent=extracted_se.name)
-        for idx, orig_se in enumerate(original_sub_epics):
-            if idx not in matched_originals:
-                report.add_missing_sub_epic(orig_se.name)
+                for story in ext_se.get_all_stories_recursive():
+                    report.add_new_story(story.name, parent=ext_se.name)
+
+        for i in range(len(extracted_sub_epics), len(original_sub_epics)):
+            report.add_missing_sub_epic(original_sub_epics[i].name)
 
 
 @dataclass
@@ -314,16 +315,32 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
             stories = [c for c in sub_epic.children if isinstance(c, Story)]
             stories.sort(key=lambda s: getattr(s, 'sequential_order', 0) or 0)
 
-            story_x = x_cursor + BAR_PADDING
+            se_saved = self._saved_position_for(f'SUB_EPIC|{self.name}', layout_data)
+            se_right = (se_saved.x + layout_data.boundary_for(f'SUB_EPIC|{self.name}').width) if (se_saved and layout_data and layout_data.boundary_for(f'SUB_EPIC|{self.name}')) else None
+            se_left = x_cursor + BAR_PADDING
+
+            story_x = se_left
+            story_y = rows.story_y
             seen_actors: set = set()
             for story in stories:
                 story_type = getattr(story, 'story_type', 'user') or 'user'
                 drawio_story = DrawIOStoryNodeSerializer.create_story(
                     story.name, getattr(story, 'sequential_order', 0) or 0, story_type)
-                drawio_story.render_from_domain(
-                    story, story_x, rows.story_y, rows.actor_y,
-                    path_prefix=se_path, seen_actors=seen_actors,
-                    layout_data=layout_data)
+                story_path = f'{se_path}/{_slug(drawio_story.name)}' if se_path else _slug(drawio_story.name)
+                has_saved = layout_data and layout_data.position_for(story_path)
+                if has_saved:
+                    drawio_story.render_from_domain(
+                        story, story_x, story_y, rows.actor_y,
+                        path_prefix=se_path, seen_actors=seen_actors,
+                        layout_data=layout_data)
+                else:
+                    if se_right and story_x + CELL_SIZE > se_right:
+                        story_x = se_left
+                        story_y += CELL_SIZE + CELL_SPACING
+                    drawio_story.render_from_domain(
+                        story, story_x, story_y, rows.actor_y,
+                        path_prefix=se_path, seen_actors=seen_actors,
+                        layout_data=None)
                 self.add_child(drawio_story)
                 story_x += CELL_SIZE + CELL_SPACING
             if stories:
@@ -345,15 +362,40 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
         return nodes
 
     def generate_update_report_for_sub_epic_subtree(self, original_sub_epic, report: UpdateReport):
-        extracted_stories = self.get_stories()
-        orig_stories = [c for c in original_sub_epic.children if isinstance(c, Story)]
+        extracted_nested = sorted(self.get_sub_epics(), key=lambda s: s.sequential_order or 0)
+        original_nested = sorted([c for c in original_sub_epic._children if isinstance(c, SubEpic)],
+                                  key=lambda s: getattr(s, 'sequential_order', 0) or 0)
 
-        matched_originals = set()
-        for ext_story in extracted_stories:
-            ext_story.match_against_originals(orig_stories, matched_originals, report, parent=self.name)
-        for idx, orig_s in enumerate(orig_stories):
-            if idx not in matched_originals:
-                report.add_removed_story(orig_s.name, parent=self.name)
+        for i, ext_nse in enumerate(extracted_nested):
+            if i < len(original_nested):
+                orig_nse = original_nested[i]
+                if ext_nse.name != orig_nse.name:
+                    report.add_rename(ext_nse.name, orig_nse.name, confidence=1.0, parent=self.name)
+                else:
+                    report.add_exact_match(ext_nse.name, orig_nse.name, parent=self.name)
+                ext_nse.generate_update_report_for_sub_epic_subtree(orig_nse, report)
+            else:
+                for story in ext_nse.get_all_stories_recursive():
+                    report.add_new_story(story.name, parent=ext_nse.name)
+
+        for i in range(len(extracted_nested), len(original_nested)):
+            report.add_missing_sub_epic(original_nested[i].name)
+
+        extracted_stories = sorted(self.get_stories(), key=lambda s: s.sequential_order or 0)
+        orig_stories = sorted([c for c in original_sub_epic.children if isinstance(c, Story)],
+                               key=lambda s: getattr(s, 'sequential_order', 0) or 0)
+
+        for i, ext_story in enumerate(extracted_stories):
+            if i < len(orig_stories):
+                if ext_story.name != orig_stories[i].name:
+                    report.add_rename(ext_story.name, orig_stories[i].name, confidence=1.0, parent=self.name)
+                else:
+                    report.add_exact_match(ext_story.name, orig_stories[i].name, parent=self.name)
+            else:
+                report.add_new_story(ext_story.name, parent=self.name)
+
+        for i in range(len(extracted_stories), len(orig_stories)):
+            report.add_removed_story(orig_stories[i].name, parent=self.name)
 
 
 @dataclass
@@ -464,34 +506,6 @@ class DrawIOStory(Story, DrawIOStoryNode):
         nodes.extend(self._ac_elements)
         return nodes
 
-    def match_against_originals(self, original_stories: list, matched_originals: set,
-                                 report: UpdateReport, parent: str = ''):
-        for idx, orig in enumerate(original_stories):
-            if idx in matched_originals:
-                continue
-            if self.name.lower() == orig.name.lower():
-                matched_originals.add(idx)
-                report.add_exact_match(self.name, orig.name, parent=parent)
-                return
-
-        best_ratio = 0.0
-        best_idx = -1
-        best_orig_name = ''
-        for idx, orig in enumerate(original_stories):
-            if idx in matched_originals:
-                continue
-            ratio = SequenceMatcher(None, self.name.lower(), orig.name.lower()).ratio()
-            if ratio > best_ratio:
-                best_ratio = ratio
-                best_idx = idx
-                best_orig_name = orig.name
-
-        if best_ratio >= 0.7 and best_idx >= 0:
-            matched_originals.add(best_idx)
-            report.add_fuzzy_match(self.name, best_orig_name, confidence=best_ratio, parent=parent)
-            return
-
-        report.add_new_story(self.name, parent=parent)
 
 
 class DrawIOIncrementLane:

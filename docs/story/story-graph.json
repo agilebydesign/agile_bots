@@ -218,6 +218,11 @@
                       "name": "WHEN Bot code changes are detected\nTHEN MCP Server clears Python bytecode cache (__pycache__) AND MCP Server restarts to load new code AND Server restarts gracefully without losing state AND Server re-registers with MCP Protocol Handler after restart",
                       "text": "WHEN Bot code changes are detected\nTHEN MCP Server clears Python bytecode cache (__pycache__) AND MCP Server restarts to load new code AND Server restarts gracefully without losing state AND Server re-registers with MCP Protocol Handler after restart",
                       "sequential_order": 1.0
+                    },
+                    {
+                      "name": "Acceptance-criteria1",
+                      "text": "Acceptance-criteria1",
+                      "sequential_order": 1.0
                     }
                   ],
                   "behavior": null
@@ -257,42 +262,6 @@
                   "acceptance_criteria": [],
                   "behavior": null,
                   "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Build Agile Bots\\Generate MCP Tools\\📄 Story3.md"
-                },
-                {
-                  "name": "Story4",
-                  "sequential_order": 7.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_class": null,
-                  "scenarios": [],
-                  "acceptance_criteria": [],
-                  "behavior": null,
-                  "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Build Agile Bots\\Generate MCP Tools\\📄 Story4.md"
-                },
-                {
-                  "name": "Story5",
-                  "sequential_order": 8.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_class": null,
-                  "scenarios": [],
-                  "acceptance_criteria": [],
-                  "behavior": null,
-                  "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Build Agile Bots\\Generate MCP Tools\\📄 Story5.md"
-                },
-                {
-                  "name": "Story6",
-                  "sequential_order": 9.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_class": null,
-                  "scenarios": [],
-                  "acceptance_criteria": [],
-                  "behavior": null,
-                  "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Build Agile Bots\\Generate MCP Tools\\📄 Story6.md"
                 }
               ]
             }
