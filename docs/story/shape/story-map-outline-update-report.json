@@ -1,0 +1,11 @@
+{
+  "matched_count": 251,
+  "renames": [
+    {
+      "extracted": "Test1<span style=\"white-space: pre;\">\t</span>",
+      "original": "Story1",
+      "confidence": 1.0,
+      "parent": "Generate MCP Tools"
+    }
+  ]
+}

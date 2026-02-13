@@ -216,17 +216,12 @@ class RenderOutputAction(Action):
         """Extract from DrawIO diagrams and generate update reports.
         CLI: <behavior>.render.generateReport
         """
-        from synchronizers.story_io.story_map_drawio_synchronizer import (
-            synchronize_story_graph_from_drawio_outline,
-            synchronize_story_graph_from_drawio_increments,
-            generate_merge_report
-        )
-        import shutil
+        from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
+        from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
+        from story_graph.nodes import StoryMap
 
         story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
         results = []
-
-        from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
         sync = DrawIOSynchronizer()
 
         for spec, diagram_path in self._get_drawio_specs_with_paths():
@@ -235,29 +230,14 @@ class RenderOutputAction(Action):
 
             sync.save_layout(diagram_path)
 
-            extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
-
             try:
-                if 'increment' in diagram_path.stem:
-                    synchronize_story_graph_from_drawio_increments(
-                        drawio_path=diagram_path,
-                        output_path=extracted_path,
-                        original_path=story_graph_path
-                    )
-                else:
-                    synchronize_story_graph_from_drawio_outline(
-                        drawio_path=diagram_path,
-                        output_path=extracted_path,
-                        original_path=story_graph_path
-                    )
+                drawio_map = DrawIOStoryMap.load(diagram_path)
+                graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
+                original_map = StoryMap(graph_data)
 
-                merge_report_path = extracted_path.parent / f"{extracted_path.stem}-merge-report.json"
+                report = drawio_map.generate_update_report(original_map)
                 update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
-
-                if merge_report_path.exists():
-                    shutil.copy2(str(merge_report_path), str(update_report_path))
-                elif story_graph_path.exists():
-                    generate_merge_report(extracted_path, story_graph_path, update_report_path)
+                report.save(update_report_path)
 
                 results.append({
                     'diagram': spec.output,
@@ -282,29 +262,50 @@ class RenderOutputAction(Action):
         """Apply update reports to merge diagram changes into story graph.
         CLI: <behavior>.render.updateFromDiagram
         """
-        from synchronizers.story_io.story_map_drawio_synchronizer import merge_story_graphs
+        from synchronizers.story_io.update_report import UpdateReport
 
         story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
         results = []
 
         for spec, diagram_path in self._get_drawio_specs_with_paths():
-            extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
             update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
 
-            if not extracted_path.exists() or not update_report_path.exists():
+            if not update_report_path.exists():
                 continue
 
             try:
-                result = merge_story_graphs(
-                    extracted_path=extracted_path,
-                    original_path=story_graph_path,
-                    report_path=update_report_path,
-                    output_path=story_graph_path
-                )
+                report_data = json.loads(update_report_path.read_text(encoding='utf-8'))
+                report = UpdateReport.from_dict(report_data)
+
+                if not report.has_changes:
+                    results.append({'diagram': spec.output, 'status': 'no_changes'})
+                    continue
+
+                graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
+                changed = False
+
+                for rename in report.renames:
+                    if self._apply_rename(graph_data, rename.original_name, rename.extracted_name):
+                        changed = True
+
+                for new_story in report.new_stories:
+                    if self._apply_new_story(graph_data, new_story.name, new_story.parent):
+                        changed = True
+
+                for removed in report.removed_stories:
+                    if self._apply_remove_story(graph_data, removed.name, removed.parent):
+                        changed = True
+
+                if changed:
+                    story_graph_path.write_text(
+                        json.dumps(graph_data, indent=2, ensure_ascii=False), encoding='utf-8')
+
+                update_report_path.unlink()
+
                 results.append({
                     'diagram': spec.output,
                     'status': 'success',
-                    'result': result
+                    'changes_applied': changed
                 })
             except Exception as e:
                 logger.error(f'Failed to update from {spec.output}: {e}')
@@ -325,6 +326,65 @@ class RenderOutputAction(Action):
             'message': f'Updated story graph from {len(results)} diagram(s)',
             'results': results
         }
+
+    def _apply_rename(self, graph_data: dict, old_name: str, new_name: str) -> bool:
+        for epic in graph_data.get('epics', []):
+            if self._rename_in_node(epic, old_name, new_name):
+                return True
+        return False
+
+    def _rename_in_node(self, node: dict, old_name: str, new_name: str) -> bool:
+        for se in node.get('sub_epics', []):
+            if se.get('name') == old_name:
+                se['name'] = new_name
+                return True
+            if self._rename_in_node(se, old_name, new_name):
+                return True
+        for sg in node.get('story_groups', []):
+            for story in sg.get('stories', []):
+                if story.get('name') == old_name:
+                    story['name'] = new_name
+                    return True
+        return False
+
+    def _apply_new_story(self, graph_data: dict, story_name: str, parent_name: str) -> bool:
+        for epic in graph_data.get('epics', []):
+            if self._add_story_to_parent(epic, story_name, parent_name):
+                return True
+        return False
+
+    def _add_story_to_parent(self, node: dict, story_name: str, parent_name: str) -> bool:
+        if node.get('name') == parent_name:
+            groups = node.get('story_groups', [])
+            if not groups:
+                groups = [{'type': 'and', 'connector': None, 'stories': []}]
+                node['story_groups'] = groups
+            stories = groups[0].get('stories', [])
+            order = max((s.get('sequential_order', 0) for s in stories), default=0) + 1
+            stories.append({'name': story_name, 'sequential_order': order, 'story_type': 'user'})
+            return True
+        for se in node.get('sub_epics', []):
+            if self._add_story_to_parent(se, story_name, parent_name):
+                return True
+        return False
+
+    def _apply_remove_story(self, graph_data: dict, story_name: str, parent_name: str) -> bool:
+        for epic in graph_data.get('epics', []):
+            if self._remove_story_from_node(epic, story_name):
+                return True
+        return False
+
+    def _remove_story_from_node(self, node: dict, story_name: str) -> bool:
+        for sg in node.get('story_groups', []):
+            stories = sg.get('stories', [])
+            for i, story in enumerate(stories):
+                if story.get('name') == story_name:
+                    stories.pop(i)
+                    return True
+        for se in node.get('sub_epics', []):
+            if self._remove_story_from_node(se, story_name):
+                return True
+        return False
 
     def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
         diagrams = []
