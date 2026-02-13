@@ -2,25 +2,25 @@
   "EPIC|Build Agile Bots": {
     "x": 20.0,
     "y": 120.0,
-    "width": 620.0,
+    "width": 500.0,
     "height": 60.0
   },
   "build-agile-bots": {
     "x": 20.0,
     "y": 120.0,
-    "width": 620.0,
+    "width": 500.0,
     "height": 60.0
   },
   "SUB_EPIC|Generate MCP Tools": {
     "x": 25.0,
     "y": 195.0,
-    "width": 360.0,
+    "width": 240.0,
     "height": 60.0
   },
   "build-agile-bots/generate-mcp-tools": {
     "x": 25.0,
     "y": 195.0,
-    "width": 360.0,
+    "width": 240.0,
     "height": 60.0
   },
   "STORY|Build Agile Bots|Generate MCP Tools|Generate Bot Tools": {
@@ -71,51 +71,39 @@
     "width": 50.0,
     "height": 50.0
   },
-  "STORY|Build Agile Bots|Generate MCP Tools|Test2": {
-    "x": 270.0,
-    "y": 495.0,
+  "STORY|Build Agile Bots|Generate MCP Tools|rrr": {
+    "x": 25.0,
+    "y": 560.0,
     "width": 50.0,
     "height": 50.0
   },
-  "build-agile-bots/generate-mcp-tools/test2": {
-    "x": 270.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Build Agile Bots|Generate MCP Tools|Test3": {
-    "x": 30.0,
-    "y": 555.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "build-agile-bots/generate-mcp-tools/test3": {
-    "x": 30.0,
-    "y": 555.0,
+  "2": {
+    "x": 25.0,
+    "y": 560.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Generate CLI": {
-    "x": 395.0,
+    "x": 275.0,
     "y": 195.0,
     "width": 240.0,
     "height": 60.0
   },
   "build-agile-bots/generate-cli": {
-    "x": 395.0,
+    "x": 275.0,
     "y": 195.0,
     "width": 240.0,
     "height": 60.0
   },
   "STORY|Build Agile Bots|Generate CLI|Generate Command Definitions": {
     "x": 280.0,
-    "y": 495.0,
+    "y": 480.0,
     "width": 50.0,
     "height": 50.0
   },
   "build-agile-bots/generate-cli/generate-command-definitions": {
     "x": 280.0,
-    "y": 495.0,
+    "y": 480.0,
     "width": 50.0,
     "height": 50.0
   },
@@ -158,35 +146,35 @@
   "EPIC|Invoke Bot": {
     "x": 670.0,
     "y": 120.0,
-    "width": 12730.0,
+    "width": 12590.0,
     "height": 60.0
   },
   "invoke-bot": {
     "x": 670.0,
     "y": 120.0,
-    "width": 12730.0,
+    "width": 12590.0,
     "height": 60.0
   },
   "SUB_EPIC|Initialize Bot": {
-    "x": 655.0,
+    "x": 535.0,
     "y": 195.0,
     "width": 1420.0,
     "height": 60.0
   },
   "invoke-bot/initialize-bot": {
-    "x": 655.0,
+    "x": 535.0,
     "y": 195.0,
     "width": 1420.0,
     "height": 60.0
   },
   "SUB_EPIC|Load Bot, Behavior, and Actions": {
-    "x": 660.0,
+    "x": 540.0,
     "y": 270.0,
     "width": 540.0,
     "height": 60.0
   },
   "invoke-bot/initialize-bot/load-bot,-behavior,-and-actions": {
-    "x": 660.0,
+    "x": 540.0,
     "y": 270.0,
     "width": 540.0,
     "height": 60.0
@@ -300,13 +288,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Initialize Bot Interface": {
-    "x": 1210.0,
+    "x": 1090.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/initialize-bot/initialize-bot-interface": {
-    "x": 1210.0,
+    "x": 1090.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
@@ -372,13 +360,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Render Bot Interface": {
-    "x": 1520.0,
+    "x": 1400.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/initialize-bot/render-bot-interface": {
-    "x": 1520.0,
+    "x": 1400.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
@@ -456,13 +444,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Set Workspace": {
-    "x": 1890.0,
+    "x": 1770.0,
     "y": 270.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/initialize-bot/set-workspace": {
-    "x": 1890.0,
+    "x": 1770.0,
     "y": 270.0,
     "width": 180.0,
     "height": 60.0
@@ -504,37 +492,37 @@
     "height": 50.0
   },
   "SUB_EPIC|Work With Story Map": {
-    "x": 2085.0,
+    "x": 1965.0,
     "y": 195.0,
     "width": 5910.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map": {
-    "x": 2085.0,
+    "x": 1965.0,
     "y": 195.0,
     "width": 5910.0,
     "height": 60.0
   },
   "SUB_EPIC|Scope Files": {
-    "x": 2090.0,
+    "x": 1970.0,
     "y": 270.0,
     "width": 740.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files": {
-    "x": 2090.0,
+    "x": 1970.0,
     "y": 270.0,
     "width": 740.0,
     "height": 60.0
   },
   "SUB_EPIC|Set File Filter": {
-    "x": 2095.0,
+    "x": 1975.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files/set-file-filter": {
-    "x": 2095.0,
+    "x": 1975.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
@@ -612,13 +600,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Filter File Scope": {
-    "x": 2465.0,
+    "x": 2345.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files/filter-file-scope": {
-    "x": 2465.0,
+    "x": 2345.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
@@ -696,25 +684,25 @@
     "height": 50.0
   },
   "SUB_EPIC|Scope Stories": {
-    "x": 2840.0,
+    "x": 2720.0,
     "y": 270.0,
     "width": 1830.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-stories": {
-    "x": 2840.0,
+    "x": 2720.0,
     "y": 270.0,
     "width": 1830.0,
     "height": 60.0
   },
   "SUB_EPIC|Filter Scope of Stories": {
-    "x": 2845.0,
+    "x": 2725.0,
     "y": 345.0,
     "width": 540.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories": {
-    "x": 2845.0,
+    "x": 2725.0,
     "y": 345.0,
     "width": 540.0,
     "height": 60.0
@@ -828,13 +816,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Manage Story Scope": {
-    "x": 3395.0,
+    "x": 3275.0,
     "y": 345.0,
     "width": 540.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-stories/manage-story-scope": {
-    "x": 3395.0,
+    "x": 3275.0,
     "y": 345.0,
     "width": 540.0,
     "height": 60.0
@@ -948,13 +936,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Set Scope Using Filter Parts": {
-    "x": 3945.0,
+    "x": 3825.0,
     "y": 345.0,
     "width": 720.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts": {
-    "x": 3945.0,
+    "x": 3825.0,
     "y": 345.0,
     "width": 720.0,
     "height": 60.0
@@ -1104,13 +1092,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Edit Story Map": {
-    "x": 4680.0,
+    "x": 4560.0,
     "y": 270.0,
     "width": 1140.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/edit-story-map": {
-    "x": 4680.0,
+    "x": 4560.0,
     "y": 270.0,
     "width": 1140.0,
     "height": 60.0
@@ -1344,13 +1332,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Edit Increments": {
-    "x": 5830.0,
+    "x": 5710.0,
     "y": 270.0,
     "width": 840.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/edit-increments": {
-    "x": 5830.0,
+    "x": 5710.0,
     "y": 270.0,
     "width": 840.0,
     "height": 60.0
@@ -1524,13 +1512,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Act With Selected Node": {
-    "x": 6680.0,
+    "x": 6560.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node": {
-    "x": 6680.0,
+    "x": 6560.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
@@ -1596,13 +1584,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Open Story Related Files": {
-    "x": 6990.0,
+    "x": 6870.0,
     "y": 270.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/open-story-related-files": {
-    "x": 6990.0,
+    "x": 6870.0,
     "y": 270.0,
     "width": 180.0,
     "height": 60.0
@@ -1644,25 +1632,25 @@
     "height": 50.0
   },
   "SUB_EPIC|Trace Story Graph": {
-    "x": 7180.0,
+    "x": 7060.0,
     "y": 270.0,
     "width": 810.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph": {
-    "x": 7180.0,
+    "x": 7060.0,
     "y": 270.0,
     "width": 810.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Story": {
-    "x": 7185.0,
+    "x": 7065.0,
     "y": 345.0,
     "width": 120.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story": {
-    "x": 7185.0,
+    "x": 7065.0,
     "y": 345.0,
     "width": 120.0,
     "height": 60.0
@@ -1692,13 +1680,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Trace Scenario": {
-    "x": 7315.0,
+    "x": 7195.0,
     "y": 345.0,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario": {
-    "x": 7315.0,
+    "x": 7195.0,
     "y": 345.0,
     "width": 420.0,
     "height": 60.0
@@ -1788,13 +1776,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Trace Code": {
-    "x": 7745.0,
+    "x": 7625.0,
     "y": 345.0,
     "width": 240.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code": {
-    "x": 7745.0,
+    "x": 7625.0,
     "y": 345.0,
     "width": 240.0,
     "height": 60.0
@@ -1848,25 +1836,25 @@
     "height": 50.0
   },
   "SUB_EPIC|Navigate Behavior Actions": {
-    "x": 8005.0,
+    "x": 7885.0,
     "y": 195.0,
     "width": 1590.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions": {
-    "x": 8005.0,
+    "x": 7885.0,
     "y": 195.0,
     "width": 1590.0,
     "height": 60.0
   },
   "SUB_EPIC|Navigate Behavior And Actions": {
-    "x": 8010.0,
+    "x": 7890.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions": {
-    "x": 8010.0,
+    "x": 7890.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
@@ -1968,13 +1956,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Perform Behavior Action In Bot Workflow": {
-    "x": 8500.0,
+    "x": 8380.0,
     "y": 270.0,
     "width": 660.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow": {
-    "x": 8500.0,
+    "x": 8380.0,
     "y": 270.0,
     "width": 660.0,
     "height": 60.0
@@ -2112,13 +2100,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Display Behavior Action State": {
-    "x": 9170.0,
+    "x": 9050.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state": {
-    "x": 9170.0,
+    "x": 9050.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
@@ -2208,25 +2196,25 @@
     "height": 50.0
   },
   "SUB_EPIC|Perform Action": {
-    "x": 9605.0,
+    "x": 9485.0,
     "y": 195.0,
     "width": 3260.0,
     "height": 60.0
   },
   "invoke-bot/perform-action": {
-    "x": 9605.0,
+    "x": 9485.0,
     "y": 195.0,
     "width": 3260.0,
     "height": 60.0
   },
   "SUB_EPIC|Prepare Common Instructions For Behavior, Action, and Scope": {
-    "x": 9610.0,
+    "x": 9490.0,
     "y": 270.0,
     "width": 840.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope": {
-    "x": 9610.0,
+    "x": 9490.0,
     "y": 270.0,
     "width": 840.0,
     "height": 60.0
@@ -2400,13 +2388,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Clarify Requirements": {
-    "x": 10460.0,
+    "x": 10340.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/clarify-requirements": {
-    "x": 10460.0,
+    "x": 10340.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
@@ -2472,13 +2460,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Decide Strategy": {
-    "x": 10770.0,
+    "x": 10650.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/decide-strategy": {
-    "x": 10770.0,
+    "x": 10650.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
@@ -2556,13 +2544,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Build Story Graph": {
-    "x": 11140.0,
+    "x": 11020.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/build-story-graph": {
-    "x": 11140.0,
+    "x": 11020.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
@@ -2628,13 +2616,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Render Content": {
-    "x": 11450.0,
+    "x": 11330.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-content": {
-    "x": 11450.0,
+    "x": 11330.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
@@ -2712,13 +2700,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Synchronized Graph with Rendered Diagram Content": {
-    "x": 11820.0,
+    "x": 11700.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content": {
-    "x": 11820.0,
+    "x": 11700.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
@@ -2808,13 +2796,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Validate With Rules": {
-    "x": 12250.0,
+    "x": 12130.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/validate-with-rules": {
-    "x": 12250.0,
+    "x": 12130.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
@@ -2892,13 +2880,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Use Rules In Prompt": {
-    "x": 12620.0,
+    "x": 12500.0,
     "y": 270.0,
     "width": 240.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt": {
-    "x": 12620.0,
+    "x": 12500.0,
     "y": 270.0,
     "width": 240.0,
     "height": 60.0
@@ -2952,13 +2940,13 @@
     "height": 50.0
   },
   "SUB_EPIC|Get Help": {
-    "x": 12875.0,
+    "x": 12755.0,
     "y": 195.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/get-help": {
-    "x": 12875.0,
+    "x": 12755.0,
     "y": 195.0,
     "width": 360.0,
     "height": 60.0
@@ -3034,53 +3022,5 @@
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
-  },
-  "SUB_EPIC|AAAAAA": {
-    "x": 13245.0,
-    "y": 195.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "invoke-bot/aaaaaa": {
-    "x": 13245.0,
-    "y": 195.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "EPIC|CCC": {
-    "x": 13412.0,
-    "y": 120.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "3": {
-    "x": 13412.0,
-    "y": 120.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|BBBB": {
-    "x": 13320.0,
-    "y": 195.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "2": {
-    "x": 13320.0,
-    "y": 195.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|DDD": {
-    "x": 13412.0,
-    "y": 190.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "4": {
-    "x": 13412.0,
-    "y": 190.0,
-    "width": 60.0,
-    "height": 60.0
   }
 }
