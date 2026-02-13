@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Get Help](.)  
-**Sequential Order:** 1
+**Sequential Order:** 2.0
 **Story Type:** user
 
 ## Story Description

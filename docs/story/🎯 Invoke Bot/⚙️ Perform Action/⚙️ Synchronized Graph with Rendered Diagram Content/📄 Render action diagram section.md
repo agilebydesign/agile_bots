@@ -4,7 +4,7 @@
 
 **User:** Bot Behavior
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Perform Action](..) / [⚙️ Synchronized Graph with Rendered Diagram Content](.)  
-**Sequential Order:** 7
+**Sequential Order:** 7.0
 **Story Type:** user
 
 ## Story Description

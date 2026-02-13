@@ -691,8 +691,8 @@ class TestUpdateGraphFromStoryMap:
         report = drawio_story_map.generate_update_report(original_story_map)
 
         assert isinstance(report, UpdateReport)
-        assert isinstance(report.exact_matches, list)
-        assert isinstance(report.fuzzy_matches, list)
+        assert report.matched_count >= 0
+        assert isinstance(report.renames, list)
         assert isinstance(report.new_stories, list)
         assert isinstance(report.removed_stories, list)
 
@@ -705,7 +705,7 @@ class TestUpdateGraphFromStoryMap:
 
         report = drawio_story_map.generate_update_report(original_story_map)
 
-        assert len(report.exact_matches) >= 1
+        assert report.matched_count >= 1
         assert len(report.new_stories) >= 1
 
     def test_renamed_or_reordered_nodes_flagged_as_fuzzy_matches_in_update_report(self, tmp_path):
@@ -718,10 +718,10 @@ class TestUpdateGraphFromStoryMap:
 
         report = drawio_story_map.generate_update_report(original_story_map)
 
-        assert len(report.fuzzy_matches) >= 1
-        fuzzy = report.fuzzy_matches[0]
-        assert fuzzy.extracted_name
-        assert fuzzy.original_name
+        assert len(report.renames) >= 1
+        rename = report.renames[0]
+        assert rename.extracted_name
+        assert rename.original_name
 
     def test_deleted_nodes_listed_as_removed_and_large_deletions_flagged(self, tmp_path):
         helper = BotTestHelper(tmp_path)
@@ -768,7 +768,7 @@ class TestUpdateGraphFromStoryMap:
         report = drawio_story_map.generate_update_report(original_story_map)
 
         assert len(report.removed_stories) >= 1
-        assert len(report.exact_matches) >= 1
+        assert report.matched_count >= 1
 
     def test_deleted_sub_epic_reassigns_its_stories_by_position(self, tmp_path):
         helper = BotTestHelper(tmp_path)
@@ -982,7 +982,7 @@ class TestRenderActionDiagramSection:
             diagram_path.write_text('<mxfile/>', encoding='utf-8')
             # Create an update report file
             report_path = diagram_path.parent / (diagram_path.stem + '-update-report.json')
-            report_path.write_text('{"exact_matches": []}', encoding='utf-8')
+            report_path.write_text('{"matched_count": 0}', encoding='utf-8')
 
             diagrams = action_obj._collect_diagram_data(render_specs, workspace_dir)
             diagrams_with_report = [d for d in diagrams if d.get('report_path')]

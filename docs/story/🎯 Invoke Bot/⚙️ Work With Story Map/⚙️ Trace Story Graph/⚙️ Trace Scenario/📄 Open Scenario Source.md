@@ -4,7 +4,7 @@
 
 **User:** Developer
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Trace Story Graph](..) / [⚙️ Trace Scenario](.)  
-**Sequential Order:** 3
+**Sequential Order:** 3.0
 **Story Type:** user
 
 ## Story Description

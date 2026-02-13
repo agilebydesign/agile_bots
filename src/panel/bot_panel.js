@@ -1294,6 +1294,7 @@ class BotPanel {
             }
             const renderCmd = `${behaviorName}.render.renderDiagram`;
             this._log(`[BotPanel] renderDiagram -> ${renderCmd}`);
+            this._renderInProgress = true;
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
               title: 'Rendering diagram...',
@@ -1306,10 +1307,38 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
                 }
-                await this._update();
               } catch (error) {
                 this._log(`[BotPanel] renderDiagram ERROR: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to render diagram: ${error.message}`);
+              } finally {
+                setTimeout(() => { self._renderInProgress = false; }, 2000);
+              }
+            });
+            return;
+          }
+          case "saveDiagramLayout": {
+            const behaviorNameLayout = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
+            if (!behaviorNameLayout) {
+              vscode.window.showErrorMessage('No current behavior set');
+              return;
+            }
+            const layoutCmd = behaviorNameLayout + '.render.saveDiagramLayout';
+            this._log('[BotPanel] saveDiagramLayout -> ' + layoutCmd);
+            vscode.window.withProgress({
+              location: vscode.ProgressLocation.Notification,
+              title: 'Saving diagram layout...',
+              cancellable: false
+            }, async () => {
+              try {
+                const result = await this._botView.execute(layoutCmd);
+                if (result?.status === 'success') {
+                  vscode.window.showInformationMessage(result.message || 'Layout saved');
+                } else {
+                  vscode.window.showErrorMessage(result?.message || 'Failed to save layout');
+                }
+              } catch (error) {
+                this._log('[BotPanel] saveDiagramLayout ERROR: ' + error.message);
+                vscode.window.showErrorMessage('Failed to save layout: ' + error.message);
               }
             });
             return;
@@ -1927,6 +1956,85 @@ class BotPanel {
     return this._update();
   }
 
+  _setupDiagramFileWatchers(botData) {
+    if (this._diagramWatchers) {
+      this._diagramWatchers.forEach(function(w) { w.dispose(); });
+    }
+    this._diagramWatchers = [];
+
+    var instructions = (botData && botData.instructions) ? botData.instructions : {};
+    var outputPaths = instructions.render_output_paths || [];
+    var drawioFiles = outputPaths.filter(function(p) { return p && p.endsWith('.drawio'); });
+
+    if (drawioFiles.length === 0 && this._workspaceRoot) {
+      var fs = require('fs');
+      var glob = require('path');
+      var shapeDir = glob.join(this._workspaceRoot, 'docs', 'story', 'shape');
+      try {
+        if (fs.existsSync(shapeDir)) {
+          var files = fs.readdirSync(shapeDir);
+          for (var fi = 0; fi < files.length; fi++) {
+            if (files[fi].endsWith('.drawio')) {
+              drawioFiles.push(glob.join(shapeDir, files[fi]));
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    this._log('[BotPanel] _setupDiagramFileWatchers: drawioFiles=' + drawioFiles.length);
+    if (drawioFiles.length === 0) return;
+
+    var fs = require('fs');
+    var self = this;
+
+    for (var i = 0; i < drawioFiles.length; i++) {
+      var drawioPath = drawioFiles[i];
+      try {
+        if (!fs.existsSync(drawioPath)) continue;
+
+        var watcher = vscode.workspace.createFileSystemWatcher(
+          new vscode.RelativePattern(path.dirname(drawioPath), path.basename(drawioPath))
+        );
+
+        this._log('[BotPanel] Watching diagram: ' + drawioPath);
+
+        var makeHandler = function(dp) {
+          return function() {
+            if (self._renderInProgress) return;
+            try {
+              var layoutPath = dp.replace('.drawio', '-layout.json');
+              var reportPath = dp.replace('.drawio', '-update-report.json');
+              var drawioStat = fs.existsSync(dp) ? fs.statSync(dp) : null;
+              var layoutStat = fs.existsSync(layoutPath) ? fs.statSync(layoutPath) : null;
+              self._panel.webview.postMessage({
+                command: 'diagramFileChanged',
+                diagram: {
+                  file_path: dp,
+                  exists: !!drawioStat,
+                  file_modified_time: drawioStat ? drawioStat.mtimeMs : null,
+                  last_sync_time: layoutStat ? layoutStat.mtimeMs : null,
+                  report_path: fs.existsSync(reportPath) ? reportPath : null
+                }
+              });
+            } catch (err) {
+              self._log('[BotPanel] diagram watcher error: ' + err.message);
+            }
+          };
+        };
+
+        var handler = makeHandler(drawioPath);
+        watcher.onDidChange(handler);
+        watcher.onDidCreate(handler);
+        this._diagramWatchers.push(watcher);
+        this._disposables.push(watcher);
+      } catch (err) {
+        this._log('[BotPanel] Failed to watch ' + drawioPath + ': ' + err.message);
+      }
+    }
+  }
+
+
   async _update() {
     // ===== PERFORMANCE: Start overall timing =====
     const perfUpdateStart = performance.now();
@@ -2021,6 +2129,9 @@ class BotPanel {
       
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
+      
+      try { this._setupDiagramFileWatchers(botData); } catch (e) { this._log('[BotPanel] watcher setup error: ' + e.message); }
+      
       const perfHtmlUpdateEnd = performance.now();
       const htmlUpdateDuration = (perfHtmlUpdateEnd - perfHtmlUpdateStart).toFixed(2);
       this._log('[BotPanel] Webview HTML property set');
@@ -4975,6 +5086,39 @@ class BotPanel {
                     }
                 } catch (err) {
                     console.error('[WebView] Error in expandInstructionsSection handler:', err);
+                }
+                return;
+            }
+            
+            if (message.command === 'diagramFileChanged') {
+                var ds = document.getElementById('diagram-section');
+                if (ds && message.diagram) {
+                    var d = message.diagram;
+                    var isStale = d.file_modified_time && d.last_sync_time && d.file_modified_time > d.last_sync_time;
+                    var neverSynced = !d.last_sync_time;
+                    var needsAction = isStale || neverSynced;
+                    var staleEl = ds.querySelector('.stale-indicator');
+                    var linkParent = ds.querySelector('.diagram-link');
+                    if (linkParent) { linkParent = linkParent.parentElement; }
+                    if (needsAction && !staleEl && linkParent) {
+                        var ind = document.createElement('span');
+                        ind.className = 'stale-indicator';
+                        ind.style.cssText = 'color: var(--vscode-editorWarning-foreground); margin-left: 8px;';
+                        ind.textContent = 'Diagram Changes Not In Graph';
+                        linkParent.appendChild(ind);
+                    }
+                    if (needsAction && !ds.querySelector('.generate-report-button')) {
+                        var btnDiv = ds.querySelector('.diagram-item');
+                        if (btnDiv) { btnDiv = btnDiv.lastElementChild; }
+                        if (btnDiv) {
+                            var genBtn = document.createElement('button');
+                            genBtn.className = 'generate-report-button';
+                            genBtn.textContent = 'Generate Report';
+                            genBtn.style.cssText = 'margin: 4px 4px 4px 0; cursor: pointer;';
+                            genBtn.onclick = function() { vscode.postMessage({ command: 'generateDiagramReport', path: d.file_path }); };
+                            btnDiv.appendChild(genBtn);
+                        }
+                    }
                 }
                 return;
             }

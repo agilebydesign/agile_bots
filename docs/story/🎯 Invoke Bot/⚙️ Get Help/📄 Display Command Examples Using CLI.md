@@ -2,9 +2,9 @@
 
 **Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/get_help/test_get_help_using_cli.py)
 
-**User:** User
+**User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Get Help](.)  
-**Sequential Order:** 3
+**Sequential Order:** 4.0
 **Story Type:** user
 
 ## Story Description

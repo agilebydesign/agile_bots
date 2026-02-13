@@ -4,7 +4,7 @@
 
 **User:** MCP Server Generator
 **Path:** [🎯 Build Agile Bots](../..) / [⚙️ Generate MCP Tools](.)  
-**Sequential Order:** 3
+**Sequential Order:** 1.0
 **Story Type:** user
 
 ## Story Description

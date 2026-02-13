@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Initialize Bot](..) / [⚙️ Set Workspace](.)  
-**Sequential Order:** 2
+**Sequential Order:** 2.0
 **Story Type:** user
 
 ## Story Description

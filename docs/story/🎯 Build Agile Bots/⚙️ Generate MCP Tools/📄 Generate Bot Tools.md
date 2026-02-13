@@ -4,7 +4,7 @@
 
 **User:** System
 **Path:** [🎯 Build Agile Bots](../..) / [⚙️ Generate MCP Tools](.)  
-**Sequential Order:** 0
+**Sequential Order:** 0.0
 **Story Type:** user
 
 ## Story Description

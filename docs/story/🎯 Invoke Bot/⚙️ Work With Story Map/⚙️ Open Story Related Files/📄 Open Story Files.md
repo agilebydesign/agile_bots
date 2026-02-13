@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Open Story Related Files](.)  
-**Sequential Order:** 2
+**Sequential Order:** 2.0
 **Story Type:** user
 
 ## Story Description

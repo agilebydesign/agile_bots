@@ -53,18 +53,28 @@ class DrawIOSynchronizer:
         else:
             summary = drawio_map.render_from_story_map(story_map, layout_data)
 
-        # Save diagram
         output_path.parent.mkdir(parents=True, exist_ok=True)
         drawio_map.save(output_path)
-
-        # Save layout data for future re-renders
-        layout = drawio_map.extract_layout()
-        layout.save(output_path.parent / f"{output_path.stem}-layout.json")
 
         return {
             "output_path": str(output_path),
             "summary": summary,
         }
+
+    def save_layout(self, drawio_path: Union[str, Path]) -> Dict[str, Any]:
+        from .drawio_story_map import DrawIOStoryMap
+        from .layout_data import LayoutData
+
+        drawio_path = Path(drawio_path)
+        if not drawio_path.exists():
+            return {"status": "error", "message": f"File not found: {drawio_path}"}
+
+        drawio_map = DrawIOStoryMap.load(drawio_path)
+        layout = drawio_map.extract_layout()
+        layout_path = drawio_path.parent / f"{drawio_path.stem}-layout.json"
+        layout.save(layout_path)
+
+        return {"status": "success", "layout_path": str(layout_path)}
 
     def synchronize_outline(self, drawio_path: Path,
                            original_path: Optional[Path] = None,

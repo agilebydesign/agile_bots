@@ -4,7 +4,7 @@
 
 **User:** CLI
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Initialize Bot](..) / [⚙️ Set Workspace](.)  
-**Sequential Order:** 1
+**Sequential Order:** 1.0
 **Story Type:** system
 
 ## Story Description

@@ -322,7 +322,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                     story.name, getattr(story, 'sequential_order', 0) or 0, story_type)
                 drawio_story.render_from_domain(
                     story, story_x, rows.story_y, rows.actor_y,
-                    path_prefix=se_path, seen_actors=seen_actors)
+                    path_prefix=se_path, seen_actors=seen_actors,
+                    layout_data=layout_data)
                 self.add_child(drawio_story)
                 story_x += CELL_SIZE + CELL_SPACING
             if stories:
@@ -394,16 +395,15 @@ class DrawIOStory(Story, DrawIOStoryNode):
     def render_from_domain(self, story, x_pos: float, story_y: float,
                             actor_y: float = 0,
                             path_prefix: str = '',
-                            seen_actors: set = None) -> 'DrawIOStory':
-        """Render story as a 50x50 sticky note with actors above it.
-
-        When *seen_actors* is provided, each unique actor name is only
-        rendered once per sub-epic — above the first story that uses it.
-        """
+                            seen_actors: set = None,
+                            layout_data=None) -> 'DrawIOStory':
         story_path = f'{path_prefix}/{_slug(self.name)}' if path_prefix else _slug(self.name)
         self._element._cell_id = story_path
 
-        self.set_position(x_pos, story_y)
+        saved = self._saved_position_for(story_path, layout_data)
+        final_x = saved.x if saved else x_pos
+        final_y = saved.y if saved else story_y
+        self.set_position(final_x, final_y)
         self.set_size(CELL_SIZE, CELL_SIZE)
 
         # Actors placed directly above this story (deduplicated within sub-epic)

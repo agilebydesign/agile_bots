@@ -186,6 +186,9 @@ class DrawIOStoryMap(StoryMap):
             layout.set_entry(f'EPIC|{epic.name}',
                              epic.position.x, epic.position.y,
                              epic.boundary.width, epic.boundary.height)
+            layout.set_entry(epic.cell_id,
+                             epic.position.x, epic.position.y,
+                             epic.boundary.width, epic.boundary.height)
             for se in epic.get_sub_epics():
                 self._extract_layout_for_sub_epic(layout, epic.name, se)
         return layout
@@ -195,6 +198,9 @@ class DrawIOStoryMap(StoryMap):
         layout.set_entry(f'SUB_EPIC|{se.name}',
                          se.position.x, se.position.y,
                          se.boundary.width, se.boundary.height)
+        layout.set_entry(se.cell_id,
+                         se.position.x, se.position.y,
+                         se.boundary.width, se.boundary.height)
         for nested_se in se.get_sub_epics():
             self._extract_layout_for_sub_epic(layout, epic_name, nested_se)
         for story in se.get_stories():
@@ -202,6 +208,9 @@ class DrawIOStoryMap(StoryMap):
                 f'STORY|{epic_name}|{se.name}|{story.name}',
                 story.position.x, story.position.y,
                 story.boundary.width, story.boundary.height)
+            layout.set_entry(story.cell_id,
+                             story.position.x, story.position.y,
+                             story.boundary.width, story.boundary.height)
 
     # ------------------------------------------------------------------
     # Update report
@@ -272,21 +281,28 @@ class DrawIOStoryMap(StoryMap):
     @classmethod
     def load(cls, file_path: Path) -> 'DrawIOStoryMap':
         content = file_path.read_text(encoding='utf-8')
-        nodes = DrawIOStoryNodeSerializer.parse_nodes_from_xml(content)
+        nodes, parent_map = DrawIOStoryNodeSerializer.parse_nodes_from_xml(content)
         story_map = cls()
+
+        nodes_by_id = {}
+        for n in nodes:
+            nodes_by_id[n.cell_id] = n
+
         epics = [n for n in nodes if isinstance(n, DrawIOEpic)]
         sub_epics = [n for n in nodes if isinstance(n, DrawIOSubEpic)]
         stories = [n for n in nodes if isinstance(n, DrawIOStory)]
-        story_map._assign_stories_to_sub_epics_by_containment(sub_epics, stories)
-        story_map._assign_nested_sub_epics_by_containment(sub_epics)
-        story_map._assign_top_level_sub_epics_to_epics(epics, sub_epics)
+
+        story_map._assign_by_parent_map(nodes_by_id, parent_map, epics, sub_epics, stories)
         story_map._assign_sequential_order_from_position(epics, sub_epics, stories)
         story_map._drawio_epics = epics
-        # Preserve non-classified nodes (actors, etc.) for round-trip
+
         classified = set()
         for e in epics:
-            for n in e.collect_all_nodes():
-                classified.add(id(n))
+            classified.add(id(e))
+            for se in e.get_sub_epics():
+                classified.add(id(se))
+                for s in se.get_stories():
+                    classified.add(id(s))
         story_map._extra_nodes = [n for n in nodes if id(n) not in classified]
         return story_map
 
@@ -294,55 +310,37 @@ class DrawIOStoryMap(StoryMap):
     # Internal helpers (load direction)
     # ------------------------------------------------------------------
 
-    def _assign_stories_to_sub_epics_by_containment(self, sub_epics, stories):
-        for story in stories:
-            story_center = story.boundary.center
-            best_se = None
-            best_area = float('inf')
-            for se in sub_epics:
-                if se.boundary.contains_position(story_center):
-                    area = se.boundary.width * se.boundary.height
-                    if area < best_area:
-                        best_area = area
-                        best_se = se
-            if best_se:
-                best_se.add_child(story)
-
-    def _assign_nested_sub_epics_by_containment(self, sub_epics):
-        assigned = set()
-        sorted_ses = sorted(sub_epics, key=lambda se: se.boundary.width * se.boundary.height)
-        for i, child_se in enumerate(sorted_ses):
-            child_center = child_se.boundary.center
-            best_parent = None
-            best_area = float('inf')
-            for j, parent_se in enumerate(sorted_ses):
-                if i == j:
-                    continue
-                parent_area = parent_se.boundary.width * parent_se.boundary.height
-                child_area = child_se.boundary.width * child_se.boundary.height
-                if parent_area <= child_area:
-                    continue
-                if parent_se.boundary.contains_position(child_center):
-                    if parent_area < best_area:
-                        best_area = parent_area
-                        best_parent = parent_se
-            if best_parent:
-                best_parent.add_child(child_se)
-                assigned.add(id(child_se))
-
-    def _assign_top_level_sub_epics_to_epics(self, epics, sub_epics):
-        nested_ids = set()
-        for se in sub_epics:
-            for child in se.get_sub_epics():
-                nested_ids.add(id(child))
-
-        for se in sub_epics:
-            if id(se) in nested_ids:
+    def _assign_by_parent_map(self, nodes_by_id, parent_map, epics, sub_epics, stories):
+        all_nodes = list(epics) + list(sub_epics) + list(stories)
+        for node in all_nodes:
+            cell_id = node.cell_id
+            if '/' not in cell_id:
                 continue
-            se_center = se.boundary.center
+            parent_path = cell_id.rsplit('/', 1)[0]
+            parent_node = nodes_by_id.get(parent_path)
+            if parent_node and parent_node is not node:
+                parent_node.add_child(node)
+                continue
+            pid = parent_map.get(cell_id, '')
+            parent_from_attr = nodes_by_id.get(pid)
+            if parent_from_attr and parent_from_attr is not node:
+                parent_from_attr.add_child(node)
+                continue
+
+        for se in sub_epics:
+            if se._parent is not None:
+                continue
             for epic in epics:
-                if epic.boundary.contains_position(se_center):
+                if epic.boundary.contains_position(se.boundary.center):
                     epic.add_child(se)
+                    break
+
+        for story in stories:
+            if story._parent is not None:
+                continue
+            for se in sub_epics:
+                if se.boundary.contains_position(story.boundary.center):
+                    se.add_child(story)
                     break
 
     def _assign_sequential_order_from_position(self, epics, sub_epics, stories):

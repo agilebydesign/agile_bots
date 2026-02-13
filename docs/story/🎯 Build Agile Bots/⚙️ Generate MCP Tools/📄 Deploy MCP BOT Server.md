@@ -2,9 +2,9 @@
 
 **Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
 
-**User:** System
+**User:** MCP Server Generator
 **Path:** [🎯 Build Agile Bots](../..) / [⚙️ Generate MCP Tools](.)  
-**Sequential Order:** 4
+**Sequential Order:** 2.0
 **Story Type:** user
 
 ## Story Description
