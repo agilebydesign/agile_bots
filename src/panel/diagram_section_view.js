@@ -30,37 +30,29 @@ class DiagramSectionView {
             </div>`;
         }
 
-        const isStale = fileModifiedTime && lastSyncTime && fileModifiedTime > lastSyncTime;
-        const neverSynced = !lastSyncTime;
-        let indicators = '';
         let buttons = '';
 
         buttons += `<button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>`;
         buttons += `<button class="save-layout-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'saveDiagramLayout', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Save Layout</button>`;
+        buttons += `<button class="clear-layout-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'clearDiagramLayout', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Clear Layout</button>`;
         buttons += `<button class="generate-report-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'generateDiagramReport', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Generate Report</button>`;
-
-        if (isStale || neverSynced) {
-            indicators += `<span class="stale-indicator" style="color: var(--vscode-editorWarning-foreground); margin-left: 8px;">Diagram Changes Not In Graph</span>`;
-        }
 
         if (reportPath) {
             const jsReportPath = this._escapeForJs(reportPath);
             buttons += `<button class="update-button" data-path="${this._escapeHtml(filePath)}" data-report="${this._escapeHtml(reportPath)}" onclick="vscode.postMessage({ command: 'updateFromDiagram', path: '${jsPath}', report: '${jsReportPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Update Graph</button>`;
         }
 
-        let reportLink = '';
+        let fileLinks = '';
+        fileLinks += `<a href="#" class="diagram-link" onclick="openFile('${jsPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; font-size: 0.9em;">${this._escapeHtml(this._fileName(filePath))}</a>`;
         if (reportPath) {
             const jsReportPath = this._escapeForJs(reportPath);
-            reportLink = `<a href="#" class="report-link" onclick="openFile('${jsReportPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; margin-left: 8px;">${this._escapeHtml(this._fileName(reportPath))}</a>`;
+            fileLinks += `<span style="margin: 0 6px; opacity: 0.5;">|</span>`;
+            fileLinks += `<a href="#" class="report-link" onclick="openFile('${jsReportPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; font-size: 0.9em;">${this._escapeHtml(this._fileName(reportPath))}</a>`;
         }
 
         return `<div class="diagram-item" style="margin: 8px 0; padding: 6px; border: 1px solid var(--vscode-panel-border); border-radius: 4px;">
-            <div style="display: flex; align-items: center; flex-wrap: wrap;">
-                <a href="#" class="diagram-link" onclick="openFile('${jsPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer;">${this._escapeHtml(this._fileName(filePath))}</a>
-                ${indicators}
-                ${reportLink}
-            </div>
-            <div style="margin-top: 4px;">${buttons}</div>
+            <div style="margin-bottom: 4px;">${buttons}</div>
+            <div style="display: flex; align-items: center; flex-wrap: wrap;">${fileLinks}</div>
         </div>`;
     }
 

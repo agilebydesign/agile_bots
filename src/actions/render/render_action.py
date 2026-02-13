@@ -197,6 +197,28 @@ class RenderOutputAction(Action):
             'results': results
         }
 
+    def clearLayout(self) -> Dict[str, Any]:
+        """Delete layout files for all DrawIO diagrams so next render starts fresh.
+        CLI: <behavior>.render.clearLayout
+        """
+        workspace_dir = self.behavior.bot_paths.workspace_directory
+        results = []
+
+        for spec, diagram_path in self._get_drawio_specs_with_paths():
+            layout_path = diagram_path.parent / f"{diagram_path.stem}-layout.json"
+            if layout_path.exists():
+                layout_path.unlink()
+                results.append({'diagram': spec.output, 'status': 'cleared'})
+            else:
+                results.append({'diagram': spec.output, 'status': 'no_layout'})
+
+        cleared_count = sum(1 for r in results if r['status'] == 'cleared')
+        return {
+            'status': 'success',
+            'message': f'Cleared layout for {cleared_count} diagram(s)',
+            'results': results
+        }
+
     def renderAll(self) -> Dict[str, Any]:
         """Execute all synchronizer-based render specs.
         CLI: <behavior>.render.renderAll

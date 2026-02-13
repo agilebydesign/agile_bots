@@ -1286,6 +1286,15 @@ class BotPanel {
                 const result = await this._botView.execute(renderCmd);
                 if (result?.status === 'success') {
                   vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
+                  // Open the rendered diagram file (use vscode.open so DrawIO editor opens, not XML)
+                  if (message.path) {
+                    try {
+                      const diagramUri = vscode.Uri.file(message.path);
+                      await vscode.commands.executeCommand('vscode.open', diagramUri);
+                    } catch (openErr) {
+                      this._log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
+                    }
+                  }
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
                 }
@@ -1321,6 +1330,33 @@ class BotPanel {
               } catch (error) {
                 this._log('[BotPanel] saveDiagramLayout ERROR: ' + error.message);
                 vscode.window.showErrorMessage('Failed to save layout: ' + error.message);
+              }
+            });
+            return;
+          }
+          case "clearDiagramLayout": {
+            const behaviorNameClear = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
+            if (!behaviorNameClear) {
+              vscode.window.showErrorMessage('No current behavior set');
+              return;
+            }
+            const clearCmd = behaviorNameClear + '.render.clearLayout';
+            this._log('[BotPanel] clearDiagramLayout -> ' + clearCmd);
+            vscode.window.withProgress({
+              location: vscode.ProgressLocation.Notification,
+              title: 'Clearing diagram layout...',
+              cancellable: false
+            }, async () => {
+              try {
+                const result = await this._botView.execute(clearCmd);
+                if (result?.status === 'success') {
+                  vscode.window.showInformationMessage(result.message || 'Layout cleared');
+                } else {
+                  vscode.window.showErrorMessage(result?.message || 'Failed to clear layout');
+                }
+              } catch (error) {
+                this._log('[BotPanel] clearDiagramLayout ERROR: ' + error.message);
+                vscode.window.showErrorMessage('Failed to clear layout: ' + error.message);
               }
             });
             return;
@@ -1372,6 +1408,10 @@ class BotPanel {
                   vscode.window.showInformationMessage(result.message || 'Story graph updated successfully');
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to update story graph');
+                }
+                // Clear cached data so panel reloads fresh story map
+                if (this._botView) {
+                  this._botView.botData = null;
                 }
                 await this._update();
               } catch (error) {

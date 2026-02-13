@@ -226,23 +226,6 @@
                     }
                   ],
                   "behavior": null
-                },
-                {
-                  "name": "Test2",
-                  "sequential_order": 4.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_class": null,
-                  "scenarios": [],
-                  "acceptance_criteria": [],
-                  "behavior": null,
-                  "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Build Agile Bots\\Generate MCP Tools\\📄 Story1.md"
-                },
-                {
-                  "name": "Test3",
-                  "sequential_order": 5.0,
-                  "story_type": "user"
                 }
               ]
             }
@@ -21269,32 +21252,9 @@
               ]
             }
           ]
-        },
-        {
-          "name": "AAAAAA",
-          "sequential_order": 5.0,
-          "sub_epics": [],
-          "story_groups": []
         }
-      ]
-    },
-    {
-      "name": "CCC",
-      "sequential_order": 1,
-      "sub_epics": [
-        {
-          "name": "BBBB",
-          "sequential_order": 1,
-          "sub_epics": [],
-          "story_groups": []
-        },
-        {
-          "name": "DDD",
-          "sequential_order": 2,
-          "sub_epics": [],
-          "story_groups": []
-        }
-      ]
+      ],
+      "story_groups": []
     }
   ],
   "increments": [
