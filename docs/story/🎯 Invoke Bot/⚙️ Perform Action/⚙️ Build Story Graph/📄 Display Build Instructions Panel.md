@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Perform Action](..) / [⚙️ Build Story Graph](.)  
-**Sequential Order:** 4
+**Sequential Order:** 4.0
 **Story Type:** user
 
 ## Story Description

@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Perform Action](..) / [⚙️ Prepare Common Instructions For Behavior, Action, and Scope](.)  
-**Sequential Order:** 7
+**Sequential Order:** 7.0
 **Story Type:** user
 
 ## Story Description

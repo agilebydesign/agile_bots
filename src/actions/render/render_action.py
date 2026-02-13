@@ -165,6 +165,27 @@ class RenderOutputAction(Action):
             result.append((spec, diagram_path))
         return result
 
+    def saveDiagramLayout(self) -> Dict[str, Any]:
+        """Extract and save positional data from current diagram files.
+        CLI: <behavior>.render.saveDiagramLayout
+        """
+        from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
+        sync = DrawIOSynchronizer()
+        results = []
+
+        for spec, diagram_path in self._get_drawio_specs_with_paths():
+            if not diagram_path.exists():
+                continue
+            result = sync.save_layout(diagram_path)
+            results.append({'diagram': spec.output, **result})
+
+        saved_count = sum(1 for r in results if r.get('status') == 'success')
+        return {
+            'status': 'success',
+            'message': 'Saved layout for ' + str(saved_count) + ' diagram(s)',
+            'results': results
+        }
+
     def renderDiagram(self) -> Dict[str, Any]:
         """Re-render all DrawIO diagrams from story graph.
         CLI: <behavior>.render.renderDiagram
@@ -205,9 +226,14 @@ class RenderOutputAction(Action):
         story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
         results = []
 
+        from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
+        sync = DrawIOSynchronizer()
+
         for spec, diagram_path in self._get_drawio_specs_with_paths():
             if not diagram_path.exists():
                 continue
+
+            sync.save_layout(diagram_path)
 
             extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
 

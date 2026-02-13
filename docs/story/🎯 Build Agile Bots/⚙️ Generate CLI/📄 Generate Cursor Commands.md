@@ -2,9 +2,9 @@
 
 **Navigation:** [📄‹ Story Map](../../../../story-map.drawio)
 
-**User:** Generator
+**User:** System
 **Path:** [🎯 Build Agile Bots](../..) / [⚙️ Generate CLI](.)  
-**Sequential Order:** 2
+**Sequential Order:** 3.0
 **Story Type:** user
 
 ## Story Description

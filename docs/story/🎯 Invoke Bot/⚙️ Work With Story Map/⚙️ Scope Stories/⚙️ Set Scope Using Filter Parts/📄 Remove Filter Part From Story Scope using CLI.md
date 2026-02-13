@@ -4,7 +4,7 @@
 
 **User:** User
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Scope Stories](..) / [⚙️ Set Scope Using Filter Parts](.)  
-**Sequential Order:** 6
+**Sequential Order:** 6.0
 **Story Type:** user
 
 ## Story Description

@@ -1,8 +1,3 @@
-"""
-UpdateReport - Structured report comparing extracted diagram to original story graph.
-
-Lists exact matches, fuzzy matches, new stories, removed stories, and large deletions.
-"""
 import json
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -13,7 +8,6 @@ from dataclasses import dataclass, field
 class MatchEntry:
     extracted_name: str
     original_name: str
-    match_type: str
     confidence: float = 1.0
     parent: str = ''
 
@@ -33,19 +27,19 @@ class LargeDeletions:
 class UpdateReport:
 
     def __init__(self):
-        self._exact_matches: List[MatchEntry] = []
-        self._fuzzy_matches: List[MatchEntry] = []
+        self._renames: List[MatchEntry] = []
         self._new_stories: List[StoryEntry] = []
         self._removed_stories: List[StoryEntry] = []
         self._large_deletions = LargeDeletions()
+        self._matched_count = 0
 
     @property
-    def exact_matches(self) -> List[MatchEntry]:
-        return list(self._exact_matches)
+    def renames(self) -> List[MatchEntry]:
+        return list(self._renames)
 
     @property
     def fuzzy_matches(self) -> List[MatchEntry]:
-        return list(self._fuzzy_matches)
+        return self.renames
 
     @property
     def new_stories(self) -> List[StoryEntry]:
@@ -59,16 +53,26 @@ class UpdateReport:
     def large_deletions(self) -> LargeDeletions:
         return self._large_deletions
 
+    @property
+    def matched_count(self) -> int:
+        return self._matched_count
+
+    @property
+    def has_changes(self) -> bool:
+        return len(self._renames) > 0 or len(self._new_stories) > 0 or len(self._removed_stories) > 0 or len(self._large_deletions.missing_epics) > 0 or len(self._large_deletions.missing_sub_epics) > 0
+
     def add_exact_match(self, extracted_name: str, original_name: str, parent: str = ''):
-        self._exact_matches.append(
+        self._matched_count += 1
+
+    def add_rename(self, extracted_name: str, original_name: str,
+                   confidence: float, parent: str = ''):
+        self._renames.append(
             MatchEntry(extracted_name=extracted_name, original_name=original_name,
-                       match_type='exact', confidence=1.0, parent=parent))
+                       confidence=confidence, parent=parent))
 
     def add_fuzzy_match(self, extracted_name: str, original_name: str,
                         confidence: float, parent: str = ''):
-        self._fuzzy_matches.append(
-            MatchEntry(extracted_name=extracted_name, original_name=original_name,
-                       match_type='fuzzy', confidence=confidence, parent=parent))
+        self.add_rename(extracted_name, original_name, confidence, parent)
 
     def add_new_story(self, name: str, parent: str = ''):
         self._new_stories.append(StoryEntry(name=name, parent=parent))
@@ -83,20 +87,23 @@ class UpdateReport:
         self._large_deletions.missing_sub_epics.append(sub_epic_name)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            'exact_matches': [{'extracted': m.extracted_name, 'original': m.original_name,
-                               'confidence': m.confidence, 'parent': m.parent}
-                              for m in self._exact_matches],
-            'fuzzy_matches': [{'extracted': m.extracted_name, 'original': m.original_name,
-                               'confidence': m.confidence, 'parent': m.parent}
-                              for m in self._fuzzy_matches],
-            'new_stories': [{'name': s.name, 'parent': s.parent} for s in self._new_stories],
-            'removed_stories': [{'name': s.name, 'parent': s.parent} for s in self._removed_stories],
-            'large_deletions': {
+        result = {'matched_count': self._matched_count}
+        if self._renames:
+            result['renames'] = [{'extracted': m.extracted_name, 'original': m.original_name,
+                                  'confidence': m.confidence, 'parent': m.parent}
+                                 for m in self._renames]
+        if self._new_stories:
+            result['new_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._new_stories]
+        if self._removed_stories:
+            result['removed_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_stories]
+        if self._large_deletions.missing_epics or self._large_deletions.missing_sub_epics:
+            result['large_deletions'] = {
                 'missing_epics': self._large_deletions.missing_epics,
                 'missing_sub_epics': self._large_deletions.missing_sub_epics
             }
-        }
+        if not self.has_changes:
+            result['status'] = 'no_changes'
+        return result
 
     def save(self, file_path: Path):
         file_path.parent.mkdir(parents=True, exist_ok=True)
@@ -105,10 +112,9 @@ class UpdateReport:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'UpdateReport':
         report = cls()
-        for m in data.get('exact_matches', []):
-            report.add_exact_match(m['extracted'], m['original'], m.get('parent', ''))
-        for m in data.get('fuzzy_matches', []):
-            report.add_fuzzy_match(m['extracted'], m['original'], m['confidence'], m.get('parent', ''))
+        report._matched_count = data.get('matched_count', 0)
+        for m in data.get('renames', []):
+            report.add_rename(m['extracted'], m['original'], m['confidence'], m.get('parent', ''))
         for s in data.get('new_stories', []):
             report.add_new_story(s['name'], s.get('parent', ''))
         for s in data.get('removed_stories', []):

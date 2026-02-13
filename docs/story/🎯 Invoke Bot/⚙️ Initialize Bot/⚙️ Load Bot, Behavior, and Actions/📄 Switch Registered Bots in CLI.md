@@ -4,7 +4,7 @@
 
 **User:** CLI
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Initialize Bot](..) / [⚙️ Load Bot, Behavior, and Actions](.)  
-**Sequential Order:** 2
+**Sequential Order:** 2.0
 **Story Type:** system
 
 ## Story Description

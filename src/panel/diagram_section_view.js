@@ -25,7 +25,7 @@ class DiagramSectionView {
             return `<div class="diagram-item" style="margin: 8px 0;">
                 <span class="missing-indicator" style="color: var(--vscode-errorForeground);">Diagram file not found: ${this._escapeHtml(this._fileName(filePath))}</span>
                 <div style="margin-top: 4px;">
-                    <button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>
+                    <button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>
                 </div>
             </div>`;
         }
@@ -35,29 +35,23 @@ class DiagramSectionView {
         let indicators = '';
         let buttons = '';
 
-        buttons += `<button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>`;
-
-        if (isStale) {
-            indicators += `<span class="stale-indicator" style="color: var(--vscode-editorWarning-foreground); margin-left: 8px;">Changed since last sync</span>`;
-        }
+        buttons += `<button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>`;
+        buttons += `<button class="save-layout-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'saveDiagramLayout', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Save Layout</button>`;
 
         if (isStale || neverSynced) {
-            if (neverSynced) {
-                indicators += `<span class="pending-indicator" style="color: var(--vscode-editorInfo-foreground); margin-left: 8px;">Not yet synced</span>`;
-            } else {
-                indicators += `<span class="pending-indicator" style="color: var(--vscode-editorInfo-foreground); margin-left: 8px;">Pending changes</span>`;
-            }
-            buttons += `<button class="generate-report-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'generateDiagramReport' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Generate Report</button>`;
+            indicators += `<span class="stale-indicator" style="color: var(--vscode-editorWarning-foreground); margin-left: 8px;">Diagram Changes Not In Graph</span>`;
+            buttons += `<button class="generate-report-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'generateDiagramReport', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Generate Report</button>`;
         }
 
         if (reportPath) {
-            buttons += `<button class="update-button" data-path="${this._escapeHtml(filePath)}" data-report="${this._escapeHtml(reportPath)}" onclick="vscode.postMessage({ command: 'updateFromDiagram' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Update Graph</button>`;
+            const jsReportPath = this._escapeForJs(reportPath);
+            buttons += `<button class="update-button" data-path="${this._escapeHtml(filePath)}" data-report="${this._escapeHtml(reportPath)}" onclick="vscode.postMessage({ command: 'updateFromDiagram', path: '${jsPath}', report: '${jsReportPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Update Graph</button>`;
         }
 
         let reportLink = '';
         if (reportPath) {
             const jsReportPath = this._escapeForJs(reportPath);
-            reportLink = `<a href="#" class="report-link" onclick="openFile('${jsReportPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; margin-left: 8px;">View Report</a>`;
+            reportLink = `<a href="#" class="report-link" onclick="openFile('${jsReportPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; margin-left: 8px;">${this._escapeHtml(this._fileName(reportPath))}</a>`;
         }
 
         return `<div class="diagram-item" style="margin: 8px 0; padding: 6px; border: 1px solid var(--vscode-panel-border); border-radius: 4px;">

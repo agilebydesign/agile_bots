@@ -54,13 +54,14 @@ class DrawIOStoryNodeSerializer:
         return cell
 
     @staticmethod
-    def from_mx_cell(cell: ET.Element) -> Optional[DrawIOStoryNode]:
+    def from_mx_cell(cell: ET.Element):
         cell_id = cell.get('id', '')
         value = cell.get('value', '')
         style = cell.get('style', '')
+        parent_id = cell.get('parent', '')
         geometry = cell.find('mxGeometry')
         if geometry is None:
-            return None
+            return None, None
         x = float(geometry.get('x', '0'))
         y = float(geometry.get('y', '0'))
         width = float(geometry.get('width', '0'))
@@ -72,7 +73,7 @@ class DrawIOStoryNodeSerializer:
             node._element._cell_id = cell_id
             node.set_position(x, y)
             node.set_size(width, height)
-        return node
+        return node, parent_id
 
     @staticmethod
     def _classify_node(value: str, fill_color: str) -> Optional[DrawIOStoryNode]:
@@ -107,12 +108,17 @@ class DrawIOStoryNodeSerializer:
         return ET.tostring(mxfile, encoding='unicode', xml_declaration=True)
 
     @staticmethod
-    def parse_nodes_from_xml(xml_content: str) -> List[DrawIOStoryNode]:
+    def parse_nodes_from_xml(xml_content: str):
         tree = ET.fromstring(xml_content)
         nodes = []
+        parent_map = {}
         for cell in tree.iter('mxCell'):
             if cell.get('vertex') == '1':
-                node = DrawIOStoryNodeSerializer.from_mx_cell(cell)
+                result = DrawIOStoryNodeSerializer.from_mx_cell(cell)
+                if result is None:
+                    continue
+                node, parent_id = result
                 if node:
                     nodes.append(node)
-        return nodes
+                    parent_map[node.cell_id] = parent_id
+        return nodes, parent_map
