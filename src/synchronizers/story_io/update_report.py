@@ -40,6 +40,14 @@ class IncrementMove:
     to_increment: str     # '' means now unassigned (orphan)
 
 
+@dataclass
+class StoryMove:
+    """A story that moved from one parent (sub-epic) to another in the hierarchy."""
+    name: str
+    from_parent: str
+    to_parent: str
+
+
 class UpdateReport:
 
     def __init__(self):
@@ -52,8 +60,11 @@ class UpdateReport:
         self._removed_epics: List[StoryEntry] = []
         self._large_deletions = LargeDeletions()
         self._matched_count = 0
+        self._moved_stories: List[StoryMove] = []
         self._increment_changes: List[IncrementChange] = []
         self._increment_moves: List[IncrementMove] = []
+        self._removed_increments: List[str] = []
+        self._increment_order: List[Dict[str, Any]] = []  # [{name, priority}, ...]
 
     @property
     def renames(self) -> List[MatchEntry]:
@@ -96,6 +107,10 @@ class UpdateReport:
         return self._matched_count
 
     @property
+    def moved_stories(self) -> List[StoryMove]:
+        return list(self._moved_stories)
+
+    @property
     def increment_changes(self) -> List[IncrementChange]:
         return list(self._increment_changes)
 
@@ -103,10 +118,22 @@ class UpdateReport:
     def increment_moves(self) -> List[IncrementMove]:
         return list(self._increment_moves)
 
+    @property
+    def removed_increments(self) -> List[str]:
+        return list(self._removed_increments)
+
+    @property
+    def increment_order(self) -> List[Dict[str, Any]]:
+        return list(self._increment_order)
+
     def set_increment_changes(self, changes: List[IncrementChange],
-                               moves: List[IncrementMove]):
+                               moves: List[IncrementMove],
+                               removed_increments: List[str] = None,
+                               increment_order: List[Dict[str, Any]] = None):
         self._increment_changes = list(changes)
         self._increment_moves = list(moves)
+        self._removed_increments = list(removed_increments or [])
+        self._increment_order = list(increment_order or [])
 
     @property
     def has_changes(self) -> bool:
@@ -114,10 +141,13 @@ class UpdateReport:
                 or len(self._new_sub_epics) > 0 or len(self._new_epics) > 0
                 or len(self._removed_stories) > 0
                 or len(self._removed_sub_epics) > 0 or len(self._removed_epics) > 0
+                or len(self._moved_stories) > 0
                 or len(self._large_deletions.missing_epics) > 0
                 or len(self._large_deletions.missing_sub_epics) > 0
                 or len(self._increment_changes) > 0
-                or len(self._increment_moves) > 0)
+                or len(self._increment_moves) > 0
+                or len(self._removed_increments) > 0
+                or len(self._increment_order) > 0)
 
     def add_exact_match(self, extracted_name: str, original_name: str, parent: str = ''):
         self._matched_count += 1
@@ -156,6 +186,93 @@ class UpdateReport:
     def add_missing_sub_epic(self, sub_epic_name: str):
         self._large_deletions.missing_sub_epics.append(sub_epic_name)
 
+    def reconcile_moves(self, original_story_map=None):
+        """Post-process: detect stories that are actually moves, not new+removed.
+
+        Two cases:
+        1. A story appears in both new_stories and removed_stories with
+           different parents → it was moved between sub-epics.
+        2. A story appears in new_stories and its name existed under a
+           removed sub-epic in the original tree → it was promoted from
+           the removed sub-epic to a new parent.
+
+        Matched stories are moved from new/removed into moved_stories.
+        """
+        moved_names: set = set()
+
+        # --- Case 1: direct overlap between new and removed ---
+        new_by_name: Dict[str, StoryEntry] = {}
+        for s in self._new_stories:
+            new_by_name.setdefault(s.name, s)
+
+        removed_by_name: Dict[str, StoryEntry] = {}
+        for s in self._removed_stories:
+            removed_by_name.setdefault(s.name, s)
+
+        for name in list(new_by_name.keys()):
+            if name in removed_by_name:
+                new_entry = new_by_name[name]
+                removed_entry = removed_by_name[name]
+                self._moved_stories.append(StoryMove(
+                    name=name,
+                    from_parent=removed_entry.parent,
+                    to_parent=new_entry.parent))
+                moved_names.add(name)
+
+        # --- Case 2: stories from removed sub-epics ---
+        if original_story_map:
+            removed_se_names = {s.name for s in self._removed_sub_epics}
+            if removed_se_names:
+                # Collect all story names under removed sub-epics in the original
+                orphaned_from_se: Dict[str, str] = {}  # story_name → sub_epic_name
+                for epic in original_story_map.epics:
+                    self._collect_stories_under_removed(
+                        epic, removed_se_names, orphaned_from_se)
+
+                for name, from_parent in orphaned_from_se.items():
+                    if name in moved_names:
+                        continue  # already handled by Case 1
+                    if name in new_by_name:
+                        new_entry = new_by_name[name]
+                        self._moved_stories.append(StoryMove(
+                            name=name,
+                            from_parent=from_parent,
+                            to_parent=new_entry.parent))
+                        moved_names.add(name)
+
+        # Remove reconciled entries from new_stories and removed_stories
+        if moved_names:
+            self._new_stories = [s for s in self._new_stories
+                                 if s.name not in moved_names]
+            self._removed_stories = [s for s in self._removed_stories
+                                     if s.name not in moved_names]
+
+    @staticmethod
+    def _collect_stories_under_removed(node, removed_se_names: set,
+                                        result: Dict[str, str]):
+        """Walk the original tree and collect story names under removed sub-epics."""
+        sub_epics = []
+        if hasattr(node, 'sub_epics'):
+            sub_epics = list(node.sub_epics)
+        elif hasattr(node, 'children'):
+            from story_graph.nodes import SubEpic
+            sub_epics = [c for c in node.children if isinstance(c, SubEpic)]
+
+        for se in sub_epics:
+            if se.name in removed_se_names:
+                # All stories under this (now removed) sub-epic
+                all_stories = []
+                if hasattr(se, 'all_stories'):
+                    all_stories = list(se.all_stories)
+                elif hasattr(se, 'children'):
+                    from story_graph.nodes import Story
+                    all_stories = [c for c in se.children if isinstance(c, Story)]
+                for story in all_stories:
+                    result[story.name] = se.name
+            else:
+                UpdateReport._collect_stories_under_removed(
+                    se, removed_se_names, result)
+
     def to_dict(self) -> Dict[str, Any]:
         result = {'matched_count': self._matched_count}
         if self._renames:
@@ -172,6 +289,10 @@ class UpdateReport:
             result['removed_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_epics]
         if self._removed_sub_epics:
             result['removed_sub_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_sub_epics]
+        if self._moved_stories:
+            result['moved_stories'] = [
+                {'name': m.name, 'from_parent': m.from_parent, 'to_parent': m.to_parent}
+                for m in self._moved_stories]
         if self._removed_stories:
             result['removed_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_stories]
         if self._large_deletions.missing_epics or self._large_deletions.missing_sub_epics:
@@ -195,6 +316,10 @@ class UpdateReport:
                  'to': m.to_increment or '(unassigned)'}
                 for m in self._increment_moves
             ]
+        if self._removed_increments:
+            result['removed_increments'] = self._removed_increments
+        if self._increment_order:
+            result['increment_order'] = self._increment_order
         if not self.has_changes:
             result['status'] = 'no_changes'
         return result
@@ -215,6 +340,11 @@ class UpdateReport:
             report.add_new_sub_epic(s['name'], s.get('parent', ''))
         for s in data.get('new_stories', []):
             report.add_new_story(s['name'], s.get('parent', ''))
+        for m in data.get('moved_stories', []):
+            report._moved_stories.append(
+                StoryMove(name=m['name'],
+                          from_parent=m.get('from_parent', ''),
+                          to_parent=m.get('to_parent', '')))
         for s in data.get('removed_epics', []):
             report.add_removed_epic(s['name'], s.get('parent', ''))
         for s in data.get('removed_sub_epics', []):
@@ -244,4 +374,6 @@ class UpdateReport:
                     story=m['story'],
                     from_increment=from_inc,
                     to_increment=to_inc))
+        report._removed_increments = list(data.get('removed_increments', []))
+        report._increment_order = list(data.get('increment_order', []))
         return report

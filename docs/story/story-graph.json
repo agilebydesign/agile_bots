@@ -408,7 +408,7 @@
           "test_file": "invoke_bot/initialize_bot/",
           "sub_epics": [
             {
-              "name": "Load Bot, Behavior, and Actions",
+              "name": "Load Behavior, and Actions",
               "sequential_order": 0.0,
               "behavior": null,
               "domain_concepts": [
@@ -1115,206 +1115,6 @@
                   "behavior": null,
                   "stories": [
                     {
-                      "name": "Resolve Bot Path",
-                      "sequential_order": 0.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestResolveBotPath",
-                      "scenarios": [
-                        {
-                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_base_actions_directory_property",
-                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
-                        },
-                        {
-                          "name": "BotPath resolves directories from environment variables",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
-                          "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
-                        },
-                        {
-                          "name": "BotPath.python_workspace_root property returns Python workspace root.",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_python_workspace_root_property",
-                          "steps": ""
-                        },
-                        {
-                          "name": "BotPath raises error when environment variables not set",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
-                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
-                        },
-                        {
-                          "name": "BotPath.find_repo_root() method returns repository root.",
-                          "sequential_order": 5.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_bot_paths_find_repo_root_method",
-                          "steps": ""
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Resolve Bot Path Using CLI",
-                      "sequential_order": 1.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestResolveBotPathUsingCLI",
-                      "scenarios": [
-                        {
-                          "name": "CLI session resolves bot and workspace directories",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_resolves_bot_and_workspace_directories",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot paths accessed via CLI\nTHEN: Directories resolved correctly"
-                        },
-                        {
-                          "name": "Base actions directory accessible via CLI session",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_base_actions_directory_accessible",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: base_actions_directory accessed via CLI\nTHEN: Returns real agile_bots/base_actions path"
-                        },
-                        {
-                          "name": "Python workspace root accessible via CLI session",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_python_workspace_root_accessible",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: python_workspace_root accessed via CLI\nTHEN: Returns Python workspace root path"
-                        },
-                        {
-                          "name": "find_repo_root method works via CLI session",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_find_repo_root_method_works",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: find_repo_root() called via CLI\nTHEN: Returns repository root path"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Switch Registered Bots in CLI",
-                      "sequential_order": 2.0,
-                      "connector": "and",
-                      "story_type": "system",
-                      "users": [
-                        "CLI"
-                      ],
-                      "test_class": "TestSwitchRegisteredBots",
-                      "scenarios": [
-                        {
-                          "name": "Display Registered Bots in CLI STATUS",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_display_registered_bots_in_cli_status",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Switch to Valid Registered Bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_switch_to_valid_registered_bot",
-                          "steps": ""
-                        },
-                        {
-                          "name": "Attempt to Switch to Unregistered Bot",
-                          "sequential_order": 3.0,
-                          "type": "error_path",
-                          "background": [],
-                          "test_method": "test_attempt_to_switch_to_unregistered_bot",
-                          "steps": ""
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                          "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                          "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                          "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
-                          "sequential_order": 5.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Switch Bot panel",
-                      "sequential_order": 3.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestSwitchBot",
-                      "scenarios": [
-                        {
-                          "name": "Panel shows story_bot and multiple bots available",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
-                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
-                        },
-                        {
-                          "name": "User switches to crc_bot",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_switches_to_crc_bot",
-                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User switches bot\nTHEN System displays updated bot name AND System displays behavior action section for new bot AND System displays behavior action stateof workspace for new bot",
-                          "text": "WHEN User switches bot\nTHEN System displays updated bot name AND System displays behavior action section for new bot AND System displays behavior action stateof workspace for new bot",
-                          "sequential_order": 1.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
                       "name": "Load Bot Behaviors",
                       "sequential_order": 4.0,
                       "connector": "or",
@@ -1391,36 +1191,6 @@
                       "behavior": null
                     },
                     {
-                      "name": "Load Bot Using CLI",
-                      "sequential_order": 6.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestLoadBotUsingCLI",
-                      "scenarios": [
-                        {
-                          "name": "CLI session loads bot with name and workspace",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_loads_bot_with_name_and_workspace",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot accessed via CLI\nTHEN: Bot has correct name and workspace"
-                        },
-                        {
-                          "name": "Bot name property accessible via CLI session",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_bot_name_property_accessible",
-                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot name accessed\nTHEN: Returns correct bot name"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
                       "name": "Load Bot Behaviors Using CLI",
                       "sequential_order": 7.0,
                       "connector": null,
@@ -1491,641 +1261,6 @@
                           "background": [],
                           "test_method": "test_cli_session_action_instructions_accessible",
                           "steps": "GIVEN: CLI session at shape.clarify\nWHEN: Action instructions accessed\nTHEN: Merged instructions from base and behavior available"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Initialize Bot Interface",
-              "sequential_order": 1.0,
-              "behavior": null,
-              "domain_concepts": [
-                {
-                  "name": "CLISession",
-                  "responsibilities": [
-                    {
-                      "name": "Runs CLI loop",
-                      "collaborators": []
-                    },
-                    {
-                      "name": "Reads input from stdin or terminal",
-                      "collaborators": []
-                    },
-                    {
-                      "name": "Determine channel adapter",
-                      "collaborators": [
-                        "ChannelAdapter"
-                      ]
-                    },
-                    {
-                      "name": "Read and execute command",
-                      "collaborators": [
-                        "Command String",
-                        "CLICommandResponse"
-                      ]
-                    },
-                    {
-                      "name": "Parse command",
-                      "collaborators": [
-                        "Command String",
-                        "Command Verb",
-                        "Params"
-                      ]
-                    },
-                    {
-                      "name": "Route to bot domain methods",
-                      "collaborators": [
-                        "Bot",
-                        "Command Verb",
-                        "Params",
-                        "BotResult"
-                      ]
-                    },
-                    {
-                      "name": "Serializes via channel adapter",
-                      "collaborators": [
-                        "ChannelAdapter",
-                        "String"
-                      ]
-                    },
-                    {
-                      "name": "Displays serialized output",
-                      "collaborators": [
-                        "Stdout"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "ChannelAdapter (Abstract)",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize domain object to format",
-                      "collaborators": [
-                        "Domain Object",
-                        "Format"
-                      ]
-                    },
-                    {
-                      "name": "Deserialize format to domain object",
-                      "collaborators": [
-                        "Format",
-                        "Domain Object"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "TextAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Parse command text",
-                      "collaborators": [
-                        "Text String",
-                        "Command",
-                        "Params"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "ChannelAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "TTYAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize to TTY text",
-                      "collaborators": [
-                        "Domain Object",
-                        "String"
-                      ]
-                    },
-                    {
-                      "name": "Deserialize TTY text",
-                      "collaborators": [
-                        "String",
-                        "Domain Object"
-                      ]
-                    },
-                    {
-                      "name": "Add color",
-                      "collaborators": [
-                        "Text",
-                        "Color"
-                      ]
-                    },
-                    {
-                      "name": "Format indentation",
-                      "collaborators": [
-                        "Indent Level",
-                        "Spaces"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "TextAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "TTYProgressAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Format line with marker",
-                      "collaborators": [
-                        "Marker",
-                        "Text",
-                        "Indent"
-                      ]
-                    },
-                    {
-                      "name": "Render marker",
-                      "collaborators": [
-                        "Is Completed",
-                        "Is Current"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "TTYAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "JSONAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize to JSON dict",
-                      "collaborators": [
-                        "Dict"
-                      ]
-                    },
-                    {
-                      "name": "Deserialize JSON dict",
-                      "collaborators": [
-                        "Dict",
-                        "Domain Object"
-                      ]
-                    },
-                    {
-                      "name": "Convert to JSON string",
-                      "collaborators": [
-                        "Dict",
-                        "String"
-                      ]
-                    },
-                    {
-                      "name": "Parse JSON string",
-                      "collaborators": [
-                        "String",
-                        "Dict"
-                      ]
-                    },
-                    {
-                      "name": "Validate JSON structure",
-                      "collaborators": [
-                        "Dict",
-                        "Schema"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "ChannelAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "JSONProgressAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Include progress fields",
-                      "collaborators": [
-                        "Is Completed",
-                        "Is Current"
-                      ]
-                    },
-                    {
-                      "name": "Include completion markers",
-                      "collaborators": [
-                        "Progress String"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "JSONAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "MarkdownAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Serialize to Markdown",
-                      "collaborators": [
-                        "String"
-                      ]
-                    },
-                    {
-                      "name": "Deserialize Markdown",
-                      "collaborators": [
-                        "String",
-                        "Domain Object"
-                      ]
-                    },
-                    {
-                      "name": "Parse markdown sections",
-                      "collaborators": [
-                        "Markdown",
-                        "Sections"
-                      ]
-                    },
-                    {
-                      "name": "Format header",
-                      "collaborators": [
-                        "Level",
-                        "Text"
-                      ]
-                    },
-                    {
-                      "name": "Format list item",
-                      "collaborators": [
-                        "Marker",
-                        "Text",
-                        "Indent"
-                      ]
-                    },
-                    {
-                      "name": "Format code block",
-                      "collaborators": [
-                        "Language",
-                        "Content"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "TextAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "MarkdownProgressAdapter",
-                  "responsibilities": [
-                    {
-                      "name": "Render progress marker",
-                      "collaborators": [
-                        "Is Completed",
-                        "Is Current",
-                        "Marker String"
-                      ]
-                    },
-                    {
-                      "name": "Format progress line",
-                      "collaborators": [
-                        "Name",
-                        "Is Completed",
-                        "Is Current",
-                        "String"
-                      ]
-                    }
-                  ],
-                  "module": "cli",
-                  "inherits_from": "MarkdownAdapter (Abstract)",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL"
-                },
-                {
-                  "name": "DotNotationParser",
-                  "responsibilities": [
-                    {
-                      "name": "Parses dot notation to node path",
-                      "collaborators": [
-                        "Dot Notation String",
-                        "Path Segments"
-                      ]
-                    },
-                    {
-                      "name": "Resolves node from path",
-                      "collaborators": [
-                        "StoryGraph",
-                        "Path Segments",
-                        "StoryNode"
-                      ]
-                    },
-                    {
-                      "name": "Formats navigation error with valid paths",
-                      "collaborators": [
-                        "Error Message",
-                        "Valid Paths List"
-                      ]
-                    }
-                  ],
-                  "module": "story_graph.story_map",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL",
-                  "instantiated_with": [
-                    "StoryGraph"
-                  ],
-                  "ownership": {
-                    "references": [
-                      "StoryGraph",
-                      "StoryNode"
-                    ]
-                  }
-                },
-                {
-                  "name": "FileModificationMonitor",
-                  "responsibilities": [
-                    {
-                      "name": "Detects file modification",
-                      "collaborators": [
-                        "File System",
-                        "Last Modified Timestamp"
-                      ]
-                    },
-                    {
-                      "name": "Delegates reload to StoryGraph",
-                      "collaborators": [
-                        "StoryGraph",
-                        "File Path"
-                      ]
-                    },
-                    {
-                      "name": "Triggers panel refresh",
-                      "collaborators": [
-                        "StoryMapView",
-                        "DOM"
-                      ]
-                    },
-                    {
-                      "name": "Shows validation error notification",
-                      "collaborators": [
-                        "Error Message",
-                        "Panel Display"
-                      ]
-                    },
-                    {
-                      "name": "Retains previous valid graph on error",
-                      "collaborators": [
-                        "Previous Graph",
-                        "StoryGraph"
-                      ]
-                    }
-                  ],
-                  "module": "story_graph.story_map",
-                  "_source_path": "Invoke Bot.Invoke Bot Through REPL",
-                  "instantiated_with": [
-                    "File Path"
-                  ],
-                  "ownership": {
-                    "references": [
-                      "StoryGraph",
-                      "StoryMapView"
-                    ]
-                  }
-                }
-              ],
-              "test_file": "invoke_bot/initialize_bot/test_initialize_bot_interface.py",
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "name": "",
-                  "sequential_order": 0.0,
-                  "type": "and",
-                  "connector": null,
-                  "behavior": null,
-                  "stories": [
-                    {
-                      "name": "Detect CLI Mode",
-                      "sequential_order": 0.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestDetectCLIMode",
-                      "scenarios": [
-                        {
-                          "name": "CLI detects TTY mode",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_detects_tty_mode",
-                          "steps": "GIVEN: stdin/stdout are TTY\nWHEN: CLISession created without explicit mode\nTHEN: Session uses TTY mode"
-                        },
-                        {
-                          "name": "CLI detects pipe mode",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_detects_pipe_mode",
-                          "steps": "GIVEN: stdin/stdout are piped (not TTY)\nWHEN: CLISession created without explicit mode\nTHEN: Session uses markdown mode"
-                        },
-                        {
-                          "name": "CLI accepts JSON mode flag",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_accepts_json_mode_flag",
-                          "steps": "GIVEN: JSON mode explicitly requested\nWHEN: CLISession created with mode='json'\nTHEN: Session uses JSON mode"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Detect CLI Mode.md"
-                    },
-                    {
-                      "name": "Initialize CLI Session",
-                      "sequential_order": 1.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestInitializeCLISession",
-                      "scenarios": [
-                        {
-                          "name": "CLI session initializes bot (all channels)",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_initializes_bot",
-                          "steps": "GIVEN: Bot and workspace configured\nWHEN: CLISession is created\nTHEN: Session wraps bot"
-                        },
-                        {
-                          "name": "CLI session loads existing state (all channels)",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_loads_existing_state",
-                          "steps": "GIVEN: Bot with saved state\nWHEN: CLISession is created\nTHEN: Bot loads previous state"
-                        },
-                        {
-                          "name": "CLI session can execute commands (all channels)",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_session_can_execute_commands",
-                          "steps": "GIVEN: Initialized CLI session\nWHEN: Command is executed\nTHEN: Session returns response"
-                        }
-                      ],
-                      "acceptance_criteria": [],
-                      "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Initialize CLI Session.md"
-                    },
-                    {
-                      "name": "Open Panel",
-                      "sequential_order": 2.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestOpenPanel",
-                      "scenarios": [
-                        {
-                          "name": "",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_user_opens_panel_via_command_palette_happy_path",
-                          "steps": "Given VS Code workspace with bot installed\nWhen User executes 'Open Status Panel' command\nThen Panel webview appears\nAnd Panel displays bot name\nAnd Panel displays workspace path\nAnd Panel displays behavior action section\nAnd Panel displays scope section\nAnd Panel displays instructions section"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel is already open in VS Code\nWhen User executes 'Open Status Panel' command again\nThen Existing panel is brought to front\nAnd No duplicate panel is created"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 3.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given VS Code workspace with no bots installed\nWhen User executes 'Open Status Panel' command\nThen Panel displays error message\nAnd Error message indicates no bots found"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User activates panel command\nTHEN System displays bot name AND System displays workspace path AND System displays bot path AND System displays available botss AND System displays behavior action section AND System displays scope section AND System displays instructions section",
-                          "text": "WHEN User activates panel command\nTHEN System displays bot name AND System displays workspace path AND System displays bot path AND System displays available botss AND System displays behavior action section AND System displays scope section AND System displays instructions section",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "Acceptance-criteria1",
-                          "text": "Acceptance-criteria1",
-                          "sequential_order": 1.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Apply Visual Branding",
-                      "sequential_order": 3.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "Panel"
-                      ],
-                      "test_class": null,
-                      "scenarios": [
-                        {
-                          "name": "Panel applies default Agile By Design branding when no config entry exists",
-                          "sequential_order": 1.0,
-                          "type": "edge",
-                          "background": [],
-                          "test_method": "test_panel_applies_default_agile_by_design_branding_when_no_config_entry_exists",
-                          "steps": "GIVEN: Config file missing OR branding property not set OR repo root not set\nWHEN: Panel initializes with workspace root\nTHEN: Branding module logs warning about missing config\nAND: Branding module returns default ABD settings\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #000000 (dark background)\nAND: Panel injects --text-color as #FFFFFF\nAND: Panel injects --accent-color as #FF8C00 (orange)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Bots' as product name\nAND: Header loads images from default img/ directory\nBUT: Panel does not crash or show error"
-                        },
-                        {
-                          "name": "Panel applies Scotia branding when config specifies Scotia brand",
-                          "sequential_order": 2.0,
-                          "type": "happy",
-                          "background": [],
-                          "test_method": "test_panel_applies_scotia_branding_when_config_specifies_scotia_brand",
-                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'Scotia'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Branding module caches config for subsequent calls\nAND: Panel logs 'Scotia' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #FFFFFF (light background)\nAND: Panel injects --text-color as #000000\nAND: Panel injects --accent-color as #EC111A (Scotia red)\nAND: Panel injects --font-weight-normal as 600\nAND: Panel sets --hover-bg to dark overlay for light background\nWHEN: Header view renders\nTHEN: Header displays 'Scotia Bots' as product name\nAND: Header applies Scotia red to title style\nAND: Header loads images from img/scotia/ subdirectory"
-                        },
-                        {
-                          "name": "Panel applies ACE branding when config specifies ACE brand",
-                          "sequential_order": 3.0,
-                          "type": "happy",
-                          "background": [],
-                          "test_method": "test_panel_applies_ace_branding_when_config_specifies_ace_brand",
-                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'ACE'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Panel logs 'ACE' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #1E1E1E (VS Code dark grey)\nAND: Panel injects --text-color as #D4D4D4 (VS Code light grey)\nAND: Panel injects --accent-color as #569CD6 (VS Code blue)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Context Engine' as product name\nAND: Header applies VS Code blue to title style\nAND: Header loads images from img/ace/ subdirectory"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN Panel initializes\nTHEN Panel loads branding config from conf/config.json",
-                          "text": "WHEN Panel initializes\nTHEN Panel loads branding config from conf/config.json",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN branding property specifies brand name\nTHEN Panel activates that brand's settings",
-                          "text": "WHEN branding property specifies brand name\nTHEN Panel activates that brand's settings",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN Panel generates webview\nTHEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
-                          "text": "WHEN Panel generates webview\nTHEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
-                          "sequential_order": 3.0
-                        },
-                        {
-                          "name": "WHEN brand has path property\nTHEN Panel loads images from that subdirectory",
-                          "text": "WHEN brand has path property\nTHEN Panel loads images from that subdirectory",
-                          "sequential_order": 4.0
-                        },
-                        {
-                          "name": "WHEN Header renders\nTHEN Header displays product name from brand title AND applies brand accent color to title",
-                          "text": "WHEN Header renders\nTHEN Header displays product name from brand title AND applies brand accent color to title",
-                          "sequential_order": 5.0
-                        },
-                        {
-                          "name": "WHEN config file missing\nTHEN Panel uses default ABD branding BUT does not crash",
-                          "text": "WHEN config file missing\nTHEN Panel uses default ABD branding BUT does not crash",
-                          "sequential_order": 6.0
-                        },
-                        {
-                          "name": "WHEN background is light (#FFFFFF)\nTHEN Panel uses dark overlays for hover states",
-                          "text": "WHEN background is light (#FFFFFF)\nTHEN Panel uses dark overlays for hover states",
-                          "sequential_order": 7.0
-                        },
-                        {
-                          "name": "WHEN background is dark (#000000)\nTHEN Panel uses light overlays for hover states",
-                          "text": "WHEN background is dark (#000000)\nTHEN Panel uses light overlays for hover states",
-                          "sequential_order": 8.0
-                        },
-                        {
-                          "name": "WHEN branding loads\nTHEN branding caches config for subsequent calls",
-                          "text": "WHEN branding loads\nTHEN branding caches config for subsequent calls",
-                          "sequential_order": 9.0
-                        }
-                      ],
-                      "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Apply Visual Branding.md"
-                    },
-                    {
-                      "name": "Exit CLI REPL",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestExitREPL",
-                      "scenarios": [
-                        {
-                          "name": "User exits REPL with exit command",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_user_exits_repl_with_exit_command",
-                          "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
                         }
                       ],
                       "acceptance_criteria": [],
@@ -3051,26 +2186,484 @@
                         }
                       ],
                       "behavior": null
+                    },
+                    {
+                      "name": "Detect CLI Mode",
+                      "sequential_order": 0.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestDetectCLIMode",
+                      "scenarios": [
+                        {
+                          "name": "CLI detects TTY mode",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_detects_tty_mode",
+                          "steps": "GIVEN: stdin/stdout are TTY\nWHEN: CLISession created without explicit mode\nTHEN: Session uses TTY mode"
+                        },
+                        {
+                          "name": "CLI detects pipe mode",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_detects_pipe_mode",
+                          "steps": "GIVEN: stdin/stdout are piped (not TTY)\nWHEN: CLISession created without explicit mode\nTHEN: Session uses markdown mode"
+                        },
+                        {
+                          "name": "CLI accepts JSON mode flag",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_accepts_json_mode_flag",
+                          "steps": "GIVEN: JSON mode explicitly requested\nWHEN: CLISession created with mode='json'\nTHEN: Session uses JSON mode"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Detect CLI Mode.md"
+                    },
+                    {
+                      "name": "Initialize CLI Session",
+                      "sequential_order": 1.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestInitializeCLISession",
+                      "scenarios": [
+                        {
+                          "name": "CLI session initializes bot (all channels)",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_initializes_bot",
+                          "steps": "GIVEN: Bot and workspace configured\nWHEN: CLISession is created\nTHEN: Session wraps bot"
+                        },
+                        {
+                          "name": "CLI session loads existing state (all channels)",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_loads_existing_state",
+                          "steps": "GIVEN: Bot with saved state\nWHEN: CLISession is created\nTHEN: Bot loads previous state"
+                        },
+                        {
+                          "name": "CLI session can execute commands (all channels)",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_can_execute_commands",
+                          "steps": "GIVEN: Initialized CLI session\nWHEN: Command is executed\nTHEN: Session returns response"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Initialize CLI Session.md"
+                    },
+                    {
+                      "name": "Open Panel",
+                      "sequential_order": 2.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestOpenPanel",
+                      "scenarios": [
+                        {
+                          "name": "",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_user_opens_panel_via_command_palette_happy_path",
+                          "steps": "Given VS Code workspace with bot installed\nWhen User executes 'Open Status Panel' command\nThen Panel webview appears\nAnd Panel displays bot name\nAnd Panel displays workspace path\nAnd Panel displays behavior action section\nAnd Panel displays scope section\nAnd Panel displays instructions section"
+                        },
+                        {
+                          "name": "",
+                          "sequential_order": 2.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel is already open in VS Code\nWhen User executes 'Open Status Panel' command again\nThen Existing panel is brought to front\nAnd No duplicate panel is created"
+                        },
+                        {
+                          "name": "",
+                          "sequential_order": 3.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given VS Code workspace with no bots installed\nWhen User executes 'Open Status Panel' command\nThen Panel displays error message\nAnd Error message indicates no bots found"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User activates panel command\nTHEN System displays bot name AND System displays workspace path AND System displays bot path AND System displays available botss AND System displays behavior action section AND System displays scope section AND System displays instructions section",
+                          "text": "WHEN User activates panel command\nTHEN System displays bot name AND System displays workspace path AND System displays bot path AND System displays available botss AND System displays behavior action section AND System displays scope section AND System displays instructions section",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "Acceptance-criteria1",
+                          "text": "Acceptance-criteria1",
+                          "sequential_order": 1.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Apply Visual Branding",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "Panel"
+                      ],
+                      "test_class": null,
+                      "scenarios": [
+                        {
+                          "name": "Panel applies default Agile By Design branding when no config entry exists",
+                          "sequential_order": 1.0,
+                          "type": "edge",
+                          "background": [],
+                          "test_method": "test_panel_applies_default_agile_by_design_branding_when_no_config_entry_exists",
+                          "steps": "GIVEN: Config file missing OR branding property not set OR repo root not set\nWHEN: Panel initializes with workspace root\nTHEN: Branding module logs warning about missing config\nAND: Branding module returns default ABD settings\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #000000 (dark background)\nAND: Panel injects --text-color as #FFFFFF\nAND: Panel injects --accent-color as #FF8C00 (orange)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Bots' as product name\nAND: Header loads images from default img/ directory\nBUT: Panel does not crash or show error"
+                        },
+                        {
+                          "name": "Panel applies Scotia branding when config specifies Scotia brand",
+                          "sequential_order": 2.0,
+                          "type": "happy",
+                          "background": [],
+                          "test_method": "test_panel_applies_scotia_branding_when_config_specifies_scotia_brand",
+                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'Scotia'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Branding module caches config for subsequent calls\nAND: Panel logs 'Scotia' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #FFFFFF (light background)\nAND: Panel injects --text-color as #000000\nAND: Panel injects --accent-color as #EC111A (Scotia red)\nAND: Panel injects --font-weight-normal as 600\nAND: Panel sets --hover-bg to dark overlay for light background\nWHEN: Header view renders\nTHEN: Header displays 'Scotia Bots' as product name\nAND: Header applies Scotia red to title style\nAND: Header loads images from img/scotia/ subdirectory"
+                        },
+                        {
+                          "name": "Panel applies ACE branding when config specifies ACE brand",
+                          "sequential_order": 3.0,
+                          "type": "happy",
+                          "background": [],
+                          "test_method": "test_panel_applies_ace_branding_when_config_specifies_ace_brand",
+                          "steps": "GIVEN: Config file exists at conf/config.json with branding property set to 'ACE'\nWHEN: Panel initializes with workspace root\nTHEN: Branding module reads conf/config.json\nAND: Panel logs 'ACE' as active branding\nWHEN: Panel generates webview content\nTHEN: Panel injects --bg-base as #1E1E1E (VS Code dark grey)\nAND: Panel injects --text-color as #D4D4D4 (VS Code light grey)\nAND: Panel injects --accent-color as #569CD6 (VS Code blue)\nAND: Panel injects --font-weight-normal as 400\nAND: Panel sets --hover-bg to light overlay for dark background\nWHEN: Header view renders\nTHEN: Header displays 'Agile Context Engine' as product name\nAND: Header applies VS Code blue to title style\nAND: Header loads images from img/ace/ subdirectory"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Panel initializes\nTHEN Panel loads branding config from conf/config.json",
+                          "text": "WHEN Panel initializes\nTHEN Panel loads branding config from conf/config.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN branding property specifies brand name\nTHEN Panel activates that brand's settings",
+                          "text": "WHEN branding property specifies brand name\nTHEN Panel activates that brand's settings",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN Panel generates webview\nTHEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
+                          "text": "WHEN Panel generates webview\nTHEN Panel injects CSS variables from brand colors (--bg-base, --text-color, --accent-color, --text-color-faded, --font-weight-normal)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN brand has path property\nTHEN Panel loads images from that subdirectory",
+                          "text": "WHEN brand has path property\nTHEN Panel loads images from that subdirectory",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN Header renders\nTHEN Header displays product name from brand title AND applies brand accent color to title",
+                          "text": "WHEN Header renders\nTHEN Header displays product name from brand title AND applies brand accent color to title",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "WHEN config file missing\nTHEN Panel uses default ABD branding BUT does not crash",
+                          "text": "WHEN config file missing\nTHEN Panel uses default ABD branding BUT does not crash",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "WHEN background is light (#FFFFFF)\nTHEN Panel uses dark overlays for hover states",
+                          "text": "WHEN background is light (#FFFFFF)\nTHEN Panel uses dark overlays for hover states",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "WHEN background is dark (#000000)\nTHEN Panel uses light overlays for hover states",
+                          "text": "WHEN background is dark (#000000)\nTHEN Panel uses light overlays for hover states",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "WHEN branding loads\nTHEN branding caches config for subsequent calls",
+                          "text": "WHEN branding loads\nTHEN branding caches config for subsequent calls",
+                          "sequential_order": 9.0
+                        }
+                      ],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Apply Visual Branding.md"
+                    },
+                    {
+                      "name": "Exit CLI REPL",
+                      "sequential_order": 4.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestExitREPL",
+                      "scenarios": [
+                        {
+                          "name": "User exits REPL with exit command",
+                          "sequential_order": 1.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_user_exits_repl_with_exit_command",
+                          "steps": "GIVEN: CLI is running\nWHEN: user enters 'exit'\nTHEN: CLI terminates REPL loop"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
                     }
                   ]
                 }
               ]
             },
             {
-              "name": "Set Workspace",
-              "sequential_order": 3.0,
-              "behavior": null,
-              "domain_concepts": [],
-              "test_file": "invoke_bot/initialize_bot/test_set_workspace.js",
+              "name": "Load Bot",
+              "sequential_order": 4.0,
               "sub_epics": [],
               "story_groups": [
                 {
-                  "name": "",
-                  "sequential_order": 0.0,
                   "type": "and",
                   "connector": null,
-                  "behavior": null,
                   "stories": [
+                    {
+                      "name": "Resolve Bot Path Using CLI",
+                      "sequential_order": 1.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestResolveBotPathUsingCLI",
+                      "scenarios": [
+                        {
+                          "name": "CLI session resolves bot and workspace directories",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_resolves_bot_and_workspace_directories",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot paths accessed via CLI\nTHEN: Directories resolved correctly"
+                        },
+                        {
+                          "name": "Base actions directory accessible via CLI session",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_base_actions_directory_accessible",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: base_actions_directory accessed via CLI\nTHEN: Returns real agile_bots/base_actions path"
+                        },
+                        {
+                          "name": "Python workspace root accessible via CLI session",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_python_workspace_root_accessible",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: python_workspace_root accessed via CLI\nTHEN: Returns Python workspace root path"
+                        },
+                        {
+                          "name": "find_repo_root method works via CLI session",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_find_repo_root_method_works",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: find_repo_root() called via CLI\nTHEN: Returns repository root path"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Resolve Bot Path",
+                      "sequential_order": 0.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": "TestResolveBotPath",
+                      "scenarios": [
+                        {
+                          "name": "BotPath.base_actions_directory returns real agile_bot base_actions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_base_actions_directory_property",
+                          "steps": "Given BotPath instantiated\nWhen base_actions_directory property accessed\nThen Returns real agile_bot/base_actions path (not test directory)\nThen Note: base_actions_directory always returns the real agile_bot/base_actions path,\nThen not the test directory. This is by design - see get_base_actions_directory() in workspace.py."
+                        },
+                        {
+                          "name": "BotPath resolves directories from environment variables",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_resolves_bot_and_workspace_directories_from_environment",
+                          "steps": "Given BOT_DIRECTORY and WORKING_AREA environment variables set\nWhen BotPath accessed from bot\nThen Both directory properties return paths from environment"
+                        },
+                        {
+                          "name": "BotPath.python_workspace_root property returns Python workspace root.",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_python_workspace_root_property",
+                          "steps": ""
+                        },
+                        {
+                          "name": "BotPath raises error when environment variables not set",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_raises_error_when_environment_variables_not_set",
+                          "steps": "Given No BOT_DIRECTORY or WORKING_AREA environment variables\nWhen BotPath instantiated\nThen Raises RuntimeError"
+                        },
+                        {
+                          "name": "BotPath.find_repo_root() method returns repository root.",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_bot_paths_find_repo_root_method",
+                          "steps": ""
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Load Bot Using CLI",
+                      "sequential_order": 6.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestLoadBotUsingCLI",
+                      "scenarios": [
+                        {
+                          "name": "CLI session loads bot with name and workspace",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_loads_bot_with_name_and_workspace",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot accessed via CLI\nTHEN: Bot has correct name and workspace"
+                        },
+                        {
+                          "name": "Bot name property accessible via CLI session",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_session_bot_name_property_accessible",
+                          "steps": "GIVEN: CLI session initialized\nWHEN: Bot name accessed\nTHEN: Returns correct bot name"
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Switch Registered Bots in CLI",
+                      "sequential_order": 2.0,
+                      "connector": "and",
+                      "story_type": "system",
+                      "users": [
+                        "CLI"
+                      ],
+                      "test_class": "TestSwitchRegisteredBots",
+                      "scenarios": [
+                        {
+                          "name": "Display Registered Bots in CLI STATUS",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_display_registered_bots_in_cli_status",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Switch to Valid Registered Bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_switch_to_valid_registered_bot",
+                          "steps": ""
+                        },
+                        {
+                          "name": "Attempt to Switch to Unregistered Bot",
+                          "sequential_order": 3.0,
+                          "type": "error_path",
+                          "background": [],
+                          "test_method": "test_attempt_to_switch_to_unregistered_bot",
+                          "steps": ""
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows current bot name followed by pipe-separated list of all registered bots AND format is: Bot: <current_bot> | Registered: <bot1> | <bot2> | <bot3>",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                          "text": "WHEN CLI STATUS section is displayed\nTHEN CLI shows bot switching instructions AND format is: To change bots: bot <name>",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                          "text": "WHEN user enters bot <name> command AND bot name is registered\nTHEN CLI switches to the specified bot AND updates CLI STATUS section to show new current bot",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                          "text": "WHEN user enters bot <name> command AND bot name is not registered\nTHEN CLI displays error message AND shows list of available registered bots AND keeps current bot active",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                          "text": "WHEN bot is switched\nTHEN CLI loads bot configuration from bot_config.json AND makes bot behaviors and actions available",
+                          "sequential_order": 5.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Switch Bot panel",
+                      "sequential_order": 3.0,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestSwitchBot",
+                      "scenarios": [
+                        {
+                          "name": "Panel shows story_bot and multiple bots available",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_shows_story_bot_and_multiple_bots_available",
+                          "steps": "Given Panel is open showing story_bot\nAnd Multiple bots are available (story_bot, crc_bot)\nWhen User selects crc_bot from bot selector dropdown\nThen Panel displays crc_bot as current bot\nAnd Panel displays crc_bot's behaviors\nAnd Panel displays crc_bot's current action\nAnd Panel refreshes all sections with crc_bot data"
+                        },
+                        {
+                          "name": "User switches to crc_bot",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_user_switches_to_crc_bot",
+                          "steps": "Given Panel is open with story_bot at workspace c:/dev/project_a\nWhen User switches to crc_bot\nThen Panel displays crc_bot\nAnd Panel retains workspace c:/dev/project_a\nAnd Panel displays crc_bot state for that workspace"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User switches bot\nTHEN System displays updated bot name AND System displays behavior action section for new bot AND System displays behavior action stateof workspace for new bot",
+                          "text": "WHEN User switches bot\nTHEN System displays updated bot name AND System displays behavior action section for new bot AND System displays behavior action stateof workspace for new bot",
+                          "sequential_order": 1.0
+                        }
+                      ],
+                      "behavior": null
+                    },
                     {
                       "name": "Manage Bot Registry",
                       "sequential_order": 0.0,
@@ -7117,6 +6710,48 @@
                           "acceptance_criteria": [],
                           "behavior": null,
                           "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Filter Scope\\Scope Stories\\Manage Story Scope\\📄 Execute Actions With Scope.md"
+                        },
+                        {
+                          "name": "Domain Scoping",
+                          "sequential_order": 9.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Show All Increment Scope Through CLI",
+                          "sequential_order": 10.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_class": "TestShowAllIncrementScopeThroughCLI",
+                          "scenarios": [],
+                          "acceptance_criteria": [],
+                          "behavior": null
+                        },
+                        {
+                          "name": "Show All Increment Scope",
+                          "sequential_order": 11.0,
+                          "connector": null,
+                          "story_type": "user",
+                          "users": [],
+                          "test_class": null,
+                          "scenarios": [],
+                          "acceptance_criteria": [],
+                          "behavior": null
+                        },
+                        {
+                          "name": "Show All Increment Scope Through Panel",
+                          "sequential_order": 13.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": [
+                            "Bot Behavior"
+                          ],
+                          "test_class": "TestShowAllIncrementScopeThroughPanel",
+                          "scenarios": [],
+                          "acceptance_criteria": [],
+                          "behavior": null
                         }
                       ]
                     }
@@ -9501,6 +9136,11 @@
                       ],
                       "behavior": null,
                       "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\📄 Automatically Refresh Story Graph Changes  CLI.md"
+                    },
+                    {
+                      "name": "Execute Scope \"Runs\"",
+                      "sequential_order": 20.0,
+                      "story_type": "user"
                     }
                   ]
                 }
@@ -10136,30 +9776,6 @@
                       "behavior": null
                     },
                     {
-                      "name": "Show All Increment Scope Through CLI",
-                      "sequential_order": 10.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestShowAllIncrementScopeThroughCLI",
-                      "scenarios": [],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Show All Increment Scope",
-                      "sequential_order": 11.0,
-                      "connector": null,
-                      "story_type": "user",
-                      "users": [],
-                      "test_class": null,
-                      "scenarios": [],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
                       "name": "Display Increment Scope View",
                       "sequential_order": 12.0,
                       "connector": "or",
@@ -10402,19 +10018,6 @@
                           ]
                         }
                       ],
-                      "acceptance_criteria": [],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Show All Increment Scope Through Panel",
-                      "sequential_order": 13.0,
-                      "connector": "or",
-                      "story_type": "user",
-                      "users": [
-                        "Bot Behavior"
-                      ],
-                      "test_class": "TestShowAllIncrementScopeThroughPanel",
-                      "scenarios": [],
                       "acceptance_criteria": [],
                       "behavior": null
                     }
@@ -12043,69 +11646,6 @@
                       "acceptance_criteria": [],
                       "behavior": null,
                       "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Enrich Scope With Links.md"
-                    },
-                    {
-                      "name": "Open Story Files",
-                      "sequential_order": 2.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestOpenStoryFiles",
-                      "scenarios": [
-                        {
-                          "name": "User opens story graph JSON file",
-                          "sequential_order": 1.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_opens_story_graph_json_file",
-                          "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
-                        },
-                        {
-                          "name": "User opens story map diagram",
-                          "sequential_order": 2.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_user_opens_story_map_diagram",
-                          "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
-                        },
-                        {
-                          "name": "User clicks link to non-existent file shows error",
-                          "sequential_order": 3.0,
-                          "type": "error_case",
-                          "background": [],
-                          "test_method": "test_user_clicks_link_to_nonexistent_file_shows_error",
-                          "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
-                        },
-                        {
-                          "name": "Story graph and map links always visible in scope header",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_story_graph_and_story_map_links_always_visible",
-                          "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "WHEN User clicks graph link\nTHEN System opens story-graph.json in editor",
-                          "text": "WHEN User clicks graph link\nTHEN System opens story-graph.json in editor",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN User clicks map link\nTHEN System opens story-map.drawio in diagram viewer",
-                          "text": "WHEN User clicks map link\nTHEN System opens story-map.drawio in diagram viewer",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN System cannot open file\nTHEN System displays error message",
-                          "text": "WHEN System cannot open file\nTHEN System displays error message",
-                          "sequential_order": 3.0
-                        }
-                      ],
-                      "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Open Story Files.md"
                     }
                   ]
                 }
@@ -12433,6 +11973,69 @@
                             }
                           ],
                           "behavior": null
+                        },
+                        {
+                          "name": "Open Story Files",
+                          "sequential_order": 2.0,
+                          "connector": "and",
+                          "story_type": "user",
+                          "users": [
+                            "User"
+                          ],
+                          "test_class": "TestOpenStoryFiles",
+                          "scenarios": [
+                            {
+                              "name": "User opens story graph JSON file",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_user_opens_story_graph_json_file",
+                              "steps": "Given Panel displays scope section with graph link\nWhen User clicks Graph link\nThen VS Code opens story-graph.json in editor\nAnd File is displayed with JSON syntax highlighting"
+                            },
+                            {
+                              "name": "User opens story map diagram",
+                              "sequential_order": 2.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_user_opens_story_map_diagram",
+                              "steps": "Given Panel displays scope section with map link\nWhen User clicks map link\nThen VS Code opens story-map.drawio in diagram viewer\nAnd Diagram is displayed with Draw.io extension"
+                            },
+                            {
+                              "name": "User clicks link to non-existent file shows error",
+                              "sequential_order": 3.0,
+                              "type": "error_case",
+                              "background": [],
+                              "test_method": "test_user_clicks_link_to_nonexistent_file_shows_error",
+                              "steps": "Given Panel displays link to non-existent file\nWhen User clicks link\nThen Panel displays error message\nAnd Error message indicates file not found"
+                            },
+                            {
+                              "name": "Story graph and map links always visible in scope header",
+                              "sequential_order": 4.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_story_graph_and_story_map_links_always_visible",
+                              "steps": "Given Panel displays scope section\nAnd Scope may be filtered or showing all stories\nWhen User views scope header\nThen story-graph.json link is always visible\nAnd story-map.md link is always visible\nAnd Links persist regardless of filter state\nAnd Links are positioned consistently in header"
+                            }
+                          ],
+                          "acceptance_criteria": [
+                            {
+                              "name": "WHEN User clicks graph link\nTHEN System opens story-graph.json in editor",
+                              "text": "WHEN User clicks graph link\nTHEN System opens story-graph.json in editor",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "WHEN User clicks map link\nTHEN System opens story-map.drawio in diagram viewer",
+                              "text": "WHEN User clicks map link\nTHEN System opens story-map.drawio in diagram viewer",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "WHEN System cannot open file\nTHEN System displays error message",
+                              "text": "WHEN System cannot open file\nTHEN System displays error message",
+                              "sequential_order": 3.0
+                            }
+                          ],
+                          "behavior": null,
+                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Open Story Files.md"
                         }
                       ]
                     }
@@ -18005,7 +17608,7 @@
                   "behavior": null,
                   "stories": [
                     {
-                      "name": "Render Output",
+                      "name": "Render Output Usng Story API",
                       "sequential_order": 0.0,
                       "connector": "or",
                       "story_type": "user",
@@ -21272,154 +20875,241 @@
   ],
   "increments": [
     {
-      "name": "User Manually Drops Config In to AI Chat",
+      "name": "Bot Behavior",
       "priority": 1,
       "stories": [
-        "Generate Bot Tools"
-      ]
-    },
-    {
-      "name": "Simplest MCP",
-      "priority": 2,
-      "stories": [
-        "Generate Behavior Action Tools",
+        "Apply Visual Branding",
+        "Build Story Graph",
+        "Build Story Graph Using CLI",
+        "Change Workspace Path panel",
+        "Clarify Requirements",
+        "Clarify Requirements Using CLI",
+        "Decide Strategy",
+        "Decide Strategy Using CLI",
         "Deploy MCP BOT Server",
-        "Restart MCP Server To Load Code Changes"
-      ]
-    },
-    {
-      "name": "Workflow",
-      "priority": 3,
-      "stories": [
-        "Track Activity For Workspace"
-      ]
-    },
-    {
-      "name": "CLI",
-      "priority": 4,
-      "stories": [
+        "Detect CLI Mode",
+        "Display Action Help Using CLI",
+        "Display Base Instructions Panel",
+        "Display Bot Hierarchy Tree with Progress Indicators CLI",
+        "Display Build Instructions Panel",
+        "Display CLI Bot Command in Navigation Menu Footer",
+        "Display CLI Header",
+        "Display CLI Navigation Menu Footer",
+        "Display Clarification Data Through CLI",
+        "Display Clarify Instructions Panel",
+        "Display Command Examples Using CLI",
+        "Display Context Using CLI",
+        "Display Current Position in CLI",
+        "Display Headless Mode Status in CLI",
+        "Display Help Using CLI",
+        "Display Hierarchy In Panel",
+        "Display Parameter Help Using CLI",
+        "Display Piped Mode Instructions for AI Agents",
+        "Display Raw Format Instructions In Panel",
+        "Display Render Configurations Through CLI",
+        "Display Render Instructions Panel",
+        "Display Rules",
+        "Display Rules Using CLI",
+        "Display Session Status panel",
+        "Display Strategy Data Through CLI",
+        "Display Strategy Instructions Panel",
+        "Display Synchronizer Output Through CLI",
+        "Display Validate Instructions Panel",
+        "Display Validation Results Through CLI",
+        "Display Validation Scanners Through CLI",
+        "Execute Behavior Action",
+        "Execute Behavior Action Panel",
+        "Execute End To End Workflow Using CLI",
+        "Exit CLI REPL",
+        "Filter Scope By Stories Using CLI",
+        "Filter Story Scope By Files",
+        "Filter Story Scope By Files CLI",
+        "Filter Story Scope By Files Panel",
+        "Filter Story Scope By Increments",
+        "Filter Story Scope By Increments CLI",
+        "Filter Story Scope By Increments Panel",
+        "Filter Story Scope By Stories",
+        "Filter Story Scope by Stories Panel",
+        "Generate Behavior Action Tools",
+        "Generate Bot Tools",
         "Generate CLI Entry Point",
+        "Generate Command Definitions",
         "Generate Cursor Commands",
         "Generate Help Documentation",
-        "Generate Command Definitions"
-      ]
-    },
-    {
-      "name": "Inject / Store Content",
-      "priority": 6,
-      "stories": []
-    },
-    {
-      "name": "Code Scanner",
-      "priority": 7,
-      "stories": []
-    },
-    {
-      "name": "Refactoring",
-      "priority": 8,
-      "stories": [
+        "Get Action Instructions Through CLI",
+        "Get Build Instructions Through CLI",
+        "Get Clarify Instructions Through CLI",
+        "Get Help",
+        "Get Help Using CLI",
+        "Get Render Instructions Through CLI",
+        "Get Rules Instructions Through CLI",
+        "Get Strategy Instructions Through CLI",
+        "Get Validate Instructions Through CLI",
+        "Handle Operation Errors and Validation in CLI",
+        "Initialize CLI Session",
+        "Inject Context Into Instructions",
+        "Load Actions",
+        "Load Actions Using CLI",
         "Load Bot Behaviors",
-        "Load Actions"
+        "Load Bot Behaviors Using CLI",
+        "Load Bot Using CLI",
+        "Load and Display Workspace Context in CLI",
+        "Manage Behavior Action State Using CLI",
+        "Manage Behaviors Using CLI",
+        "Manage Bot Registry",
+        "Navigate Behavior Action Panel",
+        "Navigate Sequentially",
+        "Navigate Sequentially Using CLI",
+        "Navigate Sequentially Using CLI Commands",
+        "Navigate To Behavior Action And Execute Using CLI",
+        "Navigate To First Behavior Action",
+        "Navigate Using CLI Dot Notation",
+        "Open Panel",
+        "Persist Behavior Action State",
+        "Proceed across End To End Workflow",
+        "Re-execute Current Operation Using CLI",
+        "Record Activity Metrics And Paths",
+        "Render Output Using CLI",
+        "Render action diagram section",
+        "Render story map",
+        "Render story map increments",
+        "Render story map with acceptance criteria",
+        "Resolve Bot Path",
+        "Resolve Bot Path Using CLI",
+        "Restart MCP Server To Load Code Changes",
+        "Save Clarification Answers",
+        "Save Clarification Evidence",
+        "Save File Isolation",
+        "Save Guardrails Through CLI",
+        "Save Guardrails Through Panel",
+        "Save Multiple Guardrails Together",
+        "Save Strategy Decisions",
+        "Show Remaining Actions After Completion",
+        "Submit Behavior Rules Through Panel",
+        "Submit Instructions Through CLI",
+        "Submit Instructions To AI Agent Panel",
+        "Submit Scope Instructions",
+        "Switch Bot panel",
+        "Switch Registered Bots in CLI",
+        "Toggle Panel Section",
+        "Track Action Completion",
+        "Track Action Start",
+        "Track Activity For Workspace",
+        "Update and Find Current Behavior",
+        "Update graph from map increments",
+        "Update graph from story map",
+        "Update story graph from map acceptance criteria",
+        "Validate Rules",
+        "Validate Rules Using CLI"
       ]
     },
     {
-      "name": "LangGraph Orchestration",
-      "priority": 9,
-      "stories": []
-    },
-    {
-      "name": "REPL CLI",
-      "priority": 10,
+      "name": "Story Map Scoping",
+      "priority": 2,
       "stories": [
-        "Generate CLI Entry Point",
-        "Generate Cursor Commands",
-        "Generate Help Documentation"
-      ]
-    },
-    {
-      "name": "Existing",
-      "priority": 11,
-      "description": "Basic scope management functionality",
-      "stories": [
-        "Create Scope",
-        "Persist Scope",
+        "Automatically Refresh Story Graph Changes  CLI",
+        "Automatically Refresh Story Graph Changes Panel",
         "Clear Scope",
+        "Copy Story Node To Clipboard",
+        "Create Child Story Node",
+        "Create Child Story Node Under Parent CLI",
+        "Create Child Story Node Under Parent Panel",
+        "Create Epic",
+        "Create Scope",
+        "Create Scope Using CLI",
+        "Delete Story Node",
+        "Delete Story Node From Parent CLI",
+        "Delete Story Node From Parent Panel",
+        "Display Increment Scope View",
+        "Display Scope Using CLI",
+        "Display Story Hierarchy Panel",
+        "Domain Scoping",
+        "Enrich Scope With Links",
+        "Execute Action Scoped To Story Node",
         "Execute Actions With Scope",
+        "Execute Actions With Scope Using CLI",
+        "Move Story Node  CLI",
+        "Move Story Node Panel",
+        "Move Story Node To Parent",
         "Navigate Story Graph",
-        "Show All Scope Through Panel"
+        "Navigate Story Graph Using CLI",
+        "Open All Related Files",
+        "Persist Scope",
+        "Render Output Usng Story API",
+        "Save Story Map Changes Asynchronously",
+        "Set scope to selected Increment",
+        "Set scope to selected story node",
+        "Show All Scope Through Panel",
+        "Submit Current Behavior Action For Selected Node",
+        "Submit action for selected story node",
+        "Update Story Node Name",
+        "Update Story Node name  CLI",
+        "Update Story Node name Panel"
       ]
     },
     {
-      "name": "Manage Story Hierarchy",
-      "priority": 12,
-      "description": "Story node management including add, delete, update, move operations",
-      "stories": []
-    },
-    {
-      "name": "Display Domain Concepts",
-      "priority": 13,
-      "description": "Display domain concepts in the story graph",
-      "stories": []
-    },
-    {
-      "name": "Filter Domain Concepts",
-      "priority": 14,
-      "description": "Filter domain concepts in the story graph",
-      "stories": []
-    },
-    {
-      "name": "Manage Increments",
-      "priority": 15,
-      "description": "Increment management including add, delete, move, and update operations",
-      "stories": []
-    },
-    {
-      "name": "Perform Action",
-      "priority": 16,
-      "description": "Story graph API actions for building and rendering",
+      "name": "Addtional Scoping",
+      "priority": 3,
       "stories": [
-        "Build Story Graph Using API",
-        "Render Output"
-      ]
-    },
-    {
-      "name": "Story Filter Advanced",
-      "priority": 17,
-      "description": "Advanced story filtering with add/remove filter parts",
-      "stories": []
-    },
-    {
-      "name": "Increment Filtering",
-      "priority": 18,
-      "description": "Filtering by increments and increment scope management",
-      "stories": [
+        "Add Filter Part To File Scope",
+        "Add Filter Part To File Scope CLI",
+        "Add Filter Part To File Scope Panel",
+        "Add Filter Part To Story Scope",
+        "Add Filter Part To Story Scope In Panel",
+        "Add Filter Part To Story Scope using CLI",
+        "Add Increment",
+        "Add Increment CLI",
         "Add Increment Filter Part To Story Scope",
+        "Add Increment Filter Part To Story Scope CLI",
+        "Add Increment Filter Part To Story Scope Panel",
+        "Add Increment Panel",
+        "Build Story Graph Using API",
+        "Delete Increment",
+        "Delete Increment CLI",
+        "Delete Increment Panel",
+        "Display Increment Scope View CLI",
+        "Execute Scope \"Runs\"",
+        "Filter File Scope  By Files",
+        "Filter File Scope  By Files CLI",
+        "Filter File Scope  By Files Panel",
+        "Filter File Scope By Stories CLI",
+        "Filter File Scope By Stories Panel",
+        "Filter Scope By Files Using CLI",
+        "Move Story to Increment",
+        "Move Story to Increment CLI",
+        "Move Story to Increment Panel",
+        "Remove Filter Part From File Scope",
+        "Remove Filter Part From File Scope CLI",
+        "Remove Filter Part From File Scope Panel",
+        "Remove Filter Part From Story Scope",
+        "Remove Filter Part From Story Scope In Panel",
+        "Remove Filter Part From Story Scope using CLI",
         "Remove Increment Filter Part From Story Scope",
+        "Remove Increment Filter Part From Story Scope CLI",
+        "Remove Increment Filter Part From Story Scope Panel",
         "Show All Increment Scope",
-        "Show All Increment Scope Through Panel",
-        "Show All Increment Scope Through CLI"
+        "Show All Increment Scope Through CLI",
+        "Show All Increment Scope Through Panel"
       ]
     },
     {
-      "name": "File Filtering",
-      "priority": 19,
-      "description": "File scope filtering and management",
+      "name": "Trace and Edit",
+      "priority": 4,
       "stories": [
+        "Add / Remove Examples",
+        "Display Code Trace",
+        "Display Examples Table",
+        "Display Scenario Steps",
+        "Display Stories",
+        "Edit Code Step",
+        "Edit Example",
+        "Edit Example Cell Data",
+        "Edit Scenarios in Trace Editor",
+        "Edit Stories in Trace Editor",
+        "Navigate Code Trace",
+        "Open Scenario Source",
+        "Open Source File",
         "Open Story Files"
-      ]
-    },
-    {
-      "name": "Submit Scoped Action",
-      "priority": 20,
-      "description": "Submit actions scoped to story scope or increment",
-      "stories": []
-    },
-    {
-      "name": "CLI Multi Bots",
-      "priority": 21,
-      "description": "Additional CLI features for bot switching, command display, and behavior invocation",
-      "stories": [
-        "Display CLI Bot Command in Navigation Menu Footer"
       ]
     }
   ]

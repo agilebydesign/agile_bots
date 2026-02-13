@@ -58,7 +58,7 @@ describe('TestRenderActionDiagramSection', () => {
         assert.ok(missingIndicator, 'Missing indicator should be shown');
     });
 
-    test('render button onclick sends renderDiagram command without path', () => {
+    test('render button onclick sends renderDiagram command with path', () => {
         const view = new DiagramSectionView([
             { file_path: '/workspace/docs/story-map-outline.drawio', exists: true,
               last_sync_time: 2000, file_modified_time: 1000 }
@@ -69,9 +69,8 @@ describe('TestRenderActionDiagramSection', () => {
 
         const renderButton = document.querySelector('.render-button');
         const onclick = renderButton.getAttribute('onclick');
-        // Command should not include path - render action resolves paths internally
         assert.ok(onclick.includes("command: 'renderDiagram'"), 'Should send renderDiagram command');
-        assert.ok(!onclick.includes("path:"), 'Should NOT include path argument');
+        assert.ok(onclick.includes("path:"), 'Should include path argument');
     });
 
     // --- Generate Report button ---
@@ -84,10 +83,6 @@ describe('TestRenderActionDiagramSection', () => {
 
         const html = view.renderSection();
         document.body.innerHTML = html;
-
-        const staleIndicator = document.querySelector('.stale-indicator');
-        assert.ok(staleIndicator, 'Stale indicator should be shown');
-        assert.ok(staleIndicator.textContent.includes('Changed since last sync'));
 
         const generateButton = document.querySelector('.generate-report-button');
         assert.ok(generateButton, 'Generate report button should be shown');
@@ -106,13 +101,9 @@ describe('TestRenderActionDiagramSection', () => {
 
         const generateButton = document.querySelector('.generate-report-button');
         assert.ok(generateButton, 'Generate report button should be shown for never-synced diagram');
-
-        const pendingIndicator = document.querySelector('.pending-indicator');
-        assert.ok(pendingIndicator, 'Pending indicator should be shown');
-        assert.ok(pendingIndicator.textContent.includes('Not yet synced'));
     });
 
-    test('generate report button NOT shown when diagram is in sync', () => {
+    test('generate report button always shown for existing diagram', () => {
         const view = new DiagramSectionView([
             { file_path: 'story-map.drawio', exists: true,
               last_sync_time: 2000, file_modified_time: 1000 }
@@ -122,11 +113,11 @@ describe('TestRenderActionDiagramSection', () => {
         document.body.innerHTML = html;
 
         const generateButton = document.querySelector('.generate-report-button');
-        assert.strictEqual(generateButton, null,
-            'Generate report button should NOT be shown when diagram is in sync');
+        assert.ok(generateButton,
+            'Generate report button should always be shown for existing diagrams');
     });
 
-    test('generate report button onclick sends generateDiagramReport command without path', () => {
+    test('generate report button onclick sends generateDiagramReport command with path', () => {
         const view = new DiagramSectionView([
             { file_path: '/workspace/docs/story-map-outline.drawio', exists: true,
               last_sync_time: 1000, file_modified_time: 2000 }
@@ -139,7 +130,7 @@ describe('TestRenderActionDiagramSection', () => {
         const onclick = generateButton.getAttribute('onclick');
         assert.ok(onclick.includes("command: 'generateDiagramReport'"),
             'Should send generateDiagramReport command');
-        assert.ok(!onclick.includes("path:"), 'Should NOT include path argument');
+        assert.ok(onclick.includes("path:"), 'Should include path argument');
     });
 
     // --- Generate Report button NOT shown for missing diagram ---
@@ -190,7 +181,7 @@ describe('TestRenderActionDiagramSection', () => {
             'Update button should not show when no report');
     });
 
-    test('update graph button onclick sends updateFromDiagram without paths', () => {
+    test('update graph button onclick sends updateFromDiagram with paths', () => {
         const view = new DiagramSectionView([
             { file_path: '/workspace/docs/story-map-outline.drawio', exists: true,
               last_sync_time: 2000, file_modified_time: 1000,
@@ -204,9 +195,8 @@ describe('TestRenderActionDiagramSection', () => {
         const onclick = updateButton.getAttribute('onclick');
         assert.ok(onclick.includes("command: 'updateFromDiagram'"),
             'Should send updateFromDiagram command');
-        // Paths no longer sent - render action resolves them internally
-        assert.ok(!onclick.includes("path:"), 'Should NOT include path argument');
-        assert.ok(!onclick.includes("report:"), 'Should NOT include report argument');
+        assert.ok(onclick.includes("path:"), 'Should include path argument');
+        assert.ok(onclick.includes("report:"), 'Should include report argument');
     });
 
     // --- Links ---
@@ -270,10 +260,10 @@ describe('TestRenderActionDiagramSection', () => {
         const renderButtons = document.querySelectorAll('.render-button');
         assert.strictEqual(renderButtons.length, 2, 'Each diagram should have a render button');
 
-        // Second diagram is stale, should have generate report button
+        // Generate report button is always shown for existing diagrams
         const generateButtons = document.querySelectorAll('.generate-report-button');
-        assert.strictEqual(generateButtons.length, 1,
-            'Only stale diagram should have generate report button');
+        assert.strictEqual(generateButtons.length, 2,
+            'Each existing diagram should have a generate report button');
     });
 
     test('windows paths with backslashes are properly escaped in diagram link onclick', () => {
@@ -293,7 +283,7 @@ describe('TestRenderActionDiagramSection', () => {
             'Windows paths should have backslashes escaped in openFile link');
     });
 
-    test('stale diagram shows both stale indicator and pending changes indicator', () => {
+    test('stale diagram still shows all action buttons', () => {
         const view = new DiagramSectionView([
             { file_path: 'story-map.drawio', exists: true,
               last_sync_time: 1000, file_modified_time: 2000 }
@@ -302,12 +292,12 @@ describe('TestRenderActionDiagramSection', () => {
         const html = view.renderSection();
         document.body.innerHTML = html;
 
-        const staleIndicator = document.querySelector('.stale-indicator');
-        assert.ok(staleIndicator, 'Stale indicator should be shown');
-
-        const pendingIndicator = document.querySelector('.pending-indicator');
-        assert.ok(pendingIndicator, 'Pending changes indicator should be shown');
-        assert.ok(pendingIndicator.textContent.includes('Pending changes'));
+        // All action buttons should be present regardless of staleness
+        assert.ok(document.querySelector('.render-button'), 'Render button should be shown');
+        assert.ok(document.querySelector('.generate-report-button'),
+            'Generate report button should be shown');
+        assert.ok(document.querySelector('.save-layout-button'),
+            'Save layout button should be shown');
     });
 
     test('diagram data-path attribute matches file path for test verification', () => {

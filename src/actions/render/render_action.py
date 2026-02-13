@@ -293,6 +293,10 @@ class RenderOutputAction(Action):
                 graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
                 original_map = StoryMap(graph_data)
 
+                # Write extracted JSON (the diagram's current structure)
+                extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
+                drawio_map.save_as_json(extracted_path)
+
                 report = drawio_map.generate_update_report(original_map)
                 update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
                 report.save(update_report_path)
@@ -358,6 +362,15 @@ class RenderOutputAction(Action):
                     if self._apply_new_story(graph_data, new_story.name, new_story.parent):
                         changed = True
 
+                # Apply story moves BEFORE removes to preserve story data.
+                # If a sub-epic is removed but its stories were moved to
+                # another sub-epic, the move must happen first or the
+                # stories are lost when the sub-epic is deleted.
+                for move in report.moved_stories:
+                    if self._apply_move_story(graph_data, move.name,
+                                               move.from_parent, move.to_parent):
+                        changed = True
+
                 for removed in report.removed_epics:
                     if self._apply_remove_epic(graph_data, removed.name):
                         changed = True
@@ -373,6 +386,21 @@ class RenderOutputAction(Action):
                 # Apply increment changes (stories added/removed from increments)
                 for inc_change in report.increment_changes:
                     if self._apply_increment_change(graph_data, inc_change):
+                        changed = True
+
+                # Apply increment moves (story moved from one increment to another)
+                for inc_move in report.increment_moves:
+                    if self._apply_increment_move(graph_data, inc_move):
+                        changed = True
+
+                # Remove increments that are no longer in the diagram
+                for inc_name in report.removed_increments:
+                    if self._apply_remove_increment(graph_data, inc_name):
+                        changed = True
+
+                # Update increment priorities to match diagram order
+                if report.increment_order:
+                    if self._apply_increment_order(graph_data, report.increment_order):
                         changed = True
 
                 if changed:
@@ -528,6 +556,78 @@ class RenderOutputAction(Action):
                 return True
         return False
 
+    def _apply_move_story(self, graph_data: dict, story_name: str,
+                          from_parent: str, to_parent: str) -> bool:
+        """Move a story from one sub-epic to another, preserving all data.
+
+        Extracts the full story dict from the old parent and inserts it
+        into the new parent, keeping scenarios, acceptance criteria, etc.
+        """
+        # Step 1: Extract (remove) the story data from its current location
+        story_data = None
+        for epic in graph_data.get('epics', []):
+            story_data = self._extract_story_from_node(epic, story_name, from_parent)
+            if story_data:
+                break
+
+        if story_data is None:
+            # Fallback: search anywhere if from_parent didn't match
+            for epic in graph_data.get('epics', []):
+                story_data = self._extract_story_from_node(epic, story_name)
+                if story_data:
+                    break
+
+        if story_data is None:
+            return False
+
+        # Step 2: Insert the story into the new parent
+        for epic in graph_data.get('epics', []):
+            if self._insert_story_into_parent(epic, story_data, to_parent):
+                return True
+
+        # If we couldn't find the target parent, put the story back
+        # where it came from to avoid data loss
+        for epic in graph_data.get('epics', []):
+            if self._insert_story_into_parent(epic, story_data, from_parent):
+                return False
+        return False
+
+    def _extract_story_from_node(self, node: dict, story_name: str,
+                                  parent_name: str = None) -> Optional[dict]:
+        """Remove and return a story dict from the tree.
+
+        If parent_name is given, only extract from that specific parent.
+        """
+        if parent_name is None or node.get('name') == parent_name:
+            for sg in node.get('story_groups', []):
+                stories = sg.get('stories', [])
+                for i, story in enumerate(stories):
+                    if story.get('name') == story_name:
+                        return stories.pop(i)
+        for se in node.get('sub_epics', []):
+            result = self._extract_story_from_node(se, story_name, parent_name)
+            if result:
+                return result
+        return None
+
+    def _insert_story_into_parent(self, node: dict, story_data: dict,
+                                   parent_name: str) -> bool:
+        """Insert a story dict under the named parent."""
+        if node.get('name') == parent_name:
+            groups = node.get('story_groups', [])
+            if not groups:
+                groups = [{'type': 'and', 'connector': None, 'stories': []}]
+                node['story_groups'] = groups
+            stories = groups[0].get('stories', [])
+            # Don't insert if it already exists (safety check)
+            if not any(s.get('name') == story_data.get('name') for s in stories):
+                stories.append(story_data)
+            return True
+        for se in node.get('sub_epics', []):
+            if self._insert_story_into_parent(se, story_data, parent_name):
+                return True
+        return False
+
     def _apply_increment_change(self, graph_data: dict, change) -> bool:
         """Apply an IncrementChange to the story graph's increments section.
 
@@ -574,6 +674,90 @@ class RenderOutputAction(Action):
                 modified = True
 
         target['stories'] = stories
+        return modified
+
+    def _apply_increment_move(self, graph_data: dict, move) -> bool:
+        """Move a story from one increment to another.
+
+        Removes the story from *from_increment* and adds it to *to_increment*.
+        Creates the target increment if it does not exist.
+        """
+        increments = graph_data.get('increments', [])
+
+        def _story_name(s):
+            return s.get('name', '') if isinstance(s, dict) else str(s)
+
+        modified = False
+
+        # Remove from source increment (if specified)
+        if move.from_increment:
+            for inc in increments:
+                if inc.get('name') == move.from_increment:
+                    stories = inc.get('stories', [])
+                    for i, s in enumerate(stories):
+                        if _story_name(s) == move.story:
+                            stories.pop(i)
+                            modified = True
+                            break
+                    break
+
+        # Add to target increment
+        if move.to_increment:
+            target = None
+            for inc in increments:
+                if inc.get('name') == move.to_increment:
+                    target = inc
+                    break
+            if target is None:
+                target = {'name': move.to_increment,
+                          'priority': len(increments) + 1, 'stories': []}
+                increments.append(target)
+
+            stories = target.get('stories', [])
+            existing = {_story_name(s) for s in stories}
+            if move.story not in existing:
+                stories.append(move.story)
+                target['stories'] = stories
+                modified = True
+
+        return modified
+
+    def _apply_remove_increment(self, graph_data: dict, inc_name: str) -> bool:
+        """Remove an entire increment from the story graph."""
+        increments = graph_data.get('increments', [])
+        for i, inc in enumerate(increments):
+            if inc.get('name') == inc_name:
+                increments.pop(i)
+                return True
+        return False
+
+    def _apply_increment_order(self, graph_data: dict,
+                                order: list) -> bool:
+        """Update increment priorities to match the diagram order.
+
+        *order* is a list of ``{'name': ..., 'priority': ...}`` dicts from
+        the diagram (top-to-bottom).  Any increments not in this list keep
+        their existing priority but are pushed after the ordered ones.
+        """
+        increments = graph_data.get('increments', [])
+        if not increments:
+            return False
+
+        order_map = {entry['name']: entry['priority'] for entry in order}
+        modified = False
+
+        for inc in increments:
+            name = inc.get('name', '')
+            if name in order_map:
+                new_priority = order_map[name]
+                if inc.get('priority') != new_priority:
+                    inc['priority'] = new_priority
+                    modified = True
+
+        # Sort increments by priority so the JSON is ordered correctly
+        if modified:
+            increments.sort(key=lambda inc: inc.get('priority', 9999))
+
         return modified
 
     def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
