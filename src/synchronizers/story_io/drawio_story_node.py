@@ -265,12 +265,16 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
 
     def render_from_domain(self, epic: Epic, x_pos: float,
                             rows: _RowPositions = None,
-                            layout_data=None) -> 'DrawIOEpic':
+                            layout_data=None,
+                            skip_stories: bool = False) -> 'DrawIOEpic':
         """Render epic as a flat horizontal bar spanning its sub-epics.
 
         The epic does NOT visually contain its sub-epics; it sits on
         its own row and its width spans from the first to the last
         sub-epic underneath it.
+
+        When *skip_stories* is True sub-epics are rendered without
+        story cells (used by increments view).
         """
         from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 
@@ -287,7 +291,8 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
                 sub_epic.name, getattr(sub_epic, 'sequential_order', 0) or 0)
             cursor_x = drawio_se.render_from_domain(
                 sub_epic, cursor_x, depth=0, rows=rows,
-                layout_data=layout_data, path_prefix=epic_slug)
+                layout_data=layout_data, path_prefix=epic_slug,
+                skip_stories=skip_stories)
             self.add_child(drawio_se)
             cursor_x += CELL_SPACING
 
@@ -353,11 +358,16 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
     def render_from_domain(self, sub_epic, x_cursor: float, depth: int,
                             rows: _RowPositions,
                             layout_data=None,
-                            path_prefix: str = '') -> float:
+                            path_prefix: str = '',
+                            skip_stories: bool = False) -> float:
         """Render sub-epic as a flat horizontal bar.
 
         Returns the x position of the right edge of this sub-epic's
         content (so the caller knows where to place the next sibling).
+
+        When *skip_stories* is True the sub-epic computes its width
+        from the number of domain stories but does not create story
+        cells (used by increments view).
         """
         from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 
@@ -374,7 +384,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                     n.name, getattr(n, 'sequential_order', 0) or 0)
                 inner_x = drawio_n.render_from_domain(
                     n, inner_x, depth + 1, rows, layout_data,
-                    path_prefix=se_path)
+                    path_prefix=se_path,
+                    skip_stories=skip_stories)
                 self.add_child(drawio_n)
                 inner_x += CELL_SPACING
             inner_x -= CELL_SPACING  # remove trailing
@@ -383,37 +394,48 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
             stories = [c for c in sub_epic.children if isinstance(c, Story)]
             stories.sort(key=lambda s: getattr(s, 'sequential_order', 0) or 0)
 
-            se_saved = self._saved_position_for(f'SUB_EPIC|{self.name}', layout_data)
-            se_right = (se_saved.x + layout_data.boundary_for(f'SUB_EPIC|{self.name}').width) if (se_saved and layout_data and layout_data.boundary_for(f'SUB_EPIC|{self.name}')) else None
-            se_left = x_cursor + BAR_PADDING
-
-            story_x = se_left
-            story_y = rows.story_y
-            seen_actors: set = set()
-            for story in stories:
-                story_type = getattr(story, 'story_type', 'user') or 'user'
-                drawio_story = DrawIOStoryNodeSerializer.create_story(
-                    story.name, getattr(story, 'sequential_order', 0) or 0, story_type)
-                story_path = f'{se_path}/{_slug(drawio_story.name)}' if se_path else _slug(drawio_story.name)
-                has_saved = layout_data and layout_data.position_for(story_path)
-                if has_saved:
-                    drawio_story.render_from_domain(
-                        story, story_x, story_y, rows.actor_y,
-                        path_prefix=se_path, seen_actors=seen_actors,
-                        layout_data=layout_data)
+            if skip_stories:
+                # Compute sub-epic width from story count without creating
+                # story cells.  Each story occupies CELL_SIZE + CELL_SPACING
+                # and the sub-epic has BAR_PADDING on each side.
+                story_count = len(stories)
+                if story_count:
+                    content_width = story_count * CELL_SIZE + (story_count - 1) * CELL_SPACING
                 else:
-                    if se_right and story_x + CELL_SIZE > se_right:
-                        story_x = se_left
-                        story_y += CELL_SIZE + CELL_SPACING
-                    drawio_story.render_from_domain(
-                        story, story_x, story_y, rows.actor_y,
-                        path_prefix=se_path, seen_actors=seen_actors,
-                        layout_data=None)
-                self.add_child(drawio_story)
-                story_x += CELL_SIZE + CELL_SPACING
-            if stories:
-                story_x -= CELL_SPACING
-            end_x = story_x + BAR_PADDING
+                    content_width = CELL_SIZE
+                end_x = x_cursor + BAR_PADDING + content_width + BAR_PADDING
+            else:
+                se_saved = self._saved_position_for(f'SUB_EPIC|{self.name}', layout_data)
+                se_right = (se_saved.x + layout_data.boundary_for(f'SUB_EPIC|{self.name}').width) if (se_saved and layout_data and layout_data.boundary_for(f'SUB_EPIC|{self.name}')) else None
+                se_left = x_cursor + BAR_PADDING
+
+                story_x = se_left
+                story_y = rows.story_y
+                seen_actors: set = set()
+                for story in stories:
+                    story_type = getattr(story, 'story_type', 'user') or 'user'
+                    drawio_story = DrawIOStoryNodeSerializer.create_story(
+                        story.name, getattr(story, 'sequential_order', 0) or 0, story_type)
+                    story_path = f'{se_path}/{_slug(drawio_story.name)}' if se_path else _slug(drawio_story.name)
+                    has_saved = layout_data and layout_data.position_for(story_path)
+                    if has_saved:
+                        drawio_story.render_from_domain(
+                            story, story_x, story_y, rows.actor_y,
+                            path_prefix=se_path, seen_actors=seen_actors,
+                            layout_data=layout_data)
+                    else:
+                        if se_right and story_x + CELL_SIZE > se_right:
+                            story_x = se_left
+                            story_y += CELL_SIZE + CELL_SPACING
+                        drawio_story.render_from_domain(
+                            story, story_x, story_y, rows.actor_y,
+                            path_prefix=se_path, seen_actors=seen_actors,
+                            layout_data=None)
+                    self.add_child(drawio_story)
+                    story_x += CELL_SIZE + CELL_SPACING
+                if stories:
+                    story_x -= CELL_SPACING
+                end_x = story_x + BAR_PADDING
 
         se_y = rows.sub_epic_y(depth)
         self.set_position(start_x, se_y)
@@ -434,8 +456,19 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
         _compare_node_lists(self.get_sub_epics(), orig_nested,
                             report, parent_name=self.name, recurse=True)
 
+        # Deduplicate extracted stories by name.  The same story can
+        # appear multiple times in the tree when it lives in several
+        # increment lanes (each lane copy is assigned to the same
+        # sub-epic by X-position).  Keep the first occurrence.
+        seen_names: set = set()
+        unique_stories: list = []
+        for s in self.get_stories():
+            if s.name not in seen_names:
+                seen_names.add(s.name)
+                unique_stories.append(s)
+
         orig_stories = [c for c in original_sub_epic.children if isinstance(c, Story)]
-        _compare_node_lists(self.get_stories(), orig_stories,
+        _compare_node_lists(unique_stories, orig_stories,
                             report, parent_name=self.name, recurse=False)
 
 
@@ -552,17 +585,13 @@ class DrawIOStory(Story, DrawIOStoryNode):
 class DrawIOIncrementLane:
     """An increment lane (horizontal band) in the story map diagram."""
 
-    LANE_HEIGHT = 100
+    LABEL_Y_OFFSET = 5       # label starts 5px below lane top
+    LABEL_HEIGHT = 30
     LABEL_WIDTH = 150
-    STORY_Y_OFFSET = 25
-
-    PRIORITY_COLORS = [
-        '#f5f5f5',
-        '#e8f5e9',
-        '#e3f2fd',
-        '#fff3e0',
-        '#fce4ec',
-    ]
+    ACTOR_Y_OFFSET = 40      # actor starts below label (5+30+5)
+    ACTOR_SIZE = CELL_SIZE    # 50x50 – consistent with outline actors
+    STORY_Y_OFFSET = 95      # story starts below actor (40+50+5)
+    LANE_HEIGHT = 155         # label(30) + gap + actor(50) + gap + story(50) + pad
 
     def __init__(self, name: str, priority: int, story_names: list):
         self.name = name
@@ -571,24 +600,42 @@ class DrawIOIncrementLane:
         self._lane_element: Optional[DrawIOElement] = None
         self._label_element: Optional[DrawIOElement] = None
         self._story_copies: List[DrawIOElement] = []
+        self._actor_elements: List[DrawIOElement] = []
 
     def render(self, index: int, y_start: float, total_width: float,
-               stories: List['DrawIOStory']) -> float:
+               stories: List['DrawIOStory'],
+               domain_stories: Optional[list] = None) -> float:
+        """Render an increment lane with stories and actor labels.
+
+        Args:
+            stories: DrawIOStory objects from the outline render (used for
+                     position and style info).
+            domain_stories: Original domain Story objects (used for user
+                           info to render actor labels).
+        """
         lane_y = y_start + index * self.LANE_HEIGHT
 
-        color_idx = min(self.priority, len(self.PRIORITY_COLORS) - 1)
         lane_slug = _slug(self.name)
         self._lane_element = DrawIOElement(cell_id=f'inc-lane/{lane_slug}', value='')
-        self._lane_element.set_style(fill=self.PRIORITY_COLORS[color_idx], stroke='#cccccc')
+        self._lane_element.apply_style_for_type('increment_lane')
         self._lane_element.set_position(0, lane_y)
         self._lane_element.set_size(total_width + 40, self.LANE_HEIGHT)
 
         self._label_element = DrawIOElement(cell_id=f'inc-label/{lane_slug}', value=self.name)
         self._label_element.apply_style_for_type('increment_lane')
-        self._label_element.set_position(5, lane_y + 5)
-        self._label_element.set_size(self.LABEL_WIDTH, 30)
+        self._label_element.set_position(5, lane_y + self.LABEL_Y_OFFSET)
+        self._label_element.set_size(self.LABEL_WIDTH, self.LABEL_HEIGHT)
+
+        # Build lookup from story name to domain story for user info
+        domain_by_name = {}
+        if domain_stories:
+            for ds in domain_stories:
+                ds_name = ds.name if hasattr(ds, 'name') else str(ds)
+                domain_by_name[ds_name] = ds
 
         self._story_copies = []
+        self._actor_elements = []
+        seen_actors: set = set()
         for story in stories:
             if story.name in self.story_names:
                 copy = DrawIOElement(
@@ -600,6 +647,23 @@ class DrawIOIncrementLane:
                 copy.set_size(CELL_SIZE, CELL_SIZE)
                 self._story_copies.append(copy)
 
+                # Actor labels above stories (deduplicated per lane)
+                domain_story = domain_by_name.get(story.name)
+                if domain_story:
+                    users = getattr(domain_story, 'users', []) or []
+                    for user in users:
+                        user_name = user.name if hasattr(user, 'name') else str(user)
+                        if user_name in seen_actors:
+                            continue
+                        seen_actors.add(user_name)
+                        actor = DrawIOElement(
+                            cell_id=f'inc-lane/{lane_slug}/actor-{_slug(user_name)}',
+                            value=user_name)
+                        actor.apply_style_for_type('actor')
+                        actor.set_position(story.position.x, lane_y + self.ACTOR_Y_OFFSET)
+                        actor.set_size(self.ACTOR_SIZE, self.ACTOR_SIZE)
+                        self._actor_elements.append(actor)
+
         return self.LANE_HEIGHT
 
     def collect_all_elements(self) -> list:
@@ -608,5 +672,6 @@ class DrawIOIncrementLane:
             elements.append(self._lane_element)
         if self._label_element:
             elements.append(self._label_element)
+        elements.extend(self._actor_elements)
         elements.extend(self._story_copies)
         return elements

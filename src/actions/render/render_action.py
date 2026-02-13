@@ -370,6 +370,11 @@ class RenderOutputAction(Action):
                     if self._apply_remove_story(graph_data, removed.name, removed.parent):
                         changed = True
 
+                # Apply increment changes (stories added/removed from increments)
+                for inc_change in report.increment_changes:
+                    if self._apply_increment_change(graph_data, inc_change):
+                        changed = True
+
                 if changed:
                     story_graph_path.write_text(
                         json.dumps(graph_data, indent=2, ensure_ascii=False), encoding='utf-8')
@@ -522,6 +527,54 @@ class RenderOutputAction(Action):
             if self._remove_sub_epic_from_node(se, sub_epic_name):
                 return True
         return False
+
+    def _apply_increment_change(self, graph_data: dict, change) -> bool:
+        """Apply an IncrementChange to the story graph's increments section.
+
+        Adds/removes stories from the named increment.  If the increment
+        does not exist yet, it is created.
+        """
+        increments = graph_data.setdefault('increments', [])
+
+        # Find the increment by name
+        target = None
+        for inc in increments:
+            if inc.get('name') == change.name:
+                target = inc
+                break
+
+        if target is None and change.added:
+            # Increment mentioned in diagram but not in graph → create it
+            target = {'name': change.name, 'priority': len(increments) + 1, 'stories': []}
+            increments.append(target)
+
+        if target is None:
+            return False
+
+        modified = False
+        stories = target.get('stories', [])
+
+        # Normalise: stories can be plain strings or dicts with 'name'
+        def _story_name(s):
+            return s.get('name', '') if isinstance(s, dict) else str(s)
+
+        # Remove stories
+        for name in change.removed:
+            for i, s in enumerate(stories):
+                if _story_name(s) == name:
+                    stories.pop(i)
+                    modified = True
+                    break
+
+        # Add stories (as plain strings, matching the existing format)
+        existing_names = {_story_name(s) for s in stories}
+        for name in change.added:
+            if name not in existing_names:
+                stories.append(name)
+                modified = True
+
+        target['stories'] = stories
+        return modified
 
     def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
         diagrams = []

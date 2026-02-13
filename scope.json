@@ -1,6 +1,8 @@
 {
-  "type": "showAll",
-  "value": [],
+  "type": "story",
+  "value": [
+    "onfirm Behavor Action Instruction Response"
+  ],
   "exclude": [],
   "skiprule": []
 }

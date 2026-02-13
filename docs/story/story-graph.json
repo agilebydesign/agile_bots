@@ -19335,7 +19335,7 @@
                           "type": "",
                           "background": [],
                           "test_method": "test_render_increments_diagram_with_stories_assigned_to_increment_lanes",
-                          "steps": "Given {StoryMap} has {StoryMap.epics} with {DrawIOSubEpic} and {DrawIOStory} nodes\nAnd {StoryMap} has increments with stories assigned to each increment\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} spanning {DrawIOSubEpic} spanning {DrawIOStory}\nAnd increment lanes rendered with {DrawIOStory} cells assigned to lanes from story graph increments\nAnd actor labels positioned above {DrawIOStory} within each lane\nAnd {DrawIOStory} cells styled per story_type as in outline"
+                          "steps": "Given {StoryMap} has {StoryMap.epics} with {DrawIOSubEpic} and {DrawIOStory} nodes\nAnd {StoryMap} has increments with stories assigned to each increment\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} outline contains {DrawIOEpic} and {DrawIOSubEpic} but no {DrawIOStory} cells\nAnd {DrawIOStory} cells appear only in increment lanes (not duplicated in outline)\nAnd increment lanes rendered with {DrawIOStory} cells assigned to lanes from story graph increments\nAnd {DrawIOStory} cells styled per story_type as in outline"
                         },
                         {
                           "name": "Increment lanes ordered by priority with Y positions from outline bottom",
@@ -19367,7 +19367,7 @@
                           "type": "",
                           "background": [],
                           "test_method": "test_increment_lane_cells_styled_for_extractor_detection",
-                          "steps": "Given {StoryMap} has increments\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen increment lane {DrawIOElement} cells have fill #f5f5f5 and stroke #666666 and bold text and black font\nAnd lane cell style has strokeColor and x less than 0 consistent with {DrawIOStoryMap}.get_increments_and_boundaries"
+                          "steps": "Given {StoryMap} has increments\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen all increment lane {DrawIOElement} backgrounds use uniform fill #f5f5f5 and stroke #666666 (no priority-based colors)\nAnd lane labels use fill #f5f5f5 and stroke #666666 and bold text and black font\nAnd lane cell style has strokeColor consistent with {DrawIOStoryMap}.get_increments_and_boundaries"
                         },
                         {
                           "name": "Render increments with no increments defined produces outline-only diagram",
@@ -19375,13 +19375,21 @@
                           "type": "",
                           "background": [],
                           "test_method": "test_render_increments_with_no_increments_defined_produces_outline_only_diagram",
-                          "steps": "Given {StoryMap} has {StoryMap.epics} but no increments defined\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory} without increment lanes\nAnd summary reports increment count 0"
+                          "steps": "Given {StoryMap} has {StoryMap.epics} but no increments defined\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen {DrawIOStoryMap} contains {DrawIOEpic} and {DrawIOSubEpic} without increment lanes\nAnd summary reports increment count 0"
+                        },
+                        {
+                          "name": "Actor labels rendered above stories in increment lanes",
+                          "sequential_order": 7.0,
+                          "type": "",
+                          "background": [],
+                          "test_method": "test_actor_labels_rendered_above_stories_in_increment_lanes",
+                          "steps": "Given {StoryMap} has increments with {DrawIOStory} that have users assigned\nWhen {DrawIOStoryMap} renders increments from {StoryMap}\nThen actor labels appear above {DrawIOStory} within each increment lane\nAnd actor labels are deduplicated per lane (same user not repeated within one lane)\nAnd each lane has its own deduplication scope (same user can appear in multiple lanes)"
                         }
                       ],
                       "acceptance_criteria": [
                         {
-                          "name": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes; epic width spans sub-epics; sub-epic width spans stories; stories assigned to lanes from story graph increments[]; actors above stories within each lane; story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline",
-                          "text": "When user requests increments diagram from story graph then system renders epics sub-epics stories and increment lanes; epic width spans sub-epics; sub-epic width spans stories; stories assigned to lanes from story graph increments[]; actors above stories within each lane; story cells use distinct styles per story_type (user yellow system dark-blue technical black) as in outline",
+                          "name": "When user requests increments diagram then system renders outline with epics and sub-epics but WITHOUT story cells in the outline; stories appear ONLY in increment lanes (no duplication); story cells styled per story_type as in outline",
+                          "text": "When user requests increments diagram then system renders outline with epics and sub-epics but WITHOUT story cells in the outline; stories appear ONLY in increment lanes (no duplication); story cells styled per story_type as in outline",
                           "sequential_order": 1.0
                         },
                         {
@@ -19400,9 +19408,14 @@
                           "sequential_order": 4.0
                         },
                         {
-                          "name": "When increment lane cells are rendered then system uses fill (#f5f5f5) stroke (#666666) bold text and black font; style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)",
-                          "text": "When increment lane cells are rendered then system uses fill (#f5f5f5) stroke (#666666) bold text and black font; style and position allow extractor to detect them (strokeColor and x less than 0 consistent with get_increments_and_boundaries)",
+                          "name": "All increment lanes use uniform neutral style: fill #f5f5f5 stroke #666666 (no priority-based colors); both lane backgrounds and labels use this style",
+                          "text": "All increment lanes use uniform neutral style: fill #f5f5f5 stroke #666666 (no priority-based colors); both lane backgrounds and labels use this style",
                           "sequential_order": 5.0
+                        },
+                        {
+                          "name": "Actor labels rendered above stories within each increment lane; deduplicated per lane (same user not repeated within one lane); each lane has its own deduplication scope",
+                          "text": "Actor labels rendered above stories within each increment lane; deduplicated per lane (same user not repeated within one lane); each lane has its own deduplication scope",
+                          "sequential_order": 6.0
                         }
                       ],
                       "behavior": null
@@ -19668,7 +19681,7 @@
                           "sequential_order": 2.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_update_report_generated_for_increments_view_with_story_level_matches",
                           "steps": "Given {DrawIOStoryMap} increments have been extracted\nAnd original {StoryMap} provided\nWhen {DrawIOStoryMap}.generateUpdateReport({StoryMap}) runs for increments view\nThen {UpdateReport} lists story-level exact matches and fuzzy matches and new stories and removed stories\nAnd increment membership in extracted reflects {DrawIOStoryMap} lane positions"
                         },
                         {
@@ -19676,7 +19689,7 @@
                           "sequential_order": 3.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_story_moved_between_increments_reflected_in_extracted_graph",
                           "steps": "Given {DrawIOStory} has been moved from one increment lane to another in {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nThen extracted graph reflects new increment membership for that {DrawIOStory} based on Y position"
                         },
                         {
@@ -19684,7 +19697,7 @@
                           "sequential_order": 4.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_merge_preserves_original_ac_and_updates_story_fields",
                           "steps": "Given {UpdateReport} has been generated from {DrawIOStoryMap} increments vs {StoryMap}\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs for increments view\nThen {StoryMap} preserves original acceptance_criteria and steps\nAnd {StoryMap} updates {DrawIOStory} fields (users, sequential_order) from extracted\nAnd increments matched by position (first extracted lane to first original lane)\nAnd renamed increments updated\nAnd extra lanes appended as new increments\nAnd merge does not remove increments or replace which stories belong to which increment"
                         },
                         {
@@ -19692,7 +19705,7 @@
                           "sequential_order": 5.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_new_increment_lane_at_bottom_appended_as_new_increment",
                           "steps": "Given a new increment lane exists at the bottom of {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nAnd {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen extracted graph has one more increment\nAnd merge appends the new lane as a new increment in {StoryMap}"
                         },
                         {
@@ -19700,7 +19713,7 @@
                           "sequential_order": 6.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_removed_increment_lane_stays_in_merged_with_original_stories",
                           "steps": "Given an increment lane has been removed from {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nThen extracted has fewer lanes\nAnd {DrawIOStory} from deleted lane reassigned to nearest remaining lane in extracted\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen merge does not remove the increment from {StoryMap}\nAnd removed lane stays in merged {StoryMap} with its original stories"
                         },
                         {
@@ -19708,7 +19721,7 @@
                           "sequential_order": 7.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_renamed_increment_lane_updated_by_position_based_matching",
                           "steps": "Given an increment lane has been renamed in {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nAnd {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen merge treats the lane at that position as the same increment\nAnd updates its name in {StoryMap}"
                         },
                         {
@@ -19716,7 +19729,7 @@
                           "sequential_order": 8.0,
                           "type": "outline",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_extra_extracted_lanes_appended_fewer_lanes_leave_originals_unchanged",
                           "steps": "Given original {StoryMap} has {StoryMap.increment_count} increment lanes\nAnd extracted {DrawIOStoryMap} has {DrawIOStoryMap.increment_count} increment lanes\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs\nThen {UpdateReport.merge_result}",
                           "examples": [
                             {
@@ -19747,7 +19760,7 @@
                           "sequential_order": 9.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_known_inserting_lane_between_existing_may_misinterpret_without_stable_ids",
                           "steps": "Given original {StoryMap} has increment lanes [A, B, C]\nAnd a new lane has been inserted between A and B in {DrawIOStoryMap}\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nThen position-based matching maps extracted lane 1 to original A and lane 2 to original B\nAnd the inserted lane may be misinterpreted as a rename of B without stable IDs"
                         },
                         {
@@ -19755,7 +19768,7 @@
                           "sequential_order": 10.0,
                           "type": "",
                           "background": [],
-                          "test_method": null,
+                          "test_method": "test_story_not_within_100px_of_any_lane_remains_unassigned_in_extracted",
                           "steps": "Given {DrawIOStoryMap} increments file has {DrawIOStory} positioned more than 100px from any increment lane\nWhen {DrawIOStoryMap} extracts increments from {DrawIOStoryMap}\nThen that {DrawIOStory} is not assigned to any increment lane in extracted graph"
                         }
                       ],
@@ -21269,38 +21282,15 @@
       "name": "Simplest MCP",
       "priority": 2,
       "stories": [
-        "Generate MCP Bot Server",
         "Generate Behavior Action Tools",
         "Deploy MCP BOT Server",
-        "Inject Validation Rules for Validate Rules Action",
-        "Restart MCP Server To Load Code Changes",
-        "Invoke Bot Tool"
+        "Restart MCP Server To Load Code Changes"
       ]
     },
     {
       "name": "Workflow",
       "priority": 3,
       "stories": [
-        "Generate Behavior Tools",
-        "Generate MCP Bot Server",
-        "Inject Knowledge Graph Template and Builder Instructions",
-        "Track Activity for Build Knowledge Action",
-        "Proceed To Render Output",
-        "Track Activity for Gather Context Action",
-        "Proceed To Decide Planning",
-        "Load Render Configurations",
-        "Inject Template Instructions",
-        "Inject Synchronizer Instructions",
-        "Track Activity for Render Output Action",
-        "Track Activity for Validate Rules Action",
-        "Initialize Project Location",
-        "Close Current Action",
-        "Execute Behavior",
-        "Find Behavior Folder",
-        "Forward To Current Action",
-        "Forward To Current Behavior and Current Action",
-        "Invoke Behavior Actions in Workflow Order",
-        "Invoke Behavior in Workflow Order",
         "Track Activity For Workspace"
       ]
     },
@@ -21308,158 +21298,42 @@
       "name": "CLI",
       "priority": 4,
       "stories": [
-        "Generate REPL Command Definitions",
         "Generate CLI Entry Point",
         "Generate Cursor Commands",
-        "Generate Help Documentation"
+        "Generate Help Documentation",
+        "Generate Command Definitions"
       ]
     },
     {
       "name": "Inject / Store Content",
       "priority": 6,
-      "stories": [
-        "Load Story Graph Into Memory",
-        "Update Existing Knowledge Graph",
-        "Save Final Assumptions and Decisions",
-        "Store Clarification Data",
-        "Inject Guardrails As Part Of Clarify Requirements",
-        "Store Context Files",
-        "Stores Activity for Initialize Project Action",
-        "Guards Prevent Writes Without Project",
-        "Initialize Project Creates Context Folder",
-        "Inject Next Behavior Reminder",
-        "Input File Copied To Context Folder",
-        "Load And Merge Behavior Action Instructions"
-      ]
+      "stories": []
     },
     {
       "name": "Code Scanner",
       "priority": 7,
-      "stories": [
-        "Inject Validation Rules for Validate Rules Action",
-        "Discovers Scanners",
-        "Run Scanners against Knowledge Graph",
-        "Track Activity for Validate Rules Action",
-        "Handle Validate Rules Exceptions",
-        "Run All Scanners",
-        "Run Scanners Against Test Code",
-        "Run Scanners Against Code",
-        "Load Rules Collection",
-        "Find Rule By Name",
-        "Iterate Rules",
-        "Load Rule From File",
-        "Load Scanner For Rule",
-        "Get Rule Properties",
-        "Create Validation Scope",
-        "Load Scanner Class",
-        "Load Scanner Classes",
-        "Perform Incremental Validation",
-        "Scope Based Parameter Handling",
-        "Validation With All Parameter Combinations",
-        "Inject Rules Into AI Chat Message",
-        "Example Story",
-        "Another Story"
-      ]
+      "stories": []
     },
     {
       "name": "Refactoring",
       "priority": 8,
       "stories": [
-        "Create Build Scope",
-        "Filter Knowledge Graph",
-        "Inject Render Instructions And Configs",
-        "Get Render Instructions",
-        "Merge Base And Render Instructions",
-        "Render Output Using Synchronizers",
-        "Detect Trigger Words Through Extension",
-        "Get Trigger Priority",
-        "Match Text Against Triggers",
-        "CLI Accepts Scope With Python Dict Syntax",
-        "CLI Normalizes Python Dict To JSON",
-        "CLI Builds Parameters From Arguments",
-        "CLI Handles Scope In Real Usage",
-        "CLI Preserves Array Values In Scope",
-        "Scope Based Parameter Handling",
-        "Validation Parameter Variations",
-        "CLI Type Safe Action Context",
-        "CLI Context Builder Parses Typed Context",
-        "CLI Parser Generator Creates Action Parsers",
-        "Bootstrap Workspace",
-        "Generate Help",
-        "Generate Cursor Awareness Files",
-        "Generate Help Parameters From Action Context Classes",
-        "Insert Context Into Instructions",
-        "Inject Status Update Breadcrumbs Into Instructions",
-        "Load Bot Configuration",
         "Load Bot Behaviors",
-        "Load Actions",
-        "Load Base Action Configuration",
-        "Access Bot Paths",
-        "Get Base Instructions",
-        "Load Behavior Config",
-        "Manage Behaviors Collection",
-        "Resolve Bot Paths",
-        "Filter Action Based On Scope",
-        "Inject Strategy Into Instructions",
-        "Store Strategy Data"
+        "Load Actions"
       ]
     },
     {
       "name": "LangGraph Orchestration",
       "priority": 9,
-      "stories": [
-        "Route to Default Behavior Action",
-        "Route to BotLangFlow",
-        "Invoke BotLangActionNode",
-        "Prepare Action Instructions",
-        "Process Bot Behavor Action Instructions Automatically",
-        "Process Behavor Action Instructions Through AI Chat",
-        "Confirm Behavor Action Instruction Response",
-        "Return to chat and pause for human-in-the-loop Node",
-        "Handle Execution Modes",
-        "Resume BotLangFlow from Checkpoint"
-      ]
+      "stories": []
     },
     {
       "name": "REPL CLI",
       "priority": 10,
       "stories": [
-        "Launch REPL Loop",
-        "Detect TTY Input",
-        "Support Pipe Automation Mode",
-        "Support Dot Notation Commands",
-        "Display Fresh Start",
-        "Display Existing State",
-        "Show Current Position In Workflow Breadcrumbs",
-        "Show Available Behaviors and Actions",
-        "Navigate To Behavior",
-        "Navigate To Action",
-        "Navigate Within Behavior",
-        "Confirm Advances Across Behaviors",
-        "Request Help",
-        "Request Status",
-        "Auto-Run Instructions On Navigate",
-        "Confirm Action Completion Through CLI",
-        "Auto-Confirm Action After Instructions Complete",
-        "Advance To Next Action",
-        "Loop Back To Display State",
-        "Exit REPL",
-        "Provide Context For Instructions",
-        "Provide Story Scope Context For Instructions",
-        "Provide File Scope Context For Instructions",
-        "Store Scope Context",
-        "Show Current Behavior Action Help",
-        "Generate REPL Command Definitions",
         "Generate CLI Entry Point",
         "Generate Cursor Commands",
-        "Generate Help Documentation",
-        "Execute Current Action",
-        "Parse Command Input",
-        "Retrieve and Display Bot Behavior Action Instructions",
-        "Display Action Output",
-        "Prompt For Basic Parameters",
-        "Prompt For Story Scope Parameters",
-        "Prompt For File Scope Parameters"
+        "Generate Help Documentation"
       ]
     },
     {
@@ -21468,43 +21342,18 @@
       "description": "Basic scope management functionality",
       "stories": [
         "Create Scope",
-        "Filter Scope By Stories",
-        "Filter Scope By Files",
         "Persist Scope",
         "Clear Scope",
         "Execute Actions With Scope",
         "Navigate Story Graph",
-        "Filter Story Scope",
-        "Show All Scope Through Panel",
-        "Display Story Scope Hierarchy",
-        "Filter Work Using Knowledge Graph Scope in CLI",
-        "Filter Work Using Files Scope in CLI",
-        "Enforce Mutually Exclusive Scope Types",
-        "View Current Scope in CLI",
-        "Clear Scope Through CLI"
+        "Show All Scope Through Panel"
       ]
     },
     {
       "name": "Manage Story Hierarchy",
       "priority": 12,
       "description": "Story node management including add, delete, update, move operations",
-      "stories": [
-        "Direct.Edit Story Graph.Add Child Story Node To Parent",
-        "Direct.Edit Story Graph.Delete Story Node From Parent",
-        "Direct.Edit Story Graph.Update Story Node name",
-        "Direct.Edit Story Graph.Move Story Node",
-        "Panel.Edit Story Graph.Add Child Story Node To Parent",
-        "Panel.Edit Story Graph.Delete Story Node From Parent",
-        "Panel.Edit Story Graph.Update Story Node name",
-        "Panel.Edit Story Graph.Move Story Node",
-        "CLI.Edit Story Graph.Add Child Story Node To Parent",
-        "CLI.Edit Story Graph.Delete Story Node From Parent",
-        "CLI.Edit Story Graph.Update Story Node name",
-        "CLI.Edit Story Graph.Move Story Node",
-        "Update Story Graph Changes",
-        "Automatically Refresh Story Graph Changes",
-        "CLI.Automatically Refresh Story Graph Changes"
-      ]
+      "stories": []
     },
     {
       "name": "Display Domain Concepts",
@@ -21522,52 +21371,22 @@
       "name": "Manage Increments",
       "priority": 15,
       "description": "Increment management including add, delete, move, and update operations",
-      "stories": [
-        "Direct.Edit Increments.Add Increment",
-        "Direct.Edit Increments.Delete Increment",
-        "Direct.Edit Increments.Move Story to Increment",
-        "Panel.Edit Increments.Add Increment",
-        "Panel.Edit Increments.Delete Increment",
-        "Panel.Edit Increments.Move Story to Increment",
-        "CLI.Edit Increments.Add Increment",
-        "CLI.Edit Increments.Delete Increment",
-        "CLI.Edit Increments.Move Story to Increment"
-      ]
+      "stories": []
     },
     {
       "name": "Perform Action",
       "priority": 16,
       "description": "Story graph API actions for building and rendering",
       "stories": [
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map",
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map increments",
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Render story map with acceptance criteria",
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Update graph from story map",
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Update graph from map increments",
-        "Render Content.Synchronized Graph with Rendered Diagram Content.Update story graph from map acceptance criteria",
         "Build Story Graph Using API",
-        "Build Story Graph With CLI",
-        "Render Output",
-        "Detect Story Graph Changes From Diagram",
-        "Create Child Story Node From Diagram",
-        "Delete Story Node From Diagram",
-        "Update Story Node Name From Diagram",
-        "Move Story Node From Diagram",
-        "Persist Story Graph Changes From Diagram"
+        "Render Output"
       ]
     },
     {
       "name": "Story Filter Advanced",
       "priority": 17,
       "description": "Advanced story filtering with add/remove filter parts",
-      "stories": [
-        "Direct.Filter on Story Scope.Add Filter Part To Story Scope",
-        "Direct.Filter on Story Scope.Remove Filter Part From Story Scope",
-        "CLI.Filter on Story Scope.Add Filter Part To Story Scope",
-        "CLI.Filter on Story Scope.Remove Filter Part From Story Scope",
-        "Panel.Filter on Story Scope.Add Filter Part To Story Scope",
-        "Panel.Filter on Story Scope.Remove Filter Part From Story Scope"
-      ]
+      "stories": []
     },
     {
       "name": "Increment Filtering",
@@ -21576,13 +21395,6 @@
       "stories": [
         "Add Increment Filter Part To Story Scope",
         "Remove Increment Filter Part From Story Scope",
-        "CLI.Filter on Increment Scope.Add Increment Filter Part To Story Scope",
-        "CLI.Filter on Increment Scope.Remove Increment Filter Part From Story Scope",
-        "Panel.Filter on Increment Scope.Add Increment Filter Part To Story Scope",
-        "Panel.Filter on Increment Scope.Remove Increment Filter Part From Story Scope",
-        "Filter Story Scope Using Increment View",
-        "Display Story Scope Using Increment View in CLI",
-        "Display Story Scope Using Increment View",
         "Show All Increment Scope",
         "Show All Increment Scope Through Panel",
         "Show All Increment Scope Through CLI"
@@ -21593,47 +21405,20 @@
       "priority": 19,
       "description": "File scope filtering and management",
       "stories": [
-        "Direct.Manage File Scope.Filter File Scope",
-        "Direct.Manage File Scope.Get All Files For Behavior",
-        "Direct.Manage File Scope.Add Filter Part To File Scope",
-        "Direct.Manage File Scope.Remove Filter Part From File Scope",
-        "Panel.Manage File Scope.Filter File Scope",
-        "Panel.Manage File Scope.Display All Files For Behavior",
-        "Panel.Manage File Scope.Add Filter Part To File Scope",
-        "Panel.Manage File Scope.Remove Filter Part From File Scope",
-        "REPL.Manage File Scope.Filter File Scope",
-        "REPL.Manage File Scope.Display All Files For Behavior",
-        "REPL.Manage File Scope.Add Filter Part To File Scope",
-        "REPL.Manage File Scope.Remove Filter Part From File Scope",
-        "Panel.Manage Story Scope.Filter File Scope",
-        "Open Story Files",
-        "Get Files Filtered By Story Scope",
-        "CLI.Display Files Filtered By Story Scope",
-        "Display Files Filtered By Story Scope"
+        "Open Story Files"
       ]
     },
     {
       "name": "Submit Scoped Action",
       "priority": 20,
       "description": "Submit actions scoped to story scope or increment",
-      "stories": [
-        "Direct.Edit Story Graph.Submit Action Scoped To Story Scope",
-        "Panel.Edit Story Graph.Submit Action Scoped To Story Scope",
-        "CLI.Edit Story Graph.Submit Action Scoped To Story Scope",
-        "Direct.Edit Increments.Submit Action Scoped To Increment",
-        "Panel.Edit Increments.Submit Action Scoped To Increment",
-        "CLI.Edit Increments.Submit Action Scoped To Increment"
-      ]
+      "stories": []
     },
     {
       "name": "CLI Multi Bots",
       "priority": 21,
       "description": "Additional CLI features for bot switching, command display, and behavior invocation",
       "stories": [
-        "Load All Registered Bots",
-        "Invoke Specific Bot Behavior Command through CLI",
-        "Navigate to Bot using CLI Dot Notation",
-        "Display Available Bot in Tree Hierarchy",
         "Display CLI Bot Command in Navigation Menu Footer"
       ]
     }

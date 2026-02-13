@@ -73,7 +73,13 @@ class DrawIOStoryNodeSerializer:
             node._element._cell_id = cell_id
             node.set_position(x, y)
             node.set_size(width, height)
-        return node, parent_id
+            return node, parent_id
+        # Unrecognized fill → raw DrawIOElement (increment lanes, actors, AC boxes, etc.)
+        raw = DrawIOElement(cell_id=cell_id, value=value)
+        raw.set_style_from_string(style)
+        raw.set_position(x, y)
+        raw.set_size(width, height)
+        return raw, parent_id
 
     @staticmethod
     def _classify_node(value: str, fill_color: str) -> Optional[DrawIOStoryNode]:

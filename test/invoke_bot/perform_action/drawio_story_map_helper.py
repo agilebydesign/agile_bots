@@ -188,8 +188,9 @@ class DrawIOStoryMapTestHelper(BaseHelper):
                                     "type": "and",
                                     "connector": None,
                                     "stories": [
-                                        {"name": "Load Config", "sequential_order": 1.0, "story_type": "user", "users": [], "acceptance_criteria": []},
-                                        {"name": "Register Behaviors", "sequential_order": 2.0, "story_type": "system", "users": [], "acceptance_criteria": []}
+                                        {"name": "Load Config", "sequential_order": 1.0, "story_type": "user", "users": ["Bot Behavior"], "acceptance_criteria": []},
+                                        {"name": "Register Behaviors", "sequential_order": 2.0, "story_type": "system", "users": ["Bot Behavior"], "acceptance_criteria": []},
+                                        {"name": "Validate Input", "sequential_order": 3.0, "story_type": "user", "users": ["Developer"], "acceptance_criteria": []}
                                     ]
                                 }
                             ]
@@ -304,6 +305,59 @@ class DrawIOStoryMapTestHelper(BaseHelper):
         drawio_file = docs_dir / filename
         drawio_file.write_text(xml_content, encoding='utf-8')
         return drawio_file
+
+    def create_rendered_increments_drawio_file(self, data=None, filename='story-map-increments.drawio'):
+        """Render an increments diagram from story map data and save to disk.
+
+        Returns (drawio_file_path, story_map, data_dict).
+        """
+        from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
+        from story_graph.nodes import StoryMap
+        if data is None:
+            data = self.create_story_map_data_with_increments()
+        story_map = StoryMap(data)
+        drawio_story_map = DrawIOStoryMap(diagram_type='increments')
+        drawio_story_map.render_increments_from_story_map(
+            story_map, data.get('increments', []), layout_data=None)
+        docs_dir = self.workspace / 'docs' / 'story'
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        drawio_file = docs_dir / filename
+        drawio_story_map.save(drawio_file)
+        return drawio_file, story_map, data
+
+    def create_story_map_data_with_three_increments(self):
+        """Story map with 3 stories across 3 increment lanes."""
+        return {
+            "epics": [
+                {
+                    "name": "Invoke Bot",
+                    "sequential_order": 1.0,
+                    "sub_epics": [
+                        {
+                            "name": "Initialize Bot",
+                            "sequential_order": 1.0,
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "type": "and",
+                                    "connector": None,
+                                    "stories": [
+                                        {"name": "Load Config", "sequential_order": 1.0, "story_type": "user", "users": ["Bot Behavior"], "acceptance_criteria": []},
+                                        {"name": "Register Behaviors", "sequential_order": 2.0, "story_type": "system", "users": ["Bot Behavior"], "acceptance_criteria": []},
+                                        {"name": "Validate Input", "sequential_order": 3.0, "story_type": "user", "users": ["Developer"], "acceptance_criteria": []}
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "increments": [
+                {"name": "MVP", "priority": 1, "stories": ["Load Config"]},
+                {"name": "Phase 2", "priority": 2, "stories": ["Register Behaviors"]},
+                {"name": "Phase 3", "priority": 3, "stories": ["Validate Input"]}
+            ]
+        }
 
     def create_layout_data(self):
         return {

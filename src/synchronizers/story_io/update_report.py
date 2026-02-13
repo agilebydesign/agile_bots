@@ -24,6 +24,22 @@ class LargeDeletions:
     missing_sub_epics: List[str] = field(default_factory=list)
 
 
+@dataclass
+class IncrementChange:
+    """Delta for a single increment: stories added or removed."""
+    name: str
+    added: List[str] = field(default_factory=list)
+    removed: List[str] = field(default_factory=list)
+
+
+@dataclass
+class IncrementMove:
+    """A story that moved from one increment to another."""
+    story: str
+    from_increment: str   # '' means previously unassigned (orphan)
+    to_increment: str     # '' means now unassigned (orphan)
+
+
 class UpdateReport:
 
     def __init__(self):
@@ -36,6 +52,8 @@ class UpdateReport:
         self._removed_epics: List[StoryEntry] = []
         self._large_deletions = LargeDeletions()
         self._matched_count = 0
+        self._increment_changes: List[IncrementChange] = []
+        self._increment_moves: List[IncrementMove] = []
 
     @property
     def renames(self) -> List[MatchEntry]:
@@ -78,13 +96,28 @@ class UpdateReport:
         return self._matched_count
 
     @property
+    def increment_changes(self) -> List[IncrementChange]:
+        return list(self._increment_changes)
+
+    @property
+    def increment_moves(self) -> List[IncrementMove]:
+        return list(self._increment_moves)
+
+    def set_increment_changes(self, changes: List[IncrementChange],
+                               moves: List[IncrementMove]):
+        self._increment_changes = list(changes)
+        self._increment_moves = list(moves)
+
+    @property
     def has_changes(self) -> bool:
         return (len(self._renames) > 0 or len(self._new_stories) > 0
                 or len(self._new_sub_epics) > 0 or len(self._new_epics) > 0
                 or len(self._removed_stories) > 0
                 or len(self._removed_sub_epics) > 0 or len(self._removed_epics) > 0
                 or len(self._large_deletions.missing_epics) > 0
-                or len(self._large_deletions.missing_sub_epics) > 0)
+                or len(self._large_deletions.missing_sub_epics) > 0
+                or len(self._increment_changes) > 0
+                or len(self._increment_moves) > 0)
 
     def add_exact_match(self, extracted_name: str, original_name: str, parent: str = ''):
         self._matched_count += 1
@@ -146,6 +179,22 @@ class UpdateReport:
                 'missing_epics': self._large_deletions.missing_epics,
                 'missing_sub_epics': self._large_deletions.missing_sub_epics
             }
+        if self._increment_changes:
+            result['increment_changes'] = [
+                {k: v for k, v in
+                 [('name', c.name),
+                  ('added', c.added if c.added else None),
+                  ('removed', c.removed if c.removed else None)]
+                 if v is not None}
+                for c in self._increment_changes
+            ]
+        if self._increment_moves:
+            result['increment_moves'] = [
+                {'story': m.story,
+                 'from': m.from_increment or '(unassigned)',
+                 'to': m.to_increment or '(unassigned)'}
+                for m in self._increment_moves
+            ]
         if not self.has_changes:
             result['status'] = 'no_changes'
         return result
@@ -177,4 +226,22 @@ class UpdateReport:
             report.add_missing_epic(e)
         for se in large.get('missing_sub_epics', []):
             report.add_missing_sub_epic(se)
+        for c in data.get('increment_changes', []):
+            report._increment_changes.append(
+                IncrementChange(
+                    name=c['name'],
+                    added=c.get('added', []),
+                    removed=c.get('removed', [])))
+        for m in data.get('increment_moves', []):
+            from_inc = m.get('from', '')
+            if from_inc == '(unassigned)':
+                from_inc = ''
+            to_inc = m.get('to', '')
+            if to_inc == '(unassigned)':
+                to_inc = ''
+            report._increment_moves.append(
+                IncrementMove(
+                    story=m['story'],
+                    from_increment=from_inc,
+                    to_increment=to_inc))
         return report
