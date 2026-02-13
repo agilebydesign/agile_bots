@@ -4,8 +4,8 @@ from .story_io_position import Position, Boundary
 
 
 STYLE_DEFAULTS = {
-    'epic': {'fill': '#e1d5e7', 'stroke': '#9673a6', 'font_color': '#000000', 'shape': 'rounded'},
-    'sub_epic': {'fill': '#d5e8d4', 'stroke': '#82b366', 'font_color': '#000000', 'shape': 'rounded'},
+    'epic': {'fill': '#e1d5e7', 'stroke': '#9673a6', 'font_color': '#000000', 'shape': 'rounded', 'font_size': 11},
+    'sub_epic': {'fill': '#d5e8d4', 'stroke': '#82b366', 'font_color': '#000000', 'shape': 'rounded', 'font_size': 10},
     'story_user': {'fill': '#fff2cc', 'stroke': '#d6b656', 'font_color': '#000000', 'font_size': 8, 'aspect': 'fixed'},
     'story_system': {'fill': '#1a237e', 'stroke': '#0d47a1', 'font_color': '#ffffff', 'font_size': 8, 'aspect': 'fixed'},
     'story_technical': {'fill': '#000000', 'stroke': '#333333', 'font_color': '#ffffff', 'font_size': 8, 'aspect': 'fixed'},
@@ -124,6 +124,7 @@ class DrawIOElement:
             parts.append('rounded=1')
         parts.append('whiteSpace=wrap')
         parts.append('html=1')
+        parts.append('overflow=hidden')
         if self._aspect == 'fixed':
             parts.append('aspect=fixed')
         if self._fill:

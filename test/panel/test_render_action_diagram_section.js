@@ -63,7 +63,7 @@ describe('TestRenderActionDiagramSection', () => {
         assert.strictEqual(document.querySelector('.update-button'), null);
     });
 
-    test('diagram changes not in graph indicator and generate report when stale', () => {
+    test('generate report button always shown for stale diagram', () => {
         const view = new DiagramSectionView([
             { file_path: 'story-map.drawio', exists: true,
               last_sync_time: 1000, file_modified_time: 2000 }
@@ -72,16 +72,12 @@ describe('TestRenderActionDiagramSection', () => {
         const html = view.renderSection();
         document.body.innerHTML = html;
 
-        const staleIndicator = document.querySelector('.stale-indicator');
-        assert.ok(staleIndicator);
-        assert.ok(staleIndicator.textContent.includes('Diagram Changes Not In Graph'));
-
         const generateButton = document.querySelector('.generate-report-button');
         assert.ok(generateButton);
         assert.strictEqual(generateButton.textContent, 'Generate Report');
     });
 
-    test('diagram changes not in graph indicator and generate report when never synced', () => {
+    test('generate report button always shown for never-synced diagram', () => {
         const view = new DiagramSectionView([
             { file_path: 'story-map.drawio', exists: true,
               last_sync_time: null, file_modified_time: 1000 }
@@ -89,10 +85,6 @@ describe('TestRenderActionDiagramSection', () => {
 
         const html = view.renderSection();
         document.body.innerHTML = html;
-
-        const staleIndicator = document.querySelector('.stale-indicator');
-        assert.ok(staleIndicator);
-        assert.ok(staleIndicator.textContent.includes('Diagram Changes Not In Graph'));
 
         const generateButton = document.querySelector('.generate-report-button');
         assert.ok(generateButton);

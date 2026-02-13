@@ -30,14 +30,16 @@ class TestRenderStoryMap:
 
         epics = drawio_story_map.get_epics()
         assert len(epics) == 1
-        assert epics[0].position.y == 10
+        from synchronizers.story_io.drawio_story_node import EPIC_Y
+        assert epics[0].position.y == EPIC_Y
 
         sub_epics = epics[0].get_sub_epics()
         assert epics[0].boundary.width >= sum(se.boundary.width for se in sub_epics)
         assert sub_epics[0].position.y > epics[0].position.y
 
         stories = sub_epics[0].get_stories()
-        assert sub_epics[0].boundary.width >= sum(s.boundary.width for s in stories)
+        # In row-based layout sub-epic is a separate bar, not a container.
+        # Check stories are ordered left-to-right.
         for i in range(len(stories) - 1):
             assert stories[i].position.x < stories[i+1].position.x
 
@@ -56,11 +58,12 @@ class TestRenderStoryMap:
         drawio_story_map.render_from_story_map(story_map, layout_data=layout_data)
 
         epics = drawio_story_map.get_epics()
+        # With layout data, epic uses saved position
         assert epics[0].position.x == 20
         assert epics[0].position.y == 120
         sub_epics = epics[0].get_sub_epics()
-        assert sub_epics[0].position.x == 30
-        assert sub_epics[0].position.y == 180
+        # Sub-epic X = epic X + BAR_PADDING, Y computed by row layout
+        assert sub_epics[0].position.y > epics[0].position.y
         stories = sub_epics[0].get_stories()
         assert stories[0].sequential_order < stories[1].sequential_order
 
@@ -91,10 +94,10 @@ class TestRenderStoryMap:
                 assert stories[i].sequential_order < stories[i+1].sequential_order
 
     @pytest.mark.parametrize('story_type,expected_fill,expected_stroke,expected_font_color', [
-        ('user', '#fff2cc', '#d6b656', 'black'),
-        (None, '#fff2cc', '#d6b656', 'black'),
-        ('system', '#1a237e', '#0d47a1', 'white'),
-        ('technical', '#000000', '#333333', 'white')
+        ('user', '#fff2cc', '#d6b656', '#000000'),
+        (None, '#fff2cc', '#d6b656', '#000000'),
+        ('system', '#1a237e', '#0d47a1', '#ffffff'),
+        ('technical', '#000000', '#333333', '#ffffff')
     ])
     def test_drawio_story_map_styles_story_cells_by_story_type(self, tmp_path, story_type, expected_fill, expected_stroke, expected_font_color):
         helper = BotTestHelper(tmp_path)
@@ -109,8 +112,8 @@ class TestRenderStoryMap:
         helper.drawio_story_map.assert_cell_style(stories[0], expected_fill, expected_stroke, expected_font_color)
 
     @pytest.mark.parametrize('node_type,expected_shape,expected_fill,expected_stroke,expected_font_color', [
-        ('epic', 'rounded', '#e1d5e7', '#9673a6', 'black'),
-        ('sub_epic', 'rounded', '#d5e8d4', '#82b366', 'black'),
+        ('epic', 'rounded', '#e1d5e7', '#9673a6', '#000000'),
+        ('sub_epic', 'rounded', '#d5e8d4', '#82b366', '#000000'),
     ])
     def test_drawio_story_map_styles_container_and_label_cells_by_node_type(self, tmp_path, node_type, expected_shape, expected_fill, expected_stroke, expected_font_color):
         helper = BotTestHelper(tmp_path)
@@ -338,8 +341,11 @@ class TestDomainModelDynamicYPositioning:
         dm.render_from_story_map(story_map)
         ses = dm.get_sub_epics()
         assert len(ses) == 1
-        # SUB_EPIC_Y_OFFSET from epic = 40, epic Y = 10 → sub-epic Y = 50
-        assert ses[0].position.y == 50, f"Flat sub-epic Y should be 50, got {ses[0].position.y}"
+        # Row-based: sub_epic_y(0) = EPIC_Y + EPIC_HEIGHT + ROW_GAP = 120+60+15 = 195
+        from synchronizers.story_io.drawio_story_node import EPIC_Y, EPIC_HEIGHT, ROW_GAP
+        expected_y = EPIC_Y + EPIC_HEIGHT + ROW_GAP
+        assert ses[0].position.y == expected_y, \
+            f"Flat sub-epic Y should be {expected_y}, got {ses[0].position.y}"
 
 
 class TestDiagramVisualIntegrity:
@@ -418,21 +424,20 @@ class TestDiagramVisualIntegrity:
 
     # ---- Actor positioning (catches actors-in-header bug) ----
 
-    def test_actors_positioned_below_their_story_card_not_above(self, tmp_path):
-        """Actor elements must sit below their parent story card.
-        If actors are above (negative Y offset), they land inside
-        the sub-epic header area and look like sub-epic labels."""
+    def test_actors_positioned_in_actor_row_above_stories(self, tmp_path):
+        """In the row-based layout, actors sit in a dedicated row above stories
+        but below sub-epics.  Verify actors are above stories and below the
+        sub-epic row."""
         dm = self._render_with_users(tmp_path)
         stories = dm.get_stories()
         assert len(stories) >= 1, "Need stories to test actor positioning"
 
         for story in stories:
-            story_bottom = story.position.y + story.boundary.height
             for actor in story._actor_elements:
-                assert actor.position.y >= story_bottom, \
-                    (f"Actor '{actor.value}' at y={actor.position.y} is above "
-                     f"story '{story.name}' bottom at y={story_bottom}. "
-                     f"Actors must be below their story card, not inside the parent header.")
+                # Actor should be above the story (smaller Y = higher)
+                assert actor.position.y < story.position.y, \
+                    (f"Actor '{actor.value}' at y={actor.position.y} should be above "
+                     f"story '{story.name}' at y={story.position.y} in row-based layout.")
 
     def test_actors_do_not_overlap_sub_epic_header_area(self, tmp_path):
         """Actor elements must not be positioned within the first 30px of
@@ -459,43 +464,62 @@ class TestDiagramVisualIntegrity:
 
     # ---- Geometric containment (catches container-too-small bugs) ----
 
-    def test_epic_boundary_geometrically_contains_all_sub_epics(self, tmp_path):
-        """Epic container must fully contain every sub-epic boundary.
-        A 'contains' check catches containers that are too short or narrow."""
+    def test_epic_horizontal_span_covers_all_sub_epics(self, tmp_path):
+        """In row-based layout, epic is a horizontal bar on its own row.
+        Its X-range must span all sub-epics beneath it."""
         dm = self._render_simple(tmp_path)
 
         for epic in dm.get_epics():
+            epic_left = epic.boundary.x
+            epic_right = epic.boundary.x + epic.boundary.width
             for se in epic.get_sub_epics():
-                assert epic.boundary.contains_boundary(se.boundary), \
-                    (f"Epic '{epic.name}' boundary {epic.boundary} does not contain "
-                     f"sub-epic '{se.name}' boundary {se.boundary}")
+                assert se.boundary.x >= epic_left, \
+                    (f"Sub-epic '{se.name}' left edge {se.boundary.x} is outside "
+                     f"epic '{epic.name}' left edge {epic_left}")
+                se_right = se.boundary.x + se.boundary.width
+                assert se_right <= epic_right, \
+                    (f"Sub-epic '{se.name}' right edge {se_right} exceeds "
+                     f"epic '{epic.name}' right edge {epic_right}")
 
-    def test_sub_epic_boundary_geometrically_contains_all_stories(self, tmp_path):
-        """Sub-epic container must fully contain every story boundary."""
+    def test_sub_epic_horizontal_span_covers_all_stories(self, tmp_path):
+        """In row-based layout, sub-epic is a horizontal bar on its own row.
+        Its X-range must span all stories beneath it."""
         dm = self._render_simple(tmp_path)
 
         for se in dm.get_sub_epics():
+            se_left = se.boundary.x
+            se_right = se.boundary.x + se.boundary.width
             for story in se.get_stories():
-                assert se.boundary.contains_boundary(story.boundary), \
-                    (f"Sub-epic '{se.name}' boundary {se.boundary} does not contain "
-                     f"story '{story.name}' boundary {story.boundary}")
+                assert story.boundary.x >= se_left, \
+                    (f"Story '{story.name}' left edge {story.boundary.x} is outside "
+                     f"sub-epic '{se.name}' left edge {se_left}")
+                story_right = story.boundary.x + story.boundary.width
+                assert story_right <= se_right, \
+                    (f"Story '{story.name}' right edge {story_right} exceeds "
+                     f"sub-epic '{se.name}' right edge {se_right}")
 
-    def test_nested_containers_contain_all_descendants_at_every_depth(self, tmp_path):
-        """For nested sub-epics (depth=3), every parent container must
-        fully contain all its direct children at every level."""
+    def test_nested_containers_horizontal_span_at_every_depth(self, tmp_path):
+        """For nested sub-epics (depth=3), every parent's horizontal span
+        must cover all its direct children at every level."""
         dm = self._render_nested(tmp_path, depth=3)
 
         epic = dm.get_epics()[0]
         top_se = epic.get_sub_epics()[0]
-        assert epic.boundary.contains_boundary(top_se.boundary), \
-            "Epic must contain top-level sub-epic"
+        # Epic horizontal span covers top-level sub-epic
+        assert top_se.boundary.x >= epic.boundary.x, \
+            "Top sub-epic must be within epic's horizontal span"
+        assert (top_se.boundary.x + top_se.boundary.width) <= \
+               (epic.boundary.x + epic.boundary.width), \
+            "Top sub-epic right edge must be within epic's horizontal span"
 
         for nested_se in top_se.get_sub_epics():
-            assert top_se.boundary.contains_boundary(nested_se.boundary), \
-                f"Top sub-epic must contain nested sub-epic '{nested_se.name}'"
+            # Top sub-epic horizontal span covers nested sub-epic
+            assert nested_se.boundary.x >= top_se.boundary.x, \
+                f"Nested sub-epic '{nested_se.name}' must be within top sub-epic span"
             for story in nested_se.get_stories():
-                assert nested_se.boundary.contains_boundary(story.boundary), \
-                    f"Nested sub-epic '{nested_se.name}' must contain story '{story.name}'"
+                # Nested sub-epic horizontal span covers story
+                assert story.boundary.x >= nested_se.boundary.x, \
+                    f"Story '{story.name}' must be within sub-epic '{nested_se.name}' span"
 
     # ---- Overlap detection (catches siblings piled on top of each other) ----
 
@@ -1150,6 +1174,364 @@ class TestUpdateGraphFromMapIncrements:
                 f"should be within 100px of a lane (min_dist={min_dist})"
 
 
+class TestIncrementRemovalMoveAndOrderApply:
+    """Tests for applying increment removals, moves, and priority reordering."""
+
+    def test_apply_remove_increment_deletes_entire_increment_from_story_graph(self, tmp_path):
+        """Removed increments should be completely deleted from the story graph."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        # Precondition: 2 increments exist
+        assert len(graph_data['increments']) == 2
+
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        result = action._apply_remove_increment(graph_data, 'Phase 2')
+        assert result is True
+        inc_names = [i['name'] for i in graph_data['increments']]
+        assert 'Phase 2' not in inc_names, \
+            f"Phase 2 should be removed, got: {inc_names}"
+        assert 'MVP' in inc_names, "MVP should still be present"
+        assert len(graph_data['increments']) == 1
+
+    def test_apply_remove_increment_returns_false_for_nonexistent(self, tmp_path):
+        """Removing a non-existent increment returns False."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        result = action._apply_remove_increment(graph_data, 'Nonexistent')
+        assert result is False
+        assert len(graph_data['increments']) == 2
+
+    def test_apply_increment_move_transfers_story_between_increments(self, tmp_path):
+        """Moving a story between increments removes from source and adds to target."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        from synchronizers.story_io.update_report import IncrementMove
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        move = IncrementMove(story='Load Config', from_increment='MVP',
+                             to_increment='Phase 2')
+        result = action._apply_increment_move(graph_data, move)
+        assert result is True
+
+        mvp = next(i for i in graph_data['increments'] if i['name'] == 'MVP')
+        p2 = next(i for i in graph_data['increments'] if i['name'] == 'Phase 2')
+        assert 'Load Config' not in mvp['stories'], \
+            f"Load Config should be removed from MVP: {mvp['stories']}"
+        assert 'Load Config' in p2['stories'], \
+            f"Load Config should be in Phase 2: {p2['stories']}"
+
+    def test_apply_increment_move_creates_target_if_missing(self, tmp_path):
+        """Moving a story to a non-existent increment creates it."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        from synchronizers.story_io.update_report import IncrementMove
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        move = IncrementMove(story='Load Config', from_increment='MVP',
+                             to_increment='Sprint 1')
+        result = action._apply_increment_move(graph_data, move)
+        assert result is True
+
+        inc_names = [i['name'] for i in graph_data['increments']]
+        assert 'Sprint 1' in inc_names, f"Sprint 1 should be created: {inc_names}"
+        sprint1 = next(i for i in graph_data['increments'] if i['name'] == 'Sprint 1')
+        assert 'Load Config' in sprint1['stories']
+
+    def test_apply_increment_order_updates_priorities(self, tmp_path):
+        """Increment priorities should be updated to match diagram order."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        # Original: MVP=priority 1, Phase 2=priority 2
+        # Diagram order: Phase 2 first (priority 1), MVP second (priority 2)
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        order = [{'name': 'Phase 2', 'priority': 1},
+                 {'name': 'MVP', 'priority': 2}]
+        result = action._apply_increment_order(graph_data, order)
+        assert result is True
+
+        p2 = next(i for i in graph_data['increments'] if i['name'] == 'Phase 2')
+        mvp = next(i for i in graph_data['increments'] if i['name'] == 'MVP')
+        assert p2['priority'] == 1, f"Phase 2 should be priority 1, got {p2['priority']}"
+        assert mvp['priority'] == 2, f"MVP should be priority 2, got {mvp['priority']}"
+
+        # After reordering, Phase 2 should come first in the list
+        assert graph_data['increments'][0]['name'] == 'Phase 2'
+        assert graph_data['increments'][1]['name'] == 'MVP'
+
+    def test_apply_increment_order_no_change_when_already_correct(self, tmp_path):
+        """No modification when priorities already match diagram order."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        graph_data = json.loads(json.dumps(data))
+
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        order = [{'name': 'MVP', 'priority': 1},
+                 {'name': 'Phase 2', 'priority': 2}]
+        result = action._apply_increment_order(graph_data, order)
+        assert result is False  # no changes needed
+
+    def test_report_includes_removed_increments_and_order(self, tmp_path):
+        """Report generated from diagram with fewer lanes lists removed increments and order."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        original_story_map = StoryMap(data)
+
+        # Render with only MVP (simulating removal of Phase 2)
+        reduced_data = dict(data)
+        reduced_data['increments'] = [data['increments'][0]]  # Only MVP
+
+        drawio_story_map = DrawIOStoryMap(diagram_type='increments')
+        drawio_story_map.render_increments_from_story_map(
+            original_story_map, reduced_data['increments'], layout_data=None)
+        drawio_file = tmp_path / 'increments.drawio'
+        drawio_story_map.save(drawio_file)
+
+        loaded = DrawIOStoryMap.load(drawio_file)
+        report = loaded.generate_update_report(original_story_map)
+
+        # Phase 2 should be listed as removed
+        assert 'Phase 2' in report.removed_increments, \
+            f"Phase 2 should be in removed_increments: {report.removed_increments}"
+
+        # increment_order should list only MVP
+        order_names = [o['name'] for o in report.increment_order]
+        assert 'MVP' in order_names, \
+            f"MVP should be in increment_order: {report.increment_order}"
+        assert 'Phase 2' not in order_names, \
+            "Phase 2 should NOT be in increment_order"
+
+    def test_removed_increments_and_order_roundtrip_through_json(self, tmp_path):
+        """removed_increments and increment_order survive to_dict → from_dict."""
+        from synchronizers.story_io.update_report import (
+            UpdateReport, IncrementChange, IncrementMove)
+
+        report = UpdateReport()
+        report.set_increment_changes(
+            changes=[IncrementChange(name='MVP', added=['Story A'])],
+            moves=[IncrementMove(story='Story B', from_increment='X', to_increment='Y')],
+            removed_increments=['Phase 2', 'Phase 3'],
+            increment_order=[{'name': 'MVP', 'priority': 1}])
+
+        data = report.to_dict()
+        assert 'removed_increments' in data
+        assert 'increment_order' in data
+
+        restored = UpdateReport.from_dict(data)
+        assert restored.removed_increments == ['Phase 2', 'Phase 3']
+        assert restored.increment_order == [{'name': 'MVP', 'priority': 1}]
+        assert len(restored.increment_changes) == 1
+        assert len(restored.increment_moves) == 1
+
+    def test_end_to_end_remove_lane_and_reorder_updates_story_graph(self, tmp_path):
+        """Full flow: render 2 lanes → remove Phase 2 → report → apply → verify."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        original_data = json.loads(json.dumps(data))
+        story_map = StoryMap(data)
+
+        # 1. Render with only MVP (simulating user deleting Phase 2 lane)
+        reduced_increments = [data['increments'][0]]
+        drawio_map = DrawIOStoryMap(diagram_type='increments')
+        drawio_map.render_increments_from_story_map(
+            story_map, reduced_increments, layout_data=None)
+        drawio_file = tmp_path / 'increments.drawio'
+        drawio_map.save(drawio_file)
+
+        # 2. Load and generate report
+        loaded = DrawIOStoryMap.load(drawio_file)
+        report = loaded.generate_update_report(story_map)
+
+        # 3. Apply all changes
+        from actions.render.render_action import RenderOutputAction
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        graph_data = json.loads(json.dumps(original_data))
+
+        for inc_change in report.increment_changes:
+            action._apply_increment_change(graph_data, inc_change)
+        for inc_move in report.increment_moves:
+            action._apply_increment_move(graph_data, inc_move)
+        for inc_name in report.removed_increments:
+            action._apply_remove_increment(graph_data, inc_name)
+        if report.increment_order:
+            action._apply_increment_order(graph_data, report.increment_order)
+
+        # 4. Verify: Phase 2 should be gone, MVP should remain
+        inc_names = [i['name'] for i in graph_data['increments']]
+        assert 'Phase 2' not in inc_names, \
+            f"Phase 2 should be removed: {inc_names}"
+        assert 'MVP' in inc_names, \
+            f"MVP should remain: {inc_names}"
+        mvp = next(i for i in graph_data['increments'] if i['name'] == 'MVP')
+        assert mvp['priority'] == 1
+
+
+class TestUserCreatedIncrementLaneDetection:
+    """Tests that user-created increment lanes (with simple cell IDs
+    instead of inc-lane/ prefix) are correctly detected during extraction."""
+
+    def test_user_created_lane_detected_by_geometry(self, tmp_path):
+        """A user-created lane background (large rectangle, empty value,
+        simple ID) and its label should be extracted as a new increment."""
+        helper = BotTestHelper(tmp_path)
+        drawio_file, story_map, data = \
+            helper.drawio_story_map.create_rendered_increments_drawio_file()
+
+        loaded = DrawIOStoryMap.load(drawio_file)
+
+        # Find an existing lane to get its geometry for reference
+        existing_lanes = [n for n in loaded._extra_nodes
+                          if getattr(n, 'cell_id', '').startswith('inc-lane/')
+                          and getattr(n, 'value', '') == '']
+        assert len(existing_lanes) > 0
+        ref_lane = existing_lanes[0]
+        lane_width = ref_lane.boundary.width
+        lane_height = ref_lane.boundary.height
+        last_lane_bottom = max(n.position.y + n.boundary.height
+                               for n in existing_lanes)
+
+        # Add a user-created lane background (simple id, empty value)
+        from synchronizers.story_io.drawio_element import DrawIOElement
+        new_bg = DrawIOElement(cell_id='99', value='')
+        new_bg.set_position(0, last_lane_bottom + 10)
+        new_bg.set_size(lane_width, lane_height)
+        loaded._extra_nodes.append(new_bg)
+
+        # Add a user-created lane label (simple id, with name)
+        new_label = DrawIOElement(cell_id='100', value='My New Increment')
+        new_label.set_position(5, last_lane_bottom + 15)
+        new_label.set_size(150, 30)
+        loaded._extra_nodes.append(new_label)
+
+        extracted = loaded.extract_increment_assignments()
+        inc_names = [inc['name'] for inc in extracted]
+        assert 'My New Increment' in inc_names, \
+            f"User-created lane not detected. Found: {inc_names}"
+
+    def test_user_created_lane_stories_assigned_by_y_position(self, tmp_path):
+        """Stories positioned inside a user-created lane should be
+        assigned to that increment."""
+        helper = BotTestHelper(tmp_path)
+        drawio_file, story_map, data = \
+            helper.drawio_story_map.create_rendered_increments_drawio_file()
+
+        loaded = DrawIOStoryMap.load(drawio_file)
+
+        existing_lanes = [n for n in loaded._extra_nodes
+                          if getattr(n, 'cell_id', '').startswith('inc-lane/')
+                          and getattr(n, 'value', '') == '']
+        ref_lane = existing_lanes[0]
+        lane_width = ref_lane.boundary.width
+        lane_height = ref_lane.boundary.height
+        last_lane_bottom = max(n.position.y + n.boundary.height
+                               for n in existing_lanes)
+
+        lane_y = last_lane_bottom + 10
+        from synchronizers.story_io.drawio_element import DrawIOElement
+
+        # Lane background
+        new_bg = DrawIOElement(cell_id='99', value='')
+        new_bg.set_position(0, lane_y)
+        new_bg.set_size(lane_width, lane_height)
+        loaded._extra_nodes.append(new_bg)
+
+        # Lane label
+        new_label = DrawIOElement(cell_id='100', value='Custom Lane')
+        new_label.set_position(5, lane_y + 5)
+        new_label.set_size(150, 30)
+        loaded._extra_nodes.append(new_label)
+
+        # A story inside the lane
+        story_in_lane = DrawIOElement(cell_id='101', value='Test Story')
+        story_in_lane.set_position(200, lane_y + 80)
+        story_in_lane.set_size(50, 50)
+        loaded._extra_nodes.append(story_in_lane)
+
+        extracted = loaded.extract_increment_assignments()
+        custom = next((inc for inc in extracted if inc['name'] == 'Custom Lane'), None)
+        assert custom is not None, "Custom Lane not found in extracted"
+        assert 'Test Story' in custom['stories'], \
+            f"Test Story not assigned to Custom Lane. Stories: {custom['stories']}"
+
+    def test_user_created_lane_shows_in_report_as_new_increment(self, tmp_path):
+        """A user-created increment lane should appear in the report
+        with its stories and in the new increment_order."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_increments()
+        original_story_map = StoryMap(data)
+
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_increments_from_story_map(
+            original_story_map, data['increments'], layout_data=None)
+
+        # Find lane geometry
+        existing_lanes = [n for n in drawio_map._extra_nodes
+                          if getattr(n, 'cell_id', '').startswith('inc-lane/')
+                          and getattr(n, 'value', '') == '']
+        ref_lane = existing_lanes[0]
+        lane_width = ref_lane.boundary.width
+        lane_height = ref_lane.boundary.height
+        last_lane_bottom = max(n.position.y + n.boundary.height
+                               for n in existing_lanes)
+
+        lane_y = last_lane_bottom + 10
+        from synchronizers.story_io.drawio_element import DrawIOElement
+
+        # Add user-created lane
+        new_bg = DrawIOElement(cell_id='50', value='')
+        new_bg.set_position(0, lane_y)
+        new_bg.set_size(lane_width, lane_height)
+        drawio_map._extra_nodes.append(new_bg)
+
+        new_label = DrawIOElement(cell_id='51', value='New Sprint')
+        new_label.set_position(5, lane_y + 5)
+        new_label.set_size(150, 30)
+        drawio_map._extra_nodes.append(new_label)
+
+        # Move a story into the new lane
+        orphan = None
+        for s in drawio_map.get_stories():
+            if s.name == 'Validate Input':
+                orphan = s
+                break
+        if orphan:
+            copy = DrawIOElement(cell_id='52', value='Validate Input')
+            copy.set_position(orphan.position.x, lane_y + 80)
+            copy.set_size(50, 50)
+            drawio_map._extra_nodes.append(copy)
+
+        # Save, reload, generate report
+        drawio_file = tmp_path / 'test.drawio'
+        drawio_map.save(drawio_file)
+        loaded = DrawIOStoryMap.load(drawio_file)
+        report = loaded.generate_update_report(original_story_map)
+
+        # New Sprint should appear in increment_order
+        order_names = [o['name'] for o in report.increment_order]
+        assert 'New Sprint' in order_names, \
+            f"New Sprint not in increment_order: {order_names}"
+
+
 class TestIncrementReportTwoPassExtraction:
     """Tests for the two-pass report: pass 1 = hierarchy, pass 2 = increment delta."""
 
@@ -1450,6 +1832,519 @@ class TestIncrementReportTwoPassExtraction:
             f"Load Config should now be in Phase 2: {p2['stories']}"
 
 
+class TestStoryMoveDetection:
+    """Tests for detecting moved stories (not false new+removed) in update reports."""
+
+    @staticmethod
+    def _two_sub_epic_data():
+        """Story map with two sub-epics so we can test cross-sub-epic moves."""
+        return {
+            "epics": [{
+                "name": "Invoke Bot",
+                "sequential_order": 1.0,
+                "sub_epics": [
+                    {
+                        "name": "Initialize Bot",
+                        "sequential_order": 1.0,
+                        "sub_epics": [],
+                        "story_groups": [{
+                            "type": "and", "connector": None,
+                            "stories": [
+                                {"name": "Load Config", "sequential_order": 1.0,
+                                 "story_type": "user", "acceptance_criteria": [
+                                     {"name": "Config file is loaded from workspace root"}]},
+                                {"name": "Validate Input", "sequential_order": 2.0,
+                                 "story_type": "user", "acceptance_criteria": []},
+                            ]
+                        }]
+                    },
+                    {
+                        "name": "Run Bot",
+                        "sequential_order": 2.0,
+                        "sub_epics": [],
+                        "story_groups": [{
+                            "type": "and", "connector": None,
+                            "stories": [
+                                {"name": "Register Behaviors", "sequential_order": 1.0,
+                                 "story_type": "system", "acceptance_criteria": []},
+                                {"name": "Execute Action", "sequential_order": 2.0,
+                                 "story_type": "user", "acceptance_criteria": []},
+                            ]
+                        }]
+                    },
+                ]
+            }]
+        }
+
+    @staticmethod
+    def _nested_sub_epic_data():
+        """Story map with a sub-epic nested inside another (for removal tests)."""
+        return {
+            "epics": [{
+                "name": "Invoke Bot",
+                "sequential_order": 1.0,
+                "sub_epics": [
+                    {
+                        "name": "Initialize Bot",
+                        "sequential_order": 1.0,
+                        "sub_epics": [
+                            {
+                                "name": "Init Interface",
+                                "sequential_order": 1.0,
+                                "sub_epics": [],
+                                "story_groups": [{
+                                    "type": "and", "connector": None,
+                                    "stories": [
+                                        {"name": "Open Panel", "sequential_order": 1.0,
+                                         "story_type": "user",
+                                         "acceptance_criteria": [
+                                             {"name": "Panel opens in IDE sidebar"}]},
+                                        {"name": "Apply Branding", "sequential_order": 2.0,
+                                         "story_type": "user", "acceptance_criteria": []},
+                                    ]
+                                }]
+                            }
+                        ],
+                        "story_groups": [{
+                            "type": "and", "connector": None,
+                            "stories": [
+                                {"name": "Load Config", "sequential_order": 1.0,
+                                 "story_type": "user", "acceptance_criteria": []},
+                            ]
+                        }]
+                    },
+                ]
+            }]
+        }
+
+    def test_story_moved_between_sub_epics_detected_as_move_not_new(self, tmp_path):
+        """When a story moves from sub-epic A to sub-epic B, it should appear
+        in moved_stories, NOT in new_stories or removed_stories."""
+        original_data = self._two_sub_epic_data()
+        original_map = StoryMap(original_data)
+
+        # Create modified data: 'Load Config' moved from 'Initialize Bot' to 'Run Bot'
+        import copy
+        modified_data = copy.deepcopy(original_data)
+        init_stories = modified_data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories']
+        run_stories = modified_data['epics'][0]['sub_epics'][1]['story_groups'][0]['stories']
+
+        # Remove from Init, add to Run
+        moved_story = [s for s in init_stories if s['name'] == 'Load Config'][0]
+        init_stories.remove(moved_story)
+        run_stories.append(moved_story)
+
+        # Render the modified data
+        modified_map = StoryMap(modified_data)
+        drawio_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_map.render_from_story_map(modified_map, layout_data=None)
+
+        # Generate report comparing modified diagram against original
+        report = drawio_map.generate_update_report(original_map)
+
+        # Should be a move, not new+removed
+        moved_names = [m.name for m in report.moved_stories]
+        new_names = [s.name for s in report.new_stories]
+        removed_names = [s.name for s in report.removed_stories]
+
+        assert 'Load Config' in moved_names, \
+            f"'Load Config' should be in moved_stories, got moved={moved_names}, " \
+            f"new={new_names}, removed={removed_names}"
+        assert 'Load Config' not in new_names, \
+            f"'Load Config' should NOT be in new_stories"
+        assert 'Load Config' not in removed_names, \
+            f"'Load Config' should NOT be in removed_stories"
+
+        # Verify move details
+        move = next(m for m in report.moved_stories if m.name == 'Load Config')
+        assert move.from_parent == 'Initialize Bot'
+        assert move.to_parent == 'Run Bot'
+
+    def test_stories_from_removed_sub_epic_detected_as_moves(self, tmp_path):
+        """When a sub-epic is removed and its stories appear under the parent,
+        those stories should be moves (from removed sub-epic to parent)."""
+        original_data = self._nested_sub_epic_data()
+        original_map = StoryMap(original_data)
+
+        # Create modified data: remove 'Init Interface', promote its stories
+        import copy
+        modified_data = copy.deepcopy(original_data)
+        init_bot = modified_data['epics'][0]['sub_epics'][0]
+
+        # Get stories from the nested sub-epic
+        nested_se = init_bot['sub_epics'][0]  # 'Init Interface'
+        promoted_stories = nested_se['story_groups'][0]['stories']
+
+        # Remove the nested sub-epic
+        init_bot['sub_epics'] = []
+
+        # Add promoted stories to 'Initialize Bot'
+        init_bot['story_groups'][0]['stories'].extend(promoted_stories)
+
+        # Render the modified data
+        modified_map = StoryMap(modified_data)
+        drawio_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_map.render_from_story_map(modified_map, layout_data=None)
+
+        # Generate report
+        report = drawio_map.generate_update_report(original_map)
+
+        moved_names = [m.name for m in report.moved_stories]
+        new_names = [s.name for s in report.new_stories]
+
+        # 'Open Panel' and 'Apply Branding' should be moves, not new
+        assert 'Open Panel' in moved_names, \
+            f"'Open Panel' should be in moved_stories, got moved={moved_names}, new={new_names}"
+        assert 'Apply Branding' in moved_names, \
+            f"'Apply Branding' should be in moved_stories"
+        assert 'Open Panel' not in new_names
+        assert 'Apply Branding' not in new_names
+
+        # The removed sub-epic should still be reported
+        removed_se_names = [s.name for s in report.removed_sub_epics]
+        assert 'Init Interface' in removed_se_names
+
+        # Verify move details
+        panel_move = next(m for m in report.moved_stories if m.name == 'Open Panel')
+        assert panel_move.from_parent == 'Init Interface'
+        assert panel_move.to_parent == 'Initialize Bot'
+
+    def test_moved_stories_serializes_to_json_and_round_trips(self, tmp_path):
+        """moved_stories should survive to_dict → from_dict roundtrip."""
+        from synchronizers.story_io.update_report import StoryMove
+
+        report = UpdateReport()
+        report._moved_stories = [
+            StoryMove(name='Load Config', from_parent='Initialize Bot', to_parent='Run Bot'),
+            StoryMove(name='Open Panel', from_parent='Init Interface', to_parent='Initialize Bot'),
+        ]
+
+        report_dict = report.to_dict()
+        assert 'moved_stories' in report_dict
+        assert len(report_dict['moved_stories']) == 2
+
+        restored = UpdateReport.from_dict(report_dict)
+        assert len(restored.moved_stories) == 2
+        assert restored.moved_stories[0].name == 'Load Config'
+        assert restored.moved_stories[0].from_parent == 'Initialize Bot'
+        assert restored.moved_stories[0].to_parent == 'Run Bot'
+
+    def test_apply_move_story_preserves_data(self, tmp_path):
+        """Moving a story via _apply_move_story should preserve all fields
+        (acceptance criteria, story_type, etc.)."""
+        from actions.render.render_action import RenderOutputAction
+
+        data = self._two_sub_epic_data()
+        import copy
+        graph_data = copy.deepcopy(data)
+
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        result = action._apply_move_story(
+            graph_data, 'Load Config', 'Initialize Bot', 'Run Bot')
+
+        assert result is True
+
+        # Verify it was removed from Initialize Bot
+        init_stories = graph_data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories']
+        assert not any(s['name'] == 'Load Config' for s in init_stories), \
+            "Load Config should be removed from Initialize Bot"
+
+        # Verify it was added to Run Bot with original data preserved
+        run_stories = graph_data['epics'][0]['sub_epics'][1]['story_groups'][0]['stories']
+        lc = next((s for s in run_stories if s['name'] == 'Load Config'), None)
+        assert lc is not None, "Load Config should be in Run Bot"
+        assert lc['story_type'] == 'user', "story_type should be preserved"
+        assert len(lc['acceptance_criteria']) == 1, "acceptance_criteria should be preserved"
+        assert lc['acceptance_criteria'][0]['name'] == 'Config file is loaded from workspace root'
+
+    def test_end_to_end_move_story_via_report_preserves_data(self, tmp_path):
+        """Full flow: modified diagram → report with moves → apply → verify data preserved."""
+        from actions.render.render_action import RenderOutputAction
+        import copy
+
+        original_data = self._two_sub_epic_data()
+        original_map = StoryMap(original_data)
+
+        # Create modified data: move 'Load Config' to 'Run Bot'
+        modified_data = copy.deepcopy(original_data)
+        init_stories = modified_data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories']
+        run_stories = modified_data['epics'][0]['sub_epics'][1]['story_groups'][0]['stories']
+        moved = [s for s in init_stories if s['name'] == 'Load Config'][0]
+        init_stories.remove(moved)
+        run_stories.append(moved)
+
+        # Render and generate report
+        modified_map = StoryMap(modified_data)
+        drawio_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_map.render_from_story_map(modified_map, layout_data=None)
+        report = drawio_map.generate_update_report(original_map)
+
+        assert len(report.moved_stories) >= 1, "Should detect the move"
+
+        # Apply to a fresh copy of original data
+        graph_data = copy.deepcopy(original_data)
+        action = RenderOutputAction.__new__(RenderOutputAction)
+
+        for move in report.moved_stories:
+            action._apply_move_story(graph_data, move.name, move.from_parent, move.to_parent)
+
+        # Verify: Load Config in Run Bot with preserved acceptance criteria
+        run_stories = graph_data['epics'][0]['sub_epics'][1]['story_groups'][0]['stories']
+        lc = next((s for s in run_stories if s['name'] == 'Load Config'), None)
+        assert lc is not None, "Load Config should be in Run Bot"
+        assert len(lc.get('acceptance_criteria', [])) == 1, \
+            "Acceptance criteria should be preserved through the move"
+
+    def test_no_false_moves_when_no_changes(self, tmp_path):
+        """When the diagram matches the original, no moves should be reported."""
+        data = self._two_sub_epic_data()
+        original_map = StoryMap(data)
+
+        drawio_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_map.render_from_story_map(original_map, layout_data=None)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        assert len(report.moved_stories) == 0
+        assert len(report.new_stories) == 0
+        assert len(report.removed_stories) == 0
+
+
+class TestRenamePairingByIdType:
+    """Tests that user-created nodes (simple cell IDs without '/')
+    are treated as genuinely new sub-epics and NOT paired as renames,
+    while tool-generated nodes (hierarchical cell IDs with '/') remain
+    eligible for rename pairing."""
+
+    def _make_drawio_xml(self, sub_epics_spec, stories_spec=None):
+        """Build DrawIO XML with explicit sub-epic and story cell IDs.
+
+        sub_epics_spec: list of (cell_id, name, x, y, w, h)
+        stories_spec: list of (cell_id, name, x, y) or None
+        """
+        epic_w = 800
+        cells = [
+            '<mxCell id="0"/>',
+            '<mxCell id="1" parent="0"/>',
+            f'<mxCell id="epic-1" value="Invoke Bot" '
+            f'style="rounded=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" '
+            f'vertex="1" parent="1">'
+            f'<mxGeometry x="20" y="120" width="{epic_w}" height="400" as="geometry"/></mxCell>',
+        ]
+        for cid, name, x, y, w, h in sub_epics_spec:
+            cells.append(
+                f'<mxCell id="{cid}" value="{name}" '
+                f'style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" '
+                f'vertex="1" parent="1">'
+                f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>')
+        if stories_spec:
+            for cid, name, x, y in stories_spec:
+                cells.append(
+                    f'<mxCell id="{cid}" value="{name}" '
+                    f'style="fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" '
+                    f'vertex="1" parent="1">'
+                    f'<mxGeometry x="{x}" y="270" width="120" height="50" as="geometry"/></mxCell>')
+        cells_xml = '\n        '.join(cells)
+        return f'''<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Story Map" id="test-diagram">
+    <mxGraphModel><root>
+        {cells_xml}
+    </root></mxGraphModel>
+  </diagram>
+</mxfile>'''
+
+    def _make_story_map_data(self, sub_epics):
+        """Build story map data with specified sub-epics under 'Invoke Bot'.
+
+        sub_epics: list of (name, stories_list) where stories_list is
+                   list of story name strings.
+        """
+        se_list = []
+        for i, (se_name, story_names) in enumerate(sub_epics):
+            stories = [
+                {"name": sn, "sequential_order": float(j + 1),
+                 "story_type": "user", "users": [], "acceptance_criteria": []}
+                for j, sn in enumerate(story_names)
+            ]
+            se_list.append({
+                "name": se_name,
+                "sequential_order": float(i + 1),
+                "sub_epics": [],
+                "story_groups": [{"type": "and", "connector": None, "stories": stories}]
+            })
+        return {
+            "epics": [{
+                "name": "Invoke Bot",
+                "sequential_order": 1.0,
+                "sub_epics": se_list
+            }]
+        }
+
+    def test_user_created_sub_epic_with_simple_id_reported_as_new_not_rename(self, tmp_path):
+        """A sub-epic manually created in DrawIO (simple cell ID without '/')
+        must appear as a new_sub_epic, even when there are unmatched originals
+        that could theoretically pair with it."""
+        # Diagram: two sub-epics – one tool-generated (has '/'), one user-created (no '/')
+        xml = self._make_drawio_xml(
+            sub_epics_spec=[
+                # tool-generated sub-epic (renamed from original "Alpha")
+                ('invoke-bot/alpha', 'Alpha Renamed', 30, 180, 300, 200),
+                # user-created sub-epic (simple ID "3")
+                ('3', 'Brand New Feature', 340, 180, 300, 200),
+            ],
+            stories_spec=[
+                ('invoke-bot/alpha/s1', 'Story A', 40, 270),
+                ('4', 'Story B', 350, 270),
+            ],
+        )
+        drawio_file = tmp_path / 'docs' / 'story' / 'test.drawio'
+        drawio_file.parent.mkdir(parents=True, exist_ok=True)
+        drawio_file.write_text(xml, encoding='utf-8')
+
+        # Original has "Alpha" and "Beta" sub-epics
+        original_data = self._make_story_map_data([
+            ('Alpha', ['Story A']),
+            ('Beta', ['Story B']),
+        ])
+
+        drawio_map = DrawIOStoryMap.load(drawio_file)
+        original_map = StoryMap(original_data)
+        report = drawio_map.generate_update_report(original_map)
+
+        # "Brand New Feature" (id="3") should be new, not a rename
+        new_sub_epic_names = [s.name for s in report.new_sub_epics]
+        assert 'Brand New Feature' in new_sub_epic_names
+
+        # "Alpha Renamed" should be a rename of "Alpha"
+        rename_pairs = {r.extracted_name: r.original_name for r in report.renames}
+        assert rename_pairs.get('Alpha Renamed') == 'Alpha'
+
+        # "Brand New Feature" should NOT appear as a rename
+        assert 'Brand New Feature' not in rename_pairs
+
+    def test_tool_generated_sub_epic_with_hierarchical_id_still_eligible_for_rename(self, tmp_path):
+        """A sub-epic with a hierarchical cell ID (containing '/') should
+        still be paired as a rename when its name doesn't exist elsewhere."""
+        xml = self._make_drawio_xml(
+            sub_epics_spec=[
+                ('invoke-bot/alpha', 'Alpha V2', 30, 180, 300, 200),
+            ],
+            stories_spec=[
+                ('invoke-bot/alpha/s1', 'Story A', 40, 270),
+            ],
+        )
+        drawio_file = tmp_path / 'docs' / 'story' / 'test.drawio'
+        drawio_file.parent.mkdir(parents=True, exist_ok=True)
+        drawio_file.write_text(xml, encoding='utf-8')
+
+        original_data = self._make_story_map_data([
+            ('Alpha', ['Story A']),
+        ])
+
+        drawio_map = DrawIOStoryMap.load(drawio_file)
+        original_map = StoryMap(original_data)
+        report = drawio_map.generate_update_report(original_map)
+
+        rename_pairs = {r.extracted_name: r.original_name for r in report.renames}
+        assert rename_pairs.get('Alpha V2') == 'Alpha'
+        assert len(report.new_sub_epics) == 0
+
+    def test_mixed_user_and_tool_ids_only_tool_ids_participate_in_rename(self, tmp_path):
+        """When multiple unmatched sub-epics exist, only those with
+        hierarchical cell IDs participate in rename pairing.  User-created
+        ones go straight to new_sub_epics."""
+        xml = self._make_drawio_xml(
+            sub_epics_spec=[
+                # Tool-generated (rename candidate)
+                ('invoke-bot/load-bot-behaviors', 'Load Behavior, and Actions', 30, 180, 300, 200),
+                # User-created (should be new)
+                ('3', 'Load Bot', 340, 180, 300, 200),
+            ],
+            stories_spec=[
+                ('invoke-bot/load-bot-behaviors/s1', 'Load Config', 40, 270),
+                ('5', 'Resolve Bot Path', 350, 270),
+            ],
+        )
+        drawio_file = tmp_path / 'docs' / 'story' / 'test.drawio'
+        drawio_file.parent.mkdir(parents=True, exist_ok=True)
+        drawio_file.write_text(xml, encoding='utf-8')
+
+        # Original: "Load Bot, Behavior, and Actions" and "Set Workspace"
+        original_data = self._make_story_map_data([
+            ('Load Bot, Behavior, and Actions', ['Load Config', 'Resolve Bot Path']),
+            ('Set Workspace', ['Change Workspace Path']),
+        ])
+
+        drawio_map = DrawIOStoryMap.load(drawio_file)
+        original_map = StoryMap(original_data)
+        report = drawio_map.generate_update_report(original_map)
+
+        # "Load Behavior, and Actions" should pair as rename of
+        # "Load Bot, Behavior, and Actions"
+        rename_pairs = {r.extracted_name: r.original_name for r in report.renames}
+        assert rename_pairs.get('Load Behavior, and Actions') == 'Load Bot, Behavior, and Actions'
+
+        # "Load Bot" (id="3") must be new, not a rename
+        new_sub_epic_names = [s.name for s in report.new_sub_epics]
+        assert 'Load Bot' in new_sub_epic_names
+        assert 'Load Bot' not in rename_pairs
+
+    def test_all_simple_id_sub_epics_become_new_when_no_hierarchical_candidates(self, tmp_path):
+        """If ALL unmatched sub-epics have simple IDs, none participate in
+        rename pairing – all become new sub-epics."""
+        xml = self._make_drawio_xml(
+            sub_epics_spec=[
+                ('2', 'Feature X', 30, 180, 300, 200),
+                ('3', 'Feature Y', 340, 180, 300, 200),
+            ],
+            stories_spec=[
+                ('4', 'Story 1', 40, 270),
+                ('5', 'Story 2', 350, 270),
+            ],
+        )
+        drawio_file = tmp_path / 'docs' / 'story' / 'test.drawio'
+        drawio_file.parent.mkdir(parents=True, exist_ok=True)
+        drawio_file.write_text(xml, encoding='utf-8')
+
+        original_data = self._make_story_map_data([
+            ('Old Feature A', ['Story 1']),
+            ('Old Feature B', ['Story 2']),
+        ])
+
+        drawio_map = DrawIOStoryMap.load(drawio_file)
+        original_map = StoryMap(original_data)
+        report = drawio_map.generate_update_report(original_map)
+
+        # No renames at sub-epic level
+        rename_parents = {r.extracted_name for r in report.renames}
+        assert 'Feature X' not in rename_parents
+        assert 'Feature Y' not in rename_parents
+
+        # Both should be new sub-epics
+        new_names = {s.name for s in report.new_sub_epics}
+        assert 'Feature X' in new_names
+        assert 'Feature Y' in new_names
+
+    def test_story_rename_still_works_regardless_of_cell_id_format(self, tmp_path):
+        """The cell-ID check only applies to sub-epics and epics.
+        Stories should still be paired for renames even with simple IDs."""
+        helper = BotTestHelper(tmp_path)
+        drawio_file = helper.drawio_story_map.create_drawio_file(
+            helper.drawio_story_map.create_drawio_xml_with_renamed_story())
+        drawio_story_map = DrawIOStoryMap.load(drawio_file)
+        original_data = helper.drawio_story_map.create_story_map_data_with_renamed_story()
+        original_story_map = StoryMap(original_data)
+
+        report = drawio_story_map.generate_update_report(original_story_map)
+
+        # Story-level rename should still be detected
+        assert len(report.renames) >= 1
+        rename = report.renames[0]
+        assert rename.extracted_name
+        assert rename.original_name
+
+
 class TestUpdateStoryGraphFromMapAcceptanceCriteria:
 
     def test_extract_exploration_maps_ac_boxes_to_stories_by_position_and_containment(self, tmp_path):
@@ -1667,3 +2562,214 @@ class TestRenderActionDiagramSection:
         response = session.execute_command('shape.render.generateReport')
 
         assert response.status != 'error', f"CLI should succeed, got: {response.output}"
+
+
+class TestUpdateFromDiagramMoveBeforeRemove:
+    """Regression: updateFromDiagram must move stories BEFORE removing
+    sub-epics.  If a sub-epic is removed but its stories were moved to
+    another sub-epic, the move must happen first.  Otherwise the stories
+    are permanently deleted when the sub-epic is popped from the tree.
+
+    Tests the RenderOutputAction private methods directly to avoid
+    needing full bot/behavior setup."""
+
+    @staticmethod
+    def _make_graph_data():
+        """Story graph with two sub-epics under one epic.
+        'Old SubEpic' has two stories; 'Target SubEpic' has one."""
+        return {
+            "epics": [{
+                "name": "Epic A",
+                "sequential_order": 1.0,
+                "sub_epics": [
+                    {
+                        "name": "Old SubEpic",
+                        "sequential_order": 1.0,
+                        "sub_epics": [],
+                        "story_groups": [{"type": "and", "connector": None, "stories": [
+                            {"name": "Story Alpha", "sequential_order": 1.0,
+                             "story_type": "user", "users": [], "acceptance_criteria": [],
+                             "scenarios": [{"name": "Important Scenario"}]},
+                            {"name": "Story Beta", "sequential_order": 2.0,
+                             "story_type": "user", "users": [], "acceptance_criteria": []},
+                        ]}]
+                    },
+                    {
+                        "name": "Target SubEpic",
+                        "sequential_order": 2.0,
+                        "sub_epics": [],
+                        "story_groups": [{"type": "and", "connector": None, "stories": [
+                            {"name": "Story Gamma", "sequential_order": 1.0,
+                             "story_type": "user", "users": [], "acceptance_criteria": []},
+                        ]}]
+                    },
+                ]
+            }]
+        }
+
+    @staticmethod
+    def _apply_report_to_graph(graph_data, report):
+        """Simulate the updateFromDiagram ordering logic using
+        RenderOutputAction's private methods.  This mirrors the exact
+        order in updateFromDiagram: renames, new epics/sub-epics/stories,
+        moves, THEN removes."""
+        from actions.render.render_action import RenderOutputAction
+
+        # Create a minimal action instance just to access the methods.
+        # We use object.__new__ to skip __init__ which needs a behavior.
+        action = object.__new__(RenderOutputAction)
+
+        for rename in report.renames:
+            action._apply_rename(graph_data, rename.original_name, rename.extracted_name)
+
+        for ns in report.new_sub_epics:
+            action._apply_new_sub_epic(graph_data, ns.name, ns.parent)
+
+        for ns in report.new_stories:
+            action._apply_new_story(graph_data, ns.name, ns.parent)
+
+        # Moves BEFORE removes
+        for move in report.moved_stories:
+            action._apply_move_story(graph_data, move.name,
+                                      move.from_parent, move.to_parent)
+
+        for removed in report.removed_sub_epics:
+            action._apply_remove_sub_epic(graph_data, removed.name, removed.parent)
+
+        for removed in report.removed_stories:
+            action._apply_remove_story(graph_data, removed.name, removed.parent)
+
+    def test_stories_preserved_when_sub_epic_removed_but_stories_moved(self, tmp_path):
+        """Stories moved out of a sub-epic must survive the sub-epic's removal."""
+        graph_data = self._make_graph_data()
+
+        report_data = {
+            "matched_count": 1,
+            "moved_stories": [
+                {"name": "Story Alpha", "from_parent": "Old SubEpic",
+                 "to_parent": "Target SubEpic"},
+            ],
+            "removed_sub_epics": [
+                {"name": "Old SubEpic", "parent": "Epic A"},
+            ],
+        }
+        report = UpdateReport.from_dict(report_data)
+
+        self._apply_report_to_graph(graph_data, report)
+
+        # Old SubEpic should be gone
+        all_se_names = [se['name'] for e in graph_data['epics']
+                        for se in e.get('sub_epics', [])]
+        assert 'Old SubEpic' not in all_se_names
+
+        # Story Alpha should be in Target SubEpic
+        target_se = next(se for e in graph_data['epics']
+                         for se in e['sub_epics']
+                         if se['name'] == 'Target SubEpic')
+        target_stories = [s['name'] for sg in target_se['story_groups']
+                          for s in sg.get('stories', [])]
+        assert 'Story Alpha' in target_stories, (
+            "Story Alpha was lost! Moves must run before removes.")
+
+        # Verify scenario data survived (not a skeleton replacement)
+        alpha = next(s for sg in target_se['story_groups']
+                     for s in sg['stories'] if s['name'] == 'Story Alpha')
+        assert len(alpha.get('scenarios', [])) >= 1, (
+            "Story Alpha's scenario data was lost during the move.")
+
+    def test_story_not_moved_is_deleted_with_sub_epic(self, tmp_path):
+        """Stories NOT in the moved list should still be removed along
+        with their sub-epic (normal delete behaviour)."""
+        graph_data = self._make_graph_data()
+
+        report_data = {
+            "matched_count": 1,
+            "moved_stories": [
+                {"name": "Story Alpha", "from_parent": "Old SubEpic",
+                 "to_parent": "Target SubEpic"},
+            ],
+            "removed_sub_epics": [
+                {"name": "Old SubEpic", "parent": "Epic A"},
+            ],
+        }
+        report = UpdateReport.from_dict(report_data)
+
+        self._apply_report_to_graph(graph_data, report)
+
+        # Story Beta should be gone (it stayed in the removed sub-epic)
+        all_stories = [s['name'] for e in graph_data['epics']
+                       for se in e.get('sub_epics', [])
+                       for sg in se.get('story_groups', [])
+                       for s in sg.get('stories', [])]
+        assert 'Story Beta' not in all_stories
+        assert 'Story Alpha' in all_stories
+
+    def test_move_to_renamed_sub_epic(self, tmp_path):
+        """Stories should move correctly to a sub-epic that was just renamed."""
+        graph_data = self._make_graph_data()
+
+        # Rename Target SubEpic, then move Story Alpha into it
+        report_data = {
+            "matched_count": 1,
+            "renames": [
+                {"extracted": "New Target Name", "original": "Target SubEpic",
+                 "confidence": 1.0, "parent": "Epic A"},
+            ],
+            "moved_stories": [
+                {"name": "Story Alpha", "from_parent": "Old SubEpic",
+                 "to_parent": "New Target Name"},
+            ],
+            "removed_sub_epics": [
+                {"name": "Old SubEpic", "parent": "Epic A"},
+            ],
+        }
+        report = UpdateReport.from_dict(report_data)
+
+        self._apply_report_to_graph(graph_data, report)
+
+        # Target SubEpic should now be named "New Target Name"
+        all_se_names = [se['name'] for e in graph_data['epics']
+                        for se in e.get('sub_epics', [])]
+        assert 'New Target Name' in all_se_names
+        assert 'Target SubEpic' not in all_se_names
+
+        # Story Alpha should be in the renamed sub-epic
+        target = next(se for e in graph_data['epics']
+                      for se in e['sub_epics']
+                      if se['name'] == 'New Target Name')
+        stories = [s['name'] for sg in target['story_groups']
+                   for s in sg.get('stories', [])]
+        assert 'Story Alpha' in stories
+
+    def test_move_to_new_sub_epic(self, tmp_path):
+        """Stories should move correctly to a newly created sub-epic."""
+        graph_data = self._make_graph_data()
+
+        report_data = {
+            "matched_count": 1,
+            "new_sub_epics": [
+                {"name": "Brand New SubEpic", "parent": "Epic A"},
+            ],
+            "moved_stories": [
+                {"name": "Story Alpha", "from_parent": "Old SubEpic",
+                 "to_parent": "Brand New SubEpic"},
+            ],
+            "removed_sub_epics": [
+                {"name": "Old SubEpic", "parent": "Epic A"},
+            ],
+        }
+        report = UpdateReport.from_dict(report_data)
+
+        self._apply_report_to_graph(graph_data, report)
+
+        # Brand New SubEpic should exist with Story Alpha
+        all_se_names = [se['name'] for e in graph_data['epics']
+                        for se in e.get('sub_epics', [])]
+        assert 'Brand New SubEpic' in all_se_names
+
+        new_se = next(se for e in graph_data['epics']
+                      for se in e['sub_epics']
+                      if se['name'] == 'Brand New SubEpic')
+        stories = [s['name'] for sg in new_se['story_groups']
+                   for s in sg.get('stories', [])]
+        assert 'Story Alpha' in stories

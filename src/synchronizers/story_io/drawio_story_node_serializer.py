@@ -1,11 +1,26 @@
 """
 DrawIOStoryNodeSerializer - Creates, loads, and writes DrawIO story nodes to XML.
 """
+import re
 import xml.etree.ElementTree as ET
 from typing import Optional, List
 from .drawio_element import DrawIOElement
 from .drawio_story_node import DrawIOStoryNode, DrawIOEpic, DrawIOSubEpic, DrawIOStory
 from .story_io_position import Position, Boundary
+
+_HTML_TAG_RE = re.compile(r'<[^>]+>')
+_HTML_ENTITY_MAP = {'&amp;': '&', '&lt;': '<', '&gt;': '>',
+                     '&quot;': '"', '&nbsp;': ' ', '&#39;': "'"}
+
+
+def _strip_html(text: str) -> str:
+    """Remove HTML tags and decode common entities from DrawIO cell values."""
+    if '<' not in text:
+        return text
+    cleaned = _HTML_TAG_RE.sub('', text)
+    for entity, char in _HTML_ENTITY_MAP.items():
+        cleaned = cleaned.replace(entity, char)
+    return cleaned.strip()
 
 
 class DrawIOStoryNodeSerializer:
@@ -56,7 +71,7 @@ class DrawIOStoryNodeSerializer:
     @staticmethod
     def from_mx_cell(cell: ET.Element):
         cell_id = cell.get('id', '')
-        value = cell.get('value', '')
+        value = _strip_html(cell.get('value', ''))
         style = cell.get('style', '')
         parent_id = cell.get('parent', '')
         geometry = cell.find('mxGeometry')

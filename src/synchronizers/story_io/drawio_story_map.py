@@ -13,8 +13,8 @@ from story_graph.nodes import StoryMap, Epic, SubEpic, Story, StoryGroup
 from .drawio_story_node import (
     DrawIOStoryNode, DrawIOEpic, DrawIOSubEpic, DrawIOStory,
     DrawIOIncrementLane, SPACING, CONTAINER_PADDING, CELL_SIZE,
-    _max_sub_epic_depth, _RowPositions, CELL_SPACING,
-    _compare_node_lists,
+    _max_sub_epic_depth, _RowPositions, CELL_SPACING, ROW_GAP,
+    _compare_node_lists, _collect_all_names,
 )
 from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 from .layout_data import LayoutData
@@ -60,17 +60,31 @@ class DrawIOStoryMap(StoryMap):
         return max(e.boundary.right for e in self._drawio_epics)
 
     def get_bottom_y(self) -> float:
-        """Lowest Y coordinate of any outline element (sub-epics or stories)."""
+        """Lowest Y coordinate of any outline element (sub-epics or stories).
+
+        Recursively checks nested sub-epics so that deeply nested elements
+        (e.g. second-level sub-epics) are accounted for.
+        """
         bottom = 0
         for story in self.get_stories():
             b = story.position.y + story.boundary.height
             if b > bottom:
                 bottom = b
-        for se in self.get_sub_epics():
+        for se in self._all_sub_epics_recursive():
             b = se.position.y + se.boundary.height
             if b > bottom:
                 bottom = b
         return bottom
+
+    def _all_sub_epics_recursive(self) -> List[DrawIOSubEpic]:
+        """Return all sub-epics at every nesting level."""
+        result = []
+        stack = list(self.get_sub_epics())
+        while stack:
+            se = stack.pop()
+            result.append(se)
+            stack.extend(se.get_sub_epics())
+        return result
 
     # ------------------------------------------------------------------
     # Render – Outline
@@ -168,7 +182,10 @@ class DrawIOStoryMap(StoryMap):
             max((s.position.x + CELL_SIZE for s in all_drawio_stories),
                 default=0))
 
-        y_start = outline_bottom + 50  # 50px gap between outline and lanes
+        # Reserve space below the outline for at least one row of orphan
+        # stories (CELL_SIZE) plus padding.  This ensures lanes never overlap
+        # with the deepest sub-epics or orphan story rows.
+        y_start = outline_bottom + CELL_SIZE + ROW_GAP
 
         for idx, inc_data in enumerate(increments_data):
             story_names = []
@@ -285,8 +302,28 @@ class DrawIOStoryMap(StoryMap):
         extracted_epics = sorted(self._drawio_epics, key=lambda e: e.sequential_order or 0)
         original_epics = sorted(list(original_story_map.epics), key=lambda e: getattr(e, 'sequential_order', 0) or 0)
 
+        # Collect all names from both trees so rename detection can
+        # distinguish genuine renames from moves.
+        all_extracted_names = _collect_all_names(extracted_epics)
+        all_original_names = _collect_all_names(original_epics)
+
         _compare_node_lists(extracted_epics, original_epics, report,
-                            parent_name='', recurse=True)
+                            parent_name='', recurse=True,
+                            all_extracted_names=all_extracted_names,
+                            all_original_names=all_original_names)
+
+        # Flag large deletions: when entire epics or sub-epics are missing
+        # from the diagram, flag them so the consumer can decide how to
+        # handle bulk removals (e.g. confirmation prompt).
+        for ep in report.removed_epics:
+            report.add_missing_epic(ep.name)
+        for se in report.removed_sub_epics:
+            report.add_missing_sub_epic(se.name)
+
+        # Reconcile moves: stories that appear in both new and removed
+        # (or are descendants of removed sub-epics) are reclassified as
+        # moved_stories so updateFromDiagram preserves their data.
+        report.reconcile_moves(original_story_map)
 
         # Pass 2: increment assignments (vertical position).
         # Compare extracted state against original to produce the delta.
@@ -300,7 +337,7 @@ class DrawIOStoryMap(StoryMap):
                                   extracted: list,
                                   original_increments: list):
         """Compare extracted increment assignments against original and
-        populate the report with only the changes (added/removed/moved).
+        populate the report with changes, moves, removals, and new order.
         """
         from .update_report import IncrementChange, IncrementMove
 
@@ -359,7 +396,29 @@ class DrawIOStoryMap(StoryMap):
                 moves.append(IncrementMove(
                     story=story, from_increment=from_inc, to_increment=inc))
 
-        report.set_increment_changes(changes, moves)
+        # Compute removed increments: in original but not in extracted
+        ext_inc_names = set(ext_by_inc.keys())
+        removed_increments = [
+            inc.get('name', '') for inc in original_increments
+            if inc.get('name', '') not in ext_inc_names
+        ]
+
+        # Only include increment_order when the name sequence actually
+        # changed.  Compare name order only -- not priority values --
+        # because original priorities may not be sequential 1..N.
+        new_name_seq = [inc['name'] for inc in extracted]
+        orig_name_seq = [inc.get('name', '') for inc in original_increments]
+        if new_name_seq != orig_name_seq:
+            increment_order = [
+                {'name': n, 'priority': i + 1}
+                for i, n in enumerate(new_name_seq)
+            ]
+        else:
+            increment_order = []
+
+        report.set_increment_changes(changes, moves,
+                                     removed_increments=removed_increments,
+                                     increment_order=increment_order)
 
     # ------------------------------------------------------------------
     # Pass 2 – Increment extraction by vertical position
@@ -375,34 +434,72 @@ class DrawIOStoryMap(StoryMap):
             List of dicts ``[{'name': 'CLI', 'stories': ['Story A', ...]}, ...]``
             ordered top-to-bottom by lane Y.
         """
-        # 1. Find lane backgrounds (large rectangles with inc-lane/ id, empty value)
+        # 1. Find lane backgrounds (large rectangles with empty value).
+        #    Tool-generated lanes have inc-lane/ prefix; user-created lanes
+        #    have simple IDs (e.g. "2").  Both are detected by their empty
+        #    value, large width, and lane-like height.
         lanes = []
+        _LANE_MIN_WIDTH = 200   # lanes are much wider than story cells
+        _LANE_MIN_HEIGHT = 50
         for n in self._extra_nodes:
             cid = getattr(n, 'cell_id', '')
-            if (cid.startswith('inc-lane/')
-                    and '/' not in cid.replace('inc-lane/', '', 1)
-                    and getattr(n, 'value', '') == ''):
+            val = getattr(n, 'value', '') or ''
+            bnd = getattr(n, 'boundary', None)
+            if (val == '' and bnd is not None
+                    and bnd.height >= _LANE_MIN_HEIGHT
+                    and bnd.width >= _LANE_MIN_WIDTH):
+                if cid.startswith('inc-lane/'):
+                    slug = cid.replace('inc-lane/', '')
+                else:
+                    slug = cid  # user-created lane, use raw id as slug
                 lanes.append({
-                    'slug': cid.replace('inc-lane/', ''),
+                    'slug': slug,
                     'y': n.position.y,
-                    'height': n.boundary.height,
+                    'height': bnd.height,
                     'name': '',
+                    'cell_id': cid,
                 })
 
-        # 2. Match lane labels (inc-label/) to get human-readable names
+        # 2. Match lane labels to get human-readable names.
+        #    Tool-generated labels have inc-label/ prefix; user-created
+        #    labels have simple IDs with a non-empty value and sit inside
+        #    a lane's Y boundaries.
         for n in self._extra_nodes:
             cid = getattr(n, 'cell_id', '')
+            val = getattr(n, 'value', '') or ''
+            if not val:
+                continue
             if cid.startswith('inc-label/'):
                 slug = cid.replace('inc-label/', '')
                 for lane in lanes:
                     if lane['slug'] == slug:
-                        lane['name'] = getattr(n, 'value', '') or slug
+                        lane['name'] = val
+                        break
+            elif '/' not in cid and val:
+                # Potential user-created label -- match by Y position
+                ny = getattr(n, 'position', None)
+                if ny is None:
+                    continue
+                for lane in lanes:
+                    if (lane['name'] == ''
+                            and lane['y'] <= ny.y <= lane['y'] + lane['height']):
+                        lane['name'] = val
                         break
 
         if not lanes:
             return []
 
         lanes.sort(key=lambda l: l['y'])
+
+        # Build set of cell IDs used as lane backgrounds or labels
+        # so we can skip them when gathering story candidates.
+        _lane_bg_ids = {lane['cell_id'] for lane in lanes}
+        _lane_label_ids = set()
+        for n in self._extra_nodes:
+            cid = getattr(n, 'cell_id', '')
+            val = getattr(n, 'value', '') or ''
+            if val and any(lane['name'] == val for lane in lanes):
+                _lane_label_ids.add(cid)
 
         # 3. Gather every element that could be a story – from the tree
         #    (DrawIOStory instances) and from extra_nodes (raw
@@ -414,8 +511,10 @@ class DrawIOStoryMap(StoryMap):
             name = getattr(n, 'name', None) or getattr(n, 'value', None) or ''
             if name and hasattr(n, 'position') and n.position.y > 0:
                 cid = getattr(n, 'cell_id', '')
-                # Skip lane backgrounds and labels (they aren't stories)
-                if cid.startswith('inc-lane/') and '/' not in cid.replace('inc-lane/', '', 1):
+                # Skip lane backgrounds and labels
+                if cid in _lane_bg_ids or cid in _lane_label_ids:
+                    continue
+                if cid.startswith('inc-lane/') and not name:
                     continue
                 if cid.startswith('inc-label/'):
                     continue
@@ -488,6 +587,12 @@ class DrawIOStoryMap(StoryMap):
     def load(cls, file_path: Path) -> 'DrawIOStoryMap':
         content = file_path.read_text(encoding='utf-8')
         nodes, parent_map = DrawIOStoryNodeSerializer.parse_nodes_from_xml(content)
+
+        # Resolve group-relative positions: elements whose parent is a group
+        # have x/y relative to the group.  Add the group's absolute position
+        # so all nodes use absolute coordinates.
+        cls._resolve_group_positions(nodes, parent_map)
+
         story_map = cls()
 
         nodes_by_id = {}
@@ -518,13 +623,39 @@ class DrawIOStoryMap(StoryMap):
                 classified.add(id(s))
             cls._classify_sub_epic_tree(se.get_sub_epics(), classified)
 
+    @staticmethod
+    def _resolve_group_positions(nodes, parent_map):
+        """Convert group-relative positions to absolute positions.
+
+        DrawIO stores child positions relative to their parent group.
+        This method adds the parent group's x/y offset so all nodes
+        use absolute coordinates.
+        """
+        nodes_by_id = {n.cell_id: n for n in nodes}
+        for node in nodes:
+            pid = parent_map.get(node.cell_id, '')
+            if pid in ('', '0', '1'):
+                continue  # top-level element, position is already absolute
+            parent_node = nodes_by_id.get(pid)
+            if parent_node is None:
+                continue
+            if not hasattr(parent_node, 'position'):
+                continue
+            # Offset this node by its parent group's position
+            abs_x = node.position.x + parent_node.position.x
+            abs_y = node.position.y + parent_node.position.y
+            node.set_position(abs_x, abs_y)
+
     # ------------------------------------------------------------------
     # Internal helpers (load direction)
     # ------------------------------------------------------------------
 
     def _assign_by_parent_map(self, nodes_by_id, parent_map, epics, sub_epics, stories):
-        all_nodes = list(epics) + list(sub_epics) + list(stories)
-        for node in all_nodes:
+        # ── Phase 1: ID-based assignment for epics and sub-epics only ──
+        # Stories are intentionally excluded here because their cell IDs
+        # become stale when users drag them to a new sub-epic in DrawIO
+        # (DrawIO preserves the original ID, only the position changes).
+        for node in list(epics) + list(sub_epics):
             cell_id = node.cell_id
             if '/' not in cell_id:
                 continue
@@ -545,6 +676,30 @@ class DrawIOStoryMap(StoryMap):
                 parent_from_attr.add_child(node)
                 continue
 
+        # ── Phase 2a: Position-based sub-epic → sub-epic nesting ──
+        # For orphan sub-epics without a hierarchical ID (e.g. user-added
+        # cells with ids like "3"), try to find a containing *sub-epic*
+        # that already has a parent.  Prefer the narrowest container so
+        # "Load Bot" (x 559–1025) nests under "Initialize Bot" (x 560–1955)
+        # rather than directly under the epic.
+        for se in sub_epics:
+            if se._parent is not None:
+                continue
+            se_cx = se.boundary.center.x
+            best_parent_se = None
+            best_width = float('inf')
+            for candidate_se in sub_epics:
+                if candidate_se is se or candidate_se._parent is None:
+                    continue
+                cl = candidate_se.boundary.x
+                cr = candidate_se.boundary.x + candidate_se.boundary.width
+                if cl <= se_cx <= cr and candidate_se.boundary.width < best_width:
+                    best_width = candidate_se.boundary.width
+                    best_parent_se = candidate_se
+            if best_parent_se:
+                best_parent_se.add_child(se)
+
+        # ── Phase 2b: Position-based sub-epic → epic fallback ──
         MARGIN = 200
         for se in sub_epics:
             if se._parent is not None:
@@ -563,9 +718,10 @@ class DrawIOStoryMap(StoryMap):
             if best_epic:
                 best_epic.add_child(se)
 
+        # ── Phase 3: Position-based story → sub-epic assignment ──
+        # Always use position for stories (never IDs) because the visual
+        # position in the diagram is the source of truth after user edits.
         for story in stories:
-            if story._parent is not None:
-                continue
             story_cx = story.boundary.center.x
             best_se = None
             best_width = float('inf')
