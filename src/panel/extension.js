@@ -73,6 +73,15 @@ function activate(context) {
     
     context.subscriptions.push(viewPanelCommand);
     
+    // In Cursor, ensure the primary sidebar stays on the left.
+    // The extension registers in the secondarySideBar (right) which is correct,
+    // but Cursor's layout restore can push the primary sidebar to the right.
+    const isCursor = vscode.env.appName?.includes("Cursor");
+    if (isCursor) {
+      vscode.commands.executeCommand("workbench.action.moveSideBarLeft");
+      log("Cursor detected - enforced primary sidebar to left");
+    }
+
     log("Bot Panel extension activated successfully - command registered");
     
   } catch (error) {

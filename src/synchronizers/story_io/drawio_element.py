@@ -94,6 +94,29 @@ class DrawIOElement:
         style = STYLE_DEFAULTS.get(element_type, {})
         self.set_style(**style)
 
+    def set_style_from_string(self, style_string: str):
+        """Parse a Draw.io style string and apply its values."""
+        parsed = self.from_style_string(style_string)
+        if 'rounded' in parsed and parsed['rounded'] == '1':
+            self._shape = 'rounded'
+        if 'fillColor' in parsed:
+            self._fill = parsed['fillColor']
+        if 'strokeColor' in parsed:
+            self._stroke = parsed['strokeColor']
+        if 'fontColor' in parsed:
+            self._font_color = parsed['fontColor']
+        if 'fontSize' in parsed:
+            try:
+                self._font_size = int(parsed['fontSize'])
+            except ValueError:
+                pass
+        if 'align' in parsed:
+            self._align = parsed['align']
+        if 'fontStyle' in parsed and parsed['fontStyle'] == '1':
+            self._font_style = 'bold'
+        if 'aspect' in parsed and parsed['aspect'] == 'fixed':
+            self._aspect = 'fixed'
+
     def to_style_string(self) -> str:
         """Generate Draw.io style string matching reference diagram format."""
         parts = []

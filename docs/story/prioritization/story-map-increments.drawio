@@ -1,285 +1,794 @@
-<?xml version="1.0" ?>
 <mxfile host="65bd71144e">
-    <diagram id="story-map" name="Story Map">
-        <mxGraphModel dx="2656" dy="1035" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4000" pageHeight="3000" math="0" shadow="0">
+    <diagram name="Story Map" id="story-map">
+        <mxGraphModel dx="3072" dy="2258" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="epic-group" value="" style="group" parent="1" vertex="1" connectable="0">
-                    <mxGeometry x="0" y="0" width="1" height="1" as="geometry"/>
+                <mxCell id="16" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="11" y="788.75" width="13160" height="240" as="geometry"/>
                 </mxCell>
-                <mxCell id="epic1" value="&lt;div style=&quot;position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding-right: 70px; box-sizing: border-box;&quot;&gt;&lt;span style=&quot;flex: 1; text-align: center;&quot;&gt;Build Agile Bots&lt;/span&gt;&lt;div style=&quot;position: absolute; top: 2px; right: 5px; font-size: 8px; color: rgb(128, 128, 128); white-space: nowrap; z-index: 10;&quot;&gt;8 stories&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="20.0" y="120" width="541.0" height="60" as="geometry"/>
+                <mxCell id="inc-lane/manage-increments" value="" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" parent="16" vertex="1">
+                    <mxGeometry width="13160" height="120" as="geometry"/>
                 </mxCell>
-                <mxCell id="e1f1" value="&lt;div style=&quot;position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding-right: 70px; box-sizing: border-box;&quot;&gt;&lt;span style=&quot;flex: 1; text-align: center;&quot;&gt;Generate MCP Tools&lt;/span&gt;&lt;div style=&quot;position: absolute; top: 2px; right: 5px; font-size: 8px; color: rgb(128, 128, 128); white-space: nowrap; z-index: 10;&quot;&gt;4 stories&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="30.0" y="195" width="241.0" height="60" as="geometry"/>
+                <mxCell id="inc-label/manage-increments" value="Addtional Scoping" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" parent="16" vertex="1">
+                    <mxGeometry x="10" y="10" width="150" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="user_e1f1s2_MCP Server Generator" value="MCP Server Generator" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="32.0" y="265.0" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-story/display-stories" value="Display Stories" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7025" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e1f2" value="&lt;div style=&quot;position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding-right: 70px; box-sizing: border-box;&quot;&gt;&lt;span style=&quot;flex: 1; text-align: center;&quot;&gt;Generate CLI&lt;/span&gt;&lt;div style=&quot;position: absolute; top: 2px; right: 5px; font-size: 8px; color: rgb(128, 128, 128); white-space: nowrap; z-index: 10;&quot;&gt;4 stories&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="281.0" y="195" width="250.0" height="60" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-story/edit-stories-in-trace-editor" value="Edit Stories in Trace Editor" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7140" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="user_e1f2s1_Generator" value="Generator" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="283.0" y="265.0" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/display-scenario-steps" value="Display Scenario Steps" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7209" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e1f2s1" value="Generate Command Definitions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="294" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-scenarios-in-trace-editor" value="Edit Scenarios in Trace Editor" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7269" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="epic2" value="&lt;div style=&quot;position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding-right: 70px; box-sizing: border-box;&quot;&gt;&lt;span style=&quot;flex: 1; text-align: center;&quot;&gt;Invoke Bot&lt;/span&gt;&lt;div style=&quot;position: absolute; top: 2px; right: 5px; font-size: 8px; color: rgb(128, 128, 128); white-space: nowrap; z-index: 10;&quot;&gt;6 stories&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="571.0" y="120" width="662.0" height="60" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/open-scenario-source" value="Open Scenario Source" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7329" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f1" value="&lt;div style=&quot;display: flex; align-items: center; justify-content: center; width: 100%;&quot;&gt;Work With Story Map&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="541.0" y="195" width="282.0" height="60" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/display-examples-table" value="Display Examples Table" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7389" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2" value="&lt;div style=&quot;position: relative; width: 100%; display: flex; align-items: center; justify-content: center; padding-right: 70px; box-sizing: border-box;&quot;&gt;&lt;span style=&quot;flex: 1; text-align: center;&quot;&gt;Get Help&lt;/span&gt;&lt;div style=&quot;position: absolute; top: 2px; right: 5px; font-size: 8px; color: rgb(128, 128, 128); white-space: nowrap; z-index: 10;&quot;&gt;6 stories&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="833.0" y="195" width="370.0" height="60" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/add-/-remove-examples" value="Add / Remove Examples" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7449" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;strokeColor=#FFFFFF;fillColor=#F7F7F7;" parent="1" vertex="1">
-                    <mxGeometry x="891.0" y="340" width="360.0" height="60" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-example" value="Edit Example" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7509" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="user_e2f2s1_Bot Behavior" value="Bot Behavior" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="835.0" y="265.0" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-example-cell-data" value="Edit Example Cell Data" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7564" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s1" value="Get Help" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="896.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-code/display-code-trace" value="Display Code Trace" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7634" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="user_e2f2s2_User" value="User" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="895.0" y="265.0" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-code/edit-code-step" value="Edit Code Step" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7691" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s2" value="Display Parameter Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="956.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-code/open-source-file" value="Open Source File" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7809" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s3" value="Display Action Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="1016.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-code/navigate-code-trace" value="Navigate Code Trace" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7749" y="131.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s4" value="Display Command Examples Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="1076.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="18" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;Domain Scoping&lt;/font&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" vertex="1" parent="16">
+                    <mxGeometry x="3279" y="11.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s5" value="Get Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="1136.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="20" value="Execute Scope &quot;Runs&quot;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" vertex="1" parent="16">
+                    <mxGeometry x="4529" y="21.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="e2f2s6" value="Display Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="1196.0" y="345" width="50" height="50" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-increment-filter-part-to-story-scope-panel" value="Add Increment Filter Part To Story Scope Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4285" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment1" value="User Manually Drops Config In to AI Chat" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="460.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-increment-filter-part-to-story-scope-cli" value="Add Increment Filter Part To Story Scope CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4345" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment2" value="Simplest MCP" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="560.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-increment-filter-part-from-story-scope-cli" value="Remove Increment Filter Part From Story Scope CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4410" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment3" value="Workflow" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="660.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-increment-filter-part-from-story-scope-panel" value="Remove Increment Filter Part From Story Scope Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4470" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment4" value="CLI" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="760.0" width="150" height="40" as="geometry"/>
+                <mxCell id="inc-lane/increment-filtering/invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-increment-filter-part-from-story-scope" value="Remove Increment Filter Part From Story Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4225" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment5" value="Inject / Store Content" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="860.0" width="150" height="40" as="geometry"/>
+                <mxCell id="inc-lane/increment-filtering/invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-increment-filter-part-to-story-scope" value="Add Increment Filter Part To Story Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="4175" y="21.5" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment6" value="Code Scanner" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="960.0" width="150" height="40" as="geometry"/>
+                <mxCell id="inc-lane/increment-filtering/invoke-bot/work-with-story-map/edit-increments/show-all-increment-scope-through-cli" value="Show All Increment Scope Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="3339" y="21.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment7" value="Refactoring" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1060.0" width="150" height="40" as="geometry"/>
+                <mxCell id="inc-lane/increment-filtering/invoke-bot/work-with-story-map/edit-increments/show-all-increment-scope" value="Show All Increment Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="3399" y="21.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment8" value="LangGraph Orchestration" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1160.0" width="150" height="40" as="geometry"/>
+                <mxCell id="inc-lane/increment-filtering/invoke-bot/work-with-story-map/edit-increments/show-all-increment-scope-through-panel" value="Show All Increment Scope Through Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="3454" y="21.25" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment9" value="REPL CLI" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1260.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/add-filter-part-to-file-scope" value="Add Filter Part To File Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="1969" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment10" value="Existing" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1360.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/add-filter-part-to-file-scope-cli" value="Add Filter Part To File Scope CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2029" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment11" value="Manage Story Hierarchy" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1460.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/add-filter-part-to-file-scope-panel" value="Add Filter Part To File Scope Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2089" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment12" value="Display Domain Concepts" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1560.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/remove-filter-part-from-file-scope" value="Remove Filter Part From File Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2149" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment13" value="Filter Domain Concepts" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1660.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/remove-filter-part-from-file-scope-cli" value="Remove Filter Part From File Scope CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2209" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment14" value="Manage Increments" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1760.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter/remove-filter-part-from-file-scope-panel" value="Remove Filter Part From File Scope Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2269" y="35" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment15" value="Perform Action" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1860.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-file-scope--by-files" value="Filter File Scope  By Files" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2339" y="32" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment16" value="Story Filter Advanced" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="1960.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-file-scope--by-files-cli" value="Filter File Scope  By Files CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2399" y="32" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment17" value="Increment Filtering" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="2060.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-file-scope--by-files-panel" value="Filter File Scope  By Files Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2459" y="32" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment18" value="File Filtering" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="2160.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-file-scope-by-stories-panel" value="Filter File Scope By Stories Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2519" y="32" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="increment19" value="Submit Scoped Action" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="2260.0" width="150" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="increment20" value="CLI Multi Bots" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="-180" y="2360.0" width="150" height="40" as="geometry"/>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-file-scope-by-stories-cli" value="Filter File Scope By Stories CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2579" y="32" width="50" height="50" as="geometry"/>
                 </mxCell>
-                <mxCell id="inc2_bg_1" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;strokeColor=#FFFFFF;fillColor=#F7F7F7;" parent="1" vertex="1">
-                    <mxGeometry x="30.0" y="575.0" width="241.0" height="60.0" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc4_bg_1" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;strokeColor=#FFFFFF;fillColor=#F7F7F7;" parent="1" vertex="1">
-                    <mxGeometry x="281.0" y="775.0" width="250.0" height="60.0" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc9_bg_1" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=1 2;strokeColor=#FFFFFF;fillColor=#F7F7F7;" parent="1" vertex="1">
-                    <mxGeometry x="281.0" y="1275.0" width="250.0" height="60.0" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc1_Build Agile Bots_Generate MCP Tools_Generate Bot Tools_Generate_Bot_Tools" value="Generate Bot Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="32.0" y="480.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc2_Build Agile Bots_Generate MCP Tools_Generate Behavior Action Tools_Generate_Behavior_Action_Tools" value="Generate Behavior Action Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="32.0" y="580.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc2_Build Agile Bots_Generate MCP Tools_Deploy MCP BOT Server_Deploy_MCP_BOT_Server" value="Deploy MCP BOT Server" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="92.0" y="580.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc2_Build Agile Bots_Generate MCP Tools_Restart MCP Server To Load Code Changes_Restart_MCP_Server_To_Load_Code_Changes" value="Restart MCP Server To Load Code Changes" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="152.0" y="580.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc4_Build Agile Bots_Generate CLI_Generate CLI Entry Point_Generate_CLI_Entry_Point" value="Generate CLI Entry Point" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="283.0" y="780.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc9_Build Agile Bots_Generate CLI_Generate CLI Entry Point_Generate_CLI_Entry_Point" value="Generate CLI Entry Point" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="283.0" y="1280.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc4_Build Agile Bots_Generate CLI_Generate Cursor Commands_Generate_Cursor_Commands" value="Generate Cursor Commands" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="343.0" y="780.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc9_Build Agile Bots_Generate CLI_Generate Cursor Commands_Generate_Cursor_Commands" value="Generate Cursor Commands" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="343.0" y="1280.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc4_Build Agile Bots_Generate CLI_Generate Help Documentation_Generate_Help_Documentation" value="Generate Help Documentation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="403.0" y="780.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="inc9_Build Agile Bots_Generate CLI_Generate Help Documentation_Generate_Help_Documentation" value="Generate Help Documentation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
-                    <mxGeometry x="403.0" y="1280.0" width="50" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="increment_sep1" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="560.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="560.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep2" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="660.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="660.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep3" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="760.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="760.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep4" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="860.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="860.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep5" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="960.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="960.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep6" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1060.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1060.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep7" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1160.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1160.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep8" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1260.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1260.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep9" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1360.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1360.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep10" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1460.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1460.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep11" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1560.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1560.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep12" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1660.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1660.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep13" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1760.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1760.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep14" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1860.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1860.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep15" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="1960.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="1960.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep16" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="2060.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="2060.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep17" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="2160.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="2160.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep18" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="2260.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="2260.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep19" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="2360.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="2360.0" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="increment_sep20" value="" style="endArrow=none;dashed=1;html=1;" parent="1" edge="1">
-                    <mxGeometry width="50" height="50" relative="1" as="geometry">
-                        <mxPoint x="-180" y="2460.0" as="sourcePoint"/>
-                        <mxPoint x="4000" y="2460.0" as="targetPoint"/>
-                    </mxGeometry>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope/filter-scope-by-files-using-cli" value="Filter Scope By Files Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="2639" y="32" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/file-filtering/invoke-bot/work-with-story-map/open-story-related-files/open-story-files" value="Open Story Files" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="16" vertex="1">
+                    <mxGeometry x="7084" y="131.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Build Story Graph Using API" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" vertex="1" parent="16">
+                    <mxGeometry x="11259" y="131.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" vertex="1" parent="16">
+                    <mxGeometry y="120" width="13160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Trace&amp;nbsp; Knowledge" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" vertex="1" parent="16">
+                    <mxGeometry x="10" y="131.25" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/inject-/-store-content" value="" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="693.75" width="13155" height="95" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli" value="" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;connectable=1;" parent="1" vertex="1">
+                    <mxGeometry x="10" y="570" width="13155" height="123.75" as="geometry"/>
+                </mxCell>
+                <mxCell id="build-agile-bots" value="Build Agile Bots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="120" width="520" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="build-agile-bots/generate-mcp-tools" value="Generate MCP Tools" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="25" y="195" width="240" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="build-agile-bots/generate-cli" value="Generate CLI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="275" y="195" width="265" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot" value="Invoke Bot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="120" width="12560" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot" value="Initialize Bot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="195" width="1395" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions" value="Load Behavior, and Actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="267" width="244" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/resolve-bot-path" value="Resolve Bot Path" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="601" y="618.75" width="55" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/resolve-bot-path-using-cli" value="Resolve Bot Path Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;fontStyle=0" parent="1" vertex="1">
+                    <mxGeometry x="540" y="620.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/switch-registered-bots-in-cli" value="Switch Registered Bots in CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="779" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/switch-bot-panel" value="Switch Bot panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="840" y="618.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/load-bot-using-cli" value="Load Bot Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="667" y="621.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/load-bot-behaviors-using-cli" value="Load Bot Behaviors Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1055" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/load-actions-using-cli" value="Load Actions Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1163" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/initialize-bot-interface/detect-cli-mode" value="Detect CLI Mode" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1300" y="619.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/initialize-bot-interface/initialize-cli-session" value="Initialize CLI Session" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1360" y="619.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/initialize-bot-interface/open-panel" value="Open Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1420" y="619.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/initialize-bot-interface/apply-visual-branding" value="Apply Visual Branding" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1480" y="619.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/initialize-bot-interface/exit-cli-repl" value="Exit CLI REPL" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1900" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface" value="Render Bot Interface" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1290" y="267" width="660" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface/display-cli-header" value="Display CLI Header" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#1a237e;strokeColor=#0d47a1;fontColor=#ffffff;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1540" y="620.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface/display-piped-mode-instructions-for-ai-agents" value="Display Piped Mode Instructions for AI Agents" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1600" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface/display-headless-mode-status-in-cli" value="Display Headless Mode Status in CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1660" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface/display-session-status-panel" value="Display Session Status panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1720" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/render-bot-interface/toggle-panel-section" value="Toggle Panel Section" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1780" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/set-workspace/manage-bot-registry" value="Manage Bot Registry" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="720" y="620.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/set-workspace/load-and-display-workspace-context-in-cli" value="Load and Display Workspace Context in CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="909" y="618.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/initialize-bot/set-workspace/change-workspace-path-panel" value="Change Workspace Path panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="965" y="618.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map" value="Work With Story Map" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1965" y="195" width="5910" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files" value="Scope Files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1970" y="270" width="740" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/set-file-filter" value="Set File Filter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1975" y="345" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-files/filter-file-scope" value="Filter File Scope" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="2345" y="345" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories" value="Scope Stories" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="2720" y="270" width="1810" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories" value="Filter Scope of Stories" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="2725" y="345" width="540" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-stories" value="Filter Story Scope By Stories" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="2725" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-scope-by-stories-using-cli" value="Filter Scope By Stories Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="2785" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-stories-panel" value="Filter Story Scope by Stories Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="2845" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-files" value="Filter Story Scope By Files" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="2905" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-files-cli" value="Filter Story Scope By Files CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="2965" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-files-panel" value="Filter Story Scope By Files Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3025" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-increments" value="Filter Story Scope By Increments" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3085" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-increments-cli" value="Filter Story Scope By Increments CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3145" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories/filter-story-scope-by-increments-panel" value="Filter Story Scope By Increments Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3205" y="712.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/manage-story-scope" value="Manage Story Scope" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="3275" y="345" width="540" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/manage-story-scope/create-scope-using-cli" value="Create Scope Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3290" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/manage-story-scope/display-scope-using-cli" value="Display Scope Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3580" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/manage-story-scope/execute-actions-with-scope-using-cli" value="Execute Actions With Scope Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3640" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/manage-story-scope/execute-action-scoped-to-story-node" value="Execute Action Scoped To Story Node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3700" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts" value="Set Scope Using Filter Parts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="3825" y="345" width="705" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-filter-part-to-story-scope" value="Add Filter Part To Story Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3825" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-filter-part-to-story-scope-using-cli" value="Add Filter Part To Story Scope using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3885" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/add-filter-part-to-story-scope-in-panel" value="Add Filter Part To Story Scope In Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3945" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-filter-part-from-story-scope" value="Remove Filter Part From Story Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4005" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-filter-part-from-story-scope-using-cli" value="Remove Filter Part From Story Scope using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4065" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts/remove-filter-part-from-story-scope-in-panel" value="Remove Filter Part From Story Scope In Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4125" y="815" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map" value="Edit Story Map" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="4540" y="270" width="1160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/navigate-story-graph-using-cli" value="Navigate Story Graph Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4640" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/display-story-hierarchy-panel" value="Display Story Hierarchy Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4690" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/create-child-story-node" value="Create Child Story Node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4750" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/create-child-story-node-under-parent-panel" value="Create Child Story Node Under Parent Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4810" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/create-child-story-node-under-parent-cli" value="Create Child Story Node Under Parent CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4870" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/create-epic" value="Create Epic" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4930" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/delete-story-node" value="Delete Story Node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4990" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/delete-story-node-from-parent-cli" value="Delete Story Node From Parent CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5050" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/delete-story-node-from-parent-panel" value="Delete Story Node From Parent Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5110" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/move-story-node-to-parent" value="Move Story Node To Parent" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5170" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/move-story-node--cli" value="Move Story Node  CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5230" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/move-story-node-panel" value="Move Story Node Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5290" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/update-story-node-name--cli" value="Update Story Node name  CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5350" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/update-story-node-name-panel" value="Update Story Node name Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5410" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/update-story-node-name" value="Update Story Node Name" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5470" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/save-story-map-changes-asynchronously" value="Save Story Map Changes Asynchronously" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5530" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/automatically-refresh-story-graph-changes-panel" value="Automatically Refresh Story Graph Changes Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5590" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-story-map/automatically-refresh-story-graph-changes--cli" value="Automatically Refresh Story Graph Changes  CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5650" y="720.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments" value="Edit Increments" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="5710" y="270" width="840" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/add-increment" value="Add Increment" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5730" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/add-increment-panel" value="Add Increment Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5790" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/add-increment-cli" value="Add Increment CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5850" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/delete-increment" value="Delete Increment" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5910" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/delete-increment-cli" value="Delete Increment CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="5970" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/delete-increment-panel" value="Delete Increment Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6030" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/move-story-to-increment" value="Move Story to Increment" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6090" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/move-story-to-increment-cli" value="Move Story to Increment CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6150" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/move-story-to-increment-panel" value="Move Story to Increment Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6210" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/display-increment-scope-view-cli" value="Display Increment Scope View CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6270" y="810" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/edit-increments/display-increment-scope-view" value="Display Increment Scope View" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6325" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node" value="Act With Selected Node" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="6560" y="270" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node/set-scope-to-selected-story-node" value="Set scope to selected story node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6560" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node/submit-action-for-selected-story-node" value="Submit action for selected story node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6620" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node/submit-current-behavior-action-for-selected-node" value="Submit Current Behavior Action For Selected Node" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6680" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node/set-scope-to-selected-increment" value="Set scope to selected Increment" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6740" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/act-with-selected-node/copy-story-node-to-clipboard" value="Copy Story Node To Clipboard" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6800" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/open-story-related-files" value="Open Story Related Files" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="6870" y="270" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/open-story-related-files/open-all-related-files" value="Open All Related Files" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6900" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/open-story-related-files/enrich-scope-with-links" value="Enrich Scope With Links" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="6950" y="716.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph" value="Trace Story Graph" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7050" y="272" width="820" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-story" value="Trace Story" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7057" y="344" width="135" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-scenario" value="Trace Scenario" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7200" y="345" width="440" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/work-with-story-map/trace-story-graph/trace-code" value="Trace Code" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7650" y="344" width="220" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions" value="Navigate Behavior Actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7885" y="195" width="1590" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions" value="Navigate Behavior And Actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="7890" y="270" width="480" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially" value="Navigate Sequentially" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="7890" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-to-first-behavior-action" value="Navigate To First Behavior Action" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="7950" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-using-cli-dot-notation" value="Navigate Using CLI Dot Notation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8010" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially-using-cli-commands" value="Navigate Sequentially Using CLI Commands" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8070" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-behavior-action-panel" value="Navigate Behavior Action Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8130" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/manage-behaviors-using-cli" value="Manage Behaviors Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8190" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-to-behavior-action-and-execute-using-cli" value="Navigate To Behavior Action And Execute Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8250" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially-using-cli" value="Navigate Sequentially Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8310" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow" value="Perform Behavior Action In Bot Workflow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="8380" y="270" width="660" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-behavior-action" value="Execute Behavior Action" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8385" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-behavior-action-panel" value="Execute Behavior Action Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8440" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/update-and-find-current-behavior" value="Update and Find Current Behavior" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8500" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/persist-behavior-action-state" value="Persist Behavior Action State" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8560" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-action-start" value="Track Action Start" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8680" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-action-completion" value="Track Action Completion" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8740" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/proceed-across-end-to-end-workflow" value="Proceed across End To End Workflow" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8800" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/record-activity-metrics-and-paths" value="Record Activity Metrics And Paths" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8860" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/re-execute-current-operation-using-cli" value="Re-execute Current Operation Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8920" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-end-to-end-workflow-using-cli" value="Execute End To End Workflow Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8980" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state" value="Display Behavior Action State" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="9050" y="270" width="420" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-bot-hierarchy-tree-with-progress-indicators-cli" value="Display Bot Hierarchy Tree with Progress Indicators CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9060" y="601" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/show-remaining-actions-after-completion" value="Show Remaining Actions After Completion" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9116" y="601" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-current-position-in-cli" value="Display Current Position in CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9170" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-cli-navigation-menu-footer" value="Display CLI Navigation Menu Footer" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9230" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-hierarchy-in-panel" value="Display Hierarchy In Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9290" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/manage-behavior-action-state-using-cli" value="Manage Behavior Action State Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9350" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-context-using-cli" value="Display Context Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9410" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action" value="Perform Action" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="9485" y="195" width="3260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope" value="Prepare Common Instructions For Behavior, Action, and Scope" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="9490" y="270" width="840" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/inject-context-into-instructions" value="Inject Context Into Instructions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9490" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/get-action-instructions-through-cli" value="Get Action Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9550" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/submit-instructions-through-cli" value="Submit Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9610" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/display-base-instructions-panel" value="Display Base Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9670" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/display-raw-format-instructions-in-panel" value="Display Raw Format Instructions In Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9730" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-clarification-answers" value="Save Clarification Answers" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9790" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-clarification-evidence" value="Save Clarification Evidence" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9850" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-strategy-decisions" value="Save Strategy Decisions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9910" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-multiple-guardrails-together" value="Save Multiple Guardrails Together" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="9970" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-file-isolation" value="Save File Isolation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10030" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-guardrails-through-panel" value="Save Guardrails Through Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10090" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/submit-scope-instructions" value="Submit Scope Instructions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10150" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/handle-operation-errors-and-validation-in-cli" value="Handle Operation Errors and Validation in CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10210" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-guardrails-through-cli" value="Save Guardrails Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10270" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements" value="Clarify Requirements" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="10340" y="270" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements/clarify-requirements" value="Clarify Requirements" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10340" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements/clarify-requirements-using-cli" value="Clarify Requirements Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10400" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements/display-clarification-data-through-cli" value="Display Clarification Data Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10460" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements/display-clarify-instructions-panel" value="Display Clarify Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10520" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/clarify-requirements/get-clarify-instructions-through-cli" value="Get Clarify Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10580" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy" value="Decide Strategy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="10650" y="270" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/decide-strategy" value="Decide Strategy" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10650" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/decide-strategy-using-cli" value="Decide Strategy Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10710" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/display-strategy-data-through-cli" value="Display Strategy Data Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10770" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/display-strategy-instructions-panel" value="Display Strategy Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10830" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/submit-instructions-to-ai-agent-panel" value="Submit Instructions To AI Agent Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10890" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/decide-strategy/get-strategy-instructions-through-cli" value="Get Strategy Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="10950" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/build-story-graph" value="Build Story Graph" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="11020" y="270" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/build-story-graph/build-story-graph" value="Build Story Graph" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11040" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/build-story-graph/build-story-graph-using-cli" value="Build Story Graph Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11100" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/build-story-graph/get-build-instructions-through-cli" value="Get Build Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11155" y="606.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/build-story-graph/display-build-instructions-panel" value="Display Build Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11260" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content" value="Render Content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="11330" y="270" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content/render-output-using-cli" value="Render Output Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11390" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content/display-synchronizer-output-through-cli" value="Display Synchronizer Output Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11450" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content/display-render-configurations-through-cli" value="Display Render Configurations Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11510" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content/get-render-instructions-through-cli" value="Get Render Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11570" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/render-content/display-render-instructions-panel" value="Display Render Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11630" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content" value="Synchronized Graph with Rendered Diagram Content" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="11700" y="270" width="420" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/render-story-map" value="Render story map" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11700" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/render-story-map-increments" value="Render story map increments" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11760" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/render-story-map-with-acceptance-criteria" value="Render story map with acceptance criteria" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11820" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/update-graph-from-story-map" value="Update graph from story map" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11880" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/update-graph-from-map-increments" value="Update graph from map increments" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="11940" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/update-story-graph-from-map-acceptance-criteria" value="Update story graph from map acceptance criteria" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12000" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/render-action-diagram-section" value="Render action diagram section" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12060" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules" value="Validate With Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="12130" y="270" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/validate-rules" value="Validate Rules" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12130" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/validate-rules-using-cli" value="Validate Rules Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12190" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/display-validation-results-through-cli" value="Display Validation Results Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12250" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/display-validation-scanners-through-cli" value="Display Validation Scanners Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12310" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/display-validate-instructions-panel" value="Display Validate Instructions Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12370" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/validate-with-rules/get-validate-instructions-through-cli" value="Get Validate Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12430" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/use-rules-in-prompt" value="Use Rules In Prompt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="12500" y="270" width="240" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/use-rules-in-prompt/display-rules" value="Display Rules" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12500" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/use-rules-in-prompt/display-rules-using-cli" value="Display Rules Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12560" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/use-rules-in-prompt/submit-behavior-rules-through-panel" value="Submit Behavior Rules Through Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12620" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/perform-action/use-rules-in-prompt/get-rules-instructions-through-cli" value="Get Rules Instructions Through CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12680" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help" value="Get Help" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="12755" y="195" width="360" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/get-help" value="Get Help" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12755" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/display-parameter-help-using-cli" value="Display Parameter Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12815" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/display-action-help-using-cli" value="Display Action Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12875" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/display-command-examples-using-cli" value="Display Command Examples Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12935" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/get-help-using-cli" value="Get Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="12995" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="invoke-bot/get-help/display-help-using-cli" value="Display Help Using CLI" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="13055" y="605" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/user-manually-drops-config-in-to-ai-chat/build-agile-bots/generate-mcp-tools/generate-bot-tools" value="Generate Bot Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="187" y="622.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/simplest-mcp/build-agile-bots/generate-mcp-tools/generate-behavior-action-tools" value="Generate Behavior Action Tools" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="16" y="623.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/simplest-mcp/build-agile-bots/generate-mcp-tools/deploy-mcp-bot-server" value="Deploy MCP BOT Server" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="75" y="622.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/simplest-mcp/build-agile-bots/generate-mcp-tools/restart-mcp-server-to-load-code-changes" value="Restart MCP Server To Load Code Changes" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="133" y="622.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/workflow/invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-activity-for-workspace" value="Track Activity For Workspace" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="8620" y="600" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-label/cli" value="Bot Behavior" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="15" y="576.25" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli/build-agile-bots/generate-cli/generate-command-definitions" value="Generate Command Definitions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="251" y="620.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli/build-agile-bots/generate-cli/generate-cli-entry-point" value="Generate CLI Entry Point" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="307" y="621.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli/build-agile-bots/generate-cli/generate-cursor-commands" value="Generate Cursor Commands" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="362" y="621.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli/build-agile-bots/generate-cli/generate-help-documentation" value="Generate Help Documentation" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="417" y="621.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-label/inject-/-store-content" value="Story Map Scoping" style="whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;fontSize=11;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="16" y="700" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/refactoring/invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/load-bot-behaviors" value="Load Bot Behaviors" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1108" y="618.75" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/refactoring/invoke-bot/initialize-bot/load-bot,-behavior,-and-actions/load-actions" value="Load Actions" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1220" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/scope-stories/manage-story-scope/create-scope" value="Create Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3345" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/scope-stories/manage-story-scope/clear-scope" value="Clear Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3400" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/scope-stories/manage-story-scope/show-all-scope-through-panel" value="Show All Scope Through Panel" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3454" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/scope-stories/manage-story-scope/persist-scope" value="Persist Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3515" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/scope-stories/manage-story-scope/execute-actions-with-scope" value="Execute Actions With Scope" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="3750" y="720.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/existing/invoke-bot/work-with-story-map/edit-story-map/navigate-story-graph" value="Navigate Story Graph" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="4585" y="722.5" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="inc-lane/cli-multi-bots/invoke-bot/initialize-bot/render-bot-interface/display-cli-bot-command-in-navigation-menu-footer" value="Display CLI Bot Command in Navigation Menu Footer" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="1840" y="619.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Load Bot" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" vertex="1" parent="1">
+                    <mxGeometry x="559" y="266" width="466" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Display CLI Header" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" vertex="1" parent="1">
+                    <mxGeometry x="1540" y="620.25" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="Render Output Usng Story API" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontSize=8;" vertex="1" parent="1">
+                    <mxGeometry x="11390" y="730" width="50" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

@@ -12,7 +12,7 @@ from typing import List, Optional, Dict, Any
 from story_graph.nodes import StoryMap, Epic, SubEpic, Story, StoryGroup
 from .drawio_story_node import (
     DrawIOStoryNode, DrawIOEpic, DrawIOSubEpic, DrawIOStory,
-    DrawIOIncrementLane, SPACING, CONTAINER_PADDING,
+    DrawIOIncrementLane, SPACING, CONTAINER_PADDING, CELL_SIZE,
     _max_sub_epic_depth, _RowPositions, CELL_SPACING,
     _compare_node_lists,
 )
@@ -77,11 +77,16 @@ class DrawIOStoryMap(StoryMap):
     # ------------------------------------------------------------------
 
     def render_from_story_map(self, story_map: StoryMap,
-                               layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
+                               layout_data: Optional[LayoutData] = None,
+                               skip_stories: bool = False) -> Dict[str, Any]:
         """Render outline diagram.  Each node renders itself.
 
         Computes global row positions first so all epics share the
         same Y levels, then lays out epics left-to-right.
+
+        When *skip_stories* is True the outline renders epics and
+        sub-epics but omits story cells (used by the increments view
+        where stories appear only in increment lanes).
         """
         self._layout_data = layout_data
         self._drawio_epics = []
@@ -99,7 +104,8 @@ class DrawIOStoryMap(StoryMap):
         for epic in epics:
             drawio_epic = DrawIOStoryNodeSerializer.create_epic(
                 epic.name, getattr(epic, 'sequential_order', 0) or 0)
-            drawio_epic.render_from_domain(epic, x_pos, rows, layout_data)
+            drawio_epic.render_from_domain(epic, x_pos, rows, layout_data,
+                                           skip_stories=skip_stories)
             self._drawio_epics.append(drawio_epic)
             x_pos = drawio_epic.boundary.right + CELL_SPACING
 
@@ -117,12 +123,52 @@ class DrawIOStoryMap(StoryMap):
             self, story_map: StoryMap,
             increments_data: list,
             layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
-        """Render outline first, then add increment lanes at the bottom."""
-        summary = self.render_from_story_map(story_map, layout_data)
+        """Render outline with orphaned stories, then increment lanes.
 
-        y_start = self.get_bottom_y() + 50
-        total_width = self.get_total_width()
-        all_stories = self.get_stories()
+        Stories assigned to an increment appear ONLY in their lane.
+        Stories NOT assigned to any increment ("orphaned") appear
+        under their sub-epic just like a normal outline, providing
+        context for the column structure.
+
+        Increment lanes are positioned below the orphaned story area
+        so there is room for potentially multiple rows of unassigned
+        stories.
+        """
+        # Collect all story names that belong to at least one increment
+        increment_story_names: set = set()
+        for inc_data in increments_data:
+            for s in inc_data.get('stories', []):
+                increment_story_names.add(
+                    s.get('name', '') if isinstance(s, dict) else str(s))
+
+        # Phase 1: render full outline (epics, sub-epics, ALL stories)
+        # so that orphaned stories appear under their sub-epics and we
+        # get correct positions for every story.
+        summary = self.render_from_story_map(story_map, layout_data,
+                                             skip_stories=False)
+        all_drawio_stories = self.get_stories()
+
+        # Phase 2: remove increment-assigned stories from the outline
+        # tree (they will live only in their lanes).  Orphaned stories
+        # stay in the tree.
+        for epic in self._drawio_epics:
+            for se in epic.get_sub_epics():
+                self._remove_increment_stories(se, increment_story_names)
+
+        # Collect domain stories for user/actor info
+        domain_stories = list(story_map.all_stories)
+
+        # Phase 3: compute where increment lanes start.
+        # Use the full story set's bottom (before removal) so column
+        # widths are correct; then derive Y from the actual remaining
+        # outline bottom which includes orphaned stories.
+        outline_bottom = self.get_bottom_y()
+        total_width = max(
+            self.get_total_width(),
+            max((s.position.x + CELL_SIZE for s in all_drawio_stories),
+                default=0))
+
+        y_start = outline_bottom + 50  # 50px gap between outline and lanes
 
         for idx, inc_data in enumerate(increments_data):
             story_names = []
@@ -133,11 +179,26 @@ class DrawIOStoryMap(StoryMap):
                 name=inc_data.get('name', f'Increment {idx + 1}'),
                 priority=inc_data.get('priority', idx + 1),
                 story_names=story_names)
-            lane.render(idx, y_start, total_width, all_stories)
+            lane.render(idx, y_start, total_width, all_drawio_stories,
+                        domain_stories=domain_stories)
             self._extra_nodes.extend(lane.collect_all_elements())
 
         summary['increments'] = len(increments_data)
         return summary
+
+    @staticmethod
+    def _remove_increment_stories(sub_epic: DrawIOSubEpic,
+                                   increment_names: set):
+        """Remove stories that belong to increments from a sub-epic tree.
+
+        Recurses into nested sub-epics.  Only leaf sub-epics have stories.
+        """
+        for nested in sub_epic.get_sub_epics():
+            DrawIOStoryMap._remove_increment_stories(nested, increment_names)
+        to_remove = [s for s in sub_epic.get_stories()
+                     if s.name in increment_names]
+        for s in to_remove:
+            sub_epic._children.remove(s)
 
     # ------------------------------------------------------------------
     # Render – Exploration / Acceptance Criteria
@@ -219,12 +280,167 @@ class DrawIOStoryMap(StoryMap):
 
     def generate_update_report(self, original_story_map: StoryMap) -> UpdateReport:
         report = UpdateReport()
+
+        # Pass 1: hierarchy comparison (horizontal position).
         extracted_epics = sorted(self._drawio_epics, key=lambda e: e.sequential_order or 0)
         original_epics = sorted(list(original_story_map.epics), key=lambda e: getattr(e, 'sequential_order', 0) or 0)
 
         _compare_node_lists(extracted_epics, original_epics, report,
                             parent_name='', recurse=True)
+
+        # Pass 2: increment assignments (vertical position).
+        # Compare extracted state against original to produce the delta.
+        extracted = self.extract_increment_assignments()
+        if extracted:
+            original_increments = original_story_map.story_graph.get('increments', [])
+            self._compute_increment_delta(report, extracted, original_increments)
         return report
+
+    def _compute_increment_delta(self, report: UpdateReport,
+                                  extracted: list,
+                                  original_increments: list):
+        """Compare extracted increment assignments against original and
+        populate the report with only the changes (added/removed/moved).
+        """
+        from .update_report import IncrementChange, IncrementMove
+
+        # Build original: story → set of increment names
+        orig_by_story: dict = {}  # story_name → set of increment names
+        orig_by_inc: dict = {}    # inc_name → set of story names
+        for inc in original_increments:
+            inc_name = inc.get('name', '')
+            stories = set()
+            for s in inc.get('stories', []):
+                name = s.get('name', '') if isinstance(s, dict) else str(s)
+                stories.add(name)
+                orig_by_story.setdefault(name, set()).add(inc_name)
+            orig_by_inc[inc_name] = stories
+
+        # Build extracted: story → set of increment names
+        ext_by_story: dict = {}
+        ext_by_inc: dict = {}
+        for inc in extracted:
+            inc_name = inc['name']
+            stories = set(inc['stories'])
+            ext_by_inc[inc_name] = stories
+            for s in stories:
+                ext_by_story.setdefault(s, set()).add(inc_name)
+
+        # Compute per-increment changes (only include increments that changed)
+        all_inc_names = list(dict.fromkeys(
+            [inc.get('name', '') for inc in original_increments] +
+            [inc['name'] for inc in extracted]))
+
+        changes = []
+        for inc_name in all_inc_names:
+            orig_stories = orig_by_inc.get(inc_name, set())
+            ext_stories = ext_by_inc.get(inc_name, set())
+            added = sorted(ext_stories - orig_stories)
+            removed = sorted(orig_stories - ext_stories)
+            if added or removed:
+                changes.append(IncrementChange(
+                    name=inc_name, added=added, removed=removed))
+
+        # Compute moves (story was in increment A, now in increment B)
+        moves = []
+        all_stories = set(orig_by_story.keys()) | set(ext_by_story.keys())
+        for story in sorted(all_stories):
+            orig_incs = orig_by_story.get(story, set())
+            ext_incs = ext_by_story.get(story, set())
+            if orig_incs == ext_incs:
+                continue
+            # Story gained new increment(s)
+            for inc in sorted(ext_incs - orig_incs):
+                from_inc = ''
+                # If it was in exactly one before and is now somewhere else,
+                # that's a move from old → new
+                if len(orig_incs) == 1 and len(ext_incs) == 1:
+                    from_inc = next(iter(orig_incs))
+                moves.append(IncrementMove(
+                    story=story, from_increment=from_inc, to_increment=inc))
+
+        report.set_increment_changes(changes, moves)
+
+    # ------------------------------------------------------------------
+    # Pass 2 – Increment extraction by vertical position
+    # ------------------------------------------------------------------
+
+    def extract_increment_assignments(self) -> list:
+        """Determine which increment lane each story belongs to by Y position.
+
+        Completely isolated from the hierarchy (pass 1).  Only looks at
+        vertical boundaries of increment lanes vs story Y positions.
+
+        Returns:
+            List of dicts ``[{'name': 'CLI', 'stories': ['Story A', ...]}, ...]``
+            ordered top-to-bottom by lane Y.
+        """
+        # 1. Find lane backgrounds (large rectangles with inc-lane/ id, empty value)
+        lanes = []
+        for n in self._extra_nodes:
+            cid = getattr(n, 'cell_id', '')
+            if (cid.startswith('inc-lane/')
+                    and '/' not in cid.replace('inc-lane/', '', 1)
+                    and getattr(n, 'value', '') == ''):
+                lanes.append({
+                    'slug': cid.replace('inc-lane/', ''),
+                    'y': n.position.y,
+                    'height': n.boundary.height,
+                    'name': '',
+                })
+
+        # 2. Match lane labels (inc-label/) to get human-readable names
+        for n in self._extra_nodes:
+            cid = getattr(n, 'cell_id', '')
+            if cid.startswith('inc-label/'):
+                slug = cid.replace('inc-label/', '')
+                for lane in lanes:
+                    if lane['slug'] == slug:
+                        lane['name'] = getattr(n, 'value', '') or slug
+                        break
+
+        if not lanes:
+            return []
+
+        lanes.sort(key=lambda l: l['y'])
+
+        # 3. Gather every element that could be a story – from the tree
+        #    (DrawIOStory instances) and from extra_nodes (raw
+        #    DrawIOElement lane copies with a value/name).
+        candidates = []
+        for story in self.get_stories():
+            candidates.append((story.name, story.position.y))
+        for n in self._extra_nodes:
+            name = getattr(n, 'name', None) or getattr(n, 'value', None) or ''
+            if name and hasattr(n, 'position') and n.position.y > 0:
+                cid = getattr(n, 'cell_id', '')
+                # Skip lane backgrounds and labels (they aren't stories)
+                if cid.startswith('inc-lane/') and '/' not in cid.replace('inc-lane/', '', 1):
+                    continue
+                if cid.startswith('inc-label/'):
+                    continue
+                # Skip actor elements
+                if '/actor-' in cid:
+                    continue
+                candidates.append((name, n.position.y))
+
+        # 4. For each lane, check every candidate.
+        TOLERANCE = 20  # px slack for edges
+        for lane in lanes:
+            lane['stories'] = []
+            lane['_seen'] = set()
+
+        for name, y in candidates:
+            for lane in lanes:
+                top = lane['y'] - TOLERANCE
+                bottom = lane['y'] + lane['height'] + TOLERANCE
+                if top <= y <= bottom:
+                    if name not in lane['_seen']:
+                        lane['_seen'].add(name)
+                        lane['stories'].append(name)
+                    break
+
+        return [{'name': l['name'], 'stories': l['stories']} for l in lanes]
 
     # ------------------------------------------------------------------
     # Dict conversion
@@ -317,7 +533,7 @@ class DrawIOStoryMap(StoryMap):
             for cut in range(len(parts) - 1, 0, -1):
                 candidate = '/'.join(parts[:cut])
                 parent_node = nodes_by_id.get(candidate)
-                if parent_node and parent_node is not node:
+                if parent_node and parent_node is not node and hasattr(parent_node, 'add_child'):
                     parent_node.add_child(node)
                     found = True
                     break
@@ -325,7 +541,7 @@ class DrawIOStoryMap(StoryMap):
                 continue
             pid = parent_map.get(cell_id, '')
             parent_from_attr = nodes_by_id.get(pid)
-            if parent_from_attr and parent_from_attr is not node:
+            if parent_from_attr and parent_from_attr is not node and hasattr(parent_from_attr, 'add_child'):
                 parent_from_attr.add_child(node)
                 continue
 
@@ -389,11 +605,29 @@ class DrawIOStoryMap(StoryMap):
     # ------------------------------------------------------------------
 
     def _collect_all_nodes(self) -> list:
-        """Walk the tree and gather every renderable node."""
+        """Walk the tree and gather every renderable node.
+
+        Serialization order determines visual stacking in DrawIO (later =
+        on top).  For increments view we want:
+          1. Lane backgrounds (large rectangles) – bottom layer
+          2. Epics / sub-epics bars – structural outlines
+          3. Lane labels, actors, story copies inside lanes
+          4. Orphaned stories in the outline – top layer so the user can
+             drag them onto a lane without them being hidden behind it.
+        """
+        # Separate lane backgrounds from other extra nodes
+        lane_bgs = [n for n in self._extra_nodes
+                    if hasattr(n, 'cell_id')
+                    and n.cell_id.startswith('inc-lane/')
+                    and '/' not in n.cell_id.replace('inc-lane/', '', 1)
+                    and getattr(n, 'value', '') == '']
+        other_extra = [n for n in self._extra_nodes if n not in lane_bgs]
+
         nodes = []
+        nodes.extend(lane_bgs)            # 1. lane backgrounds (bottom)
         for epic in self._drawio_epics:
-            nodes.extend(epic.collect_all_nodes())
-        nodes.extend(self._extra_nodes)
+            nodes.extend(epic.collect_all_nodes())  # 2+4. structure + orphans
+        nodes.extend(other_extra)          # 3. labels, actors, lane stories
         return nodes
 
     def _collect_domain_stories(self, story_map: StoryMap,
