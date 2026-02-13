@@ -44,9 +44,6 @@ class BotPanel {
       
       this._log("[BotPanel] Constructor invoked");
       this._log(`[PERF] Constructor start`);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:19',message:'Constructor ENTRY',data:{workspaceRoot,hasPanel:!!panel,hasExtensionUri:!!extensionUri},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,D'})}).catch(()=>{});
-      // #endregion
       console.log(`[BotPanel] Constructor called - workspaceRoot: ${workspaceRoot}`);
       this._panel = panel;
       this._workspaceRoot = workspaceRoot;
@@ -78,14 +75,8 @@ class BotPanel {
       // Create shared PanelView instance for CLI operations
       const perfPanelViewStart = performance.now();
       console.log("[BotPanel] Creating shared PanelView instance");
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'Before PanelView creation',data:{workspaceRoot,botDirectory},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       this._sharedCLI = new PanelView(botDirectory);
       const perfPanelViewEnd = performance.now();
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:43',message:'After PanelView creation',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       console.log("[BotPanel] Shared PanelView instance created successfully");
       this._log(`[PERF] PanelView creation: ${(perfPanelViewEnd - perfPanelViewStart).toFixed(2)}ms`);
       
@@ -98,16 +89,10 @@ class BotPanel {
       
       // Update content asynchronously (can't await in constructor)
       console.log("[BotPanel] Calling _update()");
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:55',message:'Before _update()',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       this._update().catch(err => {
         console.error(`[BotPanel] ERROR in async _update: ${err.message}`);
         console.error(`[BotPanel] ERROR stack: ${err.stack}`);
         vscode.window.showErrorMessage(`Bot Panel Error: ${err.message}`);
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:55',message:'_update() threw error',data:{error:err.message,stack:err.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
       });
       
       // ===== PERFORMANCE: End constructor timing =====
@@ -115,9 +100,6 @@ class BotPanel {
       const constructorDuration = (perfConstructorEnd - perfConstructorStart).toFixed(2);
       console.log("[BotPanel] Constructor completed successfully");
       this._log(`[PERF] TOTAL Constructor duration: ${constructorDuration}ms`);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:60',message:'Constructor EXIT',data:{constructorDurationMs:constructorDuration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
     } catch (error) {
       console.error(`[BotPanel] ERROR in constructor: ${error.message}`);
       console.error(`[BotPanel] ERROR stack: ${error.stack}`);
@@ -1423,9 +1405,6 @@ class BotPanel {
   }
 
   static createOrShow(workspaceRoot, extensionUri) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:262',message:'createOrShow ENTRY',data:{workspaceRoot,extensionUri:extensionUri?.toString()},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     console.log(`[BotPanel] >>> ENTERING createOrShow - workspaceRoot: ${workspaceRoot}`);
     console.log(`[BotPanel] >>> extensionUri: ${extensionUri}`);
     
@@ -1457,13 +1436,7 @@ class BotPanel {
       console.log("[BotPanel] >>> Webview panel created");
 
       console.log("[BotPanel] >>> Instantiating BotPanel class");
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:294',message:'Before new BotPanel()',data:{hasPanel:!!panel},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       BotPanel.currentPanel = new BotPanel(panel, workspaceRoot, extensionUri);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:294',message:'After new BotPanel()',data:{instanceCreated:!!BotPanel.currentPanel},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-      // #endregion
       console.log("[BotPanel] >>> BotPanel instance created successfully");
     } catch (error) {
       console.error(`[BotPanel] >>> EXCEPTION in createOrShow: ${error.message}`);
@@ -1957,81 +1930,11 @@ class BotPanel {
   }
 
   _setupDiagramFileWatchers(botData) {
+    // Disabled – file watchers were overwriting user edits to .drawio files
     if (this._diagramWatchers) {
       this._diagramWatchers.forEach(function(w) { w.dispose(); });
     }
     this._diagramWatchers = [];
-
-    var instructions = (botData && botData.instructions) ? botData.instructions : {};
-    var outputPaths = instructions.render_output_paths || [];
-    var drawioFiles = outputPaths.filter(function(p) { return p && p.endsWith('.drawio'); });
-
-    if (drawioFiles.length === 0 && this._workspaceRoot) {
-      var fs = require('fs');
-      var glob = require('path');
-      var shapeDir = glob.join(this._workspaceRoot, 'docs', 'story', 'shape');
-      try {
-        if (fs.existsSync(shapeDir)) {
-          var files = fs.readdirSync(shapeDir);
-          for (var fi = 0; fi < files.length; fi++) {
-            if (files[fi].endsWith('.drawio')) {
-              drawioFiles.push(glob.join(shapeDir, files[fi]));
-            }
-          }
-        }
-      } catch (e) {}
-    }
-
-    this._log('[BotPanel] _setupDiagramFileWatchers: drawioFiles=' + drawioFiles.length);
-    if (drawioFiles.length === 0) return;
-
-    var fs = require('fs');
-    var self = this;
-
-    for (var i = 0; i < drawioFiles.length; i++) {
-      var drawioPath = drawioFiles[i];
-      try {
-        if (!fs.existsSync(drawioPath)) continue;
-
-        var watcher = vscode.workspace.createFileSystemWatcher(
-          new vscode.RelativePattern(path.dirname(drawioPath), path.basename(drawioPath))
-        );
-
-        this._log('[BotPanel] Watching diagram: ' + drawioPath);
-
-        var makeHandler = function(dp) {
-          return function() {
-            if (self._renderInProgress) return;
-            try {
-              var layoutPath = dp.replace('.drawio', '-layout.json');
-              var reportPath = dp.replace('.drawio', '-update-report.json');
-              var drawioStat = fs.existsSync(dp) ? fs.statSync(dp) : null;
-              var layoutStat = fs.existsSync(layoutPath) ? fs.statSync(layoutPath) : null;
-              self._panel.webview.postMessage({
-                command: 'diagramFileChanged',
-                diagram: {
-                  file_path: dp,
-                  exists: !!drawioStat,
-                  file_modified_time: drawioStat ? drawioStat.mtimeMs : null,
-                  last_sync_time: layoutStat ? layoutStat.mtimeMs : null,
-                  report_path: fs.existsSync(reportPath) ? reportPath : null
-                }
-              });
-            } catch (err) {
-              self._log('[BotPanel] diagram watcher error: ' + err.message);
-            }
-          };
-        };
-
-        var handler = makeHandler(drawioPath);
-        watcher.onDidChange(handler);
-        watcher.onDidCreate(handler);
-        this._diagramWatchers.push(watcher);
-        this._disposables.push(watcher);
-      } catch (err) {
-        this._log('[BotPanel] Failed to watch ' + drawioPath + ': ' + err.message);
-      }
-    }
   }
 
 
@@ -2040,10 +1943,6 @@ class BotPanel {
     const perfUpdateStart = performance.now();
     try {
       this._log('[BotPanel] _update() START');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:384',message:'_update() ENTRY',data:{hasBotView:!!this._botView},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      console.log('[BotPanel] Fetching bot status...');
-      // #endregion
       console.log("[BotPanel] _update() called");
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
@@ -2054,14 +1953,8 @@ class BotPanel {
         const perfBotViewStart = performance.now();
         console.log("[BotPanel] Creating BotView");
         this._log('[BotPanel] Creating BotView');
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:394',message:'Before new BotView()',data:{panelVersion:this._panelVersion,hasWebview:!!webview,hasExtensionUri:!!this._extensionUri},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-        // #endregion
         try {
           this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:394',message:'After new BotView()',data:{botViewCreated:!!this._botView},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-          // #endregion
           const perfBotViewEnd = performance.now();
           const botViewDuration = (perfBotViewEnd - perfBotViewStart).toFixed(2);
           console.log("[BotPanel] BotView created successfully");
@@ -2071,9 +1964,6 @@ class BotPanel {
           console.error(`[BotPanel] ERROR creating BotView: ${botViewError.message}`);
           console.error(`[BotPanel] ERROR stack: ${botViewError.stack}`);
           this._log(`[BotPanel] ERROR creating BotView: ${botViewError.message}`);
-          // #region agent log
-          fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:394',message:'BotView construction failed',data:{error:botViewError.message,stack:botViewError.stack},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-          // #endregion
           throw botViewError;
         }
       }
@@ -2098,9 +1988,6 @@ class BotPanel {
       const perfRenderStart = performance.now();
       console.log("[BotPanel] Rendering HTML");
       this._log('[BotPanel] _botView.render() starting');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:405',message:'Before _botView.render()',data:{},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       // Render HTML using BotView (async now)
       const botData = this._botView.botData || await this._botView.execute('status');
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
@@ -2108,9 +1995,6 @@ class BotPanel {
       const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction, botData);
       const perfRenderEnd = performance.now();
       const renderDuration = (perfRenderEnd - perfRenderStart).toFixed(2);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:405',message:'After _botView.render()',data:{htmlLength:html?.length||0},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       this._log(`[PERF] HTML rendering: ${renderDuration}ms`)
       
       // ===== PERFORMANCE: HTML update =====
@@ -2155,9 +2039,6 @@ class BotPanel {
       this._log('[BotPanel] _update() completed successfully');
       this._log(`[PERF] TOTAL _update() duration: ${totalDuration}ms`);
       this._log('[BotPanel] _update() END');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'bot_panel.js:407',message:'_update() EXIT success',data:{totalDurationMs:totalDuration},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})}).catch(()=>{});
-      // #endregion
       
     } catch (err) {
       console.error(`[BotPanel] ERROR in _update: ${err.message}`);

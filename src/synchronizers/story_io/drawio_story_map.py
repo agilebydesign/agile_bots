@@ -14,6 +14,7 @@ from .drawio_story_node import (
     DrawIOStoryNode, DrawIOEpic, DrawIOSubEpic, DrawIOStory,
     DrawIOIncrementLane, SPACING, CONTAINER_PADDING,
     _max_sub_epic_depth, _RowPositions, CELL_SPACING,
+    _compare_node_lists,
 )
 from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 from .layout_data import LayoutData
@@ -218,22 +219,11 @@ class DrawIOStoryMap(StoryMap):
 
     def generate_update_report(self, original_story_map: StoryMap) -> UpdateReport:
         report = UpdateReport()
-        orig_epics = list(original_story_map.epics)
-        matched_originals = set()
+        extracted_epics = sorted(self._drawio_epics, key=lambda e: e.sequential_order or 0)
+        original_epics = sorted(list(original_story_map.epics), key=lambda e: getattr(e, 'sequential_order', 0) or 0)
 
-        for ext_epic in self._drawio_epics:
-            for idx, orig_epic in enumerate(orig_epics):
-                if idx in matched_originals:
-                    continue
-                if ext_epic.name.lower() == orig_epic.name.lower():
-                    matched_originals.add(idx)
-                    ext_epic.generate_update_report_for_epic_subtree(orig_epic, report)
-                    break
-
-        for idx, orig_epic in enumerate(orig_epics):
-            if idx not in matched_originals:
-                report.add_missing_epic(orig_epic.name)
-
+        _compare_node_lists(extracted_epics, original_epics, report,
+                            parent_name='', recurse=True)
         return report
 
     # ------------------------------------------------------------------
@@ -299,12 +289,18 @@ class DrawIOStoryMap(StoryMap):
         classified = set()
         for e in epics:
             classified.add(id(e))
-            for se in e.get_sub_epics():
-                classified.add(id(se))
-                for s in se.get_stories():
-                    classified.add(id(s))
+            cls._classify_sub_epic_tree(e.get_sub_epics(), classified)
         story_map._extra_nodes = [n for n in nodes if id(n) not in classified]
         return story_map
+
+    @classmethod
+    def _classify_sub_epic_tree(cls, sub_epics, classified: set):
+        """Recursively walk sub-epics and their children into the classified set."""
+        for se in sub_epics:
+            classified.add(id(se))
+            for s in se.get_stories():
+                classified.add(id(s))
+            cls._classify_sub_epic_tree(se.get_sub_epics(), classified)
 
     # ------------------------------------------------------------------
     # Internal helpers (load direction)
@@ -333,27 +329,60 @@ class DrawIOStoryMap(StoryMap):
                 parent_from_attr.add_child(node)
                 continue
 
+        MARGIN = 200
         for se in sub_epics:
             if se._parent is not None:
                 continue
+            se_cx = se.boundary.center.x
+            best_epic = None
+            best_dist = float('inf')
             for epic in epics:
-                if epic.boundary.contains_position(se.boundary.center):
-                    epic.add_child(se)
-                    break
+                left = epic.boundary.x - MARGIN
+                right = epic.boundary.x + epic.boundary.width + MARGIN
+                if left <= se_cx <= right:
+                    dist = abs(se_cx - epic.boundary.center.x)
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_epic = epic
+            if best_epic:
+                best_epic.add_child(se)
 
         for story in stories:
             if story._parent is not None:
                 continue
+            story_cx = story.boundary.center.x
+            best_se = None
+            best_width = float('inf')
             for se in sub_epics:
-                if se.boundary.contains_position(story.boundary.center):
-                    se.add_child(story)
-                    break
+                if se._parent is None:
+                    continue
+                se_left = se.boundary.x
+                se_right = se.boundary.x + se.boundary.width
+                if se_left <= story_cx <= se_right:
+                    if not se.get_sub_epics() and se.boundary.width < best_width:
+                        best_width = se.boundary.width
+                        best_se = se
+            if best_se:
+                best_se.add_child(story)
 
     def _assign_sequential_order_from_position(self, epics, sub_epics, stories):
-        for group in [epics, sub_epics, stories]:
-            sorted_nodes = sorted(group, key=lambda n: (n.position.y, n.position.x))
-            for idx, node in enumerate(sorted_nodes):
-                node.sequential_order = float(idx + 1)
+        Y_TOLERANCE = 30  # nodes within this many px of Y are on the same row
+
+        # Epics: left-to-right by X only, ignore Y
+        for idx, node in enumerate(sorted(epics, key=lambda n: n.position.x)):
+            node.sequential_order = float(idx + 1)
+
+        # Sub-epics and stories: order within parent, Y tolerance then X
+        for group in [sub_epics, stories]:
+            by_parent = {}
+            for n in group:
+                pid = id(n._parent) if n._parent else 0
+                by_parent.setdefault(pid, []).append(n)
+            for siblings in by_parent.values():
+                sorted_nodes = sorted(siblings,
+                    key=lambda n: (round(n.position.y / Y_TOLERANCE), n.position.x))
+                for idx, node in enumerate(sorted_nodes):
+                    node.sequential_order = float(idx + 1)
 
     # ------------------------------------------------------------------
     # Private helpers

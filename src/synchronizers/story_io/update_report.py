@@ -29,7 +29,11 @@ class UpdateReport:
     def __init__(self):
         self._renames: List[MatchEntry] = []
         self._new_stories: List[StoryEntry] = []
+        self._new_sub_epics: List[StoryEntry] = []
+        self._new_epics: List[StoryEntry] = []
         self._removed_stories: List[StoryEntry] = []
+        self._removed_sub_epics: List[StoryEntry] = []
+        self._removed_epics: List[StoryEntry] = []
         self._large_deletions = LargeDeletions()
         self._matched_count = 0
 
@@ -46,8 +50,24 @@ class UpdateReport:
         return list(self._new_stories)
 
     @property
+    def new_sub_epics(self) -> List[StoryEntry]:
+        return list(self._new_sub_epics)
+
+    @property
+    def new_epics(self) -> List[StoryEntry]:
+        return list(self._new_epics)
+
+    @property
     def removed_stories(self) -> List[StoryEntry]:
         return list(self._removed_stories)
+
+    @property
+    def removed_sub_epics(self) -> List[StoryEntry]:
+        return list(self._removed_sub_epics)
+
+    @property
+    def removed_epics(self) -> List[StoryEntry]:
+        return list(self._removed_epics)
 
     @property
     def large_deletions(self) -> LargeDeletions:
@@ -59,7 +79,12 @@ class UpdateReport:
 
     @property
     def has_changes(self) -> bool:
-        return len(self._renames) > 0 or len(self._new_stories) > 0 or len(self._removed_stories) > 0 or len(self._large_deletions.missing_epics) > 0 or len(self._large_deletions.missing_sub_epics) > 0
+        return (len(self._renames) > 0 or len(self._new_stories) > 0
+                or len(self._new_sub_epics) > 0 or len(self._new_epics) > 0
+                or len(self._removed_stories) > 0
+                or len(self._removed_sub_epics) > 0 or len(self._removed_epics) > 0
+                or len(self._large_deletions.missing_epics) > 0
+                or len(self._large_deletions.missing_sub_epics) > 0)
 
     def add_exact_match(self, extracted_name: str, original_name: str, parent: str = ''):
         self._matched_count += 1
@@ -77,8 +102,20 @@ class UpdateReport:
     def add_new_story(self, name: str, parent: str = ''):
         self._new_stories.append(StoryEntry(name=name, parent=parent))
 
+    def add_new_sub_epic(self, name: str, parent: str = ''):
+        self._new_sub_epics.append(StoryEntry(name=name, parent=parent))
+
+    def add_new_epic(self, name: str, parent: str = ''):
+        self._new_epics.append(StoryEntry(name=name, parent=parent))
+
     def add_removed_story(self, name: str, parent: str = ''):
         self._removed_stories.append(StoryEntry(name=name, parent=parent))
+
+    def add_removed_sub_epic(self, name: str, parent: str = ''):
+        self._removed_sub_epics.append(StoryEntry(name=name, parent=parent))
+
+    def add_removed_epic(self, name: str, parent: str = ''):
+        self._removed_epics.append(StoryEntry(name=name, parent=parent))
 
     def add_missing_epic(self, epic_name: str):
         self._large_deletions.missing_epics.append(epic_name)
@@ -92,8 +129,16 @@ class UpdateReport:
             result['renames'] = [{'extracted': m.extracted_name, 'original': m.original_name,
                                   'confidence': m.confidence, 'parent': m.parent}
                                  for m in self._renames]
+        if self._new_epics:
+            result['new_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._new_epics]
+        if self._new_sub_epics:
+            result['new_sub_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._new_sub_epics]
         if self._new_stories:
             result['new_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._new_stories]
+        if self._removed_epics:
+            result['removed_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_epics]
+        if self._removed_sub_epics:
+            result['removed_sub_epics'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_sub_epics]
         if self._removed_stories:
             result['removed_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_stories]
         if self._large_deletions.missing_epics or self._large_deletions.missing_sub_epics:
@@ -115,8 +160,16 @@ class UpdateReport:
         report._matched_count = data.get('matched_count', 0)
         for m in data.get('renames', []):
             report.add_rename(m['extracted'], m['original'], m['confidence'], m.get('parent', ''))
+        for s in data.get('new_epics', []):
+            report.add_new_epic(s['name'], s.get('parent', ''))
+        for s in data.get('new_sub_epics', []):
+            report.add_new_sub_epic(s['name'], s.get('parent', ''))
         for s in data.get('new_stories', []):
             report.add_new_story(s['name'], s.get('parent', ''))
+        for s in data.get('removed_epics', []):
+            report.add_removed_epic(s['name'], s.get('parent', ''))
+        for s in data.get('removed_sub_epics', []):
+            report.add_removed_sub_epic(s['name'], s.get('parent', ''))
         for s in data.get('removed_stories', []):
             report.add_removed_story(s['name'], s.get('parent', ''))
         large = data.get('large_deletions', {})

@@ -37,10 +37,10 @@ class DiagramSectionView {
 
         buttons += `<button class="render-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'renderDiagram', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Render Diagram</button>`;
         buttons += `<button class="save-layout-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'saveDiagramLayout', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Save Layout</button>`;
+        buttons += `<button class="generate-report-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'generateDiagramReport', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Generate Report</button>`;
 
         if (isStale || neverSynced) {
             indicators += `<span class="stale-indicator" style="color: var(--vscode-editorWarning-foreground); margin-left: 8px;">Diagram Changes Not In Graph</span>`;
-            buttons += `<button class="generate-report-button" data-path="${this._escapeHtml(filePath)}" onclick="vscode.postMessage({ command: 'generateDiagramReport', path: '${jsPath}' })" style="margin: 4px 4px 4px 0; cursor: pointer;">Generate Report</button>`;
         }
 
         if (reportPath) {
