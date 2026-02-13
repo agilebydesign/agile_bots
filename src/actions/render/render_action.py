@@ -49,8 +49,6 @@ class RenderOutputAction(Action):
         render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
         
-        self._execute_synchronizers(render_specs, context=context)
-        
         merged_data = {
             'base_instructions': instructions.get('base_instructions', []),
             'render_instructions': render_instructions
@@ -105,11 +103,24 @@ class RenderOutputAction(Action):
         diagrams = self._collect_diagram_data(render_specs, workspace_dir)
         if diagrams:
             instructions._data['diagrams'] = diagrams
+        
+        # Collect synchronizer specs that need to be executed by the AI
+        sync_specs = [spec for spec in render_specs if spec.synchronizer and not spec.is_executed]
+        if sync_specs:
+            behavior_name = self.behavior.name
+            sync_names = [spec.name or spec.output for spec in sync_specs]
+            instructions._data['synchronizer_specs'] = [spec.config_data for spec in sync_specs]
+            instructions._data['base_instructions'].append(
+                f"IMPORTANT: After completing all template-based rendering, you MUST execute "
+                f"the synchronizer-based render specs by running: {behavior_name}.render.renderAll\n"
+                f"This will render the following outputs: {', '.join(sync_names)}"
+            )
     
     def do_execute(self, context: ScopeActionContext = None):
         render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
-        self._execute_synchronizers(render_specs, context=context)
+        # NOTE: _execute_synchronizers removed — diagrams are only rendered
+        # via the explicit "Render Diagram" button (renderDiagram method).
         
         instructions = self.get_instructions(context)
         
@@ -183,6 +194,31 @@ class RenderOutputAction(Action):
         return {
             'status': 'success',
             'message': 'Saved layout for ' + str(saved_count) + ' diagram(s)',
+            'results': results
+        }
+
+    def renderAll(self) -> Dict[str, Any]:
+        """Execute all synchronizer-based render specs.
+        CLI: <behavior>.render.renderAll
+        """
+        sync_specs = [spec for spec in self._render_specs if spec.synchronizer]
+        if not sync_specs:
+            return {'status': 'success', 'message': 'No synchronizer specs to execute', 'results': []}
+
+        self._execute_synchronizers(sync_specs)
+
+        results = []
+        for spec in sync_specs:
+            results.append({
+                'name': spec.name,
+                'output': spec.output,
+                'status': spec.execution_status,
+            })
+
+        rendered_count = sum(1 for r in results if r['status'] == 'executed')
+        return {
+            'status': 'success',
+            'message': f'Rendered {rendered_count} spec(s)',
             'results': results
         }
 
@@ -288,8 +324,24 @@ class RenderOutputAction(Action):
                     if self._apply_rename(graph_data, rename.original_name, rename.extracted_name):
                         changed = True
 
+                for new_epic in report.new_epics:
+                    if self._apply_new_epic(graph_data, new_epic.name):
+                        changed = True
+
+                for new_sub_epic in report.new_sub_epics:
+                    if self._apply_new_sub_epic(graph_data, new_sub_epic.name, new_sub_epic.parent):
+                        changed = True
+
                 for new_story in report.new_stories:
                     if self._apply_new_story(graph_data, new_story.name, new_story.parent):
+                        changed = True
+
+                for removed in report.removed_epics:
+                    if self._apply_remove_epic(graph_data, removed.name):
+                        changed = True
+
+                for removed in report.removed_sub_epics:
+                    if self._apply_remove_sub_epic(graph_data, removed.name, removed.parent):
                         changed = True
 
                 for removed in report.removed_stories:
@@ -360,7 +412,7 @@ class RenderOutputAction(Action):
                 groups = [{'type': 'and', 'connector': None, 'stories': []}]
                 node['story_groups'] = groups
             stories = groups[0].get('stories', [])
-            order = max((s.get('sequential_order', 0) for s in stories), default=0) + 1
+            order = max((s.get('sequential_order') or 0 for s in stories), default=0) + 1
             stories.append({'name': story_name, 'sequential_order': order, 'story_type': 'user'})
             return True
         for se in node.get('sub_epics', []):
@@ -383,6 +435,69 @@ class RenderOutputAction(Action):
                     return True
         for se in node.get('sub_epics', []):
             if self._remove_story_from_node(se, story_name):
+                return True
+        return False
+
+    def _apply_new_epic(self, graph_data: dict, epic_name: str) -> bool:
+        epics = graph_data.get('epics', [])
+        # Don't add if already exists
+        if any(e.get('name') == epic_name for e in epics):
+            return False
+        order = max((e.get('sequential_order') or 0 for e in epics), default=0) + 1
+        epics.append({
+            'name': epic_name,
+            'sequential_order': order,
+            'sub_epics': []
+        })
+        return True
+
+    def _apply_new_sub_epic(self, graph_data: dict, sub_epic_name: str, parent_name: str) -> bool:
+        for epic in graph_data.get('epics', []):
+            if self._add_sub_epic_to_parent(epic, sub_epic_name, parent_name):
+                return True
+        return False
+
+    def _add_sub_epic_to_parent(self, node: dict, sub_epic_name: str, parent_name: str) -> bool:
+        if node.get('name') == parent_name:
+            sub_epics = node.get('sub_epics', [])
+            # Don't add if already exists
+            if any(se.get('name') == sub_epic_name for se in sub_epics):
+                return False
+            order = max((se.get('sequential_order') or 0 for se in sub_epics), default=0) + 1
+            sub_epics.append({
+                'name': sub_epic_name,
+                'sequential_order': order,
+                'sub_epics': [],
+                'story_groups': []
+            })
+            node['sub_epics'] = sub_epics
+            return True
+        for se in node.get('sub_epics', []):
+            if self._add_sub_epic_to_parent(se, sub_epic_name, parent_name):
+                return True
+        return False
+
+    def _apply_remove_epic(self, graph_data: dict, epic_name: str) -> bool:
+        epics = graph_data.get('epics', [])
+        for i, epic in enumerate(epics):
+            if epic.get('name') == epic_name:
+                epics.pop(i)
+                return True
+        return False
+
+    def _apply_remove_sub_epic(self, graph_data: dict, sub_epic_name: str, parent_name: str) -> bool:
+        for epic in graph_data.get('epics', []):
+            if self._remove_sub_epic_from_node(epic, sub_epic_name):
+                return True
+        return False
+
+    def _remove_sub_epic_from_node(self, node: dict, sub_epic_name: str) -> bool:
+        sub_epics = node.get('sub_epics', [])
+        for i, se in enumerate(sub_epics):
+            if se.get('name') == sub_epic_name:
+                sub_epics.pop(i)
+                return True
+            if self._remove_sub_epic_from_node(se, sub_epic_name):
                 return True
         return False
 

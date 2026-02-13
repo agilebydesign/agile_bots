@@ -26,6 +26,89 @@ def _slug(name: str) -> str:
     return name.lower().replace(' ', '-')
 
 
+def _add_new_by_type(report, node, parent_name=''):
+    """Report a new node using the correct method based on its type."""
+    if isinstance(node, Epic):
+        report.add_new_epic(node.name, parent=parent_name)
+    elif isinstance(node, SubEpic):
+        report.add_new_sub_epic(node.name, parent=parent_name)
+    else:
+        report.add_new_story(node.name, parent=parent_name)
+
+
+def _add_removed_by_type(report, node, parent_name=''):
+    """Report a removed node using the correct method based on its type."""
+    if isinstance(node, Epic):
+        report.add_removed_epic(node.name, parent=parent_name)
+    elif isinstance(node, SubEpic):
+        report.add_removed_sub_epic(node.name, parent=parent_name)
+    else:
+        report.add_removed_story(node.name, parent=parent_name)
+
+
+def _report_all_descendants_as_new(node, report, parent_name=''):
+    """When a node is entirely new, report all its descendants as new too."""
+    sub_epics = list(node.get_sub_epics()) if hasattr(node, 'get_sub_epics') else []
+    if sub_epics:
+        # Has sub-epics: report them and recurse (stories will be reported by recursion)
+        for se in sub_epics:
+            report.add_new_sub_epic(se.name, parent=node.name)
+            _report_all_descendants_as_new(se, report, parent_name=se.name)
+    elif hasattr(node, 'get_stories'):
+        # Leaf container: report direct stories only
+        for story in node.get_stories():
+            report.add_new_story(story.name, parent=node.name)
+
+
+def _compare_node_lists(extracted, original, report, parent_name='', recurse=False):
+    # Phase 1: Match by exact name first
+    orig_by_name = {}
+    for n in original:
+        orig_by_name[n.name] = n
+
+    matched_ext = []       # (ext_node, orig_node) pairs
+    unmatched_ext = []     # extracted nodes with no name match
+    used_orig = set()      # names already matched
+
+    for ext_node in extracted:
+        orig_node = orig_by_name.get(ext_node.name)
+        if orig_node and ext_node.name not in used_orig:
+            matched_ext.append((ext_node, orig_node))
+            used_orig.add(ext_node.name)
+        else:
+            unmatched_ext.append(ext_node)
+
+    unmatched_orig = [n for n in original if n.name not in used_orig]
+
+    # Phase 2: Report exact matches and recurse
+    for ext_node, orig_node in matched_ext:
+        report.add_exact_match(ext_node.name, orig_node.name, parent=parent_name)
+        if recurse and hasattr(ext_node, '_compare_children'):
+            ext_node._compare_children(orig_node, report)
+
+    # Phase 3: Match remaining by order for renames
+    unmatched_ext_sorted = sorted(unmatched_ext, key=lambda n: n.sequential_order or 0)
+    unmatched_orig_sorted = sorted(unmatched_orig, key=lambda n: getattr(n, 'sequential_order', 0) or 0)
+
+    rename_count = min(len(unmatched_ext_sorted), len(unmatched_orig_sorted))
+    for i in range(rename_count):
+        ext_node = unmatched_ext_sorted[i]
+        orig_node = unmatched_orig_sorted[i]
+        report.add_rename(ext_node.name, orig_node.name, confidence=1.0, parent=parent_name)
+        if recurse and hasattr(ext_node, '_compare_children'):
+            ext_node._compare_children(orig_node, report)
+
+    # Phase 4: Remaining extracted = new, remaining original = removed
+    # Use type-aware reporting so epics/sub-epics are not misclassified as stories
+    for i in range(rename_count, len(unmatched_ext_sorted)):
+        ext_node = unmatched_ext_sorted[i]
+        _add_new_by_type(report, ext_node, parent_name=parent_name)
+        _report_all_descendants_as_new(ext_node, report)
+
+    for i in range(rename_count, len(unmatched_orig_sorted)):
+        _add_removed_by_type(report, unmatched_orig_sorted[i], parent_name=parent_name)
+
+
 def _max_sub_epic_depth(node) -> int:
     """Max nesting depth of sub-epics under a domain node.
 
@@ -225,24 +308,9 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
             nodes.extend(se.collect_all_nodes())
         return nodes
 
-    def generate_update_report_for_epic_subtree(self, original_epic, report: UpdateReport):
-        extracted_sub_epics = sorted(self.get_sub_epics(), key=lambda s: s.sequential_order or 0)
-        original_sub_epics = sorted(original_epic.sub_epics, key=lambda s: getattr(s, 'sequential_order', 0) or 0)
-
-        for i, ext_se in enumerate(extracted_sub_epics):
-            if i < len(original_sub_epics):
-                orig_se = original_sub_epics[i]
-                if ext_se.name != orig_se.name:
-                    report.add_rename(ext_se.name, orig_se.name, confidence=1.0, parent=self.name)
-                else:
-                    report.add_exact_match(ext_se.name, orig_se.name, parent=self.name)
-                ext_se.generate_update_report_for_sub_epic_subtree(orig_se, report)
-            else:
-                for story in ext_se.get_all_stories_recursive():
-                    report.add_new_story(story.name, parent=ext_se.name)
-
-        for i in range(len(extracted_sub_epics), len(original_sub_epics)):
-            report.add_missing_sub_epic(original_sub_epics[i].name)
+    def _compare_children(self, original_epic, report: UpdateReport):
+        _compare_node_lists(self.get_sub_epics(), original_epic.sub_epics,
+                            report, parent_name=self.name, recurse=True)
 
 
 @dataclass
@@ -361,41 +429,14 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
             nodes.extend(story.collect_all_nodes())
         return nodes
 
-    def generate_update_report_for_sub_epic_subtree(self, original_sub_epic, report: UpdateReport):
-        extracted_nested = sorted(self.get_sub_epics(), key=lambda s: s.sequential_order or 0)
-        original_nested = sorted([c for c in original_sub_epic._children if isinstance(c, SubEpic)],
-                                  key=lambda s: getattr(s, 'sequential_order', 0) or 0)
+    def _compare_children(self, original_sub_epic, report: UpdateReport):
+        orig_nested = [c for c in original_sub_epic._children if isinstance(c, SubEpic)]
+        _compare_node_lists(self.get_sub_epics(), orig_nested,
+                            report, parent_name=self.name, recurse=True)
 
-        for i, ext_nse in enumerate(extracted_nested):
-            if i < len(original_nested):
-                orig_nse = original_nested[i]
-                if ext_nse.name != orig_nse.name:
-                    report.add_rename(ext_nse.name, orig_nse.name, confidence=1.0, parent=self.name)
-                else:
-                    report.add_exact_match(ext_nse.name, orig_nse.name, parent=self.name)
-                ext_nse.generate_update_report_for_sub_epic_subtree(orig_nse, report)
-            else:
-                for story in ext_nse.get_all_stories_recursive():
-                    report.add_new_story(story.name, parent=ext_nse.name)
-
-        for i in range(len(extracted_nested), len(original_nested)):
-            report.add_missing_sub_epic(original_nested[i].name)
-
-        extracted_stories = sorted(self.get_stories(), key=lambda s: s.sequential_order or 0)
-        orig_stories = sorted([c for c in original_sub_epic.children if isinstance(c, Story)],
-                               key=lambda s: getattr(s, 'sequential_order', 0) or 0)
-
-        for i, ext_story in enumerate(extracted_stories):
-            if i < len(orig_stories):
-                if ext_story.name != orig_stories[i].name:
-                    report.add_rename(ext_story.name, orig_stories[i].name, confidence=1.0, parent=self.name)
-                else:
-                    report.add_exact_match(ext_story.name, orig_stories[i].name, parent=self.name)
-            else:
-                report.add_new_story(ext_story.name, parent=self.name)
-
-        for i in range(len(extracted_stories), len(orig_stories)):
-            report.add_removed_story(orig_stories[i].name, parent=self.name)
+        orig_stories = [c for c in original_sub_epic.children if isinstance(c, Story)]
+        _compare_node_lists(self.get_stories(), orig_stories,
+                            report, parent_name=self.name, recurse=False)
 
 
 @dataclass
