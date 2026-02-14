@@ -27,7 +27,8 @@ class DrawIOStoryMap(StoryMap):
         super().__init__(story_graph or {'epics': []})
         self._diagram_type = diagram_type
         self._drawio_epics: List[DrawIOEpic] = []
-        self._extra_nodes: List = []          # increment lanes, AC boxes, etc.
+        self._increment_lanes: List[DrawIOIncrementLane] = []
+        self._loaded_nodes: List = []       # all parsed nodes from file (for extraction)
         self._layout_data: Optional[LayoutData] = None
 
     @property
@@ -92,7 +93,8 @@ class DrawIOStoryMap(StoryMap):
 
     def render_from_story_map(self, story_map: StoryMap,
                                layout_data: Optional[LayoutData] = None,
-                               skip_stories: bool = False) -> Dict[str, Any]:
+                               skip_stories: bool = False,
+                               story_widths: Dict[str, float] = None) -> Dict[str, Any]:
         """Render outline diagram.  Each node renders itself.
 
         Computes global row positions first so all epics share the
@@ -104,7 +106,7 @@ class DrawIOStoryMap(StoryMap):
         """
         self._layout_data = layout_data
         self._drawio_epics = []
-        self._extra_nodes = []
+        self._increment_lanes = []
 
         epics = list(story_map.epics)
         if not epics:
@@ -119,7 +121,8 @@ class DrawIOStoryMap(StoryMap):
             drawio_epic = DrawIOStoryNodeSerializer.create_epic(
                 epic.name, getattr(epic, 'sequential_order', 0) or 0)
             drawio_epic.render_from_domain(epic, x_pos, rows, layout_data,
-                                           skip_stories=skip_stories)
+                                           skip_stories=skip_stories,
+                                           story_widths=story_widths)
             self._drawio_epics.append(drawio_epic)
             x_pos = drawio_epic.boundary.right + CELL_SPACING
 
@@ -198,7 +201,7 @@ class DrawIOStoryMap(StoryMap):
                 story_names=story_names)
             lane.render(idx, y_start, total_width, all_drawio_stories,
                         domain_stories=domain_stories)
-            self._extra_nodes.extend(lane.collect_all_elements())
+            self._increment_lanes.append(lane)
 
         summary['increments'] = len(increments_data)
         return summary
@@ -223,21 +226,28 @@ class DrawIOStoryMap(StoryMap):
 
     def render_exploration_from_story_map(
             self, story_map: StoryMap,
-            layout_data: Optional[LayoutData] = None,
-            scope: Optional[str] = None) -> Dict[str, Any]:
-        """Render outline first, then add AC boxes below stories."""
-        summary = self.render_from_story_map(story_map, layout_data)
+            layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
+        """Render outline with AC-aware spacing, then add AC boxes.
 
-        domain_stories = self._collect_domain_stories(story_map, scope)
+        Stories are spaced apart based on their widest acceptance
+        criteria box so that AC text does not overlap between stories.
+        """
+        domain_stories = self._collect_domain_stories(story_map)
+
+        # Pre-compute the horizontal space each story needs (widest AC box)
+        story_widths: Dict[str, float] = {}
+        for name, ds in domain_stories.items():
+            story_widths[name] = DrawIOStory.compute_ac_width(ds)
+
+        summary = self.render_from_story_map(
+            story_map, layout_data, story_widths=story_widths)
+
         for drawio_story in self.get_stories():
             domain_story = domain_stories.get(drawio_story.name)
             if domain_story and domain_story.has_acceptance_criteria():
-                ac_elems = drawio_story.render_ac_boxes(domain_story)
-                self._extra_nodes.extend(ac_elems)
+                drawio_story.render_ac_boxes(domain_story)
 
         summary['exploration'] = True
-        if scope:
-            summary['scope'] = scope
         return summary
 
     # ------------------------------------------------------------------
@@ -331,6 +341,13 @@ class DrawIOStoryMap(StoryMap):
         if extracted:
             original_increments = original_story_map.story_graph.get('increments', [])
             self._compute_increment_delta(report, extracted, original_increments)
+
+        # Pass 3: acceptance criteria delta.
+        # Compare extracted AC boxes against original story AC.
+        extracted_ac = self.extract_ac_assignments()
+        if extracted_ac:
+            self._compute_ac_delta(report, extracted_ac, original_story_map)
+            report.reconcile_ac_moves()
         return report
 
     def _compute_increment_delta(self, report: UpdateReport,
@@ -434,14 +451,25 @@ class DrawIOStoryMap(StoryMap):
             List of dicts ``[{'name': 'CLI', 'stories': ['Story A', ...]}, ...]``
             ordered top-to-bottom by lane Y.
         """
+        # If we have rendered lanes, use them directly.
+        if self._increment_lanes:
+            result = []
+            for lane in sorted(self._increment_lanes,
+                               key=lambda l: l._lane_element.position.y
+                               if l._lane_element else 0):
+                stories = [getattr(s, 'name', '') or getattr(s, 'value', '')
+                           for s in lane._story_copies]
+                result.append({'name': lane.name, 'stories': stories})
+            return result
+
+        # Loaded from file: scan all parsed nodes to discover lanes.
+        all_nodes = self._loaded_nodes if self._loaded_nodes else self._collect_all_nodes()
+
         # 1. Find lane backgrounds (large rectangles with empty value).
-        #    Tool-generated lanes have inc-lane/ prefix; user-created lanes
-        #    have simple IDs (e.g. "2").  Both are detected by their empty
-        #    value, large width, and lane-like height.
         lanes = []
-        _LANE_MIN_WIDTH = 200   # lanes are much wider than story cells
+        _LANE_MIN_WIDTH = 200
         _LANE_MIN_HEIGHT = 50
-        for n in self._extra_nodes:
+        for n in all_nodes:
             cid = getattr(n, 'cell_id', '')
             val = getattr(n, 'value', '') or ''
             bnd = getattr(n, 'boundary', None)
@@ -451,7 +479,7 @@ class DrawIOStoryMap(StoryMap):
                 if cid.startswith('inc-lane/'):
                     slug = cid.replace('inc-lane/', '')
                 else:
-                    slug = cid  # user-created lane, use raw id as slug
+                    slug = cid
                 lanes.append({
                     'slug': slug,
                     'y': n.position.y,
@@ -461,10 +489,7 @@ class DrawIOStoryMap(StoryMap):
                 })
 
         # 2. Match lane labels to get human-readable names.
-        #    Tool-generated labels have inc-label/ prefix; user-created
-        #    labels have simple IDs with a non-empty value and sit inside
-        #    a lane's Y boundaries.
-        for n in self._extra_nodes:
+        for n in all_nodes:
             cid = getattr(n, 'cell_id', '')
             val = getattr(n, 'value', '') or ''
             if not val:
@@ -476,7 +501,6 @@ class DrawIOStoryMap(StoryMap):
                         lane['name'] = val
                         break
             elif '/' not in cid and val:
-                # Potential user-created label -- match by Y position
                 ny = getattr(n, 'position', None)
                 if ny is None:
                     continue
@@ -491,40 +515,25 @@ class DrawIOStoryMap(StoryMap):
 
         lanes.sort(key=lambda l: l['y'])
 
-        # Build set of cell IDs used as lane backgrounds or labels
-        # so we can skip them when gathering story candidates.
-        _lane_bg_ids = {lane['cell_id'] for lane in lanes}
-        _lane_label_ids = set()
-        for n in self._extra_nodes:
-            cid = getattr(n, 'cell_id', '')
-            val = getattr(n, 'value', '') or ''
-            if val and any(lane['name'] == val for lane in lanes):
-                _lane_label_ids.add(cid)
-
-        # 3. Gather every element that could be a story – from the tree
-        #    (DrawIOStory instances) and from extra_nodes (raw
-        #    DrawIOElement lane copies with a value/name).
+        # 3. Gather story candidates by Y position.
+        _skip_ids = {lane['cell_id'] for lane in lanes}
         candidates = []
         for story in self.get_stories():
             candidates.append((story.name, story.position.y))
-        for n in self._extra_nodes:
+        for n in all_nodes:
             name = getattr(n, 'name', None) or getattr(n, 'value', None) or ''
             if name and hasattr(n, 'position') and n.position.y > 0:
                 cid = getattr(n, 'cell_id', '')
-                # Skip lane backgrounds and labels
-                if cid in _lane_bg_ids or cid in _lane_label_ids:
+                if cid in _skip_ids:
                     continue
-                if cid.startswith('inc-lane/') and not name:
+                if cid.startswith('inc-lane/') or cid.startswith('inc-label/'):
                     continue
-                if cid.startswith('inc-label/'):
-                    continue
-                # Skip actor elements
-                if '/actor-' in cid:
+                if '/actor-' in cid or '/ac-' in cid:
                     continue
                 candidates.append((name, n.position.y))
 
-        # 4. For each lane, check every candidate.
-        TOLERANCE = 20  # px slack for edges
+        # 4. Assign stories to lanes by Y overlap.
+        TOLERANCE = 20
         for lane in lanes:
             lane['stories'] = []
             lane['_seen'] = set()
@@ -540,6 +549,184 @@ class DrawIOStoryMap(StoryMap):
                     break
 
         return [{'name': l['name'], 'stories': l['stories']} for l in lanes]
+
+    # ------------------------------------------------------------------
+    # Pass 3 - Acceptance Criteria extraction
+    # ------------------------------------------------------------------
+
+    def extract_ac_assignments(self) -> Dict[str, List[str]]:
+        """Extract acceptance criteria text per story from the diagram.
+
+        Finds AC boxes (elements with cell_id containing '/ac-' or
+        user-created boxes below stories with AC-like style) and maps
+        them to stories by cell_id hierarchy or Y-position.
+
+        Returns:
+            Dict mapping story_name to list of AC text strings,
+            ordered by Y position (top to bottom).
+        """
+        # Collect all stories and their positions
+        stories = []
+        for story in self.get_stories():
+            stories.append({
+                'name': story.name,
+                'cell_id': story.cell_id,
+                'x': story.position.x,
+                'y': story.position.y,
+                'width': getattr(story.boundary, 'width', CELL_SIZE),
+                'height': getattr(story.boundary, 'height', CELL_SIZE),
+            })
+
+        if not stories:
+            return {}
+
+        # Collect AC boxes from story _ac_elements and extra_nodes.
+        # Tool-generated AC: cell_id contains '/ac-'
+        # User-created AC: detected by style (yellow fill, wider than story,
+        #                   positioned below a story)
+        ac_candidates = []
+        for story in self.get_stories():
+            ac_candidates.extend(getattr(story, '_ac_elements', []))
+
+        ac_boxes = []
+        for n in ac_candidates:
+            cid = getattr(n, 'cell_id', '')
+            val = getattr(n, 'value', '') or getattr(n, 'name', '') or ''
+            if not val:
+                continue
+            bnd = getattr(n, 'boundary', None)
+            pos = getattr(n, 'position', None)
+            if not bnd or not pos:
+                continue
+
+            is_tool_ac = '/ac-' in cid
+            # User-created AC: wider than a story cell, below the story area
+            is_user_ac = (not is_tool_ac
+                          and '/' not in cid
+                          and bnd.width > CELL_SIZE * 2
+                          and bnd.height >= 30)
+
+            if is_tool_ac or is_user_ac:
+                ac_boxes.append({
+                    'cell_id': cid,
+                    'text': val.strip(),
+                    'x': pos.x,
+                    'y': pos.y,
+                    'width': bnd.width,
+                    'height': bnd.height,
+                })
+
+        if not ac_boxes:
+            return {}
+
+        # Sort AC boxes by Y position
+        ac_boxes.sort(key=lambda b: b['y'])
+
+        # Match AC boxes to stories
+        result: Dict[str, List[str]] = {}
+        for ac in ac_boxes:
+            # Method 1: cell_id hierarchy (tool-generated)
+            matched_story = None
+            if '/ac-' in ac['cell_id']:
+                # cell_id format: "epic/sub-epic/story/ac-N"
+                story_path = ac['cell_id'].rsplit('/ac-', 1)[0]
+                for s in stories:
+                    if s['cell_id'] == story_path:
+                        matched_story = s['name']
+                        break
+
+            # Method 2: positional (below + horizontally overlapping)
+            if not matched_story:
+                best = None
+                best_dist = float('inf')
+                for s in stories:
+                    # AC must be below the story
+                    if ac['y'] < s['y'] + s['height']:
+                        continue
+                    # Horizontal overlap check
+                    ac_right = ac['x'] + ac['width']
+                    s_right = s['x'] + s['width']
+                    if ac['x'] > s_right + 50 or ac_right < s['x'] - 50:
+                        continue
+                    dist = ac['y'] - (s['y'] + s['height'])
+                    if dist < best_dist and dist < 500:
+                        best_dist = dist
+                        best = s['name']
+                if best:
+                    matched_story = best
+
+            if matched_story:
+                result.setdefault(matched_story, []).append(ac['text'])
+
+        return result
+
+    def _compute_ac_delta(self, report: 'UpdateReport',
+                           extracted_ac: Dict[str, List[str]],
+                           original_story_map: StoryMap):
+        """Compare extracted AC against original story graph and populate
+        the report with AC changes (added, removed, modified)."""
+        from .update_report import ACChange
+
+        # Build original AC map: story_name -> list of AC text
+        original_ac: Dict[str, List[str]] = {}
+        for story in original_story_map.all_stories:
+            ac_list = getattr(story, 'acceptance_criteria', []) or []
+            if ac_list:
+                texts = []
+                for ac in ac_list:
+                    if hasattr(ac, 'name') and ac.name:
+                        texts.append(ac.name.strip())
+                    elif isinstance(ac, dict):
+                        texts.append(
+                            (ac.get('name', '') or ac.get('description', '')).strip())
+                    elif isinstance(ac, str):
+                        texts.append(ac.strip())
+                if texts:
+                    original_ac[story.name] = texts
+
+        # Find the parent sub-epic for each story (for reporting)
+        story_parents: Dict[str, str] = {}
+        for epic in original_story_map.epics:
+            self._collect_story_parents(epic, story_parents)
+
+        changes = []
+        # Check all stories that have AC in either extracted or original
+        all_story_names = set(extracted_ac.keys()) | set(original_ac.keys())
+        for story_name in sorted(all_story_names):
+            ext_ac = extracted_ac.get(story_name, [])
+            orig_ac = original_ac.get(story_name, [])
+
+            if ext_ac == orig_ac:
+                continue  # no change
+
+            # Compute added/removed
+            ext_set = set(ext_ac)
+            orig_set = set(orig_ac)
+            added = sorted(ext_set - orig_set)
+            removed = sorted(orig_set - ext_set)
+
+            if added or removed:
+                changes.append(ACChange(
+                    story_name=story_name,
+                    parent=story_parents.get(story_name, ''),
+                    added=added,
+                    removed=removed,
+                ))
+
+        if changes:
+            report.set_ac_changes(changes)
+
+    @staticmethod
+    def _collect_story_parents(node, result: Dict[str, str]):
+        """Walk tree collecting story_name -> parent_name mapping."""
+        from story_graph.nodes import SubEpic, Story
+        children = getattr(node, 'children', [])
+        parent_name = getattr(node, 'name', '')
+        for child in children:
+            if isinstance(child, Story):
+                result[child.name] = parent_name
+            elif isinstance(child, SubEpic):
+                DrawIOStoryMap._collect_story_parents(child, result)
 
     # ------------------------------------------------------------------
     # Dict conversion
@@ -607,11 +794,37 @@ class DrawIOStoryMap(StoryMap):
         story_map._assign_sequential_order_from_position(epics, sub_epics, stories)
         story_map._drawio_epics = epics
 
+        # Classify remaining nodes: attach AC elements to their parent
+        # stories, and reconstruct increment lanes.  Anything else is
+        # discarded (lane backgrounds, labels, actors are reconstructed
+        # on demand by extract_increment_assignments).
         classified = set()
         for e in epics:
             classified.add(id(e))
             cls._classify_sub_epic_tree(e.get_sub_epics(), classified)
-        story_map._extra_nodes = [n for n in nodes if id(n) not in classified]
+
+        # Build story lookup by cell_id for AC attachment
+        story_by_cid = {}
+        for s in stories:
+            story_by_cid[s.cell_id] = s
+
+        unclassified = []
+        for n in nodes:
+            if id(n) in classified:
+                continue
+            cid = getattr(n, 'cell_id', '')
+            # Attach AC elements to parent story
+            if '/ac-' in cid:
+                story_cid = cid.rsplit('/ac-', 1)[0]
+                parent_story = story_by_cid.get(story_cid)
+                if parent_story:
+                    if not hasattr(parent_story, '_ac_elements'):
+                        parent_story._ac_elements = []
+                    parent_story._ac_elements.append(n)
+                continue
+            unclassified.append(n)
+
+        story_map._loaded_nodes = unclassified
         return story_map
 
     @classmethod
@@ -767,52 +980,44 @@ class DrawIOStoryMap(StoryMap):
         on top).  For increments view we want:
           1. Lane backgrounds (large rectangles) – bottom layer
           2. Epics / sub-epics bars – structural outlines
+             (includes stories with their actor and AC elements)
           3. Lane labels, actors, story copies inside lanes
-          4. Orphaned stories in the outline – top layer so the user can
-             drag them onto a lane without them being hidden behind it.
         """
-        # Separate lane backgrounds from other extra nodes
-        lane_bgs = [n for n in self._extra_nodes
-                    if hasattr(n, 'cell_id')
-                    and n.cell_id.startswith('inc-lane/')
-                    and '/' not in n.cell_id.replace('inc-lane/', '', 1)
-                    and getattr(n, 'value', '') == '']
-        other_extra = [n for n in self._extra_nodes if n not in lane_bgs]
-
         nodes = []
-        nodes.extend(lane_bgs)            # 1. lane backgrounds (bottom)
+
+        # 1. Lane backgrounds first (bottom layer)
+        for lane in self._increment_lanes:
+            if lane._lane_element:
+                nodes.append(lane._lane_element)
+
+        # 2. Epic tree (epics, sub-epics, stories, actors, AC)
         for epic in self._drawio_epics:
-            nodes.extend(epic.collect_all_nodes())  # 2+4. structure + orphans
-        nodes.extend(other_extra)          # 3. labels, actors, lane stories
+            nodes.extend(epic.collect_all_nodes())
+
+        # 3. Lane labels, actors, story copies (top layer)
+        for lane in self._increment_lanes:
+            if lane._label_element:
+                nodes.append(lane._label_element)
+            nodes.extend(lane._actor_elements)
+            nodes.extend(lane._story_copies)
+
         return nodes
 
-    def _collect_domain_stories(self, story_map: StoryMap,
-                                 scope: Optional[str] = None) -> dict:
-        """Build name→Story lookup, optionally filtered by scope (increment name)."""
+    def _collect_domain_stories(self, story_map: StoryMap) -> dict:
+        """Build name→Story lookup from all stories in the map."""
         result: Dict[str, Story] = {}
-        scope_names = None
-        if scope:
-            for inc in story_map.story_graph.get('increments', []):
-                if inc.get('name') == scope:
-                    scope_names = set()
-                    for s in inc.get('stories', []):
-                        scope_names.add(s.get('name', '') if isinstance(s, dict) else str(s))
-                    break
-
         for epic in story_map.epics:
             for sub_epic in epic.sub_epics:
-                self._gather_stories(sub_epic, result, scope_names)
+                self._gather_stories(sub_epic, result)
         return result
 
-    def _gather_stories(self, sub_epic, result: dict, scope_names):
+    def _gather_stories(self, sub_epic, result: dict):
         for child in sub_epic.children:
             if isinstance(child, Story):
-                if scope_names is None or child.name in scope_names:
-                    result[child.name] = child
+                result[child.name] = child
             elif isinstance(child, SubEpic):
-                self._gather_stories(child, result, scope_names)
+                self._gather_stories(child, result)
             elif isinstance(child, StoryGroup):
                 for story in child.children:
                     if isinstance(story, Story):
-                        if scope_names is None or story.name in scope_names:
-                            result[story.name] = story
+                        result[story.name] = story

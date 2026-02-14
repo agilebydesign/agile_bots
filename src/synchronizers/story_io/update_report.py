@@ -48,6 +48,24 @@ class StoryMove:
     to_parent: str
 
 
+@dataclass
+class ACChange:
+    """Delta for acceptance criteria on a single story."""
+    story_name: str
+    parent: str = ''
+    added: List[str] = field(default_factory=list)      # AC text added
+    removed: List[str] = field(default_factory=list)     # AC text removed
+    modified: List[Dict[str, str]] = field(default_factory=list)  # [{old, new}]
+
+
+@dataclass
+class ACMove:
+    """An acceptance criterion that moved from one story to another."""
+    ac_text: str
+    from_story: str
+    to_story: str
+
+
 class UpdateReport:
 
     def __init__(self):
@@ -65,6 +83,8 @@ class UpdateReport:
         self._increment_moves: List[IncrementMove] = []
         self._removed_increments: List[str] = []
         self._increment_order: List[Dict[str, Any]] = []  # [{name, priority}, ...]
+        self._ac_changes: List[ACChange] = []
+        self._ac_moves: List[ACMove] = []
 
     @property
     def renames(self) -> List[MatchEntry]:
@@ -126,6 +146,53 @@ class UpdateReport:
     def increment_order(self) -> List[Dict[str, Any]]:
         return list(self._increment_order)
 
+    @property
+    def ac_changes(self) -> List[ACChange]:
+        return list(self._ac_changes)
+
+    @property
+    def ac_moves(self) -> List[ACMove]:
+        return list(self._ac_moves)
+
+    def set_ac_changes(self, changes: List[ACChange]):
+        self._ac_changes = list(changes)
+
+    def reconcile_ac_moves(self):
+        """Post-process AC changes: detect AC text that moved between stories.
+
+        If the same AC text appears in one story's 'removed' and another
+        story's 'added', it's a move, not a delete+add.  Reconciled entries
+        are moved from ac_changes into ac_moves.
+        """
+        # Build maps: ac_text -> story that removed it / added it
+        removed_map: Dict[str, str] = {}  # ac_text -> story_name
+        added_map: Dict[str, str] = {}
+
+        for change in self._ac_changes:
+            for text in change.removed:
+                removed_map[text] = change.story_name
+            for text in change.added:
+                added_map[text] = change.story_name
+
+        # Find overlap: same text removed from one story and added to another
+        moved_texts: set = set()
+        for text in list(removed_map.keys()):
+            if text in added_map and removed_map[text] != added_map[text]:
+                self._ac_moves.append(ACMove(
+                    ac_text=text,
+                    from_story=removed_map[text],
+                    to_story=added_map[text]))
+                moved_texts.add(text)
+
+        # Remove reconciled entries from ac_changes
+        if moved_texts:
+            for change in self._ac_changes:
+                change.added = [t for t in change.added if t not in moved_texts]
+                change.removed = [t for t in change.removed if t not in moved_texts]
+            # Remove empty changes
+            self._ac_changes = [c for c in self._ac_changes
+                                if c.added or c.removed or c.modified]
+
     def set_increment_changes(self, changes: List[IncrementChange],
                                moves: List[IncrementMove],
                                removed_increments: List[str] = None,
@@ -147,7 +214,9 @@ class UpdateReport:
                 or len(self._increment_changes) > 0
                 or len(self._increment_moves) > 0
                 or len(self._removed_increments) > 0
-                or len(self._increment_order) > 0)
+                or len(self._increment_order) > 0
+                or len(self._ac_changes) > 0
+                or len(self._ac_moves) > 0)
 
     def add_exact_match(self, extracted_name: str, original_name: str, parent: str = ''):
         self._matched_count += 1
@@ -320,6 +389,25 @@ class UpdateReport:
             result['removed_increments'] = self._removed_increments
         if self._increment_order:
             result['increment_order'] = self._increment_order
+        if self._ac_changes:
+            result['ac_changes'] = []
+            for ac in self._ac_changes:
+                entry = {'story': ac.story_name}
+                if ac.parent:
+                    entry['parent'] = ac.parent
+                if ac.added:
+                    entry['added'] = ac.added
+                if ac.removed:
+                    entry['removed'] = ac.removed
+                if ac.modified:
+                    entry['modified'] = ac.modified
+                result['ac_changes'].append(entry)
+        if self._ac_moves:
+            result['ac_moves'] = [
+                {'ac_text': m.ac_text, 'from_story': m.from_story,
+                 'to_story': m.to_story}
+                for m in self._ac_moves
+            ]
         if not self.has_changes:
             result['status'] = 'no_changes'
         return result
@@ -376,4 +464,16 @@ class UpdateReport:
                     to_increment=to_inc))
         report._removed_increments = list(data.get('removed_increments', []))
         report._increment_order = list(data.get('increment_order', []))
+        for ac in data.get('ac_changes', []):
+            report._ac_changes.append(ACChange(
+                story_name=ac['story'],
+                parent=ac.get('parent', ''),
+                added=ac.get('added', []),
+                removed=ac.get('removed', []),
+                modified=ac.get('modified', [])))
+        for m in data.get('ac_moves', []):
+            report._ac_moves.append(ACMove(
+                ac_text=m['ac_text'],
+                from_story=m['from_story'],
+                to_story=m['to_story']))
         return report

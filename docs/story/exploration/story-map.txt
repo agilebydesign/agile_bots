@@ -1,75 +1,39 @@
 (E) Invoke Bot
-    (E) Trace Story Graph
-        (E) Trace Story
-            (S) Developer --> Display Stories
-                (AC) Developer --> WHEN Developer opens strace file THEN story properties display (name, users, acceptance criteria) AND nested scenarios display under story
-            (S) Developer --> Edit Stories in Trace Editor
-                (AC) Developer --> WHEN Developer modifies story field THEN changes save to story-graph.json (on blur/Ctrl+S) AND JSON structure preserves
-            (S) Developer --> Open Story Source
-                (AC) Developer --> WHEN Developer clicks Open on story THEN story-graph.json opens at story name line
-        (E) Trace Scenario
-            (S) Developer --> Display Scenario Steps
-                (AC) Developer --> WHEN Developer views scenario THEN scenario steps display in given/when/then format
-            (S) Developer --> Display Test for Scenario
-                (AC) Developer --> WHEN Developer views scenario THEN linked test method and file path display
-            (S) Developer --> Edit Scenarios in Trace Editor
-                (AC) Developer --> WHEN Developer modifies scenario steps THEN changes save to story-graph.json (on blur/Ctrl+S)
-            (S) Developer --> Open Scenario Source
-                (AC) Developer --> WHEN Developer clicks Open on scenario THEN story-graph.json opens at scenario line
-        (E) Trace Code
-            (S) Developer --> Generate Code Trace
-                (AC) Developer --> WHEN Developer opens strace for test THEN call hierarchy generates from test method
-            (S) Developer --> Display Code Hierarchy
-                (AC) Developer --> WHEN trace generates THEN nested call tree displays with function/method names
-            (S) Developer --> Load Code Snippet
-                (AC) Developer --> WHEN Developer expands code node THEN lazy-loaded source displays with line numbers
-            (S) Developer --> Navigate to Source
-                (AC) Developer --> WHEN Developer clicks Open on code node THEN source file opens at specific line
-(E) Invoke Bot
-    (E) Perform Action
-        (E) Synchronize Graph with Rendered Content
-            (S) Bot Behavior --> Render story map
-                (AC) Bot Behavior --> WHEN user requests outline diagram from story graph THEN system renders epics sub-epics and stories to DrawIO file AND each node has position and size and output is valid DrawIO XML
-                (AC) Bot Behavior --> WHEN layout data from previous render exists THEN system applies saved positions to preserve user arrangement and new nodes get default spacing
-                (AC) Bot Behavior --> WHEN render completes THEN system writes DrawIO file to specified path and summary reports epic and story counts
-                (AC) Bot Behavior --> WHEN story graph has E epics S sub-epics and N stories THEN diagram contains exactly E epic cells S sub-epic cells N story cells and summary reports epics E and sub_epic_count S
-                (AC) Bot Behavior --> WHEN stories and sub-epics have sequential_order THEN diagram orders sub-epics left to right and stories by sequential_order with and-groups horizontal and or-groups vertical
-                (AC) Bot Behavior --> WHEN layout data exists THEN system applies saved x y width height for epics and sub-epics and new nodes receive default spacing from render constants
-            (S) Bot Behavior --> Render story map increments
-                (AC) Bot Behavior --> WHEN user requests increments diagram from story graph THEN system renders epics sub-epics stories and increment lanes and assigns stories to lanes from story graph increments
-                (AC) Bot Behavior --> WHEN story graph has increments with priority THEN system preserves priority order and lane Y from outline bottom and lane height
-                (AC) Bot Behavior --> WHEN layout data exists for increments view THEN system applies saved positions for epics and sub-epics and increment lane positions computed or from layout
-                (AC) Bot Behavior --> WHEN render completes THEN system writes DrawIO file and summary includes increment count
-                (AC) Bot Behavior --> WHEN increment cells are rendered THEN style and position allow extractor to detect them for round-trip sync
-            (S) Bot Behavior --> Render story map with acceptance criteria
-                (AC) Bot Behavior --> WHEN user requests exploration diagram THEN system renders stories and acceptance criteria boxes below stories and AC text is formatted When/Then in boxes
-                (AC) Bot Behavior --> WHEN story has acceptance criteria THEN system creates wider AC boxes below story and extracts step text from AC
-                (AC) Bot Behavior --> WHEN layout data exists THEN system preserves positions of story and AC boxes
-                (AC) Bot Behavior --> WHEN render completes THEN output DrawIO contains both story cells and AC cells with correct containment
-            (S) Bot Behavior --> Update graph from story map
-                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO outline file THEN system extracts epics sub-epics and stories from DrawIO and writes extracted JSON and assigns stories to sub-epics by position and containment
-                (AC) Bot Behavior --> WHEN original story graph path is provided THEN system generates merge report comparing extracted to original and report lists exact matches fuzzy matches new stories and removed stories
-                (AC) Bot Behavior --> WHEN merge report exists and user runs merge THEN system updates original with extracted structure and preserves acceptance criteria and steps from original for matched stories
-                (AC) Bot Behavior --> WHEN user renames or reorders nodes in DrawIO THEN extracted graph reflects new names and order and merge report flags renames as fuzzy matches when names differ
-                (AC) Bot Behavior --> WHEN user deletes nodes in DrawIO THEN extracted graph omits those nodes and merge report lists them as removed and large deletion detection flags entire missing epics or sub-epics
-                (AC) Bot Behavior --> WHEN sync runs THEN system persists layout data to separate JSON file and layout includes x y width height for nodes for use on next render
-                (AC) Bot Behavior --> WHEN user moves a story in DrawIO and saves THEN sync extracts new position and sequential_order from position and merge updates sequential_order for matched story
-                (AC) Bot Behavior --> WHEN user deletes one story cell THEN extracted omits that story and merge report removed_stories and merge keeps original structure with only matched stories updated
-                (AC) Bot Behavior --> WHEN user deletes a sub-epic box THEN extracted omits that sub-epic and stories reassigned by containment and large_deletions includes missing_sub_epics
-                (AC) Bot Behavior --> WHEN user deletes an epic box THEN extracted omits that epic and all its sub-epics and stories and merge report removed and large_deletions includes missing_epics
-            (S) Bot Behavior --> Update graph from map increments
-                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO increments file THEN system extracts increment boxes by style and x less than 0 sorted by Y and assigns stories by story Y vs increment Y and priority is position order name is cell value
-                (AC) Bot Behavior --> WHEN original story graph is provided THEN system generates merge report for epics and for increments
-                (AC) Bot Behavior --> WHEN user moves stories between increments in DrawIO THEN extracted graph reflects new increment membership by Y position
-                (AC) Bot Behavior --> WHEN merge runs THEN system preserves AC and steps and matches increments by name only and adds new names and does not remove increments from merged graph
-                (AC) Bot Behavior --> WHEN sync runs THEN system writes extracted JSON with epics and increments and optional merge report when original provided
-                (AC) Bot Behavior --> WHEN user adds an increment lane THEN extracted has one more by Y order and merge adds it as new name
-                (AC) Bot Behavior --> WHEN user removes an increment lane THEN extracted has fewer merge does not remove so removed name stays in merged stories in deleted lane reassign by Y to closest remaining
-                (AC) Bot Behavior --> WHEN user renames an increment THEN extracted has new name merge adds it and does not remove old name so merged can contain both until rename strategy defined
-                (AC) Bot Behavior --> WHEN distinguishing original vs new increment THEN system uses name only same label same increment no duplicate add different label add as new cannot distinguish rename from new without stable id or position matching
-            (S) Bot Behavior --> Update story graph from map acceptance criteria
-                (AC) Bot Behavior --> WHEN user synchronizes from DrawIO exploration file THEN system extracts stories and acceptance criteria boxes and maps AC text back to story acceptance_criteria or steps
-                (AC) Bot Behavior --> WHEN AC box text is When/Then format THEN system extracts step description and associates with story
-                (AC) Bot Behavior --> WHEN merge runs THEN system preserves original scenario steps and updates AC text from extracted where matched
-                (AC) Bot Behavior --> WHEN user adds or removes AC boxes in DrawIO THEN extracted graph reflects new or removed AC and merge report reflects structural changes
-                (AC) Bot Behavior --> WHEN sync runs THEN system assigns AC cells to stories by vertical position and containment below story cells
+    (E) Work With Story Map
+        (E) Trace Story Graph
+            (E) Trace Code
+                    (S) Developer --> Display Code Trace
+                        (AC) WHEN Developer views scenario with linked test THEN Trace Editor parses test method for function/method calls AND follows each call to find implementation AND builds call hierarchy
+                        (AC) WHEN Trace Editor builds hierarchy THEN displays test method as root node AND called functions as child nodes AND recursively traces calls AND expands to 3 levels by default
+                        (AC) WHEN Trace Editor displays code box THEN shows symbol name AND file path and line number AND source code with syntax highlighting AND line numbers
+                        (AC) WHEN hierarchy exceeds 3 levels THEN shows collapsed nodes beyond level 3 AND lazy-loads deeper levels on expand
+                        (AC) WHEN call target not found in workspace THEN skips external/library calls BUT continues tracing other calls
+                        (AC) WHEN scenario has no linked test THEN shows "No test linked" indicator BUT does not show error
+                        (AC) WHEN linked test file not found THEN shows test reference with warning indicator BUT still renders trace UI structure
+                        (AC) WHEN test method has no calls THEN displays empty code trace section
+                        (AC) WHEN call tree exceeds depth limit THEN truncates at maximum depth AND shows truncation indicator
+                    (S) Developer --> Edit Code Step
+                        (AC) WHEN Trace Editor displays code trace THEN expands hierarchy by default AND displays code snippet in editable box AND shows line numbers
+                        (AC) WHEN Developer modifies code and triggers save THEN saves changes to source file AND shows save confirmation indicator
+                        (AC) WHEN Developer modifies test code THEN saves changes to test file
+                        (AC) WHEN Developer modifies implementation code THEN saves changes to code file
+                        (AC) WHEN save operation fails THEN shows error indicator BUT preserves user edits
+                        (AC) WHEN Developer presses Escape THEN reverts to previous value BUT does not save changes
+                    (S) Developer --> Open Source File
+                        (AC) WHEN Developer clicks Open on code node THEN Editor opens source file AND navigates to specific line number
+                        (AC) WHEN Developer clicks Open on test node THEN Editor opens test file AND navigates to test method line
+                        (AC) WHEN source file not found THEN shows file not found error BUT does not crash
+                        (AC) WHEN line number exceeds file length THEN Editor opens file at end AND shows line not found warning
+                        (AC) WHEN Developer clicks Open while file already open THEN Editor focuses existing tab AND navigates to line
+                    (S) Developer --> Navigate Code Trace
+                        (AC) WHEN Developer clicks method call within code box THEN navigates to code box for that method AND scrolls hierarchy AND highlights target
+                        (AC) WHEN Developer clicks property access THEN navigates to code box for that property
+                        (AC) WHEN Developer clicks nested method/property call THEN expands parent nodes if collapsed AND navigates to nested code box
+                        (AC) WHEN clicked method/property not in trace hierarchy THEN shows "Not traced" indicator BUT does not navigate
+                        (AC) WHEN Developer expands code node THEN lazy-loads source code AND displays code with line numbers AND shows loading indicator
+                        (AC) WHEN Developer collapses node THEN hides code snippet BUT preserves loaded content in memory
+                        (AC) WHEN Developer clicks Expand All THEN expands entire hierarchy BUT does not auto-load code snippets
+                        (AC) WHEN Developer clicks Collapse All THEN collapses entire hierarchy
+                        (AC) WHEN Developer clicks Toggle Code THEN shows/hides code for all expanded nodes
+                        (AC) WHEN Developer hovers over code node THEN shows full path tooltip
+                        (AC) WHEN source file not found during lazy load THEN shows file not found message BUT does not collapse node

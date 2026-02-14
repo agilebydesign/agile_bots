@@ -2428,11 +2428,16 @@
             {
               "name": "Load Bot",
               "sequential_order": 4.0,
+              "behavior": null,
+              "domain_concepts": [],
               "sub_epics": [],
               "story_groups": [
                 {
+                  "name": "",
+                  "sequential_order": 0.0,
                   "type": "and",
                   "connector": null,
+                  "behavior": null,
                   "stories": [
                     {
                       "name": "Resolve Bot Path Using CLI",
@@ -6714,7 +6719,13 @@
                         {
                           "name": "Domain Scoping",
                           "sequential_order": 9.0,
-                          "story_type": "user"
+                          "connector": null,
+                          "story_type": "user",
+                          "users": [],
+                          "test_class": null,
+                          "scenarios": [],
+                          "acceptance_criteria": [],
+                          "behavior": null
                         },
                         {
                           "name": "Show All Increment Scope Through CLI",
@@ -9140,7 +9151,13 @@
                     {
                       "name": "Execute Scope \"Runs\"",
                       "sequential_order": 20.0,
-                      "story_type": "user"
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [],
+                      "behavior": null
                     }
                   ]
                 }
@@ -19616,6 +19633,18 @@
                         }
                       ],
                       "behavior": null
+                    },
+                    {
+                      "name": "Synchronize DIagram With Scoped Nodes",
+                      "sequential_order": 7.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Perform Action\\Synchronized Graph with Rendered Diagram Content\\📄 Synchronize DIagram With Scoped Nodes.md"
                     }
                   ]
                 }
@@ -20307,6 +20336,11 @@
                         }
                       ],
                       "behavior": null
+                    },
+                    {
+                      "name": "YAYAYAYAYA",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
                     }
                   ]
                 }

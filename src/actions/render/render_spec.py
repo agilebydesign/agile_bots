@@ -119,6 +119,11 @@ class RenderSpec:
                 output_file = self._resolve_solution_name_slug(output_file, input_path)
             if '{scope}' in output_file:
                 output_file = self._resolve_scope_placeholder(output_file, scope)
+            elif scope and output_file.endswith('.drawio'):
+                # Append scope slug before extension for specs without {scope}
+                sanitized = scope.lower().replace(' ', '-')
+                sanitized = ''.join(c for c in sanitized if c.isalnum() or c == '-')
+                output_file = output_file.replace('.drawio', f'-{sanitized}.drawio')
             return workspace_dir / config_path / output_file
         # If no output specified, just use the path (for folder-based synchronizers)
         return workspace_dir / config_path

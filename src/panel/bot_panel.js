@@ -1274,7 +1274,9 @@ class BotPanel {
               vscode.window.showErrorMessage('No current behavior set');
               return;
             }
-            const renderCmd = `${behaviorName}.render.renderDiagram`;
+            const diagramScope = message.scope || '';
+            const scopeParam = diagramScope ? ` scope:"${diagramScope}"` : '';
+            const renderCmd = `${behaviorName}.render.renderDiagram${scopeParam}`;
             this._log(`[BotPanel] renderDiagram -> ${renderCmd}`);
             this._renderInProgress = true;
             vscode.window.withProgress({
@@ -1289,7 +1291,22 @@ class BotPanel {
                   // Open the rendered diagram file (use vscode.open so DrawIO editor opens, not XML)
                   if (message.path) {
                     try {
-                      const diagramUri = vscode.Uri.file(message.path);
+                      // Resolve scoped filename using the same logic
+                      // the Python backend applies.
+                      let openPath = message.path;
+                      if (diagramScope) {
+                        const sanitized = diagramScope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+                        if (openPath.includes('{scope}')) {
+                          openPath = openPath.replace('{scope}', sanitized);
+                        } else if (openPath.includes('-all.drawio')) {
+                          openPath = openPath.replace('-all.drawio', `-${sanitized}.drawio`);
+                        } else if (openPath.endsWith('.drawio')) {
+                          openPath = openPath.replace('.drawio', `-${sanitized}.drawio`);
+                        }
+                      } else if (openPath.includes('{scope}')) {
+                        openPath = openPath.replace('{scope}', 'all');
+                      }
+                      const diagramUri = vscode.Uri.file(openPath);
                       await vscode.commands.executeCommand('vscode.open', diagramUri);
                     } catch (openErr) {
                       this._log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
@@ -1313,7 +1330,9 @@ class BotPanel {
               vscode.window.showErrorMessage('No current behavior set');
               return;
             }
-            const layoutCmd = behaviorNameLayout + '.render.saveDiagramLayout';
+            const layoutScope = message.scope || '';
+            const layoutScopeParam = layoutScope ? ` scope:"${layoutScope}"` : '';
+            const layoutCmd = `${behaviorNameLayout}.render.saveDiagramLayout${layoutScopeParam}`;
             this._log('[BotPanel] saveDiagramLayout -> ' + layoutCmd);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
@@ -1340,7 +1359,9 @@ class BotPanel {
               vscode.window.showErrorMessage('No current behavior set');
               return;
             }
-            const clearCmd = behaviorNameClear + '.render.clearLayout';
+            const clearScope = message.scope || '';
+            const clearScopeParam = clearScope ? ` scope:"${clearScope}"` : '';
+            const clearCmd = `${behaviorNameClear}.render.clearLayout${clearScopeParam}`;
             this._log('[BotPanel] clearDiagramLayout -> ' + clearCmd);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
@@ -1367,7 +1388,9 @@ class BotPanel {
               vscode.window.showErrorMessage('No current behavior set');
               return;
             }
-            const reportCmd = `${behaviorName2}.render.generateReport`;
+            const reportScope = message.scope || '';
+            const reportScopeParam = reportScope ? ` scope:"${reportScope}"` : '';
+            const reportCmd = `${behaviorName2}.render.generateReport${reportScopeParam}`;
             this._log(`[BotPanel] generateDiagramReport -> ${reportCmd}`);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
@@ -1395,7 +1418,9 @@ class BotPanel {
               vscode.window.showErrorMessage('No current behavior set');
               return;
             }
-            const updateCmd = `${behaviorName3}.render.updateFromDiagram`;
+            const updateScope = message.scope || '';
+            const updateScopeParam = updateScope ? ` scope:"${updateScope}"` : '';
+            const updateCmd = `${behaviorName3}.render.updateFromDiagram${updateScopeParam}`;
             this._log(`[BotPanel] updateFromDiagram -> ${updateCmd}`);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
@@ -3486,19 +3511,35 @@ class BotPanel {
                 event.preventDefault();
                 event.stopPropagation();
             }
-            console.log('[WebView] openFile called with:', filePath);
+            // Resolve scoped diagram filename when a node is selected.
+            // For specs that had {scope} (resolved to -all), replace -all with -slug.
+            // For other specs, append -slug before .drawio.
+            var resolvedPath = filePath;
+            if (window.diagramScope && filePath && filePath.indexOf('.drawio') !== -1) {
+                var slug = window.diagramScope.toLowerCase().split(' ').join('-').split('').filter(function(c) {
+                    return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === '-';
+                }).join('');
+                if (slug && filePath.indexOf('-' + slug + '.drawio') === -1) {
+                    if (filePath.indexOf('-all.drawio') !== -1) {
+                        resolvedPath = filePath.split('-all.drawio').join('-' + slug + '.drawio');
+                    } else {
+                        resolvedPath = filePath.split('.drawio').join('-' + slug + '.drawio');
+                    }
+                }
+            }
+            console.log('[WebView] openFile called with:', resolvedPath);
             // Save scroll position before opening file (which may cause focus change)
-            const savedScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+            var savedScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
             sessionStorage.setItem('scrollPosition', savedScrollY.toString());
             console.log('[WebView] Saved scroll position before file open:', savedScrollY);
             
             vscode.postMessage({
                 command: 'logToFile',
-                message: '[WebView] openFile called with: ' + filePath
+                message: '[WebView] openFile called with: ' + resolvedPath
             });
             vscode.postMessage({
                 command: 'openFile',
-                filePath: filePath
+                filePath: resolvedPath
             });
             
             // Ensure scroll position is preserved after message sending (prevents any DOM reflow issues)
@@ -4087,6 +4128,53 @@ class BotPanel {
             if (window.selectedNode.type !== 'root') {
                 if (btnOpenGraph) btnOpenGraph.style.display = 'block';
                 if (btnOpenAll) btnOpenAll.style.display = 'block';
+            }
+            
+            // Update diagram scope global and button labels.
+            // The onclick handlers read window.diagramScope at click time,
+            // so we never need to rewrite onclick attributes (avoids
+            // backslash/escaping issues inside this template literal).
+            var dScope = (window.selectedNode.type !== 'root' && window.selectedNode.name)
+                ? window.selectedNode.name : '';
+            window.diagramScope = dScope;
+            
+            var renderBtns = document.querySelectorAll('.render-button');
+            for (var ri = 0; ri < renderBtns.length; ri++) {
+                renderBtns[ri].textContent = dScope ? 'Render Diagram for "' + dScope + '"' : 'Render Diagram';
+            }
+            var saveBtns = document.querySelectorAll('.save-layout-button');
+            for (var si = 0; si < saveBtns.length; si++) {
+                saveBtns[si].textContent = dScope ? 'Save Layout for "' + dScope + '"' : 'Save Layout';
+            }
+            var clearBtns = document.querySelectorAll('.clear-layout-button');
+            for (var ci = 0; ci < clearBtns.length; ci++) {
+                clearBtns[ci].textContent = dScope ? 'Clear Layout for "' + dScope + '"' : 'Clear Layout';
+            }
+            var reportBtns = document.querySelectorAll('.generate-report-button');
+            for (var gi = 0; gi < reportBtns.length; gi++) {
+                reportBtns[gi].textContent = dScope ? 'Generate Report for "' + dScope + '"' : 'Generate Report';
+            }
+            var updateBtns = document.querySelectorAll('.update-button');
+            for (var ui = 0; ui < updateBtns.length; ui++) {
+                updateBtns[ui].textContent = dScope ? 'Update Graph for "' + dScope + '"' : 'Update Graph';
+            }
+            
+            // Update diagram file link to show the scoped filename
+            var scopeSlug = dScope ? dScope.toLowerCase().split(' ').join('-').split('').filter(function(c) {
+                return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === '-';
+            }).join('') : '';
+            var diagLinks = document.querySelectorAll('.diagram-link');
+            for (var di = 0; di < diagLinks.length; di++) {
+                var origName = diagLinks[di].getAttribute('data-original-name') || '';
+                if (scopeSlug && origName) {
+                    if (origName.indexOf('-all.drawio') !== -1) {
+                        diagLinks[di].textContent = origName.split('-all.drawio').join('-' + scopeSlug + '.drawio');
+                    } else {
+                        diagLinks[di].textContent = origName.split('.drawio').join('-' + scopeSlug + '.drawio');
+                    }
+                } else if (origName) {
+                    diagLinks[di].textContent = origName;
+                }
             }
             
             // Update submit button based on current behavior and action
@@ -4824,9 +4912,19 @@ class BotPanel {
         
         
         // Initialize: show Create Epic button by default
-        setTimeout(() => {
+        setTimeout(function() {
             window.selectNode('root', null);
         }, 100);
+        
+        // Escape key deselects the current node and resets buttons
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Clear session storage so refresh doesn't restore
+                try { sessionStorage.removeItem('selectedNode'); } catch(err) {}
+                window.diagramScope = '';
+                window.selectNode('root', null);
+            }
+        });
         
         // Toggle Q&A expand/collapse
         window.toggleQAExpand = function(idx) {

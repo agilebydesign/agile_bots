@@ -28,6 +28,19 @@ class RenderOutputAction(Action):
     def action_name(self, value: str):
         raise AttributeError('action_name is read-only for RenderOutputAction')
 
+    def _execute_synchronizers_with_scope(self, render_specs: List['RenderSpec'],
+                                          scope: str = None) -> None:
+        """Execute synchronizers with an explicit scope string."""
+        for spec in render_specs:
+            if spec.synchronizer:
+                try:
+                    result = spec.execute_synchronizer(scope=scope)
+                    spec.mark_executed(result)
+                    logger.info(f"Executed synchronizer for {spec.name}: {result.get('output_path', 'N/A')}")
+                except Exception as e:
+                    logger.error(f'Failed to execute synchronizer for {spec.name}: {e}')
+                    spec.mark_failed(str(e))
+
     def _execute_synchronizers(self, render_specs: List['RenderSpec'], context: ScopeActionContext = None) -> None:
         # Extract scope value from context if available
         scope_value = None
@@ -48,6 +61,11 @@ class RenderOutputAction(Action):
     def _prepare_instructions(self, instructions, context: ScopeActionContext):
         render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
+        
+        # Extract scope value from context if available
+        scope_value = None
+        if context and context.scope and context.scope.value:
+            scope_value = context.scope.value[0] if context.scope.value else None
         
         merged_data = {
             'base_instructions': instructions.get('base_instructions', []),
@@ -87,10 +105,19 @@ class RenderOutputAction(Action):
                     render_template_paths.append(str(template_path.resolve()))
             
             if spec.output:
-                # Use centralized path as default fallback
+                # Resolve scoped output filename
+                output_name = spec.output
+                if scope_value and output_name.endswith('.drawio'):
+                    slug = self._sanitize_scope(scope_value)
+                    if '{scope}' in output_name:
+                        output_name = output_name.replace('{scope}', slug)
+                    else:
+                        output_name = output_name.replace('.drawio', f'-{slug}.drawio')
+                elif '{scope}' in output_name:
+                    output_name = output_name.replace('{scope}', 'all')
                 default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
                 path_prefix = spec.config_data.get('path', default_path)
-                output_file_abs = workspace_dir / path_prefix / spec.output
+                output_file_abs = workspace_dir / path_prefix / output_name
                 render_output_paths.append(str(output_file_abs.resolve()))
         
         if render_config_paths:
@@ -163,28 +190,51 @@ class RenderOutputAction(Action):
                 synchronizers.append(spec.synchronizer)
         return synchronizers
 
-    def _get_drawio_specs_with_paths(self) -> list:
-        """Get drawio render specs paired with their resolved diagram paths."""
+    @staticmethod
+    def _sanitize_scope(scope: str) -> str:
+        """Sanitize a scope string for use in filenames."""
+        sanitized = scope.lower().replace(' ', '-')
+        return ''.join(c for c in sanitized if c.isalnum() or c == '-')
+
+    def _get_drawio_specs_with_paths(self, scope: str = None) -> list:
+        """Get drawio render specs paired with their resolved diagram paths.
+
+        When *scope* is provided, {scope} placeholders in the output
+        filename are replaced with the sanitized scope value.  Specs
+        without {scope} get the scope slug appended before '.drawio'
+        so they render to a separate file (e.g. story-map-outline.drawio
+        becomes story-map-outline-decide-strategy.drawio).
+        """
         workspace_dir = self.behavior.bot_paths.workspace_directory
         result = []
         for spec in self._render_specs:
             if not spec.output or not spec.output.endswith('.drawio'):
                 continue
+            output_name = spec.output
+            if scope:
+                slug = self._sanitize_scope(scope)
+                if '{scope}' in output_name:
+                    output_name = output_name.replace('{scope}', slug)
+                else:
+                    # Insert scope slug before .drawio extension
+                    output_name = output_name.replace('.drawio', f'-{slug}.drawio')
+            elif '{scope}' in output_name:
+                output_name = output_name.replace('{scope}', 'all')
             default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
             path_prefix = spec.config_data.get('path', default_path)
-            diagram_path = workspace_dir / path_prefix / spec.output
+            diagram_path = workspace_dir / path_prefix / output_name
             result.append((spec, diagram_path))
         return result
 
-    def saveDiagramLayout(self) -> Dict[str, Any]:
+    def saveDiagramLayout(self, scope: str = None) -> Dict[str, Any]:
         """Extract and save positional data from current diagram files.
-        CLI: <behavior>.render.saveDiagramLayout
+        CLI: <behavior>.render.saveDiagramLayout [scope:"node name"]
         """
         from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
         sync = DrawIOSynchronizer()
         results = []
 
-        for spec, diagram_path in self._get_drawio_specs_with_paths():
+        for spec, diagram_path in self._get_drawio_specs_with_paths(scope=scope):
             if not diagram_path.exists():
                 continue
             result = sync.save_layout(diagram_path)
@@ -197,14 +247,14 @@ class RenderOutputAction(Action):
             'results': results
         }
 
-    def clearLayout(self) -> Dict[str, Any]:
+    def clearLayout(self, scope: str = None) -> Dict[str, Any]:
         """Delete layout files for all DrawIO diagrams so next render starts fresh.
-        CLI: <behavior>.render.clearLayout
+        CLI: <behavior>.render.clearLayout [scope:"node name"]
         """
         workspace_dir = self.behavior.bot_paths.workspace_directory
         results = []
 
-        for spec, diagram_path in self._get_drawio_specs_with_paths():
+        for spec, diagram_path in self._get_drawio_specs_with_paths(scope=scope):
             layout_path = diagram_path.parent / f"{diagram_path.stem}-layout.json"
             if layout_path.exists():
                 layout_path.unlink()
@@ -244,16 +294,20 @@ class RenderOutputAction(Action):
             'results': results
         }
 
-    def renderDiagram(self) -> Dict[str, Any]:
+    def renderDiagram(self, scope: str = None) -> Dict[str, Any]:
         """Re-render all DrawIO diagrams from story graph.
-        CLI: <behavior>.render.renderDiagram
+        CLI: <behavior>.render.renderDiagram [scope:"node name"]
+
+        When scope is provided, all specs render to scoped filenames
+        (e.g. story-map-outline-decide-strategy.drawio) with a filtered
+        subtree.  The original global diagrams are never overwritten.
         """
-        drawio_specs = self._get_drawio_specs_with_paths()
+        drawio_specs = self._get_drawio_specs_with_paths(scope=scope)
         if not drawio_specs:
             return {'status': 'error', 'message': 'No DrawIO render specs configured'}
 
         specs_only = [spec for spec, _ in drawio_specs]
-        self._execute_synchronizers(specs_only)
+        self._execute_synchronizers_with_scope(specs_only, scope)
 
         results = []
         for spec, diagram_path in drawio_specs:
@@ -270,9 +324,9 @@ class RenderOutputAction(Action):
             'results': results
         }
 
-    def generateReport(self) -> Dict[str, Any]:
+    def generateReport(self, scope: str = None) -> Dict[str, Any]:
         """Extract from DrawIO diagrams and generate update reports.
-        CLI: <behavior>.render.generateReport
+        CLI: <behavior>.render.generateReport [scope:"node name"]
         """
         from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
         from synchronizers.story_io.story_io_synchronizer import DrawIOSynchronizer
@@ -282,7 +336,7 @@ class RenderOutputAction(Action):
         results = []
         sync = DrawIOSynchronizer()
 
-        for spec, diagram_path in self._get_drawio_specs_with_paths():
+        for spec, diagram_path in self._get_drawio_specs_with_paths(scope=scope):
             if not diagram_path.exists():
                 continue
 
@@ -292,6 +346,15 @@ class RenderOutputAction(Action):
                 drawio_map = DrawIOStoryMap.load(diagram_path)
                 graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
                 original_map = StoryMap(graph_data)
+
+                # When scope is provided, filter the original story map to
+                # only include the scoped node and its descendants.  This
+                # ensures the report compares the scoped diagram against
+                # the matching subtree, not the entire story graph.
+                if scope:
+                    filtered = original_map.filter_by_name(scope)
+                    if filtered:
+                        original_map = filtered
 
                 # Write extracted JSON (the diagram's current structure)
                 extracted_path = diagram_path.parent / f"{diagram_path.stem}-extracted.json"
@@ -320,16 +383,16 @@ class RenderOutputAction(Action):
             'results': results
         }
 
-    def updateFromDiagram(self) -> Dict[str, Any]:
+    def updateFromDiagram(self, scope: str = None) -> Dict[str, Any]:
         """Apply update reports to merge diagram changes into story graph.
-        CLI: <behavior>.render.updateFromDiagram
+        CLI: <behavior>.render.updateFromDiagram [scope:"node name"]
         """
         from synchronizers.story_io.update_report import UpdateReport
 
         story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
         results = []
 
-        for spec, diagram_path in self._get_drawio_specs_with_paths():
+        for spec, diagram_path in self._get_drawio_specs_with_paths(scope=scope):
             update_report_path = diagram_path.parent / f"{diagram_path.stem}-update-report.json"
 
             if not update_report_path.exists():
@@ -401,6 +464,14 @@ class RenderOutputAction(Action):
                 # Update increment priorities to match diagram order
                 if report.increment_order:
                     if self._apply_increment_order(graph_data, report.increment_order):
+                        changed = True
+
+                # Apply AC moves first (preserves data), then AC changes
+                for ac_move in report.ac_moves:
+                    if self._apply_ac_move(graph_data, ac_move):
+                        changed = True
+                for ac_change in report.ac_changes:
+                    if self._apply_ac_change(graph_data, ac_change):
                         changed = True
 
                 if changed:
@@ -760,14 +831,119 @@ class RenderOutputAction(Action):
 
         return modified
 
+    def _apply_ac_change(self, graph_data: dict, ac_change) -> bool:
+        """Apply acceptance criteria changes to a story in the graph.
+
+        Adds new AC entries and removes deleted AC entries.
+        """
+        story_dict = self._find_story_dict(graph_data, ac_change.story_name)
+        if not story_dict:
+            return False
+
+        ac_list = story_dict.get('acceptance_criteria', [])
+        modified = False
+
+        # Remove AC entries
+        if ac_change.removed:
+            removed_set = set(ac_change.removed)
+            before = len(ac_list)
+            ac_list = [ac for ac in ac_list
+                       if self._ac_text(ac) not in removed_set]
+            if len(ac_list) != before:
+                modified = True
+
+        # Add AC entries
+        for text in ac_change.added:
+            # Don't add duplicates
+            existing_texts = {self._ac_text(ac) for ac in ac_list}
+            if text not in existing_texts:
+                seq = max((ac.get('sequential_order', 0)
+                           for ac in ac_list if isinstance(ac, dict)),
+                          default=0) + 1.0
+                ac_list.append({
+                    'name': text,
+                    'text': text,
+                    'sequential_order': seq,
+                })
+                modified = True
+
+        if modified:
+            story_dict['acceptance_criteria'] = ac_list
+        return modified
+
+    def _apply_ac_move(self, graph_data: dict, ac_move) -> bool:
+        """Move an acceptance criterion from one story to another.
+
+        Extracts the full AC dict from the source story and inserts it
+        into the target story, preserving all fields.
+        """
+        from_story = self._find_story_dict(graph_data, ac_move.from_story)
+        to_story = self._find_story_dict(graph_data, ac_move.to_story)
+        if not from_story or not to_story:
+            return False
+
+        # Find and extract the AC entry from the source
+        ac_list = from_story.get('acceptance_criteria', [])
+        ac_entry = None
+        for i, ac in enumerate(ac_list):
+            if self._ac_text(ac) == ac_move.ac_text:
+                ac_entry = ac_list.pop(i)
+                break
+
+        if not ac_entry:
+            return False
+
+        # Insert into the target
+        to_ac = to_story.setdefault('acceptance_criteria', [])
+        to_ac.append(ac_entry)
+        return True
+
+    @staticmethod
+    def _ac_text(ac) -> str:
+        """Extract text from an AC entry (dict, string, or object)."""
+        if isinstance(ac, dict):
+            return (ac.get('name', '') or ac.get('description', '')).strip()
+        if isinstance(ac, str):
+            return ac.strip()
+        if hasattr(ac, 'name'):
+            return (ac.name or '').strip()
+        return str(ac).strip()
+
+    def _find_story_dict(self, graph_data: dict, story_name: str) -> Optional[dict]:
+        """Find a story dict by name anywhere in the graph."""
+        for epic in graph_data.get('epics', []):
+            result = self._find_story_in_node(epic, story_name)
+            if result:
+                return result
+        return None
+
+    def _find_story_in_node(self, node: dict, story_name: str) -> Optional[dict]:
+        for sg in node.get('story_groups', []):
+            for s in sg.get('stories', []):
+                if s.get('name') == story_name:
+                    return s
+        for se in node.get('sub_epics', []):
+            result = self._find_story_in_node(se, story_name)
+            if result:
+                return result
+        return None
+
     def _collect_diagram_data(self, render_specs: List['RenderSpec'], workspace_dir: Path) -> List[Dict[str, Any]]:
         diagrams = []
+        seen_outputs = set()
         for spec in render_specs:
             if not spec.output:
                 continue
             output_name = spec.output
             if not output_name.endswith('.drawio'):
                 continue
+            # Deduplicate specs that resolve to the same output file
+            if output_name in seen_outputs:
+                continue
+            seen_outputs.add(output_name)
+            # Resolve {scope} placeholder to 'all' for panel display
+            if '{scope}' in output_name:
+                output_name = output_name.replace('{scope}', 'all')
             default_path = str(self.behavior.bot_paths.story_graph_paths.docs_root)
             path_prefix = spec.config_data.get('path', default_path)
             diagram_path = workspace_dir / path_prefix / output_name
@@ -778,21 +954,49 @@ class RenderOutputAction(Action):
             # Also check for merge report (written by synchronizer)
             extracted_stem = diagram_path.stem + '-extracted'
             merge_report_path = diagram_path.parent / (extracted_stem + '-merge-report.json')
-            # Prefer update-report (written by generate_diagram_report), fall back to merge-report
+            # Prefer update-report (written by generate_diagram_report), fall back to merge-report.
+            # Also scan for scoped report files (e.g. story-map-outline-decide-strategy-update-report.json)
+            # which are created when rendering with a scope filter.
             report_path = None
             if update_report_path.exists():
                 report_path = str(update_report_path.resolve())
             elif merge_report_path.exists():
                 report_path = str(merge_report_path.resolve())
+            else:
+                # Check for scoped report files: <stem>-*-update-report.json
+                stem = diagram_path.stem
+                parent = diagram_path.parent
+                if parent.exists():
+                    for f in parent.iterdir():
+                        if (f.name.startswith(stem + '-')
+                                and f.name.endswith('-update-report.json')
+                                and f.is_file()):
+                            report_path = str(f.resolve())
+                            break
             last_sync_time = None
             if layout_path.exists():
                 last_sync_time = layout_path.stat().st_mtime
+            # For specs with {scope} resolved to 'all', also check for any
+            # scoped variant (e.g. story-map-explored-decide-strategy.drawio)
+            # so we don't falsely report "not found" when only scoped files exist.
+            effective_path = diagram_path
+            if not diagram_path.exists() and '-all.' in diagram_path.name:
+                base_stem = diagram_path.stem.replace('-all', '')
+                parent_dir = diagram_path.parent
+                if parent_dir.exists():
+                    for f in parent_dir.iterdir():
+                        if (f.name.startswith(base_stem + '-')
+                                and f.name.endswith('.drawio')
+                                and f.is_file()):
+                            effective_path = f
+                            break
+
             file_modified_time = None
-            if diagram_path.exists():
-                file_modified_time = diagram_path.stat().st_mtime
+            if effective_path.exists():
+                file_modified_time = effective_path.stat().st_mtime
             diagrams.append({
                 'file_path': str(diagram_path.resolve()),
-                'exists': diagram_path.exists(),
+                'exists': effective_path.exists(),
                 'last_sync_time': last_sync_time,
                 'file_modified_time': file_modified_time,
                 'report_path': report_path
