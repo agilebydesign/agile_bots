@@ -1,0 +1,81 @@
+{
+  "epics": [
+    {
+      "name": "Build Agile Bots",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Generate MCP Tools",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Generate Bot Tools",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate Behavior Action Tools",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Deploy MCP BOT Server",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Restart MCP Server To Load Code Changes",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Generate CLI",
+          "sequential_order": 2.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Generate Command Definitions",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate CLI Entry Point",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate Cursor Commands",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate Help Documentation",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate Cursor Commands",
+                  "sequential_order": 5.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

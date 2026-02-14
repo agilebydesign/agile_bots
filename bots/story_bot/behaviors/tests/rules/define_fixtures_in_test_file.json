@@ -32,18 +32,27 @@
                             ]
            },
     "dont":  {
-                 "description":  "Don\u0027t create separate conftest.py for agent-specific fixtures. Example: src/conftest.py with agent fixtures (wrong - put in test file)",
+                 "description":  "Don't create separate conftest.py for agent-specific fixtures. Don't create shared files without explicit need.",
                  "guidance":  [
                                   {
-                                      "description":  "Don\u0027t create conftest.py for single-test-file fixtures",
+                                      "description":  "Don't create conftest.py for single-test-file fixtures",
                                       "example":  [
                                                       "# WRONG: src/conftest.py with fixtures only used by one test file"
                                                   ]
                                   },
                                   {
-                                      "description":  "Don\u0027t put agent-specific fixtures in shared conftest",
+                                      "description":  "Don't put agent-specific fixtures in shared conftest",
                                       "example":  [
                                                       "# WRONG: Base conftest with StoryBot-specific fixtures"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don't create shared fixture files without explicit need. If a fixture is only used in one file, keep it there. When you have obvious shared logic across sub-epics, place the shared base at the appropriate hierarchy level: sub-epic level helper if shared within one sub-epic, epic level helper if shared across sub-epics. This is not an excuse to create shared files preemptively.",
+                                      "example":  [
+                                                      "# WRONG: Creating test_helpers/payment_base.py when only test_make_wire_payment.py uses it",
+                                                      "# RIGHT: Keep fixtures in test_make_wire_payment.py until test_make_ach_payment.py also needs them",
+                                                      "# RIGHT: When both wire and ACH test files need create_recipient(), move it to epic-level helper",
+                                                      "# RIGHT: Sub-epic level helper if shared within one sub-epic, epic level if shared across sub-epics"
                                                   ]
                                   }
                               ]

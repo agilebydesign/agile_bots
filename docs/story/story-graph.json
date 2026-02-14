@@ -19477,7 +19477,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_when_then_ac_text_extracted_as_step_descriptions",
                           "steps": "And AC {DrawIOElement} box has When/Then format text\nWhen {DrawIOStoryMap} extracts exploration from {DrawIOStoryMap}\nThen {DrawIOStoryMap} extracts step description from AC box text\nAnd associates extracted step with the containing {DrawIOStory}"
                         },
                         {
@@ -19487,7 +19487,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_merge_preserves_original_ac_for_matched_stories_from_exploration_view",
                           "steps": "And {UpdateReport} has been generated from {DrawIOStoryMap} exploration vs {StoryMap}\nWhen {StoryMap}.update({DrawIOStoryMap}, {UpdateReport}) runs for exploration view\nThen {StoryMap} applies report changes for matched stories\nAnd {StoryMap} preserves original acceptance_criteria and steps for matched stories\nAnd extracted AC does not overwrite original AC in {StoryMap}"
                         },
                         {
@@ -19497,7 +19497,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_added_or_removed_ac_boxes_reflected_in_extracted_graph_and_update_report",
                           "steps": "And new AC {DrawIOElement} boxes exist below a {DrawIOStory} in {DrawIOStoryMap}\nAnd existing AC boxes have been removed from another {DrawIOStory}\nWhen {DrawIOStoryMap} extracts exploration from {DrawIOStoryMap}\nThen extracted graph reflects new AC for the first {DrawIOStory}\nAnd extracted graph omits removed AC for the second {DrawIOStory}\nAnd {UpdateReport} reflects these structural changes"
                         },
                         {
@@ -19507,7 +19507,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_ac_cells_assigned_to_stories_by_vertical_position_below_story_cells",
                           "steps": "And multiple {DrawIOStory} cells have AC {DrawIOElement} boxes positioned below them\nWhen {DrawIOStoryMap} extracts exploration from {DrawIOStoryMap}\nThen each AC {DrawIOElement} assigned to the {DrawIOStory} it is contained below based on vertical position\nAnd no AC box left unassigned when positioned within a {DrawIOStory} column"
                         },
                         {
@@ -19517,7 +19517,7 @@
                           "background": [
                             "Given {DrawIOStoryMap} exploration file exists with {DrawIOStory} cells and AC {DrawIOElement} boxes"
                           ],
-                          "test_method": null,
+                          "test_method": "test_ac_box_text_not_in_when_then_format_treated_as_plain_acceptance_criteria",
                           "steps": "And AC {DrawIOElement} box has text that is not in When/Then format\nWhen {DrawIOStoryMap} extracts exploration from {DrawIOStoryMap}\nThen {DrawIOStoryMap} treats AC text as plain acceptance_criteria description\nAnd associates it with the containing {DrawIOStory} without step extraction"
                         }
                       ],

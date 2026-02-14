@@ -1,0 +1,140 @@
+{
+  "EPIC|Build Agile Bots": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 500.0,
+    "height": 60.0
+  },
+  "build-agile-bots": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 500.0,
+    "height": 60.0
+  },
+  "SUB_EPIC|Generate MCP Tools": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 240.0,
+    "height": 60.0
+  },
+  "build-agile-bots/generate-mcp-tools": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 240.0,
+    "height": 60.0
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Generate Bot Tools": {
+    "x": 30.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-mcp-tools/generate-bot-tools": {
+    "x": 30.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Generate Behavior Action Tools": {
+    "x": 90.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-mcp-tools/generate-behavior-action-tools": {
+    "x": 90.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Deploy MCP BOT Server": {
+    "x": 150.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-mcp-tools/deploy-mcp-bot-server": {
+    "x": 150.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate MCP Tools|Restart MCP Server To Load Code Changes": {
+    "x": 210.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-mcp-tools/restart-mcp-server-to-load-code-changes": {
+    "x": 210.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "SUB_EPIC|Generate CLI": {
+    "x": 275.0,
+    "y": 195.0,
+    "width": 240.0,
+    "height": 60.0
+  },
+  "build-agile-bots/generate-cli": {
+    "x": 275.0,
+    "y": 195.0,
+    "width": 240.0,
+    "height": 60.0
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Command Definitions": {
+    "x": 280.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-cli/generate-command-definitions": {
+    "x": 280.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate CLI Entry Point": {
+    "x": 340.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-cli/generate-cli-entry-point": {
+    "x": 340.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Cursor Commands": {
+    "x": 400.0,
+    "y": 410.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-cli/generate-cursor-commands": {
+    "x": 400.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Build Agile Bots|Generate CLI|Generate Help Documentation": {
+    "x": 460.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "build-agile-bots/generate-cli/generate-help-documentation": {
+    "x": 460.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "2": {
+    "x": 400.0,
+    "y": 410.0,
+    "width": 50.0,
+    "height": 50.0
+  }
+}
