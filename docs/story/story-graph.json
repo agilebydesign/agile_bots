@@ -12074,7 +12074,7 @@
                       "stories": [
                         {
                           "name": "Display Scenario Steps",
-                          "sequential_order": 1.0,
+                          "sequential_order": 0.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12195,7 +12195,7 @@
                         },
                         {
                           "name": "Edit Scenarios in Trace Editor",
-                          "sequential_order": 2.0,
+                          "sequential_order": 1.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12308,7 +12308,7 @@
                         },
                         {
                           "name": "Open Scenario Source",
-                          "sequential_order": 3.0,
+                          "sequential_order": 2.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12410,7 +12410,7 @@
                         },
                         {
                           "name": "Display Examples Table",
-                          "sequential_order": 4.0,
+                          "sequential_order": 3.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12514,7 +12514,7 @@
                         },
                         {
                           "name": "Add / Remove Examples",
-                          "sequential_order": 5.0,
+                          "sequential_order": 4.0,
                           "connector": "and",
                           "story_type": "user",
                           "users": [
@@ -12644,6 +12644,81 @@
                           "behavior": "shape"
                         },
                         {
+                          "name": "Design Example",
+                          "sequential_order": 5.0,
+                          "connector": null,
+                          "story_type": "user",
+                          "users": [],
+                          "test_class": null,
+                          "scenarios": [
+                            {
+                              "name": "Duplicate column name shows validation error",
+                              "sequential_order": 0.0,
+                              "type": "error_case",
+                              "background": [],
+                              "test_method": null,
+                              "steps": "Given Scenario \"{scenario_name}\" has columns \"{existing_columns}\"\nWhen Developer adds a column named \"{new_column_name}\"\nThen the trace editor shows error \"{error_message}\" and does not add the column",
+                              "examples": [
+                                {
+                                  "columns": [
+                                    "Scenario Name",
+                                    "Existing Columns",
+                                    "New Column Name",
+                                    "Error Message"
+                                  ],
+                                  "rows": [
+                                    [
+                                      "Approve Transfer",
+                                      "Transfer Type, Amount",
+                                      "Amount",
+                                      "Column name already exists"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "acceptance_criteria": [
+                            {
+                              "name": "**WHEN** Developer cancels column dialog\n**THEN** Trace Editor closes dialog\n**BUT** does not modify table",
+                              "text": "**WHEN** Developer cancels column dialog\n**THEN** Trace Editor closes dialog\n**BUT** does not modify table",
+                              "sequential_order": 1.0
+                            },
+                            {
+                              "name": "**WHEN** Developer cancels deletion\n**THEN** Trace Editor preserves column and data",
+                              "text": "**WHEN** Developer cancels deletion\n**THEN** Trace Editor preserves column and data",
+                              "sequential_order": 2.0
+                            },
+                            {
+                              "name": "**WHEN** Developer clicks Add Column button\n**THEN** Trace Editor displays column name input dialog",
+                              "text": "**WHEN** Developer clicks Add Column button\n**THEN** Trace Editor displays column name input dialog",
+                              "sequential_order": 3.0
+                            },
+                            {
+                              "name": "**WHEN** Developer clicks Delete on column header\n**THEN** Trace Editor shows confirmation dialog\n**AND** Dialog warns that column data will be lost",
+                              "text": "**WHEN** Developer clicks Delete on column header\n**THEN** Trace Editor shows confirmation dialog\n**AND** Dialog warns that column data will be lost",
+                              "sequential_order": 4.0
+                            },
+                            {
+                              "name": "**WHEN** Developer confirms column deletion\n**THEN** Trace Editor removes column from table\n**AND** Trace Editor removes column data from all rows\n**AND** Trace Editor saves changes to story data",
+                              "text": "**WHEN** Developer confirms column deletion\n**THEN** Trace Editor removes column from table\n**AND** Trace Editor removes column data from all rows\n**AND** Trace Editor saves changes to story data",
+                              "sequential_order": 5.0
+                            },
+                            {
+                              "name": "**WHEN** Developer enters column name and confirms\n**THEN** Trace Editor adds new column to table\n**AND** Trace Editor adds empty cell to each existing row\n**AND** Trace Editor saves changes to story data",
+                              "text": "**WHEN** Developer enters column name and confirms\n**THEN** Trace Editor adds new column to table\n**AND** Trace Editor adds empty cell to each existing row\n**AND** Trace Editor saves changes to story data",
+                              "sequential_order": 6.0
+                            },
+                            {
+                              "name": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not add duplicate column",
+                              "text": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not add duplicate column",
+                              "sequential_order": 7.0
+                            }
+                          ],
+                          "behavior": null,
+                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Trace Story Graph\\Trace Scenario\\📄 Design Example.md"
+                        },
+                        {
                           "name": "Edit Example",
                           "sequential_order": 6.0,
                           "connector": "and",
@@ -12704,32 +12779,6 @@
                                   ]
                                 }
                               ]
-                            },
-                            {
-                              "name": "Duplicate column name shows validation error",
-                              "sequential_order": 3.0,
-                              "type": "error_case",
-                              "background": [],
-                              "test_method": null,
-                              "steps": "Given Scenario \"{scenario_name}\" has columns \"{existing_columns}\"\nWhen Developer adds a column named \"{new_column_name}\"\nThen the trace editor shows error \"{error_message}\" and does not add the column",
-                              "examples": [
-                                {
-                                  "columns": [
-                                    "Scenario Name",
-                                    "Existing Columns",
-                                    "New Column Name",
-                                    "Error Message"
-                                  ],
-                                  "rows": [
-                                    [
-                                      "Approve Transfer",
-                                      "Transfer Type, Amount",
-                                      "Amount",
-                                      "Column name already exists"
-                                    ]
-                                  ]
-                                }
-                              ]
                             }
                           ],
                           "acceptance_criteria": [
@@ -12764,46 +12813,6 @@
                               "sequential_order": 6.0
                             },
                             {
-                              "name": "**WHEN** Developer clicks Add Column button\n**THEN** Trace Editor displays column name input dialog",
-                              "text": "**WHEN** Developer clicks Add Column button\n**THEN** Trace Editor displays column name input dialog",
-                              "sequential_order": 7.0
-                            },
-                            {
-                              "name": "**WHEN** Developer enters column name and confirms\n**THEN** Trace Editor adds new column to table\n**AND** Trace Editor adds empty cell to each existing row\n**AND** Trace Editor saves changes to story data",
-                              "text": "**WHEN** Developer enters column name and confirms\n**THEN** Trace Editor adds new column to table\n**AND** Trace Editor adds empty cell to each existing row\n**AND** Trace Editor saves changes to story data",
-                              "sequential_order": 8.0
-                            },
-                            {
-                              "name": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not add duplicate column",
-                              "text": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not add duplicate column",
-                              "sequential_order": 9.0
-                            },
-                            {
-                              "name": "**WHEN** Developer cancels column dialog\n**THEN** Trace Editor closes dialog\n**BUT** does not modify table",
-                              "text": "**WHEN** Developer cancels column dialog\n**THEN** Trace Editor closes dialog\n**BUT** does not modify table",
-                              "sequential_order": 10.0
-                            },
-                            {
-                              "name": "**WHEN** Developer clicks Delete on column header\n**THEN** Trace Editor shows confirmation dialog\n**AND** Dialog warns that column data will be lost",
-                              "text": "**WHEN** Developer clicks Delete on column header\n**THEN** Trace Editor shows confirmation dialog\n**AND** Dialog warns that column data will be lost",
-                              "sequential_order": 11.0
-                            },
-                            {
-                              "name": "**WHEN** Developer confirms column deletion\n**THEN** Trace Editor removes column from table\n**AND** Trace Editor removes column data from all rows\n**AND** Trace Editor saves changes to story data",
-                              "text": "**WHEN** Developer confirms column deletion\n**THEN** Trace Editor removes column from table\n**AND** Trace Editor removes column data from all rows\n**AND** Trace Editor saves changes to story data",
-                              "sequential_order": 12.0
-                            },
-                            {
-                              "name": "**WHEN** Developer removes last column\n**THEN** Trace Editor removes all example data\n**AND** Trace Editor shows empty examples section",
-                              "text": "**WHEN** Developer removes last column\n**THEN** Trace Editor removes all example data\n**AND** Trace Editor shows empty examples section",
-                              "sequential_order": 13.0
-                            },
-                            {
-                              "name": "**WHEN** Developer cancels deletion\n**THEN** Trace Editor preserves column and data",
-                              "text": "**WHEN** Developer cancels deletion\n**THEN** Trace Editor preserves column and data",
-                              "sequential_order": 14.0
-                            },
-                            {
                               "name": "**WHEN** Developer double-clicks column header\n**THEN** Trace Editor displays inline text editor on header",
                               "text": "**WHEN** Developer double-clicks column header\n**THEN** Trace Editor displays inline text editor on header",
                               "sequential_order": 15.0
@@ -12812,11 +12821,6 @@
                               "name": "**WHEN** Developer modifies header text and saves\n**THEN** Trace Editor updates column name\n**AND** Trace Editor saves changes to story data",
                               "text": "**WHEN** Developer modifies header text and saves\n**THEN** Trace Editor updates column name\n**AND** Trace Editor saves changes to story data",
                               "sequential_order": 16.0
-                            },
-                            {
-                              "name": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not save duplicate name",
-                              "text": "**WHEN** Developer enters duplicate column name\n**THEN** Trace Editor shows validation error\n**BUT** does not save duplicate name",
-                              "sequential_order": 17.0
                             },
                             {
                               "name": "**WHEN** Developer clears header text\n**THEN** Trace Editor shows validation error\n**BUT** does not allow empty column name",
@@ -13226,6 +13230,21 @@
                               "name": "**WHEN** Developer presses Escape in edit box\n**THEN** Trace Editor reverts to previous value\n**BUT** does not save changes",
                               "text": "**WHEN** Developer presses Escape in edit box\n**THEN** Trace Editor reverts to previous value\n**BUT** does not save changes",
                               "sequential_order": 6.0
+                            },
+                            {
+                              "name": "**WHEN** Developer clicks Collapse All button\n**THEN** Trace Editor collapses entire hierarchy",
+                              "text": "**WHEN** Developer clicks Collapse All button\n**THEN** Trace Editor collapses entire hierarchy",
+                              "sequential_order": 8.0
+                            },
+                            {
+                              "name": "**WHEN** Developer clicks Expand All button\n**THEN** Trace Editor expands entire hierarchy\n**BUT** does not auto-load code snippets",
+                              "text": "**WHEN** Developer clicks Expand All button\n**THEN** Trace Editor expands entire hierarchy\n**BUT** does not auto-load code snippets",
+                              "sequential_order": 7.0
+                            },
+                            {
+                              "name": "**WHEN** Developer clicks Toggle Code button\n**THEN** Trace Editor shows/hides code for all expanded nodes",
+                              "text": "**WHEN** Developer clicks Toggle Code button\n**THEN** Trace Editor shows/hides code for all expanded nodes",
+                              "sequential_order": 9.0
                             }
                           ],
                           "behavior": "shape"
@@ -13438,24 +13457,14 @@
                               "sequential_order": 1.0
                             },
                             {
-                              "name": "**WHEN** Developer clicks on property access within code box\n**THEN** Trace Editor navigates to code box for that property",
-                              "text": "**WHEN** Developer clicks on property access within code box\n**THEN** Trace Editor navigates to code box for that property",
-                              "sequential_order": 2.0
-                            },
-                            {
                               "name": "**WHEN** Developer clicks on nested method/property call\n**THEN** Trace Editor expands parent nodes if collapsed\n**AND** Trace Editor navigates to nested code box",
                               "text": "**WHEN** Developer clicks on nested method/property call\n**THEN** Trace Editor expands parent nodes if collapsed\n**AND** Trace Editor navigates to nested code box",
                               "sequential_order": 3.0
                             },
                             {
-                              "name": "**WHEN** clicked method/property not in trace hierarchy\n**THEN** Trace Editor shows \"Not traced\" indicator\n**BUT** does not navigate",
-                              "text": "**WHEN** clicked method/property not in trace hierarchy\n**THEN** Trace Editor shows \"Not traced\" indicator\n**BUT** does not navigate",
-                              "sequential_order": 4.0
-                            },
-                            {
-                              "name": "**WHEN** Developer expands code node\n**THEN** Trace Editor lazy-loads source code for node\n**AND** Trace Editor displays code with line numbers\n**AND** Trace Editor shows loading indicator during fetch",
-                              "text": "**WHEN** Developer expands code node\n**THEN** Trace Editor lazy-loads source code for node\n**AND** Trace Editor displays code with line numbers\n**AND** Trace Editor shows loading indicator during fetch",
-                              "sequential_order": 5.0
+                              "name": "**WHEN** Developer clicks on property access within code box\n**THEN** Trace Editor navigates to code box for that property",
+                              "text": "**WHEN** Developer clicks on property access within code box\n**THEN** Trace Editor navigates to code box for that property",
+                              "sequential_order": 2.0
                             },
                             {
                               "name": "**WHEN** Developer collapses previously expanded node\n**THEN** Trace Editor hides code snippet\n**BUT** preserves loaded content in memory",
@@ -13463,24 +13472,19 @@
                               "sequential_order": 6.0
                             },
                             {
-                              "name": "**WHEN** Developer clicks Expand All button\n**THEN** Trace Editor expands entire hierarchy\n**BUT** does not auto-load code snippets",
-                              "text": "**WHEN** Developer clicks Expand All button\n**THEN** Trace Editor expands entire hierarchy\n**BUT** does not auto-load code snippets",
-                              "sequential_order": 7.0
-                            },
-                            {
-                              "name": "**WHEN** Developer clicks Collapse All button\n**THEN** Trace Editor collapses entire hierarchy",
-                              "text": "**WHEN** Developer clicks Collapse All button\n**THEN** Trace Editor collapses entire hierarchy",
-                              "sequential_order": 8.0
-                            },
-                            {
-                              "name": "**WHEN** Developer clicks Toggle Code button\n**THEN** Trace Editor shows/hides code for all expanded nodes",
-                              "text": "**WHEN** Developer clicks Toggle Code button\n**THEN** Trace Editor shows/hides code for all expanded nodes",
-                              "sequential_order": 9.0
+                              "name": "**WHEN** Developer expands code node\n**THEN** Trace Editor lazy-loads source code for node\n**AND** Trace Editor displays code with line numbers\n**AND** Trace Editor shows loading indicator during fetch",
+                              "text": "**WHEN** Developer expands code node\n**THEN** Trace Editor lazy-loads source code for node\n**AND** Trace Editor displays code with line numbers\n**AND** Trace Editor shows loading indicator during fetch",
+                              "sequential_order": 5.0
                             },
                             {
                               "name": "**WHEN** Developer hovers over code node\n**THEN** Trace Editor shows full path tooltip",
                               "text": "**WHEN** Developer hovers over code node\n**THEN** Trace Editor shows full path tooltip",
                               "sequential_order": 10.0
+                            },
+                            {
+                              "name": "**WHEN** clicked method/property not in trace hierarchy\n**THEN** Trace Editor shows \"Not traced\" indicator\n**BUT** does not navigate",
+                              "text": "**WHEN** clicked method/property not in trace hierarchy\n**THEN** Trace Editor shows \"Not traced\" indicator\n**BUT** does not navigate",
+                              "sequential_order": 4.0
                             },
                             {
                               "name": "**WHEN** source file not found during lazy load\n**THEN** Trace Editor shows file not found message in node\n**BUT** does not collapse node",
@@ -20340,7 +20344,13 @@
                     {
                       "name": "YAYAYAYAYA",
                       "sequential_order": 4.0,
-                      "story_type": "user"
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [],
+                      "behavior": null
                     }
                   ]
                 }
