@@ -56,6 +56,7 @@ class ACChange:
     added: List[str] = field(default_factory=list)      # AC text added
     removed: List[str] = field(default_factory=list)     # AC text removed
     modified: List[Dict[str, str]] = field(default_factory=list)  # [{old, new}]
+    reordered: List[str] = field(default_factory=list)   # new AC order (texts)
 
 
 @dataclass
@@ -189,9 +190,10 @@ class UpdateReport:
             for change in self._ac_changes:
                 change.added = [t for t in change.added if t not in moved_texts]
                 change.removed = [t for t in change.removed if t not in moved_texts]
-            # Remove empty changes
+            # Remove empty changes (keep reorder-only entries)
             self._ac_changes = [c for c in self._ac_changes
-                                if c.added or c.removed or c.modified]
+                                if c.added or c.removed or c.modified
+                                or c.reordered]
 
     def set_increment_changes(self, changes: List[IncrementChange],
                                moves: List[IncrementMove],
@@ -401,6 +403,8 @@ class UpdateReport:
                     entry['removed'] = ac.removed
                 if ac.modified:
                     entry['modified'] = ac.modified
+                if ac.reordered:
+                    entry['reordered'] = ac.reordered
                 result['ac_changes'].append(entry)
         if self._ac_moves:
             result['ac_moves'] = [
@@ -470,7 +474,8 @@ class UpdateReport:
                 parent=ac.get('parent', ''),
                 added=ac.get('added', []),
                 removed=ac.get('removed', []),
-                modified=ac.get('modified', [])))
+                modified=ac.get('modified', []),
+                reordered=ac.get('reordered', [])))
         for m in data.get('ac_moves', []):
             report._ac_moves.append(ACMove(
                 ac_text=m['ac_text'],

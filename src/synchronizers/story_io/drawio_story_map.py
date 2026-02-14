@@ -580,13 +580,16 @@ class DrawIOStoryMap(StoryMap):
         if not stories:
             return {}
 
-        # Collect AC boxes from story _ac_elements and extra_nodes.
+        # Collect AC boxes from story _ac_elements and unclassified nodes.
         # Tool-generated AC: cell_id contains '/ac-'
         # User-created AC: detected by style (yellow fill, wider than story,
         #                   positioned below a story)
         ac_candidates = []
         for story in self.get_stories():
             ac_candidates.extend(getattr(story, '_ac_elements', []))
+        # Also include unclassified/loaded nodes so user-created AC boxes
+        # (which lack '/ac-' in their cell_id) are considered.
+        ac_candidates.extend(getattr(self, '_loaded_nodes', []))
 
         ac_boxes = []
         for n in ac_candidates:
@@ -622,38 +625,51 @@ class DrawIOStoryMap(StoryMap):
         # Sort AC boxes by Y position
         ac_boxes.sort(key=lambda b: b['y'])
 
-        # Match AC boxes to stories
+        # Match AC boxes to stories.
+        # Position is the source of truth: when users drag AC boxes in
+        # the diagram the position changes but the cell_id stays the same.
+        # Always try positional matching first, fall back to cell_id only
+        # when no positional match is found.
         result: Dict[str, List[str]] = {}
         for ac in ac_boxes:
-            # Method 1: cell_id hierarchy (tool-generated)
             matched_story = None
-            if '/ac-' in ac['cell_id']:
-                # cell_id format: "epic/sub-epic/story/ac-N"
+
+            # Primary: positional (below + horizontally overlapping).
+            # In a story map, AC boxes are x-aligned with their parent
+            # story.  When multiple stories overlap horizontally, prefer
+            # the one whose x is closest to the AC's x (column alignment)
+            # and use vertical distance only as a tiebreaker.
+            # The vertical limit is generous (2000px) because stories can
+            # have many ACs stacked below: 20+ ACs at ~70px each easily
+            # exceeds 1400px of vertical extent.
+            candidates = []
+            for s in stories:
+                # AC must be below the story
+                if ac['y'] < s['y'] + s['height']:
+                    continue
+                # Horizontal overlap check
+                ac_right = ac['x'] + ac['width']
+                s_right = s['x'] + s['width']
+                if ac['x'] > s_right + 50 or ac_right < s['x'] - 50:
+                    continue
+                y_dist = ac['y'] - (s['y'] + s['height'])
+                if y_dist >= 2000:
+                    continue
+                x_dist = abs(ac['x'] - s['x'])
+                candidates.append((x_dist, y_dist, s['name']))
+            if candidates:
+                # Sort by x-alignment first (column match), then vertical
+                candidates.sort()
+                matched_story = candidates[0][2]
+
+            # Fallback: cell_id hierarchy (tool-generated AC that could
+            # not be matched positionally, e.g. overlapping columns)
+            if not matched_story and '/ac-' in ac['cell_id']:
                 story_path = ac['cell_id'].rsplit('/ac-', 1)[0]
                 for s in stories:
                     if s['cell_id'] == story_path:
                         matched_story = s['name']
                         break
-
-            # Method 2: positional (below + horizontally overlapping)
-            if not matched_story:
-                best = None
-                best_dist = float('inf')
-                for s in stories:
-                    # AC must be below the story
-                    if ac['y'] < s['y'] + s['height']:
-                        continue
-                    # Horizontal overlap check
-                    ac_right = ac['x'] + ac['width']
-                    s_right = s['x'] + s['width']
-                    if ac['x'] > s_right + 50 or ac_right < s['x'] - 50:
-                        continue
-                    dist = ac['y'] - (s['y'] + s['height'])
-                    if dist < best_dist and dist < 500:
-                        best_dist = dist
-                        best = s['name']
-                if best:
-                    matched_story = best
 
             if matched_story:
                 result.setdefault(matched_story, []).append(ac['text'])
@@ -705,12 +721,18 @@ class DrawIOStoryMap(StoryMap):
             added = sorted(ext_set - orig_set)
             removed = sorted(orig_set - ext_set)
 
-            if added or removed:
+            # Detect pure reorder: same items, different order
+            reordered = []
+            if not added and not removed and ext_ac != orig_ac:
+                reordered = list(ext_ac)
+
+            if added or removed or reordered:
                 changes.append(ACChange(
                     story_name=story_name,
                     parent=story_parents.get(story_name, ''),
                     added=added,
                     removed=removed,
+                    reordered=reordered,
                 ))
 
         if changes:

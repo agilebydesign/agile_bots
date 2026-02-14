@@ -834,7 +834,8 @@ class RenderOutputAction(Action):
     def _apply_ac_change(self, graph_data: dict, ac_change) -> bool:
         """Apply acceptance criteria changes to a story in the graph.
 
-        Adds new AC entries and removes deleted AC entries.
+        Adds new AC entries, removes deleted AC entries, and applies
+        reordering when AC items were rearranged in the diagram.
         """
         story_dict = self._find_story_dict(graph_data, ac_change.story_name)
         if not story_dict:
@@ -865,6 +866,21 @@ class RenderOutputAction(Action):
                     'text': text,
                     'sequential_order': seq,
                 })
+                modified = True
+
+        # Apply reordering: sort ac_list to match the diagram order
+        if getattr(ac_change, 'reordered', None):
+            order_map = {text: idx for idx, text in enumerate(ac_change.reordered)}
+            # Items not in the reorder list go to the end
+            sentinel = len(order_map)
+            new_order = sorted(ac_list,
+                               key=lambda ac: order_map.get(self._ac_text(ac), sentinel))
+            if new_order != ac_list:
+                ac_list = new_order
+                # Update sequential_order to reflect new positions
+                for i, ac in enumerate(ac_list):
+                    if isinstance(ac, dict):
+                        ac['sequential_order'] = float(i + 1)
                 modified = True
 
         if modified:
@@ -966,9 +982,16 @@ class RenderOutputAction(Action):
                 # Check for scoped report files: <stem>-*-update-report.json
                 stem = diagram_path.stem
                 parent = diagram_path.parent
+                # For {scope} specs resolved to 'all', also search with '-all'
+                # removed so we can find e.g.
+                # story-map-explored-trace-story-graph-update-report.json
+                # when the base stem is story-map-explored-all.
+                prefixes = [stem + '-']
+                if '-all' in stem:
+                    prefixes.append(stem.replace('-all', '') + '-')
                 if parent.exists():
                     for f in parent.iterdir():
-                        if (f.name.startswith(stem + '-')
+                        if (any(f.name.startswith(p) for p in prefixes)
                                 and f.name.endswith('-update-report.json')
                                 and f.is_file()):
                             report_path = str(f.resolve())

@@ -83,7 +83,9 @@ class DrawIOStoryNodeSerializer:
         height = float(geometry.get('height', '0'))
         style_dict = DrawIOElement.from_style_string(style)
         fill_color = style_dict.get('fillColor', '')
-        node = DrawIOStoryNodeSerializer._classify_node(value, fill_color)
+        node = DrawIOStoryNodeSerializer._classify_node(
+            value, fill_color, cell_id=cell_id, style_dict=style_dict,
+            width=width, height=height)
         if node:
             node._element._cell_id = cell_id
             node.set_position(x, y)
@@ -97,12 +99,27 @@ class DrawIOStoryNodeSerializer:
         return raw, parent_id
 
     @staticmethod
-    def _classify_node(value: str, fill_color: str) -> Optional[DrawIOStoryNode]:
+    def _classify_node(value: str, fill_color: str, *,
+                        cell_id: str = '', style_dict: dict = None,
+                        width: float = 0, height: float = 0) -> Optional[DrawIOStoryNode]:
         if fill_color == '#e1d5e7':
             return DrawIOStoryNodeSerializer.create_epic(value, 0)
         elif fill_color == '#d5e8d4':
             return DrawIOStoryNodeSerializer.create_sub_epic(value, 0)
         elif fill_color in ('#fff2cc', '#1a237e', '#000000'):
+            # AC boxes share #fff2cc with stories but are distinguishable:
+            # - cell_id contains '/ac-'  (tool-generated AC)
+            # - align=left style without aspect=fixed  (wider text boxes)
+            # - NOT square (width != height, typically 250x60)
+            if fill_color == '#fff2cc':
+                if '/ac-' in cell_id:
+                    return None  # AC box, not a story
+                sd = style_dict or {}
+                if (sd.get('align') == 'left'
+                        and 'aspect' not in sd
+                        and width > 0 and height > 0
+                        and abs(width - height) > 10):
+                    return None  # User-created or loaded AC box
             story_type = 'user'
             if fill_color == '#1a237e':
                 story_type = 'system'
