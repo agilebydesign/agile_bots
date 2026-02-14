@@ -1,6 +1,8 @@
 {
-  "type": "showAll",
-  "value": [],
+  "type": "story",
+  "value": [
+    "Synchronized Graph with Rendered Diagram Content"
+  ],
   "exclude": [],
   "skiprule": []
 }

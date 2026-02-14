@@ -2431,6 +2431,14 @@ class TestRenamePairingByIdType:
 
 class TestUpdateStoryGraphFromMapAcceptanceCriteria:
 
+    def _given_exploration_with_ac(self, helper):
+        """Shared setup: render exploration from story map with AC data."""
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+        return data, original_map, drawio_map
+
     def test_extract_exploration_maps_ac_boxes_to_stories_by_position_and_containment(self, tmp_path):
         helper = BotTestHelper(tmp_path)
         drawio_file = helper.drawio_story_map.create_drawio_file()
@@ -2443,6 +2451,122 @@ class TestUpdateStoryGraphFromMapAcceptanceCriteria:
         for sub_epic in sub_epics:
             for story in sub_epic.get_stories():
                 assert sub_epic.boundary.contains_position(story.boundary.center)
+
+    def test_when_then_ac_text_extracted_as_step_descriptions(self, tmp_path):
+        """AC box with When/Then text has step description extracted
+        and associated with the containing story."""
+        helper = BotTestHelper(tmp_path)
+        data, original_map, drawio_map = self._given_exploration_with_ac(helper)
+
+        ac_assignments = drawio_map.extract_ac_assignments()
+
+        lc_ac = ac_assignments.get('Load Config', [])
+        assert len(lc_ac) >= 1, "Load Config should have extracted AC"
+        assert any('config file exists' in ac for ac in lc_ac), \
+            f"Should extract When/Then text from AC box, got {lc_ac}"
+
+    def test_merge_preserves_original_ac_for_matched_stories_from_exploration_view(self, tmp_path):
+        """Update from exploration preserves original AC and steps
+        for matched stories -- extracted AC does not overwrite."""
+        import copy
+        from actions.render.render_action import RenderOutputAction
+
+        helper = BotTestHelper(tmp_path)
+        data, original_map, drawio_map = self._given_exploration_with_ac(helper)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        graph_data = copy.deepcopy(data)
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        for ac_change in report.ac_changes:
+            action._apply_ac_change(graph_data, ac_change)
+
+        lc = next(s for e in graph_data['epics']
+                  for se in e['sub_epics']
+                  for sg in se['story_groups']
+                  for s in sg['stories'] if s['name'] == 'Load Config')
+        lc_texts = [ac.get('name', '') for ac in lc['acceptance_criteria']]
+        assert 'When config file exists then system loads settings' in lc_texts, \
+            "Original AC should be preserved after merge"
+        assert 'When config file missing then system uses defaults' in lc_texts, \
+            "Original AC should be preserved after merge"
+
+    def test_added_or_removed_ac_boxes_reflected_in_extracted_graph_and_update_report(self, tmp_path):
+        """New AC boxes appear as added; removed AC boxes appear as removed
+        in the UpdateReport."""
+        from synchronizers.story_io.drawio_element import DrawIOElement
+
+        helper = BotTestHelper(tmp_path)
+        data, original_map, drawio_map = self._given_exploration_with_ac(helper)
+
+        # Add AC to Register Behaviors (has none)
+        reg_story = next(s for s in drawio_map.get_stories()
+                         if s.name == 'Register Behaviors')
+        new_ac = DrawIOElement(
+            cell_id=f'{reg_story.cell_id}/ac-0',
+            value='When behavior registered then it appears in list')
+        new_ac.apply_style_for_type('acceptance_criteria')
+        new_ac.set_position(reg_story.position.x, reg_story.position.y + 60)
+        new_ac.set_size(250, 60)
+        reg_story._ac_elements.append(new_ac)
+
+        # Remove one AC from Load Config
+        lc_story = next(s for s in drawio_map.get_stories()
+                        if s.name == 'Load Config')
+        if lc_story._ac_elements:
+            lc_story._ac_elements.pop(0)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        ac_added = [c for c in report.ac_changes if c.story_name == 'Register Behaviors']
+        assert len(ac_added) >= 1, "Should detect added AC for Register Behaviors"
+
+        ac_removed = [c for c in report.ac_changes if c.story_name == 'Load Config']
+        assert len(ac_removed) >= 1, "Should detect removed AC for Load Config"
+
+    def test_ac_cells_assigned_to_stories_by_vertical_position_below_story_cells(self, tmp_path):
+        """Multiple stories with AC boxes: each AC is assigned to the
+        story it is contained below based on vertical position."""
+        helper = BotTestHelper(tmp_path)
+        data, original_map, drawio_map = self._given_exploration_with_ac(helper)
+
+        ac_assignments = drawio_map.extract_ac_assignments()
+
+        # Load Config has AC, Register Behaviors does not
+        assert 'Load Config' in ac_assignments, \
+            "AC boxes should be assigned to Load Config by position"
+        assert 'Register Behaviors' not in ac_assignments, \
+            "Register Behaviors has no AC boxes"
+
+        # Verify AC count matches what was rendered
+        lc_ac = ac_assignments['Load Config']
+        assert len(lc_ac) == 2, \
+            f"Load Config has 2 AC in data, should extract 2, got {len(lc_ac)}"
+
+    def test_ac_box_text_not_in_when_then_format_treated_as_plain_acceptance_criteria(self, tmp_path):
+        """AC box with text not in When/Then format is treated as plain
+        acceptance_criteria description without step extraction."""
+        from synchronizers.story_io.drawio_element import DrawIOElement
+
+        helper = BotTestHelper(tmp_path)
+        data, original_map, drawio_map = self._given_exploration_with_ac(helper)
+
+        # Add a plain-text AC (no When/Then)
+        lc_story = next(s for s in drawio_map.get_stories()
+                        if s.name == 'Load Config')
+        plain_ac = DrawIOElement(
+            cell_id=f'{lc_story.cell_id}/ac-99',
+            value='Config validation rules apply')
+        plain_ac.apply_style_for_type('acceptance_criteria')
+        plain_ac.set_position(lc_story.position.x, lc_story.position.y + 200)
+        plain_ac.set_size(250, 60)
+        lc_story._ac_elements.append(plain_ac)
+
+        ac_assignments = drawio_map.extract_ac_assignments()
+
+        lc_ac = ac_assignments.get('Load Config', [])
+        assert 'Config validation rules apply' in lc_ac, \
+            f"Plain text AC should be extracted, got {lc_ac}"
 
 
 class TestAcceptanceCriteriaDelta:
