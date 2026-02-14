@@ -2146,6 +2146,49 @@ class StoryMap:
                 concepts.extend(epic.domain_concepts)
         return concepts
 
+    def filter_by_name(self, name: str) -> Optional['StoryMap']:
+        """Return a new StoryMap containing only the subtree rooted at
+        the node with the given name.  The returned StoryMap preserves
+        the epic/sub-epic hierarchy leading to the matched node.
+
+        Returns None if no node with that name is found.
+        """
+        node = self.find_node(name)
+        if not node:
+            return None
+
+        if isinstance(node, Epic):
+            return StoryMap({'epics': [self._epic_to_dict(node)]})
+
+        # Walk up to find the containing epic and build a filtered graph
+        # that includes only the path to this node.
+        for epic in self._epics_list:
+            for child in self.walk(epic):
+                if child.name == name:
+                    # Found it -- rebuild the epic with only this subtree
+                    if isinstance(node, SubEpic):
+                        filtered_epic = dict(self._epic_to_dict(epic))
+                        filtered_epic['sub_epics'] = [
+                            self._sub_epic_to_dict(node)]
+                        filtered_epic['story_groups'] = []
+                        return StoryMap({'epics': [filtered_epic]})
+                    elif isinstance(node, Story):
+                        # Find the parent sub-epic
+                        for se_child in epic.children:
+                            if isinstance(se_child, SubEpic):
+                                for s in se_child.all_stories:
+                                    if s.name == name:
+                                        filtered_se = dict(
+                                            self._sub_epic_to_dict(se_child))
+                                        filtered_epic = dict(
+                                            self._epic_to_dict(epic))
+                                        filtered_epic['sub_epics'] = [
+                                            filtered_se]
+                                        filtered_epic['story_groups'] = []
+                                        return StoryMap(
+                                            {'epics': [filtered_epic]})
+        return None
+
     def filter_by_epic_names(self, epic_names: set) -> 'StoryMap':
         filtered_epics = [e for e in self._epics_list if e.name in epic_names]
         filtered_graph = {'epics': [self._epic_to_dict(e) for e in filtered_epics]}

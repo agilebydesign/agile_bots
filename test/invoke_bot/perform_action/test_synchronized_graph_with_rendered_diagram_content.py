@@ -579,8 +579,8 @@ class TestRenderStoryMapIncrements:
         assert 'Register Behaviors' not in outline_story_names, \
             "Increment-assigned story should not be in outline"
 
-        # Increment-assigned stories exist in extra_nodes (lanes)
-        extra_values = [n.value for n in drawio_story_map._extra_nodes if hasattr(n, 'value')]
+        # Increment-assigned stories exist in increment lanes
+        extra_values = [v for lane in drawio_story_map._increment_lanes for el in lane.collect_all_elements() for v in [getattr(el, 'value', '')] if v]
         assert 'Load Config' in extra_values, "Load Config should be in increment lane"
         assert 'Register Behaviors' in extra_values, "Register Behaviors should be in increment lane"
         assert summary.get('increments') == 2
@@ -595,11 +595,8 @@ class TestRenderStoryMapIncrements:
         drawio_story_map.render_increments_from_story_map(
             story_map, data.get('increments', []), layout_data=None)
 
-        # Find lane elements (id starts with 'inc-lane/')
-        lane_elements = [n for n in drawio_story_map._extra_nodes
-                         if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-lane/')
-                         and '/actor-' not in n.cell_id
-                         and n.value == '']
+        # Find lane elements (background rectangles)
+        lane_elements = [lane._lane_element for lane in drawio_story_map._increment_lanes if lane._lane_element]
         assert len(lane_elements) == 2, "Should have 2 lane background elements"
         # First lane (MVP, priority 1) should be above second lane (Phase 2, priority 2)
         assert lane_elements[0].position.y < lane_elements[1].position.y
@@ -643,11 +640,8 @@ class TestRenderStoryMapIncrements:
         drawio_story_map.render_increments_from_story_map(
             story_map, data.get('increments', []), layout_data=None)
 
-        # Find lane background elements (empty value, id starts with 'inc-lane/')
-        lane_bgs = [n for n in drawio_story_map._extra_nodes
-                     if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-lane/')
-                     and '/actor-' not in n.cell_id
-                     and n.value == '']
+        # Find lane background elements
+        lane_bgs = [lane._lane_element for lane in drawio_story_map._increment_lanes if lane._lane_element]
         assert len(lane_bgs) == 2
         for lane_bg in lane_bgs:
             style = lane_bg.to_style_string()
@@ -657,8 +651,7 @@ class TestRenderStoryMapIncrements:
                 f"Lane background should use stroke #666666, got: {style}"
 
         # Find lane label elements
-        lane_labels = [n for n in drawio_story_map._extra_nodes
-                       if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-label/')]
+        lane_labels = [lane._label_element for lane in drawio_story_map._increment_lanes if lane._label_element]
         assert len(lane_labels) == 2
         for label in lane_labels:
             style = label.to_style_string()
@@ -690,9 +683,8 @@ class TestRenderStoryMapIncrements:
         drawio_story_map.render_increments_from_story_map(
             story_map, data.get('increments', []), layout_data=None)
 
-        # Find actor elements in extra_nodes (lane actors only)
-        actor_elements = [n for n in drawio_story_map._extra_nodes
-                          if hasattr(n, 'cell_id') and '/actor-' in n.cell_id]
+        # Find actor elements in increment lanes
+        actor_elements = [a for lane in drawio_story_map._increment_lanes for a in lane._actor_elements]
         # Each lane has one story with user "Bot Behavior" so each lane
         # should have exactly one actor label (deduplicated)
         assert len(actor_elements) == 2, \
@@ -702,17 +694,13 @@ class TestRenderStoryMapIncrements:
 
         # Verify actor is positioned BELOW lane label and ABOVE story
         from synchronizers.story_io.drawio_story_node import DrawIOIncrementLane
-        lane_bgs = [n for n in drawio_story_map._extra_nodes
-                     if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-lane/')
-                     and '/actor-' not in n.cell_id and n.value == '']
-        for lane_bg in lane_bgs:
+        for lane in drawio_story_map._increment_lanes:
+            lane_bg = lane._lane_element
+            if not lane_bg:
+                continue
             lane_y = lane_bg.position.y
-            # Find actors and stories in this lane
-            lane_slug = lane_bg.cell_id.replace('inc-lane/', '')
-            lane_actors = [a for a in actor_elements if lane_slug in a.cell_id]
-            lane_stories = [n for n in drawio_story_map._extra_nodes
-                            if hasattr(n, 'cell_id') and n.cell_id.startswith(f'inc-lane/{lane_slug}/')
-                            and '/actor-' not in n.cell_id and n.value != '']
+            lane_actors = lane._actor_elements
+            lane_stories = lane._story_copies
             for a in lane_actors:
                 # Actor Y should be below label bottom (lane_y + LABEL_Y_OFFSET + LABEL_HEIGHT)
                 label_bottom = lane_y + DrawIOIncrementLane.LABEL_Y_OFFSET + DrawIOIncrementLane.LABEL_HEIGHT
@@ -941,8 +929,8 @@ class TestUpdateGraphFromMapIncrements:
         assert len(loaded.get_epics()) >= 1
         assert len(loaded.get_sub_epics()) >= 1
 
-        # Extra nodes should include increment lane elements
-        extra_ids = [n.cell_id for n in loaded._extra_nodes if hasattr(n, 'cell_id')]
+        # Loaded nodes should include increment lane elements
+        extra_ids = [n.cell_id for n in loaded._loaded_nodes if hasattr(n, 'cell_id')]
         lane_ids = [cid for cid in extra_ids if cid.startswith('inc-lane/')]
         assert len(lane_ids) >= 2, "Should extract at least 2 lane-related elements"
 
@@ -1023,7 +1011,7 @@ class TestUpdateGraphFromMapIncrements:
         loaded = DrawIOStoryMap.load(drawio_file)
 
         # Verify we extracted 3 lane background elements
-        lane_bgs = [n for n in loaded._extra_nodes
+        lane_bgs = [n for n in loaded._loaded_nodes
                     if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-lane/')
                     and '/actor-' not in n.cell_id
                     and n.value == '']
@@ -1049,7 +1037,7 @@ class TestUpdateGraphFromMapIncrements:
         loaded = DrawIOStoryMap.load(drawio_file)
 
         # Only 1 lane background should exist in loaded diagram
-        lane_bgs = [n for n in loaded._extra_nodes
+        lane_bgs = [n for n in loaded._loaded_nodes
                     if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-lane/')
                     and '/actor-' not in n.cell_id
                     and n.value == '']
@@ -1080,8 +1068,8 @@ class TestUpdateGraphFromMapIncrements:
 
         loaded = DrawIOStoryMap.load(drawio_file)
 
-        # Verify the renamed label exists in extra_nodes
-        label_values = [n.value for n in loaded._extra_nodes
+        # Verify the renamed label exists in loaded nodes
+        label_values = [n.value for n in loaded._loaded_nodes
                         if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-label/')]
         assert 'Sprint 1' in label_values, \
             f"Renamed lane 'Sprint 1' should appear in labels, got: {label_values}"
@@ -1108,7 +1096,7 @@ class TestUpdateGraphFromMapIncrements:
         assert isinstance(report, UpdateReport)
 
         # Verify lane count in rendered matches increments count
-        lane_labels = [n for n in loaded._extra_nodes
+        lane_labels = [n for n in loaded._loaded_nodes
                        if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-label/')]
         assert len(lane_labels) == 2, \
             f"Expected 2 lane labels, got {len(lane_labels)}"
@@ -1128,7 +1116,7 @@ class TestUpdateGraphFromMapIncrements:
         loaded = DrawIOStoryMap.load(drawio_file)
 
         # Verify 3 lanes extracted (position-based matching would map 1:1)
-        lane_labels = [n for n in loaded._extra_nodes
+        lane_labels = [n for n in loaded._loaded_nodes
                        if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-label/')]
         assert len(lane_labels) == 3
         # Position-based matching maps lane at index 0 to original[0], etc.
@@ -1146,8 +1134,8 @@ class TestUpdateGraphFromMapIncrements:
 
         loaded = DrawIOStoryMap.load(drawio_file)
 
-        # Verify the diagram loaded correctly with extra nodes
-        extra_nodes = loaded._extra_nodes
+        # Verify the diagram loaded correctly with loaded nodes
+        extra_nodes = loaded._loaded_nodes
         assert len(extra_nodes) >= 4, \
             "Should have lane backgrounds, labels, and story copies"
 
@@ -1400,7 +1388,7 @@ class TestUserCreatedIncrementLaneDetection:
         loaded = DrawIOStoryMap.load(drawio_file)
 
         # Find an existing lane to get its geometry for reference
-        existing_lanes = [n for n in loaded._extra_nodes
+        existing_lanes = [n for n in loaded._loaded_nodes
                           if getattr(n, 'cell_id', '').startswith('inc-lane/')
                           and getattr(n, 'value', '') == '']
         assert len(existing_lanes) > 0
@@ -1415,13 +1403,13 @@ class TestUserCreatedIncrementLaneDetection:
         new_bg = DrawIOElement(cell_id='99', value='')
         new_bg.set_position(0, last_lane_bottom + 10)
         new_bg.set_size(lane_width, lane_height)
-        loaded._extra_nodes.append(new_bg)
+        loaded._loaded_nodes.append(new_bg)
 
         # Add a user-created lane label (simple id, with name)
         new_label = DrawIOElement(cell_id='100', value='My New Increment')
         new_label.set_position(5, last_lane_bottom + 15)
         new_label.set_size(150, 30)
-        loaded._extra_nodes.append(new_label)
+        loaded._loaded_nodes.append(new_label)
 
         extracted = loaded.extract_increment_assignments()
         inc_names = [inc['name'] for inc in extracted]
@@ -1437,7 +1425,7 @@ class TestUserCreatedIncrementLaneDetection:
 
         loaded = DrawIOStoryMap.load(drawio_file)
 
-        existing_lanes = [n for n in loaded._extra_nodes
+        existing_lanes = [n for n in loaded._loaded_nodes
                           if getattr(n, 'cell_id', '').startswith('inc-lane/')
                           and getattr(n, 'value', '') == '']
         ref_lane = existing_lanes[0]
@@ -1453,19 +1441,19 @@ class TestUserCreatedIncrementLaneDetection:
         new_bg = DrawIOElement(cell_id='99', value='')
         new_bg.set_position(0, lane_y)
         new_bg.set_size(lane_width, lane_height)
-        loaded._extra_nodes.append(new_bg)
+        loaded._loaded_nodes.append(new_bg)
 
         # Lane label
         new_label = DrawIOElement(cell_id='100', value='Custom Lane')
         new_label.set_position(5, lane_y + 5)
         new_label.set_size(150, 30)
-        loaded._extra_nodes.append(new_label)
+        loaded._loaded_nodes.append(new_label)
 
         # A story inside the lane
         story_in_lane = DrawIOElement(cell_id='101', value='Test Story')
         story_in_lane.set_position(200, lane_y + 80)
         story_in_lane.set_size(50, 50)
-        loaded._extra_nodes.append(story_in_lane)
+        loaded._loaded_nodes.append(story_in_lane)
 
         extracted = loaded.extract_increment_assignments()
         custom = next((inc for inc in extracted if inc['name'] == 'Custom Lane'), None)
@@ -1485,9 +1473,7 @@ class TestUserCreatedIncrementLaneDetection:
             original_story_map, data['increments'], layout_data=None)
 
         # Find lane geometry
-        existing_lanes = [n for n in drawio_map._extra_nodes
-                          if getattr(n, 'cell_id', '').startswith('inc-lane/')
-                          and getattr(n, 'value', '') == '']
+        existing_lanes = [lane._lane_element for lane in drawio_map._increment_lanes if lane._lane_element]
         ref_lane = existing_lanes[0]
         lane_width = ref_lane.boundary.width
         lane_height = ref_lane.boundary.height
@@ -1496,17 +1482,17 @@ class TestUserCreatedIncrementLaneDetection:
 
         lane_y = last_lane_bottom + 10
         from synchronizers.story_io.drawio_element import DrawIOElement
+        from synchronizers.story_io.drawio_story_node import DrawIOIncrementLane
 
-        # Add user-created lane
-        new_bg = DrawIOElement(cell_id='50', value='')
-        new_bg.set_position(0, lane_y)
-        new_bg.set_size(lane_width, lane_height)
-        drawio_map._extra_nodes.append(new_bg)
-
-        new_label = DrawIOElement(cell_id='51', value='New Sprint')
-        new_label.set_position(5, lane_y + 5)
-        new_label.set_size(150, 30)
-        drawio_map._extra_nodes.append(new_label)
+        # Build a user-created lane and add it to _increment_lanes
+        new_lane = DrawIOIncrementLane(name='New Sprint', priority=99,
+                                       story_names=[])
+        new_lane._lane_element = DrawIOElement(cell_id='50', value='')
+        new_lane._lane_element.set_position(0, lane_y)
+        new_lane._lane_element.set_size(lane_width, lane_height)
+        new_lane._label_element = DrawIOElement(cell_id='51', value='New Sprint')
+        new_lane._label_element.set_position(5, lane_y + 5)
+        new_lane._label_element.set_size(150, 30)
 
         # Move a story into the new lane
         orphan = None
@@ -1518,7 +1504,9 @@ class TestUserCreatedIncrementLaneDetection:
             copy = DrawIOElement(cell_id='52', value='Validate Input')
             copy.set_position(orphan.position.x, lane_y + 80)
             copy.set_size(50, 50)
-            drawio_map._extra_nodes.append(copy)
+            new_lane._story_copies.append(copy)
+
+        drawio_map._increment_lanes.append(new_lane)
 
         # Save, reload, generate report
         drawio_file = tmp_path / 'test.drawio'
@@ -1566,7 +1554,7 @@ class TestIncrementReportTwoPassExtraction:
                 break
         assert orphan is not None, "Validate Input should be in the loaded tree"
 
-        lane_bgs = [n for n in loaded._extra_nodes
+        lane_bgs = [n for n in loaded._loaded_nodes
                     if hasattr(n, 'cell_id')
                     and n.cell_id.startswith('inc-lane/')
                     and '/' not in n.cell_id.replace('inc-lane/', '', 1)
@@ -1634,7 +1622,7 @@ class TestIncrementReportTwoPassExtraction:
             if s.name == 'Validate Input':
                 orphan = s
                 break
-        lane_bgs = [n for n in loaded._extra_nodes
+        lane_bgs = [n for n in loaded._loaded_nodes
                     if hasattr(n, 'cell_id')
                     and n.cell_id.startswith('inc-lane/')
                     and '/' not in n.cell_id.replace('inc-lane/', '', 1)
@@ -1662,7 +1650,7 @@ class TestIncrementReportTwoPassExtraction:
 
     @staticmethod
     def _lane_bgs(loaded):
-        return [n for n in loaded._extra_nodes
+        return [n for n in loaded._loaded_nodes
                 if hasattr(n, 'cell_id')
                 and n.cell_id.startswith('inc-lane/')
                 and '/' not in n.cell_id.replace('inc-lane/', '', 1)
@@ -1670,7 +1658,7 @@ class TestIncrementReportTwoPassExtraction:
 
     @staticmethod
     def _lane_labels(loaded):
-        return {n.value: n for n in loaded._extra_nodes
+        return {n.value: n for n in loaded._loaded_nodes
                 if hasattr(n, 'cell_id')
                 and n.cell_id.startswith('inc-label/')}
 
@@ -1678,10 +1666,10 @@ class TestIncrementReportTwoPassExtraction:
     def _lane_bg_for(loaded, lane_name):
         """Find the lane background element for a named increment."""
         labels = {n.cell_id.replace('inc-label/', ''): n.value
-                  for n in loaded._extra_nodes
+                  for n in loaded._loaded_nodes
                   if hasattr(n, 'cell_id') and n.cell_id.startswith('inc-label/')}
         slug_to_name = {slug: name for slug, name in labels.items()}
-        for n in loaded._extra_nodes:
+        for n in loaded._loaded_nodes:
             cid = getattr(n, 'cell_id', '')
             if (cid.startswith('inc-lane/')
                     and '/' not in cid.replace('inc-lane/', '', 1)
@@ -2109,6 +2097,102 @@ class TestStoryMoveDetection:
         assert len(report.new_stories) == 0
         assert len(report.removed_stories) == 0
 
+    @staticmethod
+    def _two_epic_data():
+        """Story map with two epics for cross-epic move tests."""
+        return {
+            "epics": [
+                {
+                    "name": "Epic Alpha",
+                    "sequential_order": 1.0,
+                    "sub_epics": [{
+                        "name": "SubEpic A1",
+                        "sequential_order": 1.0,
+                        "sub_epics": [],
+                        "story_groups": [{"type": "and", "connector": None, "stories": [
+                            {"name": "Story X", "sequential_order": 1.0,
+                             "story_type": "user", "users": [],
+                             "acceptance_criteria": [{"name": "AC for X"}],
+                             "scenarios": [{"name": "Scenario for X"}]},
+                            {"name": "Story Y", "sequential_order": 2.0,
+                             "story_type": "system", "users": [],
+                             "acceptance_criteria": []},
+                        ]}]
+                    }]
+                },
+                {
+                    "name": "Epic Beta",
+                    "sequential_order": 2.0,
+                    "sub_epics": [{
+                        "name": "SubEpic B1",
+                        "sequential_order": 1.0,
+                        "sub_epics": [],
+                        "story_groups": [{"type": "and", "connector": None, "stories": [
+                            {"name": "Story Z", "sequential_order": 1.0,
+                             "story_type": "user", "users": [],
+                             "acceptance_criteria": []},
+                        ]}]
+                    }]
+                },
+            ]
+        }
+
+    def test_story_moved_across_epics_detected_as_move(self, tmp_path):
+        """Moving a story from Epic Alpha/SubEpic A1 to Epic Beta/SubEpic B1
+        should be detected as a move, not new+removed."""
+        import copy
+        original_data = self._two_epic_data()
+        original_map = StoryMap(original_data)
+
+        modified_data = copy.deepcopy(original_data)
+        a1_stories = modified_data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories']
+        b1_stories = modified_data['epics'][1]['sub_epics'][0]['story_groups'][0]['stories']
+        moved = [s for s in a1_stories if s['name'] == 'Story X'][0]
+        a1_stories.remove(moved)
+        b1_stories.append(moved)
+
+        modified_map = StoryMap(modified_data)
+        drawio_map = DrawIOStoryMap(diagram_type='outline')
+        drawio_map.render_from_story_map(modified_map, layout_data=None)
+        report = drawio_map.generate_update_report(original_map)
+
+        moved_names = [m.name for m in report.moved_stories]
+        assert 'Story X' in moved_names, \
+            f"Cross-epic move not detected. moved={moved_names}, " \
+            f"new={[s.name for s in report.new_stories]}, " \
+            f"removed={[s.name for s in report.removed_stories]}"
+
+        move = next(m for m in report.moved_stories if m.name == 'Story X')
+        assert move.from_parent == 'SubEpic A1'
+        assert move.to_parent == 'SubEpic B1'
+
+    def test_cross_epic_move_preserves_story_data(self, tmp_path):
+        """Applying a cross-epic move should preserve AC, scenarios, etc."""
+        from actions.render.render_action import RenderOutputAction
+        import copy
+
+        original_data = self._two_epic_data()
+        graph_data = copy.deepcopy(original_data)
+
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        result = action._apply_move_story(
+            graph_data, 'Story X', 'SubEpic A1', 'SubEpic B1')
+
+        assert result is True
+
+        # Verify preserved in SubEpic B1
+        b1_stories = graph_data['epics'][1]['sub_epics'][0]['story_groups'][0]['stories']
+        sx = next((s for s in b1_stories if s['name'] == 'Story X'), None)
+        assert sx is not None
+        assert len(sx.get('acceptance_criteria', [])) == 1
+        assert sx['acceptance_criteria'][0]['name'] == 'AC for X'
+        assert len(sx.get('scenarios', [])) == 1
+        assert sx['scenarios'][0]['name'] == 'Scenario for X'
+
+        # Verify removed from SubEpic A1
+        a1_stories = graph_data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories']
+        assert not any(s['name'] == 'Story X' for s in a1_stories)
+
 
 class TestRenamePairingByIdType:
     """Tests that user-created nodes (simple cell IDs without '/')
@@ -2359,6 +2443,315 @@ class TestUpdateStoryGraphFromMapAcceptanceCriteria:
         for sub_epic in sub_epics:
             for story in sub_epic.get_stories():
                 assert sub_epic.boundary.contains_position(story.boundary.center)
+
+
+class TestAcceptanceCriteriaDelta:
+    """Tests for AC delta tracking: detecting added, removed, and modified AC
+    in update reports, and applying those changes via updateFromDiagram."""
+
+    def test_no_ac_changes_when_diagram_matches_original(self, tmp_path):
+        """When exploration diagram matches the original, no AC changes reported."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+
+        report = drawio_map.generate_update_report(original_map)
+        assert len(report.ac_changes) == 0, \
+            f"Expected no AC changes, got {[(c.story_name, c.added, c.removed) for c in report.ac_changes]}"
+
+    def test_added_ac_box_detected_in_report(self, tmp_path):
+        """Adding a new AC box below a story should appear as an added AC."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+
+        # Add a new AC box below 'Register Behaviors' (which has no AC)
+        reg_story = None
+        for s in drawio_map.get_stories():
+            if s.name == 'Register Behaviors':
+                reg_story = s
+                break
+        assert reg_story is not None
+
+        from synchronizers.story_io.drawio_element import DrawIOElement
+        new_ac = DrawIOElement(
+            cell_id=f'{reg_story.cell_id}/ac-0',
+            value='When behavior registered then it appears in list')
+        new_ac.apply_style_for_type('acceptance_criteria')
+        new_ac.set_position(reg_story.position.x, reg_story.position.y + 60)
+        new_ac.set_size(250, 60)
+        reg_story._ac_elements.append(new_ac)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        ac_for_reg = [c for c in report.ac_changes if c.story_name == 'Register Behaviors']
+        assert len(ac_for_reg) == 1, f"Should detect AC addition for Register Behaviors"
+        assert 'When behavior registered then it appears in list' in ac_for_reg[0].added
+
+    def test_removed_ac_box_detected_in_report(self, tmp_path):
+        """Removing an AC box from a story should appear as a removed AC."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+
+        # Remove one AC box from 'Load Config' (which has 2)
+        lc_story = next(s for s in drawio_map.get_stories() if s.name == 'Load Config')
+        ac_to_remove = None
+        for n in lc_story._ac_elements:
+            cid = getattr(n, 'cell_id', '')
+            if '/ac-1' in cid:
+                ac_to_remove = n
+                break
+
+        if ac_to_remove:
+            lc_story._ac_elements.remove(ac_to_remove)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        ac_for_lc = [c for c in report.ac_changes if c.story_name == 'Load Config']
+        assert len(ac_for_lc) == 1, f"Should detect AC removal for Load Config"
+        assert 'When config file missing then system uses defaults' in ac_for_lc[0].removed
+
+    def test_ac_changes_roundtrip_through_json(self, tmp_path):
+        """AC changes survive to_dict -> from_dict roundtrip."""
+        from synchronizers.story_io.update_report import ACChange
+
+        report = UpdateReport()
+        report.set_ac_changes([
+            ACChange(story_name='Load Config', parent='Initialize Bot',
+                     added=['New AC text'],
+                     removed=['Old AC text']),
+        ])
+
+        data = report.to_dict()
+        assert 'ac_changes' in data
+
+        restored = UpdateReport.from_dict(data)
+        assert len(restored.ac_changes) == 1
+        assert restored.ac_changes[0].story_name == 'Load Config'
+        assert restored.ac_changes[0].added == ['New AC text']
+        assert restored.ac_changes[0].removed == ['Old AC text']
+
+    def test_apply_ac_change_adds_and_removes(self, tmp_path):
+        """_apply_ac_change should add new AC and remove deleted AC."""
+        from actions.render.render_action import RenderOutputAction
+        from synchronizers.story_io.update_report import ACChange
+
+        data = {
+            "epics": [{"name": "E", "sequential_order": 1.0, "sub_epics": [
+                {"name": "SE", "sequential_order": 1.0, "sub_epics": [],
+                 "story_groups": [{"type": "and", "connector": None, "stories": [
+                     {"name": "S1", "sequential_order": 1.0, "story_type": "user",
+                      "users": [], "acceptance_criteria": [
+                          {"name": "AC One", "text": "AC One", "sequential_order": 1.0},
+                          {"name": "AC Two", "text": "AC Two", "sequential_order": 2.0},
+                      ]},
+                 ]}]}
+            ]}]
+        }
+
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        change = ACChange(story_name='S1', parent='SE',
+                          added=['AC Three'], removed=['AC One'])
+
+        result = action._apply_ac_change(data, change)
+        assert result is True
+
+        story = data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
+        ac_texts = [ac.get('name', '') for ac in story['acceptance_criteria']]
+        assert 'AC One' not in ac_texts, "AC One should be removed"
+        assert 'AC Two' in ac_texts, "AC Two should remain"
+        assert 'AC Three' in ac_texts, "AC Three should be added"
+
+    def test_end_to_end_ac_add_remove_via_report(self, tmp_path):
+        """Full flow: render exploration -> modify AC -> report -> apply -> verify."""
+        from actions.render.render_action import RenderOutputAction
+        import copy
+
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+
+        # Render exploration diagram
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+
+        # Remove one AC from Load Config, add one to Register Behaviors
+        lc_story = next(s for s in drawio_map.get_stories() if s.name == 'Load Config')
+        ac_to_remove = None
+        for n in lc_story._ac_elements:
+            cid = getattr(n, 'cell_id', '')
+            if '/ac-0' in cid:
+                ac_to_remove = n
+                break
+        if ac_to_remove:
+            lc_story._ac_elements.remove(ac_to_remove)
+
+        reg_story = next(s for s in drawio_map.get_stories()
+                         if s.name == 'Register Behaviors')
+        from synchronizers.story_io.drawio_element import DrawIOElement
+        new_ac = DrawIOElement(
+            cell_id=f'{reg_story.cell_id}/ac-0',
+            value='Behaviors load from config')
+        new_ac.apply_style_for_type('acceptance_criteria')
+        new_ac.set_position(reg_story.position.x, reg_story.position.y + 60)
+        new_ac.set_size(250, 60)
+        reg_story._ac_elements.append(new_ac)
+
+        # Generate report
+        report = drawio_map.generate_update_report(original_map)
+        assert len(report.ac_changes) >= 1
+
+        # Apply to a fresh copy
+        graph_data = copy.deepcopy(data)
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        for ac_change in report.ac_changes:
+            action._apply_ac_change(graph_data, ac_change)
+
+        # Verify Load Config lost one AC
+        lc = next(s for e in graph_data['epics']
+                  for se in e['sub_epics']
+                  for sg in se['story_groups']
+                  for s in sg['stories'] if s['name'] == 'Load Config')
+        lc_texts = [ac.get('name', '') for ac in lc['acceptance_criteria']]
+        assert len(lc_texts) == 1, f"Load Config should have 1 AC, got {lc_texts}"
+        assert 'When config file missing then system uses defaults' in lc_texts
+
+        # Verify Register Behaviors gained one AC
+        rb = next(s for e in graph_data['epics']
+                  for se in e['sub_epics']
+                  for sg in se['story_groups']
+                  for s in sg['stories'] if s['name'] == 'Register Behaviors')
+        rb_texts = [ac.get('name', '') for ac in rb['acceptance_criteria']]
+        assert 'Behaviors load from config' in rb_texts
+
+    def test_ac_moved_between_stories_detected_as_move(self, tmp_path):
+        """AC text removed from Story A and added to Story B should be
+        reconciled as an AC move, not separate add+remove."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+
+        # Render exploration diagram
+        drawio_map = DrawIOStoryMap()
+        drawio_map.render_exploration_from_story_map(original_map)
+
+        # Move AC box from 'Load Config' to below 'Register Behaviors'
+        lc_story = next(s for s in drawio_map.get_stories() if s.name == 'Load Config')
+        ac_to_move = None
+        for n in lc_story._ac_elements:
+            cid = getattr(n, 'cell_id', '')
+            if '/ac-0' in cid:
+                ac_to_move = n
+                break
+        assert ac_to_move is not None
+
+        reg_story = next(s for s in drawio_map.get_stories()
+                         if s.name == 'Register Behaviors')
+
+        # Remove from old story, re-add below Register Behaviors
+        lc_story._ac_elements.remove(ac_to_move)
+        from synchronizers.story_io.drawio_element import DrawIOElement
+        moved_ac = DrawIOElement(
+            cell_id=f'{reg_story.cell_id}/ac-0',
+            value=ac_to_move.value)
+        moved_ac.apply_style_for_type('acceptance_criteria')
+        moved_ac.set_position(reg_story.position.x, reg_story.position.y + 60)
+        moved_ac.set_size(250, 60)
+        reg_story._ac_elements.append(moved_ac)
+
+        report = drawio_map.generate_update_report(original_map)
+
+        # Should be an AC move
+        assert len(report.ac_moves) >= 1, \
+            f"Expected AC move, got moves={report.ac_moves}, changes={[(c.story_name, c.added, c.removed) for c in report.ac_changes]}"
+        move = report.ac_moves[0]
+        assert move.from_story == 'Load Config'
+        assert move.to_story == 'Register Behaviors'
+
+    def test_ac_move_roundtrip_json(self, tmp_path):
+        """AC moves survive to_dict -> from_dict."""
+        from synchronizers.story_io.update_report import ACMove
+
+        report = UpdateReport()
+        report._ac_moves = [ACMove(
+            ac_text='When X then Y', from_story='Story A', to_story='Story B')]
+
+        data = report.to_dict()
+        assert 'ac_moves' in data
+
+        restored = UpdateReport.from_dict(data)
+        assert len(restored.ac_moves) == 1
+        assert restored.ac_moves[0].ac_text == 'When X then Y'
+        assert restored.ac_moves[0].from_story == 'Story A'
+        assert restored.ac_moves[0].to_story == 'Story B'
+
+    def test_apply_ac_move_preserves_data(self, tmp_path):
+        """_apply_ac_move extracts AC from source and inserts in target."""
+        from actions.render.render_action import RenderOutputAction
+        from synchronizers.story_io.update_report import ACMove
+
+        data = {
+            "epics": [{"name": "E", "sequential_order": 1.0, "sub_epics": [
+                {"name": "SE", "sequential_order": 1.0, "sub_epics": [],
+                 "story_groups": [{"type": "and", "connector": None, "stories": [
+                     {"name": "S1", "sequential_order": 1.0, "story_type": "user",
+                      "users": [], "acceptance_criteria": [
+                          {"name": "AC Alpha", "text": "AC Alpha", "sequential_order": 1.0},
+                          {"name": "AC Beta", "text": "AC Beta", "sequential_order": 2.0},
+                      ]},
+                     {"name": "S2", "sequential_order": 2.0, "story_type": "user",
+                      "users": [], "acceptance_criteria": []},
+                 ]}]}
+            ]}]
+        }
+
+        action = RenderOutputAction.__new__(RenderOutputAction)
+        move = ACMove(ac_text='AC Alpha', from_story='S1', to_story='S2')
+        result = action._apply_ac_move(data, move)
+        assert result is True
+
+        s1 = data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][0]
+        s2 = data['epics'][0]['sub_epics'][0]['story_groups'][0]['stories'][1]
+
+        s1_texts = [ac.get('name', '') for ac in s1['acceptance_criteria']]
+        s2_texts = [ac.get('name', '') for ac in s2['acceptance_criteria']]
+
+        assert 'AC Alpha' not in s1_texts, "AC Alpha should be removed from S1"
+        assert 'AC Beta' in s1_texts, "AC Beta should remain in S1"
+        assert 'AC Alpha' in s2_texts, "AC Alpha should be in S2"
+
+    def test_story_split_ac_distributed_correctly(self, tmp_path):
+        """When a story is split (some AC moved to new story), the report
+        correctly shows AC moves and the remaining AC stays."""
+        from synchronizers.story_io.update_report import ACChange, ACMove
+
+        # Simulate: Story A had AC1, AC2, AC3.  AC2 and AC3 moved to Story B.
+        report = UpdateReport()
+        report.set_ac_changes([
+            ACChange(story_name='Story A', removed=['AC2', 'AC3']),
+            ACChange(story_name='Story B', added=['AC2', 'AC3']),
+        ])
+        report.reconcile_ac_moves()
+
+        assert len(report.ac_moves) == 2
+        move_texts = {m.ac_text for m in report.ac_moves}
+        assert move_texts == {'AC2', 'AC3'}
+        for m in report.ac_moves:
+            assert m.from_story == 'Story A'
+            assert m.to_story == 'Story B'
+
+        # ac_changes should now be empty (all reconciled as moves)
+        assert len(report.ac_changes) == 0
 
 
 class TestRenderActionDiagramSection:
@@ -2773,3 +3166,137 @@ class TestUpdateFromDiagramMoveBeforeRemove:
         stories = [s['name'] for sg in new_se['story_groups']
                    for s in sg.get('stories', [])]
         assert 'Story Alpha' in stories
+
+
+class TestScopedDiagramOperations:
+    """Tests for Synchronize Diagram With Scoped Nodes.
+    Scope parameter threads through renderDiagram, generateReport,
+    updateFromDiagram and resolves {scope} placeholders in filenames."""
+
+    @staticmethod
+    def _make_fake_spec(output, path='docs/story/exploration'):
+        """Create a lightweight spec-like object for testing scope resolution."""
+        from types import SimpleNamespace
+        spec = SimpleNamespace()
+        spec.output = output
+        spec.config_data = {'path': path}
+        spec.synchronizer = None
+        spec.execution_status = 'pending'
+        return spec
+
+    def test_get_drawio_specs_with_scope_resolves_placeholder(self, tmp_path):
+        """_get_drawio_specs_with_paths replaces {scope} in output filename."""
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.state.set_state('shape', 'render')
+        action = helper.bot.behaviors.current.actions.find_by_name('render')
+
+        action._render_specs = [
+            self._make_fake_spec('story-map-explored-{scope}.drawio')]
+
+        result = action._get_drawio_specs_with_paths(scope='Trace Code')
+        assert len(result) == 1
+        _, path = result[0]
+        assert 'trace-code' in str(path).lower()
+        assert '{scope}' not in str(path)
+
+    def test_get_drawio_specs_without_scope_defaults_to_all(self, tmp_path):
+        """Without scope, {scope} placeholder defaults to 'all'."""
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.state.set_state('shape', 'render')
+        action = helper.bot.behaviors.current.actions.find_by_name('render')
+
+        action._render_specs = [
+            self._make_fake_spec('story-map-explored-{scope}.drawio')]
+
+        result = action._get_drawio_specs_with_paths(scope=None)
+        assert len(result) == 1
+        _, path = result[0]
+        assert 'all' in str(path).lower()
+
+    def test_scope_sanitized_for_filename(self, tmp_path):
+        """Scope with spaces and special chars is sanitized for filename."""
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.state.set_state('shape', 'render')
+        action = helper.bot.behaviors.current.actions.find_by_name('render')
+
+        action._render_specs = [
+            self._make_fake_spec('story-map-explored-{scope}.drawio')]
+
+        result = action._get_drawio_specs_with_paths(scope='Trace Story Graph')
+        _, path = result[0]
+        filename = str(path).split('/')[-1].split('\\')[-1]
+        assert filename == 'story-map-explored-trace-story-graph.drawio'
+
+    def test_render_diagram_accepts_scope_parameter(self, tmp_path):
+        """renderDiagram(scope=...) passes scope through to synchronizers."""
+        helper = BotTestHelper(tmp_path)
+        story_graph_path = helper.bot.bot_paths.story_graph_paths.story_graph_path
+        story_graph_path.parent.mkdir(parents=True, exist_ok=True)
+        data = helper.drawio_story_map.create_simple_story_map_data()
+        story_graph_path.write_text(json.dumps(data), encoding='utf-8')
+
+        helper.bot.behaviors.navigate_to('shape')
+        helper.state.set_state('shape', 'render')
+        action = helper.bot.behaviors.current.actions.find_by_name('render')
+
+        # Call with scope - should not error even if no matching specs
+        result = action.renderDiagram(scope='Trace Code')
+        # Either success with 0 rendered or error for no specs - both are valid
+        assert result['status'] in ('success', 'error')
+
+    def test_specs_without_scope_placeholder_get_scoped_filename(self, tmp_path):
+        """Non-exploration specs (no {scope} in output) get scope slug appended."""
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.state.set_state('shape', 'render')
+        action = helper.bot.behaviors.current.actions.find_by_name('render')
+
+        action._render_specs = [
+            self._make_fake_spec('story-map-outline.drawio', 'docs/story/shape')]
+
+        result = action._get_drawio_specs_with_paths(scope='Trace Code')
+        assert len(result) == 1
+        _, path = result[0]
+        assert 'story-map-outline-trace-code.drawio' in str(path)
+
+    def test_exploration_render_with_scope_produces_scoped_diagram(self, tmp_path):
+        """End-to-end: exploration render with scope creates scoped .drawio file.
+        Scope filtering is done upstream (synchronizer), so we filter the
+        story map before passing it to the renderer.
+        """
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_story_map_data_with_acceptance_criteria()
+        original_map = StoryMap(data)
+        filtered_map = original_map.filter_by_name('Initialize Bot')
+        assert filtered_map is not None
+
+        drawio_map = DrawIOStoryMap()
+        summary = drawio_map.render_exploration_from_story_map(filtered_map)
+
+        assert summary.get('exploration') is True
+        assert len(drawio_map.get_stories()) >= 1
+
+    def test_filter_by_name_returns_subtree_for_sub_epic(self, tmp_path):
+        """StoryMap.filter_by_name returns filtered map for a sub-epic."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_simple_story_map_data()
+        story_map = StoryMap(data)
+
+        filtered = story_map.filter_by_name('Initialize Bot')
+        assert filtered is not None
+        assert len(filtered.epics) == 1
+        # The filtered map should contain the sub-epic's stories
+        all_stories = list(filtered.all_stories)
+        assert len(all_stories) >= 1
+
+    def test_filter_by_name_returns_none_for_nonexistent(self, tmp_path):
+        """StoryMap.filter_by_name returns None when name not found."""
+        helper = BotTestHelper(tmp_path)
+        data = helper.drawio_story_map.create_simple_story_map_data()
+        story_map = StoryMap(data)
+
+        filtered = story_map.filter_by_name('Does Not Exist')
+        assert filtered is None

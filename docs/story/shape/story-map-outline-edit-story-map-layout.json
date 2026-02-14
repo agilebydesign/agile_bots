@@ -1,0 +1,266 @@
+{
+  "EPIC|Invoke Bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 1210.0,
+    "height": 60.0
+  },
+  "invoke-bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 1210.0,
+    "height": 60.0
+  },
+  "SUB_EPIC|Edit Story Map": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 1200.0,
+    "height": 60.0
+  },
+  "invoke-bot/edit-story-map": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 1200.0,
+    "height": 60.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph": {
+    "x": 30.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/navigate-story-graph": {
+    "x": 30.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph Using CLI": {
+    "x": 90.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/navigate-story-graph-using-cli": {
+    "x": 90.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Display Story Hierarchy Panel": {
+    "x": 150.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/display-story-hierarchy-panel": {
+    "x": 150.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node": {
+    "x": 210.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/create-child-story-node": {
+    "x": 210.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent Panel": {
+    "x": 270.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/create-child-story-node-under-parent-panel": {
+    "x": 270.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent CLI": {
+    "x": 330.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/create-child-story-node-under-parent-cli": {
+    "x": 330.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Create Epic": {
+    "x": 390.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/create-epic": {
+    "x": 390.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node": {
+    "x": 450.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/delete-story-node": {
+    "x": 450.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent CLI": {
+    "x": 510.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/delete-story-node-from-parent-cli": {
+    "x": 510.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent Panel": {
+    "x": 570.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/delete-story-node-from-parent-panel": {
+    "x": 570.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node To Parent": {
+    "x": 630.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/move-story-node-to-parent": {
+    "x": 630.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node  CLI": {
+    "x": 690.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/move-story-node--cli": {
+    "x": 690.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Move Story Node Panel": {
+    "x": 750.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/move-story-node-panel": {
+    "x": 750.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node name  CLI": {
+    "x": 810.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/update-story-node-name--cli": {
+    "x": 810.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node name Panel": {
+    "x": 870.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/update-story-node-name-panel": {
+    "x": 870.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Update Story Node Name": {
+    "x": 930.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/update-story-node-name": {
+    "x": 930.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Save Story Map Changes Asynchronously": {
+    "x": 990.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/save-story-map-changes-asynchronously": {
+    "x": 990.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes Panel": {
+    "x": 1050.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/automatically-refresh-story-graph-changes-panel": {
+    "x": 1050.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes  CLI": {
+    "x": 1110.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/automatically-refresh-story-graph-changes--cli": {
+    "x": 1110.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Edit Story Map|Execute Scope \"Runs\"": {
+    "x": 1170.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/edit-story-map/execute-scope-\"runs\"": {
+    "x": 1170.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  }
+}

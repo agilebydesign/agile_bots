@@ -1,0 +1,58 @@
+{
+  "epics": [
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Decide Strategy",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Decide Strategy",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Decide Strategy Using CLI",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Strategy Data Through CLI",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Strategy Instructions Panel",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Submit Instructions To AI Agent Panel",
+                  "sequential_order": 5.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Get Strategy Instructions Through CLI",
+                  "sequential_order": 6.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "New Story 1",
+                  "sequential_order": 7.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

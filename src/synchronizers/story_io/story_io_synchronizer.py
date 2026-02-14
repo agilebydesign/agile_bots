@@ -35,6 +35,14 @@ class DrawIOSynchronizer:
 
         story_map = StoryMap(graph_data)
 
+        # When a scope is provided, filter the story map to the named
+        # node's subtree so only the relevant portion is rendered.
+        scope = kwargs.get('scope')
+        if scope:
+            filtered = story_map.filter_by_name(scope)
+            if filtered is not None:
+                story_map = filtered
+
         # Load layout data if it exists alongside the output
         layout_path = output_path.parent / f"{output_path.stem}-layout.json"
         layout_data = LayoutData.load(layout_path) if layout_path.exists() else None
@@ -47,9 +55,8 @@ class DrawIOSynchronizer:
             summary = drawio_map.render_increments_from_story_map(
                 story_map, increments, layout_data)
         elif renderer_command == 'render-exploration':
-            scope = kwargs.get('scope')
             summary = drawio_map.render_exploration_from_story_map(
-                story_map, layout_data, scope=scope)
+                story_map, layout_data)
         else:
             summary = drawio_map.render_from_story_map(story_map, layout_data)
 

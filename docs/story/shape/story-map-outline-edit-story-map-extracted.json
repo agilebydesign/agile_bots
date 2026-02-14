@@ -1,0 +1,123 @@
+{
+  "epics": [
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Edit Story Map",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Navigate Story Graph",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Navigate Story Graph Using CLI",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Story Hierarchy Panel",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Create Child Story Node",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Create Child Story Node Under Parent Panel",
+                  "sequential_order": 5.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Create Child Story Node Under Parent CLI",
+                  "sequential_order": 6.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Create Epic",
+                  "sequential_order": 7.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Delete Story Node",
+                  "sequential_order": 8.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Delete Story Node From Parent CLI",
+                  "sequential_order": 9.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Delete Story Node From Parent Panel",
+                  "sequential_order": 10.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Move Story Node To Parent",
+                  "sequential_order": 11.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Move Story Node  CLI",
+                  "sequential_order": 12.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Move Story Node Panel",
+                  "sequential_order": 13.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Update Story Node name  CLI",
+                  "sequential_order": 14.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Update Story Node name Panel",
+                  "sequential_order": 15.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Update Story Node Name",
+                  "sequential_order": 16.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Save Story Map Changes Asynchronously",
+                  "sequential_order": 17.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Automatically Refresh Story Graph Changes Panel",
+                  "sequential_order": 18.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Automatically Refresh Story Graph Changes  CLI",
+                  "sequential_order": 19.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Execute Scope \"Runs\"",
+                  "sequential_order": 20.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

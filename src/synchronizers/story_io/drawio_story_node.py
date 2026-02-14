@@ -341,7 +341,8 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
     def render_from_domain(self, epic: Epic, x_pos: float,
                             rows: _RowPositions = None,
                             layout_data=None,
-                            skip_stories: bool = False) -> 'DrawIOEpic':
+                            skip_stories: bool = False,
+                            story_widths: dict = None) -> 'DrawIOEpic':
         """Render epic as a flat horizontal bar spanning its sub-epics.
 
         The epic does NOT visually contain its sub-epics; it sits on
@@ -350,6 +351,9 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
 
         When *skip_stories* is True sub-epics are rendered without
         story cells (used by increments view).
+
+        When *story_widths* is provided (exploration view), stories are
+        spaced apart based on their widest AC box width.
         """
         from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 
@@ -367,7 +371,8 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
             cursor_x = drawio_se.render_from_domain(
                 sub_epic, cursor_x, depth=0, rows=rows,
                 layout_data=layout_data, path_prefix=epic_slug,
-                skip_stories=skip_stories)
+                skip_stories=skip_stories,
+                story_widths=story_widths)
             self.add_child(drawio_se)
             cursor_x += CELL_SPACING
 
@@ -438,7 +443,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                             rows: _RowPositions,
                             layout_data=None,
                             path_prefix: str = '',
-                            skip_stories: bool = False) -> float:
+                            skip_stories: bool = False,
+                            story_widths: dict = None) -> float:
         """Render sub-epic as a flat horizontal bar.
 
         Returns the x position of the right edge of this sub-epic's
@@ -447,6 +453,10 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
         When *skip_stories* is True the sub-epic computes its width
         from the number of domain stories but does not create story
         cells (used by increments view).
+
+        When *story_widths* is provided (exploration view), the
+        horizontal spacing between stories is determined by each
+        story's widest AC box, so acceptance criteria don't overlap.
         """
         from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 
@@ -464,7 +474,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                 inner_x = drawio_n.render_from_domain(
                     n, inner_x, depth + 1, rows, layout_data,
                     path_prefix=se_path,
-                    skip_stories=skip_stories)
+                    skip_stories=skip_stories,
+                    story_widths=story_widths)
                 self.add_child(drawio_n)
                 inner_x += CELL_SPACING
             inner_x -= CELL_SPACING  # remove trailing
@@ -474,9 +485,6 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
             stories.sort(key=lambda s: getattr(s, 'sequential_order', 0) or 0)
 
             if skip_stories:
-                # Compute sub-epic width from story count without creating
-                # story cells.  Each story occupies CELL_SIZE + CELL_SPACING
-                # and the sub-epic has BAR_PADDING on each side.
                 story_count = len(stories)
                 if story_count:
                     content_width = story_count * CELL_SIZE + (story_count - 1) * CELL_SPACING
@@ -511,7 +519,10 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                             path_prefix=se_path, seen_actors=seen_actors,
                             layout_data=None)
                     self.add_child(drawio_story)
-                    story_x += CELL_SIZE + CELL_SPACING
+                    # Advance X by the AC width if in exploration mode,
+                    # otherwise by the standard cell size.
+                    ac_w = story_widths.get(story.name, CELL_SIZE) if story_widths else CELL_SIZE
+                    story_x += max(CELL_SIZE, ac_w) + CELL_SPACING
                 if stories:
                     story_x -= CELL_SPACING
                 end_x = story_x + BAR_PADDING
@@ -624,6 +635,28 @@ class DrawIOStory(Story, DrawIOStoryNode):
             self._actor_elements.append(actor)
         return self
 
+    @staticmethod
+    def compute_ac_width(domain_story) -> float:
+        """Return the width needed for AC boxes of this story.
+
+        All AC boxes use a consistent fixed width (AC_MIN_WIDTH) since
+        the text wraps inside the box.  Returns CELL_SIZE if no AC.
+        """
+        ac_list = getattr(domain_story, 'acceptance_criteria', []) or []
+        if not ac_list:
+            return CELL_SIZE
+        return DrawIOStory.AC_MIN_WIDTH
+
+    @staticmethod
+    def _format_ac_text_static(ac) -> str:
+        if hasattr(ac, 'name') and ac.name:
+            return ac.name
+        if isinstance(ac, str):
+            return ac
+        if isinstance(ac, dict):
+            return ac.get('name', ac.get('description', ''))
+        return str(ac) if ac else ''
+
     def render_ac_boxes(self, domain_story) -> List[DrawIOElement]:
         """Create acceptance criteria DrawIOElements below this story."""
         ac_list = getattr(domain_story, 'acceptance_criteria', []) or []
@@ -637,13 +670,12 @@ class DrawIOStory(Story, DrawIOStoryNode):
             text = self._format_ac_text(ac)
             if not text:
                 continue
-            ac_width = max(self.AC_MIN_WIDTH, len(text) * self.AC_CHAR_WIDTH + self.AC_PADDING * 2)
             ac_elem = DrawIOElement(
                 cell_id=f'{self.cell_id}/ac-{idx}',
                 value=text)
             ac_elem.apply_style_for_type('acceptance_criteria')
             ac_elem.set_position(self.position.x, ac_y)
-            ac_elem.set_size(ac_width, self.AC_HEIGHT)
+            ac_elem.set_size(self.AC_MIN_WIDTH, self.AC_HEIGHT)
             elements.append(ac_elem)
             ac_y += self.AC_HEIGHT + self.AC_SPACING_Y
 

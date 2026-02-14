@@ -1,0 +1,396 @@
+{
+  "epics": [
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Perform Action",
+          "sequential_order": 1.0,
+          "sub_epics": [
+            {
+              "name": "Prepare Common Instructions For Behavior, Action, and Scope",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Inject Context Into Instructions",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Action Instructions Through CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Instructions Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Base Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Raw Format Instructions In Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Clarification Answers",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Clarification Evidence",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Strategy Decisions",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Multiple Guardrails Together",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save File Isolation",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Guardrails Through Panel",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Scope Instructions",
+                      "sequential_order": 12.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Handle Operation Errors and Validation in CLI",
+                      "sequential_order": 13.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Guardrails Through CLI",
+                      "sequential_order": 14.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Clarify Requirements",
+              "sequential_order": 2.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Clarify Requirements",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Clarify Requirements Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Clarification Data Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Clarify Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Clarify Instructions Through CLI",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Decide Strategy",
+              "sequential_order": 3.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Decide Strategy",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Decide Strategy Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Strategy Data Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Strategy Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Instructions To AI Agent Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Strategy Instructions Through CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Build Story Graph",
+              "sequential_order": 4.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Build Story Graph",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Build Story Graph Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Build Instructions Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Build Story Graph Using API",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Build Instructions Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Render Content",
+              "sequential_order": 5.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Render Output Usng Story API",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render Output Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Synchronizer Output Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Render Configurations Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Render Instructions Through CLI",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Render Instructions Panel",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Synchronized Graph with Rendered Diagram Content",
+              "sequential_order": 6.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Render story map",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render story map increments",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render story map with acceptance criteria",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update graph from story map",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update graph from map increments",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update story graph from map acceptance criteria",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render action diagram section",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Synchronize DIagram With Scoped Nodes",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Validate With Rules",
+              "sequential_order": 7.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Validate Rules",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Validate Rules Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validation Results Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validation Scanners Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validate Instructions Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Validate Instructions Through CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Use Rules In Prompt",
+              "sequential_order": 8.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Display Rules",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Rules Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Behavior Rules Through Panel",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Rules Instructions Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "YAYAYAYAYA",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "story_groups": []
+        }
+      ]
+    }
+  ]
+}
