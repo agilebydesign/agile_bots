@@ -66,6 +66,32 @@
                     "When they select an item",
                     "Then the thing is processed"
                 ]
+            },
+            {
+                "description": "Don't use the wrong domain concept for the context. When multiple concepts represent the same entity in different contexts, use the one that matches where the entity actually lives.",
+                "example": [
+                    "WRONG - DrawIOEpic is a diagram cell, but this entity lives in the StoryMap:",
+                    "  Given {DrawIOEpic} exists in {StoryMap}  (an Epic exists in StoryMap, not a DrawIOEpic)",
+                    "  And {DrawIOSubEpic} exists under {DrawIOEpic}  (SubEpic under Epic in the StoryMap)",
+                    "",
+                    "CORRECT - use the concept that matches where it lives:",
+                    "  Given {Epic} exists in {StoryMap}  (Epic is a StoryMap entity)",
+                    "  And {SubEpic} exists under {Epic}  (SubEpic is a StoryMap entity)",
+                    "  ...",
+                    "  Then {DrawIOEpic} cells are rendered  (DrawIOEpic is the diagram representation)"
+                ]
+            },
+            {
+                "description": "Don't use abstract descriptions when concrete {Concept.property} references are available. If the table has the specific values, reference them.",
+                "example": [
+                    "WRONG - vague, abstracts away what's actually configured/derived:",
+                    "  And {DrawIOStoryMap} is configured for rendering",
+                    "  And {DrawIOStoryMap} exists with content derived from {StoryMap}",
+                    "",
+                    "CORRECT - reference the concrete property or state:",
+                    "  And {DrawIOStoryMap} is configured with {DrawIOStoryMap.diagram_type}",
+                    "  And {DrawIOStoryMap} has been rendered from {StoryMap}"
+                ]
             }
         ]
     },

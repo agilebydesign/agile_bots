@@ -5,6 +5,8 @@
   "order": 6,
   "auto_confirm": true,
   "instructions": [
+    "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
+    "",
     "Please follow the instructions below in order to manually render output documents using templates",
     "",
     "All render configurations are automatically loaded and injected below. Process ALL configs - do not skip any.",

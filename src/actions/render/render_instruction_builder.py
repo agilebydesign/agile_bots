@@ -11,7 +11,8 @@ class RenderInstructionBuilder:
         executed_specs = [spec for spec in render_specs if spec.is_executed]
         template_specs = [spec for spec in render_specs if spec.requires_ai_handling and (not spec.is_executed)]
         
-        if not template_specs:
+        sync_specs = [spec for spec in render_specs if spec.synchronizer and not spec.is_executed]
+        if not template_specs and not sync_specs:
             base_instructions_list = []
         
         self._add_spec_instructions(base_instructions_list, executed_specs, template_specs)

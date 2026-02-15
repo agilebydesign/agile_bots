@@ -1,8 +1,9 @@
 {
   "_explanation": {
     "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios with optional examples for data-driven testing",
-    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), background (common setup), steps (Given/When/Then), and optional examples",
-    "examples_structure": "examples is an array of tables, each with name, columns, and rows. For simple single-table scenarios, use one table. For multi-table domain scenarios, add multiple tables",
+    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), steps (Given/When/Then), and optional examples",
+    "background_structure": "background is a story-level field with steps (shared Given/And) and examples (tables for Background concepts). These are NOT duplicated per scenario.",
+    "examples_structure": "Scenario-level examples hold ONLY scenario-specific tables. Background tables go in story.background.examples, not per-scenario.",
     "variable_matching": "Every <variable_name> in steps MUST appear in example columns. Include both input variables and expected output/result variables",
     "domain_alignment": "Example tables MUST mirror domain_concepts structure: each domain concept with collaborators becomes a related table, responsibilities define the columns",
     "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure",
@@ -34,19 +35,30 @@
                   "story_type": "user",
                   "test_file": "",
                   "test_class": "",
+                  "background": {
+                    "steps": [
+                      "Given <common_setup_step>",
+                      "And <another_common_setup>"
+                    ],
+                    "examples": [
+                      {
+                        "name": "SharedConcept",
+                        "columns": ["shared_field_1", "shared_field_2"],
+                        "rows": [
+                          ["value1", "value2"]
+                        ]
+                      }
+                    ]
+                  },
                   "scenarios": [
                     {
                       "name": "Simple scenario with flat examples",
                       "test_method": "",
                       "context_source": {"file": "requirements.pdf", "page": "15", "section": "4.1 Basic Flow"},
-                      "background": [
-                        "Given <common_setup_step>",
-                        "And <another_common_setup>"
-                      ],
                       "steps": [
-                        "Given <scenario_specific_state> at \"<variable_path>\"",
-                        "When <action> with <variable_parameter>=\"<variable_value>\"",
-                        "Then <expected_outcome> equals \"<variable_expected_result>\""
+                        {"text": "Given <scenario_specific_state> at \"<variable_path>\"", "sequential_order": 1},
+                        {"text": "When <action> with <variable_parameter>=\"<variable_value>\"", "sequential_order": 2},
+                        {"text": "Then <expected_outcome> equals \"<variable_expected_result>\"", "sequential_order": 3}
                       ],
                       "examples": [
                         {
@@ -65,47 +77,46 @@
                       "test_method": "",
                       "type": "happy_path",
                       "context_source": {"file": "requirements.pdf", "page": "20", "section": "5.2 Customer Account Lookup"},
-                      "background": [],
                       "steps": [
-                        "Given Customer <customer_name> has account <account_number>",
-                        "And Account belongs to product <product_name>",
-                        "And Account has transactions shown in table",
-                        "When Customer looks up account",
-                        "Then Customer sees transactions for <product_name>",
-                        "And Customer sees <expected_outcome>"
+                        {"text": "Given Customer <customer_name> has account <account_number>", "sequential_order": 1},
+                        {"text": "And Account belongs to product <product_name>", "sequential_order": 2},
+                        {"text": "And Account has transactions shown in table", "sequential_order": 3},
+                        {"text": "When Customer looks up account", "sequential_order": 4},
+                        {"text": "Then Customer sees transactions for <product_name>", "sequential_order": 5},
+                        {"text": "And Customer sees <expected_outcome>", "sequential_order": 6}
                       ],
                       "examples": [
-                          {
-                            "name": "Customer",
-                            "columns": ["customer_name", "customer_type", "expected_outcome"],
-                            "rows": [
-                              ["Alice Smith", "premium", "transaction approved"],
-                              ["Bob Jones", "standard", "transaction pending review"]
-                            ],
-                            "context_source": {"file": "test-data.xlsx", "page": "Customers", "section": "Premium and Standard"}
-                          },
-                          {
-                            "name": "Account",
-                            "columns": ["customer_name", "account_number", "product_name", "balance"],
-                            "rows": [
-                              ["Alice Smith", "ACC-001", "Gold Savings", "50000"],
-                              ["Bob Jones", "ACC-002", "Basic Checking", "1500"]
-                            ],
-                            "context_source": {"file": "test-data.xlsx", "page": "Accounts", "section": "Test Accounts"}
-                          },
-                          {
-                            "name": "Transaction",
-                            "columns": ["account_number", "transaction_id", "amount", "type"],
-                            "rows": [
-                              ["ACC-001", "TXN-101", "500", "deposit"],
-                              ["ACC-001", "TXN-102", "200", "withdrawal"],
-                              ["ACC-001", "TXN-103", "1000", "transfer"],
-                              ["ACC-002", "TXN-201", "100", "deposit"],
-                              ["ACC-002", "TXN-202", "50", "withdrawal"]
-                            ],
-                            "context_source": {"file": "test-data.xlsx", "page": "Transactions", "section": "Sample Transactions"}
-                          }
-                        ]
+                        {
+                          "name": "Customer",
+                          "columns": ["customer_name", "customer_type", "expected_outcome"],
+                          "rows": [
+                            ["Alice Smith", "premium", "transaction approved"],
+                            ["Bob Jones", "standard", "transaction pending review"]
+                          ],
+                          "context_source": {"file": "test-data.xlsx", "page": "Customers", "section": "Premium and Standard"}
+                        },
+                        {
+                          "name": "Account",
+                          "columns": ["customer_name", "account_number", "product_name", "balance"],
+                          "rows": [
+                            ["Alice Smith", "ACC-001", "Gold Savings", "50000"],
+                            ["Bob Jones", "ACC-002", "Basic Checking", "1500"]
+                          ],
+                          "context_source": {"file": "test-data.xlsx", "page": "Accounts", "section": "Test Accounts"}
+                        },
+                        {
+                          "name": "Transaction",
+                          "columns": ["account_number", "transaction_id", "amount", "type"],
+                          "rows": [
+                            ["ACC-001", "TXN-101", "500", "deposit"],
+                            ["ACC-001", "TXN-102", "200", "withdrawal"],
+                            ["ACC-001", "TXN-103", "1000", "transfer"],
+                            ["ACC-002", "TXN-201", "100", "deposit"],
+                            ["ACC-002", "TXN-202", "50", "withdrawal"]
+                          ],
+                          "context_source": {"file": "test-data.xlsx", "page": "Transactions", "section": "Sample Transactions"}
+                        }
+                      ]
                     }
                   ]
                 }

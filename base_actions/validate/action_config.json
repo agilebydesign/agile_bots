@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "validate_rules",
   "description": "Validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance",
   "workflow": true,
@@ -6,6 +6,8 @@
   "auto_confirm": false,
   "next_action": "render_output",
   "instructions": [
+    "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
+    "",
     "## Step 1: Scanner Violation Review",
     "",
     "{{scanner_output}}",

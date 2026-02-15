@@ -144,22 +144,15 @@ class RenderOutputAction(Action):
             )
     
     def do_execute(self, context: ScopeActionContext = None):
-        render_instructions = self._config_loader.load_render_instructions()
         render_specs = self._render_specs
         # NOTE: _execute_synchronizers removed — diagrams are only rendered
         # via the explicit "Render Diagram" button (renderDiagram method).
         
+        # get_instructions() calls _prepare_instructions which already runs
+        # inject_render_data and adds the synchronizer renderAll instruction.
+        # Do NOT call inject_render_data again here -- it wipes base_instructions
+        # when there are no template specs (synchronizer-only behaviors).
         instructions = self.get_instructions(context)
-        
-        merged_data = {
-            'base_instructions': instructions.get('base_instructions', []),
-            'render_instructions': render_instructions
-        }
-        self._instruction_formatter.inject_render_data(merged_data, render_instructions, render_specs)
-        
-        instructions._data['base_instructions'] = merged_data.get('base_instructions', [])
-        if 'render_instructions' in merged_data:
-            instructions.set('render_instructions', merged_data['render_instructions'])
         
         executed_specs = [spec for spec in render_specs if spec.is_executed]
         template_specs = [spec for spec in render_specs if spec.requires_ai_handling and (not spec.is_executed)]
