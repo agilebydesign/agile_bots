@@ -1,3 +1,17 @@
+(E) Build Agile Bots
+    (E) Generate CLI
+        (E) Generate Cursor Context Package
+            (S) Generator --> Create Rule Files From Bot Behavior
+                (AC) WHEN generate context package command runs on bot THEN Generator iterates over bot behaviors: Walks bots/{bot_name}/behaviors/, Reads each behavior.json, Extracts behaviorName/description/goal/inputs/outputs, Creates one .mdc rule file per behavior in .cursor/rules/{bot_name}_{behavior}.mdc
+                (AC) WHEN Generator writes rule file header THEN adds Title, Subtitle, Sections Goal/Inputs/Outputs
+                (AC) WHEN Generator adds trigger words section THEN creates ## When to use this behavior, extracts trigger_words.patterns, formats as bullets, converts regex to natural language
+                (AC) WHEN Generator adds clarification section THEN reads key_questions.json and evidence.json, merges clarify action, adds clarification logic, save to clarification.strategy
+                (AC) WHEN Generator adds strategy section THEN reads typical_assumptions.json and decision_criteria/*.json, merges strategy action, adds strategy logic, save to strategy.json
+                (AC) WHEN Generator adds build section THEN merges build action, specifies templates from content/render/*.json
+                (AC) WHEN Generator adds render section THEN walks content/render/*.json, extracts template path/output path/instructions, formats as bullets
+                (AC) WHEN Generator processes rules directory THEN walks rules/*.json sorted by priority, extracts description/do/dont guidance, formats as ## Rules with DO/DON'T blocks and examples
+                (AC) WHEN Generator completes THEN output is .mdc rule files saved to workspace .cursor/rules/ folder (one per behavior)
+
 (E) Invoke Bot
     (E) Work With Story Map
         (E) Trace Story Graph

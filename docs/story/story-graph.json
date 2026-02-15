@@ -236,7 +236,166 @@
           "sequential_order": 1.0,
           "behavior": null,
           "domain_concepts": [],
-          "sub_epics": [],
+          "sub_epics": [
+            {
+              "name": "Generate Cursor Context Package",
+              "sequential_order": 0.0,
+              "behavior": null,
+              "domain_concepts": [],
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": "or",
+                  "behavior": null,
+                  "stories": [
+                    {
+                      "name": "Create Rule Files From Bot Behavior",
+                      "sequential_order": 1.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Generator"
+                      ],
+                      "test_class": "TestCreateRuleFilesFromBotBehavior",
+                      "scenarios": [
+                        {
+                          "name": "Generator produces rule file per behavior when bot has valid behaviors",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_produces_rule_file_per_behavior_when_bot_has_valid_behaviors",
+                          "steps": "Given Bot {bot_name} exists with behaviors directory\nAnd Behavior {behavior_name} has valid behavior.json with behaviorName, description, goal, inputs, outputs\nWhen Generator runs generate context package command on {bot_name}\nThen Generator walks bots/{bot_name}/behaviors/ directory\nAnd Generator reads each behavior.json\nAnd Generator creates one .mdc rule file at .cursor/rules/{bot_name}_{behavior}.mdc per behavior"
+                        },
+                        {
+                          "name": "Generator writes rule file header with title subtitle and sections",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_writes_rule_file_header_with_title_subtitle_and_sections",
+                          "steps": "Given Bot story_bot exists with shape behavior\nWhen Generator writes rule file for story_bot shape\nThen Generator adds title # story_bot shape Behavior\nAnd Generator adds description as subtitle\nAnd Generator adds sections Goal, Inputs, Outputs"
+                        },
+                        {
+                          "name": "Generator adds trigger words section from behavior.json patterns",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_adds_trigger_words_section_from_behavior_json_patterns",
+                          "steps": "Given Behavior has trigger_words.patterns in behavior.json\nWhen Generator adds trigger words section\nThen Generator creates ## When to use this behavior\nAnd Generator extracts trigger_words.patterns from behavior.json\nAnd Generator formats as Use this behavior when: with each pattern as bullet\nAnd Generator converts regex patterns to natural language"
+                        },
+                        {
+                          "name": "Generator merges clarification section from guardrails and base actions",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_merges_clarification_section_from_guardrails_and_base_actions",
+                          "steps": "Given Behavior has guardrails/required_context/key_questions.json and evidence.json\nAnd Behavior has clarify action in actions_workflow\nWhen Generator adds clarification section\nThen Generator reads key_questions.json and evidence.json\nAnd Generator merges clarify action from behavior.json and base_actions/clarify/action_config.json\nAnd Generator adds logic to state NOT ENOUGH INFORMATION when context missing\nAnd Generator specifies save to clarification.strategy"
+                        },
+                        {
+                          "name": "Generator merges strategy section from guardrails and base actions",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_merges_strategy_section_from_guardrails_and_base_actions",
+                          "steps": "Given Behavior has guardrails/strategy/typical_assumptions.json and decision_criteria\nWhen Generator adds strategy section\nThen Generator reads typical_assumptions.json and decision_criteria/*.json\nAnd Generator merges strategy action from behavior.json and base_actions/strategy/action_config.json\nAnd Generator adds logic to state NOT ENOUGH INFORMATION when context insufficient\nAnd Generator specifies save to strategy.json"
+                        },
+                        {
+                          "name": "Generator adds build and render sections from content config",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_adds_build_and_render_sections_from_content_config",
+                          "steps": "Given Behavior has build action and content/render/*.json configs\nWhen Generator adds build section\nThen Generator merges build action instructions from behavior.json\nAnd Generator specifies templates from content/render/*.json\nWhen Generator adds render section\nThen Generator walks content/render/*.json\nAnd Generator extracts template path, output path, instructions per config\nAnd Generator formats as bullets"
+                        },
+                        {
+                          "name": "Generator processes rules directory and formats DO DON'T blocks",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_processes_rules_directory_and_formats_do_dont_blocks",
+                          "steps": "Given Behavior has rules/*.json files sorted by priority\nWhen Generator processes rules directory\nThen Generator walks rules/*.json\nAnd Generator extracts description, do.description, do.guidance, dont.description, dont.guidance\nAnd Generator formats as ## Rules with DO/DON'T blocks\nAnd Generator includes examples as code blocks"
+                        },
+                        {
+                          "name": "Generator outputs .mdc files to workspace .cursor/rules folder",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_generator_outputs_mdc_files_to_workspace_cursor_rules_folder",
+                          "steps": "Given Generator has produced rule content for each behavior\nWhen Generator completes\nThen Generator saves .mdc rule files to workspace .cursor/rules/ folder\nAnd One .mdc file exists per behavior"
+                        },
+                        {
+                          "name": "Generator skips behavior when behavior.json is malformed",
+                          "sequential_order": 9.0,
+                          "type": "error_case",
+                          "background": [],
+                          "test_method": "test_generator_skips_behavior_when_behavior_json_is_malformed",
+                          "steps": "Given Bot has behaviors directory\nAnd One behavior.json contains invalid JSON\nWhen Generator runs generate context package command\nThen Generator does not crash\nAnd Generator produces rule files for valid behaviors only\nAnd Generator skips or reports malformed behavior"
+                        },
+                        {
+                          "name": "Generator produces rule file when bot has single behavior",
+                          "sequential_order": 10.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_generator_produces_rule_file_when_bot_has_single_behavior",
+                          "steps": "Given Bot has exactly one behavior in behaviors directory\nWhen Generator runs generate context package command\nThen Generator creates one .mdc rule file\nAnd Rule file path follows {bot_name}_{behavior}.mdc pattern"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors",
+                          "text": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot → story_shape.mdc)",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN Generator writes rule file header, THEN it adds",
+                          "text": "WHEN Generator writes rule file header, THEN it adds:\n- Title: # {bot_name} {behaviorName} Behavior\n- Subtitle: description\n- Sections: Goal, Inputs, Outputs",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN Generator adds trigger words section, THEN it",
+                          "text": "WHEN Generator adds trigger words section, THEN it:\n- Section: ## When to use this behavior\n- Extracts trigger_words.patterns from behavior.json\n- Formats as Use this behavior when: with each pattern as bullet\n- Converts regex patterns to natural language",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN Generator adds clarification section, THEN it",
+                          "text": "WHEN Generator adds clarification section, THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json → key questions as bullets\n- Reads guardrails/required_context/evidence.json → evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or infer—be explicit when information is missing; save to clarification.strategy",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN Generator adds strategy section, THEN it",
+                          "text": "WHEN Generator adds strategy section, THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json → assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json → each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "WHEN Generator adds build section, THEN it",
+                          "text": "WHEN Generator adds build section, THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)—no JSON schema for build output",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "WHEN Generator adds render section, THEN it",
+                          "text": "WHEN Generator adds render section, THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template → story-map.txt)",
+                          "sequential_order": 7.0
+                        },
+                        {
+                          "name": "WHEN Generator processes rules directory, THEN it",
+                          "text": "WHEN Generator processes rules directory, THEN it:\n- Walks rules/*.json, sorts by priority\n- For each: extracts description, do.description, do.guidance, dont.description, dont.guidance\n- Formats as ## Rules with DO/DON'T blocks\n- Includes examples as code blocks",
+                          "sequential_order": 8.0
+                        },
+                        {
+                          "name": "WHEN Generator completes, THEN output is .mdc rule files saved to workspace .cursor/rules/ folder (one per behavior)",
+                          "text": "WHEN Generator completes, THEN output is .mdc rule files saved to workspace .cursor/rules/ folder (one per behavior)",
+                          "sequential_order": 9.0
+                        }
+                      ],
+                      "behavior": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
           "story_groups": [
             {
               "name": "",
@@ -245,6 +404,146 @@
               "connector": null,
               "behavior": null,
               "stories": [
+                {
+                  "name": "Create Rule Files From Bot Behavior",
+                  "sequential_order": 0.5,
+                  "connector": "or",
+                  "story_type": "user",
+                  "users": [
+                    "Generator"
+                  ],
+                  "test_class": "TestCreateRuleFilesFromBotBehavior",
+                  "scenarios": [
+                    {
+                      "name": "Generator produces rule file per behavior when bot has valid behaviors",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_produces_rule_file_per_behavior_when_bot_has_valid_behaviors",
+                      "steps": "Given Bot {bot_name} exists with behaviors directory\nAnd Behavior {behavior_name} has valid behavior.json with behaviorName, description, goal, inputs, outputs\nWhen Generator runs generate context package command on {bot_name}\nThen Generator walks bots/{bot_name}/behaviors/ directory\nAnd Generator reads each behavior.json\nAnd Generator creates one .mdc rule file at .cursor/rules/{bot_name}_{behavior}.mdc per behavior"
+                    },
+                    {
+                      "name": "Generator writes rule file header with title subtitle and sections",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_writes_rule_file_header_with_title_subtitle_and_sections",
+                      "steps": "Given Bot story_bot exists with shape behavior\nWhen Generator writes rule file for story_bot shape\nThen Generator adds title # story_bot shape Behavior\nAnd Generator adds description as subtitle\nAnd Generator adds sections Goal, Inputs, Outputs"
+                    },
+                    {
+                      "name": "Generator adds trigger words section from behavior.json patterns",
+                      "sequential_order": 3.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_adds_trigger_words_section_from_behavior_json_patterns",
+                      "steps": "Given Behavior has trigger_words.patterns in behavior.json\nWhen Generator adds trigger words section\nThen Generator creates ## When to use this behavior\nAnd Generator extracts trigger_words.patterns from behavior.json\nAnd Generator formats as Use this behavior when: with each pattern as bullet\nAnd Generator converts regex patterns to natural language"
+                    },
+                    {
+                      "name": "Generator merges clarification section from guardrails and base actions",
+                      "sequential_order": 4.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_merges_clarification_section_from_guardrails_and_base_actions",
+                      "steps": "Given Behavior has guardrails/required_context/key_questions.json and evidence.json\nAnd Behavior has clarify action in actions_workflow\nWhen Generator adds clarification section\nThen Generator reads key_questions.json and evidence.json\nAnd Generator merges clarify action from behavior.json and base_actions/clarify/action_config.json\nAnd Generator adds logic to state NOT ENOUGH INFORMATION when context missing\nAnd Generator specifies save to clarification.strategy"
+                    },
+                    {
+                      "name": "Generator merges strategy section from guardrails and base actions",
+                      "sequential_order": 5.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_merges_strategy_section_from_guardrails_and_base_actions",
+                      "steps": "Given Behavior has guardrails/strategy/typical_assumptions.json and decision_criteria\nWhen Generator adds strategy section\nThen Generator reads typical_assumptions.json and decision_criteria/*.json\nAnd Generator merges strategy action from behavior.json and base_actions/strategy/action_config.json\nAnd Generator adds logic to state NOT ENOUGH INFORMATION when context insufficient\nAnd Generator specifies save to strategy.json"
+                    },
+                    {
+                      "name": "Generator adds build and render sections from content config",
+                      "sequential_order": 6.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_adds_build_and_render_sections_from_content_config",
+                      "steps": "Given Behavior has build action and content/render/*.json configs\nWhen Generator adds build section\nThen Generator merges build action instructions from behavior.json\nAnd Generator specifies templates from content/render/*.json\nWhen Generator adds render section\nThen Generator walks content/render/*.json\nAnd Generator extracts template path, output path, instructions per config\nAnd Generator formats as bullets"
+                    },
+                    {
+                      "name": "Generator processes rules directory and formats DO DON'T blocks",
+                      "sequential_order": 7.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_processes_rules_directory_and_formats_do_dont_blocks",
+                      "steps": "Given Behavior has rules/*.json files sorted by priority\nWhen Generator processes rules directory\nThen Generator walks rules/*.json\nAnd Generator extracts description, do.description, do.guidance, dont.description, dont.guidance\nAnd Generator formats as ## Rules with DO/DON'T blocks\nAnd Generator includes examples as code blocks"
+                    },
+                    {
+                      "name": "Generator outputs .mdc files to workspace .cursor/rules folder",
+                      "sequential_order": 8.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "test_generator_outputs_mdc_files_to_workspace_cursor_rules_folder",
+                      "steps": "Given Generator has produced rule content for each behavior\nWhen Generator completes\nThen Generator saves .mdc rule files to workspace .cursor/rules/ folder\nAnd One .mdc file exists per behavior"
+                    },
+                    {
+                      "name": "Generator skips behavior when behavior.json is malformed",
+                      "sequential_order": 9.0,
+                      "type": "error_case",
+                      "background": [],
+                      "test_method": "test_generator_skips_behavior_when_behavior_json_is_malformed",
+                      "steps": "Given Bot has behaviors directory\nAnd One behavior.json contains invalid JSON\nWhen Generator runs generate context package command\nThen Generator does not crash\nAnd Generator produces rule files for valid behaviors only\nAnd Generator skips or reports malformed behavior"
+                    },
+                    {
+                      "name": "Generator produces rule file when bot has single behavior",
+                      "sequential_order": 10.0,
+                      "type": "edge_case",
+                      "background": [],
+                      "test_method": "test_generator_produces_rule_file_when_bot_has_single_behavior",
+                      "steps": "Given Bot has exactly one behavior in behaviors directory\nWhen Generator runs generate context package command\nThen Generator creates one .mdc rule file\nAnd Rule file path follows {bot_name}_{behavior}.mdc pattern"
+                    }
+                  ],
+                  "acceptance_criteria": [
+                    {
+                      "name": "WHEN generate context package command on bot THEN Generator iterates over bot behaviors",
+                      "text": "WHEN generate context package command on bot THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot → story_shape.mdc)",
+                      "sequential_order": 1.0
+                    },
+                    {
+                      "name": "WHEN Generator writes rule file header THEN it adds",
+                      "text": "WHEN Generator writes rule file header THEN it adds:\n- Title: # {bot_name} {behaviorName} Behavior\n- Subtitle: description\n- Sections: Goal, Inputs, Outputs",
+                      "sequential_order": 2.0
+                    },
+                    {
+                      "name": "WHEN Generator adds trigger words section THEN it",
+                      "text": "WHEN Generator adds trigger words section THEN it:\n- Section: ## When to use this behavior\n- Extracts trigger_words.patterns from behavior.json\n- Formats as Use this behavior when: with each pattern as bullet\n- Converts regex patterns to natural language",
+                      "sequential_order": 3.0
+                    },
+                    {
+                      "name": "WHEN Generator adds clarification section THEN it",
+                      "text": "WHEN Generator adds clarification section THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json → key questions as bullets\n- Reads guardrails/required_context/evidence.json → evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or infer—be explicit when information is missing; save to clarification.strategy",
+                      "sequential_order": 4.0
+                    },
+                    {
+                      "name": "WHEN Generator adds strategy section THEN it",
+                      "text": "WHEN Generator adds strategy section THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json → assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json → each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
+                      "sequential_order": 5.0
+                    },
+                    {
+                      "name": "WHEN Generator adds build section THEN it",
+                      "text": "WHEN Generator adds build section THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)—no JSON schema for build output",
+                      "sequential_order": 6.0
+                    },
+                    {
+                      "name": "WHEN Generator adds render section THEN it",
+                      "text": "WHEN Generator adds render section THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template → story-map.txt)",
+                      "sequential_order": 7.0
+                    },
+                    {
+                      "name": "WHEN Generator processes rules directory THEN it",
+                      "text": "WHEN Generator processes rules directory THEN it:\n- Walks rules/*.json, sorts by priority\n- For each: extracts description, do.description, do.guidance, dont.description, dont.guidance\n- Formats as ## Rules with DO/DON'T blocks\n- Includes examples as code blocks",
+                      "sequential_order": 8.0
+                    },
+                    {
+                      "name": "WHEN Generator completes THEN output is .mdc rule files in workspace .cursor/rules/",
+                      "text": "WHEN Generator completes THEN output is .mdc rule files saved to workspace .cursor/rules/ folder (one per behavior)",
+                      "sequential_order": 9.0
+                    }
+                  ],
+                  "behavior": null
+                },
                 {
                   "name": "Generate Command Definitions",
                   "sequential_order": 1.0,
