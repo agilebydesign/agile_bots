@@ -7,7 +7,7 @@ from scanners.violation import Violation
 
 if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
-from .resources.ast_elements import Functions
+from scanners.resources.ast_elements import Functions
 
 class CoverAllPathsScanner(TestScanner):
     

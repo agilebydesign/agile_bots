@@ -7,7 +7,7 @@ from scanners.code.python.code_scanner import CodeScanner
 
 if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
-from .resources.ast_elements import Functions, IfStatements
+from scanners.resources.ast_elements import Functions, IfStatements
 
 logger = logging.getLogger(__name__)
 
