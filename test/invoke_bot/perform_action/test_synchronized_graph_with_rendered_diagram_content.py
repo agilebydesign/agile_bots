@@ -957,11 +957,10 @@ class TestUpdateGraphFromMapIncrements:
         # Load the rendered diagram and verify roundtrip integrity
         loaded = DrawIOStoryMap.load(drawio_file)
 
-        # Stories from increment lanes are parsed as DrawIOStory objects
-        # and assigned to sub-epics by position. Their cell_id retains
-        # the inc-lane/ prefix from the rendered diagram.
-        stories = loaded.get_stories()
-        lane_stories = [s for s in stories if 'inc-lane/' in s.cell_id]
+        # Stories from increment lanes are excluded from hierarchy (they appear only in lanes)
+        # but should still be parsed and accessible via _all_stories
+        all_stories = loaded._all_stories if hasattr(loaded, '_all_stories') else []
+        lane_stories = [s for s in all_stories if 'inc-lane/' in s.cell_id]
         assert len(lane_stories) >= 2, \
             f"Expected at least 2 lane stories, got {len(lane_stories)}"
         # Each story should have a valid Y position
@@ -1689,8 +1688,10 @@ class TestIncrementReportTwoPassExtraction:
         loaded = DrawIOStoryMap.load(drawio_file)
 
         # Find the story 'Load Config' (currently in MVP lane)
+        # Lane stories are in _all_stories, not in hierarchy
         story = None
-        for s in loaded.get_stories():
+        all_stories = loaded._all_stories if hasattr(loaded, '_all_stories') else loaded.get_stories()
+        for s in all_stories:
             if s.name == 'Load Config':
                 story = s
                 break
@@ -1790,7 +1791,9 @@ class TestIncrementReportTwoPassExtraction:
 
         # 2. Load and move 'Load Config' from MVP into Phase 2
         loaded = DrawIOStoryMap.load(drawio_file)
-        story = next(s for s in loaded.get_stories() if s.name == 'Load Config')
+        all_stories = loaded._all_stories if hasattr(loaded, '_all_stories') else loaded.get_stories()
+        story = next((s for s in all_stories if s.name == 'Load Config'), None)
+        assert story is not None, "'Load Config' story should be found in loaded diagram"
         phase2_lane = self._lane_bg_for(loaded, 'Phase 2')
         assert phase2_lane is not None
 

@@ -29,7 +29,10 @@ class DrawIOStoryMap(StoryMap):
         self._drawio_epics: List[DrawIOEpic] = []
         self._increment_lanes: List[DrawIOIncrementLane] = []
         self._loaded_nodes: List = []       # all parsed nodes from file (for extraction)
+        self._all_stories: List[DrawIOStory] = []  # all parsed stories (including orphans from lanes)
         self._layout_data: Optional[LayoutData] = None
+        self._has_rendered_ac = False       # track if AC was rendered
+        self._has_rendered_increments = False  # track if increments were rendered
 
     @property
     def diagram_type(self) -> str:
@@ -116,13 +119,17 @@ class DrawIOStoryMap(StoryMap):
         max_depth = max(_max_sub_epic_depth(epic) for epic in epics)
         rows = _RowPositions(max_depth)
 
+        # AC boxes are rendered only for acceptance_criteria diagram type
+        render_ac = (self._diagram_type == 'acceptance_criteria')
+
         x_pos = DrawIOEpic.X_START
         for epic in epics:
             drawio_epic = DrawIOStoryNodeSerializer.create_epic(
                 epic.name, getattr(epic, 'sequential_order', 0) or 0)
             drawio_epic.render_from_domain(epic, x_pos, rows, layout_data,
                                            skip_stories=skip_stories,
-                                           story_widths=story_widths)
+                                           story_widths=story_widths,
+                                           render_ac=render_ac)
             self._drawio_epics.append(drawio_epic)
             x_pos = drawio_epic.boundary.right + CELL_SPACING
 
@@ -141,6 +148,8 @@ class DrawIOStoryMap(StoryMap):
             increments_data: list,
             layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
         """Render outline with orphaned stories, then increment lanes.
+        
+        Sets _has_rendered_increments flag for extraction logic.
 
         Stories assigned to an increment appear ONLY in their lane.
         Stories NOT assigned to any increment ("orphaned") appear
@@ -151,6 +160,7 @@ class DrawIOStoryMap(StoryMap):
         so there is room for potentially multiple rows of unassigned
         stories.
         """
+        self._has_rendered_increments = True
         # Collect all story names that belong to at least one increment
         increment_story_names: set = set()
         for inc_data in increments_data:
@@ -232,6 +242,7 @@ class DrawIOStoryMap(StoryMap):
         Stories are spaced apart based on their widest acceptance
         criteria box so that AC text does not overlap between stories.
         """
+        self._has_rendered_ac = True
         domain_stories = self._collect_domain_stories(story_map)
 
         # Pre-compute the horizontal space each story needs (widest AC box)
@@ -259,6 +270,10 @@ class DrawIOStoryMap(StoryMap):
         xml_content = DrawIOStoryNodeSerializer.to_drawio_xml(all_nodes)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(xml_content, encoding='utf-8')
+
+    def save_layout(self, layout_path: Path):
+        layout = self.extract_layout()
+        layout.save(layout_path)
 
     def save_as_json(self, file_path: Path):
         data = self._to_story_graph_dict()
@@ -333,19 +348,27 @@ class DrawIOStoryMap(StoryMap):
         # Reconcile moves: stories that appear in both new and removed
         # (or are descendants of removed sub-epics) are reclassified as
         # moved_stories so updateFromDiagram preserves their data.
-        report.reconcile_moves(original_story_map)
+        # Also pass extracted increment data so stories in lanes aren't reported as removed.
+        extracted_increments = self.extract_increment_assignments() if self._has_rendered_increments else []
+        report.reconcile_moves(original_story_map, extracted_increments=extracted_increments)
 
         # Pass 2: increment assignments (vertical position).
-        # Compare extracted state against original to produce the delta.
+        # Only extract if this diagram has increments rendered or loaded.
         extracted = self.extract_increment_assignments()
-        if extracted:
+        # Only compute delta if we actually have increment data and either:
+        # - This was rendered as increments, OR
+        # - The extracted data has lanes (file was loaded with lanes)
+        if extracted and (self._has_rendered_increments or self._diagram_type == 'increments'):
             original_increments = original_story_map.story_graph.get('increments', [])
             self._compute_increment_delta(report, extracted, original_increments)
 
         # Pass 3: acceptance criteria delta.
-        # Compare extracted AC boxes against original story AC.
+        # Only extract if this diagram has AC rendered or loaded.
         extracted_ac = self.extract_ac_assignments()
-        if extracted_ac:
+        # Only compute delta if we actually have AC data and either:
+        # - AC was explicitly rendered, OR  
+        # - The extracted data has AC elements (file was loaded with AC)
+        if extracted_ac and (self._has_rendered_ac or self._diagram_type == 'acceptance_criteria'):
             self._compute_ac_delta(report, extracted_ac, original_story_map)
             report.reconcile_ac_moves()
         return report
@@ -465,7 +488,7 @@ class DrawIOStoryMap(StoryMap):
         # Loaded from file: scan all parsed nodes to discover lanes.
         all_nodes = self._loaded_nodes if self._loaded_nodes else self._collect_all_nodes()
 
-        # 1. Find lane backgrounds (large rectangles with empty value).
+        # 1. Find lane backgrounds: large rectangles with empty value
         lanes = []
         _LANE_MIN_WIDTH = 200
         _LANE_MIN_HEIGHT = 50
@@ -473,9 +496,14 @@ class DrawIOStoryMap(StoryMap):
             cid = getattr(n, 'cell_id', '')
             val = getattr(n, 'value', '') or ''
             bnd = getattr(n, 'boundary', None)
-            if (val == '' and bnd is not None
-                    and bnd.height >= _LANE_MIN_HEIGHT
-                    and bnd.width >= _LANE_MIN_WIDTH):
+            
+            # Must be large rectangle (potential lane background)
+            if bnd is None or bnd.height < _LANE_MIN_HEIGHT or bnd.width < _LANE_MIN_WIDTH:
+                continue
+            
+            # Lane backgrounds are large rectangles with empty value
+            # (both tool-generated and user-created backgrounds)
+            if val == '':
                 if cid.startswith('inc-lane/'):
                     slug = cid.replace('inc-lane/', '')
                 else:
@@ -487,6 +515,18 @@ class DrawIOStoryMap(StoryMap):
                     'name': '',
                     'cell_id': cid,
                 })
+            # User-created swimlane with name directly on it
+            elif cid.startswith('inc-lane/') or '/' not in cid:
+                shape = getattr(n, 'shape', '')
+                if shape == 'swimlane' or (not cid.startswith('epic-') and not cid.startswith('sub-epic-')):
+                    slug = cid.replace('inc-lane/', '') if cid.startswith('inc-lane/') else cid
+                    lanes.append({
+                        'slug': slug,
+                        'y': n.position.y,
+                        'height': bnd.height,
+                        'name': val,
+                        'cell_id': cid,
+                    })
 
         # 2. Match lane labels to get human-readable names.
         for n in all_nodes:
@@ -518,7 +558,10 @@ class DrawIOStoryMap(StoryMap):
         # 3. Gather story candidates by Y position.
         _skip_ids = {lane['cell_id'] for lane in lanes}
         candidates = []
-        for story in self.get_stories():
+        # Use _all_stories to include stories that were excluded from hierarchy
+        # (those in increment lanes)
+        stories_list = self._all_stories if hasattr(self, '_all_stories') and self._all_stories else self.get_stories()
+        for story in stories_list:
             candidates.append((story.name, story.position.y))
         for n in all_nodes:
             name = getattr(n, 'name', None) or getattr(n, 'value', None) or ''
@@ -793,16 +836,21 @@ class DrawIOStoryMap(StoryMap):
     # ------------------------------------------------------------------
 
     @classmethod
-    def load(cls, file_path: Path) -> 'DrawIOStoryMap':
+    def load(cls, file_path: Path, diagram_type: str = 'outline') -> 'DrawIOStoryMap':
+        """Load DrawIO diagram from file."""
+        instance = cls(diagram_type=diagram_type)
+        instance._load_from_file(file_path)
+        return instance
+    
+    def _load_from_file(self, file_path: Path):
+        """Internal method to load from file."""
         content = file_path.read_text(encoding='utf-8')
         nodes, parent_map = DrawIOStoryNodeSerializer.parse_nodes_from_xml(content)
 
         # Resolve group-relative positions: elements whose parent is a group
         # have x/y relative to the group.  Add the group's absolute position
         # so all nodes use absolute coordinates.
-        cls._resolve_group_positions(nodes, parent_map)
-
-        story_map = cls()
+        self._resolve_group_positions(nodes, parent_map)
 
         nodes_by_id = {}
         for n in nodes:
@@ -812,9 +860,10 @@ class DrawIOStoryMap(StoryMap):
         sub_epics = [n for n in nodes if isinstance(n, DrawIOSubEpic)]
         stories = [n for n in nodes if isinstance(n, DrawIOStory)]
 
-        story_map._assign_by_parent_map(nodes_by_id, parent_map, epics, sub_epics, stories)
-        story_map._assign_sequential_order_from_position(epics, sub_epics, stories)
-        story_map._drawio_epics = epics
+        self._assign_by_parent_map(nodes_by_id, parent_map, epics, sub_epics, stories, all_nodes=nodes)
+        self._assign_sequential_order_from_position(epics, sub_epics, stories)
+        self._drawio_epics = epics
+        self._all_stories = stories  # Keep all parsed stories for increment extraction
 
         # Classify remaining nodes: attach AC elements to their parent
         # stories, and reconstruct increment lanes.  Anything else is
@@ -823,7 +872,12 @@ class DrawIOStoryMap(StoryMap):
         classified = set()
         for e in epics:
             classified.add(id(e))
-            cls._classify_sub_epic_tree(e.get_sub_epics(), classified)
+            self._classify_sub_epic_tree(e.get_sub_epics(), classified)
+        
+        # Mark all stories as classified (even those excluded from hierarchy)
+        # so they don't end up in _loaded_nodes
+        for s in stories:
+            classified.add(id(s))
 
         # Build story lookup by cell_id for AC attachment
         story_by_cid = {}
@@ -846,17 +900,30 @@ class DrawIOStoryMap(StoryMap):
                 continue
             unclassified.append(n)
 
-        story_map._loaded_nodes = unclassified
-        return story_map
+        self._loaded_nodes = unclassified
+        
+        # Detect what type of content this diagram has based on loaded elements
+        # Check for increment lanes
+        for n in unclassified:
+            cid = getattr(n, 'cell_id', '')
+            shape = getattr(n, 'shape', '')
+            if cid.startswith('inc-lane/') or cid.startswith('inc-label/') or shape == 'swimlane':
+                self._has_rendered_increments = True
+                break
+        
+        # Check for AC boxes (attached to stories)
+        for s in stories:
+            if hasattr(s, '_ac_elements') and s._ac_elements:
+                self._has_rendered_ac = True
+                break
 
-    @classmethod
-    def _classify_sub_epic_tree(cls, sub_epics, classified: set):
+    def _classify_sub_epic_tree(self, sub_epics, classified: set):
         """Recursively walk sub-epics and their children into the classified set."""
         for se in sub_epics:
             classified.add(id(se))
             for s in se.get_stories():
                 classified.add(id(s))
-            cls._classify_sub_epic_tree(se.get_sub_epics(), classified)
+            self._classify_sub_epic_tree(se.get_sub_epics(), classified)
 
     @staticmethod
     def _resolve_group_positions(nodes, parent_map):
@@ -885,7 +952,7 @@ class DrawIOStoryMap(StoryMap):
     # Internal helpers (load direction)
     # ------------------------------------------------------------------
 
-    def _assign_by_parent_map(self, nodes_by_id, parent_map, epics, sub_epics, stories):
+    def _assign_by_parent_map(self, nodes_by_id, parent_map, epics, sub_epics, stories, all_nodes=None):
         # ── Phase 1: ID-based assignment for epics and sub-epics only ──
         # Stories are intentionally excluded here because their cell IDs
         # become stale when users drag them to a new sub-epic in DrawIO
@@ -956,7 +1023,59 @@ class DrawIOStoryMap(StoryMap):
         # ── Phase 3: Position-based story → sub-epic assignment ──
         # Always use position for stories (never IDs) because the visual
         # position in the diagram is the source of truth after user edits.
+        # Skip stories that are inside increment lanes - those are handled by
+        # increment extraction (Pass 2), not hierarchy assignment.
+        
+        # First, find increment lane Y ranges to exclude lane stories from hierarchy
+        # Only check for lanes if we have clear lane indicators (swimlane shapes or inc-lane/ prefixes)
+        lane_y_ranges = []
+        has_explicit_lanes = False
+        if all_nodes:
+            for n in all_nodes:
+                if isinstance(n, (DrawIOEpic, DrawIOSubEpic, DrawIOStory)):
+                    continue
+                cid = getattr(n, 'cell_id', '')
+                shape = getattr(n, 'shape', '')
+                # Only detect lanes if there are explicit indicators
+                if cid.startswith('inc-lane/') or cid.startswith('inc-label/') or shape == 'swimlane':
+                    has_explicit_lanes = True
+                    break
+        
+        if has_explicit_lanes and all_nodes:
+            for n in all_nodes:
+                if isinstance(n, (DrawIOEpic, DrawIOSubEpic, DrawIOStory)):
+                    continue
+                if not hasattr(n, 'boundary') or not hasattr(n, 'position'):
+                    continue
+                cid = getattr(n, 'cell_id', '')
+                val = getattr(n, 'value', '') or ''
+                bnd = n.boundary
+                shape = getattr(n, 'shape', '')
+                # Detect lane backgrounds
+                if (bnd and bnd.width >= 200 and bnd.height >= 50):
+                    # Tool-generated: empty value with inc-lane/ or shape=swimlane
+                    # User/test: large rectangle with lane-X id (but not lane-story-X-Y)
+                    is_lane = (cid.startswith('inc-lane/') or 
+                              shape == 'swimlane' or
+                              (cid.startswith('lane-') and not cid.startswith('lane-story-')))
+                    if is_lane:
+                        lane_y_ranges.append((n.position.y, n.position.y + bnd.height))
+        
         for story in stories:
+            # Skip story copies in increment lanes (by cell ID or Y position)
+            if story.cell_id.startswith('inc-lane/'):
+                continue
+            # Skip stories positioned within any increment lane Y range
+            if lane_y_ranges:
+                story_y = story.position.y
+                in_lane = False
+                for y_start, y_end in lane_y_ranges:
+                    if y_start <= story_y <= y_end:
+                        in_lane = True
+                        break
+                if in_lane:
+                    continue
+            
             story_cx = story.boundary.center.x
             best_se = None
             best_width = float('inf')

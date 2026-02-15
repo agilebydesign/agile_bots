@@ -20311,7 +20311,7 @@
                   "sequential_order": 1.0,
                   "behavior": null,
                   "domain_concepts": [],
-                  "test_file": "invoke_bot/perform_action/test_sync_epics_and_sub_epics.py",
+                  "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_epics_and_sub_epics.py",
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -20330,7 +20330,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestRenderEpicAndSubEpicHierarchy",
-                          "test_file": "invoke_bot/perform_action/test_sync_epics_and_sub_epics.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_epics_and_sub_epics.py",
                           "acceptance_criteria": [
                             {
                               "name": "When story graph has nested sub-epics then system renders each depth level with increasing Y positions and parent width encompasses all children",
@@ -20355,7 +20355,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_render_3_level_nested_sub_epics_creates_sub_epic_inside_sub_epic",
+                              "test_method": "test_render_epic_and_subepic_hierarchy_with_default_layout_positions_epics_at_fixed_y_and_subepics_below",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -20403,7 +20403,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_epic_horizontal_span_covers_all_sub_epics",
+                              "test_method": "test_parent_epic_spans_all_child_subepics_horizontally",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOSubEpic} is rendered with {DrawIOSubEpic.x} and {DrawIOSubEpic.width}",
@@ -20470,7 +20470,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_sibling_sub_epics_do_not_overlap_horizontally",
+                              "test_method": "test_sibling_subepics_do_not_overlap_horizontally",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOSubEpic} is rendered with {DrawIOSubEpic.x} and {DrawIOSubEpic.width}",
@@ -20518,7 +20518,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_rerender_with_saved_layout_data_preserves_epic_and_subepic_positions",
                               "steps": [
                                 {
                                   "text": "Given {LayoutData} exists with saved positions for {DrawIOSubEpic}",
@@ -20570,7 +20570,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_render_and_save_nested_sub_epics_produces_valid_drawio",
+                              "test_method": "test_render_completes_and_writes_valid_drawio_file_for_epic_hierarchy",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -20612,7 +20612,7 @@
                               "sequential_order": 6.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_render_4_level_nested_sub_epics_recurses_to_all_depths",
+                              "test_method": "test_nested_subepics_render_recursively_to_4_levels_of_depth",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOSubEpic} nested 4 levels deep",
@@ -20684,7 +20684,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_parent_and_leaf_sub_epics_both_rendered",
+                              "test_method": "test_both_parent_and_leaf_subepics_rendered_in_hierarchy",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOSubEpic} with {DrawIOSubEpic.role} of parent and leaf",
@@ -20791,7 +20791,7 @@
                               "sequential_order": 8.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_4_level_depth_produces_3_distinct_sub_epic_y_levels",
+                              "test_method": "test_nested_subepic_y_positions_increase_with_each_depth_level",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOSubEpic} nested multiple levels deep",
@@ -20858,7 +20858,7 @@
                               "sequential_order": 9.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_flat_graph_sub_epic_at_standard_y",
+                              "test_method": "test_singlelevel_subepic_renders_at_standard_y_position",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOEpic} with {DrawIOEpic.y} position",
@@ -20915,7 +20915,7 @@
                               "sequential_order": 10.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_nested_containers_horizontal_span_at_every_depth",
+                              "test_method": "test_nested_container_spans_children_at_every_depth_level",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOSubEpic} nested multiple levels deep",
@@ -21100,7 +21100,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestReportEpicAndSubEpicChanges",
-                          "test_file": "invoke_bot/perform_action/test_sync_epics_and_sub_epics.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_epics_and_sub_epics.py",
                           "acceptance_criteria": [
                             {
                               "name": "When user creates a sub-epic manually in DrawIO with simple cell ID then report treats it as new not rename",
@@ -21121,7 +21121,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_no_changes_reported_when_diagram_matches_original_for_epics_and_subepics",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has same sub-epic structure as {StoryMap}",
@@ -21151,7 +21151,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_user_created_sub_epic_with_simple_id_reported_as_new_not_rename",
+                              "test_method": "test_subepic_added_in_diagram_detected_as_new_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOSubEpic} not present in {StoryMap}",
@@ -21187,7 +21187,7 @@
                               "sequential_order": 3.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_tool_generated_sub_epic_with_hierarchical_id_still_eligible_for_rename",
+                              "test_method": "test_subepic_renamed_in_diagram_detected_as_rename_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOSubEpic} in {DrawIOStoryMap} has different name than {StoryMap}",
@@ -21229,7 +21229,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_extract_to_json_preserves_nested_sub_epic_structure",
+                              "test_method": "test_report_roundtrips_through_json_for_epic_and_subepic_hierarchy_structure",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has sub-epic changes",
@@ -21301,7 +21301,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_update_report_lists_exact_fuzzy_new_and_removed_stories",
+                              "test_method": "test_report_lists_exact_fuzzy_new_and_removed_entities_for_epics",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} exists with content extracted from diagram",
@@ -21353,7 +21353,7 @@
                               "sequential_order": 6.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_mixed_user_and_tool_ids_only_tool_ids_participate_in_rename",
+                              "test_method": "test_only_hierarchical_cell_id_subepics_participate_in_rename_pairing",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has unmatched {DrawIOSubEpic} with both simple and hierarchical {DrawIOElement.cell_id}",
@@ -21417,7 +21417,7 @@
                               "sequential_order": 7.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_all_simple_id_sub_epics_become_new_when_no_hierarchical_candidates",
+                              "test_method": "test_all_simple_cell_id_subepics_treated_as_new_when_no_hierarchical_candidates",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has unmatched {DrawIOSubEpic} all with simple {DrawIOElement.cell_id}",
@@ -21481,7 +21481,7 @@
                               "sequential_order": 8.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_rename_still_works_regardless_of_cell_id_format",
+                              "test_method": "test_story_rename_works_regardless_of_cell_id_format",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOStory} with name different from {StoryMap} and any {DrawIOElement.cell_id} format",
@@ -21525,7 +21525,7 @@
                               "sequential_order": 9.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_deleted_nodes_listed_as_removed_and_large_deletions_flagged",
+                              "test_method": "test_removed_epics_and_subepics_flagged_as_large_deletions_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has fewer nodes than {StoryMap}",
@@ -21669,7 +21669,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestUpdateEpicsAndSubEpicsFromDiagram",
-                          "test_file": "invoke_bot/perform_action/test_sync_epics_and_sub_epics.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_epics_and_sub_epics.py",
                           "acceptance_criteria": [
                             {
                               "name": "When new sub-epic appears in diagram then story graph adds it",
@@ -21694,7 +21694,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_story_map_updated_from_outline_diagram_applies_report_changes",
+                              "test_method": "test_apply_epic_and_subepic_changes_from_report_updates_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has sub-epic changes",
@@ -21743,7 +21743,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_deleted_sub_epic_reassigns_its_stories_by_position",
+                              "test_method": "test_removed_subepic_reassigns_its_stories_by_position",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOSubEpic} has been removed from {DrawIOStoryMap}",
@@ -21822,7 +21822,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_deleted_epic_removes_all_children_and_flags_large_deletions",
+                              "test_method": "test_removed_epic_removes_all_children_from_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOEpic} has been removed from {DrawIOStoryMap}",
@@ -21879,7 +21879,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_renamed_or_reordered_nodes_flagged_as_fuzzy_matches_in_update_report",
+                              "test_method": "test_renamed_subepic_in_diagram_updates_name_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOSubEpic} in {DrawIOStoryMap} has different name than in {StoryMap}",
@@ -21917,7 +21917,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_new_subepic_in_diagram_creates_it_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOSubEpic} not present in {StoryMap}",
@@ -21953,7 +21953,7 @@
                               "sequential_order": 6.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_endtoend_render_then_report_then_update_for_epic_hierarchy",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {DrawIOSubEpic}",
@@ -22008,7 +22008,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_extract_outline_assigns_stories_to_sub_epics_by_containment_and_sequential_order",
+                              "test_method": "test_extract_assigns_entities_to_parent_subepics_by_containment_and_sequential_order",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} outline file contains {DrawIOEpic} and {DrawIOSubEpic} and {DrawIOStory} cells",
@@ -22288,7 +22288,7 @@
                   "sequential_order": 2.0,
                   "behavior": null,
                   "domain_concepts": [],
-                  "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                  "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -22307,7 +22307,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestRenderStoriesAndActors",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When stories are rendered then they are positioned below deepest sub-epic",
@@ -22332,7 +22332,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_stories_positioned_below_deepest_sub_epic",
+                              "test_method": "test_render_stories_and_actors_with_default_layout_positions_stories_below_deepest_subepic",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -22358,7 +22358,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_sub_epic_horizontal_span_covers_all_stories",
+                              "test_method": "test_parent_subepic_spans_all_child_stories_horizontally",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} is rendered with {DrawIOStory.x} and {DrawIOStory.width}",
@@ -22471,7 +22471,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_rerender_with_saved_layout_data_preserves_story_and_actor_positions",
                               "steps": [
                                 {
                                   "text": "Given {LayoutData} exists with saved positions for {DrawIOStory}",
@@ -22613,7 +22613,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestRenderAcceptanceCriteria",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When story has acceptance criteria then system renders AC boxes below story in exploration diagram",
@@ -22638,7 +22638,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_render_acceptance_criteria_with_default_layout_positions_ac_boxes_below_stories",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -22664,7 +22664,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_re_render_exploration_with_layout_data_preserves_story_and_ac_box_positions",
+                              "test_method": "test_rerender_with_saved_layout_data_preserves_story_and_ac_box_positions",
                               "steps": [
                                 {
                                   "text": "Given {LayoutData} exists with saved positions for {DrawIOStory} and {DrawIOElement}",
@@ -22716,7 +22716,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_with_no_acceptance_criteria_renders_without_ac_boxes",
+                              "test_method": "test_render_with_no_acceptance_criteria_produces_story_without_ac_boxes",
                               "steps": [
                                 {
                                   "text": "Given {Story} has no {AcceptanceCriteria} defined",
@@ -22738,7 +22738,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_render_exploration_diagram_with_ac_boxes_below_stories",
+                              "test_method": "test_render_acceptance_criteria_boxes_below_stories_in_exploration_diagram",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -22772,7 +22772,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_ac_boxes_styled_and_positioned_below_story_with_extracted_step_text",
+                              "test_method": "test_ac_boxes_styled_with_correct_fill_stroke_and_positioned_below_story",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -22820,7 +22820,7 @@
                               "sequential_order": 6.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_exploration_render_output_contains_story_and_ac_cells_with_correct_containment",
+                              "test_method": "test_rendered_output_contains_story_and_ac_cells_with_correct_containment",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -22947,7 +22947,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestReportStoryMovesBetweenParents",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When story position changes between sub-epics in diagram then report detects it as a move not new plus removed",
@@ -22968,7 +22968,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_no_false_moves_when_no_changes",
+                              "test_method": "test_no_changes_reported_when_diagram_matches_original_for_story_positions",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has same story structure as {StoryMap}",
@@ -22994,7 +22994,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_story_moved_between_sub_epics_detected_as_move_not_new",
+                              "test_method": "test_story_moved_between_subepics_detected_as_move_not_new_plus_removed",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} in {DrawIOStoryMap} has different parent than in {StoryMap}",
@@ -23032,7 +23032,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_moved_across_epics_detected_as_move",
+                              "test_method": "test_story_moved_across_epics_detected_as_move_not_new_plus_removed",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} in {DrawIOStoryMap} has parent in different {Epic} than in {StoryMap}",
@@ -23101,7 +23101,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_moved_stories_serializes_to_json_and_round_trips",
+                              "test_method": "test_report_roundtrips_through_json_for_story_move_changes",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has story move changes",
@@ -23169,7 +23169,7 @@
                               "sequential_order": 5.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_stories_from_removed_sub_epic_detected_as_moves",
+                              "test_method": "test_stories_from_removed_subepic_detected_as_moves_to_parent",
                               "steps": [
                                 {
                                   "text": "Given {SubEpic} has been removed from {DrawIOStoryMap}",
@@ -23300,7 +23300,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestReportAcceptanceCriteriaChanges",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When AC box is added in diagram then report lists it as new acceptance criteria",
@@ -23325,7 +23325,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_no_ac_changes_when_diagram_matches_original",
+                              "test_method": "test_no_changes_reported_when_diagram_matches_original_for_acceptance_criteria",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has same {AcceptanceCriteria} structure as {StoryMap}",
@@ -23351,7 +23351,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_added_ac_box_detected_in_report",
+                              "test_method": "test_ac_box_added_in_diagram_detected_as_new_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOElement} AC box not present in {StoryMap}",
@@ -23387,7 +23387,7 @@
                               "sequential_order": 3.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_removed_ac_box_detected_in_report",
+                              "test_method": "test_ac_box_removed_from_diagram_detected_as_removed_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} lacks {DrawIOElement} AC box that {StoryMap} has",
@@ -23423,7 +23423,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_ac_moved_between_stories_detected_as_move",
+                              "test_method": "test_ac_moved_between_stories_detected_as_move_not_new_plus_removed",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOElement} AC box has moved from one {DrawIOStory} to another",
@@ -23461,7 +23461,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_ac_cells_assigned_to_stories_by_vertical_position_below_story_cells",
+                              "test_method": "test_ac_boxes_assigned_to_stories_by_vertical_position_below_story_cells",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has AC {DrawIOElement} positioned below {DrawIOStory}",
@@ -23483,7 +23483,7 @@
                               "sequential_order": 6.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_extract_exploration_maps_ac_boxes_to_stories_by_position_and_containment",
+                              "test_method": "test_extract_assigns_ac_boxes_to_stories_by_vertical_position_and_containment",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has AC {DrawIOElement} positioned below {DrawIOStory}",
@@ -23509,7 +23509,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_ac_changes_roundtrip_through_json",
+                              "test_method": "test_report_roundtrips_through_json_for_acceptance_criteria_changes",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has acceptance criteria changes",
@@ -23562,7 +23562,7 @@
                               "sequential_order": 8.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_when_then_ac_text_extracted_as_step_descriptions",
+                              "test_method": "test_ac_box_with_whenthen_format_text_extracted_as_step_description",
                               "steps": [
                                 {
                                   "text": "Given AC {DrawIOElement} has {DrawIOElement.text} with When/Then format",
@@ -23604,7 +23604,7 @@
                               "sequential_order": 9.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_ac_box_text_not_in_when_then_format_treated_as_plain_acceptance_criteria",
+                              "test_method": "test_ac_box_with_plain_text_format_treated_as_acceptance_criteria_without_step_extraction",
                               "steps": [
                                 {
                                   "text": "Given AC {DrawIOElement} has {DrawIOElement.text} with plain format",
@@ -23761,7 +23761,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestUpdateStoriesFromDiagram",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When story is moved between sub-epics in diagram then story graph transfers it preserving all fields",
@@ -23786,7 +23786,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_moved_story_gets_recomputed_sequential_order_from_new_position",
+                              "test_method": "test_apply_story_move_transfers_between_subepics_preserving_data",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} has been moved to a new position in {DrawIOStoryMap}",
@@ -23828,7 +23828,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_move_story_preserves_data",
+                              "test_method": "test_apply_story_move_preserves_all_story_fields",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} contains a {StoryMove} for {DrawIOStory}",
@@ -23874,7 +23874,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_cross_epic_move_preserves_story_data",
+                              "test_method": "test_apply_crossepic_story_move_preserves_acceptance_criteria_and_scenarios",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} has been moved from {SubEpic} under one {Epic} to {SubEpic} under a different {Epic}",
@@ -23947,7 +23947,7 @@
                               "sequential_order": 4.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_single_story_deleted_keeps_original_structure_and_flags_if_many_missing",
+                              "test_method": "test_removed_story_keeps_original_structure_and_flags_if_many_missing_from_epic",
                               "steps": [
                                 {
                                   "text": "Given one {DrawIOStory} cell has been removed from {DrawIOStoryMap}",
@@ -23991,7 +23991,7 @@
                               "sequential_order": 5.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_stories_preserved_when_sub_epic_removed_but_stories_moved",
+                              "test_method": "test_moved_stories_preserved_when_subepic_removed_from_diagram",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} has been moved to another {SubEpic} in {DrawIOStoryMap}",
@@ -24033,7 +24033,7 @@
                               "sequential_order": 6.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_not_moved_is_deleted_with_sub_epic",
+                              "test_method": "test_unmoved_stories_removed_with_subepic_when_subepic_removed_from_diagram",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} was NOT moved to another {SubEpic}",
@@ -24090,7 +24090,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_move_to_renamed_sub_epic",
+                              "test_method": "test_move_to_renamed_subepic_updates_correctly_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} has been renamed in {DrawIOStoryMap}",
@@ -24128,7 +24128,7 @@
                               "sequential_order": 8.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_move_to_new_sub_epic",
+                              "test_method": "test_move_to_new_subepic_creates_it_and_transfers_story",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has a new {DrawIOStory} not in original {StoryMap}",
@@ -24166,7 +24166,7 @@
                               "sequential_order": 9.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_end_to_end_move_story_via_report_preserves_data",
+                              "test_method": "test_endtoend_render_then_report_then_update_for_story_moves",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {Story}",
@@ -24309,7 +24309,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestUpdateAcceptanceCriteriaFromDiagram",
-                          "test_file": "invoke_bot/perform_action/test_sync_stories_and_actors.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py",
                           "acceptance_criteria": [
                             {
                               "name": "When AC changes are applied from report then story graph reflects additions and removals",
@@ -24334,7 +24334,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_ac_change_adds_and_removes",
+                              "test_method": "test_apply_acceptance_criteria_changes_from_report_updates_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has acceptance criteria changes",
@@ -24377,7 +24377,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_ac_move_preserves_data",
+                              "test_method": "test_apply_ac_move_transfers_between_stories_preserving_data",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} contains an {AcceptanceCriteria} move from one {Story} to another",
@@ -24419,7 +24419,7 @@
                               "sequential_order": 3.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_split_ac_distributed_correctly",
+                              "test_method": "test_story_split_distributes_ac_correctly_to_new_and_original_stories",
                               "steps": [
                                 {
                                   "text": "Given {Story} has been split in diagram with some {AcceptanceCriteria} moved to a new {DrawIOStory}",
@@ -24486,7 +24486,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_merge_preserves_original_ac_for_matched_stories_from_exploration_view",
+                              "test_method": "test_update_preserves_original_acceptance_criteria_for_matched_stories",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has matched {AcceptanceCriteria} between diagram and {StoryMap}",
@@ -24508,7 +24508,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_end_to_end_ac_add_remove_via_report",
+                              "test_method": "test_endtoend_render_then_report_then_update_for_acceptance_criteria",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {AcceptanceCriteria}",
@@ -24656,7 +24656,7 @@
                   "sequential_order": 3.0,
                   "behavior": null,
                   "domain_concepts": [],
-                  "test_file": "invoke_bot/perform_action/test_sync_increments.py",
+                  "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_increments.py",
                   "sub_epics": [],
                   "story_groups": [
                     {
@@ -24675,7 +24675,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestRenderIncrementLanes",
-                          "test_file": "invoke_bot/perform_action/test_sync_increments.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_increments.py",
                           "acceptance_criteria": [
                             {
                               "name": "When increment lanes are rendered then stories are positioned within lanes ordered by priority",
@@ -24700,7 +24700,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_render_increments_diagram_with_stories_assigned_to_increment_lanes",
+                              "test_method": "test_render_increment_lanes_with_default_layout_positions_lanes_below_outline_by_priority",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -24726,7 +24726,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_re_render_increments_with_existing_layout_data_recomputes_lane_positions",
+                              "test_method": "test_rerender_with_saved_layout_data_preserves_epic_and_subepic_positions_and_recomputes_lane_positions",
                               "steps": [
                                 {
                                   "text": "Given {LayoutData} exists with saved positions from previous render",
@@ -24772,7 +24772,7 @@
                               "sequential_order": 3.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_render_increments_completes_and_summary_includes_increment_count",
+                              "test_method": "test_render_completes_and_writes_drawio_file_with_correct_summary_for_increment_lanes",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -24802,7 +24802,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_increment_lane_cells_styled_for_extractor_detection",
+                              "test_method": "test_all_increment_lane_cells_have_required_styles_for_extractor_detection",
                               "steps": [
                                 {
                                   "text": "Given no {LayoutData} exists for this diagram",
@@ -24824,7 +24824,7 @@
                               "sequential_order": 5.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_render_increments_with_no_increments_defined_produces_outline_only_diagram",
+                              "test_method": "test_render_with_no_increments_defined_produces_outlineonly_diagram",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has no {Increment} defined",
@@ -24894,7 +24894,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_actor_labels_rendered_above_stories_in_increment_lanes",
+                              "test_method": "test_actor_labels_rendered_above_stories_within_each_increment_lane_deduplicated_per_lane",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {Increment} with {Story} that have {StoryUser} assigned",
@@ -25086,7 +25086,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestReportIncrementChanges",
-                          "test_file": "invoke_bot/perform_action/test_sync_increments.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_increments.py",
                           "acceptance_criteria": [
                             {
                               "name": "When increment lane is added in diagram then report lists it as new",
@@ -25111,7 +25111,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_no_changes_when_diagram_matches_original",
+                              "test_method": "test_no_changes_reported_when_diagram_matches_original_for_increments",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has same {Increment} structure as {StoryMap}",
@@ -25133,7 +25133,7 @@
                               "sequential_order": 2.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_user_created_lane_shows_in_report_as_new_increment",
+                              "test_method": "test_increment_lane_added_in_diagram_detected_as_new_in_report",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has a new {Increment} lane added by user",
@@ -25181,7 +25181,7 @@
                               "sequential_order": 3.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_move_story_between_increments_reports_correct_delta",
+                              "test_method": "test_story_moved_between_increment_lanes_detected_as_move_in_report",
                               "steps": [
                                 {
                                   "text": "Given {IncrementStory} has been moved from one {Increment} to another in {DrawIOStoryMap}",
@@ -25224,7 +25224,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": null,
+                              "test_method": "test_increment_lane_renamed_in_diagram_detected_as_rename_in_report",
                               "steps": [
                                 {
                                   "text": "Given {Increment} lane has been renamed in {DrawIOStoryMap}",
@@ -25264,7 +25264,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_user_created_lane_stories_assigned_by_y_position",
+                              "test_method": "test_stories_assigned_to_increment_lanes_by_y_position",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOStory} cells positioned below {Increment} lane elements",
@@ -25286,7 +25286,7 @@
                               "sequential_order": 6.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_extract_increments_assigns_stories_to_lanes_by_y_position_with_priority_from_order",
+                              "test_method": "test_extract_assigns_stories_to_increment_lanes_by_y_position_with_priority_from_order",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} increments file contains {Increment} lane cells and {DrawIOStory} cells",
@@ -25320,7 +25320,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_increment_delta_serializes_to_json_and_round_trips",
+                              "test_method": "test_report_roundtrips_through_json_for_increment_changes",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has increment changes",
@@ -25401,7 +25401,7 @@
                               "sequential_order": 8.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_update_report_generated_for_increments_view_with_story_level_matches",
+                              "test_method": "test_report_lists_exact_fuzzy_new_and_removed_stories_for_increments_view",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has been extracted from diagram",
@@ -25460,7 +25460,7 @@
                               "sequential_order": 9.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_report_includes_removed_increments_and_order",
+                              "test_method": "test_report_includes_removed_increments_and_new_order",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has fewer {Increment} than original {StoryMap}",
@@ -25496,7 +25496,7 @@
                               "sequential_order": 10.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_user_created_lane_detected_by_geometry",
+                              "test_method": "test_usercreated_lane_detected_by_geometry_in_diagram",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has a user-created lane with simple {DrawIOElement.cell_id} and large rectangle geometry",
@@ -25534,7 +25534,7 @@
                               "sequential_order": 11.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_moving_orphan_into_lane_reports_as_added",
+                              "test_method": "test_orphan_story_dragged_into_lane_reported_as_added_to_increment",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} is unassigned in {DrawIOStoryMap} increments diagram",
@@ -25576,7 +25576,7 @@
                               "sequential_order": 12.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_no_false_new_stories_with_duplicates_across_lanes",
+                              "test_method": "test_story_in_multiple_lanes_produces_no_false_duplicate_reports",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStory} appears in multiple {Increment} lanes in {DrawIOStoryMap}",
@@ -25616,7 +25616,7 @@
                               "sequential_order": 13.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_known_inserting_lane_between_existing_may_misinterpret_without_stable_ids",
+                              "test_method": "test_known_limitation_inserting_between_existing_lanes_uses_positionbased_matching",
                               "steps": [
                                 {
                                   "text": "Given original {StoryMap} has {Increment} lanes [A, B, C]",
@@ -25668,7 +25668,7 @@
                               "sequential_order": 14.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_story_not_within_100px_of_any_lane_remains_unassigned_in_extracted",
+                              "test_method": "test_story_not_within_threshold_of_any_lane_remains_unassigned",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {DrawIOStory} positioned more than 100px from any {Increment} lane",
@@ -25826,7 +25826,7 @@
                             "Bot Behavior"
                           ],
                           "test_class": "TestUpdateIncrementsFromDiagram",
-                          "test_file": "invoke_bot/perform_action/test_sync_increments.py",
+                          "test_file": "invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_increments.py",
                           "acceptance_criteria": [
                             {
                               "name": "When increment move is applied from report then story transfers between increments preserving data",
@@ -25851,7 +25851,7 @@
                               "sequential_order": 1.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_increment_move_transfers_story_between_increments",
+                              "test_method": "test_apply_increment_move_transfers_story_between_increments_preserving_data",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} contains an {IncrementChange} move from one {Increment} to another",
@@ -25898,7 +25898,7 @@
                               "sequential_order": 2.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_apply_remove_increment_deletes_entire_increment_from_story_graph",
+                              "test_method": "test_removed_increment_deletes_entire_increment_from_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} contains a removed {Increment}",
@@ -25951,7 +25951,7 @@
                               "sequential_order": 4.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_renamed_increment_lane_updated_by_position_based_matching",
+                              "test_method": "test_renamed_increment_lane_in_diagram_updates_name_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {Increment} lane has been renamed in {DrawIOStoryMap}",
@@ -25987,7 +25987,7 @@
                               "sequential_order": 5.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_increment_move_creates_target_if_missing",
+                              "test_method": "test_new_increment_lane_in_diagram_creates_it_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has a new {Increment} not in original {StoryMap}",
@@ -26031,7 +26031,7 @@
                               "sequential_order": 6.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_merge_preserves_original_ac_and_updates_story_fields",
+                              "test_method": "test_update_preserves_original_acceptance_criteria_for_matched_increment_stories",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} has matched {Increment} between diagram and {StoryMap}",
@@ -26067,7 +26067,7 @@
                               "sequential_order": 7.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_end_to_end_remove_lane_and_reorder_updates_story_graph",
+                              "test_method": "test_endtoend_render_then_report_then_update_for_increment_lanes",
                               "steps": [
                                 {
                                   "text": "Given {StoryMap} has {Increment}",
@@ -26115,7 +26115,7 @@
                               "sequential_order": 8.0,
                               "type": "error_case",
                               "background": [],
-                              "test_method": "test_apply_remove_increment_returns_false_for_nonexistent",
+                              "test_method": "test_removing_nonexistent_increment_returns_false",
                               "steps": [
                                 {
                                   "text": "Given {UpdateReport} references an {Increment} that does not exist in {StoryMap}",
@@ -26149,7 +26149,7 @@
                               "sequential_order": 9.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_increment_order_updates_priorities",
+                              "test_method": "test_update_increment_order_from_diagram_updates_priorities_in_story_graph",
                               "steps": [
                                 {
                                   "text": "Given {DrawIOStoryMap} has {Increment} lanes in a new order different from {StoryMap}",
@@ -26189,7 +26189,7 @@
                               "sequential_order": 10.0,
                               "type": "happy_path",
                               "background": [],
-                              "test_method": "test_apply_increment_order_no_change_when_already_correct",
+                              "test_method": "test_no_changes_when_increment_priorities_already_match_diagram_order",
                               "steps": [
                                 {
                                   "text": "Given {Increment.priority} in {StoryMap} already match {DrawIOStoryMap} diagram order",
@@ -26211,7 +26211,7 @@
                               "sequential_order": 11.0,
                               "type": "edge_case",
                               "background": [],
-                              "test_method": "test_extra_extracted_lanes_appended_fewer_lanes_leave_originals_unchanged",
+                              "test_method": "test_extra_lanes_appended_and_fewer_lanes_leave_original_increments_unchanged",
                               "steps": [
                                 {
                                   "text": "Given original {StoryMap} has fewer {Increment} lanes than {DrawIOStoryMap}",
