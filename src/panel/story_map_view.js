@@ -285,9 +285,12 @@ class StoryMapView extends PanelView {
         let contentHtml = '';
         let contentSummary = '';
         
-        // Check if we should render Increment view instead of Hierarchy
-        const isIncrementView = this.currentViewMode === 'Increment';
-        log(`[StoryMapView] Rendering view mode: ${this.currentViewMode || 'Hierarchy'}`);
+        // Determine the actual view mode based on scope type and currentViewMode
+        // If scope type is 'files', we're in Files view regardless of currentViewMode
+        const isFilesView = scopeData.type === 'files';
+        const isIncrementView = !isFilesView && this.currentViewMode === 'Increment';
+        const actualViewMode = isFilesView ? 'Files' : (isIncrementView ? 'Increment' : 'Hierarchy');
+        log(`[StoryMapView] Rendering view mode: ${actualViewMode} (currentViewMode: ${this.currentViewMode}, scopeType: ${scopeData.type})`);
         
         if (isIncrementView) {
             // Render increment columns view (read-only)
@@ -2505,29 +2508,56 @@ class StoryMapView extends PanelView {
             '                }\n' +
             '            };\n' +
             '            \n' +
-            '            // Toggle between Hierarchy and Increment views\n' +
-            '            window.toggleIncrementView = function() {\n' +
-            '                var btn = document.getElementById(\'btn-toggle-increment-view\');\n' +
-            '                if (!btn) {\n' +
-            '                    console.error(\'[toggleIncrementView] Toggle button not found\');\n' +
-            '                    return;\n' +
+            '            // Switch between Hierarchy, Increment, and Files views\n' +
+            '            window.switchViewMode = function(viewMode) {\n' +
+            '                console.log(\'[switchViewMode] Switching to\', viewMode);\n' +
+            '                \n' +
+            '                // Get current view from radio buttons\n' +
+            '                var currentRadio = document.querySelector(\'input[name="view-mode"]:checked\');\n' +
+            '                var previousView = currentRadio ? currentRadio.value : \'Hierarchy\';\n' +
+            '                \n' +
+            '                // Update radio button states\n' +
+            '                var radios = document.querySelectorAll(\'input[name="view-mode"]\');\n' +
+            '                radios.forEach(function(radio) {\n' +
+            '                    if (radio.value === viewMode) {\n' +
+            '                        radio.checked = true;\n' +
+            '                    }\n' +
+            '                });\n' +
+            '                \n' +
+            '                // If switching to Files view, prepare and apply file filter\n' +
+            '                if (viewMode === \'Files\') {\n' +
+            '                    var filterInput = document.getElementById(\'scopeFilterInput\');\n' +
+            '                    if (filterInput) {\n' +
+            '                        var filterValue = filterInput.value.trim();\n' +
+            '                        \n' +
+            '                        // If no filter, default to showing all src files\n' +
+            '                        if (!filterValue) {\n' +
+            '                            filterValue = \'src/**/*.py\';\n' +
+            '                            filterInput.value = filterValue;\n' +
+            '                        } else {\n' +
+            '                            // Add src/ prefix if neither src nor test is at the start\n' +
+            '                            if (!filterValue.startsWith(\'src/\') && !filterValue.startsWith(\'test/\')) {\n' +
+            '                                filterValue = \'src/\' + filterValue;\n' +
+            '                                filterInput.value = filterValue;\n' +
+            '                            }\n' +
+            '                        }\n' +
+            '                        \n' +
+            '                        // Trigger the filter update to switch to file view\n' +
+            '                        console.log(\'[switchViewMode] Applying file filter:\', filterValue);\n' +
+            '                        updateFilter(filterValue);\n' +
+            '                    }\n' +
+            '                } else if (previousView === \'Files\' && (viewMode === \'Hierarchy\' || viewMode === \'Increment\')) {\n' +
+            '                    // Switching away from Files view - clear the file filter\n' +
+            '                    console.log(\'[switchViewMode] Switching from Files to\', viewMode, \'- clearing file filter\');\n' +
+            '                    clearScopeFilter();\n' +
+            '                    return; // clearScopeFilter will trigger the view switch\n' +
             '                }\n' +
-            '                \n' +
-            '                var currentView = btn.getAttribute(\'data-current-view\') || \'Hierarchy\';\n' +
-            '                var newView = currentView === \'Hierarchy\' ? \'Increment\' : \'Hierarchy\';\n' +
-            '                \n' +
-            '                console.log(\'[toggleIncrementView] Switching from\', currentView, \'to\', newView);\n' +
-            '                \n' +
-            '                // Update button state\n' +
-            '                btn.setAttribute(\'data-current-view\', newView);\n' +
-            '                btn.textContent = currentView; // Button shows the OTHER view to switch to\n' +
-            '                btn.title = \'Switch to \' + currentView + \' view\';\n' +
             '                \n' +
             '                // Send message to extension to switch view\n' +
             '                if (typeof vscode !== \'undefined\') {\n' +
             '                    vscode.postMessage({\n' +
-            '                        command: \'toggleIncrementView\',\n' +
-            '                        currentView: newView\n' +
+            '                        command: \'switchViewMode\',\n' +
+            '                        viewMode: viewMode\n' +
             '                    });\n' +
             '                }\n' +
             '            };\n' +
@@ -2551,24 +2581,76 @@ class StoryMapView extends PanelView {
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
-                    <button id="btn-toggle-increment-view" 
-                        data-current-view="${this.currentViewMode || 'Hierarchy'}"
-                        onclick="event.stopPropagation(); toggleIncrementView();" style="
-                        background: transparent;
+                    <div style="
+                        display: flex;
+                        gap: 6px;
+                        margin-left: 12px;
                         border: 1px solid var(--text-color-faded, #999);
                         border-radius: 4px;
-                        padding: 2px 8px;
-                        margin-left: 12px;
-                        cursor: pointer;
-                        font-size: 12px;
-                        color: var(--text-color, #fff);
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Switch to ${(this.currentViewMode || 'Hierarchy') === 'Hierarchy' ? 'Increment' : 'Hierarchy'} view">
-                        ${(this.currentViewMode || 'Hierarchy') === 'Hierarchy' ? 'Increment' : 'Hierarchy'}
-                    </button>
+                        padding: 2px;
+                        background: transparent;
+                    ">
+                        <label style="
+                            display: flex;
+                            align-items: center;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            color: var(--text-color, #fff);
+                            border-radius: 2px;
+                            background: ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                            transition: background 0.15s ease;
+                        " 
+                        onclick="event.stopPropagation();"
+                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
+                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
+                            <input type="radio" name="view-mode" value="Hierarchy" 
+                                ${actualViewMode === 'Hierarchy' ? 'checked' : ''}
+                                onchange="switchViewMode('Hierarchy')" 
+                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
+                            Hierarchy
+                        </label>
+                        <label style="
+                            display: flex;
+                            align-items: center;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            color: var(--text-color, #fff);
+                            border-radius: 2px;
+                            background: ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                            transition: background 0.15s ease;
+                        " 
+                        onclick="event.stopPropagation();"
+                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
+                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
+                            <input type="radio" name="view-mode" value="Increment" 
+                                ${actualViewMode === 'Increment' ? 'checked' : ''}
+                                onchange="switchViewMode('Increment')" 
+                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
+                            Increment
+                        </label>
+                        <label style="
+                            display: flex;
+                            align-items: center;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            color: var(--text-color, #fff);
+                            border-radius: 2px;
+                            background: ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                            transition: background 0.15s ease;
+                        " 
+                        onclick="event.stopPropagation();"
+                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
+                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
+                            <input type="radio" name="view-mode" value="Files" 
+                                ${actualViewMode === 'Files' ? 'checked' : ''}
+                                onchange="switchViewMode('Files')" 
+                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
+                            Files
+                        </label>
+                    </div>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;

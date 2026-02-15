@@ -6,12 +6,25 @@ class IncrementView {
 
     toggleView() {
         const previousView = this.currentView;
-        this.currentView = this.currentView === 'Hierarchy' ? 'Increment' : 'Hierarchy';
+        // Cycle through three views: Hierarchy -> Increment -> Files -> Hierarchy
+        if (this.currentView === 'Hierarchy') {
+            this.currentView = 'Increment';
+        } else if (this.currentView === 'Increment') {
+            this.currentView = 'Files';
+        } else {
+            this.currentView = 'Hierarchy';
+        }
         return {
             current_view: this.currentView,
             toggle_label: previousView,
             tooltip: `Display ${previousView} view`
         };
+    }
+
+    setView(viewMode) {
+        if (['Hierarchy', 'Increment', 'Files'].includes(viewMode)) {
+            this.currentView = viewMode;
+        }
     }
 
     renderIncrementColumns() {

@@ -50,7 +50,7 @@ class BotPanel {
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};
-      this._currentStoryMapView = 'Hierarchy'; // 'Hierarchy' or 'Increment'
+      this._currentStoryMapView = 'Hierarchy'; // 'Hierarchy', 'Increment', or 'Files'
       
       // Initialize branding with repo root
       branding.setRepoRoot(workspaceRoot);
@@ -182,7 +182,7 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-            // Toggle between Hierarchy and Increment views
+            // Legacy support for toggle (now handled by switchViewMode)
             this._log('[BotPanel] toggleIncrementView: switching to ' + message.currentView);
             this._currentStoryMapView = message.currentView;
             // Refresh the panel to show the new view
@@ -191,6 +191,19 @@ class BotPanel {
                 await this._update();
               } catch (err) {
                 console.error(`[BotPanel] Toggle view error: ${err.message}`);
+              }
+            })();
+            return;
+          case "switchViewMode":
+            // Switch between Hierarchy, Increment, and Files views
+            this._log('[BotPanel] switchViewMode: switching to ' + message.viewMode);
+            this._currentStoryMapView = message.viewMode;
+            // Refresh the panel to show the new view
+            (async () => {
+              try {
+                await this._update();
+              } catch (err) {
+                console.error(`[BotPanel] Switch view error: ${err.message}`);
               }
             })();
             return;
