@@ -525,15 +525,20 @@ class CLISession:
             except json.JSONDecodeError as e:
                 logging.warning(f"Failed to parse --evidence_provided: {e}")
         
-        scope_type_match = re.search(r"--scope-type=(\S+)", args_string)
-        scope_value_match = re.search(r"--scope-value=(\S+)", args_string)
-        
-        # Combine scope-type and scope-value into a single scope dict parameter
-        if scope_type_match and scope_value_match:
-            params['scope'] = {
-                'type': scope_type_match.group(1),
-                'value': scope_value_match.group(1)
-            }
+        scope_json_match = re.search(r'--scope=(\{.*\})', args_string)
+        if scope_json_match:
+            try:
+                params['scope'] = json.loads(scope_json_match.group(1))
+            except json.JSONDecodeError:
+                logging.warning(f"Failed to parse --scope JSON: {scope_json_match.group(1)}")
+        else:
+            scope_type_match = re.search(r"--scope-type=(\S+)", args_string)
+            scope_value_match = re.search(r"--scope-value=(\S+)", args_string)
+            if scope_type_match and scope_value_match:
+                params['scope'] = {
+                    'type': scope_type_match.group(1),
+                    'value': scope_value_match.group(1)
+                }
         
         return params
     
@@ -627,9 +632,9 @@ class CLISession:
         if is_non_workflow:
             return self._execute_non_workflow_action(action, action_name, args)
         
-        # Workflow action - navigate and route
         behavior.actions.navigate_to(action_name)
-        return self._route_to_behavior_action(f"{behavior.name}.{action_name}")
+        full_command = f"{behavior.name}.{action_name} {args}" if args else f"{behavior.name}.{action_name}"
+        return self._route_to_behavior_action(full_command)
     
     def _get_adapter_for_domain(self, domain_object: Any):
         if self.mode:

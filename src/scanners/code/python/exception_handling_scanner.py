@@ -7,7 +7,7 @@ from scanners.code.python.code_scanner import CodeScanner
 if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
 from scanners.violation import Violation
-from .resources.ast_elements import TryBlocks
+from scanners.resources.ast_elements import TryBlocks
 
 class ExceptionHandlingScanner(CodeScanner):
     

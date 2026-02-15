@@ -8,7 +8,7 @@ from scanners.code.python.code_scanner import CodeScanner
 
 if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
-from .resources.ast_elements import Functions
+from scanners.resources.ast_elements import Functions
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class SeparateConcernsScanner(CodeScanner):
         return violations
     
     def _check_mixed_concerns(self, func_node: ast.FunctionDef, content: str, file_path: Path) -> Optional[Dict[str, Any]]:
-        from .complexity_metrics import ComplexityMetrics
+        from scanners.complexity_metrics import ComplexityMetrics
         
         responsibilities = ComplexityMetrics.detect_responsibilities(func_node)
         

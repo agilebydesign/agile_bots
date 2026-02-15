@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
 from scanners.violation import Violation
 from collections import defaultdict
-from .resources.ast_elements import Functions, Classes
+from scanners.resources.ast_elements import Functions, Classes
 
 logger = logging.getLogger(__name__)
 

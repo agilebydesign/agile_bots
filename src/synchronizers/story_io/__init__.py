@@ -1,9 +1,3 @@
-"""
-Story IO Domain Model
-
-DrawIO story map rendering and synchronization using the domain model.
-"""
-
 from .story_io_position import Position, Boundary
 from .story_io_synchronizer import DrawIOSynchronizer
 from .drawio_story_map import DrawIOStoryMap

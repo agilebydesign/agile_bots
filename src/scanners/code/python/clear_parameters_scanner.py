@@ -5,7 +5,7 @@ import ast
 import logging
 from scanners.code.python.code_scanner import CodeScanner
 from scanners.violation import Violation
-from .resources.ast_elements import Functions
+from scanners.resources.ast_elements import Functions
 
 if TYPE_CHECKING:
     from scanners.resources.scan_context import FileScanContext
