@@ -2,6 +2,9 @@ from typing import List, Optional, Any, Set
 from dataclasses import dataclass, field
 from story_graph.nodes import StoryNode, Epic, SubEpic, Story, StoryGroup
 from story_graph.domain import DomainConcept, StoryUser
+from .diagram_story_node import (
+    DiagramStoryNode, DiagramEpic, DiagramSubEpic, DiagramStory, DiagramIncrement
+)
 from .drawio_element import DrawIOElement, STYLE_DEFAULTS
 from .story_io_position import Position, Boundary
 from .update_report import UpdateReport
@@ -255,7 +258,12 @@ class _RowPositions:
 # ---------------------------------------------------------------------------
 
 @dataclass
-class DrawIOStoryNode(StoryNode):
+class DrawIOStoryNode(DiagramStoryNode):
+    """DrawIO-specific node handling XML read/write.
+    
+    Inherits from DiagramStoryNode (platform-agnostic positioning/formatting)
+    and adds DrawIO XML serialization via DrawIOElement.
+    """
     _element: DrawIOElement = field(default=None, repr=False)
 
     def __post_init__(self):
@@ -273,10 +281,12 @@ class DrawIOStoryNode(StoryNode):
 
     @property
     def position(self) -> Position:
+        """Position from DrawIO XML element."""
         return self._element.position
 
     @property
     def boundary(self) -> Boundary:
+        """Boundary from DrawIO XML element."""
         return self._element.boundary
 
     @property
@@ -300,18 +310,43 @@ class DrawIOStoryNode(StoryNode):
         return self._element.cell_id
 
     def set_position(self, x: float, y: float):
+        """Set position in DrawIO XML element."""
         self._element.set_position(x, y)
 
     def set_size(self, width: float, height: float):
+        """Set size in DrawIO XML element."""
         self._element.set_size(width, height)
 
     def add_child(self, child: 'DrawIOStoryNode'):
+        """Add child node (from DiagramStoryNode)."""
         child._parent = self
         self._children.append(child)
 
     def compute_container_dimensions_from_children(self, spacing: float = SPACING) -> Boundary:
         """Kept for backward compatibility but not used in row-based layout."""
         return self._element.boundary
+    
+    def containment_rules(self) -> dict:
+        """Default containment rules. Subclasses override."""
+        return {}
+    
+    def placement_rules(self) -> dict:
+        """Default placement rules. Subclasses override."""
+        return {}
+    
+    def formatting_rules(self) -> dict:
+        """Default formatting rules. Subclasses override."""
+        return {}
+    
+    @classmethod
+    def create(cls, domain_node: StoryNode, parent: Optional['DiagramStoryNode'] = None):
+        """Create DrawIO node from domain node. Subclasses implement."""
+        raise NotImplementedError("Subclass must implement create()")
+    
+    @classmethod
+    def recognizes(cls, element: any) -> bool:
+        """Recognition logic. Subclasses implement."""
+        raise NotImplementedError("Subclass must implement recognizes()")
 
     def _saved_position_for(self, key: str, layout_data) -> Optional[Position]:
         if layout_data:
@@ -330,8 +365,10 @@ class DrawIOStoryNode(StoryNode):
 
 
 @dataclass
-class DrawIOEpic(Epic, DrawIOStoryNode):
+class DrawIOEpic(DiagramEpic, DrawIOStoryNode):
+    """DrawIO representation of an Epic with XML serialization."""
     _parent: Optional[StoryNode] = field(default=None, repr=False)
+    _element: DrawIOElement = field(default=None, repr=False)
 
     # Kept as class-level references for tests
     Y_DEFAULT = EPIC_Y
@@ -341,7 +378,9 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
     def __post_init__(self):
         if self.domain_concepts is None:
             self.domain_concepts = []
-        DrawIOStoryNode.__post_init__(self)
+        DiagramStoryNode.__post_init__(self)
+        if self._element is None:
+            self._element = DrawIOElement(cell_id=_slug(self.name), value=self.name)
         self._element.apply_style_for_type('epic')
 
     @property
@@ -432,8 +471,10 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
 
 
 @dataclass
-class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
+class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
+    """DrawIO representation of a SubEpic with XML serialization."""
     _parent: Optional[StoryNode] = field(default=None, repr=False)
+    _element: DrawIOElement = field(default=None, repr=False)
 
     # Kept for backward-compat references
     Y_OFFSET_FROM_PARENT = SUB_EPIC_HEIGHT + ROW_GAP
@@ -442,7 +483,9 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
     def __post_init__(self):
         if self.domain_concepts is None:
             self.domain_concepts = []
-        DrawIOStoryNode.__post_init__(self)
+        DiagramStoryNode.__post_init__(self)
+        if self._element is None:
+            self._element = DrawIOElement(cell_id=_slug(self.name), value=self.name)
         self._element.apply_style_for_type('sub_epic')
         if not hasattr(self, 'test_file'):
             self.test_file = None
@@ -600,8 +643,10 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
 
 
 @dataclass
-class DrawIOStory(Story, DrawIOStoryNode):
+class DrawIOStory(DiagramStory, DrawIOStoryNode):
+    """DrawIO representation of a Story with XML serialization."""
     _parent: Optional[StoryNode] = field(default=None, repr=False)
+    _element: DrawIOElement = field(default=None, repr=False)
 
     # Stories are 50x50 sticky-note squares
     WIDTH = CELL_SIZE
@@ -625,7 +670,9 @@ class DrawIOStory(Story, DrawIOStoryNode):
     def __post_init__(self):
         if self.users is None:
             self.users = []
-        DrawIOStoryNode.__post_init__(self)
+        DiagramStoryNode.__post_init__(self)
+        if self._element is None:
+            self._element = DrawIOElement(cell_id=_slug(self.name), value=self.name)
         style_key = self.STORY_TYPE_STYLES.get(self.story_type, 'story_user')
         self._element.apply_style_for_type(style_key)
         self._actor_elements: List[DrawIOElement] = []

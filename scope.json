@@ -8,8 +8,7 @@
     "src/synchronizers/story_io/drawio_story_node_serializer.py",
     "src/synchronizers/story_io/layout_data.py",
     "src/synchronizers/story_io/story_io_position.py",
-    "src/synchronizers/story_io/story_io_synchronizer.py",
-    "src/synchronizers/story_io/increment_views.py"
+    "src/synchronizers/story_io/story_io_synchronizer.py"
   ],
   "exclude": [],
   "skiprule": []

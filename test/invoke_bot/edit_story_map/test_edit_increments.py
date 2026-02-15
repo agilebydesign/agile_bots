@@ -388,26 +388,55 @@ def given_panel_in_increment_view(helper):
 
 def when_user_requests_increment_view_via_cli(helper, story_graph):
     """Request increment view via CLI."""
-    from synchronizers.story_io.increment_views import get_increments_view
-    return get_increments_view(story_graph)
+    from story_graph.nodes import IncrementCollection
+    increments = story_graph.get("increments", [])
+    if not increments:
+        return {
+            "increments": [],
+            "message": "No increments defined in story graph"
+        }
+    return {"increments": increments}
 
 
 def when_user_enters_increment_view_command(helper, story_graph):
     """Enter increment view command via CLI."""
-    from synchronizers.story_io.increment_views import format_increments_for_cli
-    return format_increments_for_cli(story_graph)
+    from story_graph.nodes import IncrementCollection
+    increment_collection = IncrementCollection.from_list(story_graph.get("increments", []))
+    return increment_collection.format_for_cli()
 
 
 def when_user_clicks_view_toggle(panel_state):
     """Click view toggle button."""
-    from synchronizers.story_io.increment_views import toggle_view
-    return toggle_view(panel_state)
+    current_view = panel_state.get("current_view", "Hierarchy")
+    new_view = "Increment" if current_view == "Hierarchy" else "Hierarchy"
+    return {
+        "current_view": new_view,
+        "toggle_label": current_view,
+        "tooltip": f"Display {current_view} view"
+    }
 
 
 def when_panel_renders_increment_view(panel_state):
     """Render increment view in panel."""
-    from synchronizers.story_io.increment_views import render_increment_view
-    return render_increment_view(panel_state)
+    def _sort_stories_by_sequential_order(stories):
+        return sorted(stories, key=lambda s: s.get("sequential_order", 0))
+    
+    columns = []
+    for increment in panel_state.get("increments", []):
+        stories = increment.get("stories", [])
+        sorted_stories = _sort_stories_by_sequential_order(stories)
+        column = {
+            "name": increment["name"],
+            "stories": sorted_stories,
+            "read_only": True
+        }
+        if not stories:
+            column["empty_message"] = "(no stories)"
+        columns.append(column)
+    return {
+        "columns": columns,
+        "controls_visible": False
+    }
 
 
 def then_cli_returns_increments_object(increments):
