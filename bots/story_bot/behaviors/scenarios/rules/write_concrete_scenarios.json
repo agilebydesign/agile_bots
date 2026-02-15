@@ -146,6 +146,21 @@
                 ]
             },
             {
+                "description": "Don't use calculated values as a substitute for source data. If a report has renames_count=1, show the actual renamed entity. Counts, booleans, and summaries are outputs - the scenario needs the inputs that produce them.",
+                "example": [
+                    "WRONG - calculated output without the source data that creates it:",
+                    "  UpdateReport: | renames_count | new_count | | 1 | 2 |",
+                    "",
+                    "CORRECT - source entities that the report is built from:",
+                    "  UpdateReport (renames): | original_name | new_name | parent |",
+                    "                          | Banking | Reconciliation | Wire Transfers |",
+                    "  UpdateReport (new):     | name | parent |",
+                    "                          | FX Conversion | Wire Transfers |",
+                    "",
+                    "(The scenario specifies WHAT was renamed and added - not just how many)"
+                ]
+            },
+            {
                 "description": "Don't describe UI state as Given - describe data state",
                 "example": [
                     "Given User is on PaymentDetails step (WRONG - UI navigation state)",

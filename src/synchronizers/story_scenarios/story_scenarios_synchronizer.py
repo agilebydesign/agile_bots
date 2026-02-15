@@ -109,6 +109,45 @@ def get_common_background(scenarios_list):
     return common
 
 
+def _table_key(table):
+    """Create a hashable key from a table dict for comparison."""
+    return json.dumps(table, sort_keys=True, ensure_ascii=False)
+
+
+def get_common_examples(scenarios_list):
+    """Extract example tables that appear identically in ALL scenarios.
+    
+    Returns a list of tables common to every scenario (Background-level tables),
+    so they can be rendered once in the Background section instead of repeated
+    in every scenario.
+    """
+    if not scenarios_list or len(scenarios_list) < 2:
+        return []
+    
+    # Get examples from all scenarios that have them
+    all_examples = []
+    for s in scenarios_list:
+        ex = s.get('examples', [])
+        if isinstance(ex, list):
+            all_examples.append(ex)
+        else:
+            all_examples.append([])
+    
+    if not all_examples or not all_examples[0]:
+        return []
+    
+    # Find tables from the first scenario that appear in ALL other scenarios
+    common = []
+    first_tables = all_examples[0]
+    
+    for table in first_tables:
+        key = _table_key(table)
+        if all(any(_table_key(t) == key for t in ex) for ex in all_examples[1:]):
+            common.append(table)
+    
+    return common
+
+
 def format_examples_table(headers, rows, name='', indent_level=0, collaboration=''):
     """
     Format examples data into markdown table(s).
@@ -205,10 +244,14 @@ def format_examples_table(headers, rows, name='', indent_level=0, collaboration=
     return "\n".join(result_parts) + "\n"
 
 
-def format_scenarios(scenarios_list, common_background=None, story_test_file='', workspace_directory=None, story_file_path=None):
+def format_scenarios(scenarios_list, common_background=None, common_examples=None, story_test_file='', workspace_directory=None, story_file_path=None):
     """Format scenarios list into markdown"""
     if not scenarios_list:
         return ""
+    
+    common_example_keys = set()
+    if common_examples:
+        common_example_keys = {_table_key(t) for t in common_examples}
     
     formatted = []
     for scenario in scenarios_list:
@@ -248,24 +291,32 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
         
         # Add scenario-specific steps (these should start with scenario-specific Given if needed)
         for step in steps_list:
-            if step.strip():
-                step_lines.append(step.strip())
+            # Steps can be plain strings or dicts with 'text' key
+            step_text = step.get('text', '') if isinstance(step, dict) else str(step)
+            if step_text.strip():
+                step_lines.append(step_text.strip())
         
         steps_text = "\n".join(step_lines)
 
         examples_block = ""
         examples_data = scenario.get('examples')
         
+        # Filter out common (Background-level) examples so they aren't repeated per scenario
+        if common_example_keys and isinstance(examples_data, list):
+            examples_data = [t for t in examples_data if _table_key(t) not in common_example_keys]
+            if not examples_data:
+                examples_data = None
+        
         # Handle multiple formats for examples data
         if isinstance(examples_data, dict):
             # Check for headers+rows format (story-graph.json format)
             headers = examples_data.get('headers') or examples_data.get('columns')
             rows = examples_data.get('rows', [])
-            name = examples_data.get('name', examples_data.get('description', ''))
+            table_name = examples_data.get('name', examples_data.get('description', ''))
             collaboration = examples_data.get('collaboration', '')
             
             if headers and rows:
-                examples_block = format_examples_table(headers, rows, name, 0, collaboration)
+                examples_block = format_examples_table(headers, rows, table_name, 0, collaboration)
         elif isinstance(examples_data, list) and examples_data:
             # New preferred format: list of tables with columns/rows
             table_like = [tbl for tbl in examples_data if isinstance(tbl, dict)]
@@ -274,10 +325,10 @@ def format_scenarios(scenarios_list, common_background=None, story_test_file='',
                 for table in table_like:
                     headers = table.get('headers') or table.get('columns')
                     rows = table.get('rows', [])
-                    name = table.get('name', table.get('description', ''))
+                    table_name = table.get('name', table.get('description', ''))
                     collaboration = table.get('collaboration', '')
                     if headers and rows:
-                        tables.append(format_examples_table(headers, rows, name, 0, collaboration))
+                        tables.append(format_examples_table(headers, rows, table_name, 0, collaboration))
                 if tables:
                     examples_block = "\n".join(tables)
             elif all(isinstance(row, dict) for row in examples_data):
@@ -405,11 +456,17 @@ def create_story_content(story, epic_name, sub_epic_name, workspace_directory, s
     # Combine scenarios and scenario_outlines for processing
     all_scenarios = scenarios_list + scenario_outlines_list
     
-    # Get common background from all scenarios
-    common_background = get_common_background(all_scenarios)
+    # Get common background: prefer story-level field, fall back to detection
+    story_background = story.get('background', {})
+    if isinstance(story_background, dict) and story_background:
+        common_background = story_background.get('steps', [])
+        common_examples = story_background.get('examples', [])
+    else:
+        common_background = get_common_background(all_scenarios)
+        common_examples = get_common_examples(all_scenarios)
     
-    # Format scenarios (pass common_background, test_file, workspace_directory, and story_file_path so scenarios include test links)
-    scenarios_formatted = format_scenarios(all_scenarios, common_background, test_file, workspace_directory, story_file_path)
+    # Format scenarios (pass common_examples so they aren't duplicated per scenario)
+    scenarios_formatted = format_scenarios(all_scenarios, common_background, common_examples, test_file, workspace_directory, story_file_path)
     
     # Default description if not provided
     description = story.get('description', f'{story_name} functionality for the mob minion system.')
@@ -433,14 +490,28 @@ Then action completes successfully
     background_section = ""
     if common_background:
         bg_formatted = "\n".join(common_background)
+        
+        # Format common example tables for Background section
+        common_examples_block = ""
+        if common_examples:
+            tables = []
+            for table in common_examples:
+                headers = table.get('headers') or table.get('columns')
+                rows = table.get('rows', [])
+                table_name = table.get('name', table.get('description', ''))
+                collaboration = table.get('collaboration', '')
+                if headers and rows:
+                    tables.append(format_examples_table(headers, rows, table_name, 0, collaboration))
+            if tables:
+                common_examples_block = "\n".join(tables)
+        
         background_section = f"""## Background
-
-**Common setup steps shared across all scenarios:**
 
 ```gherkin
 {bg_formatted}
 ```
 
+{common_examples_block}
 """
     
     # Build clickable path with proper relative links for each level
@@ -627,7 +698,10 @@ class StoryScenariosSynchronizer:
             story_name = story['name']
             # Sanitize story name for use in file path (replace invalid path characters)
             # Forward slashes and backslashes are not valid in filenames on Windows
-            sanitized_story_name = story_name.replace('/', '-').replace('\\', '-')
+            # Replace characters invalid in Windows filenames: / \ " : * ? < > |
+            sanitized_story_name = story_name
+            for ch in ['/', '\\', '"', ':', '*', '?', '<', '>', '|']:
+                sanitized_story_name = sanitized_story_name.replace(ch, '-')
             
             # Build folder path dynamically from story graph structure
             epic_folder, sub_epic_folder = build_folder_path_from_graph(

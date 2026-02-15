@@ -6,6 +6,8 @@
   "auto_confirm": false,
   "next_action": "decide_strategy",
   "instructions": [
+    "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
+    "",
     "Review all provided context, then for each required question below, thoughtfully answer it by thoroughly examining the context provided.",
     "",
     "**Answer format:**",

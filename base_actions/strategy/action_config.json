@@ -6,6 +6,8 @@
   "auto_confirm": false,
   "next_action": "build_knowledge",
   "instructions": [
+    "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
+    "",
     "Review context then make all decisions and compile assumptions. Present analysis with your reasoning.",
     "",
     "- For each assumption, state whether you accept it or propose a modification with justification.",

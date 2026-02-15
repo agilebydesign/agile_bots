@@ -5,6 +5,8 @@
   "order": 4,
   "next_action": "validate_output",
   "instructions": [
+    "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
+    "",
     "@build-instructions.txt",
     "",
     "**BUILD PROCESS:**",
