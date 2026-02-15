@@ -97,7 +97,9 @@ class DrawIOElement:
     def set_style_from_string(self, style_string: str):
         """Parse a Draw.io style string and apply its values."""
         parsed = self.from_style_string(style_string)
-        if 'rounded' in parsed and parsed['rounded'] == '1':
+        if 'shape' in parsed:
+            self._shape = parsed['shape']
+        elif 'rounded' in parsed and parsed['rounded'] == '1':
             self._shape = 'rounded'
         if 'fillColor' in parsed:
             self._fill = parsed['fillColor']

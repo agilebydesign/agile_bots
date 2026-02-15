@@ -2146,6 +2146,107 @@ class StoryMap:
                 concepts.extend(epic.domain_concepts)
         return concepts
 
+    def get_all_nodes(self) -> List[StoryNode]:
+        nodes = []
+        for epic in self._epics_list:
+            for node in self.walk(epic):
+                nodes.append(node)
+        return nodes
+
+    def get_all_acceptance_criteria(self) -> List[Dict[str, Any]]:
+        ac_list = []
+        for story in self.all_stories:
+            for ac in story.acceptance_criteria:
+                ac_entry = ac if isinstance(ac, dict) else {'text': str(ac)}
+                ac_list.append(ac_entry)
+        return ac_list
+
+    @property
+    def increments(self) -> List[Dict[str, Any]]:
+        return self.story_graph.get('increments', [])
+
+    def get_increments(self) -> List[Dict[str, Any]]:
+        return list(self.increments)
+
+    def remove_increment(self, increment_name: str) -> bool:
+        increments = self.story_graph.get('increments', [])
+        for i, inc in enumerate(increments):
+            if inc.get('name') == increment_name:
+                increments.pop(i)
+                return True
+        return False
+
+    def apply_update_report(self, report: 'UpdateReport') -> None:
+        from synchronizers.story_io.update_report import UpdateReport as UR
+        for rename in report.renames:
+            node = self.find_node(rename.original_name)
+            if node:
+                node.name = rename.extracted_name
+
+        for new_story in report.new_stories:
+            parent = self.find_node(new_story.parent) if new_story.parent else None
+            if parent and hasattr(parent, 'create_story'):
+                parent.create_story(name=new_story.name)
+
+        for new_se in report.new_sub_epics:
+            parent = self.find_node(new_se.parent) if new_se.parent else None
+            if parent and hasattr(parent, 'create_sub_epic'):
+                parent.create_sub_epic(name=new_se.name)
+
+        for moved in report.moved_stories:
+            story = self.find_story_by_name(moved.name)
+            target = self.find_node(moved.to_parent) if moved.to_parent else None
+            if story and target and hasattr(story, 'move_to'):
+                story.move_to(target)
+        
+        # Apply increment changes
+        if report.increment_order:
+            # Update increment order/priorities and add new increments
+            increments = self.story_graph.get('increments', [])
+            existing_by_name = {inc.get('name', ''): inc for inc in increments}
+            new_increments = []
+            for inc_order in report.increment_order:
+                inc_name = inc_order['name']
+                if inc_name in existing_by_name:
+                    # Update existing increment priority
+                    existing_by_name[inc_name]['priority'] = inc_order['priority']
+                    new_increments.append(existing_by_name[inc_name])
+                else:
+                    # Create new increment
+                    new_increments.append({
+                        'name': inc_name,
+                        'priority': inc_order['priority'],
+                        'stories': []
+                    })
+            self.story_graph['increments'] = new_increments
+        
+        # Apply increment story assignments
+        if report.increment_moves:
+            increments = self.story_graph.get('increments', [])
+            for move in report.increment_moves:
+                # Remove from old increment
+                if move.from_increment:
+                    for inc in increments:
+                        if inc.get('name') == move.from_increment:
+                            stories = inc.get('stories', [])
+                            inc['stories'] = [s for s in stories 
+                                            if (s.get('name', '') if isinstance(s, dict) else str(s)) != move.story]
+                # Add to new increment
+                if move.to_increment:
+                    for inc in increments:
+                        if inc.get('name') == move.to_increment:
+                            stories = inc.get('stories', [])
+                            if move.story not in [s.get('name', '') if isinstance(s, dict) else str(s) for s in stories]:
+                                stories.append({'name': move.story})
+        
+        # Remove increments
+        if report.removed_increments:
+            increments = self.story_graph.get('increments', [])
+            self.story_graph['increments'] = [
+                inc for inc in increments 
+                if inc.get('name', '') not in report.removed_increments
+            ]
+
     def filter_by_name(self, name: str) -> Optional['StoryMap']:
         """Return a new StoryMap containing only the subtree rooted at
         the node with the given name.  The returned StoryMap preserves

@@ -60,6 +60,32 @@ def _report_all_descendants_as_new(node, report, parent_name=''):
             report.add_new_story(story.name, parent=node.name)
 
 
+def _report_all_descendants_as_removed(node, report, parent_name=''):
+    """When a node is removed, report all its descendants as removed too."""
+    # Get sub-epics using whichever method/property is available
+    sub_epics = []
+    if hasattr(node, 'get_sub_epics'):
+        sub_epics = list(node.get_sub_epics())
+    elif hasattr(node, 'sub_epics'):
+        sub_epics = list(node.sub_epics)
+    
+    if sub_epics:
+        # Has sub-epics: report them and recurse (stories will be reported by recursion)
+        for se in sub_epics:
+            report.add_removed_sub_epic(se.name, parent=node.name)
+            _report_all_descendants_as_removed(se, report, parent_name=se.name)
+    
+    # Report direct stories
+    stories = []
+    if hasattr(node, 'get_stories'):
+        stories = list(node.get_stories())
+    elif hasattr(node, 'all_stories'):
+        stories = list(node.all_stories)
+    
+    for story in stories:
+        report.add_removed_story(story.name, parent=node.name)
+
+
 def _collect_all_names(nodes) -> Set[str]:
     """Recursively collect all names (epics, sub-epics, stories) from a tree."""
     names: Set[str] = set()
@@ -182,6 +208,7 @@ def _compare_node_lists(extracted, original, report, parent_name='',
 
     for orig_node in still_unmatched_orig:
         _add_removed_by_type(report, orig_node, parent_name=parent_name)
+        _report_all_descendants_as_removed(orig_node, report)
 
 
 def _max_sub_epic_depth(node) -> int:
@@ -342,7 +369,8 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
                             rows: _RowPositions = None,
                             layout_data=None,
                             skip_stories: bool = False,
-                            story_widths: dict = None) -> 'DrawIOEpic':
+                            story_widths: dict = None,
+                            render_ac: bool = False) -> 'DrawIOEpic':
         """Render epic as a flat horizontal bar spanning its sub-epics.
 
         The epic does NOT visually contain its sub-epics; it sits on
@@ -372,7 +400,8 @@ class DrawIOEpic(Epic, DrawIOStoryNode):
                 sub_epic, cursor_x, depth=0, rows=rows,
                 layout_data=layout_data, path_prefix=epic_slug,
                 skip_stories=skip_stories,
-                story_widths=story_widths)
+                story_widths=story_widths,
+                render_ac=render_ac)
             self.add_child(drawio_se)
             cursor_x += CELL_SPACING
 
@@ -444,7 +473,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                             layout_data=None,
                             path_prefix: str = '',
                             skip_stories: bool = False,
-                            story_widths: dict = None) -> float:
+                            story_widths: dict = None,
+                            render_ac: bool = False) -> float:
         """Render sub-epic as a flat horizontal bar.
 
         Returns the x position of the right edge of this sub-epic's
@@ -475,7 +505,8 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                     n, inner_x, depth + 1, rows, layout_data,
                     path_prefix=se_path,
                     skip_stories=skip_stories,
-                    story_widths=story_widths)
+                    story_widths=story_widths,
+                    render_ac=render_ac)
                 self.add_child(drawio_n)
                 inner_x += CELL_SPACING
             inner_x -= CELL_SPACING  # remove trailing
@@ -509,7 +540,7 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                         drawio_story.render_from_domain(
                             story, story_x, story_y, rows.actor_y,
                             path_prefix=se_path, seen_actors=seen_actors,
-                            layout_data=layout_data)
+                            layout_data=layout_data, render_ac=render_ac)
                     else:
                         if se_right and story_x + CELL_SIZE > se_right:
                             story_x = se_left
@@ -517,7 +548,7 @@ class DrawIOSubEpic(SubEpic, DrawIOStoryNode):
                         drawio_story.render_from_domain(
                             story, story_x, story_y, rows.actor_y,
                             path_prefix=se_path, seen_actors=seen_actors,
-                            layout_data=None)
+                            layout_data=None, render_ac=render_ac)
                     self.add_child(drawio_story)
                     # Advance X by the AC width if in exploration mode,
                     # otherwise by the standard cell size.
@@ -608,7 +639,8 @@ class DrawIOStory(Story, DrawIOStoryNode):
                             actor_y: float = 0,
                             path_prefix: str = '',
                             seen_actors: set = None,
-                            layout_data=None) -> 'DrawIOStory':
+                            layout_data=None,
+                            render_ac: bool = False) -> 'DrawIOStory':
         story_path = f'{path_prefix}/{_slug(self.name)}' if path_prefix else _slug(self.name)
         self._element._cell_id = story_path
 
@@ -633,6 +665,11 @@ class DrawIOStory(Story, DrawIOStoryNode):
             actor.set_position(x_pos, actor_y)
             actor.set_size(CELL_SIZE, CELL_SIZE)
             self._actor_elements.append(actor)
+        
+        # Render AC boxes if requested (acceptance_criteria diagram type)
+        if render_ac:
+            self.render_ac_boxes(story)
+        
         return self
 
     @staticmethod

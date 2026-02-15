@@ -156,11 +156,36 @@
 |-------------------|---------------|--------|--------------|
 | Part of `test/domain/test_perform_action.py` (TestRenderOutput)<br>Part of `test/CLI/test_execute_actions_using_cli.py` (TestRenderOutputUsingCLI) | `test/invoke_bot/test_render_content.py` | **SPLIT** + **MERGE** | **Domain:**<br>• TestRenderOutput<br><br>**CLI:**<br>• TestRenderOutputUsingCLI |
 
-### SubEpic: Perform Action → Synchronize Graph From Rendered
+### SubEpic: Perform Action → Synchronize Diagram by Domain
+
+**Structure:** 3 nested sub-sub-epics × 3 parallel operations (Render/Report/Update) = 12 stories.
+The Render/Report/Update pattern repeats identically across Epics, Stories, and Increments.
+Base test classes define shared test methods; domain subclasses provide fixture data.
+
+**Test class hierarchy:**
+
+- `BaseRenderDiagramTest` — shared Render test methods (default layout, re-render with layout, valid DrawIO output, cell styles)
+- `BaseReportDiagramTest` — shared Report test methods (no changes, entity added/renamed/removed, JSON roundtrip, exact/fuzzy matching)
+- `BaseUpdateDiagramTest` — shared Update test methods (apply changes, rename/new/remove entity, end-to-end pipeline)
+
+Each domain subclass overrides `domain_fixtures` to provide its own entities (Epics vs Stories vs Increments) and adds domain-unique test methods that don't exist in the other domains.
+
+**Helper:** `SyncDiagramTestHelper` in `sync_diagram_test_helper.py`
+- Extends `BotTestHelper` with sync-specific domain helpers
+- Common setup: `helper.sync_diagram.create_story_map(fixtures)`, `helper.sync_diagram.render_diagram(story_map, type)`, `helper.sync_diagram.generate_report(diagram, story_map)`, `helper.sync_diagram.apply_update(report, story_map)`
+- Shared assertions: no-overlap, parent-spans-children, roundtrip-survives-JSON, entity-match
 
 | Current Test Files | New Test File | Action | Test Classes |
 |-------------------|---------------|--------|--------------|
-| ❌ None found | `test/invoke_bot/test_synchronize_graph_from_rendered.py` | **CREATE** | TestDetectStoryGraphChangesFromDiagram<br>TestCreateChildStoryNodeFromDiagram<br>TestDeleteStoryNodeFromDiagram<br>TestMoveStoryNodeFromDiagram<br>TestUpdateStoryNodeNameFromDiagram<br>TestPersistStoryGraphChangesFromDiagram |
+| ❌ None found | `test/invoke_bot/perform_action/sync_diagram_test_helper.py` | **CREATE** | SyncDiagramTestHelper |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/base_render_diagram_test.py` | **CREATE** | BaseRenderDiagramTest (~5 shared methods) |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/base_report_diagram_test.py` | **CREATE** | BaseReportDiagramTest (~6 shared methods) |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/base_update_diagram_test.py` | **CREATE** | BaseUpdateDiagramTest (~5 shared methods) |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_epics_and_sub_epics.py` | **CREATE** | TestRenderEpicHierarchy(BaseRenderDiagramTest) — 10 scenarios<br>TestReportEpicChanges(BaseReportDiagramTest) — 9 scenarios<br>TestUpdateEpicsFromDiagram(BaseUpdateDiagramTest) — 9 scenarios |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_stories_and_actors.py` | **CREATE** | TestRenderStoriesAndActors(BaseRenderDiagramTest) — 4 scenarios<br>TestRenderAcceptanceCriteria(BaseRenderDiagramTest) — 6 scenarios<br>TestReportStoryMoves(BaseReportDiagramTest) — 5 scenarios<br>TestReportACChanges(BaseReportDiagramTest) — 9 scenarios<br>TestUpdateStories(BaseUpdateDiagramTest) — 9 scenarios<br>TestUpdateAC(BaseUpdateDiagramTest) — 5 scenarios |
+| ❌ None found | `test/invoke_bot/perform_action/synchronize_graph_with_rendered_diagram/test_synchronize_increments.py` | **CREATE** | TestRenderIncrementLanes(BaseRenderDiagramTest) — 7 scenarios<br>TestReportIncrementChanges(BaseReportDiagramTest) — 14 scenarios<br>TestUpdateIncrements(BaseUpdateDiagramTest) — 10 scenarios |
+
+**Reuse summary:** ~15 test methods defined once in base classes, executed across 3 domains = ~45 test runs from 15 definitions. ~52 domain-unique methods in subclasses. Total: 97 scenarios, ~67 method definitions.
 
 ### SubEpic: Perform Action → Use Rules In Prompt
 
@@ -223,9 +248,20 @@ test/
 │   ├── test_decide_strategy.py
 │   ├── test_prepare_common_instructions.py
 │   ├── test_render_content.py
-│   ├── test_synchronize_graph_from_rendered.py
 │   ├── test_use_rules_in_prompt.py
 │   ├── test_validate_with_rules.py
+│   │
+│   ├── perform_action/
+│   │   ├── __init__.py
+│   │   ├── sync_diagram_test_helper.py   # SyncDiagramTestHelper (extends BotTestHelper)
+│   │   └── synchronize_graph_with_rendered_diagram/
+│   │       ├── __init__.py
+│   │       ├── base_render_diagram_test.py   # BaseRenderDiagramTest (~5 shared methods)
+│   │       ├── base_report_diagram_test.py   # BaseReportDiagramTest (~6 shared methods)
+│   │       ├── base_update_diagram_test.py   # BaseUpdateDiagramTest (~5 shared methods)
+│   │       ├── test_synchronize_epics_and_sub_epics.py  # 3 subclasses, 28 scenarios
+│   │       ├── test_synchronize_stories_and_actors.py   # 6 subclasses, 38 scenarios
+│   │       └── test_synchronize_increments.py           # 3 subclasses, 31 scenarios
 │   │
 │   # Get Help Using CLI SubEpic
 │   ├── test_get_help_using_cli.py

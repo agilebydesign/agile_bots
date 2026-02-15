@@ -257,17 +257,20 @@ class UpdateReport:
     def add_missing_sub_epic(self, sub_epic_name: str):
         self._large_deletions.missing_sub_epics.append(sub_epic_name)
 
-    def reconcile_moves(self, original_story_map=None):
+    def reconcile_moves(self, original_story_map=None, extracted_increments=None):
         """Post-process: detect stories that are actually moves, not new+removed.
 
-        Two cases:
+        Three cases:
         1. A story appears in both new_stories and removed_stories with
            different parents → it was moved between sub-epics.
         2. A story appears in new_stories and its name existed under a
            removed sub-epic in the original tree → it was promoted from
            the removed sub-epic to a new parent.
+        3. A story is reported as removed from hierarchy but exists in
+           increment lanes → it's intentionally not in hierarchy (increments view).
 
-        Matched stories are moved from new/removed into moved_stories.
+        Matched stories are moved from new/removed into moved_stories, or
+        removed from removed_stories if they're in increment lanes.
         """
         moved_names: set = set()
 
@@ -311,6 +314,20 @@ class UpdateReport:
                             to_parent=new_entry.parent))
                         moved_names.add(name)
 
+        # --- Case 3: stories in increment lanes (not removed from hierarchy) ---
+        # If a story appears in increment assignments but is reported as removed
+        # from hierarchy, it's not actually removed - it's just in a lane.
+        if extracted_increments:
+            # Collect all story names that appear in ANY increment lane
+            stories_in_lanes: set = set()
+            for inc in extracted_increments:
+                stories_in_lanes.update(inc.get('stories', []))
+            
+            # Remove from removed_stories if they're in increments
+            if stories_in_lanes:
+                self._removed_stories = [s for s in self._removed_stories
+                                        if s.name not in stories_in_lanes]
+        
         # Remove reconciled entries from new_stories and removed_stories
         if moved_names:
             self._new_stories = [s for s in self._new_stories

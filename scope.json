@@ -1,6 +1,1 @@
-{
-  "type": "showAll",
-  "value": [],
-  "exclude": [],
-  "skiprule": []
-}
+{"type": "story", "value": ["Synchronize"], "exclude": [], "skiprule": []}
