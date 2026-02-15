@@ -22,11 +22,29 @@ class ActionResult:
     error_message: Optional[str] = None
 
 @dataclass
+class Move:
+    """Represents a node move between parents."""
+    from_parent: str
+    to_parent: str
+
+@dataclass
+class Rename:
+    """Represents a node rename."""
+    original_name: str
+    new_name: str
+
+@dataclass
 class StoryNode(ABC):
     name: str
     sequential_order: Optional[float] = None
     behavior: Optional[str] = None
     _bot: Optional[Any] = field(default=None, repr=False)
+    
+    # State properties set during comparison
+    is_new: bool = field(default=False, repr=False)
+    is_removed: bool = field(default=False, repr=False)
+    has_moved: Optional[Move] = field(default=None, repr=False)
+    is_renamed: Optional[Rename] = field(default=None, repr=False)
 
     def __post_init__(self):
         self._children: List['StoryNode'] = []
@@ -2035,6 +2053,126 @@ class EpicsCollection:
     def __len__(self) -> int:
         return len(self._epics)
 
+@dataclass
+class Increment:
+    """Domain type for a prioritized delivery slice containing story references."""
+    name: str
+    priority: int
+    stories: List[Union[str, Dict[str, Any]]] = field(default_factory=list)
+    description: Optional[str] = None
+    goal: Optional[str] = None
+    estimated_stories: Optional[int] = None
+    relative_size: Optional[str] = None
+    approach: Optional[str] = None
+    focus: Optional[str] = None
+    
+    def _sort_stories_by_sequential_order(self) -> List[Dict[str, Any]]:
+        """Sort stories by sequential_order field if present."""
+        story_dicts = []
+        for story in self.stories:
+            if isinstance(story, dict):
+                story_dicts.append(story)
+            else:
+                story_dicts.append({'name': story, 'sequential_order': 0})
+        return sorted(story_dicts, key=lambda s: s.get('sequential_order', 0))
+    
+    def format_for_cli(self) -> str:
+        """Format increment for CLI display (absorbs increment_views.py logic)."""
+        output_lines = [f"{self.name}:"]
+        if self.stories:
+            sorted_stories = self._sort_stories_by_sequential_order()
+            for story in sorted_stories:
+                story_name = story['name'] if isinstance(story, dict) else str(story)
+                output_lines.append(f"  - {story_name}")
+        else:
+            output_lines.append("  (no stories)")
+        return "\n".join(output_lines)
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'Increment':
+        """Create Increment from dictionary."""
+        return cls(
+            name=data.get('name', ''),
+            priority=data.get('priority', 0),
+            stories=data.get('stories', []),
+            description=data.get('description'),
+            goal=data.get('goal'),
+            estimated_stories=data.get('estimated_stories'),
+            relative_size=data.get('relative_size'),
+            approach=data.get('approach'),
+            focus=data.get('focus')
+        )
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert Increment to dictionary for serialization."""
+        result = {
+            'name': self.name,
+            'priority': self.priority,
+            'stories': self.stories
+        }
+        if self.description is not None:
+            result['description'] = self.description
+        if self.goal is not None:
+            result['goal'] = self.goal
+        if self.estimated_stories is not None:
+            result['estimated_stories'] = self.estimated_stories
+        if self.relative_size is not None:
+            result['relative_size'] = self.relative_size
+        if self.approach is not None:
+            result['approach'] = self.approach
+        if self.focus is not None:
+            result['focus'] = self.focus
+        return result
+
+class IncrementCollection:
+    """Collection of Increment objects with query methods."""
+    
+    def __init__(self, increments: List[Increment]):
+        self._increments = increments
+        self._by_name = {inc.name: inc for inc in increments}
+        self._by_priority = {inc.priority: inc for inc in increments}
+    
+    def __iter__(self) -> Iterator[Increment]:
+        return iter(self._increments)
+    
+    def __len__(self) -> int:
+        return len(self._increments)
+    
+    def __getitem__(self, name: str) -> Increment:
+        """Access increment by name."""
+        if name not in self._by_name:
+            raise KeyError(f'Increment "{name}" not found')
+        return self._by_name[name]
+    
+    def find_by_name(self, name: str) -> Optional[Increment]:
+        """Find increment by name, return None if not found."""
+        return self._by_name.get(name)
+    
+    def find_by_priority(self, priority: int) -> Optional[Increment]:
+        """Find increment by priority, return None if not found."""
+        return self._by_priority.get(priority)
+    
+    @property
+    def sorted_by_priority(self) -> List[Increment]:
+        """Return increments sorted by priority."""
+        return sorted(self._increments, key=lambda inc: inc.priority)
+    
+    def format_for_cli(self) -> str:
+        """Format all increments for CLI display (absorbs increment_views.py logic)."""
+        if not self._increments:
+            return "No increments defined in story graph"
+        return "\n".join(inc.format_for_cli() for inc in self._increments)
+    
+    @classmethod
+    def from_list(cls, increments_data: List[Dict[str, Any]]) -> 'IncrementCollection':
+        """Create IncrementCollection from list of dictionaries."""
+        increments = [Increment.from_dict(data) for data in increments_data]
+        return cls(increments)
+    
+    def to_list(self) -> List[Dict[str, Any]]:
+        """Convert collection to list of dictionaries for serialization."""
+        return [inc.to_dict() for inc in self._increments]
+
 class StoryMap:
 
     def __init__(self, story_graph: Dict[str, Any], bot=None):
@@ -2044,6 +2182,7 @@ class StoryMap:
         for epic_data in story_graph.get('epics', []):
             self._epics_list.append(Epic.from_dict(epic_data, bot=bot))
         self._epics = EpicsCollection(self._epics_list)
+        self._increments = IncrementCollection.from_list(story_graph.get('increments', []))
 
     @classmethod
     def from_bot(cls, bot: Any) -> 'StoryMap':
@@ -2091,6 +2230,7 @@ class StoryMap:
         
         # Regenerate story_graph dict from in-memory tree (only once, right before saving)
         self.story_graph['epics'] = [self._epic_to_dict(e) for e in self._epics_list]
+        self.story_graph['increments'] = self._increments.to_list()
         
         story_graph_path = self._bot.bot_paths.story_graph_paths.story_graph_path
         story_graph_path.parent.mkdir(parents=True, exist_ok=True)
@@ -2162,90 +2302,67 @@ class StoryMap:
         return ac_list
 
     @property
-    def increments(self) -> List[Dict[str, Any]]:
-        return self.story_graph.get('increments', [])
+    def increments(self) -> IncrementCollection:
+        return self._increments
 
     def get_increments(self) -> List[Dict[str, Any]]:
-        return list(self.increments)
+        """Return increments as list of dictionaries (legacy compatibility)."""
+        return self._increments.to_list()
 
     def remove_increment(self, increment_name: str) -> bool:
-        increments = self.story_graph.get('increments', [])
-        for i, inc in enumerate(increments):
+        """Remove an increment by name. Returns True if found and removed."""
+        increments_list = self._increments.to_list()
+        for i, inc in enumerate(increments_list):
             if inc.get('name') == increment_name:
-                increments.pop(i)
+                increments_list.pop(i)
+                self._increments = IncrementCollection.from_list(increments_list)
                 return True
         return False
 
     def apply_update_report(self, report: 'UpdateReport') -> None:
-        from synchronizers.story_io.update_report import UpdateReport as UR
-        for rename in report.renames:
-            node = self.find_node(rename.original_name)
-            if node:
-                node.name = rename.extracted_name
-
-        for new_story in report.new_stories:
-            parent = self.find_node(new_story.parent) if new_story.parent else None
-            if parent and hasattr(parent, 'create_story'):
-                parent.create_story(name=new_story.name)
-
-        for new_se in report.new_sub_epics:
-            parent = self.find_node(new_se.parent) if new_se.parent else None
-            if parent and hasattr(parent, 'create_sub_epic'):
-                parent.create_sub_epic(name=new_se.name)
-
-        for moved in report.moved_stories:
-            story = self.find_story_by_name(moved.name)
-            target = self.find_node(moved.to_parent) if moved.to_parent else None
-            if story and target and hasattr(story, 'move_to'):
-                story.move_to(target)
+        """Apply an update report to this story map.
         
-        # Apply increment changes
-        if report.increment_order:
-            # Update increment order/priorities and add new increments
-            increments = self.story_graph.get('increments', [])
-            existing_by_name = {inc.get('name', ''): inc for inc in increments}
-            new_increments = []
-            for inc_order in report.increment_order:
-                inc_name = inc_order['name']
-                if inc_name in existing_by_name:
-                    # Update existing increment priority
-                    existing_by_name[inc_name]['priority'] = inc_order['priority']
-                    new_increments.append(existing_by_name[inc_name])
-                else:
-                    # Create new increment
-                    new_increments.append({
-                        'name': inc_name,
-                        'priority': inc_order['priority'],
-                        'stories': []
-                    })
-            self.story_graph['increments'] = new_increments
+        This is a thin wrapper around StoryMapUpdater for backward compatibility.
+        New code should use generate_update_report() or merge() instead.
         
-        # Apply increment story assignments
-        if report.increment_moves:
-            increments = self.story_graph.get('increments', [])
-            for move in report.increment_moves:
-                # Remove from old increment
-                if move.from_increment:
-                    for inc in increments:
-                        if inc.get('name') == move.from_increment:
-                            stories = inc.get('stories', [])
-                            inc['stories'] = [s for s in stories 
-                                            if (s.get('name', '') if isinstance(s, dict) else str(s)) != move.story]
-                # Add to new increment
-                if move.to_increment:
-                    for inc in increments:
-                        if inc.get('name') == move.to_increment:
-                            stories = inc.get('stories', [])
-                            if move.story not in [s.get('name', '') if isinstance(s, dict) else str(s) for s in stories]:
-                                stories.append({'name': move.story})
+        Args:
+            report: The UpdateReport to apply
+        """
+        from story_graph.updater import StoryMapUpdater
+        updater = StoryMapUpdater(target_map=self)
+        updater.update_from_report(report=report)
+    
+    def generate_update_report(self, other_map: 'StoryMap') -> 'UpdateReport':
+        """Generate an update report by comparing this map against another.
         
-        # Remove increments
-        if report.removed_increments:
-            increments = self.story_graph.get('increments', [])
-            self.story_graph['increments'] = [
-                inc for inc in increments 
-                if inc.get('name', '') not in report.removed_increments
-            ]
+        Convenience wrapper that creates StoryMapUpdater internally.
+        
+        Args:
+            other_map: The source map to compare against this (target) map
+            
+        Returns:
+            UpdateReport containing the differences
+        """
+        from story_graph.updater import StoryMapUpdater
+        updater = StoryMapUpdater(target_map=self)
+        return updater.generate_report_from(source_map=other_map)
+    
+    def merge(self, other_map: 'StoryMap', report: Optional['UpdateReport'] = None) -> None:
+        """Merge changes from another map into this map.
+        
+        Convenience wrapper. If no report provided, generates one first.
+        
+        Args:
+            other_map: The source map to merge from
+            report: Optional pre-generated UpdateReport. If None, generates one.
+        """
+        from story_graph.updater import StoryMapUpdater
+        updater = StoryMapUpdater(target_map=self)
+        
+        if report is None:
+            report = updater.generate_report_from(source_map=other_map)
+        
+        updater.update_from_report(report=report)
 
     def filter_by_name(self, name: str) -> Optional['StoryMap']:
         """Return a new StoryMap containing only the subtree rooted at

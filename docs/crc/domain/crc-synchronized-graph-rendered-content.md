@@ -20,15 +20,68 @@ This domain models **bidirectional sync** between the story graph (JSON knowledg
 
 These live in the broader story graph domain; this sub-domain extends or uses them.
 
-- **StoryNode (Base)** – module: story_graph.nodes. Read/write stories in JSON knowledge graph; get/update name, node type, node ID, parent, sequential order; contains children; delete self / delete with children; get/update test; serialize via StoryNodeSerializer.
+- **StoryNode (Base)** – module: story_graph.nodes. Read/write stories in JSON knowledge graph; get/update name, node type, node ID, parent, sequential order; contains children; delete self / delete with children; get/update test; serialize via StoryNodeSerializer. NEW: is_new, is_removed (bool properties), has_moved (Optional[Move]), is_renamed (Optional[Rename]) -- state set during comparison, queryable by anyone.
 - **StoryNodeChildren** – module: story_graph.nodes. Get children, find child by name, delete child.
 - **StoryNodeNavigator** – module: story_graph.nodes. Build node ID from path, get parent, move to parent / move after / move before, determine order.
 - **StoryNodeSerializer** – module: story_graph.nodes. File, create/load/update/delete node, from/to JSON.
-- **StoryMap** – module: story_graph.story_map. Load from bot directory or story graph file; walk nodes; get all stories/scenarios/domain concepts; find by name, find node by path; get story graph dict; get epics; save/reload; validate graph structure.
+- **StoryMap** – module: story_graph.story_map. Load from bot directory or story graph file; walk nodes; get all stories/scenarios/domain concepts; find by name, find node by path; get story graph dict; get epics; save/reload; validate graph structure. NEW: increments (IncrementCollection), generate_update_report(other) and merge(other, report=None) convenience wrappers that delegate to StoryMapUpdater.
+- **Increment** – module: story_graph.nodes. Prioritized delivery slice with name, priority, and story name references. NEW domain type.
+- **IncrementCollection** – module: story_graph.nodes. Iterable collection of Increments with find_by_name, find_by_priority, sorted_by_priority. NEW.
+- **StoryMapUpdater** – module: story_graph.updater. Owns comparison and merge logic. Instantiated with target map; generate_report_from(source) compares and stores source+report; update_from_report(opt_source, opt_report) applies changes. NEW.
+
+---
+
+## Module: story_graph (domain extensions)
+
+### Increment
+
+Prioritized delivery slice containing story references.
+
+- name: String
+- priority: Int  
+- stories: List of story name references
+- format_for_cli(): String
+
+### IncrementCollection
+
+Iterable collection of Increments.
+
+- Iterable over Increment objects
+- find_by_name(name): Increment
+- find_by_priority(priority): Increment
+- sorted_by_priority: List[Increment]
+
+### StoryMapUpdater
+
+Owns comparison and merge logic between two story maps. Instantiated with the target map.
+
+- Instantiate with target map: StoryMap
+- generate_report_from(source_map): UpdateReport -- compares source against target, stores source and report
+- update_from_report(opt source, opt report): applies changes. If no args, uses stored source + last report.
+- reconcile_moves(original_map): reclassifies new+removed as moved
+- reconcile_ac_moves(): reclassifies AC adds+removes as AC moves
 
 ---
 
 ## Module: synchronizers.story_io (rendered content)
+
+### DiagramStoryNode: StoryNode
+
+Platform-agnostic diagram rules (Tier 2). Positioning, containment, and formatting without knowledge of any specific diagram tool.
+
+- position: Position
+- boundary: Boundary
+- containment_rules(): which parent types this node fits inside
+- placement_rules(): how to position relative to siblings
+- formatting_rules(): fill, stroke, font_color, shape by node type
+- compute_container_dimensions_from_children(spacing): Boundary
+- create(domain_node, parent): creates diagram node. Same API as StoryNode.create()
+- add_child, move_to, delete, rename: same API as StoryNode, enforces diagram rules
+- recognizes(element): returns bool -- classification
+
+*Subclasses: DiagramEpic, DiagramSubEpic, DiagramStory, DiagramIncrement*
+
+---
 
 ### DrawIOElement (Base)
 
@@ -44,20 +97,34 @@ Base for any element that is read from or written to DrawIO XML. Provides geomet
 
 ---
 
-### DrawIOStoryNode: DrawIOElement, StoryNode
+### DiagramStoryNode: StoryNode
 
-Same API as StoryNode but backed by DrawIO: reads and writes itself and recursively invokes the corresponding read, write, and draw methods on its children nodes. This enables fully hierarchical diagram extraction and update. Does **not** draw scenarios in DrawIO (only epics, sub-epics, stories, and optionally acceptance criteria / increment lanes). Platform-specific read/write is handled in implementation details.
+Platform-agnostic diagram rules. Same API as StoryNode but with diagram-specific positioning, containment, and formatting rules. Knows nothing about DrawIO XML or any specific tool format.
 
-- Load from DrawIO: DrawIOStoryNodeSerializer, File, DrawIO XML
-- Serialize to DrawIO: DrawIOStoryNodeSerializer, DrawIO XML
-- Get/Update name: String, DrawIO Cell
-- Get parent: Parent StoryNode, DrawIO Cell, Boundary
-- Get sequential order: Float, Position, DrawIO Tree
-- Move, rename: New Parent, Position, DrawIO Tree
-- Generate own slice of update report: Other StoryNode, UpdateReport
-- Apply update from other node (recursive): Other StoryNode, UpdateReport
+- Position and boundary: Position, Boundary
+- Containment rules: which parent types this node fits inside
+- Placement rules: position relative to siblings (left-to-right by sequential_order, Y offset from parent)
+- Formatting rules: fill, stroke, font_color, shape by node type
+- Compute container dimensions from children: Boundary, Spacing
+- Create, add_child, move_to, delete, rename: same API as StoryNode but enforces diagram rules
+- recognizes(element): returns bool -- does this type recognize the element?
 
-*Subclasses: DrawIOEpic, DrawIOSubEpic, DrawIOStory (no DrawIO scenario – scenarios not drawn in DrawIO).*
+*Subclasses: DiagramEpic, DiagramSubEpic, DiagramStory, DiagramIncrement*
+
+---
+
+### DrawIOStoryNode: DiagramStoryNode
+
+Inherits DiagramStoryNode (Tier 2) instead of StoryNode directly. DrawIO-specific XML read/write and coordinate system. All positioning, containment, and formatting come from DiagramStoryNode.
+
+- cell_id: DrawIO cell identity
+- element: DrawIOElement (XML backing)
+- read_from_xml(mxCell): reads position/style from XML into DiagramStoryNode properties
+- write_to_xml(): serializes DiagramStoryNode properties to mxCell
+
+*All positioning, containment, and formatting rules come from DiagramStoryNode. DrawIOStoryNode only handles DrawIO XML specifics.*
+
+*Subclasses: DrawIOEpic, DrawIOSubEpic, DrawIOStory, DrawIOIncrement (renamed from DrawIOIncrementLane).*
 ---
 
 ### DrawIOStoryNodeSerializer
@@ -106,24 +173,22 @@ DrawIO-backed story. Same API as Story. Scenarios are not drawn in DrawIO; story
 
 ### DrawIOStoryMap: StoryMap
 
-Story map backed by a DrawIO file. Same API as StoryMap for structure and navigation; in addition supports rendering, update and report generation, DrawIO read/write, and sync behavior. Renders itself from a StoryMap based on its diagramType. Recursive: each node contributes to the report and applies updates.
+Base class for DrawIO-backed story maps. Split into diagram-type subclasses (DrawIOOutlineMap, DrawIOExplorationMap, DrawIOIncrementsMap).
 
-- **Diagram type (outline, increments, acceptance_criteria):** DiagramType — determines what the render produces
-- Load from DrawIO file: File Path, DrawIOStoryMap, DrawIOStoryNodeSerializer
-- Save to DrawIO file: File Path, DrawIOStoryNodeSerializer, DrawIOStoryMap
-- **Render from StoryMap (based on diagramType):** StoryMap, DiagramType, LayoutData, DrawIO XML
-- Apply layout data (saved positions) during render: LayoutData, DrawIOStoryNode
-- Default layout when no layout data: DrawIOStoryNode, Spacing
-- **Generate update report:** `generateUpdateReport(other: StoryMap) -> UpdateReport`. Other can be base StoryMap or another format. Recursively builds report (exact matches, fuzzy matches, new, removed, large_deletions).
-- **Update from other:** `update(other: StoryMap, report: Optional[UpdateReport] = None)`. If report is None, generate report then apply. Applies report to self (recursive over nodes). User can edit report to mark safe edits before calling update.
-- Own layout data (positions and sizes for rendered nodes): LayoutData, DrawIOStoryNode
-- Persist layout data alongside diagram file: LayoutData, File Path
-- Load layout data for re-render: File Path, LayoutData
-- Assign stories to sub-epics by containment on load: Story Center, SubEpic Boundary
-- Assign sequential order from position on load (left-to-right, top-to-bottom): DrawIOStoryNode, Float
-- Extract layout (position/size per node) on load: DrawIO XML, LayoutData
+Base responsibilities:
+- Load from DrawIO file: File Path, DrawIOStoryNodeSerializer
+- Save to DrawIO file: File Path, DrawIOStoryNodeSerializer
+- Extract layout: LayoutData, DrawIO XML
+- Queries: get_epics, get_sub_epics, get_stories
 
-*Usage: `r = DrawIOStoryMap.generateUpdateReport(storyMap)`; `storyMap.update(drawIOStoryMap, r)`. Or `drawIOStoryMap.update(storyMap)` (no report → generate and auto-apply).*
+Subclass responsibilities (render, diagram-specific extraction):
+- **DrawIOOutlineMap**: render() for outline diagrams
+- **DrawIOExplorationMap**: render() for AC diagrams, AC extraction
+- **DrawIOIncrementsMap**: render() for increment diagrams, increment extraction
+
+Report generation delegated to StoryMapUpdater.
+
+*Usage via convenience wrappers: `report = storyMap.generate_update_report(drawioMap)` then `storyMap.merge(drawioMap, report)`.*
 
 ---
 
@@ -155,12 +220,12 @@ Position and size per node for re-render. Persisted alongside the diagram (e.g. 
 
 ### StoryMap (extended responsibilities)
 
-Existing StoryMap gains sync entry points so that any implementation (JSON or DrawIO/Mermaid) can be source or target. These are recursive over nodes.
+Existing StoryMap gains sync convenience wrappers. Actual logic is in StoryMapUpdater.
 
-- **Generate update report:** `generateUpdateReport(other: StoryMap) -> UpdateReport`. Delegates to root/epics; each node contributes its slice.
-- **Update from other:** `update(other: StoryMap, report: Optional[UpdateReport] = None)`. If report is None, generate then apply. Delegates recursively (e.g. Epic.update(DrawIOEpic), Story.update(DrawIOStory)) so that the whole graph updates from the diagram (or vice versa).
+- **generate_update_report(other: StoryMap) -> UpdateReport**: Creates StoryMapUpdater(self), calls updater.generate_report_from(other), returns report.
+- **merge(other: StoryMap, report: Optional[UpdateReport] = None)**: Creates StoryMapUpdater(self), calls updater.update_from_report(other, report). If no report, generates one first.
 
-*So we can call `StoryMap.update(DrawIOStoryMap, r)` or `DrawIOStoryMap.update(StoryMap, r)`; later `MermaidStoryMap.update(DrawIOStoryMap)` etc.*
+*So we can call `storyMap.merge(drawIOMap)` or with explicit report `storyMap.merge(drawIOMap, report)`. Bulk logic is in StoryMapUpdater.*
 
 ---
 
@@ -184,10 +249,10 @@ Same idea as DrawIOStoryMap but backed by Mermaid. Enables `MermaidStoryMap.upda
 
 ## Summary: key flows
 
-1. **Render:** StoryMap (JSON) → DrawIOStoryMap.render() → DrawIO file + LayoutData.
+1. **Render:** StoryMap (JSON) → DrawIOOutlineMap.render() → DrawIO file + LayoutData.
 2. **User edits diagram** in DrawIO.
-3. **Sync (report then update):** `report = DrawIOStoryMap.generateUpdateReport(StoryMap)`; user may edit report; `StoryMap.update(DrawIOStoryMap, report)`.
-4. **Or auto-update:** `DrawIOStoryMap.update(StoryMap)` (no report → generate and apply).
+3. **Sync (report then update):** `report = storyMap.generate_update_report(drawioMap)` (creates StoryMapUpdater internally); user may edit report; `storyMap.merge(drawioMap, report)`.
+4. **Or auto-merge:** `storyMap.merge(drawioMap)` (no report → generates and applies in one call).
 5. **Re-render:** Story graph changed → render again using LayoutData so positions are preserved; only add/remove/change.
 
 All node types (Epic, SubEpic, Story) in both JSON and DrawIO (and later Mermaid) emulate the base StoryNode API so that move, rename, delete, and recursive update/report work uniformly.

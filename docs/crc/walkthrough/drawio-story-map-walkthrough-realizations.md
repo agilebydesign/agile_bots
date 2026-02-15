@@ -1,8 +1,8 @@
 # Domain Walkthrough Realizations: Synchronized Graph with Rendered Diagram Content
 
-**Date**: 2026-02-11  
+**Date**: 2026-02-11 (updated 2026-02-15)  
 **Status**: In Progress  
-**Domain Model Version**: story-graph.json (walkthrough phase)
+**Domain Model Version**: story-graph.json (walkthrough phase with 2026-02-15 refactoring updates)
 
 ## Purpose
 
@@ -28,6 +28,24 @@ This document validates the domain model by tracing object flows through key sce
 
 **Rationale**:
 CRC model proposes unified OOP hierarchy (DrawIOStoryMap inherits StoryMap, recursive report/update) but current implementation is procedural (StoryIODiagram, DrawIORenderer, DrawIOSynchronizer, standalone functions). The functionality is proven; the architecture is the risk. Detailed walks focus on the render and update flows where the architectural mismatch is highest.
+
+---
+
+## Model Updates (2026-02-15 Refactoring)
+
+**New Concepts Added**:
+- **Increment** and **IncrementCollection** (story_graph.nodes) -- increments become proper domain types instead of raw dicts
+- **StoryMapUpdater** (story_graph.updater) -- extracted from StoryMap.apply_update_report()
+- **DiagramStoryNode** (synchronizers.story_io) -- middle tier with platform-agnostic positioning/containment/formatting rules
+- **DiagramEpic**, **DiagramSubEpic**, **DiagramStory**, **DiagramIncrement** -- diagram-tier node subclasses
+
+**Modified Concepts**:
+- **DrawIOStoryNode** -- now inherits DiagramStoryNode (Tier 2) instead of StoryNode directly. Keeps only DrawIO XML read/write.
+- **DrawIOStoryMap** -- split into base + DrawIOOutlineMap, DrawIOExplorationMap, DrawIOIncrementsMap subclasses
+- **StoryNode** -- added is_new, is_removed (bool), has_moved (Optional[Move]), is_renamed (Optional[Rename]) state properties
+- **StoryMap** -- apply_update_report() removed, replaced by convenience wrappers generate_update_report() and merge() that delegate to StoryMapUpdater
+
+**New Scenario Added**: Scenario 6 (Full Round-Trip with Move) traces render → user edit → load → compare → merge → re-render including all four change types (rename, new, removed, moved).
 
 ---
 
@@ -526,3 +544,5 @@ Each walkthrough realization is stored in `story-graph.json` under the relevant 
 - **DrawIOStoryMap**: 4 realizations (Render outline, Update graph, Increments branching, AC extension)
 - **DrawIOEpic**: 1 realization (Recursive report generation)
 - **DrawIOStoryNode (Base)**: Model updates — added "Compute container dimensions from children" and "Render child nodes (recursive)" responsibilities
+
+**Scenario 6 (2026-02-15)**: Full round-trip walkthrough (Render → User Edit → Load → Compare → Merge → Re-render) including all four change types (rename, new, removed, moved) is documented in `docs/plans/refactor-synchronize-architecture.md`. This scenario validates the three-tier node hierarchy (StoryNode → DiagramStoryNode → DrawIOStoryNode), StoryMapUpdater, and node state properties (is_new, is_removed, has_moved, is_renamed).

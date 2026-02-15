@@ -8,7 +8,7 @@ and collects nodes for serialization.
 """
 import json
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from story_graph.nodes import StoryMap, Epic, SubEpic, Story, StoryGroup
 from .drawio_story_node import (
     DrawIOStoryNode, DrawIOEpic, DrawIOSubEpic, DrawIOStory,
@@ -19,6 +19,7 @@ from .drawio_story_node import (
 from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 from .layout_data import LayoutData
 from .update_report import UpdateReport
+from .render_summary import RenderSummary
 
 
 class DrawIOStoryMap(StoryMap):
@@ -97,7 +98,7 @@ class DrawIOStoryMap(StoryMap):
     def render_from_story_map(self, story_map: StoryMap,
                                layout_data: Optional[LayoutData] = None,
                                skip_stories: bool = False,
-                               story_widths: Dict[str, float] = None) -> Dict[str, Any]:
+                               story_widths: Dict[str, float] = None) -> Union[Dict[str, Any], RenderSummary]:
         """Render outline diagram.  Each node renders itself.
 
         Computes global row positions first so all epics share the
@@ -106,6 +107,9 @@ class DrawIOStoryMap(StoryMap):
         When *skip_stories* is True the outline renders epics and
         sub-epics but omits story cells (used by the increments view
         where stories appear only in increment lanes).
+        
+        Returns:
+            RenderSummary with render statistics (also supports dict via to_dict())
         """
         self._layout_data = layout_data
         self._drawio_epics = []
@@ -113,7 +117,7 @@ class DrawIOStoryMap(StoryMap):
 
         epics = list(story_map.epics)
         if not epics:
-            return {'epics': 0, 'sub_epic_count': 0, 'diagram_generated': True}
+            return RenderSummary(epics=0, sub_epic_count=0, diagram_generated=True)
 
         # Global max depth → consistent rows across all epics
         max_depth = max(_max_sub_epic_depth(epic) for epic in epics)
@@ -133,11 +137,12 @@ class DrawIOStoryMap(StoryMap):
             self._drawio_epics.append(drawio_epic)
             x_pos = drawio_epic.boundary.right + CELL_SPACING
 
-        return {
-            'epics': len(self._drawio_epics),
-            'sub_epic_count': len(self.get_sub_epics()),
-            'diagram_generated': True,
-        }
+        return RenderSummary(
+            epics=len(self._drawio_epics),
+            sub_epic_count=len(self.get_sub_epics()),
+            story_count=len(self.get_stories()),
+            diagram_generated=True
+        )
 
     # ------------------------------------------------------------------
     # Render – Increments  (outline + increment lanes below)
@@ -146,7 +151,7 @@ class DrawIOStoryMap(StoryMap):
     def render_increments_from_story_map(
             self, story_map: StoryMap,
             increments_data: list,
-            layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
+            layout_data: Optional[LayoutData] = None) -> Union[Dict[str, Any], RenderSummary]:
         """Render outline with orphaned stories, then increment lanes.
         
         Sets _has_rendered_increments flag for extraction logic.
@@ -159,6 +164,9 @@ class DrawIOStoryMap(StoryMap):
         Increment lanes are positioned below the orphaned story area
         so there is room for potentially multiple rows of unassigned
         stories.
+        
+        Returns:
+            RenderSummary with render statistics including increment count
         """
         self._has_rendered_increments = True
         # Collect all story names that belong to at least one increment
@@ -213,8 +221,14 @@ class DrawIOStoryMap(StoryMap):
                         domain_stories=domain_stories)
             self._increment_lanes.append(lane)
 
-        summary['increments'] = len(increments_data)
-        return summary
+        # Return RenderSummary with increment count
+        if isinstance(summary, RenderSummary):
+            summary.increments = len(increments_data)
+            return summary
+        else:
+            # Backward compatibility: summary is a dict
+            summary['increments'] = len(increments_data)
+            return summary
 
     @staticmethod
     def _remove_increment_stories(sub_epic: DrawIOSubEpic,
@@ -236,11 +250,14 @@ class DrawIOStoryMap(StoryMap):
 
     def render_exploration_from_story_map(
             self, story_map: StoryMap,
-            layout_data: Optional[LayoutData] = None) -> Dict[str, Any]:
+            layout_data: Optional[LayoutData] = None) -> Union[Dict[str, Any], RenderSummary]:
         """Render outline with AC-aware spacing, then add AC boxes.
 
         Stories are spaced apart based on their widest acceptance
         criteria box so that AC text does not overlap between stories.
+        
+        Returns:
+            RenderSummary with render statistics including AC count
         """
         self._has_rendered_ac = True
         domain_stories = self._collect_domain_stories(story_map)
@@ -253,13 +270,23 @@ class DrawIOStoryMap(StoryMap):
         summary = self.render_from_story_map(
             story_map, layout_data, story_widths=story_widths)
 
+        ac_count = 0
         for drawio_story in self.get_stories():
             domain_story = domain_stories.get(drawio_story.name)
             if domain_story and domain_story.has_acceptance_criteria():
                 drawio_story.render_ac_boxes(domain_story)
+                ac_count += len(domain_story.acceptance_criteria)
 
-        summary['exploration'] = True
-        return summary
+        # Add AC count to summary
+        if isinstance(summary, RenderSummary):
+            summary.ac_count = ac_count
+            summary.exploration = True
+            return summary
+        else:
+            # Backward compatibility: summary is a dict
+            summary['ac_count'] = ac_count
+            summary['exploration'] = True
+            return summary
 
     # ------------------------------------------------------------------
     # Persistence
@@ -1162,3 +1189,88 @@ class DrawIOStoryMap(StoryMap):
                 for story in child.children:
                     if isinstance(story, Story):
                         result[story.name] = story
+
+
+# =============================================================================
+# Diagram Type Subclasses
+# =============================================================================
+
+class DrawIOOutlineMap(DrawIOStoryMap):
+    """DrawIO story map specialized for outline diagrams.
+    
+    Renders story map hierarchy as epics, sub-epics, and stories without
+    acceptance criteria or increment lanes.
+    """
+    
+    def __init__(self, story_graph: Dict[str, Any] = None):
+        super().__init__(diagram_type='outline', story_graph=story_graph)
+    
+    def render(self, story_map: StoryMap,
+               layout_data: Optional[LayoutData] = None,
+               skip_stories: bool = False,
+               story_widths: Dict[str, float] = None) -> Union[Dict[str, Any], RenderSummary]:
+        """Render outline diagram showing story map hierarchy.
+        
+        Args:
+            story_map: The story map to render
+            layout_data: Optional saved positions for nodes
+            skip_stories: If True, only render epics and sub-epics (for increment base)
+            story_widths: Optional custom widths for stories
+            
+        Returns:
+            RenderSummary with render statistics
+        """
+        return self.render_from_story_map(
+            story_map, layout_data, skip_stories, story_widths)
+
+
+class DrawIOExplorationMap(DrawIOStoryMap):
+    """DrawIO story map specialized for exploration/acceptance criteria diagrams.
+    
+    Renders story map with acceptance criteria boxes positioned below stories,
+    with AC-aware spacing to prevent overlap.
+    """
+    
+    def __init__(self, story_graph: Dict[str, Any] = None):
+        super().__init__(diagram_type='acceptance_criteria', story_graph=story_graph)
+    
+    def render(self, story_map: StoryMap,
+               layout_data: Optional[LayoutData] = None) -> Union[Dict[str, Any], RenderSummary]:
+        """Render exploration diagram with acceptance criteria.
+        
+        Args:
+            story_map: The story map to render
+            layout_data: Optional saved positions for nodes
+            
+        Returns:
+            RenderSummary with render statistics including AC count
+        """
+        return self.render_exploration_from_story_map(story_map, layout_data)
+
+
+class DrawIOIncrementsMap(DrawIOStoryMap):
+    """DrawIO story map specialized for increment diagrams.
+    
+    Renders story map with increment lanes below the outline, showing story
+    assignments to delivery increments. Stories assigned to increments appear
+    only in their lanes; unassigned stories appear in the outline above.
+    """
+    
+    def __init__(self, story_graph: Dict[str, Any] = None):
+        super().__init__(diagram_type='increments', story_graph=story_graph)
+    
+    def render(self, story_map: StoryMap,
+               increments_data: list,
+               layout_data: Optional[LayoutData] = None) -> Union[Dict[str, Any], RenderSummary]:
+        """Render increments diagram with story assignments.
+        
+        Args:
+            story_map: The story map to render
+            increments_data: List of increment dictionaries with story assignments
+            layout_data: Optional saved positions for nodes
+            
+        Returns:
+            RenderSummary with render statistics including increment count
+        """
+        return self.render_increments_from_story_map(
+            story_map, increments_data, layout_data)
