@@ -24,6 +24,19 @@ class ClassBasedOrganizationScanner(TestScanner):
         if not file_path.exists():
             return violations
         
+        # Skip base diagram test files - base classes for test inheritance, not sub-epic test files
+        stem = file_path.stem
+        if stem.startswith('base_') and ('diagram' in stem or '_test' in stem):
+            return []
+        
+        # Skip utility scripts (run_*.py) - not test files
+        if stem.startswith('run_'):
+            return []
+        
+        # Skip helper-only files (no Test classes, no test_ functions)
+        if self._is_helper_file_only(file_path):
+            return []
+        
         sub_epic_names = self._extract_sub_epic_names(story_graph)
         file_name = file_path.stem
         violation = self._check_file_name_matches_sub_epic(file_name, sub_epic_names, file_path, story_graph)
@@ -104,6 +117,10 @@ class ClassBasedOrganizationScanner(TestScanner):
     
     def _check_method_name_matches_scenario(self, method_name: str, class_name: str, story_names: List[str], 
                                            story_graph: Dict[str, Any], file_path: Path) -> Optional[Dict[str, Any]]:
+        # Skip if method exactly matches test_method in story graph
+        if self._method_matches_story_graph_test_method(method_name, class_name, story_graph):
+            return None
+        
         scenario_name_from_method = method_name[5:] if method_name.startswith('test_') else method_name
         
         if len(scenario_name_from_method) < 20:
@@ -125,6 +142,27 @@ class ClassBasedOrganizationScanner(TestScanner):
                 ).to_dict()
         
         return None
+    
+    def _method_matches_story_graph_test_method(self, method_name: str, class_name: str, story_graph: Dict[str, Any]) -> bool:
+        """Return True if method_name exactly matches a scenario's test_method for this class's story."""
+        story_name_from_class = class_name[4:] if class_name.startswith('Test') else class_name
+        story_name_normalized = self._normalize_name(story_name_from_class)
+        
+        for epic in story_graph.get('epics', []):
+            for sub_epic in epic.get('sub_epics', []):
+                for story_group in sub_epic.get('story_groups', []):
+                    for story in story_group.get('stories', []):
+                        story_name = story.get('name', '')
+                        story_name_norm = self._normalize_name(story_name) if story_name else ''
+                        if not (story_name_norm == story_name_normalized or
+                                story_name_norm.startswith(story_name_normalized) or
+                                story_name_normalized.startswith(story_name_norm)):
+                            continue
+                        for scenario in story.get('scenarios', []):
+                            test_method = scenario.get('test_method', '')
+                            if test_method and test_method == method_name:
+                                return True
+        return False
     
     def _find_expected_scenario_name(self, method_name: str, story_graph: Dict[str, Any], class_name: str) -> Optional[str]:
         full_method_name = f"test_{method_name}" if not method_name.startswith('test_') else method_name
@@ -290,6 +328,29 @@ class ClassBasedOrganizationScanner(TestScanner):
             if nested_sub_epics:
                 self._extract_sub_epic_names_recursive(nested_sub_epics, result)
     
+    def _extract_test_file_stems_from_story_graph(self, story_graph: Dict[str, Any]) -> set:
+        """Extract file stems (e.g. test_display_scope) from all test_file paths in story graph."""
+        stems = set()
+        for epic in story_graph.get('epics', []):
+            self._collect_test_file_stems(epic, stems)
+        return stems
+    
+    def _collect_test_file_stems(self, node: Dict[str, Any], stems: set) -> None:
+        test_file = node.get('test_file', '')
+        if test_file and not test_file.endswith('/'):
+            stem = Path(test_file).stem
+            if stem:
+                stems.add(stem)
+        for sub in node.get('sub_epics', []):
+            self._collect_test_file_stems(sub, stems)
+        for sg in node.get('story_groups', []):
+            for story in sg.get('stories', []):
+                tf = story.get('test_file', '')
+                if tf and not tf.endswith('/'):
+                    stem = Path(tf).stem
+                    if stem:
+                        stems.add(stem)
+    
     def _to_snake_case(self, name: str) -> str:
         name = name.replace('&amp;', 'and')
         name = name.replace('&', 'and')
@@ -300,6 +361,11 @@ class ClassBasedOrganizationScanner(TestScanner):
         return name.lower()
     
     def _check_file_name_matches_sub_epic(self, file_name: str, sub_epic_names: List[str], file_path: Path, story_graph: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        # Accept if file is explicitly listed as test_file in story graph
+        story_graph_test_stems = self._extract_test_file_stems_from_story_graph(story_graph)
+        if file_name in story_graph_test_stems:
+            return None
+        
         name_without_prefix = file_name[5:] if file_name.startswith('test_') else file_name
         
         name_normalized = self._to_snake_case(name_without_prefix)

@@ -145,7 +145,7 @@ class TestManageBehaviors:
         assert exists is True
         assert not_exists is False
     
-    def test_find_action_by_name(self, tmp_path):
+    def test_action_can_be_found_by_name_when_it_exists(self, tmp_path):
         """Scenario: Action can be found by name when it exists."""
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')
@@ -168,7 +168,7 @@ class TestManageBehaviors:
         assert isinstance(found_action, StrategyAction)
         assert found_action.action_name == 'strategy'
     
-    def test_iterate_all_actions(self, tmp_path):
+    def test_all_actions_can_be_iterated(self, tmp_path):
         """Scenario: All actions can be iterated."""
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')
@@ -513,7 +513,7 @@ class TestNavigateSequentially:
         helper.bot.behaviors.navigate_to('exploration')
         helper.behaviors.assert_current_behavior_and_action('exploration', helper.bot.behaviors.current.actions.current_action_name)
     
-    def test_get_next_behavior(self, tmp_path):
+    def test_next_behavior_in_sequence_can_be_retrieved(self, tmp_path):
         """
         Scenario: Next behavior in sequence can be retrieved
         GIVEN: Bot is at scenarios behavior
@@ -549,7 +549,7 @@ class TestNavigateSequentially:
         helper.bot.behaviors.navigate_to(last_behavior.name)
         assert helper.bot.behaviors.next() is None
     
-    def test_navigate_to_action(self, tmp_path):
+    def test_can_navigate_to_a_specific_action(self, tmp_path):
         """
         Scenario: Can navigate to a specific action
         GIVEN: Bot is at a behavior with multiple actions
@@ -561,7 +561,7 @@ class TestNavigateSequentially:
         helper.bot.behaviors.current.actions.navigate_to('build')
         helper.behaviors.assert_at_behavior_action('shape', 'build')
     
-    def test_get_next_action(self, tmp_path):
+    def test_next_action_in_sequence_can_be_retrieved(self, tmp_path):
         """
         Scenario: Next action in sequence can be retrieved
         GIVEN: Bot is at clarify action (first action)

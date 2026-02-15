@@ -4,7 +4,16 @@
 
 ## Step 1: Scanner Violation Review
 
-**Scanner status:** Scanners not run (CLI invocation not executed). No `docs/story/tests/violations` files present.
+**Scanner status:** Scanners ran. Full report: [tests-validation-status-2026-02-15_18-32-46.md](./tests-validation-status-2026-02-15_18-32-46.md) (78 files scanned).
+
+**Scanner fixes applied (2026-02-15):**
+- **Base diagram tests:** Excluded as false positives (base_*_diagram_test.py, base_*_test.py)
+- **Helper files:** Excluded via _is_helper_file_only (no Test classes, no test_ functions)
+- **run_*.py scripts:** Excluded (utility scripts)
+- **Story graph test_file:** Files listed in story graph test_file paths are accepted
+- **test_method match:** Methods that exactly match scenario test_method in story graph are accepted
+
+**Create Rule Files scope:** `test/build_agile_bots/generate_cli/test_generate_cursor_context_package.py` does **not** appear in the scanner violations—Create Rule Files tests passed automated checks.
 
 **Test execution:** 10 tests collected, 10 failed with `NotImplementedError` (expected - TDD red phase; `RuleFileGenerator.generate()` is a stub).
 
@@ -23,7 +32,7 @@ Validated `test/build_agile_bots/generate_cli/test_generate_cursor_context_packa
 
 ## Step 3: Summary
 
-- **Scanner violations:** None (scanners not run).
+- **Scanner violations:** None for Create Rule Files scope (scanner ran; test_generate_cursor_context_package.py passed).
 - **Manual findings:** No violations. Tests comply with tests behavior rules.
 - **Priority fixes:** None.
 - **Optional improvements:** None.

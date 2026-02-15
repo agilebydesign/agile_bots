@@ -341,6 +341,27 @@
                           "background": [],
                           "test_method": "test_generator_produces_rule_file_when_bot_has_single_behavior",
                           "steps": "Given Bot has exactly one behavior in behaviors directory\nWhen Generator runs generate context package command\nThen Generator creates one .mdc rule file\nAnd Rule file path follows {bot_name}_{behavior}.mdc pattern"
+                        },
+                        {
+                          "name": "Display Cursor VS Code Test Explorer",
+                          "sequential_order": 11.0,
+                          "connector": "or",
+                          "story_type": "user",
+                          "users": ["User"],
+                          "test_class": null,
+                          "test_file": "invoke_bot/test_cursor_vscode_test_explorer.py",
+                          "scenarios": [
+                            {
+                              "name": "VS Code Test Explorer discovers and runs pytest tests",
+                              "sequential_order": 1.0,
+                              "type": "happy_path",
+                              "background": [],
+                              "test_method": "test_cursor_vscode_test_explorer_smoke",
+                              "steps": ""
+                            }
+                          ],
+                          "acceptance_criteria": [],
+                          "behavior": null
                         }
                       ],
                       "acceptance_criteria": [
@@ -14023,7 +14044,7 @@
                           "sequential_order": 8.0,
                           "type": "happy_path",
                           "background": [],
-                          "test_method": "test_get_next_behavior",
+                          "test_method": "test_next_behavior_in_sequence_can_be_retrieved",
                           "steps": "Given Bot is at scenarios behavior\nWhen behaviors.next() called\nThen Returns next behavior (tests) with complete structure"
                         },
                         {
@@ -14039,7 +14060,7 @@
                           "sequential_order": 10.0,
                           "type": "happy_path",
                           "background": [],
-                          "test_method": "test_navigate_to_action",
+                          "test_method": "test_can_navigate_to_a_specific_action",
                           "steps": "Given Bot is at a behavior with multiple actions\nWhen actions.navigate_to('build') called\nThen Current action is set to build"
                         },
                         {
@@ -14047,7 +14068,7 @@
                           "sequential_order": 11.0,
                           "type": "happy_path",
                           "background": [],
-                          "test_method": "test_get_next_action",
+                          "test_method": "test_next_action_in_sequence_can_be_retrieved",
                           "steps": "Given Bot is at clarify action (first action)\nWhen actions.next() called\nThen Returns strategy action (second action)"
                         },
                         {
@@ -14877,7 +14898,7 @@
                           "sequential_order": 9.0,
                           "type": "happy_path",
                           "background": [],
-                          "test_method": "test_find_action_by_name",
+                          "test_method": "test_action_can_be_found_by_name_when_it_exists",
                           "steps": ""
                         },
                         {
@@ -14901,7 +14922,7 @@
                           "sequential_order": 12.0,
                           "type": "happy_path",
                           "background": [],
-                          "test_method": "test_iterate_all_actions",
+                          "test_method": "test_all_actions_can_be_iterated",
                           "steps": ""
                         }
                       ],
