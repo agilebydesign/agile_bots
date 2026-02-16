@@ -1,1 +1,6 @@
-{"type": "showAll", "value": [], "exclude": [], "skiprule": []}
+{
+  "type": "showAll",
+  "value": [],
+  "exclude": [],
+  "skiprule": []
+}

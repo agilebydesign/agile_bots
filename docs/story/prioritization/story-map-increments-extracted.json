@@ -12,63 +12,34 @@
             {
               "type": "and",
               "connector": null,
-              "stories": [
-                {
-                  "name": "Generate Bot Tools",
-                  "sequential_order": 1.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Generate Behavior Action Tools",
-                  "sequential_order": 2.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Deploy MCP BOT Server",
-                  "sequential_order": 3.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Restart MCP Server To Load Code Changes",
-                  "sequential_order": 4.0,
-                  "story_type": "user"
-                }
-              ]
+              "stories": []
             }
           ]
         },
         {
           "name": "Generate CLI",
           "sequential_order": 2.0,
-          "sub_epics": [],
-          "story_groups": [
+          "sub_epics": [
             {
-              "type": "and",
-              "connector": null,
-              "stories": [
+              "name": "Generate Cursor Context Package",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
                 {
-                  "name": "Generate Command Definitions",
-                  "sequential_order": 1.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Generate CLI Entry Point",
-                  "sequential_order": 2.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Generate Cursor Commands",
-                  "sequential_order": 3.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Generate Help Documentation",
-                  "sequential_order": 4.0,
-                  "story_type": "user"
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Create Rule Files From Bot Behavior",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    }
+                  ]
                 }
               ]
             }
-          ]
+          ],
+          "story_groups": []
         }
       ]
     },
@@ -88,28 +59,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Load Bot Behaviors",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Load Actions",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Load Bot Behaviors Using CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Load Actions Using CLI",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -121,63 +71,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Display CLI Header",
-                      "sequential_order": 1.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Detect CLI Mode",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display CLI Bot Command in Navigation Menu Footer",
-                      "sequential_order": 3.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Initialize CLI Session",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Piped Mode Instructions for AI Agents",
-                      "sequential_order": 5.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Open Panel",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Headless Mode Status in CLI",
-                      "sequential_order": 7.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Apply Visual Branding",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Session Status panel",
-                      "sequential_order": 9.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Exit CLI REPL",
-                      "sequential_order": 10.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Toggle Panel Section",
-                      "sequential_order": 11.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -189,48 +83,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Resolve Bot Path",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Manage Bot Registry",
-                      "sequential_order": 2.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Resolve Bot Path Using CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Load and Display Workspace Context in CLI",
-                      "sequential_order": 4.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Switch Registered Bots in CLI",
-                      "sequential_order": 5.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Change Workspace Path panel",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Switch Bot panel",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Load Bot Using CLI",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             }
@@ -253,38 +106,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Add Filter Part To File Scope",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Filter Part To File Scope CLI",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Filter Part To File Scope Panel",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope CLI",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope Panel",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -296,38 +118,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Filter File Scope  By Files",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter File Scope  By Files CLI",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter File Scope  By Files Panel",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter File Scope By Stories Panel",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter File Scope By Stories CLI",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Scope By Files Using CLI",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 }
@@ -346,53 +137,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Filter Story Scope By Stories",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Scope By Stories Using CLI",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope by Stories Panel",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Files",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Files CLI",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Files Panel",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Increments",
-                          "sequential_order": 7.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Increments CLI",
-                          "sequential_order": 8.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Filter Story Scope By Increments Panel",
-                          "sequential_order": 9.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -404,73 +149,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Create Scope",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Create Scope Using CLI",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Display Scope Using CLI",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Clear Scope",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Show All Scope Through Panel",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Execute Actions With Scope Using CLI",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Persist Scope",
-                          "sequential_order": 7.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Execute Action Scoped To Story Node",
-                          "sequential_order": 8.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Execute Actions With Scope",
-                          "sequential_order": 9.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Domain Scoping",
-                          "sequential_order": 10.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Show All Increment Scope Through CLI",
-                          "sequential_order": 11.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Show All Increment Scope",
-                          "sequential_order": 12.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Show All Increment Scope Through Panel",
-                          "sequential_order": 13.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -482,68 +161,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Add Filter Part To Story Scope",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Filter Part To Story Scope using CLI",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Filter Part To Story Scope In Panel",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From Story Scope",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From Story Scope using CLI",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Filter Part From Story Scope In Panel",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Increment Filter Part To Story Scope",
-                          "sequential_order": 7.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Increment Filter Part To Story Scope Panel",
-                          "sequential_order": 8.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add Increment Filter Part To Story Scope CLI",
-                          "sequential_order": 9.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Increment Filter Part From Story Scope",
-                          "sequential_order": 10.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Increment Filter Part From Story Scope CLI",
-                          "sequential_order": 11.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Remove Increment Filter Part From Story Scope Panel",
-                          "sequential_order": 12.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 }
@@ -558,108 +176,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Navigate Story Graph",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate Story Graph Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Story Hierarchy Panel",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Create Child Story Node",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Create Child Story Node Under Parent Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Create Child Story Node Under Parent CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Create Epic",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Story Node",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Story Node From Parent CLI",
-                      "sequential_order": 9.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Story Node From Parent Panel",
-                      "sequential_order": 10.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story Node To Parent",
-                      "sequential_order": 11.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story Node  CLI",
-                      "sequential_order": 12.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story Node Panel",
-                      "sequential_order": 13.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update Story Node name  CLI",
-                      "sequential_order": 14.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update Story Node name Panel",
-                      "sequential_order": 15.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update Story Node Name",
-                      "sequential_order": 16.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Story Map Changes Asynchronously",
-                      "sequential_order": 17.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Automatically Refresh Story Graph Changes Panel",
-                      "sequential_order": 18.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Automatically Refresh Story Graph Changes  CLI",
-                      "sequential_order": 19.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Execute Scope \"Runs\"",
-                      "sequential_order": 20.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -671,63 +188,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Display Increment Scope View",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Add Increment",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Add Increment Panel",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Add Increment CLI",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Increment",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Increment CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Delete Increment Panel",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story to Increment",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story to Increment CLI",
-                      "sequential_order": 9.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Move Story to Increment Panel",
-                      "sequential_order": 10.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Increment Scope View CLI",
-                      "sequential_order": 11.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -739,33 +200,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Set scope to selected story node",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit action for selected story node",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit Current Behavior Action For Selected Node",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Set scope to selected Increment",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Copy Story Node To Clipboard",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -777,18 +212,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Open All Related Files",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Enrich Scope With Links",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -804,23 +228,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Display Stories",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Edit Stories in Trace Editor",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Open Story Files",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -832,43 +240,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Display Scenario Steps",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Edit Scenarios in Trace Editor",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Open Scenario Source",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Display Examples Table",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Add / Remove Examples",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Edit Example",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Edit Example Cell Data",
-                          "sequential_order": 7.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -880,28 +252,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Display Code Trace",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Edit Code Step",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Open Source File",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Navigate Code Trace",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 }
@@ -923,48 +274,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Navigate Sequentially",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate To First Behavior Action",
-                      "sequential_order": 2.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Navigate Using CLI Dot Notation",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate Sequentially Using CLI Commands",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate Behavior Action Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Manage Behaviors Using CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate To Behavior Action And Execute Using CLI",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Navigate Sequentially Using CLI",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -976,63 +286,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Execute Behavior Action",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Execute Behavior Action Panel",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update and Find Current Behavior",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Persist Behavior Action State",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Track Activity For Workspace",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Track Action Start",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Track Action Completion",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Proceed across End To End Workflow",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Record Activity Metrics And Paths",
-                      "sequential_order": 9.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Re-execute Current Operation Using CLI",
-                      "sequential_order": 10.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Execute End To End Workflow Using CLI",
-                      "sequential_order": 11.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1044,43 +298,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Display Bot Hierarchy Tree with Progress Indicators CLI",
-                      "sequential_order": 1.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Show Remaining Actions After Completion",
-                      "sequential_order": 2.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Display Current Position in CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Display CLI Navigation Menu Footer",
-                      "sequential_order": 4.0,
-                      "story_type": "system"
-                    },
-                    {
-                      "name": "Display Hierarchy In Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Manage Behavior Action State Using CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Context Using CLI",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             }
@@ -1099,78 +317,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Inject Context Into Instructions",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Action Instructions Through CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit Instructions Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Base Instructions Panel",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Raw Format Instructions In Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Clarification Answers",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Clarification Evidence",
-                      "sequential_order": 7.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Strategy Decisions",
-                      "sequential_order": 8.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Multiple Guardrails Together",
-                      "sequential_order": 9.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save File Isolation",
-                      "sequential_order": 10.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Guardrails Through Panel",
-                      "sequential_order": 11.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit Scope Instructions",
-                      "sequential_order": 12.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Handle Operation Errors and Validation in CLI",
-                      "sequential_order": 13.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save Guardrails Through CLI",
-                      "sequential_order": 14.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1182,33 +329,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Clarify Requirements",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Clarify Requirements Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Clarification Data Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Clarify Instructions Panel",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Clarify Instructions Through CLI",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1220,38 +341,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Decide Strategy",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Decide Strategy Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Strategy Data Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Strategy Instructions Panel",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit Instructions To AI Agent Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Strategy Instructions Through CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1263,33 +353,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Build Story Graph",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Build Story Graph Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Build Instructions Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Build Instructions Panel",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Build Story Graph Using API",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1301,38 +365,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Render Output Using CLI",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Synchronizer Output Through CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Render Configurations Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Render Instructions Through CLI",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Render Instructions Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Render Output Usng Story API",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1346,38 +379,8 @@
                   "connector": null,
                   "stories": [
                     {
-                      "name": "Render story map",
+                      "name": "Synchronize DIagram With Scoped Nodes",
                       "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Render story map increments",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Render story map with acceptance criteria",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update graph from story map",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update graph from map increments",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update story graph from map acceptance criteria",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Render action diagram section",
-                      "sequential_order": 7.0,
                       "story_type": "user"
                     }
                   ]
@@ -1392,38 +395,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Validate Rules",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Validate Rules Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Validation Results Through CLI",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Validation Scanners Through CLI",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Validate Instructions Panel",
-                      "sequential_order": 5.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Validate Instructions Through CLI",
-                      "sequential_order": 6.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -1437,28 +409,119 @@
                   "connector": null,
                   "stories": [
                     {
-                      "name": "Display Rules",
+                      "name": "YAYAYAYAYA",
                       "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Rules Using CLI",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Submit Behavior Rules Through Panel",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Get Rules Instructions Through CLI",
-                      "sequential_order": 4.0,
                       "story_type": "user"
                     }
                   ]
                 }
               ]
+            },
+            {
+              "name": "Synchronize Diagram by Domain",
+              "sequential_order": 9.0,
+              "sub_epics": [
+                {
+                  "name": "Synchronize Epics and Sub-Epics",
+                  "sequential_order": 1.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render epic and sub-epic hierarchy",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report epic and sub-epic changes",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update epics and sub-epics from diagram",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Synchronize Stories and Actors",
+                  "sequential_order": 2.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render stories and actors",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Render acceptance criteria",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report story moves between parents",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report acceptance criteria changes",
+                          "sequential_order": 4.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update stories from diagram",
+                          "sequential_order": 5.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update acceptance criteria from diagram",
+                          "sequential_order": 6.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Synchronize Increments",
+                  "sequential_order": 3.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render increment lanes",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report increment changes",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update increments from diagram",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "story_groups": []
             }
           ],
           "story_groups": []
@@ -1471,38 +534,7 @@
             {
               "type": "and",
               "connector": null,
-              "stories": [
-                {
-                  "name": "Get Help",
-                  "sequential_order": 1.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Display Parameter Help Using CLI",
-                  "sequential_order": 2.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Display Action Help Using CLI",
-                  "sequential_order": 3.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Display Command Examples Using CLI",
-                  "sequential_order": 4.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Get Help Using CLI",
-                  "sequential_order": 5.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Display Help Using CLI",
-                  "sequential_order": 6.0,
-                  "story_type": "user"
-                }
-              ]
+              "stories": []
             }
           ]
         }
