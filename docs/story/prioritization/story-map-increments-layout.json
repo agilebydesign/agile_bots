@@ -35,19 +35,7 @@
     "width": 70.0,
     "height": 60.0
   },
-  "SUB_EPIC|Generate Cursor Context Package": {
-    "x": 280.0,
-    "y": 270.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "build-agile-bots/generate-cli/generate-cursor-context-package": {
-    "x": 280.0,
-    "y": 270.0,
-    "width": 60.0,
-    "height": 60.0
-  },
-  "STORY|Build Agile Bots|Generate Cursor Context Package|Create Rule Files From Bot Behavior": {
+  "STORY|Build Agile Bots|Generate CLI|Create Rule Files From Bot Behavior": {
     "x": 295.0,
     "y": 990.0,
     "width": 50.0,
@@ -62,13 +50,13 @@
   "EPIC|Invoke Bot": {
     "x": 360.0,
     "y": 120.0,
-    "width": 13640.0,
+    "width": 11590.0,
     "height": 60.0
   },
   "invoke-bot": {
     "x": 360.0,
     "y": 120.0,
-    "width": 13640.0,
+    "width": 11590.0,
     "height": 60.0
   },
   "SUB_EPIC|Initialize Bot": {
@@ -107,6 +95,54 @@
     "width": 660.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Render Bot Interface|Auto Refresh State Changing Events": {
+    "x": 665.0031139930735,
+    "y": 1480.0013417504815,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "59": {
+    "x": 665.0031139930735,
+    "y": 1480.0013417504815,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display Syncing Message": {
+    "x": 725.0,
+    "y": 1480.0,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "60": {
+    "x": 725.0,
+    "y": 1480.0,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Display Bot  Help": {
+    "x": 1130.0047093066096,
+    "y": 1479.995683714959,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "62": {
+    "x": 1130.0047093066096,
+    "y": 1479.995683714959,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "STORY|Invoke Bot|Render Bot Interface|Provide Bot Guidance": {
+    "x": 1189.99721685948,
+    "y": 1479.995683714958,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
+  "61": {
+    "x": 1189.99721685948,
+    "y": 1479.995683714958,
+    "width": 52.318286302751005,
+    "height": 52.318286302751005
+  },
   "SUB_EPIC|Load Bot": {
     "x": 1290.0,
     "y": 270.0,
@@ -120,579 +156,873 @@
     "height": 60.0
   },
   "SUB_EPIC|Work With Story Map": {
-    "x": 1785.0,
+    "x": 2550.0,
     "y": 195.0,
-    "width": 6090.0,
+    "width": 3660.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map": {
-    "x": 1785.0,
+    "x": 2550.0,
     "y": 195.0,
-    "width": 6090.0,
+    "width": 3660.0,
     "height": 60.0
   },
-  "SUB_EPIC|Scope Files": {
-    "x": 1790.0,
+  "SUB_EPIC|Filter Scope": {
+    "x": 2550.0,
     "y": 270.0,
-    "width": 740.0,
+    "width": 1050.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files": {
-    "x": 1790.0,
+    "x": 2550.0,
     "y": 270.0,
-    "width": 740.0,
+    "width": 1050.0,
     "height": 60.0
   },
-  "SUB_EPIC|Set File Filter": {
-    "x": 1795.0,
+  "SUB_EPIC|Filter Stories": {
+    "x": 2550.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 440.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files/set-file-filter": {
-    "x": 1795.0,
+    "x": 2550.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 440.0,
     "height": 60.0
   },
-  "SUB_EPIC|Filter File Scope": {
-    "x": 2165.0,
+  "SUB_EPIC|Filter Increments": {
+    "x": 3010.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 320.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-files/filter-file-scope": {
-    "x": 2165.0,
+    "x": 3010.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 320.0,
     "height": 60.0
   },
-  "SUB_EPIC|Scope Stories": {
-    "x": 2540.0,
-    "y": 270.0,
-    "width": 2070.0,
-    "height": 60.0
-  },
-  "invoke-bot/work-with-story-map/scope-stories": {
-    "x": 2540.0,
-    "y": 270.0,
-    "width": 2070.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|Filter Scope of Stories": {
-    "x": 2545.0,
+  "SUB_EPIC|Filter Files": {
+    "x": 3340.0,
     "y": 345.0,
-    "width": 540.0,
+    "width": 260.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/scope-stories/filter-scope-of-stories": {
-    "x": 2545.0,
+    "x": 3340.0,
     "y": 345.0,
-    "width": 540.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|Manage Story Scope": {
-    "x": 3095.0,
-    "y": 345.0,
-    "width": 780.0,
-    "height": 60.0
-  },
-  "invoke-bot/work-with-story-map/scope-stories/manage-story-scope": {
-    "x": 3095.0,
-    "y": 345.0,
-    "width": 780.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|Set Scope Using Filter Parts": {
-    "x": 3885.0,
-    "y": 345.0,
-    "width": 720.0,
-    "height": 60.0
-  },
-  "invoke-bot/work-with-story-map/scope-stories/set-scope-using-filter-parts": {
-    "x": 3885.0,
-    "y": 345.0,
-    "width": 720.0,
+    "width": 260.0,
     "height": 60.0
   },
   "SUB_EPIC|Edit Story Map": {
-    "x": 4620.0,
-    "y": 270.0,
-    "width": 1200.0,
+    "x": 3611.0,
+    "y": 271.5,
+    "width": 1167.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/edit-story-map": {
-    "x": 4620.0,
-    "y": 270.0,
-    "width": 1200.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|Edit Increments": {
-    "x": 5830.0,
-    "y": 270.0,
-    "width": 660.0,
-    "height": 60.0
-  },
-  "invoke-bot/work-with-story-map/edit-increments": {
-    "x": 5830.0,
-    "y": 270.0,
-    "width": 660.0,
+    "x": 3611.0,
+    "y": 271.5,
+    "width": 1167.0,
     "height": 60.0
   },
   "SUB_EPIC|Act With Selected Node": {
-    "x": 6500.0,
-    "y": 270.0,
-    "width": 300.0,
+    "x": 4790.0,
+    "y": 271.5,
+    "width": 348.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node": {
-    "x": 6500.0,
-    "y": 270.0,
-    "width": 300.0,
+    "x": 4790.0,
+    "y": 271.5,
+    "width": 348.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Act With Selected Node|Execute Scope \"Runs\"": {
+    "x": 4830.0,
+    "y": 1451.8,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "58": {
+    "x": 4830.0,
+    "y": 1451.8,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Render Diagram Selected Node": {
+    "x": 4897.0,
+    "y": 1450.65,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "72": {
+    "x": 4897.0,
+    "y": 1450.65,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "STORY|Invoke Bot|Act With Selected Node|Update Queie based on selectged Node": {
+    "x": 4955.672988753465,
+    "y": 1451.8,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "75": {
+    "x": 4955.672988753465,
+    "y": 1451.8,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Open Story Related Files": {
-    "x": 6810.0,
-    "y": 270.0,
+    "x": 5150.0,
+    "y": 271.5,
     "width": 120.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/open-story-related-files": {
-    "x": 6810.0,
-    "y": 270.0,
+    "x": 5150.0,
+    "y": 271.5,
     "width": 120.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Story Graph": {
-    "x": 6940.0,
-    "y": 270.0,
+    "x": 5280.0,
+    "y": 271.5,
     "width": 930.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph": {
-    "x": 6940.0,
-    "y": 270.0,
+    "x": 5280.0,
+    "y": 271.5,
     "width": 930.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Story": {
-    "x": 6945.0,
-    "y": 345.0,
+    "x": 5285.0,
+    "y": 346.5,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story": {
-    "x": 6945.0,
-    "y": 345.0,
+    "x": 5285.0,
+    "y": 346.5,
     "width": 180.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Scenario": {
-    "x": 7135.0,
-    "y": 345.0,
+    "x": 5475.0,
+    "y": 346.5,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario": {
-    "x": 7135.0,
-    "y": 345.0,
+    "x": 5475.0,
+    "y": 346.5,
     "width": 480.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Code": {
-    "x": 7625.0,
-    "y": 345.0,
+    "x": 5965.0,
+    "y": 346.5,
     "width": 240.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code": {
-    "x": 7625.0,
-    "y": 345.0,
+    "x": 5965.0,
+    "y": 346.5,
     "width": 240.0,
     "height": 60.0
   },
   "SUB_EPIC|Navigate Behavior Actions": {
-    "x": 7885.0,
-    "y": 195.0,
+    "x": 6225.0,
+    "y": 196.5,
     "width": 1590.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions": {
-    "x": 7885.0,
-    "y": 195.0,
+    "x": 6225.0,
+    "y": 196.5,
     "width": 1590.0,
     "height": 60.0
   },
   "SUB_EPIC|Navigate Behavior And Actions": {
-    "x": 7890.0,
-    "y": 270.0,
+    "x": 6230.0,
+    "y": 271.5,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions": {
-    "x": 7890.0,
-    "y": 270.0,
+    "x": 6230.0,
+    "y": 271.5,
     "width": 480.0,
     "height": 60.0
   },
   "SUB_EPIC|Perform Behavior Action In Bot Workflow": {
-    "x": 8380.0,
-    "y": 270.0,
+    "x": 6720.0,
+    "y": 271.5,
     "width": 660.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow": {
-    "x": 8380.0,
-    "y": 270.0,
+    "x": 6720.0,
+    "y": 271.5,
     "width": 660.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Conssolidate and Expand Behavior Aciton Queies": {
+    "x": 6721.783606679103,
+    "y": 1418.37,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "74": {
+    "x": 6721.783606679103,
+    "y": 1418.37,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Auto execute Consolidated Queue": {
+    "x": 6779.351017078075,
+    "y": 1420.5900000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "77": {
+    "x": 6779.351017078075,
+    "y": 1420.5900000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Skip Behavior and Action Queie": {
+    "x": 6839.353606679104,
+    "y": 1420.5900000000001,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "89": {
+    "x": 6839.353606679104,
+    "y": 1420.5900000000001,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Save  / Load Queue Consolidation": {
+    "x": 6899.353606679104,
+    "y": 1419.35,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "90": {
+    "x": 6899.353606679104,
+    "y": 1419.35,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Display Behavior Action State": {
-    "x": 9050.0,
-    "y": 270.0,
+    "x": 7390.0,
+    "y": 271.5,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state": {
-    "x": 9050.0,
-    "y": 270.0,
+    "x": 7390.0,
+    "y": 271.5,
     "width": 420.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Display Behavior Action State|Display  Context BAQ": {
+    "x": 7390.002137204122,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "78": {
+    "x": 7390.002137204122,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Drop Context into Queue": {
+    "x": 7449.578498288572,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "83": {
+    "x": 7449.578498288572,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Display  Behavior Action Qs": {
+    "x": 7509.35,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "76": {
+    "x": 7509.35,
+    "y": 1429.3500000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Display Behavior Action State|Drop Story Node in  Behavor Action Queue": {
+    "x": 7569.353798105656,
+    "y": 1429.35,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "73": {
+    "x": 7569.353798105656,
+    "y": 1429.35,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Perform Action": {
-    "x": 9485.0,
-    "y": 195.0,
-    "width": 4140.0,
+    "x": 7825.0,
+    "y": 196.5,
+    "width": 3730.0,
     "height": 60.0
   },
   "invoke-bot/perform-action": {
-    "x": 9485.0,
-    "y": 195.0,
-    "width": 4140.0,
+    "x": 7825.0,
+    "y": 196.5,
+    "width": 3730.0,
     "height": 60.0
   },
   "SUB_EPIC|Prepare Common Instructions For Behavior, Action, and Scope": {
-    "x": 9490.0,
-    "y": 270.0,
+    "x": 7830.0,
+    "y": 271.5,
     "width": 840.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope": {
-    "x": 9490.0,
-    "y": 270.0,
+    "x": 7830.0,
+    "y": 271.5,
     "width": 840.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Add special instructon": {
+    "x": 8139.999443468496,
+    "y": 1420.59,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "85": {
+    "x": 8139.999443468496,
+    "y": 1420.59,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Clarify Requirements": {
-    "x": 10340.0,
-    "y": 270.0,
+    "x": 8680.0,
+    "y": 271.5,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/clarify-requirements": {
-    "x": 10340.0,
-    "y": 270.0,
+    "x": 8680.0,
+    "y": 271.5,
     "width": 300.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Clarify Requirements|Clarify in Queue": {
+    "x": 8669.997011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "79": {
+    "x": 8669.997011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Display clarification answers in Queue": {
+    "x": 8729.997011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "86": {
+    "x": 8729.997011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Clarify Requirements|Associate Guard rail with scope": {
+    "x": 8794.677011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "91": {
+    "x": 8794.677011427642,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Decide Strategy": {
-    "x": 10650.0,
-    "y": 270.0,
+    "x": 8990.0,
+    "y": 271.5,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/decide-strategy": {
-    "x": 10650.0,
-    "y": 270.0,
+    "x": 8990.0,
+    "y": 271.5,
     "width": 360.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Decide Strategy|MAke Choices in queue": {
+    "x": 8990.843635112375,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "80": {
+    "x": 8990.843635112375,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "STORY|Invoke Bot|Decide Strategy|Display Chopices in Queue": {
+    "x": 9049.357011427643,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "87": {
+    "x": 9049.357011427643,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Build Story Graph": {
-    "x": 11020.0,
-    "y": 270.0,
+    "x": 9360.0,
+    "y": 271.5,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/build-story-graph": {
-    "x": 11020.0,
-    "y": 270.0,
+    "x": 9360.0,
+    "y": 271.5,
     "width": 300.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Build Story Graph|Build Story Graph Through Queue": {
+    "x": 9369.996367966387,
+    "y": 1410.0000000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "82": {
+    "x": 9369.996367966387,
+    "y": 1410.0000000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Render Content": {
-    "x": 11330.0,
-    "y": 270.0,
-    "width": 360.0,
+    "x": 9670.0,
+    "y": 271.5,
+    "width": 435.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-content": {
-    "x": 11330.0,
-    "y": 270.0,
-    "width": 360.0,
+    "x": 9670.0,
+    "y": 271.5,
+    "width": 435.0,
     "height": 60.0
   },
-  "SUB_EPIC|Synchronized Graph with Rendered Diagram Content": {
-    "x": 11700.0,
-    "y": 270.0,
-    "width": 480.0,
-    "height": 60.0
+  "STORY|Invoke Bot|Render Content|Render as Part of Build and Validate Actions": {
+    "x": 9669.351389246065,
+    "y": 1410.0000000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
   },
-  "invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content": {
-    "x": 11700.0,
-    "y": 270.0,
-    "width": 480.0,
-    "height": 60.0
+  "81": {
+    "x": 9669.351389246065,
+    "y": 1410.0000000000036,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
   },
-  "STORY|Invoke Bot|Synchronized Graph with Rendered Diagram Content|Synchronize DIagram With Scoped Nodes": {
-    "x": 12114.0,
-    "y": 990.0,
+  "STORY|Invoke Bot|Render Content|Report, Report, Update In Queue": {
+    "x": 9725.0,
+    "y": 1410.0,
     "width": 50.0,
     "height": 50.0
   },
-  "invoke-bot/perform-action/synchronized-graph-with-rendered-diagram-content/synchronize-diagram-with-scoped-nodes": {
-    "x": 12114.0,
-    "y": 990.0,
+  "95": {
+    "x": 9725.0,
+    "y": 1410.0,
     "width": 50.0,
     "height": 50.0
+  },
+  "STORY|Invoke Bot|Render Content|Display Rules in Queue": {
+    "x": 10064.356367966388,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "88": {
+    "x": 10064.356367966388,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
   },
   "SUB_EPIC|Validate With Rules": {
-    "x": 12190.0,
-    "y": 270.0,
+    "x": 10115.0,
+    "y": 270.5,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/validate-with-rules": {
-    "x": 12190.0,
-    "y": 270.0,
+    "x": 10115.0,
+    "y": 270.5,
     "width": 360.0,
     "height": 60.0
   },
+  "STORY|Invoke Bot|Validate With Rules|Validate In Queue": {
+    "x": 10129.351689334806,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
+  "84": {
+    "x": 10129.351689334806,
+    "y": 1418.3700000000035,
+    "width": 50.64581560026802,
+    "height": 50.64581560026802
+  },
   "SUB_EPIC|Use Rules In Prompt": {
-    "x": 12560.0,
+    "x": 10480.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt": {
-    "x": 12560.0,
+    "x": 10480.0,
     "y": 270.0,
     "width": 300.0,
     "height": 60.0
   },
-  "STORY|Invoke Bot|Use Rules In Prompt|YAYAYAYAYA": {
-    "x": 12805.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/perform-action/use-rules-in-prompt/yayayayaya": {
-    "x": 12805.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
   "SUB_EPIC|Synchronize Diagram by Domain": {
-    "x": 12870.0,
-    "y": 270.0,
+    "x": 10785.0,
+    "y": 270.5,
     "width": 750.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain": {
-    "x": 12870.0,
-    "y": 270.0,
+    "x": 10785.0,
+    "y": 270.5,
     "width": 750.0,
     "height": 60.0
   },
   "SUB_EPIC|Synchronize Epics and Sub-Epics": {
-    "x": 12875.0,
+    "x": 10790.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-epics-and-sub-epics": {
-    "x": 12875.0,
+    "x": 10790.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Render epic and sub-epic hierarchy": {
-    "x": 12880.0,
-    "y": 495.0,
+    "x": 10825.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-epics-and-sub-epics/render-epic-and-sub-epic-hierarchy": {
-    "x": 12880.0,
-    "y": 495.0,
+    "x": 10825.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Report epic and sub-epic changes": {
-    "x": 12940.0,
-    "y": 495.0,
+    "x": 10885.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-epics-and-sub-epics/report-epic-and-sub-epic-changes": {
-    "x": 12940.0,
-    "y": 495.0,
+    "x": 10885.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Update epics and sub-epics from diagram": {
-    "x": 13000.0,
-    "y": 495.0,
+    "x": 10945.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-epics-and-sub-epics/update-epics-and-sub-epics-from-diagram": {
-    "x": 13000.0,
-    "y": 495.0,
+    "x": 10945.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Synchronize Stories and Actors": {
-    "x": 13065.0,
+    "x": 10980.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 380.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors": {
-    "x": 13065.0,
+    "x": 10980.0,
     "y": 345.0,
-    "width": 360.0,
+    "width": 380.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Render stories and actors": {
-    "x": 13070.0,
-    "y": 495.0,
+    "x": 11015.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/render-stories-and-actors": {
-    "x": 13070.0,
-    "y": 495.0,
+    "x": 11015.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Render acceptance criteria": {
-    "x": 13130.0,
-    "y": 495.0,
+    "x": 11075.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/render-acceptance-criteria": {
-    "x": 13130.0,
-    "y": 495.0,
+    "x": 11075.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Report story moves between parents": {
-    "x": 13190.0,
-    "y": 495.0,
+    "x": 11135.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/report-story-moves-between-parents": {
-    "x": 13190.0,
-    "y": 495.0,
+    "x": 11135.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Report acceptance criteria changes": {
-    "x": 13250.0,
-    "y": 495.0,
+    "x": 11195.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/report-acceptance-criteria-changes": {
-    "x": 13250.0,
-    "y": 495.0,
+    "x": 11195.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Update stories from diagram": {
-    "x": 13310.0,
-    "y": 495.0,
+    "x": 11255.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/update-stories-from-diagram": {
-    "x": 13310.0,
-    "y": 495.0,
+    "x": 11255.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Update acceptance criteria from diagram": {
-    "x": 13370.0,
-    "y": 495.0,
+    "x": 11315.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-stories-and-actors/update-acceptance-criteria-from-diagram": {
-    "x": 13370.0,
-    "y": 495.0,
+    "x": 11315.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Synchronize Increments": {
-    "x": 13435.0,
+    "x": 11370.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-increments": {
-    "x": 13435.0,
+    "x": 11370.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Render increment lanes": {
-    "x": 13440.0,
-    "y": 495.0,
+    "x": 11385.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-increments/render-increment-lanes": {
-    "x": 13440.0,
-    "y": 495.0,
+    "x": 11385.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Report increment changes": {
-    "x": 13500.0,
-    "y": 495.0,
+    "x": 11445.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-increments/report-increment-changes": {
-    "x": 13500.0,
-    "y": 495.0,
+    "x": 11445.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Update increments from diagram": {
-    "x": 13560.0,
-    "y": 495.0,
+    "x": 11505.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/synchronize-diagram-by-domain/synchronize-increments/update-increments-from-diagram": {
-    "x": 13560.0,
-    "y": 495.0,
+    "x": 11505.0,
+    "y": 1001.5,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Get Help": {
-    "x": 13635.0,
+    "x": 11570.0,
     "y": 195.0,
-    "width": 360.0,
+    "width": 385.0,
     "height": 60.0
   },
   "invoke-bot/get-help": {
-    "x": 13635.0,
+    "x": 11570.0,
     "y": 195.0,
-    "width": 360.0,
+    "width": 385.0,
     "height": 60.0
+  },
+  "SUB_EPIC|Provide Context": {
+    "x": 1799.0,
+    "y": 195.0,
+    "width": 741.0,
+    "height": 60.0
+  },
+  "15": {
+    "x": 1799.0,
+    "y": 195.0,
+    "width": 741.0,
+    "height": 60.0
+  },
+  "STORY|Invoke Bot|Provide Context|Warn when Workspace  not setup": {
+    "x": 1860.0,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "71": {
+    "x": 1860.0,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Scan Worspace for Context Fies": {
+    "x": 2029.0046451867959,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "63": {
+    "x": 2029.0046451867959,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Add Context Files": {
+    "x": 2089.0225496286675,
+    "y": 1469.0197520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "66": {
+    "x": 2089.0225496286675,
+    "y": 1469.0197520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Remove Context File": {
+    "x": 2265.484468980318,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "64": {
+    "x": 2149.999096377037,
+    "y": 1469.0197520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Re-Scan Existing Context File": {
+    "x": 2208.996555323591,
+    "y": 1471.2360450160772,
+    "width": 47.5079331941545,
+    "height": 47.5079331941545
+  },
+  "65": {
+    "x": 2208.996555323591,
+    "y": 1471.2360450160772,
+    "width": 47.5079331941545,
+    "height": 47.5079331941545
+  },
+  "67": {
+    "x": 2265.484468980318,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Generate  Context Converter": {
+    "x": 2328.8945161381416,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "68": {
+    "x": 2328.8945161381416,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Convert Context": {
+    "x": 2387.206435489792,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "69": {
+    "x": 2387.206435489792,
+    "y": 1469.9997520661154,
+    "width": 49.98164515855758,
+    "height": 49.98164515855758
+  },
+  "STORY|Invoke Bot|Provide Context|Reset Scanned Context": {
+    "x": 2447.4624217119,
+    "y": 1469.9960450160772,
+    "width": 48.037578288100214,
+    "height": 48.037578288100214
+  },
+  "70": {
+    "x": 2447.4624217119,
+    "y": 1469.9960450160772,
+    "width": 48.037578288100214,
+    "height": 48.037578288100214
   }
 }
