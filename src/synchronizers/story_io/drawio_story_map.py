@@ -350,6 +350,15 @@ class DrawIOStoryMap(StoryMap):
     def generate_update_report(self, original_story_map: StoryMap) -> UpdateReport:
         report = UpdateReport()
 
+        # Extract increment assignments BEFORE Pass 1 so we can use them in rename detection.
+        # This ensures stories in different increments aren't mistakenly treated as renames.
+        extracted_increments = self.extract_increment_assignments() if self._has_rendered_increments or self._diagram_type == 'increments' else []
+        original_increments = original_story_map.story_graph.get('increments', [])
+        
+        # Build story→increment mappings for both extracted and original
+        extracted_story_to_inc = self._build_story_to_increment_map(extracted_increments)
+        original_story_to_inc = self._build_story_to_increment_map(original_increments)
+
         # Pass 1: hierarchy comparison (horizontal position).
         extracted_epics = sorted(self._drawio_epics, key=lambda e: e.sequential_order or 0)
         original_epics = sorted(list(original_story_map.epics), key=lambda e: getattr(e, 'sequential_order', 0) or 0)
@@ -362,7 +371,9 @@ class DrawIOStoryMap(StoryMap):
         _compare_node_lists(extracted_epics, original_epics, report,
                             parent_name='', recurse=True,
                             all_extracted_names=all_extracted_names,
-                            all_original_names=all_original_names)
+                            all_original_names=all_original_names,
+                            extracted_story_to_inc=extracted_story_to_inc,
+                            original_story_to_inc=original_story_to_inc)
 
         # Flag large deletions: when entire epics or sub-epics are missing
         # from the diagram, flag them so the consumer can decide how to
@@ -376,18 +387,16 @@ class DrawIOStoryMap(StoryMap):
         # (or are descendants of removed sub-epics) are reclassified as
         # moved_stories so updateFromDiagram preserves their data.
         # Also pass extracted increment data so stories in lanes aren't reported as removed.
-        extracted_increments = self.extract_increment_assignments() if self._has_rendered_increments else []
+        # Reuse the extracted_increments we already computed above.
         report.reconcile_moves(original_story_map, extracted_increments=extracted_increments)
 
         # Pass 2: increment assignments (vertical position).
-        # Only extract if this diagram has increments rendered or loaded.
-        extracted = self.extract_increment_assignments()
         # Only compute delta if we actually have increment data and either:
         # - This was rendered as increments, OR
         # - The extracted data has lanes (file was loaded with lanes)
-        if extracted and (self._has_rendered_increments or self._diagram_type == 'increments'):
-            original_increments = original_story_map.story_graph.get('increments', [])
-            self._compute_increment_delta(report, extracted, original_increments)
+        # Reuse the extracted_increments we already computed above.
+        if extracted_increments and (self._has_rendered_increments or self._diagram_type == 'increments'):
+            self._compute_increment_delta(report, extracted_increments, original_increments)
 
         # Pass 3: acceptance criteria delta.
         # Only extract if this diagram has AC rendered or loaded.
@@ -490,6 +499,27 @@ class DrawIOStoryMap(StoryMap):
     # ------------------------------------------------------------------
     # Pass 2 – Increment extraction by vertical position
     # ------------------------------------------------------------------
+
+    def _build_story_to_increment_map(self, increments: list) -> dict:
+        """Build a mapping of story_name → increment_name.
+        
+        Args:
+            increments: List of increment dicts with 'name' and 'stories' keys
+            
+        Returns:
+            Dict mapping story names to their increment names
+        """
+        story_to_inc = {}
+        for inc in increments:
+            inc_name = inc.get('name', '')
+            stories = inc.get('stories', [])
+            for story_name in stories:
+                # Handle both string story names and dict story objects
+                if isinstance(story_name, dict):
+                    story_name = story_name.get('name', '')
+                if story_name:
+                    story_to_inc[story_name] = inc_name
+        return story_to_inc
 
     def extract_increment_assignments(self) -> list:
         """Determine which increment lane each story belongs to by Y position.

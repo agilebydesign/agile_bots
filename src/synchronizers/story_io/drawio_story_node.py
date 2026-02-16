@@ -111,7 +111,9 @@ def _collect_all_names(nodes) -> Set[str]:
 def _compare_node_lists(extracted, original, report, parent_name='',
                         recurse=False,
                         all_extracted_names: Set[str] = None,
-                        all_original_names: Set[str] = None):
+                        all_original_names: Set[str] = None,
+                        extracted_story_to_inc: dict = None,
+                        original_story_to_inc: dict = None):
     # Phase 1: Match by exact name first
     orig_by_name = {}
     for n in original:
@@ -137,7 +139,9 @@ def _compare_node_lists(extracted, original, report, parent_name='',
         if recurse and hasattr(ext_node, '_compare_children'):
             ext_node._compare_children(orig_node, report,
                                        all_extracted_names=all_extracted_names,
-                                       all_original_names=all_original_names)
+                                       all_original_names=all_original_names,
+                                       extracted_story_to_inc=extracted_story_to_inc,
+                                       original_story_to_inc=original_story_to_inc)
 
     # Phase 3: Detect renames by story-graph order.
     # Sort unmatched originals by their story-graph sequential_order so
@@ -184,6 +188,16 @@ def _compare_node_lists(extracted, original, report, parent_name='',
             if orig_node.name in ext_names_global:
                 # This original name still exists in the diagram → it moved away
                 continue
+            # Check if both are stories with increment information.
+            # Only pair as rename if they're in the same increment (or both unassigned).
+            # This prevents stories in different increments but same horizontal position
+            # from being incorrectly treated as renames.
+            if hasattr(ext_node, 'story_type') and extracted_story_to_inc and original_story_to_inc:
+                ext_inc = extracted_story_to_inc.get(ext_node.name)
+                orig_inc = original_story_to_inc.get(orig_node.name)
+                # If either has an increment assignment and they differ, skip this pairing
+                if (ext_inc or orig_inc) and ext_inc != orig_inc:
+                    continue
             # Neither name exists elsewhere → genuine rename
             rename_pairs.append((ext_node, orig_node))
             used_ext_idx.add(i)
@@ -201,7 +215,9 @@ def _compare_node_lists(extracted, original, report, parent_name='',
         if recurse and hasattr(ext_node, '_compare_children'):
             ext_node._compare_children(orig_node, report,
                                        all_extracted_names=all_extracted_names,
-                                       all_original_names=all_original_names)
+                                       all_original_names=all_original_names,
+                                       extracted_story_to_inc=extracted_story_to_inc,
+                                       original_story_to_inc=original_story_to_inc)
 
     # Phase 4: Remaining extracted = new, remaining original = removed
     # Use type-aware reporting so epics/sub-epics are not misclassified as stories
@@ -463,11 +479,15 @@ class DrawIOEpic(DiagramEpic, DrawIOStoryNode):
 
     def _compare_children(self, original_epic, report: UpdateReport, *,
                           all_extracted_names: Set[str] = None,
-                          all_original_names: Set[str] = None):
+                          all_original_names: Set[str] = None,
+                          extracted_story_to_inc: dict = None,
+                          original_story_to_inc: dict = None):
         _compare_node_lists(self.get_sub_epics(), original_epic.sub_epics,
                             report, parent_name=self.name, recurse=True,
                             all_extracted_names=all_extracted_names,
-                            all_original_names=all_original_names)
+                            all_original_names=all_original_names,
+                            extracted_story_to_inc=extracted_story_to_inc,
+                            original_story_to_inc=original_story_to_inc)
 
 
 @dataclass
@@ -617,12 +637,16 @@ class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
 
     def _compare_children(self, original_sub_epic, report: UpdateReport, *,
                           all_extracted_names: Set[str] = None,
-                          all_original_names: Set[str] = None):
+                          all_original_names: Set[str] = None,
+                          extracted_story_to_inc: dict = None,
+                          original_story_to_inc: dict = None):
         orig_nested = [c for c in original_sub_epic._children if isinstance(c, SubEpic)]
         _compare_node_lists(self.get_sub_epics(), orig_nested,
                             report, parent_name=self.name, recurse=True,
                             all_extracted_names=all_extracted_names,
-                            all_original_names=all_original_names)
+                            all_original_names=all_original_names,
+                            extracted_story_to_inc=extracted_story_to_inc,
+                            original_story_to_inc=original_story_to_inc)
 
         # Deduplicate extracted stories by name.  The same story can
         # appear multiple times in the tree when it lives in several
@@ -639,7 +663,9 @@ class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
         _compare_node_lists(unique_stories, orig_stories,
                             report, parent_name=self.name, recurse=False,
                             all_extracted_names=all_extracted_names,
-                            all_original_names=all_original_names)
+                            all_original_names=all_original_names,
+                            extracted_story_to_inc=extracted_story_to_inc,
+                            original_story_to_inc=original_story_to_inc)
 
 
 @dataclass
