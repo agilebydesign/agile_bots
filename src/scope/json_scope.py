@@ -35,7 +35,7 @@ class JSONScope(JSONAdapter):
     def file_filter(self):
         return self.scope.file_filter
     
-    def to_dict(self, apply_include_level: bool = False) -> dict:
+    def to_dict(self, apply_include_level: bool = False, strip_links_for_instructions: bool = False) -> dict:
         """
         Serialize scope to dict.
         
@@ -43,6 +43,8 @@ class JSONScope(JSONAdapter):
             apply_include_level: When True, filter content by scope.include_level (for instructions
                 injection and clipboard copy). When False, include full content without level checks
                 (faster - use this when level filtering is not needed).
+            strip_links_for_instructions: When True, remove links/test_files arrays from content
+                (for instructions injection - keeps prompt lean; panel display keeps links).
         """
         result = {
             'type': self.scope.type.value,
@@ -95,6 +97,8 @@ class JSONScope(JSONAdapter):
                         # Always enrich scenarios with test links
                         enrich_scenarios = True
                         self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
+                        if strip_links_for_instructions:
+                            self._strip_links(content['epics'])
                         
                         # CACHE DISABLED - Don't write cache file
                         # # Write to disk cache only when there's no active filter
@@ -124,6 +128,37 @@ class JSONScope(JSONAdapter):
             result['content'] = [{'path': str(f)} for f in files]
         
         return result
+    
+    # For instructions: only keep name + structure from epic to story (stories level = name only)
+    _EPIC_KEEP = frozenset(['name', 'sub_epics', 'domain_concepts'])
+    _SUB_EPIC_KEEP = frozenset(['name', 'sub_epics', 'story_groups', 'domain_concepts'])
+    _STORY_GROUP_KEEP = frozenset(['name', 'stories'])
+    _STORY_KEEP = frozenset(['name', 'acceptance_criteria', 'scenarios'])
+    _SCENARIO_KEEP = frozenset(['name', 'background', 'steps', 'examples', 'test', 'trace'])
+    
+    def _strip_links(self, epics: list) -> None:
+        """For instructions: keep only name (+ structure) from epic to story."""
+        for epic in epics:
+            self._keep_only(epic, self._EPIC_KEEP)
+            for sub_epic in epic.get('sub_epics', []):
+                self._strip_sub_epic(sub_epic)
+    
+    def _strip_sub_epic(self, sub_epic: dict) -> None:
+        self._keep_only(sub_epic, self._SUB_EPIC_KEEP)
+        for nested in sub_epic.get('sub_epics', []):
+            self._strip_sub_epic(nested)
+        for story_group in sub_epic.get('story_groups', []):
+            self._keep_only(story_group, self._STORY_GROUP_KEEP)
+            for story in story_group.get('stories', []):
+                self._keep_only(story, self._STORY_KEEP)
+                for scenario in story.get('scenarios', []):
+                    self._keep_only(scenario, self._SCENARIO_KEEP)
+    
+    def _keep_only(self, node: dict, allowed: frozenset) -> None:
+        """Remove all keys not in allowed."""
+        for key in list(node.keys()):
+            if key not in allowed:
+                del node[key]
     
     def _enrich_with_links(self, epics: list, story_graph, enrich_scenarios: bool = True):
         if not self.scope.workspace_directory or not self.scope.bot_paths:

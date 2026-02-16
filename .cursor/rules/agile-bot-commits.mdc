@@ -229,12 +229,24 @@ When both scope files are empty, infer from changed files:
 - Confirm inference: "Inferred scope as [name] from changed files"
 - User can override if incorrect
 
-## Automatic Commits After Meaningful Changes
+## Automatic Commits After Each Change
 
-Monitor for meaningful changes during bot workflows:
-- Files saved after build/validate/render actions
-- Multiple related files changed together
-- Completion of an action workflow step
+**Commit automatically after completing each meaningful change.** Do not ask—execute the commit.
+
+### When to Auto-Commit
+- After completing an edit, feature addition, or fix
+- After build/validate/render actions
+- After multiple related files changed together
+- After completion of an action workflow step
 - Before scope gets reset in workflows
 
-When detected, suggest: "I've completed {action} for {scope}. Would you like me to commit these changes?"
+### Process
+1. Complete the user's requested change
+2. Run tests if relevant (ensure nothing breaks)
+3. Immediately run the commit process (read context, generate message, `git add -A`, `git commit -m "..."`)
+4. Confirm: "Committed: {message}"
+
+### Do NOT Auto-Commit When
+- User's primary instructions are not yet complete
+- User explicitly says "don't commit" or "no commit"
+- There are no staged/changed files
