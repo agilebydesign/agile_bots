@@ -27034,7 +27034,6 @@
         "Filter Story Scope By Files",
         "Filter Story Scope By Files CLI",
         "Filter Story Scope By Files Panel",
-        "Filter Story Scope By Increments",
         "Filter Story Scope By Increments CLI",
         "Filter Story Scope By Increments Panel",
         "Filter Story Scope By Stories",
@@ -27134,9 +27133,7 @@
         "Navigate Story Graph Using CLI",
         "Open All Related Files",
         "Persist Scope",
-        "Render Output Usng Story API",
         "Save Story Map Changes Asynchronously",
-        "Set scope to selected Increment",
         "Set scope to selected story node",
         "Show All Scope Through Panel",
         "Submit Current Behavior Action For Selected Node",
@@ -27158,7 +27155,49 @@
         "Synchronize DIagram With Scoped Nodes",
         "Update graph from map increments",
         "Update graph from story map",
-        "Update story graph from map acceptance criteria"
+        "Update story graph from map acceptance criteria",
+        {
+          "name": "Build Story Graph Using API"
+        },
+        {
+          "name": "Render Output Usng Story API"
+        },
+        {
+          "name": "Render acceptance criteria"
+        },
+        {
+          "name": "Render epic and sub-epic hierarchy"
+        },
+        {
+          "name": "Render increment lanes"
+        },
+        {
+          "name": "Render stories and actors"
+        },
+        {
+          "name": "Report acceptance criteria changes"
+        },
+        {
+          "name": "Report epic and sub-epic changes"
+        },
+        {
+          "name": "Report increment changes"
+        },
+        {
+          "name": "Report story moves between parents"
+        },
+        {
+          "name": "Update acceptance criteria from diagram"
+        },
+        {
+          "name": "Update epics and sub-epics from diagram"
+        },
+        {
+          "name": "Update increments from diagram"
+        },
+        {
+          "name": "Update stories from diagram"
+        }
       ]
     },
     {
@@ -27177,12 +27216,10 @@
         "Add Increment Filter Part To Story Scope CLI",
         "Add Increment Filter Part To Story Scope Panel",
         "Add Increment Panel",
-        "Build Story Graph Using API",
         "Delete Increment",
         "Delete Increment CLI",
         "Delete Increment Panel",
         "Display Increment Scope View CLI",
-        "Execute Scope \"Runs\"",
         "Filter File Scope  By Files",
         "Filter File Scope  By Files CLI",
         "Filter File Scope  By Files Panel",
@@ -27203,7 +27240,16 @@
         "Remove Increment Filter Part From Story Scope Panel",
         "Show All Increment Scope",
         "Show All Increment Scope Through CLI",
-        "Show All Increment Scope Through Panel"
+        "Show All Increment Scope Through Panel",
+        {
+          "name": "Filter File Scope By Stories"
+        },
+        {
+          "name": "Filter Story Scope By Increments"
+        },
+        {
+          "name": "Set scope to selected Increment"
+        }
       ]
     },
     {
@@ -27225,6 +27271,117 @@
         "Open Source File",
         "Open Story Files",
         "Design Example"
+      ]
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "priority": 6,
+      "stories": [
+        {
+          "name": "Add Context Files"
+        },
+        {
+          "name": "Add special instructon"
+        },
+        {
+          "name": "Associate Guard rail with scope"
+        },
+        {
+          "name": "Auto Refresh State Changing Events"
+        },
+        {
+          "name": "Auto execute Consolidated Queue"
+        },
+        {
+          "name": "Build Story Graph Through Queue"
+        },
+        {
+          "name": "Clarify in Queue"
+        },
+        {
+          "name": "Conssolidate and Expand Behavior Aciton Queies"
+        },
+        {
+          "name": "Convert Context"
+        },
+        {
+          "name": "Display  Behavior Action Qs"
+        },
+        {
+          "name": "Display  Context BAQ"
+        },
+        {
+          "name": "Display Bot  Help"
+        },
+        {
+          "name": "Display Chopices in Queue"
+        },
+        {
+          "name": "Display Rules in Queue"
+        },
+        {
+          "name": "Display Syncing Message"
+        },
+        {
+          "name": "Display clarification answers in Queue"
+        },
+        {
+          "name": "Drop Context into Queue"
+        },
+        {
+          "name": "Drop Story Node in  Behavor Action Queue"
+        },
+        {
+          "name": "Execute Scope \"Runs\""
+        },
+        {
+          "name": "Generate  Context Converter"
+        },
+        {
+          "name": "MAke Choices in queue"
+        },
+        {
+          "name": "Provide Bot Guidance"
+        },
+        {
+          "name": "Queue Behavior Action Workflow"
+        },
+        {
+          "name": "Re-Scan Existing Context File"
+        },
+        {
+          "name": "Remove Context File"
+        },
+        {
+          "name": "Render Diagram Selected Node"
+        },
+        {
+          "name": "Render as Part of Build and Validate Actions"
+        },
+        {
+          "name": "Report, Report, Update In Queue"
+        },
+        {
+          "name": "Reset Scanned Context"
+        },
+        {
+          "name": "Save  / Load Queue Consolidation"
+        },
+        {
+          "name": "Scan Worspace for Context Fies"
+        },
+        {
+          "name": "Skip Behavior and Action Queie"
+        },
+        {
+          "name": "Update Queie based on selectged Node"
+        },
+        {
+          "name": "Validate In Queue"
+        },
+        {
+          "name": "Warn when Workspace  not setup"
+        }
       ]
     }
   ]

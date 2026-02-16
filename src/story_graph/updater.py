@@ -115,7 +115,11 @@ class StoryMapUpdater:
             story = self._target_map.find_story_by_name(moved.name)
             target = self._target_map.find_node(moved.to_parent) if moved.to_parent else None
             if story and target and hasattr(story, 'move_to'):
-                story.move_to(target)
+                try:
+                    story.move_to(target)
+                except ValueError as e:
+                    # Skip moves that violate hierarchy rules (e.g., moving to non-leaf sub-epic)
+                    print(f"Warning: Skipping move of '{moved.name}' to '{moved.to_parent}': {e}")
     
     def _apply_increment_changes(self, report: 'UpdateReport') -> None:
         """Apply increment changes from report."""
