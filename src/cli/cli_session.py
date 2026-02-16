@@ -98,6 +98,7 @@ class CLISession:
         )
     
     
+    
     def _format_submit_response(self, result: dict, success_message: str) -> CLICommandResponse:
         if self.mode == 'json':
             import json

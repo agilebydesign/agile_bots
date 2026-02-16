@@ -159,6 +159,7 @@ class Bot:
         )
         return generator.generate()
 
+
     # Backward compatibility alias
     @property
     def story_graph(self) -> StoryMap:

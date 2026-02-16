@@ -12,6 +12,7 @@
                 (AC) WHEN Generator processes rules directory THEN walks rules/*.json sorted by priority, extracts description/do/dont guidance, formats as ## Rules with DO/DON'T blocks and examples
                 (AC) WHEN Generator completes THEN output is .mdc rule files saved to workspace .cursor/rules/ folder (one per behavior)
 
+
 (E) Invoke Bot
     (E) Work With Story Map
         (E) Trace Story Graph
