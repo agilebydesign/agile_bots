@@ -101,3 +101,6 @@ scenarios/
 *.db
 *.sqlite
 *.sqlite3
+
+# VS Code extension packages
+*.vsix
