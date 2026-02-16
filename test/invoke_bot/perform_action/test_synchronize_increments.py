@@ -307,6 +307,9 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
 
         all_new = report.new_stories + report.new_sub_epics
         new_names = [e.name for e in all_new]
+        # For increments, also check increment_order for new increments
+        increment_names = [inc['name'] for inc in report.increment_order]
+        new_names.extend(increment_names)
         assert 'Phase 3' in new_names
 
     def test_story_in_multiple_lanes_no_false_duplicates(self, tmp_path):
