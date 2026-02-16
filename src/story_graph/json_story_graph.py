@@ -32,7 +32,14 @@ class JSONStoryGraph(JSONAdapter):
     def content(self):
         return self.story_graph.content
     
-    def to_dict(self) -> dict:
+    def to_dict(self, include_level: str = 'examples') -> dict:
+        """
+        Serialize story graph with optional filtering by include_level.
+        
+        Args:
+            include_level: One of 'stories', 'domain_concepts', 'acceptance', 
+                          'scenarios', 'examples', 'tests', 'code'
+        """
         # Load domain objects and serialize them directly
         from story_graph.nodes import StoryMap
         story_map = StoryMap(self.story_graph.content, bot=None)
@@ -51,9 +58,9 @@ class JSONStoryGraph(JSONAdapter):
         for epic_data in self.story_graph.content.get('epics', []):
             collect_sub_epics(epic_data)
         
-        # Serialize domain objects to JSON by reading their properties
+        # Serialize domain objects to JSON with include_level filtering
         content = {
-            'epics': [self._serialize_epic(epic, epic_name_to_data) for epic in story_map._epics]
+            'epics': [self._serialize_epic(epic, epic_name_to_data, include_level) for epic in story_map._epics]
         }
         
         # Add increments and other top-level fields from original content
@@ -83,51 +90,48 @@ class JSONStoryGraph(JSONAdapter):
             'content': content
         }
     
-    def _serialize_epic(self, epic, name_to_data_map=None) -> dict:
-        """Serialize Epic object to dict by reading its properties."""
-        # Serialize domain_concepts properly (they are DomainConcept objects)
-        domain_concepts_serialized = []
-        if hasattr(epic, 'domain_concepts') and epic.domain_concepts:
-            from story_graph.domain import DomainConcept
-            # Get original data to preserve realization field
-            epic_data = None
-            if name_to_data_map and epic.name in name_to_data_map:
-                epic_data = name_to_data_map[epic.name]
-            
-            for dc in epic.domain_concepts:
-                dc_dict = dc.to_dict()
-                # Add realization from original data if it exists
-                if epic_data and 'domain_concepts' in epic_data:
-                    for orig_dc in epic_data['domain_concepts']:
-                        if orig_dc.get('name') == dc.name and 'realization' in orig_dc:
-                            dc_dict['realization'] = orig_dc['realization']
-                domain_concepts_serialized.append(dc_dict)
-        # Fallback: check original data if domain_concepts not loaded into object
-        elif name_to_data_map and epic.name in name_to_data_map:
-            epic_data = name_to_data_map[epic.name]
-            if 'domain_concepts' in epic_data:
-                domain_concepts_serialized = epic_data['domain_concepts']
-        
-        return {
+    def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples') -> dict:
+        """Serialize Epic object to dict by reading its properties with include_level filtering."""
+        result = {
             'name': epic.name,
             'behavior_needed': epic.behavior_needed,
-            'domain_concepts': domain_concepts_serialized,
-            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map) for child in epic.children]
+            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map, include_level) for child in epic.children]
         }
-    
-    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None) -> dict:
-        """Serialize SubEpic object to dict by reading its properties."""
-        from story_graph.nodes import SubEpic, Story, StoryGroup
         
-        # Serialize domain_concepts if they exist in original data (SubEpic doesn't have domain_concepts as dataclass field)
-        domain_concepts_serialized = []
-        if name_to_data_map and sub_epic.name in name_to_data_map:
-            sub_epic_data = name_to_data_map[sub_epic.name]
-            if 'domain_concepts' in sub_epic_data:
-                domain_concepts_raw = sub_epic_data['domain_concepts']
-                if domain_concepts_raw:
-                    # Already dictionaries from JSON, so use as-is (includes realization field)
-                    domain_concepts_serialized = domain_concepts_raw
+        # Include domain_concepts if level >= 'domain_concepts'
+        if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
+            # Serialize domain_concepts properly (they are DomainConcept objects)
+            domain_concepts_serialized = []
+            if hasattr(epic, 'domain_concepts') and epic.domain_concepts:
+                from story_graph.domain import DomainConcept
+                # Get original data to preserve realization field
+                epic_data = None
+                if name_to_data_map and epic.name in name_to_data_map:
+                    epic_data = name_to_data_map[epic.name]
+                
+                for dc in epic.domain_concepts:
+                    dc_dict = dc.to_dict()
+                    # Add realization from original data if it exists
+                    if epic_data and 'domain_concepts' in epic_data:
+                        for orig_dc in epic_data['domain_concepts']:
+                            if orig_dc.get('name') == dc.name and 'realization' in orig_dc:
+                                dc_dict['realization'] = orig_dc['realization']
+                    domain_concepts_serialized.append(dc_dict)
+            # Fallback: check original data if domain_concepts not loaded into object
+            elif name_to_data_map and epic.name in name_to_data_map:
+                epic_data = name_to_data_map[epic.name]
+                if 'domain_concepts' in epic_data:
+                    domain_concepts_serialized = epic_data['domain_concepts']
+            
+            result['domain_concepts'] = domain_concepts_serialized
+        else:
+            result['domain_concepts'] = []
+        
+        return result
+    
+    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples') -> dict:
+        """Serialize SubEpic object to dict by reading its properties with include_level filtering."""
+        from story_graph.nodes import SubEpic, Story, StoryGroup
         
         result = {
             'name': sub_epic.name,
@@ -139,44 +143,68 @@ class JSONStoryGraph(JSONAdapter):
             'story_groups': []
         }
         
-        # Add domain_concepts if they were found
-        if domain_concepts_serialized:
-            result['domain_concepts'] = domain_concepts_serialized
+        # Include domain_concepts if level >= 'domain_concepts'
+        if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
+            # Serialize domain_concepts if they exist in original data (SubEpic doesn't have domain_concepts as dataclass field)
+            domain_concepts_serialized = []
+            if name_to_data_map and sub_epic.name in name_to_data_map:
+                sub_epic_data = name_to_data_map[sub_epic.name]
+                if 'domain_concepts' in sub_epic_data:
+                    domain_concepts_raw = sub_epic_data['domain_concepts']
+                    if domain_concepts_raw:
+                        # Already dictionaries from JSON, so use as-is (includes realization field)
+                        domain_concepts_serialized = domain_concepts_raw
+            
+            # Add domain_concepts if they were found
+            if domain_concepts_serialized:
+                result['domain_concepts'] = domain_concepts_serialized
         
         # Collect nested sub-epics and story groups
         current_story_group = None
         for child in sub_epic.children:
             if isinstance(child, SubEpic):
-                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map))
+                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map, include_level))
             elif isinstance(child, StoryGroup):
-                result['story_groups'].append(self._serialize_story_group(child))
+                result['story_groups'].append(self._serialize_story_group(child, include_level))
             elif isinstance(child, Story):
                 # Direct story child - add to unnamed story group
                 if current_story_group is None:
                     current_story_group = {'name': None, 'stories': []}
                     result['story_groups'].append(current_story_group)
-                current_story_group['stories'].append(self._serialize_story(child))
+                current_story_group['stories'].append(self._serialize_story(child, include_level))
         
         return result
     
-    def _serialize_story_group(self, story_group) -> dict:
-        """Serialize StoryGroup object to dict."""
+    def _serialize_story_group(self, story_group, include_level='examples') -> dict:
+        """Serialize StoryGroup object to dict with include_level filtering."""
         return {
             'name': story_group.name if hasattr(story_group, 'name') else None,
-            'stories': [self._serialize_story(story) for story in story_group.children]
+            'stories': [self._serialize_story(story, include_level) for story in story_group.children]
         }
     
-    def _serialize_story(self, story) -> dict:
-        """Serialize Story object to dict by reading its properties."""
-        return {
+    def _serialize_story(self, story, include_level='examples') -> dict:
+        """Serialize Story object to dict by reading its properties with include_level filtering."""
+        result = {
             'name': story.name,
             'behavior_needed': story.behavior_needed,
             'behaviors_needed': story.behaviors_needed if hasattr(story, 'behaviors_needed') else [story.behavior_needed],
             'test_file': story.test_file if hasattr(story, 'test_file') else None,
             'test_class': story.test_class if hasattr(story, 'test_class') else None,
-            'acceptance_criteria': [self._serialize_ac(ac) for ac in story.acceptance_criteria],
-            'scenarios': [self._serialize_scenario(sc) for sc in story.scenarios]
         }
+        
+        # Include acceptance criteria if level >= 'acceptance'
+        if include_level in ['acceptance', 'scenarios', 'examples', 'tests', 'code']:
+            result['acceptance_criteria'] = [self._serialize_ac(ac) for ac in story.acceptance_criteria]
+        else:
+            result['acceptance_criteria'] = []
+        
+        # Include scenarios if level >= 'scenarios'
+        if include_level in ['scenarios', 'examples', 'tests', 'code']:
+            result['scenarios'] = [self._serialize_scenario(sc, include_level, story) for sc in story.scenarios]
+        else:
+            result['scenarios'] = []
+        
+        return result
     
     def _serialize_ac(self, ac) -> dict:
         """Serialize AcceptanceCriteria object."""
@@ -186,36 +214,59 @@ class JSONStoryGraph(JSONAdapter):
             'sequential_order': ac.sequential_order
         }
     
-    def _serialize_scenario(self, scenario) -> dict:
-        """Serialize Scenario object to dict by reading its properties."""
-        # Serialize background steps
-        background_steps = []
-        if hasattr(scenario, 'background'):
-            for step in scenario.background:
-                if isinstance(step, str):
-                    background_steps.append(step)
-                else:
-                    background_steps.append(self._serialize_step(step))
-        
-        # Serialize main steps
-        main_steps = []
-        if hasattr(scenario, 'steps'):
-            for step in scenario.steps:
-                if isinstance(step, str):
-                    main_steps.append(step)
-                else:
-                    main_steps.append(self._serialize_step(step))
-        
-        return {
+    def _serialize_scenario(self, scenario, include_level='examples', story=None) -> dict:
+        """Serialize Scenario object to dict by reading its properties with include_level filtering."""
+        result = {
             'name': scenario.name,
             'behavior_needed': scenario.behavior_needed,
             'test_method': scenario.test_method if hasattr(scenario, 'test_method') else None,
             'type': scenario.type if hasattr(scenario, 'type') else '',
             'sequential_order': scenario.sequential_order,
-            'background': background_steps,
-            'steps': main_steps,
-            'examples': scenario.examples if hasattr(scenario, 'examples') else None
         }
+        
+        # Serialize background steps (if level >= 'scenarios')
+        if include_level in ['scenarios', 'examples', 'tests', 'code']:
+            background_steps = []
+            if hasattr(scenario, 'background'):
+                for step in scenario.background:
+                    if isinstance(step, str):
+                        background_steps.append(step)
+                    else:
+                        background_steps.append(self._serialize_step(step))
+            result['background'] = background_steps
+            
+            # Serialize main steps
+            main_steps = []
+            if hasattr(scenario, 'steps'):
+                for step in scenario.steps:
+                    if isinstance(step, str):
+                        main_steps.append(step)
+                    else:
+                        main_steps.append(self._serialize_step(step))
+            result['steps'] = main_steps
+        else:
+            result['background'] = []
+            result['steps'] = []
+        
+        # Include examples if level >= 'examples'
+        if include_level in ['examples', 'tests', 'code']:
+            result['examples'] = scenario.examples if hasattr(scenario, 'examples') else None
+        else:
+            result['examples'] = None
+        
+        # Include test code if level >= 'tests'
+        if include_level in ['tests', 'code'] and story:
+            test_code_data = self._generate_test_code(scenario, story)
+            if test_code_data:
+                result['test'] = test_code_data
+        
+        # Include full trace if level == 'code'
+        if include_level == 'code' and story:
+            trace_data = self._generate_trace(scenario, story)
+            if trace_data:
+                result['trace'] = trace_data
+        
+        return result
     
     def _serialize_step(self, step) -> dict:
         """Serialize Step object to dict."""
@@ -223,6 +274,109 @@ class JSONStoryGraph(JSONAdapter):
             'text': step.text,
             'sequential_order': step.sequential_order
         }
+    
+    def _generate_test_code(self, scenario, story) -> Optional[dict]:
+        """Extract test method code for scenario.
+        
+        Args:
+            scenario: Scenario object with test_method
+            story: Parent Story object with test_file and test_class
+        
+        Returns:
+            Dict with test method code, file, and line number, or None if not found
+        """
+        if not hasattr(scenario, 'test_method') or not scenario.test_method:
+            return None
+        
+        if not hasattr(story, 'test_file') or not story.test_file:
+            return None
+        
+        if not hasattr(story, 'test_class') or not story.test_class:
+            return None
+        
+        test_file = self.story_graph._workspace_directory / story.test_file
+        if not test_file.exists():
+            return None
+        
+        try:
+            from traceability.trace_generator import TraceGenerator
+            generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=3)
+            
+            source = test_file.read_text(encoding='utf-8')
+            lines = source.split('\n')
+            
+            code, start, end = generator._extract_method_from_class(
+                source, lines, story.test_class, scenario.test_method
+            )
+            
+            if code:
+                return {
+                    'method': scenario.test_method,
+                    'file': str(story.test_file),
+                    'line': start,
+                    'code': code
+                }
+        except Exception:
+            pass
+        
+        return None
+    
+    def _generate_trace(self, scenario, story) -> list:
+        """Generate trace for scenario using trace generator.
+        
+        Args:
+            scenario: Scenario object with test_method
+            story: Parent Story object with test_file and test_class
+        
+        Returns:
+            List of code sections with nested children (trace tree)
+        """
+        if not hasattr(scenario, 'test_method') or not scenario.test_method:
+            return []
+        
+        if not hasattr(story, 'test_file') or not story.test_file:
+            return []
+        
+        if not hasattr(story, 'test_class') or not story.test_class:
+            return []
+        
+        try:
+            from traceability.trace_generator import TraceGenerator
+            generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=3)
+            
+            # Build method index
+            generator._build_method_index()
+            
+            # Get test code
+            test_file = self.story_graph._workspace_directory / story.test_file
+            if not test_file.exists():
+                return []
+            
+            source = test_file.read_text(encoding='utf-8')
+            lines = source.split('\n')
+            
+            # Extract test method
+            test_code, test_start, test_end = generator._extract_method_from_class(
+                source, lines, story.test_class, scenario.test_method
+            )
+            
+            if not test_code:
+                return []
+            
+            # Analyze for calls
+            calls = generator._find_calls_in_code(test_code)
+            
+            # Build trace
+            trace_sections = []
+            for call in calls:
+                section = generator._resolve_call(call, depth=1)
+                if section:
+                    trace_sections.append(section)
+            
+            return trace_sections
+            
+        except Exception:
+            return []
     
     def deserialize(self, data: str) -> dict:
         from utils import sanitize_json_string

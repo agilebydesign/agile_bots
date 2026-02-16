@@ -78,7 +78,9 @@ class JSONScope(JSONAdapter):
                     # Generate and enrich content (cache miss or invalid)
                     from story_graph.json_story_graph import JSONStoryGraph
                     graph_adapter = JSONStoryGraph(story_graph)
-                    content = graph_adapter.to_dict().get('content', [])
+                    # Pass include_level to filter content depth
+                    include_level = self.scope.include_level
+                    content = graph_adapter.to_dict(include_level=include_level).get('content', [])
                     
                     if content and 'epics' in content:
                         # Always enrich scenarios with test links

@@ -197,6 +197,7 @@ class Scope:
         self.value: List[str] = []
         self.exclude: List[str] = []
         self.skiprule: List[str] = []
+        self.include_level: str = 'examples'  # Default: stories, domain_concepts, acceptance, scenarios, examples, tests, code
         
         self._story_graph_filter: Optional[StoryGraphFilter] = None
         self._file_filter: Optional[FileFilter] = None
@@ -208,6 +209,7 @@ class Scope:
         new_scope.value = list(self.value)
         new_scope.exclude = list(self.exclude)
         new_scope.skiprule = list(self.skiprule)
+        new_scope.include_level = self.include_level
         new_scope._story_graph_filter = self._story_graph_filter
         new_scope._file_filter = self._file_filter
         if hasattr(self, '_cached_results'):
@@ -365,6 +367,7 @@ class Scope:
             'value': self.value,
             'exclude': self.exclude,
             'skiprule': self.skiprule,
+            'include_level': self.include_level,
         }
     
     @classmethod
@@ -392,7 +395,10 @@ class Scope:
         if not isinstance(skiprule, list):
             skiprule = [skiprule] if skiprule else []
         
+        include_level = data.get('include_level', 'examples')
+        
         scope.filter(scope_type, value, exclude, skiprule)
+        scope.include_level = include_level
         
         return scope
     
@@ -427,7 +433,10 @@ class Scope:
                 if not isinstance(skiprule, list):
                     skiprule = [skiprule] if skiprule else []
                 
+                include_level = scope_data.get('include_level', 'examples')
+                
                 self.filter(scope_type, value, exclude, skiprule)
+                self.include_level = include_level
         except (json.JSONDecodeError, IOError, ValueError) as e:
             logger.warning(f'Failed to load scope from file: {str(e)}')
     
