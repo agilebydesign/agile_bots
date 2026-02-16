@@ -20,9 +20,9 @@ from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
 from story_graph.nodes import StoryMap
 
-from invoke_bot.perform_action.base_render_diagram_test import BaseRenderDiagramTest
-from invoke_bot.perform_action.base_report_diagram_test import BaseReportDiagramTest
-from invoke_bot.perform_action.base_update_diagram_test import BaseUpdateDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_render_diagram_test import BaseRenderDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_report_diagram_test import BaseReportDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_update_diagram_test import BaseUpdateDiagramTest
 
 
 # ============================================================================
@@ -92,12 +92,14 @@ def _create_stories_xml(helper, story_overrides=None, sub_epic_names=None):
     story_cells = []
     x_pos = 30
     for idx, se_name in enumerate(sub_epic_names):
+        stories = default_stories.get(se_name, [f'{se_name} Story 1'])
+        # Calculate width based on number of stories (120px per story + 10px padding on each side + 130px spacing)
+        se_width = max(280, len(stories) * 130 + 20)
         se_cells.append(
             f'<mxCell id="sub-epic-{idx+1}" value="{se_name}" '
             f'style="rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;whiteSpace=wrap;html=1;" '
             f'vertex="1" parent="1">'
-            f'<mxGeometry x="{x_pos}" y="180" width="280" height="200" as="geometry"/></mxCell>')
-        stories = default_stories.get(se_name, [f'{se_name} Story 1'])
+            f'<mxGeometry x="{x_pos}" y="180" width="{se_width}" height="200" as="geometry"/></mxCell>')
         sx = x_pos + 10
         for sidx, sname in enumerate(stories):
             story_cells.append(
@@ -106,7 +108,7 @@ def _create_stories_xml(helper, story_overrides=None, sub_epic_names=None):
                 f'vertex="1" parent="1">'
                 f'<mxGeometry x="{sx}" y="300" width="120" height="50" as="geometry"/></mxCell>')
             sx += 130
-        x_pos += 290
+        x_pos += se_width + 10
     ew = max(600, x_pos + 10)
     all_cells = '\n        '.join(se_cells + story_cells)
     return f'''<?xml version="1.0" encoding="UTF-8"?>
@@ -325,7 +327,7 @@ class TestReportStoryMovesBetweenParents(BaseReportDiagramTest):
         drawio.load(drawio_file)
         report = drawio.generate_update_report(story_map)
 
-        moved_names = [m.get('name', '') for m in report.moved_entities]
+        moved_names = [m.name for m in report.moved_stories]
         assert 'Search Rooms' in moved_names
 
     def test_stories_from_removed_sub_epic_detected_as_moves(self, tmp_path):

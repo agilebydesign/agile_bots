@@ -17,9 +17,9 @@ from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
 from story_graph.nodes import StoryMap
 
-from invoke_bot.perform_action.base_render_diagram_test import BaseRenderDiagramTest
-from invoke_bot.perform_action.base_report_diagram_test import BaseReportDiagramTest
-from invoke_bot.perform_action.base_update_diagram_test import BaseUpdateDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_render_diagram_test import BaseRenderDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_report_diagram_test import BaseReportDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_update_diagram_test import BaseUpdateDiagramTest
 
 
 # ============================================================================
@@ -282,7 +282,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
         drawio.load(drawio_file)
         report = drawio.generate_update_report(story_map)
 
-        moved_names = [m.name for m in report.moved_stories]
+        moved_names = [m.story for m in report.increment_moves]
         assert 'View location' in moved_names
 
     def test_user_created_lane_detected_by_geometry(self, tmp_path):

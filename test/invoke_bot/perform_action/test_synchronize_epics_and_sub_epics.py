@@ -20,9 +20,9 @@ from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
 from story_graph.nodes import StoryMap
 
-from invoke_bot.perform_action.base_render_diagram_test import BaseRenderDiagramTest
-from invoke_bot.perform_action.base_report_diagram_test import BaseReportDiagramTest
-from invoke_bot.perform_action.base_update_diagram_test import BaseUpdateDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_render_diagram_test import BaseRenderDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_report_diagram_test import BaseReportDiagramTest
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_update_diagram_test import BaseUpdateDiagramTest
 
 
 # ============================================================================
