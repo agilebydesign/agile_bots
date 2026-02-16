@@ -962,9 +962,9 @@ document.querySelectorAll('input[name="includeLevel"]').forEach(radio => {
 15. ✅ Run existing tests to ensure no regression
 
 ### Phase 4: Panel Integration
-16. ⏸️ Add radio button controls to panel
-17. ⏸️ Add CLI command `scope include_level=<level>`
-18. ⏸️ Update panel to persist include_level selection
+16. ✅ Add radio button controls to panel (story_map_view.js)
+17. ✅ Add CLI command `scope include_level=<level>` (bot.py)
+18. ✅ Update panel to persist include_level selection (bot_panel.js executes scope command, refreshes)
 
 ### Phase 5: Cleanup
 19. ✅ Add `*.vsix` to `.gitignore`
@@ -973,7 +973,11 @@ document.querySelectorAll('input[name="includeLevel"]').forEach(radio => {
 
 ---
 
-phase 6 Validation --> run validate on tests, fix all violations, run validate on code ; same
+### Phase 6: Validation
+22. ✅ Run pytest on tests - 1007 passed
+23. ✅ Fix NameError: Optional not defined in json_story_graph.py
+24. ✅ Fix MarkdownInstructions to use JSONScope (with include_level) instead of JSONStoryGraph for scope serialization
+25. ✅ Fix scope.py: remove orphaned dead code after copy() return
 
 ## Expected Output Example
 

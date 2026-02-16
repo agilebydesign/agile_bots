@@ -50,8 +50,25 @@ class MarkdownInstructions(MarkdownAdapter):
                 
                 from cli.adapter_factory import AdapterFactory
                 try:
-                    adapter = AdapterFactory.create(results, 'json')
-                    scope_content = adapter.serialize()
+                    # Use JSONScope (not JSONStoryGraph) so include_level filtering is applied
+                    adapter = AdapterFactory.create(scope, 'json')
+                    scope_dict = adapter.to_dict()
+                    # Emit full story graph envelope for compatibility (path, has_epics, content)
+                    if scope_dict.get('content'):
+                        from story_graph.story_graph import StoryGraph
+                        sg = results
+                        envelope = {
+                            'path': str(sg.path) if hasattr(sg, 'path') and sg.path else '',
+                            'has_epics': sg.has_epics if hasattr(sg, 'has_epics') else True,
+                            'has_increments': sg.has_increments if hasattr(sg, 'has_increments') else False,
+                            'has_domain_concepts': sg.has_domain_concepts if hasattr(sg, 'has_domain_concepts') else False,
+                            'epic_count': sg.epic_count if hasattr(sg, 'epic_count') else 0,
+                            'content': scope_dict['content']
+                        }
+                        import json
+                        scope_content = json.dumps(envelope, indent=2)
+                    else:
+                        scope_content = adapter.serialize()
                     output_lines.append(scope_content)
                 except Exception:
                     pass

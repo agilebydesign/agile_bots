@@ -392,6 +392,25 @@ class Bot:
                 scope=self._scope
             )
         
+        # Handle include_level= setting (doesn't change filter, just content depth)
+        if scope_filter_lower.startswith('include_level='):
+            level = scope_filter.split('=', 1)[1].strip().lower()
+            valid_levels = ['stories', 'domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']
+            if level in valid_levels:
+                self._scope.include_level = level
+                self._scope.save()
+                from scope.scope_command_result import ScopeCommandResult
+                return ScopeCommandResult(
+                    status='success',
+                    message=f'Include level set to {level}',
+                    scope=self._scope
+                )
+            return ScopeCommandResult(
+                status='error',
+                message=f"Invalid include_level '{level}'. Valid: {', '.join(valid_levels)}",
+                scope=self._scope
+            )
+        
         # Parse scope filter based on format
         if '=' in scope_filter or ':' in scope_filter:
             scope_type, prefix, scope_values = self._parse_delimited_scope(scope_filter)

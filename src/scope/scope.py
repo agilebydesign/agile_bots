@@ -217,9 +217,6 @@ class Scope:
         if hasattr(self, '_results_dirty'):
             new_scope._results_dirty = self._results_dirty
         return new_scope
-        
-        self._cached_results = None
-        self._results_dirty = True
     
     def filter(self, type: ScopeType, value: List[str] = None, exclude: List[str] = None, skiprule: List[str] = None):
         self.type = type

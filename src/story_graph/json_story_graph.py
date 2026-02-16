@@ -1,5 +1,7 @@
 
 import json
+from typing import Optional
+
 from cli.adapters import JSONAdapter
 from story_graph.story_graph import StoryGraph
 

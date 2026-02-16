@@ -465,6 +465,173 @@ class TestSubmitScopeInstructions:
         
         # Verify domain_concepts are present and properly structured
         helper.instructions.verify_domain_concepts_in_json(parsed_json)
+    
+    def test_include_level_persisted_in_scope_json(self, tmp_path):
+        """
+        SCENARIO: Scope with include_level persists in scope.json
+        GIVEN: User sets include_level to 'code'
+        WHEN: Scope is saved
+        THEN: include_level='code' persisted to scope.json
+        AND: Reloading scope restores include_level='code'
+        """
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
+        
+        # Set include_level
+        scope.include_level = 'code'
+        scope.save()
+        
+        # Verify persisted
+        scope_file = helper.workspace / 'scope.json'
+        scope_data = json.loads(scope_file.read_text())
+        assert scope_data['include_level'] == 'code'
+        
+        # Verify restored
+        new_scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
+        new_scope.load()
+        assert new_scope.include_level == 'code'
+    
+    def test_scope_with_include_level_stories_only(self, tmp_path):
+        """
+        SCENARIO: Scope with include_level='stories' filters to structure
+        GIVEN: Story graph with domain concepts, acceptance criteria, scenarios, examples
+        WHEN: include_level='stories' and instructions retrieved
+        THEN: Scope content contains only epic/sub-epic/story names
+        AND: No domain concepts, acceptance criteria, scenarios, examples, tests, or code
+        """
+        from actions.action_context import ScopeActionContext
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create full story graph with domain concepts, acceptance criteria, scenarios
+        story_graph = {
+            'epics': [{
+                'name': 'TestEpic',
+                'sequential_order': 1,
+                'domain_concepts': [{
+                    'name': 'TestDomainConcept',
+                    'responsibilities': [{'name': 'Does something', 'collaborators': ['OtherClass']}]
+                }],
+                'sub_epics': [{
+                    'name': 'TestSubEpic',
+                    'sequential_order': 1,
+                    'story_groups': [{
+                        'stories': [{
+                            'name': 'TestStory',
+                            'sequential_order': 1,
+                            'acceptance_criteria': [{'name': 'Criteria 1', 'text': 'Criteria 1'}, {'name': 'Criteria 2', 'text': 'Criteria 2'}],
+                            'scenarios': [{
+                                'name': 'Happy path',
+                                'steps': [{'text': 'Given... When... Then...', 'sequential_order': 1}],
+                                'examples': [{'input': 'test'}]
+                            }]
+                        }]
+                    }]
+                }]
+            }]
+        }
+        helper.files.given_file_created(
+            helper.workspace / 'docs' / 'story',
+            'story-graph.json',
+            story_graph
+        )
+        
+        # Set scope with include_level='stories'
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['TestStory'])
+        scope.include_level = 'stories'
+        scope.apply_to_bot()
+        
+        # Get instructions
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        context = ScopeActionContext(scope=scope)
+        instructions = action.get_instructions(context)
+        
+        # Verify only structure included
+        content = '\n'.join(instructions.display_content)
+        assert 'TestEpic' in content
+        assert 'TestSubEpic' in content
+        assert 'TestStory' in content
+        
+        # Verify filtered out
+        assert 'TestDomainConcept' not in content
+        assert 'Criteria 1' not in content
+        assert 'Happy path' not in content
+        assert 'Given... When... Then...' not in content
+    
+    def test_scope_with_include_level_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Scope with include_level='domain_concepts' includes CRC cards
+        GIVEN: Story graph with domain concepts at epic and sub-epic levels
+        WHEN: include_level='domain_concepts'
+        THEN: Scope includes structure + domain concepts with responsibilities/collaborators
+        AND: No acceptance criteria, scenarios, examples, tests, or code
+        """
+        from actions.action_context import ScopeActionContext
+        from scope import Scope, ScopeType
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create story graph with domain concepts
+        story_graph = {
+            'epics': [{
+                'name': 'TestEpic',
+                'sequential_order': 1,
+                'domain_concepts': [{
+                    'name': 'TestDomainConcept',
+                    'responsibilities': [{
+                        'name': 'Processes test data',
+                        'collaborators': ['DataStore', 'Validator']
+                    }],
+                    'module': 'test_module',
+                    'inherits_from': 'BaseClass'
+                }],
+                'sub_epics': [{
+                    'name': 'TestSubEpic',
+                    'sequential_order': 1,
+                    'story_groups': [{
+                        'stories': [{
+                            'name': 'TestStory',
+                            'sequential_order': 1,
+                            'acceptance_criteria': [{'name': 'Criteria 1', 'text': 'Criteria 1'}],
+                            'scenarios': [{'name': 'Happy path', 'steps': [{'text': 'Given...', 'sequential_order': 1}]}]
+                        }]
+                    }]
+                }]
+            }]
+        }
+        helper.files.given_file_created(
+            helper.workspace / 'docs' / 'story',
+            'story-graph.json',
+            story_graph
+        )
+        
+        # Set scope with include_level='domain_concepts'
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['TestStory'])
+        scope.include_level = 'domain_concepts'
+        scope.apply_to_bot()
+        
+        # Get instructions
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        context = ScopeActionContext(scope=scope)
+        instructions = action.get_instructions(context)
+        
+        # Verify domain concepts included
+        content = '\n'.join(instructions.display_content)
+        assert 'TestDomainConcept' in content
+        assert 'Processes test data' in content
+        assert 'DataStore' in content
+        assert 'Validator' in content
+        
+        # Verify acceptance/scenarios filtered out
+        assert 'Criteria 1' not in content
+        assert 'Happy path' not in content
 
 
 # ============================================================================

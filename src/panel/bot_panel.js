@@ -619,26 +619,18 @@ class BotPanel {
               return;
             }
             
-            // Read current scope.json, update include_level, and save it back
-            const scopeFilePath = path.join(this._workspaceRoot, 'scope.json');
-            try {
-              let scopeData = {};
-              if (fs.existsSync(scopeFilePath)) {
-                const scopeContent = fs.readFileSync(scopeFilePath, 'utf8');
-                scopeData = JSON.parse(scopeContent);
-              }
-              
-              // Update include_level
-              scopeData.include_level = message.includeLevel;
-              
-              // Write back to scope.json
-              fs.writeFileSync(scopeFilePath, JSON.stringify(scopeData, null, 2));
-              this._log('[BotPanel] Include level updated in scope.json: ' + message.includeLevel);
-            } catch (err) {
-              const errorMsg = 'Include level update failed: ' + err.message;
-              this._log('[BotPanel] ERROR: ' + errorMsg);
-              this._displayError(errorMsg);
-            }
+            // Execute scope include_level command to update bot and persist to scope.json
+            const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
+            this._botView.execute(scopeIncludeCmd)
+              .then(() => {
+                this._log('[BotPanel] Include level updated: ' + message.includeLevel);
+                return this._update();
+              })
+              .catch((err) => {
+                const errorMsg = 'Include level update failed: ' + err.message;
+                this._log('[BotPanel] ERROR: ' + errorMsg);
+                this._displayError(errorMsg);
+              });
             return;
           
           case "updateFilter":
