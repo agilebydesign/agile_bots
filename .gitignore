@@ -36,7 +36,10 @@ venv.bak/
 
 
 # Cursor
-.cursor/
+.cursor/*
+!.cursor/rules/
+.cursor/rules/*
+!.cursor/rules/agile-bot-commits.mdc
 
 # Testing
 .pytest_cache/

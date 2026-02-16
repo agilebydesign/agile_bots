@@ -1,0 +1,240 @@
+---
+description: Generate meaningful commit messages based on current bot behavior, action, and scope
+alwaysApply: true
+---
+
+# Agile Bot Commit Message Generation
+
+When the user types `/commit` or requests a commit, automatically generate a meaningful commit message based on the current bot context.
+
+## CRITICAL: Follow Instructions First
+
+**Do NOT commit before completing the user's primary instructions.** If the user's message contains:
+- Scope, behavior instructions, action instructions, validation steps, build process, or other workflow steps
+- **AND** the word "commit" (e.g. "commit## Scope" or "commit" at the start of a message)
+
+Then **complete all primary instructions FIRST** (validate, build, render, review violations, etc.). Only after those are done should you perform the commit. The commit rule must not interfere with or shortcut the actual workflow.
+
+## Commit Message Format
+
+```
+behavior.action: meaningful description based on scope
+```
+
+## Scope Persistence
+
+Since `scope.json` is frequently reset during workflows, maintain a persistent scope file:
+- **File**: `last_commit_scope.json` (workspace root)
+- **Format**: `{"value": ["Story Name 1", "Story Name 2"], "timestamp": "2026-02-15T15:57:28"}`
+
+### Scope Update Logic
+
+1. **When scope changes** in `scope.json`:
+   - If `scope.json` has non-empty `value` field, save it to `last_commit_scope.json`
+   - Update timestamp
+
+2. **User scope override**:
+   - When user says "scope is all" → Save `{"value": ["all"], "timestamp": "..."}`
+   - When user says "scope is [name]" → Save `{"value": ["name"], "timestamp": "..."}`
+
+3. **Reading scope for commits** (priority order):
+   - First check `last_commit_scope.json` (most reliable)
+   - Fall back to `scope.json` if last_commit_scope doesn't exist or is empty
+   - **If both empty, infer scope** from changed files and content:
+     - Check `git diff` and `git status` for changed file paths
+     - Look for story/epic/sub-epic names in file paths (e.g., `docs/story/prioritization/`)
+     - Check changed documents: `story-graph.json`, `*.drawio`, `*.md` files
+     - Examine test file names (e.g., `test_synchronized_graph_with_rendered_diagram_content.py` → "Synchronized Graph")
+     - Look for story references in git diff content
+     - Extract epic/sub-epic/story from document structure
+     - Use most specific scope found (story > sub-epic > epic > document type > generic)
+
+## Process
+
+1. **Read Context Files** (located in workspace root):
+   - `behavior_action_state.json` - Contains `current_behavior` and `current_action`
+   - `last_commit_scope.json` - Contains the last meaningful scope (PREFERRED)
+   - `scope.json` - Contains current working scope (fallback)
+
+2. **Update Last Scope** (if scope.json changed):
+   - Check if `scope.json` has non-empty `value`
+   - If yes, save to `last_commit_scope.json` with timestamp
+   - This ensures commits always reference meaningful scope
+
+3. **Parse Bot Context**:
+   - Extract bot name from `current_behavior` (e.g., "story_bot.prioritization" → bot: story_bot, behavior: prioritization)
+   - Extract action from `current_action` (e.g., "story_bot.prioritization.render" → action: render)
+   - Extract scope from `last_commit_scope.json` `value` field first, then `scope.json` as fallback
+   - **If both empty**: Infer scope from changed files (see Scope Inference section) and save to `last_commit_scope.json`
+
+4. **Generate Commit Message**:
+   - Format: `{behavior}.{action}: {description}`
+   - Examples:
+     - `prioritization.render: Update story map increments for Invoke Bot`
+     - `design.build: Refine CRC cards for authentication stories`
+     - `shape.validate: Add acceptance criteria for user management stories`
+     - `domain.clarify: Extract domain concepts from payment workflow`
+
+5. **Meaningful Description Guidelines**:
+   - Describe WHAT changed in relation to the scope
+   - Keep it concise (under 80 characters if possible)
+   - Use present tense verbs
+   - Reference the story names from scope when relevant
+   - Be specific about the change type:
+     - "Update" for modifications
+     - "Add" for new content
+     - "Refine" for improvements
+     - "Fix" for corrections
+     - "Remove" for deletions
+
+6. **Execute Commit**:
+   - Stage relevant files with `git add`
+   - Create commit with generated message
+   - Confirm commit was successful
+
+## CRITICAL: No Co-authored-by Trailers
+
+**NEVER add `--trailer "Co-authored-by: ..."` or any Co-authored-by line to commits.**
+- Use only: `git commit -m "message"`
+- Do NOT use: `git commit --trailer "Co-authored-by: Cursor <cursoragent@cursor.com>" -m "message"`
+- The user owns their commits; do not add Cursor or any AI as co-author.
+
+## Bot Context Reference
+
+### Story Bot Behaviors
+- `shape` - Define story structure and acceptance criteria
+- `prioritization` - Organize stories into delivery increments
+- `scenarios` - Create BDD scenarios for stories
+- `code` - Generate implementation code
+- `tests` - Create test cases
+- `exploration` - Explore and analyze requirements
+
+### CRC Bot Behaviors
+- `domain` - Extract domain concepts and CRC cards
+- `design` - Refine CRC cards with OOP design patterns
+- `walkthrough` - Walk through scenarios to verify design
+
+### Common Actions
+- `clarify` - Gather context and requirements
+- `strategy` - Make strategic decisions
+- `build` - Create or update artifacts
+- `validate` - Verify quality and correctness
+- `render` - Generate documentation/diagrams
+
+## Example Workflow
+
+When user says `/commit` **and there are no other pending instructions**:
+
+1. Read `behavior_action_state.json`:
+   ```json
+   {
+     "current_behavior": "story_bot.prioritization",
+     "current_action": "story_bot.prioritization.render"
+   }
+   ```
+
+2. Check if `scope.json` changed and update `last_commit_scope.json`:
+   ```json
+   {
+     "value": ["Invoke Bot"],
+     "timestamp": "2026-02-15T15:57:28.027068"
+   }
+   ```
+
+3. Read scope from `last_commit_scope.json`:
+   ```json
+   {
+     "value": ["Invoke Bot"],
+     "timestamp": "2026-02-15T15:57:28.027068"
+   }
+   ```
+
+4. Generate message: `prioritization.render: Update increment diagram for Invoke Bot stories`
+
+5. Execute:
+   ```bash
+   git add -A
+   git commit -m "prioritization.render: Update increment diagram for Invoke Bot stories"
+   ```
+
+### User Override Examples
+
+**User says**: "scope is Authentication and User Management"
+- Save to `last_commit_scope.json`: `{"value": ["Authentication", "User Management"], ...}`
+- Future commits use these stories
+
+**User says**: "scope is all"
+- Save to `last_commit_scope.json`: `{"value": ["all"], ...}`
+- Commit message: `{behavior}.{action}: Update project artifacts`
+
+### Scope Inference Examples
+
+When both scope files are empty, infer from changed files:
+
+**Example 1**: Changed files include `docs/story/prioritization/story-map-increments.drawio`
+- Inferred scope: "story map increments" or "prioritization"
+- Commit: `prioritization.render: Update story map increments diagram`
+
+**Example 2**: Changed files include `test/invoke_bot/perform_action/test_*.py`
+- Inferred scope: "Invoke Bot" (from directory structure)
+- Commit: `scenarios.build: Add test scenarios for Invoke Bot`
+
+**Example 3**: Changed files include `src/panel/bot_panel.js` and `src/panel/increment_view.js`
+- Inferred scope: "bot panel" or "UI components"
+- Commit: `code.build: Update bot panel and increment view`
+
+**Example 4**: Modified `docs/story/story-graph.json` with diff showing "Authentication" story changes
+- Parse diff to find story name: "Authentication"
+- Commit: `shape.build: Add acceptance criteria for Authentication story`
+
+**Example 5**: Changed multiple documentation files in `docs/crc/`
+- Inferred scope: "CRC documentation"
+- Commit: `design.render: Update CRC documentation`
+
+## Handling Edge Cases
+
+- **No scope defined (both files empty)**: 
+  - **INFER from changed files** using these strategies:
+    - File path contains story name: `test/invoke_bot/...` → "Invoke Bot"
+    - Changed document: `story-map-increments.drawio` → "story map increments"
+    - Test file: `test_synchronized_graph_with_rendered_diagram_content.py` → "Synchronized Graph"
+    - Modified story-graph.json: Parse diff for epic/story names being changed
+    - Directory structure: `docs/story/prioritization/` → "prioritization artifacts"
+  - **Example inferences**:
+    - Changed `docs/story/prioritization/story-map-increments.drawio` → scope: "story map increments"
+    - Changed `test/invoke_bot/perform_action/*.py` → scope: "Invoke Bot perform action"
+    - Changed `src/panel/bot_panel.js` → scope: "bot panel"
+  - **Last resort**: Use generic `{behavior}.{action}: Update project artifacts`
+
+- **Scope is "all"**: Use generic description like `{behavior}.{action}: Update project artifacts`
+- **Multiple stories in scope**: Reference them as "multiple stories" or list first 2-3
+- **Failed commit**: Report the error and suggest fixes
+- **First commit (no last_commit_scope.json exists)**: Create it from current `scope.json` or inferred scope
+
+## Automatic Scope Tracking
+
+**Before any commit**, check if scope has changed:
+1. Read `scope.json`
+2. If it has a non-empty `value` field, update `last_commit_scope.json`
+3. If both files empty, **infer scope** and save to `last_commit_scope.json`
+4. This captures scope changes during workflows and persists inferences
+
+**When user explicitly sets scope**:
+- Listen for: "scope is [name]", "scope is all", "working on [story]"
+- Immediately update `last_commit_scope.json`
+- Confirm: "Scope set to [name] for future commits"
+
+**When scope is inferred**:
+- Save inferred scope to `last_commit_scope.json`
+- Confirm inference: "Inferred scope as [name] from changed files"
+- User can override if incorrect
+
+## Automatic Commits After Meaningful Changes
+
+Monitor for meaningful changes during bot workflows:
+- Files saved after build/validate/render actions
+- Multiple related files changed together
+- Completion of an action workflow step
+- Before scope gets reset in workflows
+
+When detected, suggest: "I've completed {action} for {scope}. Would you like me to commit these changes?"
