@@ -609,6 +609,38 @@ class BotPanel {
                 this._displayError(`Failed to show all: ${error.message}`);
               });
             return;
+          case "updateIncludeLevel":
+            this._log('[BotPanel] Received updateIncludeLevel: ' + message.includeLevel);
+            
+            if (!this._botView) {
+              const errorMsg = '_botView is null, cannot update include_level';
+              this._log('[BotPanel] ERROR: ' + errorMsg);
+              this._displayError(errorMsg);
+              return;
+            }
+            
+            // Read current scope.json, update include_level, and save it back
+            const scopeFilePath = path.join(this._workspaceRoot, 'scope.json');
+            try {
+              let scopeData = {};
+              if (fs.existsSync(scopeFilePath)) {
+                const scopeContent = fs.readFileSync(scopeFilePath, 'utf8');
+                scopeData = JSON.parse(scopeContent);
+              }
+              
+              // Update include_level
+              scopeData.include_level = message.includeLevel;
+              
+              // Write back to scope.json
+              fs.writeFileSync(scopeFilePath, JSON.stringify(scopeData, null, 2));
+              this._log('[BotPanel] Include level updated in scope.json: ' + message.includeLevel);
+            } catch (err) {
+              const errorMsg = 'Include level update failed: ' + err.message;
+              this._log('[BotPanel] ERROR: ' + errorMsg);
+              this._displayError(errorMsg);
+            }
+            return;
+          
           case "updateFilter":
             this._log('[BotPanel] Received updateFilter: ' + message.filter);
             this._log('[BotPanel] _botView is: ' + this._botView);
@@ -3632,6 +3664,14 @@ class BotPanel {
         
         // Test if updateFilter is defined
         console.log('[WebView] updateFilter function exists:', typeof updateFilter);
+        
+        window.updateIncludeLevel = function(level) {
+            console.log('[WebView] updateIncludeLevel called with:', level);
+            vscode.postMessage({
+                command: 'updateIncludeLevel',
+                includeLevel: level
+            });
+        };
         
         window.clearScopeFilter = function() {
             vscode.postMessage({

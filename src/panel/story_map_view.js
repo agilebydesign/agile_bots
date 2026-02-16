@@ -131,7 +131,7 @@ class StoryMapView extends PanelView {
         const dataSource = this.parentView?.botData ? 'cached' : 'fetched';
         log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
-        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
+        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
@@ -2730,6 +2730,39 @@ class StoryMapView extends PanelView {
                                placeholder="Epic or Story name"
                                onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
+                    </div>
+                    <div class="input-container" style="margin-bottom: 8px;">
+                        <div class="input-header">Include up to</div>
+                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="stories" ${scopeData.includeLevel === 'stories' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Stories</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="domain_concepts" ${scopeData.includeLevel === 'domain_concepts' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Domain</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="acceptance" ${scopeData.includeLevel === 'acceptance' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Accept</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="scenarios" ${scopeData.includeLevel === 'scenarios' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Scenarios</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="examples" ${!scopeData.includeLevel || scopeData.includeLevel === 'examples' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Examples</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="tests" ${scopeData.includeLevel === 'tests' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Tests</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
+                                <input type="radio" name="includeLevel" value="code" ${scopeData.includeLevel === 'code' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
+                                <span>Code</span>
+                            </label>
+                        </div>
                     </div>
                     ${contentHtml}
                 </div>

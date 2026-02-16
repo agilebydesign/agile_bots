@@ -40,7 +40,8 @@ class JSONScope(JSONAdapter):
             'type': self.scope.type.value,
             'filter': ', '.join(self.scope.value) if self.scope.value else '',
             'content': None,
-            'graphLinks': []
+            'graphLinks': [],
+            'includeLevel': self.scope.include_level
         }
         
         if self.scope.type.value in ('story', 'showAll'):
