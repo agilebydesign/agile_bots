@@ -144,7 +144,21 @@ class Bot:
         self._story_graph = None
         self._story_graph_file_mtime = None
         return {'status': 'success', 'message': 'Story graph cache cleared'}
-    
+
+    def generate_context_package(self) -> dict:
+        """Generate .mdc rule files from active bot behaviors to workspace .cursor/rules/.
+
+        Returns:
+            dict: Result with created_files and summary
+        """
+        from synchronizers.context_package.rule_file_generator import RuleFileGenerator
+        bot = self.active_bot
+        generator = RuleFileGenerator(
+            bot_directory=bot.bot_directory,
+            workspace_directory=bot.workspace_directory
+        )
+        return generator.generate()
+
     # Backward compatibility alias
     @property
     def story_graph(self) -> StoryMap:

@@ -43,6 +43,8 @@ class CLISession:
         handlers = {
             'save': self._handle_save,
             'submit': self._handle_submit,
+            'generate_context_package': self._handle_generate_context_package,
+            'generate': self._handle_generate,
         }
         if verb.startswith('submitrules:') or verb.startswith('submitrules '):
             return self._handle_submitrules
@@ -69,6 +71,31 @@ class CLISession:
         behavior_name = behavior_name.strip()
         result = self.bot.submit_behavior_rules(behavior_name)
         return self._format_submit_response(result, f"{behavior_name} rules submitted to chat!")
+
+    def _handle_generate(self, verb: str, args: str) -> CLICommandResponse:
+        if args.strip() == "context package":
+            return self._handle_generate_context_package(verb, args)
+        return None
+
+    def _handle_generate_context_package(self, verb: str, args: str) -> CLICommandResponse:
+        result = self.bot.generate_context_package()
+        if self.mode == 'json':
+            import json
+            return CLICommandResponse(
+                output=json.dumps(result, indent=2),
+                status='success',
+                cli_terminated=False
+            )
+        created = result.get('created_files', [])
+        summary = result.get('summary', '')
+        lines = [f"[OK] {summary}"]
+        for path in created:
+            lines.append(f"  - {path}")
+        return CLICommandResponse(
+            output='\n'.join(lines),
+            status='success',
+            cli_terminated=False
+        )
     
     
     def _format_submit_response(self, result: dict, success_message: str) -> CLICommandResponse:
