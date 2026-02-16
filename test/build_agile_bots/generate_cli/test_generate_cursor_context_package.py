@@ -6,12 +6,15 @@ Parent Epic: Build Agile Bots > Generate CLI
 
 Story: Create Rule Files From Bot Behavior
 Domain tests verify rule file generation from bot behaviors.
+CLI tests verify generate_context_package command executes on active bot.
 All tests use tmp_path - no writes to production bot workspace.
 """
 import json
+import os
 import pytest
 from pathlib import Path
 
+from cli.cli_session import CLISession
 from synchronizers.context_package.rule_file_generator import RuleFileGenerator
 
 
@@ -133,9 +136,21 @@ class TestCreateRuleFilesFromBotBehavior:
         content = rule_file.read_text(encoding="utf-8")
         assert "## Strategy" in content
 
-    def test_generator_adds_build_and_render_sections_from_content_config(self, tmp_path):
+    def test_generator_adds_build_section_with_rules_and_embedded_templates(self, tmp_path):
         bot_dir = given_bot_with_behaviors_directory(tmp_path, "story_bot")
-        given_behavior_with_valid_json(bot_dir, "shape")
+        behavior_dir = given_behavior_with_valid_json(bot_dir, "shape")
+        render_dir = behavior_dir / "content" / "render"
+        render_dir.mkdir(parents=True)
+        templates_dir = render_dir / "templates"
+        templates_dir.mkdir()
+        (templates_dir / "story-map.txt").write_text("Story Map Template", encoding="utf-8")
+        (render_dir / "render_story_map.json").write_text(
+            json.dumps({
+                "template": "templates/story-map.txt",
+                "output": "story-map.txt",
+            }),
+            encoding="utf-8",
+        )
         workspace_dir = tmp_path / "workspace"
         workspace_dir.mkdir()
 
@@ -144,7 +159,11 @@ class TestCreateRuleFilesFromBotBehavior:
         rule_file = workspace_dir / ".cursor" / "rules" / "story_bot_shape.mdc"
         content = rule_file.read_text(encoding="utf-8")
         assert "## Build" in content
-        assert "## Render" in content
+        assert "Now you're ready to build" in content
+        assert "### Rules" in content
+        assert "### Templates" in content
+        assert "#### story-map.txt" in content
+        assert "Story Map Template" in content
 
     def test_generator_processes_rules_directory_and_formats_do_dont_blocks(self, tmp_path):
         bot_dir = given_bot_with_behaviors_directory(tmp_path, "story_bot")
@@ -198,3 +217,65 @@ class TestCreateRuleFilesFromBotBehavior:
         rule_file = workspace_dir / ".cursor" / "rules" / f"{bot_name}_{behavior_name}.mdc"
         assert rule_file.exists()
         assert rule_file.suffix == ".mdc"
+
+
+class TestGenerateContextPackageViaCLI:
+    """Generate context package via CLI - command executes on active bot."""
+
+    def test_cli_generate_context_package_creates_rule_files_for_active_bot(self, tmp_path):
+        bot_name = "story_bot"
+        bot_dir = given_bot_with_behaviors_directory(tmp_path, bot_name)
+        given_behavior_with_valid_json(bot_dir, "shape")
+        (bot_dir / "bot_config.json").write_text(
+            json.dumps({"name": bot_name, "behaviors": ["shape"]}, indent=2),
+            encoding="utf-8",
+        )
+        workspace_dir = tmp_path / "workspace"
+        workspace_dir.mkdir()
+
+        os.environ["BOT_DIRECTORY"] = str(bot_dir)
+        os.environ["WORKING_AREA"] = str(workspace_dir)
+        from bot.bot import Bot
+
+        bot = Bot(
+            bot_name=bot_name,
+            bot_directory=bot_dir,
+            config_path=bot_dir / "bot_config.json",
+            workspace_path=workspace_dir,
+        )
+        cli_session = CLISession(bot=bot, workspace_directory=workspace_dir)
+
+        response = cli_session.execute_command("generate_context_package")
+
+        assert response.status == "success"
+        then_rule_files_exist_in_cursor_rules(workspace_dir, expected_count=1)
+        rule_file = workspace_dir / ".cursor" / "rules" / f"{bot_name}_shape.mdc"
+        assert rule_file.exists()
+
+    def test_cli_generate_context_package_accepts_generate_context_package_syntax(self, tmp_path):
+        bot_name = "story_bot"
+        bot_dir = given_bot_with_behaviors_directory(tmp_path, bot_name)
+        given_behavior_with_valid_json(bot_dir, "shape")
+        (bot_dir / "bot_config.json").write_text(
+            json.dumps({"name": bot_name, "behaviors": ["shape"]}, indent=2),
+            encoding="utf-8",
+        )
+        workspace_dir = tmp_path / "workspace"
+        workspace_dir.mkdir()
+
+        os.environ["BOT_DIRECTORY"] = str(bot_dir)
+        os.environ["WORKING_AREA"] = str(workspace_dir)
+        from bot.bot import Bot
+
+        bot = Bot(
+            bot_name=bot_name,
+            bot_directory=bot_dir,
+            config_path=bot_dir / "bot_config.json",
+            workspace_path=workspace_dir,
+        )
+        cli_session = CLISession(bot=bot, workspace_directory=workspace_dir)
+
+        response = cli_session.execute_command("generate context package")
+
+        assert response.status == "success"
+        then_rule_files_exist_in_cursor_rules(workspace_dir, expected_count=1)
