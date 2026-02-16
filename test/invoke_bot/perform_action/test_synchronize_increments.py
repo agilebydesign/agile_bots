@@ -278,8 +278,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
                 'Phase 2': ['Schedule service', 'Record fuel usage', 'View location']})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
 
         moved_names = [m.story for m in report.increment_moves]
@@ -303,8 +302,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
                 'Phase 3': []})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
 
         all_new = report.new_stories + report.new_sub_epics
@@ -331,8 +329,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
                 'Phase 2': ['Schedule service', 'Record fuel usage', 'View location']})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
 
         # Should not report View location as new or duplicate
@@ -351,8 +348,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
         xml = _create_increments_xml(helper)
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         # Stories positioned within lane geometry should be assigned
         assert len(drawio.get_epics()) >= 1
 
@@ -382,8 +378,7 @@ class TestReportIncrementChanges(BaseReportDiagramTest):
                 'B': ['Schedule service'], 'C': ['Record fuel usage']})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
 
         # Report should detect changes - exact behavior depends on matching algorithm
@@ -419,8 +414,7 @@ class TestUpdateIncrementsFromDiagram(BaseUpdateDiagramTest):
             stories_per_lane={'MVP': ['View location', 'Assign driver']})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
         story_map.apply_update_report(report)
 
@@ -460,8 +454,7 @@ class TestUpdateIncrementsFromDiagram(BaseUpdateDiagramTest):
                 'MVP': ['View location', 'Assign driver']})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
         story_map.apply_update_report(report)
 
@@ -484,8 +477,7 @@ class TestUpdateIncrementsFromDiagram(BaseUpdateDiagramTest):
         xml = _create_increments_xml(helper)
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='increments')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='increments')
         report = drawio.generate_update_report(story_map)
         story_map.apply_update_report(report)
 

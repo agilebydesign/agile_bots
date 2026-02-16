@@ -311,8 +311,7 @@ class TestReportEpicAndSubEpicChanges(BaseReportDiagramTest):
             helper, sub_epic_names=['Payment Authorization', 'Settle Transaction', 'Issue Refund'])
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         # Hierarchical cell IDs (sub-epic-1, etc.) should be rename candidates
@@ -333,8 +332,7 @@ class TestReportEpicAndSubEpicChanges(BaseReportDiagramTest):
         xml = xml.replace('Validate Card', 'Validate Payment Card')
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         # Story renames should be detected regardless of cell ID format
@@ -356,8 +354,7 @@ class TestReportEpicAndSubEpicChanges(BaseReportDiagramTest):
             helper, sub_epic_names=['Authorize Payment', 'Settle Transaction'])
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         all_removed = report.removed_stories + report.removed_sub_epics
@@ -404,8 +401,7 @@ class TestUpdateEpicsAndSubEpicsFromDiagram(BaseUpdateDiagramTest):
             helper, sub_epic_names=['Authorize Payment', 'Settle Transaction'])
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         # Issue Refund should be flagged
@@ -427,8 +423,7 @@ class TestUpdateEpicsAndSubEpicsFromDiagram(BaseUpdateDiagramTest):
         xml = helper.drawio_story_map.create_drawio_xml_without_epic()
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         all_removed = report.removed_stories + report.removed_sub_epics
@@ -447,8 +442,7 @@ class TestUpdateEpicsAndSubEpicsFromDiagram(BaseUpdateDiagramTest):
         xml = _create_epic_xml(helper)
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
 
         epics = drawio.get_epics()
         assert len(epics) == 1
@@ -496,8 +490,7 @@ class TestUpdateEpicsAndSubEpicsFromDiagram(BaseUpdateDiagramTest):
         xml = helper.drawio_story_map.create_empty_drawio_xml()
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
 
         assert len(drawio.get_epics()) == 0
         assert len(drawio.get_sub_epics()) == 0

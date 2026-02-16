@@ -323,8 +323,7 @@ class TestReportStoryMovesBetweenParents(BaseReportDiagramTest):
             })
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         moved_names = [m.name for m in report.moved_stories]
@@ -349,8 +348,7 @@ class TestReportStoryMovesBetweenParents(BaseReportDiagramTest):
             })
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         # Stories should be detected as moved, not new+removed
@@ -385,8 +383,7 @@ class TestReportAcceptanceCriteriaChanges(BaseReportDiagramTest):
         xml = _create_stories_xml(helper)
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='acceptance_criteria')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='acceptance_criteria')
         # Manually add an AC element to the diagram
         # (This tests the extraction + report pipeline)
         report = drawio.generate_update_report(story_map)
@@ -457,8 +454,7 @@ class TestUpdateStoriesFromDiagram(BaseUpdateDiagramTest):
             })
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         # Get AC count before move
@@ -490,8 +486,7 @@ class TestUpdateStoriesFromDiagram(BaseUpdateDiagramTest):
             story_overrides={'Check Availability': []})
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
 
         assert len(report.removed_stories) >= 2
@@ -515,8 +510,7 @@ class TestUpdateStoriesFromDiagram(BaseUpdateDiagramTest):
             })
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
         story_map.apply_update_report(report)
 
@@ -574,8 +568,7 @@ class TestUpdateAcceptanceCriteriaFromDiagram(BaseUpdateDiagramTest):
         xml = _create_stories_xml(helper)
         drawio_file = helper.drawio_story_map.create_drawio_file(xml)
 
-        drawio = DrawIOStoryMap(diagram_type='outline')
-        drawio.load(drawio_file)
+        drawio = DrawIOStoryMap.load(drawio_file, diagram_type='outline')
         report = drawio.generate_update_report(story_map)
         story_map.apply_update_report(report)
 
