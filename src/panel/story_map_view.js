@@ -131,7 +131,8 @@ class StoryMapView extends PanelView {
         const dataSource = this.parentView?.botData ? 'cached' : 'fetched';
         log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
-        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
+        // PanelView returns { bot: {...} }; BotView returns bot object directly. Support both.
+        const scopeData = (botData.bot?.scope || botData.scope) || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);

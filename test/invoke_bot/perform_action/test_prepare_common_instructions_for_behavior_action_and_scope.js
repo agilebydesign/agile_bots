@@ -43,11 +43,12 @@ const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-instr
 // but override the working area via environment variable before spawning
 
 // Create temp workspace for test data (story graphs, etc.)
+// Production uses docs/story (not docs/stories)
 function setupTestWorkspace() {
-    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'stories'), { recursive: true });
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'story'), { recursive: true });
     
     // Create empty test story graph
-    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'story', 'story-graph.json');
     fs.writeFileSync(storyGraphPath, JSON.stringify({ epics: [] }, null, 2));
     
     // Set environment variable so Python backend uses temp workspace for data
@@ -83,6 +84,7 @@ before(() => {
  */
 function createTestBotPanel() {
     const executedCommands = [];
+    const includeLevelUpdates = [];
     const sentMessages = [];
     const submittedToChat = [];
     let messageHandler = null;
@@ -153,6 +155,18 @@ function createTestBotPanel() {
             case 'refresh':
                 // Mimic refresh behavior if needed
                 break;
+            case 'updateIncludeLevel':
+                // Mimic BotPanel: execute scope include_level command
+                if (message.includeLevel) {
+                    includeLevelUpdates.push(message.includeLevel);
+                    const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
+                    try {
+                        await backendPanel.execute(scopeIncludeCmd);
+                    } catch (err) {
+                        console.log('[Test] updateIncludeLevel execute failed:', err.message);
+                    }
+                }
+                break;
             default:
                 console.log(`[Test] Unhandled message command: ${message.command}`);
         }
@@ -168,6 +182,7 @@ function createTestBotPanel() {
         botPanel,
         panel: mockVscodePanel,
         executedCommands,
+        includeLevelUpdates,
         sentMessages,
         submittedToChat,
         // Simulate webview sending a message to extension (triggers handler above)
@@ -297,6 +312,39 @@ test('TestSubmitInstructionsToAIAgent', { concurrency: false }, async (t) => {
             'Should have intercepted sendToChat message');
         assert.strictEqual(testPanel.submittedToChat[0].content, 'test instructions content',
             'Should have captured the correct content');
+    });
+});
+
+test('TestUpdateIncludeLevel', { concurrency: false }, async (t) => {
+    
+    await t.test('test_updateIncludeLevel_triggers_scope_command', async () => {
+        /**
+         * SCENARIO: Include level radio change triggers scope command
+         * GIVEN: User clicks include level radio (e.g. "code")
+         * WHEN: updateIncludeLevel message is sent to extension
+         * THEN: scope include_level=code command is executed
+         * AND: include_level is persisted to scope.json
+         */
+        await testPanel.botPanel._update();
+        
+        // Simulate user selecting "code" include level (radio button onchange)
+        await testPanel.postMessageFromWebview({
+            command: 'updateIncludeLevel',
+            includeLevel: 'code'
+        });
+        
+        assert.strictEqual(testPanel.includeLevelUpdates.length, 1, 
+            'Should have received updateIncludeLevel message');
+        assert.strictEqual(testPanel.includeLevelUpdates[0], 'code',
+            'Should have captured includeLevel code');
+        
+        // Verify scope was updated by checking scope command response
+        // scope command returns { status, message, scope: { includeLevel, ... } }
+        const scopeResult = await backendPanel.execute('scope');
+        assert.ok(scopeResult, 'Scope command should return result');
+        const includeLevel = scopeResult.scope?.includeLevel ?? scopeResult.includeLevel ?? scopeResult.include_level;
+        assert.strictEqual(includeLevel, 'code',
+            'Scope should have include_level=code after update');
     });
 });
 

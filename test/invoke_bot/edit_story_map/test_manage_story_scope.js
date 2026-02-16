@@ -32,12 +32,13 @@ const productionBotPath = path.join(repoRoot, 'bots', 'story_bot');
 const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-scope-test-'));
 
 // Setup test workspace - only data files, not the bot itself
+// Production uses docs/story (not docs/stories)
 function setupTestWorkspace() {
-    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'stories'), { recursive: true });
+    fs.mkdirSync(path.join(tempWorkspaceDir, 'docs', 'story'), { recursive: true });
     
     // Copy story-graph.json to temp directory for test isolation
-    const storyGraphSrc = path.join(repoRoot, 'docs', 'stories', 'story-graph.json');
-    const storyGraphDest = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphSrc = path.join(repoRoot, 'docs', 'story', 'story-graph.json');
+    const storyGraphDest = path.join(tempWorkspaceDir, 'docs', 'story', 'story-graph.json');
     if (fs.existsSync(storyGraphSrc)) {
         fs.copyFileSync(storyGraphSrc, storyGraphDest);
     }
@@ -241,6 +242,48 @@ test('TestScopeView', { concurrency: false }, async (t) => {
         } else {
             assert.ok(html.length > 0, 'Should render even without content');
         }
+    });
+    
+    await t.test('test_scope_has_include_level_radio_buttons', async () => {
+        /**
+         * SCENARIO: Scope section displays include level controls
+         * GIVEN: Story map view is rendered
+         * WHEN: Scope section is displayed
+         * THEN: All 7 include level radio buttons are present (stories, domain_concepts, acceptance, scenarios, examples, tests, code)
+         */
+        const view = new StoryMapView(cli);
+        const html = await view.render();
+        
+        assert.ok(html.includes('name="includeLevel"'), 'Should have includeLevel radio group');
+        assert.ok(html.includes('value="stories"'), 'Should have stories option');
+        assert.ok(html.includes('value="domain_concepts"'), 'Should have domain_concepts option');
+        assert.ok(html.includes('value="acceptance"'), 'Should have acceptance option');
+        assert.ok(html.includes('value="scenarios"'), 'Should have scenarios option');
+        assert.ok(html.includes('value="examples"'), 'Should have examples option');
+        assert.ok(html.includes('value="tests"'), 'Should have tests option');
+        assert.ok(html.includes('value="code"'), 'Should have code option');
+        assert.ok(html.includes('updateIncludeLevel'), 'Should have updateIncludeLevel handler');
+    });
+    
+    await t.test('test_scope_include_level_persists_after_cli_set', async () => {
+        /**
+         * SCENARIO: Include level persists after setting via CLI
+         * GIVEN: User sets include_level to 'code' via scope command
+         * WHEN: Story map view is rendered
+         * THEN: Scope section shows 'code' radio as selected (has checked attribute)
+         */
+        await cli.execute('scope include_level=code');
+        
+        const view = new StoryMapView(cli);
+        const html = await view.render();
+        
+        // When includeLevel is 'code', the template outputs: value="code" checked
+        assert.ok(html.includes('value="code"'), 'Should have code option');
+        assert.ok(html.includes('value="code" checked') || html.includes('value="code"  checked'),
+            'Code option should be checked when include_level is code');
+        
+        // Reset for other tests
+        await cli.execute('scope include_level=examples');
     });
 });
 
