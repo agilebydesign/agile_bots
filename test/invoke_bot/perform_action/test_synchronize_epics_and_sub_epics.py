@@ -336,7 +336,7 @@ class TestReportEpicAndSubEpicChanges(BaseReportDiagramTest):
         report = drawio.generate_update_report(story_map)
 
         # Story renames should be detected regardless of cell ID format
-        story_renames = [r for r in report.renames if r.get('original_name') == 'Validate Card']
+        story_renames = [r for r in report.renames if r.original_name == 'Validate Card']
         assert len(story_renames) >= 1
 
     def test_removed_epics_flagged_as_large_deletions(self, tmp_path):
