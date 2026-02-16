@@ -202,9 +202,7 @@ class RuleFileGenerator:
     ) -> None:
         parts.append("## Build")
         parts.append("")
-        parts.append(
-            "Build the story map using the rules mentioned below and the templates below."
-        )
+        parts.append("Now you're ready to build the solution following the rules and templates below.")
         parts.append("")
         parts.append("### Rules")
         parts.append("")
