@@ -622,8 +622,10 @@ class BotPanel {
             
             if (message.filter && message.filter.trim()) {
               const filterValue = message.filter.trim();
-              const scopeCmd = `scope "${filterValue}"`;
-              this._log('[BotPanel] Executing scope command: ' + scopeCmd);
+              // If in Files mode, prefix filter with "file:"
+              const prefixedFilter = this._currentStoryMapView === 'Files' ? `file:${filterValue}` : filterValue;
+              const scopeCmd = `scope "${prefixedFilter}"`;
+              this._log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
               
               this._botView.execute(scopeCmd)
                 .then((result) => {

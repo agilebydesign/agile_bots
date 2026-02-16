@@ -2512,19 +2512,45 @@ class StoryMapView extends PanelView {
             '            window.switchViewMode = function(viewMode) {\n' +
             '                console.log(\'[switchViewMode] Switching to\', viewMode);\n' +
             '                \n' +
-            '                // Get current view from radio buttons\n' +
-            '                var currentRadio = document.querySelector(\'input[name="view-mode"]:checked\');\n' +
-            '                var previousView = currentRadio ? currentRadio.value : \'Hierarchy\';\n' +
+            '                // Get current view from active button\n' +
+            '                var previousView = \'Hierarchy\';\n' +
+            '                var btnHierarchy = document.getElementById(\'btn-view-hierarchy\');\n' +
+            '                var btnIncrement = document.getElementById(\'btn-view-increment\');\n' +
+            '                var btnFiles = document.getElementById(\'btn-view-files\');\n' +
             '                \n' +
-            '                // Update radio button states\n' +
-            '                var radios = document.querySelectorAll(\'input[name="view-mode"]\');\n' +
-            '                radios.forEach(function(radio) {\n' +
-            '                    if (radio.value === viewMode) {\n' +
-            '                        radio.checked = true;\n' +
-            '                    }\n' +
-            '                });\n' +
+            '                if (btnHierarchy && btnHierarchy.style.fontWeight === \'600\') previousView = \'Hierarchy\';\n' +
+            '                else if (btnIncrement && btnIncrement.style.fontWeight === \'600\') previousView = \'Increment\';\n' +
+            '                else if (btnFiles && btnFiles.style.fontWeight === \'600\') previousView = \'Files\';\n' +
             '                \n' +
-            '                // If switching to Files view, prepare and apply file filter\n' +
+            '                // Update button styles to reflect selected state\n' +
+            '                if (btnHierarchy) {\n' +
+            '                    var isSelected = viewMode === \'Hierarchy\';\n' +
+            '                    btnHierarchy.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
+            '                    btnHierarchy.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
+            '                    btnHierarchy.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                }\n' +
+            '                if (btnIncrement) {\n' +
+            '                    var isSelected = viewMode === \'Increment\';\n' +
+            '                    btnIncrement.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
+            '                    btnIncrement.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
+            '                    btnIncrement.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                }\n' +
+            '                if (btnFiles) {\n' +
+            '                    var isSelected = viewMode === \'Files\';\n' +
+            '                    btnFiles.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
+            '                    btnFiles.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
+            '                    btnFiles.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                }\n' +
+            '                \n' +
+            '                // Send message to extension to switch view FIRST (sets _currentStoryMapView)\n' +
+            '                if (typeof vscode !== \'undefined\') {\n' +
+            '                    vscode.postMessage({\n' +
+            '                        command: \'switchViewMode\',\n' +
+            '                        viewMode: viewMode\n' +
+            '                    });\n' +
+            '                }\n' +
+            '                \n' +
+            '                // If switching to Files view, prepare and apply file filter AFTER view mode is set\n' +
             '                if (viewMode === \'Files\') {\n' +
             '                    var filterInput = document.getElementById(\'scopeFilterInput\');\n' +
             '                    if (filterInput) {\n' +
@@ -2542,23 +2568,16 @@ class StoryMapView extends PanelView {
             '                            }\n' +
             '                        }\n' +
             '                        \n' +
-            '                        // Trigger the filter update to switch to file view\n' +
+            '                        // Trigger the filter update to switch to file view (after view mode is set)\n' +
             '                        console.log(\'[switchViewMode] Applying file filter:\', filterValue);\n' +
-            '                        updateFilter(filterValue);\n' +
+            '                        // Use setTimeout to ensure switchViewMode message is processed first\n' +
+            '                        setTimeout(function() { updateFilter(filterValue); }, 50);\n' +
             '                    }\n' +
             '                } else if (previousView === \'Files\' && (viewMode === \'Hierarchy\' || viewMode === \'Increment\')) {\n' +
             '                    // Switching away from Files view - clear the file filter\n' +
             '                    console.log(\'[switchViewMode] Switching from Files to\', viewMode, \'- clearing file filter\');\n' +
             '                    clearScopeFilter();\n' +
             '                    return; // clearScopeFilter will trigger the view switch\n' +
-            '                }\n' +
-            '                \n' +
-            '                // Send message to extension to switch view\n' +
-            '                if (typeof vscode !== \'undefined\') {\n' +
-            '                    vscode.postMessage({\n' +
-            '                        command: \'switchViewMode\',\n' +
-            '                        viewMode: viewMode\n' +
-            '                    });\n' +
             '                }\n' +
             '            };\n' +
             '        })();\n';
@@ -2583,73 +2602,73 @@ class StoryMapView extends PanelView {
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
                     <div style="
                         display: flex;
-                        gap: 6px;
+                        gap: 4px;
                         margin-left: 12px;
-                        border: 1px solid var(--text-color-faded, #999);
-                        border-radius: 4px;
-                        padding: 2px;
                         background: transparent;
                     ">
-                        <label style="
-                            display: flex;
-                            align-items: center;
-                            padding: 2px 8px;
-                            cursor: pointer;
-                            font-size: 12px;
-                            color: var(--text-color, #fff);
-                            border-radius: 2px;
-                            background: ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                            transition: background 0.15s ease;
-                        " 
-                        onclick="event.stopPropagation();"
-                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
-                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
-                            <input type="radio" name="view-mode" value="Hierarchy" 
-                                ${actualViewMode === 'Hierarchy' ? 'checked' : ''}
-                                onchange="switchViewMode('Hierarchy')" 
-                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
+                        <button 
+                            id="btn-view-hierarchy"
+                            onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
+                            style="
+                                display: flex;
+                                align-items: center;
+                                padding: 6px 12px;
+                                cursor: pointer;
+                                font-size: 12px;
+                                color: var(--text-color, #fff);
+                                border: 1px solid ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
+                                border-radius: 3px;
+                                background: ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                                transition: all 0.15s ease;
+                                font-weight: ${actualViewMode === 'Hierarchy' ? '600' : 'normal'};
+                            " 
+                            onmouseover="if('${actualViewMode}' !== 'Hierarchy') this.style.background='rgba(255,255,255,0.1)'" 
+                            onmouseout="if('${actualViewMode}' !== 'Hierarchy') this.style.background='transparent'"
+                            title="View story map hierarchy">
                             Hierarchy
-                        </label>
-                        <label style="
-                            display: flex;
-                            align-items: center;
-                            padding: 2px 8px;
-                            cursor: pointer;
-                            font-size: 12px;
-                            color: var(--text-color, #fff);
-                            border-radius: 2px;
-                            background: ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                            transition: background 0.15s ease;
-                        " 
-                        onclick="event.stopPropagation();"
-                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
-                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
-                            <input type="radio" name="view-mode" value="Increment" 
-                                ${actualViewMode === 'Increment' ? 'checked' : ''}
-                                onchange="switchViewMode('Increment')" 
-                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
-                            Increment
-                        </label>
-                        <label style="
-                            display: flex;
-                            align-items: center;
-                            padding: 2px 8px;
-                            cursor: pointer;
-                            font-size: 12px;
-                            color: var(--text-color, #fff);
-                            border-radius: 2px;
-                            background: ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                            transition: background 0.15s ease;
-                        " 
-                        onclick="event.stopPropagation();"
-                        onmouseover="if(this.querySelector('input').checked === false) this.style.background='rgba(255,255,255,0.1)'" 
-                        onmouseout="if(this.querySelector('input').checked === false) this.style.background='transparent'">
-                            <input type="radio" name="view-mode" value="Files" 
-                                ${actualViewMode === 'Files' ? 'checked' : ''}
-                                onchange="switchViewMode('Files')" 
-                                style="margin: 0; margin-right: 4px; cursor: pointer;" />
+                        </button>
+                        <button 
+                            id="btn-view-increment"
+                            onclick="event.stopPropagation(); switchViewMode('Increment');" 
+                            style="
+                                display: flex;
+                                align-items: center;
+                                padding: 6px 12px;
+                                cursor: pointer;
+                                font-size: 12px;
+                                color: var(--text-color, #fff);
+                                border: 1px solid ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
+                                border-radius: 3px;
+                                background: ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                                transition: all 0.15s ease;
+                                font-weight: ${actualViewMode === 'Increment' ? '600' : 'normal'};
+                            " 
+                            onmouseover="if('${actualViewMode}' !== 'Increment') this.style.background='rgba(255,255,255,0.1)'" 
+                            onmouseout="if('${actualViewMode}' !== 'Increment') this.style.background='transparent'"
+                            title="View by increments">
+                            Increments
+                        </button>
+                        <button 
+                            id="btn-view-files"
+                            onclick="event.stopPropagation(); switchViewMode('Files');" 
+                            style="
+                                display: flex;
+                                align-items: center;
+                                padding: 6px 12px;
+                                cursor: pointer;
+                                font-size: 12px;
+                                color: var(--text-color, #fff);
+                                border: 1px solid ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
+                                border-radius: 3px;
+                                background: ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
+                                transition: all 0.15s ease;
+                                font-weight: ${actualViewMode === 'Files' ? '600' : 'normal'};
+                            " 
+                            onmouseover="if('${actualViewMode}' !== 'Files') this.style.background='rgba(255,255,255,0.1)'" 
+                            onmouseout="if('${actualViewMode}' !== 'Files') this.style.background='transparent'"
+                            title="View file list">
                             Files
-                        </label>
+                        </button>
                     </div>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
