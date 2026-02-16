@@ -143,11 +143,12 @@ The purpose of this action is to load behavior-specific rules...
 ### Level Hierarchy (Cumulative)
 
 1. **stories** - Structure only (epic/sub-epic/story names)
-2. **acceptance** - + Acceptance criteria text
-3. **scenarios** - + Scenario names and steps
-4. **examples** - + Example data tables (CURRENT DEFAULT)
-5. **tests** - + Test method code (depth=3, test infrastructure only)
-6. **code** - + Full implementation trace (depth=3, includes domain code)
+2. **domain_concepts** - + Domain concepts (CRC cards with responsibilities/collaborators)
+3. **acceptance** - + Acceptance criteria text
+4. **scenarios** - + Scenario names and steps
+5. **examples** - + Example data tables (CURRENT DEFAULT)
+6. **tests** - + Test method code (depth=3, test infrastructure only)
+7. **code** - + Full implementation trace (depth=3, includes domain code)
 
 ### Trace Depth Strategy
 
@@ -189,30 +190,36 @@ Test Method
    - AND: Reloading scope restores include_level='code'
 
 2. **Scope with include_level='stories' filters to structure**
-   - GIVEN: Story graph with acceptance criteria, scenarios, examples
+   - GIVEN: Story graph with domain concepts, acceptance criteria, scenarios, examples
    - WHEN: include_level='stories' and instructions retrieved
    - THEN: Scope content contains only epic/sub-epic/story names
+   - AND: No domain concepts, acceptance criteria, scenarios, examples, tests, or code
+
+3. **Scope with include_level='domain_concepts' includes CRC cards**
+   - GIVEN: Story graph with domain concepts at epic and sub-epic levels
+   - WHEN: include_level='domain_concepts'
+   - THEN: Scope includes structure + domain concepts with responsibilities/collaborators
    - AND: No acceptance criteria, scenarios, examples, tests, or code
 
-3. **Scope with include_level='acceptance' includes criteria**
+4. **Scope with include_level='acceptance' includes criteria**
    - GIVEN: Story graph with acceptance criteria
    - WHEN: include_level='acceptance'
-   - THEN: Scope includes structure + acceptance criteria
+   - THEN: Scope includes structure + domain concepts + acceptance criteria
    - AND: No scenarios, examples, tests, or code
 
-4. **Scope with include_level='scenarios' includes steps**
+5. **Scope with include_level='scenarios' includes steps**
    - GIVEN: Story graph with scenarios
    - WHEN: include_level='scenarios'
-   - THEN: Scope includes structure + criteria + scenario steps
+   - THEN: Scope includes structure + domain concepts + criteria + scenario steps
    - AND: No examples, tests, or code
 
-5. **Scope with include_level='examples' includes data (default)**
+6. **Scope with include_level='examples' includes data (default)**
    - GIVEN: Story graph with example tables
    - WHEN: include_level='examples' (default)
-   - THEN: Scope includes structure + criteria + scenarios + examples
+   - THEN: Scope includes structure + domain concepts + criteria + scenarios + examples
    - AND: No tests or code (current behavior maintained)
 
-6. **Scope with include_level='tests' includes test code**
+7. **Scope with include_level='tests' includes test code**
    - GIVEN: Story with test_file, test_class, test_method
    - AND: Test file exists with actual test code
    - WHEN: include_level='tests'
@@ -220,7 +227,7 @@ Test Method
    - AND: Trace depth limited to 3 levels
    - AND: Only traces test infrastructure (test/ directory)
 
-7. **Scope with include_level='code' includes full trace**
+8. **Scope with include_level='code' includes full trace**
    - GIVEN: Story with test that calls domain code
    - AND: Domain code exists in src/ directory
    - WHEN: include_level='code'
@@ -275,18 +282,22 @@ class TestSubmitScopeInstructions:
     def test_scope_with_include_level_stories_only(self, tmp_path):
         """
         SCENARIO: Scope with include_level='stories' filters to structure
-        GIVEN: Story graph with acceptance criteria, scenarios, examples
+        GIVEN: Story graph with domain concepts, acceptance criteria, scenarios, examples
         WHEN: include_level='stories' and instructions retrieved
         THEN: Scope content contains only epic/sub-epic/story names
-        AND: No acceptance criteria, scenarios, examples, tests, or code
+        AND: No domain concepts, acceptance criteria, scenarios, examples, tests, or code
         """
         helper = BotTestHelper(tmp_path)
         
-        # Create full story graph
+        # Create full story graph with domain concepts
         story_graph = helper.story.given_story_graph_dict(
             epic='TestEpic',
             sub_epic='TestSubEpic',
             story='TestStory',
+            domain_concepts=[{
+                'name': 'TestDomainConcept',
+                'responsibilities': [{'name': 'Does something', 'collaborators': ['OtherClass']}]
+            }],
             acceptance_criteria=['Criteria 1', 'Criteria 2'],
             scenarios=[{
                 'name': 'Happy path',
@@ -319,9 +330,68 @@ class TestSubmitScopeInstructions:
         assert 'TestStory' in '\n'.join(content)
         
         # Verify filtered out
+        assert 'TestDomainConcept' not in '\n'.join(content)
         assert 'Criteria 1' not in '\n'.join(content)
         assert 'Happy path' not in '\n'.join(content)
         assert 'Given... When... Then...' not in '\n'.join(content)
+    
+    def test_scope_with_include_level_domain_concepts(self, tmp_path):
+        """
+        SCENARIO: Scope with include_level='domain_concepts' includes CRC cards
+        GIVEN: Story graph with domain concepts at epic and sub-epic levels
+        WHEN: include_level='domain_concepts'
+        THEN: Scope includes structure + domain concepts with responsibilities/collaborators
+        AND: No acceptance criteria, scenarios, examples, tests, or code
+        """
+        helper = BotTestHelper(tmp_path)
+        
+        # Create story graph with domain concepts
+        story_graph = helper.story.given_story_graph_dict(
+            epic='TestEpic',
+            sub_epic='TestSubEpic',
+            story='TestStory',
+            domain_concepts=[{
+                'name': 'TestDomainConcept',
+                'responsibilities': [
+                    {
+                        'name': 'Processes test data',
+                        'collaborators': ['DataStore', 'Validator']
+                    }
+                ],
+                'module': 'test_module',
+                'inherits_from': 'BaseClass'
+            }],
+            acceptance_criteria=['Criteria 1'],
+            scenarios=[{'name': 'Happy path', 'steps': 'Given...'}]
+        )
+        helper.files.given_file_created(
+            helper.workspace / 'docs' / 'story',
+            'story-graph.json',
+            story_graph
+        )
+        
+        # Set scope with include_level='domain_concepts'
+        scope = Scope(workspace_directory=helper.workspace, bot_paths=helper.bot.bot_paths)
+        scope.filter(type=ScopeType.STORY, value=['TestStory'])
+        scope.include_level = 'domain_concepts'
+        scope.apply_to_bot()
+        
+        # Get instructions
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('build')
+        context = ScopeActionContext(scope=scope)
+        instructions = action.get_instructions(context)
+        
+        # Verify domain concepts included
+        content = '\n'.join(instructions.display_content)
+        assert 'TestDomainConcept' in content
+        assert 'Processes test data' in content
+        assert 'DataStore' in content
+        assert 'Validator' in content
+        
+        # Verify acceptance/scenarios filtered out
+        assert 'Criteria 1' not in content
+        assert 'Happy path' not in content
     
     def test_scope_with_include_level_tests(self, tmp_path):
         """
@@ -614,17 +684,40 @@ def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples')
     result = {
         'name': epic.name,
         'behavior_needed': epic.behavior_needed,
-        'domain_concepts': [],  # ... existing logic ...
         'sub_epics': [
             self._serialize_sub_epic(child, name_to_data_map, include_level) 
             for child in epic.children
         ]
     }
+    
+    # Include domain_concepts if level >= 'domain_concepts'
+    if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
+        # ... existing domain_concepts serialization logic ...
+        result['domain_concepts'] = self._serialize_domain_concepts(epic, name_to_data_map)
+    else:
+        result['domain_concepts'] = []
+    
     return result
 
 def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples') -> dict:
     """Serialize SubEpic with include_level filtering"""
-    # ... existing code ...
+    result = {
+        'name': sub_epic.name,
+        'behavior_needed': sub_epic.behavior_needed,
+        'test_file': sub_epic.test_file if hasattr(sub_epic, 'test_file') else None,
+        'sub_epics': [],
+        'story_groups': []
+    }
+    
+    # Include domain_concepts if level >= 'domain_concepts'
+    if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
+        # ... existing domain_concepts serialization logic ...
+        if name_to_data_map and sub_epic.name in name_to_data_map:
+            sub_epic_data = name_to_data_map[sub_epic.name]
+            if 'domain_concepts' in sub_epic_data:
+                result['domain_concepts'] = sub_epic_data['domain_concepts']
+    
+    # ... rest of existing code ...
     
     for child in sub_epic.children:
         if isinstance(child, Story):
@@ -799,7 +892,7 @@ class TraceGenerator:
 
 ---
 
-## Panel Changes (Future)
+## Panel Changes (✅ Completed)
 
 **File:** `src/panel/bot_panel.js`
 
@@ -868,7 +961,7 @@ document.querySelectorAll('input[name="includeLevel"]').forEach(radio => {
 14. ✅ Write tests for trace generation (tests and code levels)
 15. ✅ Run existing tests to ensure no regression
 
-### Phase 4: Panel Integration (Future)
+### Phase 4: Panel Integration
 16. ⏸️ Add radio button controls to panel
 17. ⏸️ Add CLI command `scope include_level=<level>`
 18. ⏸️ Update panel to persist include_level selection
@@ -879,6 +972,8 @@ document.querySelectorAll('input[name="includeLevel"]').forEach(radio => {
 21. ✅ Update documentation
 
 ---
+
+phase 6 Validation --> run validate on tests, fix all violations, run validate on code ; same
 
 ## Expected Output Example
 
@@ -894,8 +989,24 @@ Scope:
 {
   "epics": [{
     "name": "Build Agile Bots",
+    "domain_concepts": [
+      {
+        "name": "BotToolsGenerator",
+        "responsibilities": [
+          {"name": "Generates bot tools from story graph", "collaborators": ["StoryGraph", "TemplateLoader"]}
+        ]
+      }
+    ],
     "sub_epics": [{
       "name": "Generate MCP Tools",
+      "domain_concepts": [
+        {
+          "name": "MCPToolBuilder",
+          "responsibilities": [
+            {"name": "Builds MCP tool definitions", "collaborators": ["BotToolsGenerator"]}
+          ]
+        }
+      ],
       "stories": [{
         "name": "Generate Bot Tools",
         "acceptance_criteria": [
