@@ -307,12 +307,17 @@ class UpdateReport:
                     if name in moved_names:
                         continue  # already handled by Case 1
                     if name in new_by_name:
+                        # Story was under removed sub-epic but appears in new diagram
                         new_entry = new_by_name[name]
                         self._moved_stories.append(StoryMove(
                             name=name,
                             from_parent=from_parent,
                             to_parent=new_entry.parent))
                         moved_names.add(name)
+                    elif name not in removed_by_name:
+                        # Story was under removed sub-epic and is NOT in new diagram
+                        # Add it to removed_stories if not already there
+                        self._removed_stories.append(StoryEntry(name=name, parent=from_parent))
 
         # --- Case 3: stories in increment lanes (not removed from hierarchy) ---
         # If a story appears in increment assignments but is reported as removed
@@ -355,6 +360,13 @@ class UpdateReport:
                 elif hasattr(se, 'children'):
                     from story_graph.nodes import Story
                     all_stories = [c for c in se.children if isinstance(c, Story)]
+                
+                # Also collect stories from story_groups
+                if hasattr(se, 'story_groups') and se.story_groups:
+                    for group in se.story_groups:
+                        if hasattr(group, 'stories') and group.stories:
+                            all_stories.extend(group.stories)
+                
                 for story in all_stories:
                     result[story.name] = se.name
             else:
