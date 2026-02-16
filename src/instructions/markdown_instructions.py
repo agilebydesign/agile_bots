@@ -52,7 +52,7 @@ class MarkdownInstructions(MarkdownAdapter):
                 try:
                     # Use JSONScope (not JSONStoryGraph) so include_level filtering is applied
                     adapter = AdapterFactory.create(scope, 'json')
-                    scope_dict = adapter.to_dict()
+                    scope_dict = adapter.to_dict(apply_include_level=True)  # Instructions injection needs level filtering
                     # Emit full story graph envelope for compatibility (path, has_epics, content)
                     if scope_dict.get('content'):
                         from story_graph.story_graph import StoryGraph

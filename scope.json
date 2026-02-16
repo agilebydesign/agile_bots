@@ -2,5 +2,6 @@
   "type": "showAll",
   "value": [],
   "exclude": [],
-  "skiprule": []
+  "skiprule": [],
+  "include_level": "stories"
 }

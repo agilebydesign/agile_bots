@@ -290,8 +290,8 @@ class PanelView {
             
             console.log(`[PanelView] Executing command: "${command}"`);
             
-            // Increase timeout for scope/status commands (they enrich scenarios with test links)
-            const timeoutMs = (command.includes('scope') || command.includes('status')) ? 60000 : 30000;
+            // Increase timeout for scope/status commands (they enrich scenarios with test links; large story graphs can take 60+ seconds)
+            const timeoutMs = (command.includes('scope') || command.includes('status')) ? 120000 : 30000;
             console.log(`[PanelView] Using timeout: ${timeoutMs}ms for command: "${command}"`);
             
             return new Promise((resolve, reject) => {

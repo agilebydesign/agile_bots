@@ -35,7 +35,15 @@ class JSONScope(JSONAdapter):
     def file_filter(self):
         return self.scope.file_filter
     
-    def to_dict(self) -> dict:
+    def to_dict(self, apply_include_level: bool = False) -> dict:
+        """
+        Serialize scope to dict.
+        
+        Args:
+            apply_include_level: When True, filter content by scope.include_level (for instructions
+                injection and clipboard copy). When False, include full content without level checks
+                (faster - use this when level filtering is not needed).
+        """
         result = {
             'type': self.scope.type.value,
             'filter': ', '.join(self.scope.value) if self.scope.value else '',
@@ -79,8 +87,8 @@ class JSONScope(JSONAdapter):
                     # Generate and enrich content (cache miss or invalid)
                     from story_graph.json_story_graph import JSONStoryGraph
                     graph_adapter = JSONStoryGraph(story_graph)
-                    # Pass include_level to filter content depth
-                    include_level = self.scope.include_level
+                    # Only apply include_level filtering when needed (instructions, clipboard)
+                    include_level = self.scope.include_level if apply_include_level else None
                     content = graph_adapter.to_dict(include_level=include_level).get('content', [])
                     
                     if content and 'epics' in content:

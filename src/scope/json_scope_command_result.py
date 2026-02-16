@@ -1,4 +1,4 @@
-﻿
+
 import json
 from cli.adapters import JSONAdapter
 from scope.scope_command_result import ScopeCommandResult
@@ -12,7 +12,7 @@ class JSONScopeCommandResult(JSONAdapter):
         from scope.json_scope import JSONScope
         
         scope_adapter = JSONScope(self.scope_result.scope)
-        scope_dict = scope_adapter.to_dict()
+        scope_dict = scope_adapter.to_dict(apply_include_level=True)  # Scope command display needs level filtering
         
         return {
             'status': self.scope_result.status,

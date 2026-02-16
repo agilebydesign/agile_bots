@@ -7,8 +7,20 @@ from story_graph.story_graph import StoryGraph
 
 class JSONStoryGraph(JSONAdapter):
     
+    # Level sets for include_level filtering (None = include all, skip checks)
+    _LEVEL_DOMAIN = frozenset(['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code'])
+    _LEVEL_ACCEPTANCE = frozenset(['acceptance', 'scenarios', 'examples', 'tests', 'code'])
+    _LEVEL_SCENARIOS = frozenset(['scenarios', 'examples', 'tests', 'code'])
+    _LEVEL_EXAMPLES = frozenset(['examples', 'tests', 'code'])
+    _LEVEL_TESTS = frozenset(['tests', 'code'])
+    
     def __init__(self, story_graph: StoryGraph):
         self.story_graph = story_graph
+    
+    @staticmethod
+    def _level_includes(level_set: frozenset, include_level: Optional[str]) -> bool:
+        """Return True when include_level is None (include all) or when include_level is in level_set."""
+        return include_level is None or include_level in level_set
     
     @property
     def path(self):
@@ -34,13 +46,14 @@ class JSONStoryGraph(JSONAdapter):
     def content(self):
         return self.story_graph.content
     
-    def to_dict(self, include_level: str = 'examples') -> dict:
+    def to_dict(self, include_level: Optional[str] = 'examples') -> dict:
         """
         Serialize story graph with optional filtering by include_level.
         
         Args:
             include_level: One of 'stories', 'domain_concepts', 'acceptance', 
-                          'scenarios', 'examples', 'tests', 'code'
+                          'scenarios', 'examples', 'tests', 'code'. Pass None to
+                          include full content without level checks (faster).
         """
         # Load domain objects and serialize them directly
         from story_graph.nodes import StoryMap
@@ -101,8 +114,8 @@ class JSONStoryGraph(JSONAdapter):
         }
         
         # Include domain_concepts if level >= 'domain_concepts'
-        if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
-            # Serialize domain_concepts properly (they are DomainConcept objects)
+        if self._level_includes(self._LEVEL_DOMAIN, include_level):
+            # Serialize domain_concepts (Epic has DomainConcept objects)
             domain_concepts_serialized = []
             if hasattr(epic, 'domain_concepts') and epic.domain_concepts:
                 from story_graph.domain import DomainConcept
@@ -146,7 +159,7 @@ class JSONStoryGraph(JSONAdapter):
         }
         
         # Include domain_concepts if level >= 'domain_concepts'
-        if include_level in ['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']:
+        if self._level_includes(self._LEVEL_DOMAIN, include_level):
             # Serialize domain_concepts if they exist in original data (SubEpic doesn't have domain_concepts as dataclass field)
             domain_concepts_serialized = []
             if name_to_data_map and sub_epic.name in name_to_data_map:
@@ -195,13 +208,13 @@ class JSONStoryGraph(JSONAdapter):
         }
         
         # Include acceptance criteria if level >= 'acceptance'
-        if include_level in ['acceptance', 'scenarios', 'examples', 'tests', 'code']:
+        if self._level_includes(self._LEVEL_ACCEPTANCE, include_level):
             result['acceptance_criteria'] = [self._serialize_ac(ac) for ac in story.acceptance_criteria]
         else:
             result['acceptance_criteria'] = []
         
         # Include scenarios if level >= 'scenarios'
-        if include_level in ['scenarios', 'examples', 'tests', 'code']:
+        if self._level_includes(self._LEVEL_SCENARIOS, include_level):
             result['scenarios'] = [self._serialize_scenario(sc, include_level, story) for sc in story.scenarios]
         else:
             result['scenarios'] = []
@@ -227,7 +240,7 @@ class JSONStoryGraph(JSONAdapter):
         }
         
         # Serialize background steps (if level >= 'scenarios')
-        if include_level in ['scenarios', 'examples', 'tests', 'code']:
+        if self._level_includes(self._LEVEL_SCENARIOS, include_level):
             background_steps = []
             if hasattr(scenario, 'background'):
                 for step in scenario.background:
@@ -251,19 +264,19 @@ class JSONStoryGraph(JSONAdapter):
             result['steps'] = []
         
         # Include examples if level >= 'examples'
-        if include_level in ['examples', 'tests', 'code']:
+        if self._level_includes(self._LEVEL_EXAMPLES, include_level):
             result['examples'] = scenario.examples if hasattr(scenario, 'examples') else None
         else:
             result['examples'] = None
         
         # Include test code if level >= 'tests'
-        if include_level in ['tests', 'code'] and story:
+        if self._level_includes(self._LEVEL_TESTS, include_level) and story:
             test_code_data = self._generate_test_code(scenario, story)
             if test_code_data:
                 result['test'] = test_code_data
         
         # Include full trace if level == 'code'
-        if include_level == 'code' and story:
+        if (include_level is None or include_level == 'code') and story:
             trace_data = self._generate_trace(scenario, story)
             if trace_data:
                 result['trace'] = trace_data
