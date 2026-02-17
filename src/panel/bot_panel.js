@@ -619,6 +619,10 @@ class BotPanel {
             this._handleOpenRelatedFiles(message);
             return;
           case "clearScopeFilter":
+            if (message.viewMode) {
+              this._currentStoryMapView = message.viewMode;
+              this._log(`[BotPanel] clearScopeFilter: setting view to ${message.viewMode} before clearing`);
+            }
             this._botView?.execute('scope all')
               .then(() => this._update())
               .catch((error) => {
@@ -1228,6 +1232,12 @@ class BotPanel {
           case "toggleSection":
             if (message.sectionId) {
               // Expansion state is handled client-side via JavaScript
+            }
+            return;
+          case "sectionExpansion":
+            if (message.sectionId && typeof message.expanded === 'boolean') {
+              this._expansionState[message.sectionId] = message.expanded;
+              this._log(`[BotPanel] sectionExpansion: ${message.sectionId} = ${message.expanded}`);
             }
             return;
           case "toggleCollapse":
@@ -2020,6 +2030,11 @@ class BotPanel {
    * This significantly improves performance for navigation clicks.
    */
   async _updateWithCachedData() {
+    return vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: 'Reloading panel...',
+      cancellable: false
+    }, async () => {
     const perfUpdateStart = performance.now();
     try {
       this._log('[BotPanel] _updateWithCachedData() START - using cached data, skipping refresh');
@@ -2037,6 +2052,12 @@ class BotPanel {
       
       // Skip refresh - data already cached from navigation command
       this._log('[BotPanel] Skipping refresh() - using cached botData from navigation');
+      
+      // Pass view state to story map (preserve expansion across updates)
+      if (this._botView.storyMapView) {
+        this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
+        this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
+      }
       
       // Render HTML using cached data
       const perfRenderStart = performance.now();
@@ -2063,6 +2084,7 @@ class BotPanel {
       // Fall back to full update on error
       return this._update();
     }
+    });
   }
 
   /**
@@ -2082,6 +2104,11 @@ class BotPanel {
 
 
   async _update() {
+    return vscode.window.withProgress({
+      location: vscode.ProgressLocation.Notification,
+      title: 'Reloading panel...',
+      cancellable: false
+    }, async () => {
     // ===== PERFORMANCE: Start overall timing =====
     const perfUpdateStart = performance.now();
     try {
@@ -2114,6 +2141,7 @@ class BotPanel {
       // Pass current story map view state to the view
       if (this._botView.storyMapView) {
         this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
+        this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
       }
       
       // CRITICAL: Refresh data BEFORE rendering to show latest changes
@@ -2223,6 +2251,7 @@ class BotPanel {
         </div>
       `);
     }
+    });
   }
 
 
@@ -3447,6 +3476,10 @@ class BotPanel {
                         console.log('[toggleSection] Icon transform:', window.getComputedStyle(icon).transform);
                     }
                 }
+                // Persist scope-content expansion so it survives scope/filter updates
+                if (sectionId === 'scope-content' && typeof vscode !== 'undefined') {
+                    vscode.postMessage({ command: 'sectionExpansion', sectionId: sectionId, expanded: !isExpanded });
+                }
             }
         };
         
@@ -3708,9 +3741,10 @@ class BotPanel {
             });
         };
         
-        window.clearScopeFilter = function() {
+        window.clearScopeFilter = function(viewMode) {
             vscode.postMessage({
-                command: 'clearScopeFilter'
+                command: 'clearScopeFilter',
+                viewMode: viewMode || null
             });
         };
         

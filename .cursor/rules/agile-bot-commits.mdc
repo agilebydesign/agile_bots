@@ -13383,11 +13383,12 @@ Since `scope.json` is frequently reset during workflows, maintain a persistent s
 3. **Reading scope for commits** (priority order):
    - First check `last_commit_scope.json` (most reliable)
    - Fall back to `scope.json` if last_commit_scope doesn't exist or is empty
-   - **If both empty, infer scope** from changed files and content:
+   - **If both empty, infer scope from conversation context first**: Use your brain—the scope is visible in the chat history. Try to infer epic, sub-epic, story, acceptance criteria, scenario, increment, or other domain unit from what was discussed. What did the user ask you to do? What files, features, or artifacts were mentioned? Infer from the conversation; it's not rocket science.
+   - **Then infer from changed files** if conversation doesn't yield it:
      - Check `git diff` and `git status` for changed file paths
      - Look for story/epic/sub-epic names in file paths (e.g., `docs/story/prioritization/`)
      - Check changed documents: `story-graph.json`, `*.drawio`, `*.md` files
-     - Examine test file names (e.g., `test_synchronized_graph_with_rendered_diagram_content.py` → "Synchronized Graph")
+     - Examine test file names (e.g., `test_render_drawio_diagrams.py` → "Synchronized Graph")
      - Look for story references in git diff content
      - Extract epic/sub-epic/story from document structure
      - Use most specific scope found (story > sub-epic > epic > document type > generic)
@@ -13512,7 +13513,10 @@ When user says `/commit` **and there are no other pending instructions**:
 
 ### Scope Inference Examples
 
-When both scope files are empty, infer from changed files:
+When both scope files are empty, infer from conversation first, then changed files:
+
+**Example 0 (conversation)**: User asked to "remove code body from trace" and "add file enrichment for panel"—conversation was about trace, panel, copy, scope enrichment. Inferred scope: "Enrich Scope With Links" (sub-epic) or "Invoke Bot" (epic). Try epic, sub-epic, story, scenario, increment, etc. from what was discussed.
+- Commit: `code.build: Remove trace code bodies and add panel file enrichment for Enrich Scope With Links`
 
 **Example 1**: Changed files include `docs/story/prioritization/story-map-increments.drawio`
 - Inferred scope: "story map increments" or "prioritization"
@@ -13537,10 +13541,11 @@ When both scope files are empty, infer from changed files:
 ## Handling Edge Cases
 
 - **No scope defined (both files empty)**: 
-  - **INFER from changed files** using these strategies:
+  - **INFER from conversation first**: Try to infer epic, sub-epic, story, acceptance criteria, scenario, increment, or other domain unit from the chat history. What did the user ask you to do? What was discussed? Use the conversation context—it's not rocket science.
+  - **Then INFER from changed files** using these strategies:
     - File path contains story name: `test/invoke_bot/...` → "Invoke Bot"
     - Changed document: `story-map-increments.drawio` → "story map increments"
-    - Test file: `test_synchronized_graph_with_rendered_diagram_content.py` → "Synchronized Graph"
+    - Test file: `test_render_drawio_diagrams.py` → "Synchronized Graph"
     - Modified story-graph.json: Parse diff for epic/story names being changed
     - Directory structure: `docs/story/prioritization/` → "prioritization artifacts"
   - **Example inferences**:
@@ -13569,7 +13574,7 @@ When both scope files are empty, infer from changed files:
 
 **When scope is inferred**:
 - Save inferred scope to `last_commit_scope.json`
-- Confirm inference: "Inferred scope as [name] from changed files"
+- Confirm inference: "Inferred scope as [name] from conversation" or "from changed files"
 - User can override if incorrect
 
 ## Automatic Commits After Each Change

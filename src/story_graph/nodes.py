@@ -11,6 +11,21 @@ _LEVEL_TESTS = frozenset(['tests', 'code'])
 def _level_includes(level_set, include_level: Optional[str]) -> bool:
     return include_level is None or include_level in level_set
 
+
+def _domain_concepts_to_dict_list(domain_concepts: Optional[List[Any]]) -> List[Dict[str, Any]]:
+    """Safely serialize domain_concepts to list of dicts. Handles both DomainConcept objects and raw dicts."""
+    if not domain_concepts:
+        return []
+    result = []
+    for dc in domain_concepts:
+        if hasattr(dc, 'to_dict') and callable(getattr(dc, 'to_dict')):
+            result.append(dc.to_dict())
+        elif isinstance(dc, dict):
+            result.append(dc)
+        # Skip non-serializable items to avoid losing other domain_concepts
+    return result
+
+
 from dataclasses import dataclass, field
 from pathlib import Path
 import json
@@ -161,7 +176,15 @@ class StoryNode(ABC):
         if isinstance(steps_value, str):
             return [s.strip() for s in steps_value.split('\n') if s.strip()]
         elif isinstance(steps_value, list):
-            return steps_value
+            result = []
+            for item in steps_value:
+                if isinstance(item, str):
+                    result.append(item.strip() if item.strip() else item)
+                elif isinstance(item, dict) and 'text' in item:
+                    result.append(str(item['text']).strip())
+                else:
+                    result.append(str(item))
+            return result
         else:
             return []
 
@@ -2579,7 +2602,7 @@ class StoryMap:
             'name': epic.name,
             'sequential_order': epic.sequential_order,
             'behavior': epic.behavior,
-            'domain_concepts': [dc.to_dict() for dc in epic.domain_concepts] if _level_includes(_LEVEL_DOMAIN, include_level) and epic.domain_concepts else [],
+            'domain_concepts': _domain_concepts_to_dict_list(epic.domain_concepts) if _level_includes(_LEVEL_DOMAIN, include_level) else [],
             'sub_epics': [self._sub_epic_to_dict(child, include_level, generate_trace) for child in epic._children if isinstance(child, SubEpic)],
             'story_groups': [self._story_group_to_dict(child, include_level, generate_trace) for child in epic._children if isinstance(child, StoryGroup)]
         }
@@ -2590,7 +2613,7 @@ class StoryMap:
             'name': sub_epic.name,
             'sequential_order': sub_epic.sequential_order,
             'behavior': sub_epic.behavior,
-            'domain_concepts': [dc.to_dict() for dc in sub_epic.domain_concepts] if _level_includes(_LEVEL_DOMAIN, include_level) and sub_epic.domain_concepts else [],
+            'domain_concepts': _domain_concepts_to_dict_list(sub_epic.domain_concepts) if _level_includes(_LEVEL_DOMAIN, include_level) else [],
         }
         if sub_epic.test_file is not None:
             result['test_file'] = sub_epic.test_file
@@ -2636,7 +2659,15 @@ class StoryMap:
         return result
     
     def _scenario_to_dict(self, scenario: Scenario, story: Optional['Story'] = None, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
-        steps_text = '\n'.join(step.text for step in scenario.steps) if scenario.steps else ''
+        def _step_text(step) -> str:
+            t = getattr(step, 'text', '')
+            if isinstance(t, str):
+                return t
+            if isinstance(t, dict):
+                return str(t.get('text', ''))
+            return str(t) if t is not None else ''
+
+        steps_text = '\n'.join(_step_text(step) for step in scenario.steps) if scenario.steps else ''
         result = {
             'name': scenario.name,
             'sequential_order': scenario.sequential_order,

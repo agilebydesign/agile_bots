@@ -289,20 +289,23 @@ class StoryMapView extends PanelView {
         let contentHtml = '';
         let contentSummary = '';
         
-        // Determine the actual view mode based on scope type and currentViewMode
-        // If scope type is 'files', we're in Files view regardless of currentViewMode
-        const isFilesView = scopeData.type === 'files';
-        const isIncrementView = !isFilesView && this.currentViewMode === 'Increment';
-        const actualViewMode = isFilesView ? 'Files' : (isIncrementView ? 'Increment' : 'Hierarchy');
-        log(`[StoryMapView] Rendering view mode: ${actualViewMode} (currentViewMode: ${this.currentViewMode}, scopeType: ${scopeData.type})`);
+        // Determine the actual view mode from the toggle (currentViewMode), not scope type
+        const actualViewMode = this.currentViewMode || 'Hierarchy';
+        const isFilesView = actualViewMode === 'Files';
+        const isIncrementView = actualViewMode === 'Increment';
+        log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
         
         if (isIncrementView) {
             // Render increment columns view (read-only)
             contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
-        } else if ((scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
-            // Hierarchy view - content is an object with 'epics' property, not directly an array
+        } else if (isFilesView && scopeData.type === 'files' && scopeData.content) {
+            // Files view - only when toggle is Files AND scope has file data
+            contentHtml = this.renderFileList(scopeData.content);
+            contentSummary = `${scopeData.content.length} file${scopeData.content.length !== 1 ? 's' : ''}`;
+        } else if (!isFilesView && (scopeData.type === 'story' || scopeData.type === 'showAll') && scopeData.content) {
+            // Hierarchy view - content is an object with 'epics' property
             const epics = scopeData.content.epics || [];
             
             const perfRootNodeStart = performance.now();
@@ -317,9 +320,6 @@ class StoryMapView extends PanelView {
             
             contentHtml = rootNode + treeHtml;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
-        } else if (scopeData.type === 'files' && scopeData.content) {
-            contentHtml = this.renderFileList(scopeData.content);
-            contentSummary = `${scopeData.content.length} file${scopeData.content.length !== 1 ? 's' : ''}`;
         } else {
             contentHtml = '<div class="empty-state">All files in workspace</div>';
             contentSummary = 'all files';
@@ -1295,6 +1295,9 @@ class StoryMapView extends PanelView {
             '            window.handleMoveNode = function(message) {\n' +
             '                console.log(\'[handleMoveNode] Called with:\', JSON.stringify(message));\n' +
             '                console.log(\'[handleMoveNode] storyMapSaveQueue exists:\', typeof window.storyMapSaveQueue !== \'undefined\');\n' +
+            '                if (typeof vscode !== \'undefined\' && vscode.postMessage) {\n' +
+            '                    vscode.postMessage({ command: \'logToFile\', message: \'[handleMoveNode] source:\' + (message.sourceNodePath||\'\') + \' target:\' + (message.targetParentPath||\'\') + \' pos:\' + (message.position||0) + \' saveQueue:\' + (typeof window.storyMapSaveQueue !== \'undefined\') });\n' +
+            '                }\n' +
             '                \n' +
             '                // ES5-compatible: use var instead of const\n' +
             '                var sourceNodePath = message.sourceNodePath;\n' +
@@ -1389,6 +1392,9 @@ class StoryMapView extends PanelView {
             '                \n' +
             '                // 3. Build command\n' +
             '                var command = buildMoveCommand(sourceNodePath, targetParentPath, position);\n' +
+            '                if (typeof vscode !== \'undefined\' && vscode.postMessage) {\n' +
+            '                    vscode.postMessage({ command: \'logToFile\', message: \'[handleMoveNode] command:\' + command });\n' +
+            '                }\n' +
             '                \n' +
             '                // 4. Queue backend save (async) (ES5-compatible: use function instead of arrow)\n' +
             '                if (window.storyMapSaveQueue) {\n' +
@@ -2522,28 +2528,22 @@ class StoryMapView extends PanelView {
             '                var btnIncrement = document.getElementById(\'btn-view-increment\');\n' +
             '                var btnFiles = document.getElementById(\'btn-view-files\');\n' +
             '                \n' +
-            '                if (btnHierarchy && btnHierarchy.style.fontWeight === \'600\') previousView = \'Hierarchy\';\n' +
-            '                else if (btnIncrement && btnIncrement.style.fontWeight === \'600\') previousView = \'Increment\';\n' +
-            '                else if (btnFiles && btnFiles.style.fontWeight === \'600\') previousView = \'Files\';\n' +
+            '                if (btnHierarchy && btnHierarchy.style.color && !btnHierarchy.style.color.includes(\'faded\')) previousView = \'Hierarchy\';\n' +
+            '                else if (btnIncrement && btnIncrement.style.color && !btnIncrement.style.color.includes(\'faded\')) previousView = \'Increment\';\n' +
+            '                else if (btnFiles && btnFiles.style.color && !btnFiles.style.color.includes(\'faded\')) previousView = \'Files\';\n' +
             '                \n' +
             '                // Update button styles to reflect selected state\n' +
             '                if (btnHierarchy) {\n' +
             '                    var isSelected = viewMode === \'Hierarchy\';\n' +
-            '                    btnHierarchy.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
-            '                    btnHierarchy.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
-            '                    btnHierarchy.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                    btnHierarchy.style.color = isSelected ? \'var(--text-color, #fff)\' : \'var(--text-color-faded)\';\n' +
             '                }\n' +
             '                if (btnIncrement) {\n' +
             '                    var isSelected = viewMode === \'Increment\';\n' +
-            '                    btnIncrement.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
-            '                    btnIncrement.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
-            '                    btnIncrement.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                    btnIncrement.style.color = isSelected ? \'var(--text-color, #fff)\' : \'var(--text-color-faded)\';\n' +
             '                }\n' +
             '                if (btnFiles) {\n' +
             '                    var isSelected = viewMode === \'Files\';\n' +
-            '                    btnFiles.style.background = isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.2))\' : \'transparent\';\n' +
-            '                    btnFiles.style.border = \'1px solid \' + (isSelected ? \'var(--text-color-faded, rgba(255,255,255,0.5))\' : \'rgba(255,255,255,0.2)\');\n' +
-            '                    btnFiles.style.fontWeight = isSelected ? \'600\' : \'normal\';\n' +
+            '                    btnFiles.style.color = isSelected ? \'var(--text-color, #fff)\' : \'var(--text-color-faded)\';\n' +
             '                }\n' +
             '                \n' +
             '                // Send message to extension to switch view FIRST (sets _currentStoryMapView)\n' +
@@ -2578,17 +2578,32 @@ class StoryMapView extends PanelView {
             '                        setTimeout(function() { updateFilter(filterValue); }, 50);\n' +
             '                    }\n' +
             '                } else if (previousView === \'Files\' && (viewMode === \'Hierarchy\' || viewMode === \'Increment\')) {\n' +
-            '                    // Switching away from Files view - clear the file filter\n' +
+            '                    // Switching away from Files view - clear file filter and set view in one update\n' +
             '                    console.log(\'[switchViewMode] Switching from Files to\', viewMode, \'- clearing file filter\');\n' +
-            '                    clearScopeFilter();\n' +
-            '                    return; // clearScopeFilter will trigger the view switch\n' +
+            '                    clearScopeFilter(viewMode);\n' +
+            '                    return;\n' +
             '                }\n' +
+            '            };\n' +
+            '            \n' +
+            '            // Switch include level (Stories, Domain, criteria, Scenarios, Examples, Tests, Code)\n' +
+            '            window.switchIncludeLevel = function(level) {\n' +
+            '                var levels = [\'stories\', \'domain_concepts\', \'acceptance\', \'scenarios\', \'examples\', \'tests\', \'code\'];\n' +
+            '                var ids = { stories: \'btn-include-stories\', domain_concepts: \'btn-include-domain\', acceptance: \'btn-include-acceptance\', scenarios: \'btn-include-scenarios\', examples: \'btn-include-examples\', tests: \'btn-include-tests\', code: \'btn-include-code\' };\n' +
+            '                for (var i = 0; i < levels.length; i++) {\n' +
+            '                    var btn = document.getElementById(ids[levels[i]]);\n' +
+            '                    if (btn) {\n' +
+            '                        var isSelected = level === levels[i];\n' +
+            '                        btn.style.color = isSelected ? \'var(--text-color, #fff)\' : \'var(--text-color-faded)\';\n' +
+            '                    }\n' +
+            '                }\n' +
+            '                if (typeof updateIncludeLevel === \'function\') updateIncludeLevel(level);\n' +
             '            };\n' +
             '        })();\n';
         
+        const scopeSectionExpanded = this.scopeSectionExpanded !== false;
         const result = `
     <div class="section scope-section card-primary">
-        <div class="collapsible-section expanded">
+        <div class="collapsible-section ${scopeSectionExpanded ? 'expanded' : ''}">
             <div class="collapsible-header" onclick="toggleSection('scope-content')" style="
                 cursor: pointer;
                 padding: 4px 5px;
@@ -2604,76 +2619,6 @@ class StoryMapView extends PanelView {
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
                     ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
-                    <div style="
-                        display: flex;
-                        gap: 4px;
-                        margin-left: 12px;
-                        background: transparent;
-                    ">
-                        <button 
-                            id="btn-view-hierarchy"
-                            onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
-                            style="
-                                display: flex;
-                                align-items: center;
-                                padding: 6px 12px;
-                                cursor: pointer;
-                                font-size: 12px;
-                                color: var(--text-color, #fff);
-                                border: 1px solid ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
-                                border-radius: 3px;
-                                background: ${actualViewMode === 'Hierarchy' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                                transition: all 0.15s ease;
-                                font-weight: ${actualViewMode === 'Hierarchy' ? '600' : 'normal'};
-                            " 
-                            onmouseover="if('${actualViewMode}' !== 'Hierarchy') this.style.background='rgba(255,255,255,0.1)'" 
-                            onmouseout="if('${actualViewMode}' !== 'Hierarchy') this.style.background='transparent'"
-                            title="View story map hierarchy">
-                            Hierarchy
-                        </button>
-                        <button 
-                            id="btn-view-increment"
-                            onclick="event.stopPropagation(); switchViewMode('Increment');" 
-                            style="
-                                display: flex;
-                                align-items: center;
-                                padding: 6px 12px;
-                                cursor: pointer;
-                                font-size: 12px;
-                                color: var(--text-color, #fff);
-                                border: 1px solid ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
-                                border-radius: 3px;
-                                background: ${actualViewMode === 'Increment' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                                transition: all 0.15s ease;
-                                font-weight: ${actualViewMode === 'Increment' ? '600' : 'normal'};
-                            " 
-                            onmouseover="if('${actualViewMode}' !== 'Increment') this.style.background='rgba(255,255,255,0.1)'" 
-                            onmouseout="if('${actualViewMode}' !== 'Increment') this.style.background='transparent'"
-                            title="View by increments">
-                            Increments
-                        </button>
-                        <button 
-                            id="btn-view-files"
-                            onclick="event.stopPropagation(); switchViewMode('Files');" 
-                            style="
-                                display: flex;
-                                align-items: center;
-                                padding: 6px 12px;
-                                cursor: pointer;
-                                font-size: 12px;
-                                color: var(--text-color, #fff);
-                                border: 1px solid ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.5))' : 'rgba(255,255,255,0.2)'};
-                                border-radius: 3px;
-                                background: ${actualViewMode === 'Files' ? 'var(--text-color-faded, rgba(255,255,255,0.2))' : 'transparent'};
-                                transition: all 0.15s ease;
-                                font-weight: ${actualViewMode === 'Files' ? '600' : 'normal'};
-                            " 
-                            onmouseover="if('${actualViewMode}' !== 'Files') this.style.background='rgba(255,255,255,0.1)'" 
-                            onmouseout="if('${actualViewMode}' !== 'Files') this.style.background='transparent'"
-                            title="View file list">
-                            Files
-                        </button>
-                    </div>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;
@@ -2725,47 +2670,90 @@ class StoryMapView extends PanelView {
                     ${permanentLinksHtml}
                 </div>
             </div>
-            <div id="scope-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
-                <div class="card-secondary" style="padding: 5px;">
-                    <div class="input-container" style="margin-bottom: 6px;">
-                        <div class="input-header">Filter</div>
-                        <input type="text" id="scopeFilterInput" 
+            <div id="scope-content" class="collapsible-content" style="max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};">
+                <div class="card-secondary" style="padding: 2px 4px;">
+                    <div class="input-container" style="margin-bottom: 10px; padding: 6px 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 28px;">
+                            <div class="input-header" style="margin-bottom: 0; padding: 2px 6px 2px 0; border-bottom: none;">Filter</div>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <button 
+                                    id="btn-view-hierarchy"
+                                    onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        padding: 2px 6px;
+                                        line-height: 1.2;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        color: ${actualViewMode === 'Hierarchy' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
+                                        border: none;
+                                        background: transparent;
+                                        transition: all 0.15s ease;
+                                    " 
+                                    onmouseover="if('${actualViewMode}' !== 'Hierarchy') this.style.color='var(--text-color)'" 
+                                    onmouseout="if('${actualViewMode}' !== 'Hierarchy') this.style.color='var(--text-color-faded)'"
+                                    title="View story map hierarchy">
+                                    hierarchy
+                                </button>
+                                <button 
+                                    id="btn-view-increment"
+                                    onclick="event.stopPropagation(); switchViewMode('Increment');" 
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        padding: 2px 6px;
+                                        line-height: 1.2;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        color: ${actualViewMode === 'Increment' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
+                                        border: none;
+                                        background: transparent;
+                                        transition: all 0.15s ease;
+                                    " 
+                                    onmouseover="if('${actualViewMode}' !== 'Increment') this.style.color='var(--text-color)'" 
+                                    onmouseout="if('${actualViewMode}' !== 'Increment') this.style.color='var(--text-color-faded)'"
+                                    title="View by increments">
+                                    increments
+                                </button>
+                                <button 
+                                    id="btn-view-files"
+                                    onclick="event.stopPropagation(); switchViewMode('Files');" 
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        padding: 2px 6px;
+                                        line-height: 1.2;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        color: ${actualViewMode === 'Files' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
+                                        border: none;
+                                        background: transparent;
+                                        transition: all 0.15s ease;
+                                    " 
+                                    onmouseover="if('${actualViewMode}' !== 'Files') this.style.color='var(--text-color)'" 
+                                    onmouseout="if('${actualViewMode}' !== 'Files') this.style.color='var(--text-color-faded)'"
+                                    title="View file list">
+                                    files
+                                </button>
+                            </div>
+                        </div>
+                        <div style="border-top: 1px solid var(--accent-color); padding-top: 6px;">
+                        <input type="text" id="scopeFilterInput" style="padding: 4px 8px;"
                                value="${filterValue}" 
                                placeholder="Epic or Story name"
                                onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
-                    </div>
-                    <div class="input-container" style="margin-bottom: 8px;">
-                        <div class="input-header">Include up to</div>
-                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px;">
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="stories" ${scopeData.includeLevel === 'stories' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Stories</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="domain_concepts" ${scopeData.includeLevel === 'domain_concepts' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Domain</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="acceptance" ${scopeData.includeLevel === 'acceptance' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>criteria</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="scenarios" ${scopeData.includeLevel === 'scenarios' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Scenarios</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="examples" ${!scopeData.includeLevel || scopeData.includeLevel === 'examples' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Examples</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="tests" ${scopeData.includeLevel === 'tests' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Tests</span>
-                            </label>
-                            <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
-                                <input type="radio" name="includeLevel" value="code" ${scopeData.includeLevel === 'code' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Code</span>
-                            </label>
+                        </div>
+                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
+                        <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
+                        <button id="btn-include-stories" onclick="event.stopPropagation(); switchIncludeLevel('stories');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'stories') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'stories') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'stories') this.style.color='var(--text-color-faded)'" title="Include up to stories">stories</button>
+                        <button id="btn-include-domain" onclick="event.stopPropagation(); switchIncludeLevel('domain_concepts');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'domain_concepts') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'domain_concepts') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'domain_concepts') this.style.color='var(--text-color-faded)'" title="Include up to domain concepts">domain</button>
+                        <button id="btn-include-acceptance" onclick="event.stopPropagation(); switchIncludeLevel('acceptance');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'acceptance') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'acceptance') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'acceptance') this.style.color='var(--text-color-faded)'" title="Include up to acceptance criteria">criteria</button>
+                        <button id="btn-include-scenarios" onclick="event.stopPropagation(); switchIncludeLevel('scenarios');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'scenarios') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'scenarios') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'scenarios') this.style.color='var(--text-color-faded)'" title="Include up to scenarios">scenarios</button>
+                        <button id="btn-include-examples" onclick="event.stopPropagation(); switchIncludeLevel('examples');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(!scopeData.includeLevel || scopeData.includeLevel === 'examples') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'examples') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'examples') this.style.color='var(--text-color-faded)'" title="Include up to examples">examples</button>
+                        <button id="btn-include-tests" onclick="event.stopPropagation(); switchIncludeLevel('tests');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'tests') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'tests') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'tests') this.style.color='var(--text-color-faded)'" title="Include up to tests">tests</button>
+                        <button id="btn-include-code" onclick="event.stopPropagation(); switchIncludeLevel('code');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'code') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'code') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'code') this.style.color='var(--text-color-faded)'" title="Include up to code">code</button>
                         </div>
                     </div>
                     ${contentHtml}

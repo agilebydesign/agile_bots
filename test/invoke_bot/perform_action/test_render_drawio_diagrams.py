@@ -1,7 +1,7 @@
 """
-Test Synchronized Graph with Rendered Diagram Content
+Test Render DrawIO Diagrams
 
-SubEpic: Synchronized Graph with Rendered Diagram Content
+SubEpic: Render DrawIO Diagrams
 Parent Epic: Invoke Bot > Perform Action
 
 Domain tests verify DrawIO rendering, extraction, and synchronization.
@@ -11,7 +11,7 @@ import json
 import pytest
 from pathlib import Path
 from helpers.bot_test_helper import BotTestHelper
-from helpers.cli_bot_test_helpiler import CLIBotTestHelper
+from helpers.cli_bot_test_helper import CLIBotTestHelper
 from synchronizers.story_io.drawio_story_map import DrawIOStoryMap
 from synchronizers.story_io.drawio_story_node import DrawIOSubEpic
 from synchronizers.story_io.layout_data import LayoutData

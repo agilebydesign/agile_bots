@@ -88,7 +88,7 @@
       "Old synchronizers code (StoryIODiagram, DrawIORenderer, DrawIOSynchronizer) used ONLY for algorithm reference - architecture is replaced",
       "Tests use tmp_path workspace for all file operations - no writes to production bot workspace or production story graph",
       "Helper pattern: drawio_story_map_helper.py extends BaseHelper(parent), accessed via helper.drawio_story_map",
-      "Test structure: test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py with classes per story",
+      "Test structure: test/invoke_bot/perform_action/test_render_drawio_diagrams.py with classes per story",
       "Test methods named after scenarios: test_render_outline_diagram_from_story_map_with_default_layout",
       "Node panel tests in test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.js test DOM rendering with jsdom (same location and naming as .py file)",
       "All test code uses ASCII-only characters (no Unicode in code, docstrings OK)",

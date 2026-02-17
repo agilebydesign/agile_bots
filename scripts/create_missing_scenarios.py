@@ -3,7 +3,7 @@ Map test methods to scenarios: each test_method = one scenario.
 Extract all test methods from mapped classes and create scenarios in the new stories.
 Replaces any existing scenarios with the complete set from the test file.
 
-Source: test_synchronized_graph_with_rendered_diagram_content.py
+Source: test_render_drawio_diagrams.py
 Target: "Synchronize Diagram by Domain" sub-epic stories
 """
 import json
@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 STORY_GRAPH_PATH = Path(__file__).parent.parent / 'docs' / 'story' / 'story-graph.json'
-TEST_FILE = Path(__file__).parent.parent / 'test' / 'invoke_bot' / 'perform_action' / 'test_synchronized_graph_with_rendered_diagram_content.py'
+TEST_FILE = Path(__file__).parent.parent / 'test' / 'invoke_bot' / 'perform_action' / 'test_render_drawio_diagrams.py'
 NEW_SUB_EPIC = 'Synchronize Diagram by Domain'
 
 

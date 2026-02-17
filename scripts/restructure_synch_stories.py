@@ -16,7 +16,7 @@ NEW_SUB_EPIC = {
     "sequential_order": 6.0,
     "behavior": None,
     "domain_concepts": [],
-    "test_file": "invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.py",
+    "test_file": "invoke_bot/perform_action/test_render_drawio_diagrams.py",
     "sub_epics": [],
     "story_groups": [
         {

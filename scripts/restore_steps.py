@@ -29,7 +29,7 @@ for e in g['epics']:
 print(f'Found {len(old_steps)} scenarios with steps in old sub-epic')
 
 # Also check test file for docstrings as fallback for unmapped test classes
-TEST_FILE = Path(__file__).parent.parent / 'test' / 'invoke_bot' / 'perform_action' / 'test_synchronized_graph_with_rendered_diagram_content.py'
+TEST_FILE = Path(__file__).parent.parent / 'test' / 'invoke_bot' / 'perform_action' / 'test_render_drawio_diagrams.py'
 import re
 content = TEST_FILE.read_text(encoding='utf-8')
 
