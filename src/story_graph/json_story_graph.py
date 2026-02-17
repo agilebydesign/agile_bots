@@ -46,7 +46,7 @@ class JSONStoryGraph(JSONAdapter):
     def content(self):
         return self.story_graph.content
     
-    def to_dict(self, include_level: Optional[str] = 'examples') -> dict:
+    def to_dict(self, include_level: Optional[str] = 'examples', generate_trace: bool = False) -> dict:
         """
         Serialize story graph with optional filtering by include_level.
         
@@ -54,6 +54,8 @@ class JSONStoryGraph(JSONAdapter):
             include_level: One of 'stories', 'domain_concepts', 'acceptance', 
                           'scenarios', 'examples', 'tests', 'code'. Pass None to
                           include full content without level checks (faster).
+            generate_trace: When True and include_level is 'tests' or 'code', add trace
+                          to scenarios. Expensive - only set for instructions, not panel.
         """
         # Load domain objects and serialize them directly
         from story_graph.nodes import StoryMap
@@ -75,7 +77,7 @@ class JSONStoryGraph(JSONAdapter):
         
         # Serialize domain objects to JSON with include_level filtering
         content = {
-            'epics': [self._serialize_epic(epic, epic_name_to_data, include_level) for epic in story_map._epics]
+            'epics': [self._serialize_epic(epic, epic_name_to_data, include_level, generate_trace) for epic in story_map._epics]
         }
         
         # Add increments and other top-level fields from original content
@@ -105,12 +107,12 @@ class JSONStoryGraph(JSONAdapter):
             'content': content
         }
     
-    def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples') -> dict:
+    def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples', generate_trace=False) -> dict:
         """Serialize Epic object to dict by reading its properties with include_level filtering."""
         result = {
             'name': epic.name,
             'behavior_needed': epic.behavior_needed,
-            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map, include_level) for child in epic.children]
+            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace) for child in epic.children]
         }
         
         # Include domain_concepts if level >= 'domain_concepts'
@@ -142,7 +144,7 @@ class JSONStoryGraph(JSONAdapter):
         
         return result
     
-    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples') -> dict:
+    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples', generate_trace=False) -> dict:
         """Serialize SubEpic object to dict by reading its properties with include_level filtering."""
         from story_graph.nodes import SubEpic, Story, StoryGroup
         
@@ -176,26 +178,26 @@ class JSONStoryGraph(JSONAdapter):
         current_story_group = None
         for child in sub_epic.children:
             if isinstance(child, SubEpic):
-                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map, include_level))
+                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace))
             elif isinstance(child, StoryGroup):
-                result['story_groups'].append(self._serialize_story_group(child, include_level))
+                result['story_groups'].append(self._serialize_story_group(child, include_level, generate_trace))
             elif isinstance(child, Story):
                 # Direct story child - add to unnamed story group
                 if current_story_group is None:
                     current_story_group = {'name': None, 'stories': []}
                     result['story_groups'].append(current_story_group)
-                current_story_group['stories'].append(self._serialize_story(child, include_level))
+                current_story_group['stories'].append(self._serialize_story(child, include_level, generate_trace))
         
         return result
     
-    def _serialize_story_group(self, story_group, include_level='examples') -> dict:
+    def _serialize_story_group(self, story_group, include_level='examples', generate_trace=False) -> dict:
         """Serialize StoryGroup object to dict with include_level filtering."""
         return {
             'name': story_group.name if hasattr(story_group, 'name') else None,
-            'stories': [self._serialize_story(story, include_level) for story in story_group.children]
+            'stories': [self._serialize_story(story, include_level, generate_trace) for story in story_group.children]
         }
     
-    def _serialize_story(self, story, include_level='examples') -> dict:
+    def _serialize_story(self, story, include_level='examples', generate_trace=False) -> dict:
         """Serialize Story object to dict by reading its properties with include_level filtering."""
         result = {
             'name': story.name,
@@ -211,7 +213,7 @@ class JSONStoryGraph(JSONAdapter):
         
         # Include scenarios only if level >= 'scenarios'
         if self._level_includes(self._LEVEL_SCENARIOS, include_level):
-            result['scenarios'] = [self._serialize_scenario(sc, include_level, story) for sc in story.scenarios]
+            result['scenarios'] = [self._serialize_scenario(sc, include_level, story, generate_trace) for sc in story.scenarios]
         
         return result
     
@@ -223,7 +225,7 @@ class JSONStoryGraph(JSONAdapter):
             'sequential_order': ac.sequential_order
         }
     
-    def _serialize_scenario(self, scenario, include_level='examples', story=None) -> dict:
+    def _serialize_scenario(self, scenario, include_level='examples', story=None, generate_trace=False) -> dict:
         """Serialize Scenario object to dict by reading its properties with include_level filtering."""
         result = {
             'name': scenario.name,
@@ -264,11 +266,10 @@ class JSONStoryGraph(JSONAdapter):
             if test_code_data:
                 result['test'] = test_code_data
         
-        # Include full trace if level == 'code'
-        if (include_level is None or include_level == 'code') and story:
+        # Include trace only when generate_trace=True (instructions path) and level is tests/code
+        if generate_trace and include_level in ('tests', 'code') and story:
             trace_data = self._generate_trace(scenario, story)
-            if trace_data:
-                result['trace'] = trace_data
+            result['trace'] = trace_data if trace_data else []
         
         return result
     

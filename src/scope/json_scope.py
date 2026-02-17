@@ -89,14 +89,15 @@ class JSONScope(JSONAdapter):
                     # Generate and enrich content (cache miss or invalid)
                     from story_graph.json_story_graph import JSONStoryGraph
                     graph_adapter = JSONStoryGraph(story_graph)
-                    # Only apply include_level filtering when needed (instructions, clipboard)
-                    include_level = self.scope.include_level if apply_include_level else None
-                    content = graph_adapter.to_dict(include_level=include_level).get('content', [])
+                    # Panel/scope view: use examples (fast, no trace). Instructions: use scope.include_level
+                    include_level = self.scope.include_level if apply_include_level else 'examples'
+                    # Trace is expensive - only for instructions when level is tests/code
+                    generate_trace = strip_links_for_instructions and include_level in ('tests', 'code')
+                    content = graph_adapter.to_dict(include_level=include_level, generate_trace=generate_trace).get('content', [])
                     
                     if content and 'epics' in content:
-                        # Skip expensive scenario AST parsing for scenarios/examples levels - only for tests/code or fast path
-                        level = self.scope.include_level if apply_include_level else None
-                        enrich_scenarios = level is None or level in ('tests', 'code')
+                        # Skip expensive scenario enrichment for panel (examples level)
+                        enrich_scenarios = include_level in ('tests', 'code')
                         self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
                         if strip_links_for_instructions:
                             self._strip_links(content['epics'])

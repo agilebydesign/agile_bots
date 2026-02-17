@@ -76,7 +76,7 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
             self.bot._scope.load()
             from cli.adapter_factory import AdapterFactory
             scope_adapter = AdapterFactory.create(self.bot._scope, 'json')
-            result['scope'] = scope_adapter.to_dict(apply_include_level=True)  # Panel display needs level filtering
+            result['scope'] = scope_adapter.to_dict(apply_include_level=False)  # Panel/status: fast, no trace
         
         return result
     

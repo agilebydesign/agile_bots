@@ -1487,6 +1487,77 @@ class TestEnrichScopeWithLinks:
         else:
             assert len(test_links) == 0, f"Story should not have test link with sub_epic test_file={sub_epic_test_file}, story test_class={story_test_class}"
     
+    @pytest.mark.parametrize('include_level', ['tests', 'code'])
+    def test_scenario_serialization_includes_trace_when_include_level_tests_or_code(self, tmp_path, include_level):
+        """
+        SCENARIO: JSONStoryGraph serialization includes trace when include_level is 'tests' or 'code'
+        GIVEN: Story with sub_epic test_file, story test_class, scenario test_method
+        AND: Test file exists with method that has imports/calls
+        WHEN: JSONStoryGraph.to_dict(include_level='tests' or 'code') is called
+        THEN: Scenario has 'trace' key with trace sections (or empty list if no calls)
+        """
+        from story_graph.story_graph import StoryGraph
+        from story_graph.json_story_graph import JSONStoryGraph
+        
+        helper = BotTestHelper(tmp_path)
+        
+        # Create test file with method that imports something (so trace can resolve)
+        test_file = helper.story.create_test_file(
+            'invoke_bot/perform_action/test_trace.py',
+            'TestTraceScenario',
+            ['test_action_loads_context']
+        )
+        # Override with content that has an import (create_test_file may use stub)
+        test_file.write_text('''import pytest
+
+class TestTraceScenario:
+    def test_action_loads_context(self):
+        from actions.action_context import ScopeActionContext
+        ctx = ScopeActionContext()
+''', encoding='utf-8')
+        
+        action_ctx = helper.workspace / "src" / "actions" / "action_context.py"
+        action_ctx.parent.mkdir(parents=True, exist_ok=True)
+        action_ctx.write_text("class ScopeActionContext:\n    pass\n")
+        
+        story_graph_data = {
+            "epics": [{
+                "name": "Invoke Bot",
+                "sub_epics": [{
+                    "name": "Perform Action",
+                    "sequential_order": 1.0,
+                    "test_file": "test/invoke_bot/perform_action/test_trace.py",
+                    "sub_epics": [],
+                    "story_groups": [{
+                        "stories": [{
+                            "name": "Trace Scenario",
+                            "sequential_order": 1.0,
+                            "test_class": "TestTraceScenario",
+                            "scenarios": [{
+                                "name": "Action loads context",
+                                "sequential_order": 1.0,
+                                "test_method": "test_action_loads_context"
+                            }]
+                        }]
+                    }]
+                }]
+            }]
+        }
+        helper.story.create_story_graph(story_graph_data)
+        
+        sg = StoryGraph(helper.bot.bot_paths, helper.workspace, require_file=True)
+        adapter = JSONStoryGraph(sg)
+        # generate_trace=True simulates instructions path (trace only for instructions)
+        data = adapter.to_dict(include_level=include_level, generate_trace=True)
+        epics = data.get('content', {}).get('epics', [])
+        
+        story = epics[0]['sub_epics'][0]['story_groups'][0]['stories'][0]
+        scenario = story['scenarios'][0]
+        
+        assert 'trace' in scenario, f"Scenario should have trace when include_level='{include_level}'"
+        # Trace may be empty list if no resolvable calls, or have sections
+        assert isinstance(scenario['trace'], list), "Trace should be a list"
+    
     def test_scenario_with_test_method_gets_test_link(self, tmp_path):
         """
         SCENARIO: Scenario with test_method gets test link
