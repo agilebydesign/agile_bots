@@ -582,7 +582,7 @@ class Bot:
         self.behaviors.save_state()
         
         try:
-            from actions.action_context import ActionContext
+            from actions.action_context import ActionContext, ScopeActionContext
             context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
             
             if params:
@@ -601,6 +601,12 @@ class Bot:
                 # Set remaining parameters
                 for key, value in params.items():
                     setattr(context, key, value)
+            elif hasattr(context, 'scope'):
+                # Use bot's active scope when no scope in params (e.g. after "scope set epic X")
+                self._scope.load()
+                if self._scope.value or self._scope.type.value == 'showAll':
+                    setattr(context, 'scope', self._scope)
+                    include_scope = True  # Include scope in display when we have active scope
             
             instructions = action.get_instructions(context, include_scope=include_scope)
             

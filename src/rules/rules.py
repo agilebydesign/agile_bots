@@ -56,12 +56,12 @@ class ValidationContext:
             callbacks=callbacks or ValidationCallbacks(),
             skiprule=skiprule,
             exclude=exclude,
-            skip_cross_file=context.skip_cross_file,
-            all_files=context.all_files,
+            skip_cross_file=getattr(context, 'skip_cross_file', False),
+            all_files=getattr(context, 'all_files', False),
             behavior=behavior,
             bot_paths=behavior.bot_paths,
             working_dir=behavior.bot_paths.workspace_directory,
-            max_cross_file_comparisons=context.max_cross_file_comparisons
+            max_cross_file_comparisons=getattr(context, 'max_cross_file_comparisons', 20)
         )
     
     @classmethod

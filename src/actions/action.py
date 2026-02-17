@@ -367,6 +367,9 @@ class Action:
         instructions = self.instructions.copy()
         if hasattr(context, 'scope') and context.scope:
             instructions._scope = context.scope.copy() if hasattr(context.scope, 'copy') else context.scope
+            scope_type_val = getattr(getattr(context.scope, 'type', None), 'value', '')
+            if not include_scope and (context.scope.value or scope_type_val == 'showAll'):
+                include_scope = True  # Include scope in display when context has scope
         
         if self.action_config and 'instructions' in self.action_config:
             behavior_instructions = self.action_config.get('instructions', [])

@@ -48,7 +48,7 @@ class ValidationExecutor:
 
     def _log_error(self, e: Exception, context: 'ValidateActionContext', logger) -> None:
         logger.error(f'Error in synchronous validation: {e}')
-        logger.error(f'Error type: {type(e).__name__}, Context: scope={context.scope}, background={context.background}')
+        logger.error(f'Error type: {type(e).__name__}, Context: scope={context.scope}, background={getattr(context, "background", None)}')
         logger.error(f'Full traceback:\n{traceback.format_exc()}')
 
     def _inject_validation_instructions(self, validation_context: ValidationContext, streaming_writer: StreamingValidationReportWriter) -> Dict[str, Any]:

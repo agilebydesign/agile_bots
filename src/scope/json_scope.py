@@ -113,15 +113,14 @@ class JSONScope(JSONAdapter):
                     
                     if content and 'epics' in content:
                         # File enrichment: add doc/test links for panel and instructions
-                        # Panel: enrich_scenarios=False (no AST parsing for scenario line numbers - keeps it fast)
                         # Instructions: enrich_scenarios when level is tests/code
-                        # Trace never runs for panel (generate_trace=False when strip_links_for_instructions=False)
+                        # Filtered scope (story/epic): enrich scenarios - small content, affordable AST parsing
+                        # showAll (no filter): skip scenario enrichment for performance (whole graph)
                         if apply_include_level or strip_links_for_instructions:
                             enrich_scenarios = include_level in ('tests', 'code')
-                            self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
                         else:
-                            # Panel display: add file links without trace or scenario-level AST parsing
-                            self._enrich_with_links(content['epics'], story_graph, enrich_scenarios=False)
+                            enrich_scenarios = bool(has_active_filter)  # Filtered scope: enrich; showAll: skip
+                        self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
                         if strip_links_for_instructions:
                             self._strip_links(content['epics'])
                         

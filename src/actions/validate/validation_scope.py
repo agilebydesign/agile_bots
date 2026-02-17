@@ -30,10 +30,12 @@ class ValidationScope(ActionScope):
         params = {}
         if context.scope:
             params['scope'] = context.scope.to_dict()
-        if context.skip_cross_file:
-            params['skip_cross_file'] = context.skip_cross_file
-        if context.all_files:
-            params['all_files'] = context.all_files
+        skip_cross_file = getattr(context, 'skip_cross_file', False)
+        if skip_cross_file:
+            params['skip_cross_file'] = skip_cross_file
+        all_files = getattr(context, 'all_files', False)
+        if all_files:
+            params['all_files'] = all_files
         
         return cls(params, bot_paths, behavior_name)
     
