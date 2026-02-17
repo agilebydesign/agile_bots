@@ -16,11 +16,11 @@ const branding = require('./branding');
 const fs = require('fs');
 const path = require('path');
 
-// Simple file logger
+// Simple file logger - uses same path as bot_panel (workspace root)
 function log(msg) {
     const timestamp = new Date().toISOString();
     try {
-        const logFile = path.join(process.cwd(), 'panel-debug.log');
+        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
         fs.appendFileSync(logFile, `${timestamp} ${msg}\n`);
     } catch (e) {
         // Ignore
@@ -123,6 +123,7 @@ class StoryMapView extends PanelView {
     async render() {
         // ===== PERFORMANCE: Start story map rendering =====
         const perfRenderStart = performance.now();
+        log('[StoryMapView] [PERF] render() START');
         
         // Use cached botData from parent if available, otherwise fetch it
         const perfStatusStart = performance.now();
@@ -135,6 +136,7 @@ class StoryMapView extends PanelView {
         const scopeData = (botData.bot?.scope || botData.scope) || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
+        const perfIconsStart = performance.now();
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
         const magnifyingGlassIconPath = getIcon('magnifying_glass.png');
@@ -164,6 +166,7 @@ class StoryMapView extends PanelView {
         const submitTestIconPath = getIcon('submit_tests.png');
         const submitCodeIconPath = getIcon('submit_code.png');
         const refreshIconPath = getIcon('refresh.png');
+        log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
         log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
         

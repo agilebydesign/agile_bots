@@ -14,11 +14,11 @@ const InstructionsSection = require('./instructions_view');
 const fs = require('fs');
 const path = require('path');
 
-// Simple file logger
+// Simple file logger - uses same path as bot_panel (workspace root)
 function log(msg) {
     const timestamp = new Date().toISOString();
     try {
-        const logFile = path.join(process.cwd(), 'panel-debug.log');
+        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
         fs.appendFileSync(logFile, `${timestamp} ${msg}\n`);
     } catch (e) {
         // Ignore
@@ -191,10 +191,14 @@ class BotView extends PanelView {
     async refresh() {
         // ===== PERFORMANCE: BotView refresh =====
         const perfRefreshStart = performance.now();
+        log('[BotView] [PERF] refresh() START');
         
         // "status" command returns the Bot object itself
         try {
+            log('[BotView] [PERF] refresh() calling execute("status")...');
+            const tStatusStart = performance.now();
             const botJSON = await this.execute('status');
+            log(`[BotView] [PERF] refresh() execute("status") DONE: ${(performance.now() - tStatusStart).toFixed(0)}ms`);
             // Update cached botData
             this.botData = botJSON;
             // Validate botData has required fields
@@ -210,10 +214,12 @@ class BotView extends PanelView {
             const currentAction = botJSON.behaviors?.current_action || botJSON.current_action;
             
             if (currentBehavior && currentAction) {
-                log(`[BotView] Fetching instructions for behavior=${currentBehavior}, action=${currentAction}`);
+                log(`[BotView] [PERF] refresh() calling execute("${currentBehavior}.${currentAction}")...`);
+                const tInstrStart = performance.now();
                 try {
                     // Use the behavior.action command to get instructions
                     const instructionsResponse = await super.execute(`${currentBehavior}.${currentAction}`);
+                    log(`[BotView] [PERF] refresh() execute("${currentBehavior}.${currentAction}") DONE: ${(performance.now() - tInstrStart).toFixed(0)}ms`);
                     if (instructionsResponse && instructionsResponse.instructions) {
                         this.botData.instructions = instructionsResponse.instructions;
                         // Also cache for InstructionsSection

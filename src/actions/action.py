@@ -355,7 +355,7 @@ class Action:
                 result['instructions'] = instructions
         return inject_reminder_to_instructions(result, reminder)
 
-    def get_instructions(self, context: ActionContext = None) -> Instructions:
+    def get_instructions(self, context: ActionContext = None, include_scope: bool = False) -> Instructions:
         if context is None:
             context = self.context_class()
         
@@ -382,7 +382,7 @@ class Action:
         
         self._add_behavior_action_metadata(instructions)
         
-        self._build_display_content(instructions)
+        self._build_display_content(instructions, include_scope=include_scope)
         
         return instructions
     
@@ -562,13 +562,13 @@ class Action:
         instructions.set('action_metadata', action_data)
         instructions.set('action_instructions', action_data)
     
-    def _build_display_content(self, instructions: Instructions):
+    def _build_display_content(self, instructions: Instructions, include_scope: bool = False):
         from instructions.markdown_instructions import MarkdownInstructions
 
         temp_instructions = instructions.copy()
         temp_instructions._display_content = []
         
-        markdown_adapter = MarkdownInstructions(temp_instructions)
+        markdown_adapter = MarkdownInstructions(temp_instructions, include_scope=include_scope)
         markdown_output = markdown_adapter.serialize()
 
         for line in markdown_output.split('\n'):

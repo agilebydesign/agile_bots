@@ -1,5 +1,6 @@
 
 import json
+from pathlib import Path
 from typing import Optional
 
 from cli.adapters import JSONAdapter
@@ -57,9 +58,12 @@ class JSONStoryGraph(JSONAdapter):
             generate_trace: When True and include_level is 'tests' or 'code', add trace
                           to scenarios. Expensive - only set for instructions, not panel.
         """
+        import time
+        t0 = time.perf_counter()
         # Load domain objects and serialize them directly
         from story_graph.nodes import StoryMap
         story_map = StoryMap(self.story_graph.content, bot=None)
+        t1 = time.perf_counter()
         
         # Create a mapping of epic/sub-epic names to their original JSON data for domain_concepts lookup
         # Recursively collect all nested sub-epics
@@ -79,6 +83,19 @@ class JSONStoryGraph(JSONAdapter):
         content = {
             'epics': [self._serialize_epic(epic, epic_name_to_data, include_level, generate_trace) for epic in story_map._epics]
         }
+        t2 = time.perf_counter()
+        import sys
+        msg = f"[PERF] json_story_graph StoryMap build: {(t1-t0)*1000:.0f}ms | serialize epics: {(t2-t1)*1000:.0f}ms"
+        print(msg, file=sys.stderr, flush=True)
+        try:
+            wp = getattr(self.story_graph, '_workspace_directory', None)
+            if wp:
+                (wp / '.cursor').mkdir(parents=True, exist_ok=True)
+                from datetime import datetime
+                with open(wp / '.cursor' / 'panel-perf.log', 'a', encoding='utf-8') as f:
+                    f.write(f"{datetime.now().isoformat()} {msg}\n")
+        except Exception:
+            pass
         
         # Add increments and other top-level fields from original content
         if 'increments' in self.story_graph.content:
@@ -289,6 +306,13 @@ class JSONStoryGraph(JSONAdapter):
             parent = getattr(parent, '_parent', None)
         return None
     
+    def _resolve_test_file_path(self, test_file: str) -> Path:
+        """Resolve test_file (relative to test dir) to absolute path."""
+        test_dir = self.story_graph._workspace_directory / getattr(
+            self.story_graph._bot_paths, 'test_path', Path('test')
+        )
+        return test_dir / test_file
+    
     def _generate_test_code(self, scenario, story) -> Optional[dict]:
         """Extract test method code for scenario.
         
@@ -309,7 +333,7 @@ class JSONStoryGraph(JSONAdapter):
         if not hasattr(story, 'test_class') or not story.test_class:
             return None
         
-        test_file_path = self.story_graph._workspace_directory / test_file
+        test_file_path = self._resolve_test_file_path(test_file)
         if not test_file_path.exists():
             return None
         
@@ -363,8 +387,8 @@ class JSONStoryGraph(JSONAdapter):
             # Build method index
             generator._build_method_index()
             
-            # Get test code
-            test_file_path = self.story_graph._workspace_directory / test_file
+            # Get test code (test_file is relative to test dir)
+            test_file_path = self._resolve_test_file_path(test_file)
             if not test_file_path.exists():
                 return []
             

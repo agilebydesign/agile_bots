@@ -72,11 +72,28 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
             result['behaviors'] = self._behaviors_adapter.to_dict() if hasattr(self._behaviors_adapter, 'to_dict') else {}
         
         if hasattr(self.bot, '_scope') and self.bot._scope:
+            import time
             # Reload scope from file to ensure we have the latest persisted state
+            t0 = time.perf_counter()
             self.bot._scope.load()
+            t1 = time.perf_counter()
             from cli.adapter_factory import AdapterFactory
             scope_adapter = AdapterFactory.create(self.bot._scope, 'json')
             result['scope'] = scope_adapter.to_dict(apply_include_level=False)  # Panel/status: fast, no trace
+            t2 = time.perf_counter()
+            import sys
+            msg = f"[PERF] json_bot scope.load: {(t1-t0)*1000:.0f}ms | scope.to_dict: {(t2-t1)*1000:.0f}ms"
+            print(msg, file=sys.stderr, flush=True)
+            try:
+                wp = getattr(self.bot, 'bot_paths', None) and self.bot.bot_paths.workspace_directory
+                if wp:
+                    (wp / '.cursor').mkdir(parents=True, exist_ok=True)
+                    log_file = wp / '.cursor' / 'panel-perf.log'
+                    from datetime import datetime
+                    with open(log_file, 'a', encoding='utf-8') as f:
+                        f.write(f"{datetime.now().isoformat()} {msg}\n")
+            except Exception:
+                pass
         
         return result
     

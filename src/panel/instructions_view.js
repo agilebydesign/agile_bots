@@ -10,6 +10,16 @@ const PanelView = require('./panel_view');
 const branding = require('./branding');
 const vscode = require('vscode');
 const path = require('path');
+const fs = require('fs');
+
+function log(msg) {
+    const ts = new Date().toISOString();
+    try {
+        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
+        fs.appendFileSync(logFile, `${ts} ${msg}\n`);
+    } catch (e) {}
+    console.log(msg);
+}
 
 class InstructionsSection extends PanelView {
     /**
@@ -73,9 +83,11 @@ class InstructionsSection extends PanelView {
      * @returns {string} HTML string
      */
     async render() {
+        const perfRenderStart = performance.now();
+        log('[InstructionsSection] [PERF] render() START');
+        
         // Prefer the most recent CLI response (navigation returns unified {bot,instructions})
         const lastResponse = PanelView._lastResponse || {};
-        console.log('[InstructionsSection] render() START');
         console.log('[InstructionsSection] PanelView._lastResponse exists?', !!PanelView._lastResponse);
         console.log('[InstructionsSection] lastResponse keys:', Object.keys(lastResponse).join(', ') || 'EMPTY');
         
@@ -106,8 +118,10 @@ class InstructionsSection extends PanelView {
                     botData?.behaviors?.current_action;
             } else {
                 // Only fetch if we have no cached data at all
-                console.log('[InstructionsSection] No cached data, fetching status');
+                log('[InstructionsSection] [PERF] No cached data, fetching status...');
+                const tFetchStart = performance.now();
                 const fetchedData = await this.execute('status');
+                log(`[InstructionsSection] [PERF] execute('status') for instructions: ${(performance.now() - tFetchStart).toFixed(0)}ms`);
                 instructionsData = fetchedData?.instructions || {};
                 currentActionFromResponse = currentActionFromResponse ||
                     fetchedData?.current_action ||
@@ -123,6 +137,7 @@ class InstructionsSection extends PanelView {
         }
         
         if (!instructionsData || Object.keys(instructionsData).length === 0) {
+            log(`[InstructionsSection] [PERF] render() DONE (empty): ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
             return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">
@@ -529,6 +544,7 @@ class InstructionsSection extends PanelView {
         const promptContentStr = typeof this.promptContent === 'string' ? this.promptContent : (this.promptContent ? String(this.promptContent) : '');
         const escapedPromptContent = promptContentStr.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
         
+        log(`[InstructionsSection] [PERF] render() DONE: ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
         return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">

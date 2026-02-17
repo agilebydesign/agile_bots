@@ -276,12 +276,25 @@ class Scope:
             return None
         
         try:
+            import time
+            t0 = time.perf_counter()
             graph_data = json.loads(story_graph_path.read_text(encoding='utf-8'))
-            
+            t1 = time.perf_counter()
             if self._story_graph_filter:
                 filtered_data = self._story_graph_filter.filter_story_graph(graph_data)
             else:
                 filtered_data = graph_data
+            t2 = time.perf_counter()
+            import sys
+            msg = f"[PERF] scope file read+parse: {(t1-t0)*1000:.0f}ms | filter: {(t2-t1)*1000:.0f}ms"
+            print(msg, file=sys.stderr, flush=True)
+            try:
+                (self.workspace_directory / '.cursor').mkdir(parents=True, exist_ok=True)
+                from datetime import datetime
+                with open(self.workspace_directory / '.cursor' / 'panel-perf.log', 'a', encoding='utf-8') as f:
+                    f.write(f"{datetime.now().isoformat()} {msg}\n")
+            except Exception:
+                pass
             
             from story_graph.story_graph import StoryGraph
             from bot_path.bot_path import BotPath

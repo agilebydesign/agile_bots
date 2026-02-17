@@ -55,7 +55,10 @@ class JSONScope(JSONAdapter):
         }
         
         if self.scope.type.value in ('story', 'showAll'):
+            import time
+            t0 = time.perf_counter()
             story_graph = self.scope._get_story_graph_results()
+            t1 = time.perf_counter()
             if story_graph:
                 # Check if we can use disk-cached enriched content
                 # Only use cache when there's no active filter (showAll or story with no filter values)
@@ -94,11 +97,25 @@ class JSONScope(JSONAdapter):
                     # Trace is expensive - only for instructions when level is tests/code
                     generate_trace = strip_links_for_instructions and include_level in ('tests', 'code')
                     content = graph_adapter.to_dict(include_level=include_level, generate_trace=generate_trace).get('content', [])
+                    t2 = time.perf_counter()
+                    import sys
+                    msg = f"[PERF] json_scope story_graph load: {(t1-t0)*1000:.0f}ms | graph.to_dict: {(t2-t1)*1000:.0f}ms"
+                    print(msg, file=sys.stderr, flush=True)
+                    try:
+                        wp = getattr(self.scope, 'workspace_directory', None)
+                        if wp:
+                            (wp / '.cursor').mkdir(parents=True, exist_ok=True)
+                            from datetime import datetime
+                            with open(wp / '.cursor' / 'panel-perf.log', 'a', encoding='utf-8') as f:
+                                f.write(f"{datetime.now().isoformat()} {msg}\n")
+                    except Exception:
+                        pass
                     
                     if content and 'epics' in content:
-                        # Skip expensive scenario enrichment for panel (examples level)
-                        enrich_scenarios = include_level in ('tests', 'code')
-                        self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
+                        # Skip enrichment entirely for panel (no links, no filesystem scans)
+                        if apply_include_level or strip_links_for_instructions:
+                            enrich_scenarios = include_level in ('tests', 'code')
+                            self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
                         if strip_links_for_instructions:
                             self._strip_links(content['epics'])
                         

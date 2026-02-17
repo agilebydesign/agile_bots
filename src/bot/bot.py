@@ -542,7 +542,7 @@ class Bot:
                 'message': f'Current action {current_action} not found in behavior'
             }
     
-    def execute(self, behavior_name: str, action_name: Optional[str] = None, params: Optional[Dict[str, Any]] = None) -> Any:
+    def execute(self, behavior_name: str, action_name: Optional[str] = None, params: Optional[Dict[str, Any]] = None, include_scope: bool = False) -> Any:
         behavior = self.behaviors.find_by_name(behavior_name)
         if not behavior:
             return {
@@ -602,7 +602,7 @@ class Bot:
                 for key, value in params.items():
                     setattr(context, key, value)
             
-            instructions = action.get_instructions(context)
+            instructions = action.get_instructions(context, include_scope=include_scope)
             
             return instructions
         except Exception as e:
@@ -820,7 +820,8 @@ class Bot:
                     'message': f'Action {current_action_name} not found'
                 }
             
-            instructions = action.get_instructions()
+            # Include scope when submitting to chat (user explicitly requested)
+            instructions = action.get_instructions(include_scope=True)
             
             # Use the submit_instructions method to do the actual submission
             return self.submit_instructions(instructions, current_behavior.name, current_action_name)

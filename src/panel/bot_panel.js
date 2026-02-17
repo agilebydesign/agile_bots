@@ -2143,6 +2143,7 @@ class BotPanel {
       this._log('[BotPanel] _update() completed successfully');
       this._log(`[PERF] TOTAL _update() duration: ${totalDuration}ms`);
       this._log('[BotPanel] _update() END');
+      this._log('[PERF] Python timing: see .cursor/panel-perf.log in workspace');
       
     } catch (err) {
       console.error(`[BotPanel] ERROR in _update: ${err.message}`);

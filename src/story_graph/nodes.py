@@ -118,7 +118,7 @@ class StoryNode(ABC):
             scope_before = json.load(f)
         self._bot.scope(self._scope_command_for_node())
         try:
-            instructions = self._bot.execute(behavior, action_name=action)
+            instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
             # Submit to clipboard/IDE (side effect only)
             self._bot.submit_instructions(instructions, behavior, action)
             return instructions

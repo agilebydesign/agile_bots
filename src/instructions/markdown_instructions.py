@@ -4,15 +4,16 @@ from instructions.instructions import Instructions
 
 class MarkdownInstructions(MarkdownAdapter):
     
-    def __init__(self, instructions: Instructions):
+    def __init__(self, instructions: Instructions, include_scope: bool = False):
         self.instructions = instructions
+        self.include_scope = include_scope
     
     def serialize(self) -> str:
         instructions_dict = self.instructions.to_dict()
         output_lines = []
         
         scope = self.instructions.scope
-        if scope and (scope.value or scope.type.value == 'showAll'):
+        if self.include_scope and scope and (scope.value or scope.type.value == 'showAll'):
             from cli.adapters import MarkdownAdapter
             
             output_lines.append("## Scope")

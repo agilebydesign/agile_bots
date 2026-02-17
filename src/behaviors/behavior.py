@@ -171,7 +171,7 @@ class Behavior:
             
             from actions.action_context import ActionContext
             context = rules_action.context_class() if hasattr(rules_action, 'context_class') else ActionContext()
-            instructions = rules_action.get_instructions(context)
+            instructions = rules_action.get_instructions(context, include_scope=True)
             
             # Submit the instructions using bot's submit_instructions method
             return self.bot.submit_instructions(instructions, self.name, 'rules')

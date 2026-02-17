@@ -10,6 +10,21 @@ const os = require('os');
 const vscode = require("vscode");
 const branding = require('./branding');
 
+// Shared log path - set when PanelView is created with bot path (workspace root)
+let _panelLogPath = null;
+
+function _getPanelLogPath() {
+    return _panelLogPath || path.join(process.cwd(), 'panel-debug.log');
+}
+
+function _perfLog(msg) {
+    const ts = new Date().toISOString();
+    try {
+        fs.appendFileSync(_getPanelLogPath(), `${ts} [PERF] ${msg}\n`);
+    } catch (_) {}
+    console.log(`[PERF] ${msg}`);
+}
+
 /**
  * Check if a path is a temp directory
  */
@@ -82,6 +97,8 @@ class PanelView {
             const path = require('path');
             this._workspaceDir = path.resolve(this._botPath, '..', '..');
             this._pythonProcess = null;
+            // Use workspace root for panel-debug.log (same as bot_panel)
+            _panelLogPath = path.join(this._workspaceDir, 'panel-debug.log');
         }
         this._pendingResolve = null;
         this._pendingReject = null;
@@ -97,6 +114,8 @@ class PanelView {
         if (this._pythonProcess) {
             return;
         }
+        const tSpawnStart = performance.now();
+        _perfLog('_spawnProcess START');
         
         const cliPath = path.join(this._workspaceDir, 'src', 'cli', 'cli_main.py');
         
@@ -143,26 +162,28 @@ class PanelView {
             stdio: ['pipe', 'pipe', 'pipe']
         });
         
-        console.log('[PanelView] Python process spawned');
+        _perfLog(`_spawnProcess DONE: ${(performance.now() - tSpawnStart).toFixed(0)}ms`);
         
         this._pythonProcess.stdout.on('data', (data) => {
             const dataStr = data.toString();
             this._responseBuffer += dataStr;
             
-            // Log first chunk received
+            // Log first chunk received with timing
             if (this._responseBuffer.length === dataStr.length) {
-                console.log('[PanelView] First response chunk received, size:', dataStr.length);
+                const elapsed = this._perfExecuteStart ? (performance.now() - this._perfExecuteStart).toFixed(0) : '?';
+                _perfLog(`First chunk received: ${dataStr.length} bytes, ${elapsed}ms since execute start`);
             }
             
             const markerIndex = this._responseBuffer.indexOf(END_MARKER);
             if (markerIndex !== -1) {
-                console.log('[PanelView] End marker found, response size:', markerIndex);
+                const elapsed = this._perfExecuteStart ? (performance.now() - this._perfExecuteStart).toFixed(0) : '?';
+                _perfLog(`END_MARKER received, response size ${markerIndex}, ${elapsed}ms since execute start`);
                 const jsonOutput = this._responseBuffer.substring(0, markerIndex).trim();
                 this._responseBuffer = this._responseBuffer.substring(markerIndex + END_MARKER.length);
                 
                 if (this._pendingResolve) {
                     try {
-                        console.log('[PanelView] Parsing JSON response...');
+                        const tParseStart = performance.now();
                         const jsonMatch = jsonOutput.match(/\{[\s\S]*\}/);
                         if (!jsonMatch) {
                             console.error('[PanelView] No JSON found in CLI output');
@@ -179,6 +200,7 @@ class PanelView {
                             }
                             
                             const jsonData = JSON.parse(sanitizedJson);
+                            _perfLog(`JSON parse done: ${(performance.now() - tParseStart).toFixed(0)}ms, size ${jsonOutput.length}`);
                             
                             // Check if response indicates an error from CLI
                             if (jsonData.status === 'error' && jsonData.error) {
@@ -288,7 +310,9 @@ class PanelView {
                 this._spawnProcess();
             }
             
-            console.log(`[PanelView] Executing command: "${command}"`);
+            const perfCmdStart = performance.now();
+            this._perfExecuteStart = perfCmdStart;
+            _perfLog(`execute START: "${command}"`);
             
             // Increase timeout for scope/status commands (they enrich scenarios with test links; large story graphs can take 60+ seconds)
             const timeoutMs = (command.includes('scope') || command.includes('status')) ? 120000 : 30000;
@@ -311,16 +335,24 @@ class PanelView {
                 const originalReject = reject;
                 this._pendingResolve = (value) => {
                     clearTimeout(timeoutId);
+                    const perfCmdEnd = performance.now();
+                    _perfLog(`execute DONE: "${command}" in ${(perfCmdEnd - perfCmdStart).toFixed(0)}ms`);
+                    this._perfExecuteStart = null;
                     originalResolve(value);
                 };
                 this._pendingReject = (err) => {
                     clearTimeout(timeoutId);
+                    const perfCmdEnd = performance.now();
+                    _perfLog(`execute FAILED: "${command}" after ${(perfCmdEnd - perfCmdStart).toFixed(0)}ms`);
+                    this._perfExecuteStart = null;
                     originalReject(err);
                 };
                 
                 try {
                     const cmd = command.includes('--format json') ? command : `${command} --format json`;
+                    const tBeforeWrite = performance.now();
                     this._pythonProcess.stdin.write(cmd + '\n');
+                    _perfLog(`stdin.write sent: ${(performance.now() - tBeforeWrite).toFixed(0)}ms, ${(performance.now() - perfCmdStart).toFixed(0)}ms since start`);
                 } catch (err) {
                     clearTimeout(timeoutId);
                     this._pendingResolve = null;
@@ -338,4 +370,5 @@ class PanelView {
     }
 }
 
+PanelView.getPanelLogPath = _getPanelLogPath;
 module.exports = PanelView;
