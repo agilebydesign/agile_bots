@@ -94,8 +94,9 @@ class JSONScope(JSONAdapter):
                     content = graph_adapter.to_dict(include_level=include_level).get('content', [])
                     
                     if content and 'epics' in content:
-                        # Always enrich scenarios with test links
-                        enrich_scenarios = True
+                        # Skip expensive scenario AST parsing for scenarios/examples levels - only for tests/code or fast path
+                        level = self.scope.include_level if apply_include_level else None
+                        enrich_scenarios = level is None or level in ('tests', 'code')
                         self._enrich_with_links(content['epics'], story_graph, enrich_scenarios)
                         if strip_links_for_instructions:
                             self._strip_links(content['epics'])
