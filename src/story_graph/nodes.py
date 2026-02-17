@@ -2658,7 +2658,7 @@ class StoryMap:
         return result
 
     def _generate_test_code_for_scenario(self, scenario: 'Scenario', story: 'Story') -> Optional[Dict[str, Any]]:
-        """Extract test method code for scenario (method, file, line, code)."""
+        """Extract test method info for scenario (method, file, line)."""
         if not hasattr(scenario, 'test_method') or not scenario.test_method:
             return None
         test_file = self._get_story_test_file(story)
@@ -2678,7 +2678,7 @@ class StoryMap:
             generator = TraceGenerator(workspace, max_depth=3)
             code, start, _ = generator._extract_method_from_class(source, lines, story.test_class, scenario.test_method)
             if code:
-                return {'method': scenario.test_method, 'file': str(test_file), 'line': start, 'code': code}
+                return {'method': scenario.test_method, 'file': str(test_file), 'line': start}
         except Exception:
             pass
         return None

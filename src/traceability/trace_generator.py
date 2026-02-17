@@ -266,8 +266,7 @@ class TraceGenerator:
                 "test": {
                     "method": test_method,
                     "file": test_file,
-                    "line": test_start,
-                    "code": test_code
+                    "line": test_start
                 },
                 "code": code_sections
             })
@@ -344,8 +343,7 @@ class TraceGenerator:
             "test": {
                 "method": test_method,
                 "file": test_file,
-                "line": test_start,
-                "code": test_code
+                "line": test_start
             },
             "code": code_sections
         }
@@ -543,8 +541,6 @@ class TraceGenerator:
                     }
                     if is_lazy:
                         result["lazy"] = True
-                    else:
-                        result["code"] = code
                     return result
                 except Exception:
                     continue
@@ -589,8 +585,6 @@ class TraceGenerator:
                 }
                 if is_lazy:
                     result["lazy"] = True
-                else:
-                    result["code"] = code
                 sections.append(result)
             except Exception:
                 continue

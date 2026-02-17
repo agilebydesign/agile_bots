@@ -359,8 +359,7 @@ class JSONStoryGraph(JSONAdapter):
                 return {
                     'method': scenario.test_method,
                     'file': str(test_file),
-                    'line': start,
-                    'code': code
+                    'line': start
                 }
         except Exception:
             pass
