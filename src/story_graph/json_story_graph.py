@@ -279,12 +279,23 @@ class JSONStoryGraph(JSONAdapter):
             'sequential_order': step.sequential_order
         }
     
+    def _get_story_test_file(self, story) -> Optional[str]:
+        """Get test_file from story or parent SubEpic (test_file lives on SubEpic)."""
+        if hasattr(story, 'test_file') and story.test_file:
+            return story.test_file
+        parent = getattr(story, '_parent', None)
+        while parent:
+            if hasattr(parent, 'test_file') and parent.test_file:
+                return parent.test_file
+            parent = getattr(parent, '_parent', None)
+        return None
+    
     def _generate_test_code(self, scenario, story) -> Optional[dict]:
         """Extract test method code for scenario.
         
         Args:
             scenario: Scenario object with test_method
-            story: Parent Story object with test_file and test_class
+            story: Parent Story object with test_class (test_file from parent SubEpic)
         
         Returns:
             Dict with test method code, file, and line number, or None if not found
@@ -292,21 +303,22 @@ class JSONStoryGraph(JSONAdapter):
         if not hasattr(scenario, 'test_method') or not scenario.test_method:
             return None
         
-        if not hasattr(story, 'test_file') or not story.test_file:
+        test_file = self._get_story_test_file(story)
+        if not test_file:
             return None
         
         if not hasattr(story, 'test_class') or not story.test_class:
             return None
         
-        test_file = self.story_graph._workspace_directory / story.test_file
-        if not test_file.exists():
+        test_file_path = self.story_graph._workspace_directory / test_file
+        if not test_file_path.exists():
             return None
         
         try:
             from traceability.trace_generator import TraceGenerator
             generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=3)
             
-            source = test_file.read_text(encoding='utf-8')
+            source = test_file_path.read_text(encoding='utf-8')
             lines = source.split('\n')
             
             code, start, end = generator._extract_method_from_class(
@@ -316,7 +328,7 @@ class JSONStoryGraph(JSONAdapter):
             if code:
                 return {
                     'method': scenario.test_method,
-                    'file': str(story.test_file),
+                    'file': str(test_file),
                     'line': start,
                     'code': code
                 }
@@ -330,7 +342,7 @@ class JSONStoryGraph(JSONAdapter):
         
         Args:
             scenario: Scenario object with test_method
-            story: Parent Story object with test_file and test_class
+            story: Parent Story object with test_class (test_file from parent SubEpic)
         
         Returns:
             List of code sections with nested children (trace tree)
@@ -338,7 +350,8 @@ class JSONStoryGraph(JSONAdapter):
         if not hasattr(scenario, 'test_method') or not scenario.test_method:
             return []
         
-        if not hasattr(story, 'test_file') or not story.test_file:
+        test_file = self._get_story_test_file(story)
+        if not test_file:
             return []
         
         if not hasattr(story, 'test_class') or not story.test_class:
@@ -352,11 +365,11 @@ class JSONStoryGraph(JSONAdapter):
             generator._build_method_index()
             
             # Get test code
-            test_file = self.story_graph._workspace_directory / story.test_file
-            if not test_file.exists():
+            test_file_path = self.story_graph._workspace_directory / test_file
+            if not test_file_path.exists():
                 return []
             
-            source = test_file.read_text(encoding='utf-8')
+            source = test_file_path.read_text(encoding='utf-8')
             lines = source.split('\n')
             
             # Extract test method
