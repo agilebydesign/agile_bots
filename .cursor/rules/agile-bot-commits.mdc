@@ -13364,6 +13364,21 @@ Then **complete all primary instructions FIRST** (validate, build, render, revie
 behavior.action: meaningful description based on scope
 ```
 
+## Behavior Inference from Changed Files
+
+**Override `behavior_action_state.json` when changed files indicate a different behavior.** The behavior in the commit message should reflect what was actually changed, not necessarily the current bot state.
+
+| Changed content | Use behavior | Examples |
+|-----------------|--------------|----------|
+| Fixing application/source code | `code` | `src/panel/*.js`, `src/actions/*.py`, `src/scope/*.py` |
+| Fixing, adding, moving, renaming test files | `tests` | `test/**/*.py`, `*_test.py` |
+| Fixing, moving, renaming stories (epics, sub-epics, stories) | `shape` | `docs/story/story-graph.json` (structure), story names |
+| Changing increments | `prioritization` | `docs/story/prioritization/*`, increment order/content |
+| Acceptance criteria | `exploration` | AC in story-graph.json, acceptance_criteria |
+| Scenarios | `scenarios` | scenarios in story-graph.json, BDD steps |
+
+**Process**: Before using `current_behavior` from `behavior_action_state.json`, check `git status` and `git diff`. If changed files clearly match a behavior above, use that behavior instead. When fixing bugs in code or tests, use `code` or `tests` regardless of scope.
+
 ## Scope Persistence
 
 Since `scope.json` is frequently reset during workflows, maintain a persistent scope file:
@@ -13406,18 +13421,23 @@ Since `scope.json` is frequently reset during workflows, maintain a persistent s
    - This ensures commits always reference meaningful scope
 
 3. **Parse Bot Context**:
-   - Extract bot name from `current_behavior` (e.g., "story_bot.prioritization" → bot: story_bot, behavior: prioritization)
-   - Extract action from `current_action` (e.g., "story_bot.prioritization.render" → action: render)
+   - **Infer behavior from changed files first** (see Behavior Inference from Changed Files): If changes are code fixes → `code`; test fixes → `tests`; stories → `shape`; increments → `prioritization`; AC → `exploration`; scenarios → `scenarios`. Otherwise use `current_behavior` from `behavior_action_state.json`.
+   - Extract action from `current_action` (e.g., "story_bot.prioritization.render" → action: render). For code/test fixes, use `build` or `fix` as appropriate.
    - Extract scope from `last_commit_scope.json` `value` field first, then `scope.json` as fallback
    - **If both empty**: Infer scope from changed files (see Scope Inference section) and save to `last_commit_scope.json`
 
 4. **Generate Commit Message**:
-   - Format: `{behavior}.{action}: {description}`
+   - Format: `{behavior}: {scope}  one of epic |sub-epic | story | increment `
+
    - Examples:
-     - `prioritization.render: Update story map increments for Invoke Bot`
-     - `design.build: Refine CRC cards for authentication stories`
-     - `shape.validate: Add acceptance criteria for user management stories`
-     - `domain.clarify: Extract domain concepts from payment workflow`
+     - `prioritization: Update story map increments for Invoke Bot`
+     - `design: Refine CRC cards for authentication stories`
+     - `shape: Add story structure for user management`
+     - `exploration: Add acceptance criteria for user management stories`
+     - `scenarios: Add BDD scenarios for login flow`
+     - `code: Fix scope in instructions and validation context`
+     - `tests: Fix EnrichScopeWithLinks scenario test links`
+     - `domain: Extract domain concepts from payment workflow`
 
 5. **Meaningful Description Guidelines**:
    - Describe WHAT changed in relation to the scope
@@ -13446,12 +13466,12 @@ Since `scope.json` is frequently reset during workflows, maintain a persistent s
 ## Bot Context Reference
 
 ### Story Bot Behaviors
-- `shape` - Define story structure and acceptance criteria
-- `prioritization` - Organize stories into delivery increments
+- `shape` - Define story structure (epics, sub-epics, stories); fixing/moving/renaming stories
+- `prioritization` - Organize stories into delivery increments; changing increments
 - `scenarios` - Create BDD scenarios for stories
-- `code` - Generate implementation code
-- `tests` - Create test cases
-- `exploration` - Explore and analyze requirements
+- `code` - Generate implementation code; fixing application/source code
+- `tests` - Create test cases; fixing test files
+- `exploration` - Explore and analyze requirements; acceptance criteria
 
 ### CRC Bot Behaviors
 - `domain` - Extract domain concepts and CRC cards
@@ -13464,6 +13484,7 @@ Since `scope.json` is frequently reset during workflows, maintain a persistent s
 - `build` - Create or update artifacts
 - `validate` - Verify quality and correctness
 - `render` - Generate documentation/diagrams
+- `fix` - Fix failing tests (use with `code` or `tests` behavior)
 
 ## Example Workflow
 
@@ -13518,21 +13539,32 @@ When both scope files are empty, infer from conversation first, then changed fil
 **Example 0 (conversation)**: User asked to "remove code body from trace" and "add file enrichment for panel"—conversation was about trace, panel, copy, scope enrichment. Inferred scope: "Enrich Scope With Links" (sub-epic) or "Invoke Bot" (epic). Try epic, sub-epic, story, scenario, increment, etc. from what was discussed.
 - Commit: `code.build: Remove trace code bodies and add panel file enrichment for Enrich Scope With Links`
 
-**Example 1**: Changed files include `docs/story/prioritization/story-map-increments.drawio`
+**Example 1**: Changed files include `docs/story/prioritization/story-map-increments.drawio` or increment content in story-graph.json
+- Inferred behavior: `prioritization` (changing increments)
 - Inferred scope: "story map increments" or "prioritization"
 - Commit: `prioritization.render: Update story map increments diagram`
 
-**Example 2**: Changed files include `test/invoke_bot/perform_action/test_*.py`
+**Example 2**: Changed files include `test/invoke_bot/perform_action/test_*.py` (fixing failing tests)
+- Inferred behavior: `tests` (fixing test files)
 - Inferred scope: "Invoke Bot" (from directory structure)
-- Commit: `scenarios.build: Add test scenarios for Invoke Bot`
+- Commit: `tests.build: Fix scope in instructions and validation context tests`
 
-**Example 3**: Changed files include `src/panel/bot_panel.js` and `src/panel/increment_view.js`
+**Example 3**: Changed files include `src/panel/bot_panel.js` and `src/panel/increment_view.js` (fixing/updating source code)
+- Inferred behavior: `code` (fixing application code)
 - Inferred scope: "bot panel" or "UI components"
 - Commit: `code.build: Update bot panel and increment view`
 
-**Example 4**: Modified `docs/story/story-graph.json` with diff showing "Authentication" story changes
-- Parse diff to find story name: "Authentication"
-- Commit: `shape.build: Add acceptance criteria for Authentication story`
+**Example 4a**: Modified `docs/story/story-graph.json` with diff showing story structure changes (epics, sub-epics, stories)
+- Inferred behavior: `shape`
+- Commit: `shape.build: Add story structure for Authentication`
+
+**Example 4b**: Modified `docs/story/story-graph.json` with diff showing acceptance criteria changes
+- Inferred behavior: `exploration`
+- Commit: `exploration.build: Add acceptance criteria for Authentication story`
+
+**Example 4c**: Modified `docs/story/story-graph.json` with diff showing scenario/BDD changes
+- Inferred behavior: `scenarios`
+- Commit: `scenarios.build: Add BDD scenarios for Authentication story`
 
 **Example 5**: Changed multiple documentation files in `docs/crc/`
 - Inferred scope: "CRC documentation"

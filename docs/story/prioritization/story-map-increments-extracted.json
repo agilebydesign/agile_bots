@@ -440,7 +440,7 @@
                       "story_type": "user"
                     },
                     {
-                      "name": "Report, Report, Update In Queue",
+                      "name": "Report and Update InQ",
                       "sequential_order": 2.0,
                       "story_type": "user"
                     },
@@ -484,7 +484,7 @@
               ]
             },
             {
-              "name": "Synchronize Diagram by Domain",
+              "name": "Render DrawIO Diagrams",
               "sequential_order": 8.0,
               "sub_epics": [
                 {
