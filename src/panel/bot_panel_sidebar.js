@@ -26,8 +26,8 @@ class BotPanelSidebarProvider {
      * @param {vscode.CancellationToken} token 
      */
     async resolveWebviewView(webviewView, context, token) {
-        this._view = webviewView;
-        this._workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd();
+        this._view = webviewView;        
+        this._workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || vscode.Uri.parse(process.env.PWD).fsPath; // TO-DO: Find workspace by name "agile_bots?"; Fall-back to package.json ENV
         
         console.log("[BotPanelSidebar] resolveWebviewView called");
         console.log("[BotPanelSidebar] Workspace root:", this._workspaceRoot);

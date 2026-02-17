@@ -8,6 +8,7 @@
 
 const PanelView = require('./panel_view');
 const branding = require('./branding');
+const { escapeForHtml, escapeForJs } = require('./utils');
 
 class BehaviorsView extends PanelView {
     /**
@@ -38,38 +39,7 @@ class BehaviorsView extends PanelView {
         return botData.behaviors.all_behaviors;
     }
     
-    /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-
-    /**
-     * Escape text for use in JavaScript strings.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeForJs(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-    }
+    // escapeHtml and escapeForJs now imported from ./utils
     
     /**
      * Get status marker for behavior/action/operation.
@@ -370,11 +340,11 @@ class BehaviorsView extends PanelView {
             ? (tickIconPath ? `<img src="${tickIconPath}" alt="Completed" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '')
             : (notTickedIconPath ? `<img src="${notTickedIconPath}" alt="Pending" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '');
         
-        const behaviorTooltip = behavior.description ? this.escapeHtml(behavior.description) : '';
+        const behaviorTooltip = behavior.description ? escapeForHtml(behavior.description) : '';
         const behaviorId = `behavior-${bIdx}`;
         const behaviorNameRaw = behavior.name || '';
-        const behaviorName = this.escapeHtml(behaviorNameRaw);
-        const behaviorNameJs = this.escapeForJs(behaviorNameRaw);
+        const behaviorName = escapeForHtml(behaviorNameRaw);
+        const behaviorNameJs = escapeForJs(behaviorNameRaw);
         
         // Expansion logic:
         // 1. If we have saved state for this item, use it (user's explicit choice)
@@ -423,11 +393,11 @@ class BehaviorsView extends PanelView {
             ? (tickIconPath ? `<img src="${tickIconPath}" alt="Completed" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '')
             : (notTickedIconPath ? `<img src="${notTickedIconPath}" alt="Pending" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '');
         
-        const actionTooltip = action.description ? this.escapeHtml(action.description) : '';
-        const actionName = this.escapeHtml(action.action_name || action.name || '');
+        const actionTooltip = action.description ? escapeForHtml(action.description) : '';
+        const actionName = escapeForHtml(action.action_name || action.name || '');
         
         const actionActiveClass = isCurrent ? ' active' : '';
-        const actionNameJs = this.escapeForJs(action.action_name || action.name || '');
+        const actionNameJs = escapeForJs(action.action_name || action.name || '');
         const actionHtml = `<div class="collapsible-header action-item card-item${actionActiveClass}" title="${actionTooltip}"><span class="action-name-clickable" style="cursor: pointer; text-decoration: underline;" data-action="navigateToAction" data-behavior-name="${behaviorName}" data-action-name="${actionNameJs}">${actionMarker}${actionName}</span></div>`;
         
         return actionHtml;

@@ -10,16 +10,7 @@ const PanelView = require('./panel_view');
 const branding = require('./branding');
 const vscode = require('vscode');
 const path = require('path');
-const fs = require('fs');
-
-function log(msg) {
-    const ts = new Date().toISOString();
-    try {
-        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
-        fs.appendFileSync(logFile, `${ts} ${msg}\n`);
-    } catch (e) {}
-    console.log(msg);
-}
+const { escapeForHtml, escapeForJs, log } = require('./utils');
 
 class InstructionsSection extends PanelView {
     /**
@@ -36,45 +27,7 @@ class InstructionsSection extends PanelView {
         this.webview = webview || null;
         this.extensionUri = extensionUri || null;
         this.parentView = parentView;
-    }
-    
-    /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (!text) return '';
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
-    
-    /**
-     * Escape string for JavaScript context (inside single quotes)
-     */
-    escapeForJs(text) {
-        if (!text) return '';
-        return String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    }
-    
-    escapeForAttribute(text) {
-        if (!text) return '';
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
+    }    
     
     /**
      * Render instructions section HTML.
@@ -647,7 +600,7 @@ class InstructionsSection extends PanelView {
     _formatClarifyInstructions(value) {
         // Format clarify-specific instructions - Q&A and evidence
         if (typeof value !== 'object' || !value) {
-            return this.escapeHtml(String(value));
+            return escapeForHtml(String(value));
         }
         
         let html = '';
@@ -697,10 +650,10 @@ class InstructionsSection extends PanelView {
                     const overflowStyle = 'visible';
                     html += `<div class="input-container qa-container" style="margin-top: ${idx > 0 ? '12px' : '0'}; position: relative;">`;
                     html += `<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;">`;
-                    html += `<span style="flex: 1; padding-right: 8px;">${this.escapeHtml(questionText)}</span>`;
+                    html += `<span style="flex: 1; padding-right: 8px;">${escapeForHtml(questionText)}</span>`;
                     html += `<button onclick="toggleQAExpand(${idx})" id="qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button>`;
                     html += `</div>`;
-                    html += `<textarea id="clarify-answer-${idx}" data-question="${this.escapeForAttribute(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${heightStyle}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${overflowStyle};" data-collapsed="false">${this.escapeHtml(answerText)}</textarea>`;
+                    html += `<textarea id="clarify-answer-${idx}" data-question="${escapeForHtml(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${heightStyle}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${overflowStyle};" data-collapsed="false">${escapeForHtml(answerText)}</textarea>`;
                     html += `</div>`;
                 }
             });
@@ -715,7 +668,7 @@ class InstructionsSection extends PanelView {
             if (requiredEvidence.length > 0) {
                 html += '<div style="margin-top: 8px;">';
                 requiredEvidence.forEach(item => {
-                    html += `<div style="margin-bottom: 4px;">• ${this.escapeHtml(String(item))}</div>`;
+                    html += `<div style="margin-bottom: 4px;">• ${escapeForHtml(String(item))}</div>`;
                 });
                 html += '</div>';
             }
@@ -732,7 +685,7 @@ class InstructionsSection extends PanelView {
                     .join('\n');
             }
             
-            html += `<textarea id="clarify-evidence" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(providedText)}</textarea>`;
+            html += `<textarea id="clarify-evidence" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea>`;
             html += '</div>';
             html += '</div>';
         }
@@ -743,7 +696,7 @@ class InstructionsSection extends PanelView {
     _formatStrategyInstructions(value) {
         // Format strategy-specific instructions - decision criteria and assumptions
         if (typeof value !== 'object' || !value) {
-            return this.escapeHtml(String(value));
+            return escapeForHtml(String(value));
         }
 
         console.log('[DEBUG] Strategy Instructions value:', JSON.stringify(value, null, 2));
@@ -765,7 +718,7 @@ class InstructionsSection extends PanelView {
                     
                     // Render the question as header
                     const question = criteria.question || criteriaKey;
-                    html += `<div class="input-header">${this.escapeHtml(question)}</div>`;
+                    html += `<div class="input-header">${escapeForHtml(question)}</div>`;
                     
                     // Get the saved decision for this criteria
                     const savedDecision = decisionsMade[criteriaKey];
@@ -795,12 +748,12 @@ class InstructionsSection extends PanelView {
                             const isSelected = savedSelections.includes(optionText);
                             
                             // Escape for use in onclick attribute
-                            const escapedCriteriaKey = this.escapeHtml(criteriaKey).replace(/'/g, "\\'");
+                            const escapedCriteriaKey = escapeForHtml(criteriaKey).replace(/'/g, "\\'");
                             
                             html += `<div style="margin-bottom: 8px;">`;
                             html += `<label style="display: flex; align-items: flex-start; cursor: pointer;">`;
                             html += `<input type="checkbox" name="${inputName}" value="${optionIdx}" ${isSelected ? 'checked' : ''} onchange="saveStrategyMultiDecision('${escapedCriteriaKey}', '${inputName}')" style="margin-right: 8px; margin-top: 4px; cursor: pointer;" />`;
-                            html += `<span style="flex: 1; ${isSelected ? 'font-weight: 600; color: var(--vscode-textLink-foreground);' : ''}">${this.escapeHtml(optionText)}</span>`;
+                            html += `<span style="flex: 1; ${isSelected ? 'font-weight: 600; color: var(--vscode-textLink-foreground);' : ''}">${escapeForHtml(optionText)}</span>`;
                             html += `</label>`;
                             html += `</div>`;
                         });
@@ -820,7 +773,7 @@ class InstructionsSection extends PanelView {
         const assumptionsText = assumptionsMade.length > 0
             ? assumptionsMade.join('\n')
             : '';
-        html += `<textarea id="strategy-assumptions" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${this.escapeHtml(assumptionsText)}</textarea>`;
+        html += `<textarea id="strategy-assumptions" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(assumptionsText)}</textarea>`;
         html += '</div>';
 
         return html;
@@ -829,7 +782,7 @@ class InstructionsSection extends PanelView {
     _formatBuildInstructions(value) {
         // Format build-specific instructions - Story Graph and Rules only
         if (typeof value !== 'object' || !value) {
-            return this.escapeHtml(String(value));
+            return escapeForHtml(String(value));
         }
         
         let html = '';
@@ -918,7 +871,7 @@ class InstructionsSection extends PanelView {
         let html = '';
         // Template - show filename, link to full path
         if (mergedItem.template_path) {
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(mergedItem.template_path)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(mergedItem.template_path)}">`;
             html += `<span class="label">Template:</span>`;
             html += `<span class="value">${this.renderFileLink(mergedItem.template_path)}</span>`;
             html += '</div>';
@@ -926,17 +879,17 @@ class InstructionsSection extends PanelView {
         // Output - show filename, link to full path (path_dir + output_file)
         if (mergedItem.output_file) {
             const fullOutputPath = mergedItem.path_dir ? path.join(mergedItem.path_dir, mergedItem.output_file) : mergedItem.output_file;
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(fullOutputPath)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(fullOutputPath)}">`;
             html += `<span class="label">Output:</span>`;
             html += `<span class="value">${this.renderFileLink(fullOutputPath)}</span>`;
             html += '</div>';
         }
         // Path - show directory path as clickable link
         if (mergedItem.path_dir) {
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(mergedItem.path_dir)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(mergedItem.path_dir)}">`;
             html += `<span class="label">Path:</span>`;
             const jsEscapedPath = mergedItem.path_dir.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(mergedItem.path_dir)}</a></span>`;
+            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${escapeForHtml(mergedItem.path_dir)}</a></span>`;
             html += '</div>';
         }
         // Existing - Yes/No
@@ -956,7 +909,7 @@ class InstructionsSection extends PanelView {
         rules.forEach((rule, idx) => {
             const rulePath = typeof rule === 'string' ? rule : rule.rule_file || '';
             if (rulePath) {
-                html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(rulePath)}">`;
+                html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(rulePath)}">`;
                 html += `<span class="label">Rule ${idx + 1}:</span>`;
                 html += `<span class="value">${this.renderFileLink(rulePath)}</span>`;
                 html += '</div>';
@@ -969,13 +922,13 @@ class InstructionsSection extends PanelView {
         if (!fullPath) return '';
         const fileName = fullPath.split(/[\/\\]/).pop();
         const jsEscapedPath = fullPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        return '<a href="#" onclick="openFile(\'' + jsEscapedPath + '\', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">' + this.escapeHtml(fileName) + '</a>';
+        return '<a href="#" onclick="openFile(\'' + jsEscapedPath + '\', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">' + escapeForHtml(fileName) + '</a>';
     }
 
     _formatRenderInstructions(value) {
         // Format render-specific instructions - Render Configs
         if (typeof value !== 'object' || !value) {
-            return this.escapeHtml(String(value));
+            return escapeForHtml(String(value));
         }
         
         let html = '';
@@ -983,7 +936,7 @@ class InstructionsSection extends PanelView {
         // Render Config Paths (similar to Build rules)
         if (Array.isArray(value.render_config_paths) && value.render_config_paths.length > 0) {
             value.render_config_paths.forEach((configPath, idx) => {
-                html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(configPath)}">`;
+                html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(configPath)}">`;
                 html += `<span class="label">Config ${idx + 1}:</span>`;
                 html += `<span class="value">${this.renderFileLink(configPath)}</span>`;
                 html += '</div>';
@@ -993,7 +946,7 @@ class InstructionsSection extends PanelView {
         // Render Template Paths (similar to Build template_path)
         if (Array.isArray(value.render_template_paths) && value.render_template_paths.length > 0) {
             value.render_template_paths.forEach((templatePath, idx) => {
-                html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(templatePath)}">`;
+                html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(templatePath)}">`;
                 html += `<span class="label">Template ${idx + 1}:</span>`;
                 html += `<span class="value">${this.renderFileLink(templatePath)}</span>`;
                 html += '</div>';
@@ -1003,7 +956,7 @@ class InstructionsSection extends PanelView {
         // Render Output Paths (drawio, md, txt files)
         if (Array.isArray(value.render_output_paths) && value.render_output_paths.length > 0) {
             value.render_output_paths.forEach((outputPath, idx) => {
-                html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(outputPath)}">`;
+                html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(outputPath)}">`;
                 html += `<span class="label">Output ${idx + 1}:</span>`;
                 html += `<span class="value">${this.renderFileLink(outputPath)}</span>`;
                 html += '</div>';
@@ -1032,13 +985,6 @@ class InstructionsSection extends PanelView {
         return html;
     }
 
-    _formatDiagramInstructions(value) {
-        if (!value || !value.diagrams) return '';
-        const DiagramSectionView = require('./diagram_section_view');
-        const view = new DiagramSectionView(value.diagrams);
-        return view.renderSection();
-    }
-
     _formatRenderConfig(config) {
         if (!config) return '';
 
@@ -1047,7 +993,7 @@ class InstructionsSection extends PanelView {
         // Template
         if (config.template_path || config.template) {
             const templatePath = config.template_path || config.template;
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(templatePath)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(templatePath)}">`;
             html += `<span class="label">Template:</span>`;
             html += `<span class="value">${this.renderFileLink(templatePath)}</span>`;
             html += '</div>';
@@ -1057,7 +1003,7 @@ class InstructionsSection extends PanelView {
         if (config.output || config.output_file) {
             const outputFile = config.output || config.output_file;
             const fullOutputPath = config.path ? path.join(config.path, outputFile) : outputFile;
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(fullOutputPath)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(fullOutputPath)}">`;
             html += `<span class="label">Output:</span>`;
             html += `<span class="value">${this.renderFileLink(fullOutputPath)}</span>`;
             html += '</div>';
@@ -1066,10 +1012,10 @@ class InstructionsSection extends PanelView {
         // Path
         if (config.path || config.path_dir) {
             const dirPath = config.path || config.path_dir;
-            html += `<div class="info-display" style="margin-top: 4px;" title="${this.escapeHtml(dirPath)}">`;
+            html += `<div class="info-display" style="margin-top: 4px;" title="${escapeForHtml(dirPath)}">`;
             html += `<span class="label">Path:</span>`;
             const jsEscapedPath = dirPath.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(dirPath)}</a></span>`;
+            html += `<span class="value"><a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${escapeForHtml(dirPath)}</a></span>`;
             html += '</div>';
     }
     
@@ -1087,7 +1033,7 @@ class InstructionsSection extends PanelView {
     _formatValidateInstructions(value) {
         // Format validate-specific instructions - Rules + validation rule objects
         if (typeof value !== 'object' || !value) {
-            return this.escapeHtml(String(value));
+            return escapeForHtml(String(value));
         }
 
         let html = '';
@@ -1142,10 +1088,10 @@ class InstructionsSection extends PanelView {
                 const priority = rc.priority !== undefined ? rc.priority : 'N/A';
                 const hasScanner = (rc.scanner || rc.scanners) ? '[Scanner]' : '[Manual]';
                 html += `<li style="margin-bottom: 6px;">`;
-                html += `<div><strong>${this.escapeHtml(name)}</strong> (Priority ${this.escapeHtml(priority)}, ${hasScanner})</div>`;
-                html += `<div style="font-size: 12px; color: var(--text-color-faded);">File: <code>${this.escapeHtml(rule_file)}</code></div>`;
+                html += `<div><strong>${escapeForHtml(name)}</strong> (Priority ${escapeForHtml(priority)}, ${hasScanner})</div>`;
+                html += `<div style="font-size: 12px; color: var(--text-color-faded);">File: <code>${escapeForHtml(rule_file)}</code></div>`;
                 if (desc) {
-                    html += `<div style="margin-top: 2px;">${this.escapeHtml(desc)}</div>`;
+                    html += `<div style="margin-top: 2px;">${escapeForHtml(desc)}</div>`;
                 }
                 html += `</li>`;
             }
@@ -1160,24 +1106,24 @@ class InstructionsSection extends PanelView {
 
     _formatMarkdownLink(markdownLink) {
         if (!markdownLink || typeof markdownLink !== 'string') {
-            return this.escapeHtml(String(markdownLink || ''));
+            return escapeForHtml(String(markdownLink || ''));
         }
         const match = markdownLink.match(/\[([^\]]+)\]\(([^)]+)\)/);
         if (!match) {
-            return `<code>${this.escapeHtml(markdownLink)}</code>`;
+            return `<code>${escapeForHtml(markdownLink)}</code>`;
         }
         const label = match[1].replace(/^`|`$/g, '');
         const href = match[2];
         // Use onclick with openFile and return false to prevent default navigation (scroll to top)
         const jsEscapedPath = href.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        return `<a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${this.escapeHtml(label)}</a>`;
+        return `<a href="#" onclick="openFile('${jsEscapedPath}', event); return false;" style="color: var(--vscode-textLink-foreground); text-decoration: none; cursor: pointer;">${escapeForHtml(label)}</a>`;
     }
 
     _formatInstructionValue(value, borderColor) {
         if (Array.isArray(value)) {
             // Array: join with newlines and format
             const text = value.join('\n');
-            return this.escapeHtml(text)
+            return escapeForHtml(text)
                 .replace(/\n/g, '<br>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         } else if (typeof value === 'object' && value !== null) {
@@ -1201,10 +1147,10 @@ class InstructionsSection extends PanelView {
             }
             
             // Object: pretty print JSON
-            return `<pre style="margin: 0; white-space: pre-wrap; font-family: monospace; font-size: 11px; line-height: 1.4;">${this.escapeHtml(JSON.stringify(value, null, 2))}</pre>`;
+            return `<pre style="margin: 0; white-space: pre-wrap; font-family: monospace; font-size: 11px; line-height: 1.4;">${escapeForHtml(JSON.stringify(value, null, 2))}</pre>`;
         } else {
             // String or other: escape and format
-            return this.escapeHtml(String(value))
+            return escapeForHtml(String(value))
                 .replace(/\n/g, '<br>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
         }
@@ -1234,7 +1180,7 @@ class InstructionsSection extends PanelView {
           border-left: none;
         ">
           <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 13px; text-transform: capitalize;">
-            ${this.escapeHtml(phaseName)} Phase
+            ${escapeForHtml(phaseName)} Phase
           </span>
         </div>`;
 
@@ -1258,7 +1204,7 @@ class InstructionsSection extends PanelView {
             </div>
             <ul style="margin: 0; padding-left: 0; list-style-type: none; font-size: 10px; line-height: 1.6;">
               ${phaseData.evidence.sources.map(source => 
-                `<li style="color: var(--vscode-foreground); margin-bottom: 4px;">• ${this.escapeHtml(source)}</li>`
+                `<li style="color: var(--vscode-foreground); margin-bottom: 4px;">• ${escapeForHtml(source)}</li>`
               ).join('')}
             </ul>
           </div>`;
@@ -1279,7 +1225,7 @@ class InstructionsSection extends PanelView {
             </div>
             <ul style="margin: 0; padding-left: 0; list-style-type: none; font-size: 10px; line-height: 1.6;">
               ${phaseData.context.map(item => 
-                `<li style="color: var(--vscode-foreground); margin-bottom: 4px;">• ${this.escapeHtml(item)}</li>`
+                `<li style="color: var(--vscode-foreground); margin-bottom: 4px;">• ${escapeForHtml(item)}</li>`
               ).join('')}
             </ul>
           </div>`;
@@ -1308,8 +1254,8 @@ class InstructionsSection extends PanelView {
             const questionId = `question-${index}`;
             const answerId = `answer-${index}`;
             return `<div class="input-container" style="margin-bottom: ${index < entries.length - 1 ? '20px' : '0'};">
-        <div class="input-header">${this.escapeHtml(question)}</div>
-        <textarea id="${answerId}" placeholder="Enter answer..." oninput="autoResizeTextarea(this)" onchange="updateQuestionAnswer('${this.escapeForJs(question)}', this.value)">${this.escapeHtml(answer || '')}</textarea>
+        <div class="input-header">${escapeForHtml(question)}</div>
+        <textarea id="${answerId}" placeholder="Enter answer..." oninput="autoResizeTextarea(this)" onchange="updateQuestionAnswer('${escapeForJs(question)}', this.value)">${escapeForHtml(answer || '')}</textarea>
       </div>`;
         }).join('');
 
@@ -1338,7 +1284,7 @@ class InstructionsSection extends PanelView {
             border-left: none;
           ">
             <span style="font-weight: 400; color: var(--vscode-foreground);">Review Status:</span>
-            <span style="margin-left: 8px; color: var(--vscode-foreground);">${this.escapeHtml(assumptions.review_status)}</span>
+            <span style="margin-left: 8px; color: var(--vscode-foreground);">${escapeForHtml(assumptions.review_status)}</span>
           </div>`;
             }
 
@@ -1367,7 +1313,7 @@ class InstructionsSection extends PanelView {
                   line-height: 1.4;
                   flex: 1;
                 ">
-                  ${this.escapeHtml(item.assumption)}
+                  ${escapeForHtml(item.assumption)}
                 </span>
                 <span style="
                   padding: 2px 8px;
@@ -1377,7 +1323,7 @@ class InstructionsSection extends PanelView {
                   color: var(--vscode-foreground);
                   border: 1px solid rgba(255, 255, 255, 0.2);
                 ">
-                  ${statusIcon} ${this.escapeHtml(item.status || 'UNKNOWN')}
+                  ${statusIcon} ${escapeForHtml(item.status || 'UNKNOWN')}
                 </span>
               </div>
               ${item.justification ? `
@@ -1392,7 +1338,7 @@ class InstructionsSection extends PanelView {
                   padding: 8px 0;
                   margin-top: 8px;
                 ">
-                  ${this.escapeHtml(item.justification)}
+                  ${escapeForHtml(item.justification)}
                 </div>` : ''}
             </div>`;
                 });

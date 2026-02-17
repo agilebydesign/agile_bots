@@ -8,6 +8,7 @@
 
 const PanelView = require('./panel_view');
 const branding = require('./branding');
+const { escapeForHtml, truncatePath } = require('./utils');
 
 class BotHeaderView extends PanelView {
     /**
@@ -25,27 +26,7 @@ class BotHeaderView extends PanelView {
         this.webview = webview || null;
         this.extensionUri = extensionUri || null;
         this.parentView = parentView;
-    }
-    
-    /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
+    }    
     
     /**
      * Get bot icon based on bot name.
@@ -56,17 +37,6 @@ class BotHeaderView extends PanelView {
     getBotIcon(botName) {
         // No emoji fallbacks - use images only
         return '';
-    }
-    
-    /**
-     * Truncate path with ellipsis if too long
-     */
-    truncatePath(path, maxLength) {
-        if (!path || path.length <= maxLength) return path;
-        const ellipsis = '...';
-        const prefixLength = Math.floor((maxLength - ellipsis.length) / 2);
-        const suffixLength = maxLength - ellipsis.length - prefixLength;
-        return path.substring(0, prefixLength) + ellipsis + path.substring(path.length - suffixLength);
     }
     
     /**
@@ -118,13 +88,13 @@ class BotHeaderView extends PanelView {
         
         const currentBot = botData.name || botData.bot_name;
         const availableBots = botData.available_bots || [];
-        const safeBotName = this.escapeHtml(currentBot);
-        const safeBotDir = this.escapeHtml(botData.bot_directory);
-        const safeWorkspaceDir = this.escapeHtml(botData.workspace_directory);
+        const safeBotName = escapeForHtml(currentBot);
+        const safeBotDir = escapeForHtml(botData.bot_directory);
+        const safeWorkspaceDir = escapeForHtml(botData.workspace_directory);
         
         // AC: Truncate very long directory paths
-        const displayBotDir = this.truncatePath(safeBotDir, maxPathLength);
-        const displayWorkspaceDir = this.truncatePath(safeWorkspaceDir, maxPathLength);
+        const displayBotDir = truncatePath(safeBotDir, maxPathLength);
+        const displayWorkspaceDir = truncatePath(safeWorkspaceDir, maxPathLength);
         
         // Build bot selector links
         let botLinksHtml = '';
@@ -132,7 +102,7 @@ class BotHeaderView extends PanelView {
             botLinksHtml = availableBots.map(botName => {
                 const isActive = botName === currentBot;
                 const activeClass = isActive ? ' active' : '';
-                return '<a href="javascript:void(0)" class="bot-link' + activeClass + '" onclick="switchBot(\'' + this.escapeHtml(botName) + '\')">' + this.escapeHtml(botName) + '</a>';
+                return '<a href="javascript:void(0)" class="bot-link' + activeClass + '" onclick="switchBot(\'' + escapeForHtml(botName) + '\')">' + escapeForHtml(botName) + '</a>';
             }).join('\n                ');
         }
         
@@ -147,7 +117,7 @@ class BotHeaderView extends PanelView {
         console.log('[BotHeaderView] Company icon URI:', imagePath);
         
         const versionHtml = this.panelVersion 
-            ? `<span style="font-size: 14px; opacity: 0.7; margin-left: 6px;">v${this.escapeHtml(this.panelVersion)}</span>`
+            ? `<span style="font-size: 14px; opacity: 0.7; margin-left: 6px;">v${escapeForHtml(this.panelVersion)}</span>`
             : '';
         
         const productName = branding.getProductName();
