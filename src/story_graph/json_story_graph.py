@@ -280,9 +280,7 @@ class JSONStoryGraph(JSONAdapter):
         }
     
     def _get_story_test_file(self, story) -> Optional[str]:
-        """Get test_file from story or parent SubEpic (test_file lives on SubEpic)."""
-        if hasattr(story, 'test_file') and story.test_file:
-            return story.test_file
+        """Get test_file from parent SubEpic (story.test_file is always None - never look there)."""
         parent = getattr(story, '_parent', None)
         while parent:
             if hasattr(parent, 'test_file') and parent.test_file:
