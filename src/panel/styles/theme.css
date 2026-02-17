@@ -1,0 +1,501 @@
+/* ============================================================
+    THEME SYSTEM - All styling variables in one place
+    Branding: {{branding.getBranding()} ({{brandColor})
+    ============================================================ */
+
+:root {
+    /* Colors - from branding config */
+    --bg-base: {{bgColor}};
+    --text-color: {{textColor}};
+    --text-color-faded: {{textColorFaded}};
+    --accent-color: {{brandColor}};
+    --border-color: {{brandColor}};
+    --divider-color: {{brandColor}};
+    --hover-bg: {{isLightBg ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)'}};
+    
+    /* Input styling - chat-like appearance */
+    --input-bg: {{isLightBg ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)'}};
+    --input-bg-focus: {{isLightBg ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)'}};
+    --input-border: {{isLightBg ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)'}};
+    --input-border-focus: var(--accent-color);
+    --input-padding: 6px;
+    --input-border-radius: 6px;
+    --input-border-width: 1px;
+    --input-border-width-focus: 2px;
+    --input-header-border-width: 1px;
+    --input-header-border-width-focus: 2px;
+    --input-transition: border-color 150ms ease, background-color 150ms ease;
+    
+    /* Borders */
+    --border-width: 1px;
+    --border-radius: 0;
+    --border-radius-sm: 0;
+    --active-border-width: 2px;
+    
+    /* Spacing */
+    --space-xs: 2px;
+    --space-sm: 4px;
+    --space-md: 6px;
+    --space-lg: 8px;
+    
+    /* Typography */
+    --font-size-base: 13px;
+    --font-size-sm: 12px;
+    --font-size-xs: 11px;
+    --font-size-section: 14px;
+    --font-weight-normal: {{fontWeight}};
+    --line-height-base: 1.6;
+    --line-height-compact: 1.4;
+}
+
+body {
+    font-family: var(--vscode-font-family), 'Segoe UI', sans-serif;
+    padding: var(--space-md);
+    color: var(--text-color);
+    background-color: var(--bg-base);
+    line-height: var(--line-height-base);
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+}
+
+/* Prevent images from scaling with panel width */
+img {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.bot-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* ============================================================
+    CARDS & SECTIONS
+    ============================================================ */
+
+.card-primary {
+    margin-bottom: var(--space-lg);
+    padding: var(--space-lg) 0;
+    border: none;
+    border-top: var(--border-width) solid var(--divider-color);
+    background-color: transparent;
+}
+
+.card-secondary {
+    margin: var(--space-sm) 0;
+    padding: var(--space-md) 0;
+    border: none;
+    background-color: transparent;
+}
+
+.card-item {
+    margin: var(--space-xs) 0;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 0;
+    background-color: transparent;
+    transition: background-color 80ms ease;
+}
+.card-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.card-item.active,
+.card-secondary.active {
+    background-color: transparent;
+}
+
+.section {
+    margin-bottom: 0;
+    padding: var(--space-lg) 0;
+    border: none;
+    border-top: var(--border-width) solid var(--divider-color);
+    background-color: transparent;
+}
+
+.section.card-primary {
+    border-top: var(--border-width) solid var(--divider-color);
+}
+
+/* ============================================================
+    HIERARCHY & COLLAPSIBLE ITEMS
+    ============================================================ */
+
+.behavior-item, .action-item, .operation-item {
+    margin: var(--space-xs) 0;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transition: background-color 80ms ease;
+    font-weight: var(--font-weight-normal);
+}
+
+.behavior-item:hover, .action-item:hover {
+    background-color: var(--hover-bg);
+}
+
+.collapsible-header {
+    margin: var(--space-xs) 0;
+    padding: var(--space-sm);
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+    font-weight: var(--font-weight-normal);
+    font-size: var(--font-size-base);
+    transition: background-color 80ms ease;
+}
+.collapsible-header:hover {
+    background-color: var(--hover-bg);
+}
+.collapsible-header.action-item {
+    margin-left: 12px;
+    font-weight: var(--font-weight-normal);
+}
+.operation-item {
+    margin-left: 24px;
+    font-size: var(--font-size-sm);
+    color: var(--text-color-faded);
+}
+.collapsible-content {
+    padding-left: 0;
+}
+#behaviors-content .collapsible-content {
+    padding-left: 12px;
+}
+#behaviors-content .collapsible-content .collapsible-content {
+    padding-left: 12px;
+}
+
+.behavior-item.active,
+.action-item.active,
+.operation-item.active {
+    background-color: transparent;
+}
+
+/* ============================================================
+    STORY TREE NODE INTERACTION
+    ============================================================ */
+
+.story-node {
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 150ms ease;
+}
+
+.story-node:hover {
+    background-color: rgba({{brandColorRgb}, 0.15); /* Faded brand color on hover */
+}
+
+.story-node.selected {
+    background-color: rgba({{brandColorRgb}, 0.35); /* Distinct brand color when selected */
+}
+
+
+.collapsible-section {
+    margin-bottom: var(--space-sm);
+}
+
+.collapsible-section .expand-icon {
+    transition: transform 150ms ease;
+    display: inline-block;
+    transform: rotate(0deg);
+    font-style: normal;
+    min-width: var(--space-md);
+    color: {{brandColor} !important;
+    font-size: 28px;
+    margin-right: 8px;
+}
+.collapsible-section.expanded .expand-icon {
+    transform: rotate(90deg);
+}
+/* Ensure nested subsections have smaller icons */
+.collapsible-content .collapsible-section .expand-icon {
+    font-size: 20px;
+}
+.collapsible-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible-content[style*="display: none"] {
+    display: none !important;
+}
+
+.status-marker {
+    font-family: inherit;
+    font-weight: var(--font-weight-normal);
+    min-width: 20px;
+    font-size: var(--font-size-base);
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.marker-current {
+    color: var(--vscode-textLink-foreground);
+}
+
+.marker-completed {
+    color: var(--vscode-textLink-foreground);
+}
+
+.marker-pending {
+    color: var(--text-color-faded);
+}
+
+.scope-section {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+}
+
+/* ============================================================
+    INPUTS & INTERACTIVE ELEMENTS
+    ============================================================ */
+
+.input-container {
+    border: var(--input-border-width) solid var(--accent-color);
+    border-radius: var(--input-border-radius);
+    overflow: hidden;
+    transition: border-width 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+.input-container:focus-within {
+    border-width: var(--input-border-width-focus);
+}
+
+.input-header {
+    padding: 4px var(--input-padding);
+    background-color: transparent;
+    border-bottom: var(--input-header-border-width) solid var(--accent-color);
+    font-size: var(--font-size-base);
+    color: var(--text-color);
+    font-weight: 600;
+    transition: border-bottom-width 150ms ease;
+}
+.input-container:focus-within .input-header {
+    border-bottom-width: var(--input-header-border-width-focus);
+}
+
+.info-display {
+    padding: var(--space-sm) 0;
+    font-size: var(--font-size-base);
+    color: var(--text-color);
+}
+.info-display .label {
+    color: var(--text-color-faded);
+    margin-right: 8px;
+}
+.info-display .value {
+    color: var(--text-color);
+}
+
+.main-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 5px 6px 5px;
+    border-bottom: 1px solid var(--divider-color);
+}
+.main-header-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+.main-header-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.main-header-collapse {
+    background-color: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    padding: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 150ms ease;
+    margin-right: 4px;
+}
+.main-header-collapse:hover {
+    background-color: rgba(255, 140, 0, 0.1);
+}
+.main-header-refresh {
+    background-color: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 18px;
+    padding: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 150ms ease;
+}
+.main-header-refresh:hover {
+    background-color: rgba(255, 140, 0, 0.1);
+}
+
+.main-header-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    visibility: visible;
+    opacity: 1;
+}
+
+.main-header-status[style*="display: none"] {
+    display: none !important;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.save-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Save status indicator styles - matches input container design */
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: var(--input-border-width) solid var(--accent-color);
+    border-radius: var(--input-border-radius);
+    background-color: rgba(255, 140, 0, 0.1); /* Dark black with orange tint */
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+    transition: opacity 0.3s, background-color 150ms ease;
+    white-space: nowrap;
+}
+
+.save-status.saving,
+.save-status.refreshing {
+    background-color: rgba(255, 140, 0, 0.15); /* Slightly brighter when active */
+    border-color: var(--accent-color);
+}
+
+.save-status.success {
+    background-color: rgba(255, 140, 0, 0.1);
+    border-color: var(--accent-color);
+    color: #ff8c00;
+}
+
+.save-status.success #save-status-message {
+    color: #ff8c00;
+}
+
+.save-status.error {
+    background-color: rgba(255, 140, 0, 0.15);
+    border-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.save-status.error:hover {
+    background-color: rgba(255, 140, 0, 0.2);
+}
+
+.save-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.save-icon.spinner {
+    animation: spin 1s linear infinite;
+}
+
+input[type="text"],
+textarea,
+.text-input {
+    width: 100%;
+    padding: var(--space-sm) var(--input-padding);
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: none;
+    border-radius: 0;
+    font-family: var(--vscode-editor-font-family, 'Segoe UI', sans-serif);
+    font-size: var(--font-size-base);
+}
+input[type="text"]:focus,
+textarea:focus,
+.text-input:focus {
+    outline: none;
+}
+input[type="text"].drag-over {
+    background-color: var(--vscode-editor-selectionBackground, rgba(255, 140, 0, 0.2));
+    border: 1px dashed var(--vscode-focusBorder, #ff8c00);
+    box-shadow: 0 0 4px rgba(255, 140, 0, 0.4);
+}
+
+button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    padding: var(--space-xs) var(--space-md);
+    cursor: pointer;
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    transition: all 100ms ease;
+}
+button:hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+button:active {
+    background-color: var(--vscode-button-background);
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+/* Ensure button images maintain fixed size */
+button img {
+    flex-shrink: 0;
+    display: block;
+}
+
+a {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.bot-links {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    align-items: center;
+}
+.bot-link {
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--text-color-faded);
+    opacity: 0.6;
+}
+.bot-link.active {
+    color: var(--text-color);
+    font-weight: var(--font-weight-normal);
+    text-decoration: none;
+    cursor: default;
+    opacity: 1;
+}
+.bot-link:not(.active):hover {
+    opacity: 0.8;
+}
+
+.empty-state {
+    color: var(--text-color-faded);
+    font-style: italic;
+    padding: var(--space-sm);
+}
