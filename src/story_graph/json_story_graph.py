@@ -79,9 +79,16 @@ class JSONStoryGraph(JSONAdapter):
         for epic_data in self.story_graph.content.get('epics', []):
             collect_sub_epics(epic_data)
         
+        # Create one TraceGenerator when generating trace (build index once, reuse across all scenarios)
+        trace_generator = None
+        if generate_trace and include_level in ('tests', 'code'):
+            from traceability.trace_generator import TraceGenerator
+            trace_generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=1)
+            trace_generator._build_method_index()
+        
         # Serialize domain objects to JSON with include_level filtering
         content = {
-            'epics': [self._serialize_epic(epic, epic_name_to_data, include_level, generate_trace) for epic in story_map._epics]
+            'epics': [self._serialize_epic(epic, epic_name_to_data, include_level, generate_trace, trace_generator) for epic in story_map._epics]
         }
         t2 = time.perf_counter()
         import sys
@@ -124,12 +131,12 @@ class JSONStoryGraph(JSONAdapter):
             'content': content
         }
     
-    def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples', generate_trace=False) -> dict:
+    def _serialize_epic(self, epic, name_to_data_map=None, include_level='examples', generate_trace=False, trace_generator=None) -> dict:
         """Serialize Epic object to dict by reading its properties with include_level filtering."""
         result = {
             'name': epic.name,
             'behavior_needed': epic.behavior_needed,
-            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace) for child in epic.children]
+            'sub_epics': [self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace, trace_generator) for child in epic.children]
         }
         
         # Include domain_concepts if level >= 'domain_concepts'
@@ -161,7 +168,7 @@ class JSONStoryGraph(JSONAdapter):
         
         return result
     
-    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples', generate_trace=False) -> dict:
+    def _serialize_sub_epic(self, sub_epic, name_to_data_map=None, include_level='examples', generate_trace=False, trace_generator=None) -> dict:
         """Serialize SubEpic object to dict by reading its properties with include_level filtering."""
         from story_graph.nodes import SubEpic, Story, StoryGroup
         
@@ -195,26 +202,26 @@ class JSONStoryGraph(JSONAdapter):
         current_story_group = None
         for child in sub_epic.children:
             if isinstance(child, SubEpic):
-                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace))
+                result['sub_epics'].append(self._serialize_sub_epic(child, name_to_data_map, include_level, generate_trace, trace_generator))
             elif isinstance(child, StoryGroup):
-                result['story_groups'].append(self._serialize_story_group(child, include_level, generate_trace))
+                result['story_groups'].append(self._serialize_story_group(child, include_level, generate_trace, trace_generator))
             elif isinstance(child, Story):
                 # Direct story child - add to unnamed story group
                 if current_story_group is None:
                     current_story_group = {'name': None, 'stories': []}
                     result['story_groups'].append(current_story_group)
-                current_story_group['stories'].append(self._serialize_story(child, include_level, generate_trace))
+                current_story_group['stories'].append(self._serialize_story(child, include_level, generate_trace, trace_generator))
         
         return result
     
-    def _serialize_story_group(self, story_group, include_level='examples', generate_trace=False) -> dict:
+    def _serialize_story_group(self, story_group, include_level='examples', generate_trace=False, trace_generator=None) -> dict:
         """Serialize StoryGroup object to dict with include_level filtering."""
         return {
             'name': story_group.name if hasattr(story_group, 'name') else None,
-            'stories': [self._serialize_story(story, include_level, generate_trace) for story in story_group.children]
+            'stories': [self._serialize_story(story, include_level, generate_trace, trace_generator) for story in story_group.children]
         }
     
-    def _serialize_story(self, story, include_level='examples', generate_trace=False) -> dict:
+    def _serialize_story(self, story, include_level='examples', generate_trace=False, trace_generator=None) -> dict:
         """Serialize Story object to dict by reading its properties with include_level filtering."""
         result = {
             'name': story.name,
@@ -230,7 +237,7 @@ class JSONStoryGraph(JSONAdapter):
         
         # Include scenarios only if level >= 'scenarios'
         if self._level_includes(self._LEVEL_SCENARIOS, include_level):
-            result['scenarios'] = [self._serialize_scenario(sc, include_level, story, generate_trace) for sc in story.scenarios]
+            result['scenarios'] = [self._serialize_scenario(sc, include_level, story, generate_trace, trace_generator) for sc in story.scenarios]
         
         return result
     
@@ -242,7 +249,7 @@ class JSONStoryGraph(JSONAdapter):
             'sequential_order': ac.sequential_order
         }
     
-    def _serialize_scenario(self, scenario, include_level='examples', story=None, generate_trace=False) -> dict:
+    def _serialize_scenario(self, scenario, include_level='examples', story=None, generate_trace=False, trace_generator=None) -> dict:
         """Serialize Scenario object to dict by reading its properties with include_level filtering."""
         result = {
             'name': scenario.name,
@@ -284,8 +291,8 @@ class JSONStoryGraph(JSONAdapter):
                 result['test'] = test_code_data
         
         # Include trace only when generate_trace=True (instructions path) and level is tests/code
-        if generate_trace and include_level in ('tests', 'code') and story:
-            trace_data = self._generate_trace(scenario, story)
+        if generate_trace and include_level in ('tests', 'code') and story and trace_generator:
+            trace_data = self._generate_trace(scenario, story, trace_generator)
             result['trace'] = trace_data if trace_data else []
         
         return result
@@ -360,15 +367,16 @@ class JSONStoryGraph(JSONAdapter):
         
         return None
     
-    def _generate_trace(self, scenario, story) -> list:
-        """Generate trace for scenario using trace generator.
+    def _generate_trace(self, scenario, story, trace_generator) -> list:
+        """Generate trace for scenario using shared trace generator (shallow: file/line/symbol only).
         
         Args:
             scenario: Scenario object with test_method
             story: Parent Story object with test_class (test_file from parent SubEpic)
+            trace_generator: Pre-built TraceGenerator (index already built, reused across scenarios)
         
         Returns:
-            List of code sections with nested children (trace tree)
+            List of trace sections: file, line, symbol (no code, no children for speed)
         """
         if not hasattr(scenario, 'test_method') or not scenario.test_method:
             return []
@@ -381,12 +389,6 @@ class JSONStoryGraph(JSONAdapter):
             return []
         
         try:
-            from traceability.trace_generator import TraceGenerator
-            generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=3)
-            
-            # Build method index
-            generator._build_method_index()
-            
             # Get test code (test_file is relative to test dir)
             test_file_path = self._resolve_test_file_path(test_file)
             if not test_file_path.exists():
@@ -396,7 +398,7 @@ class JSONStoryGraph(JSONAdapter):
             lines = source.split('\n')
             
             # Extract test method
-            test_code, test_start, test_end = generator._extract_method_from_class(
+            test_code, test_start, test_end = trace_generator._extract_method_from_class(
                 source, lines, story.test_class, scenario.test_method
             )
             
@@ -404,12 +406,12 @@ class JSONStoryGraph(JSONAdapter):
                 return []
             
             # Analyze for calls
-            calls = generator._find_calls_in_code(test_code)
+            calls = trace_generator._find_calls_in_code(test_code)
             
-            # Build trace
+            # Build trace (shallow: file/line/symbol only, no code/children)
             trace_sections = []
             for call in calls:
-                section = generator._resolve_call(call, depth=1)
+                section = trace_generator._resolve_call(call, depth=1, shallow=True)
                 if section:
                     trace_sections.append(section)
             

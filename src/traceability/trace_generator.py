@@ -326,8 +326,12 @@ class TraceGenerator:
             chain.insert(0, node.id)
         return chain
     
-    def _resolve_call(self, call: dict, depth: int) -> Optional[dict]:
-        """Resolve a call to its implementation."""
+    def _resolve_call(self, call: dict, depth: int, shallow: bool = False) -> Optional[dict]:
+        """Resolve a call to its implementation.
+        
+        Args:
+            shallow: When True, return only file/line/symbol (no code, no children). Much faster.
+        """
         if depth > self.max_depth:
             return None
         
@@ -337,7 +341,7 @@ class TraceGenerator:
             if name in ('print', 'len', 'str', 'int', 'list', 'dict', 'set', 
                        'range', 'isinstance', 'hasattr', 'getattr', 'type', 'open'):
                 return None
-            return self._find_class_init_or_function(name, depth)
+            return self._find_class_init_or_function(name, depth, shallow)
         
         elif call["type"] == "method":
             method = call["method"]
@@ -346,11 +350,11 @@ class TraceGenerator:
                          'split', 'join', 'strip', 'lower', 'upper', 'format',
                          'startswith', 'endswith', 'replace', 'find', 'index'):
                 return None
-            return self._find_method_anywhere(method, depth)
+            return self._find_method_anywhere(method, depth, shallow)
         
         return None
     
-    def _find_class_init_or_function(self, name: str, depth: int) -> Optional[dict]:
+    def _find_class_init_or_function(self, name: str, depth: int, shallow: bool = False) -> Optional[dict]:
         """Find a class __init__ using the pre-built index."""
         symbol_key = f"{name}.__init__"
         if symbol_key in self.seen_symbols:
@@ -363,6 +367,8 @@ class TraceGenerator:
         
         for match in self._method_index["__init__"]:
             if match["class"] == name:
+                if shallow:
+                    return {"symbol": f"{name}.__init__", "file": match["file"], "line": match["line"]}
                 file_path = self.workspace / match["file"]
                 try:
                     if str(file_path) in self._file_cache:
@@ -397,7 +403,7 @@ class TraceGenerator:
                     continue
         return None
     
-    def _find_method_anywhere(self, method: str, depth: int) -> Optional[dict]:
+    def _find_method_anywhere(self, method: str, depth: int, shallow: bool = False) -> Optional[dict]:
         """Find a method definition using the pre-built index."""
         symbol_key = method
         if symbol_key in self.seen_symbols:
@@ -410,6 +416,9 @@ class TraceGenerator:
         
         # Take the first match
         match = self._method_index[method][0]
+        if shallow:
+            return {"symbol": f"{match['class']}.{method}", "file": match["file"], "line": match["line"]}
+        
         file_path = self.workspace / match["file"]
         
         try:
