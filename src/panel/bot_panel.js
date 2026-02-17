@@ -216,23 +216,50 @@ class BotPanel {
             }
             return;
           case "copyNodeToClipboard":
-            (async () => {
+            (() => {
               const nodePath = message.nodePath;
               const action = message.action; // 'name' or 'json'
               if (!nodePath || !action) return;
               const method = action === 'json' ? 'copy_json' : 'copy_name';
               const command = nodePath + '.' + method;
-              try {
+              const doCopy = async () => {
                 const response = await this._botView.execute(command);
                 const result = response && (response.result !== undefined ? response.result : response);
-                const text = action === 'json'
-                  ? (typeof result === 'string' ? result : JSON.stringify(result, null, 2))
-                  : String(result != null ? result : '');
+                let text;
+                if (action === 'json') {
+                  text = (typeof result === 'string' ? result : JSON.stringify(result, null, 2));
+                } else {
+                  // Copy name: result should be string; extract from object if backend returns wrong shape
+                  if (typeof result === 'string') {
+                    text = result;
+                  } else if (result && typeof result === 'object') {
+                    text = result.result ?? result.node_name ?? result.message ?? result.name ?? '';
+                    text = String(text);
+                  } else {
+                    text = String(result != null ? result : '');
+                  }
+                }
                 await vscode.env.clipboard.writeText(text);
-                vscode.window.setStatusBarMessage(action === 'json' ? 'Node JSON copied to clipboard' : 'Node name copied to clipboard', 2000);
-              } catch (err) {
-                this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
-                vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+                vscode.window.showInformationMessage(action === 'json' ? 'Node JSON copied to clipboard' : 'Node name copied to clipboard');
+              };
+              if (action === 'json') {
+                vscode.window.withProgress({
+                  location: vscode.ProgressLocation.Notification,
+                  title: 'Injecting scope to clipboard...',
+                  cancellable: false
+                }, async () => {
+                  try {
+                    await doCopy();
+                  } catch (err) {
+                    this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
+                    vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+                  }
+                });
+              } else {
+                doCopy().catch((err) => {
+                  this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
+                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+                });
               }
             })();
             return;
@@ -937,6 +964,9 @@ class BotPanel {
               // No need to check optimistic flag - story-changing ops always skip refresh
               
               // Special debug for submit commands
+              const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
+                message.commandText.includes('submit_instructions') ||
+                message.commandText.includes('submit_current_instructions');
               if (message.commandText.includes('submit_required_behavior_instructions')) {
                 this._log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
                 this._log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
@@ -962,7 +992,7 @@ class BotPanel {
               }
               
               this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 5] Executing command via backend...`);
-              this._botView?.execute(message.commandText)
+              const runExecute = () => this._botView?.execute(message.commandText)
                 .then((result) => {
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] [SUCCESS] Backend command executed successfully`);
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Command: ${message.commandText}`);
@@ -1082,6 +1112,15 @@ class BotPanel {
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== COMMAND FLOW FAILED ==========`);
                   this._log(`${'='.repeat(80)}\n`);
                 });
+              if (isSubmitOp) {
+                vscode.window.withProgress({
+                  location: vscode.ProgressLocation.Notification,
+                  title: 'Injecting scope to instructions...',
+                  cancellable: false
+                }, () => runExecute());
+              } else {
+                runExecute();
+              }
             } else {
               this._log(`[BotPanel] WARNING: executeCommand received with no commandText`);
             }
@@ -2965,10 +3004,11 @@ class BotPanel {
         
         // Right-click context menu on story nodes: Copy node name / Copy full JSON (event -> CLI -> bot)
         document.addEventListener('contextmenu', function(e) {
-            let target = e.target;
-            while (target && !target.classList.contains('story-node')) {
-                target = target.parentElement;
-            }
+            const target = e.target.closest ? e.target.closest('.story-node') : (function() {
+                let t = e.target;
+                while (t && !t.classList.contains('story-node')) t = t.parentElement;
+                return t;
+            })();
             if (!target || !target.classList.contains('story-node')) return;
             const nodePath = target.getAttribute('data-path');
             if (!nodePath) return;
@@ -2979,6 +3019,7 @@ class BotPanel {
             if (existing) existing.remove();
             const menu = document.createElement('div');
             menu.id = 'story-node-copy-menu';
+            menu.dataset.nodePath = nodePath;  // Store path on menu so menu item click uses correct node
             menu.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;background:var(--vscode-dropdown-background);border:1px solid var(--vscode-dropdown-border);border-radius:4px;padding:4px 0;z-index:10001;min-width:160px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
             const items = [
                 { label: 'Copy node name', action: 'name' },
@@ -2993,9 +3034,10 @@ class BotPanel {
                 div.onclick = function(ev) {
                     ev.preventDefault();
                     ev.stopPropagation();
+                    const pathToCopy = menu.dataset.nodePath;  // Read from menu, not closure
                     menu.remove();
                     document.removeEventListener('click', closeMenu);
-                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: item.action });
+                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: pathToCopy, action: item.action });
                 };
                 menu.appendChild(div);
             });

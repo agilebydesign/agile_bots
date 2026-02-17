@@ -83,7 +83,7 @@ class JSONStoryGraph(JSONAdapter):
         trace_generator = None
         if generate_trace and include_level in ('tests', 'code'):
             from traceability.trace_generator import TraceGenerator
-            trace_generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=1)
+            trace_generator = TraceGenerator(self.story_graph._workspace_directory, max_depth=3)
             trace_generator._build_method_index()
         
         # Serialize domain objects to JSON with include_level filtering
@@ -368,7 +368,9 @@ class JSONStoryGraph(JSONAdapter):
         return None
     
     def _generate_trace(self, scenario, story, trace_generator) -> list:
-        """Generate trace for scenario using shared trace generator (shallow: file/line/symbol only).
+        """Generate trace for scenario using shared trace generator.
+        
+        Traces from test method through implementation code (up to max_depth levels).
         
         Args:
             scenario: Scenario object with test_method
@@ -376,7 +378,7 @@ class JSONStoryGraph(JSONAdapter):
             trace_generator: Pre-built TraceGenerator (index already built, reused across scenarios)
         
         Returns:
-            List of trace sections: file, line, symbol (no code, no children for speed)
+            List of trace sections with symbol, file, line, children (nested call chain)
         """
         if not hasattr(scenario, 'test_method') or not scenario.test_method:
             return []
@@ -397,23 +399,46 @@ class JSONStoryGraph(JSONAdapter):
             source = test_file_path.read_text(encoding='utf-8')
             lines = source.split('\n')
             
-            # Extract test method
+            # Extract test method (Python or JS)
             test_code, test_start, test_end = trace_generator._extract_method_from_class(
                 source, lines, story.test_class, scenario.test_method
             )
+            source_file = test_file if test_code else None
+            
+            # If Python test not found, try matching JS test file
+            if not test_code and test_file_path.suffix == '.py':
+                js_path = test_file_path.with_suffix('.js')
+                if js_path.exists():
+                    js_source = js_path.read_text(encoding='utf-8')
+                    js_lines = js_source.split('\n')
+                    test_code, test_start, test_end = trace_generator._extract_method_from_js(
+                        js_source, js_lines, story.test_class, scenario.test_method
+                    )
+                    if test_code:
+                        source_file = str(js_path.relative_to(self.story_graph._workspace_directory)).replace("\\", "/")
             
             if not test_code:
                 return []
             
-            # Analyze for calls
-            calls = trace_generator._find_calls_in_code(test_code)
+            # Analyze for calls (use JS parsing when source is .js)
+            calls = trace_generator._find_calls_in_code(test_code, source_file)
             
-            # Build trace (shallow: file/line/symbol only, no code/children)
+            # Build trace (full: symbol, file, line, children through code; includes Python + JS)
             trace_sections = []
             for call in calls:
-                section = trace_generator._resolve_call(call, depth=1, shallow=True)
-                if section:
-                    trace_sections.append(section)
+                sections = trace_generator._resolve_call(call, depth=1, shallow=False)
+                if sections:
+                    trace_sections.extend(sections)
+            
+            # Also trace from JS test file when it exists (adds panel/JS impl to trace)
+            if test_file_path.suffix == '.py':
+                js_path = test_file_path.with_suffix('.js')
+                if js_path.exists() and story.test_class:
+                    js_traces = trace_generator._trace_from_js_test_file(
+                        js_path, story.test_class, self.story_graph._workspace_directory
+                    )
+                    if js_traces:
+                        trace_sections.extend(js_traces)
             
             return trace_sections
             

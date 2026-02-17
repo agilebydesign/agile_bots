@@ -1,11 +1,19 @@
 """
 Generate traces by analyzing code - traces from Test → Implementation Code.
 Walks test methods, finds all calls, locates implementations up to max_depth.
+Supports Python and JavaScript (test and src).
 """
 import ast
 import json
+import re
 from pathlib import Path
 from typing import Optional
+
+
+def _should_skip_path(file_path: Path) -> bool:
+    """Skip generated/external directories."""
+    s = str(file_path)
+    return any(x in s for x in ['__pycache__', 'node_modules', '.venv', 'site-packages', '.git'])
 
 
 class TraceGenerator:
@@ -19,11 +27,11 @@ class TraceGenerator:
         self._method_index = None  # Cache method locations
     
     def _build_method_index(self):
-        """Build index of all methods in workspace - do this once."""
+        """Build index of all methods/functions in workspace (Python and JS) - do this once."""
         if self._method_index is not None:
             return
         
-        self._method_index = {}  # method_name -> [(class_name, file_path, line)]
+        self._method_index = {}  # method_name -> [{class, file, line, end_line}]
         
         search_dirs = [
             self.workspace / "test",  # All test code
@@ -34,30 +42,100 @@ class TraceGenerator:
             if not search_dir.exists():
                 continue
             for py_file in search_dir.rglob("*.py"):
-                if '__pycache__' in str(py_file):
+                if _should_skip_path(py_file):
                     continue
                 try:
                     source = py_file.read_text(encoding='utf-8')
                     self._file_cache[str(py_file)] = source
                     tree = ast.parse(source)
                     
-                    for node in ast.walk(tree):
+                    for node in ast.iter_child_nodes(tree):
                         if isinstance(node, ast.ClassDef):
                             class_name = node.name
                             for item in node.body:
                                 if isinstance(item, ast.FunctionDef):
-                                    method_name = item.name
-                                    rel_path = str(py_file.relative_to(self.workspace)).replace("\\", "/")
-                                    if method_name not in self._method_index:
-                                        self._method_index[method_name] = []
-                                    self._method_index[method_name].append({
-                                        "class": class_name,
-                                        "file": rel_path,
-                                        "line": item.lineno,
-                                        "end_line": item.end_lineno or item.lineno
-                                    })
+                                    self._add_to_index(item.name, class_name, py_file, item.lineno, item.end_lineno or item.lineno)
+                        elif isinstance(node, ast.FunctionDef):
+                            self._add_to_index(node.name, "", py_file, node.lineno, node.end_lineno or node.lineno)
                 except Exception:
                     continue
+            
+            for js_file in search_dir.rglob("*.js"):
+                if _should_skip_path(js_file):
+                    continue
+                try:
+                    self._index_javascript_file(js_file)
+                except Exception:
+                    continue
+    
+    def _add_to_index(self, method_name: str, class_name: str, file_path: Path, line: int, end_line: int):
+        if not method_name:
+            return
+        rel_path = str(file_path.relative_to(self.workspace)).replace("\\", "/")
+        if method_name not in self._method_index:
+            self._method_index[method_name] = []
+        self._method_index[method_name].append({
+            "class": class_name,
+            "file": rel_path,
+            "line": line,
+            "end_line": end_line
+        })
+    
+    _JS_KEYWORDS = frozenset([
+        'if', 'for', 'while', 'switch', 'catch', 'return', 'typeof', 'new', 'delete',
+        'void', 'function', 'class', 'extends', 'import', 'export', 'await', 'case',
+        'else', 'try', 'throw', 'finally', 'with', 'in', 'of', 'instanceof', 'typeof'
+    ])
+
+    def _index_javascript_file(self, js_file: Path):
+        """Index JS file: functions and class methods."""
+        source = js_file.read_text(encoding='utf-8')
+        self._file_cache[str(js_file)] = source
+        lines = source.split('\n')
+        
+        func_pattern = re.compile(r'^\s*(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(')
+        class_pattern = re.compile(r'^\s*(?:export\s+)?class\s+(\w+)')
+        method_pattern = re.compile(r'^\s+(?:async\s+)?(\w+)\s*\([^)]*\)\s*\{')
+        arrow_method = re.compile(r'^\s+(\w+)\s*=\s*\([^)]*\)\s*=>')
+        method_shorthand = re.compile(r'^\s+(\w+)\s*\([^)]*\)\s*\{')
+        
+        current_class = ""
+        i = 0
+        while i < len(lines):
+            line = lines[i]
+            if match := class_pattern.match(line):
+                current_class = match.group(1)
+                i += 1
+                continue
+            if match := func_pattern.match(line):
+                name = match.group(1)
+                if name not in self._JS_KEYWORDS:
+                    end_line = self._find_js_block_end(lines, i)
+                    self._add_to_index(name, "", js_file, i + 1, end_line)
+                i += 1
+                continue
+            if current_class and (match := method_pattern.match(line) or method_shorthand.match(line) or arrow_method.match(line)):
+                name = match.group(1)
+                if name not in self._JS_KEYWORDS:
+                    end_line = self._find_js_block_end(lines, i)
+                    self._add_to_index(name, current_class, js_file, i + 1, end_line)
+                i += 1
+                continue
+            i += 1
+    
+    def _find_js_block_end(self, lines: list, start_idx: int) -> int:
+        """Find the line number (1-based) of the closing brace for a block starting at start_idx."""
+        depth = 0
+        for j in range(start_idx, len(lines)):
+            line = lines[j]
+            for c in line:
+                if c == '{':
+                    depth += 1
+                elif c == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return j + 1
+        return start_idx + 1
     
     def find_story_by_test_class(self, test_class: str, story_graph_path: str = "docs/story/story-graph.json") -> Optional[dict]:
         """Find a story in story-graph.json by its test_class.
@@ -171,9 +249,9 @@ class TraceGenerator:
                 calls = self._find_calls_in_code(test_code)
                 code_sections = []
                 for call in calls:
-                    section = self._resolve_call(call, depth=1)
-                    if section:
-                        code_sections.append(section)
+                    sections = self._resolve_call(call, depth=1)
+                    if sections:
+                        code_sections.extend(sections)
             else:
                 test_code = f"# Test method '{test_method}' not found"
                 test_start = 0
@@ -251,9 +329,9 @@ class TraceGenerator:
         # Build code sections by finding implementations
         code_sections = []
         for call in calls:
-            section = self._resolve_call(call, depth=1)
-            if section:
-                code_sections.append(section)
+            sections = self._resolve_call(call, depth=1)
+            if sections:
+                code_sections.extend(sections)
         
         return {
             "scenario": {
@@ -274,7 +352,8 @@ class TraceGenerator:
     
     def _extract_method_from_class(self, source: str, lines: list, 
                                     class_name: str, method_name: str):
-        """Extract a method from a class."""
+        """Extract a method from a Python class or from a JS test file."""
+        # Try Python first
         try:
             tree = ast.parse(source)
             for node in ast.walk(tree):
@@ -289,12 +368,59 @@ class TraceGenerator:
             pass
         return None, 0, 0
     
-    def _find_calls_in_code(self, code: str) -> list:
-        """Find all function/method calls in code."""
+    def _extract_method_from_js(self, source: str, lines: list, 
+                                test_class: str, test_method: str):
+        """Extract test callback body from JS test file. Returns (code, start_line, end_line) or (None,0,0)."""
+        pattern = re.compile(rf"(?:await\s+)?t\.test\s*\(\s*['\"]({re.escape(test_method)})['\"]")
+        pattern2 = re.compile(rf"test\s*\(\s*['\"]({re.escape(test_method)})['\"]")
+        start_idx = None
+        for i, line in enumerate(lines):
+            if pattern.search(line) or pattern2.search(line):
+                start_idx = i
+                break
+        if start_idx is None:
+            return None, 0, 0
+        end_idx = self._find_js_block_end(lines, start_idx)
+        code = '\n'.join(lines[start_idx:end_idx])
+        return code, start_idx + 1, end_idx
+    
+    def _trace_from_js_test_file(self, js_path: Path, test_class: str, workspace: Path) -> list:
+        """Collect traces from all test() blocks in describe(test_class). Returns list of trace sections."""
+        if not js_path.exists():
+            return []
+        try:
+            source = js_path.read_text(encoding='utf-8')
+            lines = source.split('\n')
+            rel_path = str(js_path.relative_to(workspace)).replace("\\", "/")
+            # Find all test('...', () => {...}) or test('...', async () => {...}) in the file
+            test_pattern = re.compile(r"test\s*\(\s*['\"]([^'\"]+)['\"]")
+            trace_sections = []
+            i = 0
+            while i < len(lines):
+                m = test_pattern.search(lines[i])
+                if m:
+                    test_name = m.group(1)
+                    end_idx = self._find_js_block_end(lines, i)
+                    code = '\n'.join(lines[i:end_idx])
+                    calls = self._find_calls_in_code(code, rel_path)
+                    for call in calls:
+                        sections = self._resolve_call(call, depth=1, shallow=False)
+                        if sections:
+                            trace_sections.extend(sections)
+                    i = end_idx
+                else:
+                    i += 1
+            return trace_sections
+        except Exception:
+            return []
+    
+    def _find_calls_in_code(self, code: str, source_file: Optional[str] = None) -> list:
+        """Find all function/method calls in code. Uses JS parsing when source_file ends with .js."""
+        if source_file and source_file.endswith('.js'):
+            return self._find_calls_in_code_js(code)
         import textwrap
         calls = []
         try:
-            # Dedent the code so it can be parsed
             dedented = textwrap.dedent(code)
             tree = ast.parse(dedented)
             for node in ast.walk(tree):
@@ -304,6 +430,29 @@ class TraceGenerator:
                         calls.append(call_info)
         except SyntaxError:
             pass
+        return calls
+    
+    def _find_calls_in_code_js(self, code: str) -> list:
+        """Find function/method calls in JavaScript code using regex."""
+        calls = []
+        js_keywords = frozenset([
+            'if', 'for', 'while', 'switch', 'catch', 'return', 'typeof', 'new', 'delete',
+            'void', 'function', 'class', 'extends', 'import', 'export', 'await', 'case'
+        ])
+        # Method calls: .methodName(
+        for m in re.finditer(r'\.([a-zA-Z_][a-zA-Z0-9_]*)\s*\(', code):
+            name = m.group(1)
+            if name not in js_keywords and name not in ('then', 'catch', 'finally'):
+                call = {"type": "method", "method": name, "chain": []}
+                if call not in calls:
+                    calls.append(call)
+        # Function calls: identifier( - not preceded by . or :
+        for m in re.finditer(r'(?<![.:\w])([a-zA-Z_][a-zA-Z0-9_]*)\s*\(', code):
+            name = m.group(1)
+            if name not in js_keywords and name not in ('then', 'catch', 'finally'):
+                call = {"type": "function", "name": name}
+                if call not in calls:
+                    calls.append(call)
         return calls
     
     def _parse_call_node(self, node: ast.Call) -> Optional[dict]:
@@ -326,33 +475,31 @@ class TraceGenerator:
             chain.insert(0, node.id)
         return chain
     
-    def _resolve_call(self, call: dict, depth: int, shallow: bool = False) -> Optional[dict]:
-        """Resolve a call to its implementation.
-        
-        Args:
-            shallow: When True, return only file/line/symbol (no code, no children). Much faster.
-        """
+    def _resolve_call(self, call: dict, depth: int, shallow: bool = False) -> list:
+        """Resolve a call to its implementation(s). Returns list of sections (Python + JS)."""
         if depth > self.max_depth:
-            return None
+            return []
         
         if call["type"] == "function":
             name = call["name"]
-            # Skip builtins
             if name in ('print', 'len', 'str', 'int', 'list', 'dict', 'set', 
-                       'range', 'isinstance', 'hasattr', 'getattr', 'type', 'open'):
-                return None
-            return self._find_class_init_or_function(name, depth, shallow)
+                       'range', 'isinstance', 'hasattr', 'getattr', 'type', 'open',
+                       'describe', 'it', 'test', 'expect', 'require', 'console', 'setTimeout', 'setInterval'):
+                return []
+            result = self._find_class_init_or_function(name, depth, shallow)
+            if result is not None:
+                return [result]
+            return self._find_method_anywhere(name, depth, shallow)
         
         elif call["type"] == "method":
             method = call["method"]
-            # Skip common string/list methods
             if method in ('append', 'extend', 'get', 'keys', 'values', 'items',
                          'split', 'join', 'strip', 'lower', 'upper', 'format',
                          'startswith', 'endswith', 'replace', 'find', 'index'):
-                return None
+                return []
             return self._find_method_anywhere(method, depth, shallow)
         
-        return None
+        return []
     
     def _find_class_init_or_function(self, name: str, depth: int, shallow: bool = False) -> Optional[dict]:
         """Find a class __init__ using the pre-built index."""
@@ -384,7 +531,7 @@ class TraceGenerator:
                     # Recursively find calls
                     children = []
                     if depth < self.max_depth:
-                        children = self._analyze_children(code, depth + 1)
+                        children = self._analyze_children(code, depth + 1, match["file"])
                     
                     is_lazy = depth >= 3
                     result = {
@@ -403,67 +550,63 @@ class TraceGenerator:
                     continue
         return None
     
-    def _find_method_anywhere(self, method: str, depth: int, shallow: bool = False) -> Optional[dict]:
-        """Find a method definition using the pre-built index."""
+    def _find_method_anywhere(self, method: str, depth: int, shallow: bool = False):
+        """Find method definitions using the pre-built index. Returns list of sections (Python + JS)."""
         symbol_key = method
         if symbol_key in self.seen_symbols:
-            return None
+            return []
         self.seen_symbols.add(symbol_key)
         
-        # Use the index
         if method not in self._method_index:
-            return None
+            return []
         
-        # Take the first match
-        match = self._method_index[method][0]
-        if shallow:
-            return {"symbol": f"{match['class']}.{method}", "file": match["file"], "line": match["line"]}
-        
-        file_path = self.workspace / match["file"]
-        
-        try:
-            if str(file_path) in self._file_cache:
-                source = self._file_cache[str(file_path)]
-            else:
-                source = file_path.read_text(encoding='utf-8')
-            
-            lines = source.split('\n')
-            start = match["line"]
-            end = match["end_line"]
-            code = '\n'.join(lines[start - 1:end])
-            
-            # Recursively find calls (but limit depth)
-            children = []
-            if depth < self.max_depth:
-                children = self._analyze_children(code, depth + 1)
-            
-            is_lazy = depth >= 3
-            result = {
-                "symbol": f"{match['class']}.{method}",
-                "file": match["file"],
-                "line": start,
-                "depth": depth,
-                "children": children
-            }
-            if is_lazy:
-                result["lazy"] = True
-            else:
-                result["code"] = code
-            return result
-        except Exception:
-            return None
+        sections = []
+        for match in self._method_index[method]:
+            symbol = f"{match['class']}.{method}" if match["class"] else method
+            if shallow:
+                sections.append({"symbol": symbol, "file": match["file"], "line": match["line"]})
+                continue
+            try:
+                file_path = self.workspace / match["file"]
+                if str(file_path) in self._file_cache:
+                    source = self._file_cache[str(file_path)]
+                else:
+                    source = file_path.read_text(encoding='utf-8')
+                lines = source.split('\n')
+                start = match["line"]
+                end = match["end_line"]
+                code = '\n'.join(lines[start - 1:end])
+                children = []
+                if depth < self.max_depth:
+                    children = self._analyze_children(code, depth + 1, match["file"])
+                is_lazy = depth >= 3
+                result = {
+                    "symbol": symbol,
+                    "file": match["file"],
+                    "line": start,
+                    "depth": depth,
+                    "children": children
+                }
+                if is_lazy:
+                    result["lazy"] = True
+                else:
+                    result["code"] = code
+                sections.append(result)
+            except Exception:
+                continue
+        return sections
     
-    def _analyze_children(self, code: str, depth: int) -> list:
-        """Analyze code for calls and build children list."""
+    def _analyze_children(self, code: str, depth: int, source_file: Optional[str] = None) -> list:
+        """Analyze code for calls and build children list. Uses JS parsing when source_file ends with .js."""
         if depth > self.max_depth:
             return []
         
         children = []
-        calls = self._find_calls_in_code(code)
+        calls = self._find_calls_in_code(code, source_file)
         for call in calls:
-            child = self._resolve_call(call, depth)
-            if child:
-                children.append(child)
+            sections = self._resolve_call(call, depth)
+            if sections:
+                children.extend(sections)
         return children
 
 
