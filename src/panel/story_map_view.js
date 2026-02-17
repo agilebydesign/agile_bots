@@ -2748,7 +2748,7 @@ class StoryMapView extends PanelView {
                             </label>
                             <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
                                 <input type="radio" name="includeLevel" value="acceptance" ${scopeData.includeLevel === 'acceptance' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">
-                                <span>Accept</span>
+                                <span>criteria</span>
                             </label>
                             <label style="display: flex; align-items: center; cursor: pointer; font-size: 12px;">
                                 <input type="radio" name="includeLevel" value="scenarios" ${scopeData.includeLevel === 'scenarios' ? 'checked' : ''} onchange="updateIncludeLevel(this.value)" style="margin-right: 4px;">

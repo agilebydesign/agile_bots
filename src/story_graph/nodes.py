@@ -1,5 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import List, Iterator, Optional, Dict, Any, Union, TYPE_CHECKING
+
+_LEVEL_DOMAIN = frozenset(['domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code'])
+_LEVEL_ACCEPTANCE = frozenset(['acceptance', 'scenarios', 'examples', 'tests', 'code'])
+_LEVEL_SCENARIOS = frozenset(['scenarios', 'examples', 'tests', 'code'])
+_LEVEL_EXAMPLES = frozenset(['examples', 'tests', 'code'])
+_LEVEL_TESTS = frozenset(['tests', 'code'])
+
+
+def _level_includes(level_set, include_level: Optional[str]) -> bool:
+    return include_level is None or include_level in level_set
+
 from dataclasses import dataclass, field
 from pathlib import Path
 import json
@@ -202,12 +213,17 @@ class StoryNode(ABC):
         """Return node name for clipboard. Used by panel context menu (event -> CLI -> bot)."""
         return {'status': 'success', 'result': self.name}
 
-    def copy_json(self) -> dict:
-        """Return this node as story-graph JSON for clipboard. Used by panel context menu (event -> CLI -> bot)."""
+    def copy_json(self, include_level: Optional[str] = None) -> dict:
+        """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit)."""
         if not self._bot or not hasattr(self._bot, 'story_map'):
             raise ValueError('Cannot serialize node without bot context')
+        if include_level is None and hasattr(self._bot, '_scope') and self._bot._scope:
+            include_level = getattr(self._bot._scope, 'include_level', 'examples') or 'examples'
+        if include_level is None:
+            include_level = 'examples'
         story_map = self._bot.story_map
-        node_dict = story_map.node_to_dict(self)
+        generate_trace = include_level in ('tests', 'code')
+        node_dict = story_map.node_to_dict(self, include_level=include_level, generate_trace=generate_trace)
         return {'status': 'success', 'result': node_dict}
 
     def delete(self, cascade: bool = True) -> dict:
@@ -2558,92 +2574,154 @@ class StoryMap:
                 return name
             counter += 1
 
-    def _epic_to_dict(self, epic: Epic) -> Dict[str, Any]:
+    def _epic_to_dict(self, epic: Epic, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
         result = {
             'name': epic.name,
             'sequential_order': epic.sequential_order,
-            'behavior': epic.behavior,  # Always include behavior (even if None)
-            'domain_concepts': [dc.to_dict() for dc in epic.domain_concepts] if epic.domain_concepts else [],
-            'sub_epics': [self._sub_epic_to_dict(child) for child in epic._children if isinstance(child, SubEpic)],
-            'story_groups': [self._story_group_to_dict(child) for child in epic._children if isinstance(child, StoryGroup)]
+            'behavior': epic.behavior,
+            'domain_concepts': [dc.to_dict() for dc in epic.domain_concepts] if _level_includes(_LEVEL_DOMAIN, include_level) and epic.domain_concepts else [],
+            'sub_epics': [self._sub_epic_to_dict(child, include_level, generate_trace) for child in epic._children if isinstance(child, SubEpic)],
+            'story_groups': [self._story_group_to_dict(child, include_level, generate_trace) for child in epic._children if isinstance(child, StoryGroup)]
         }
         return result
 
-    def _sub_epic_to_dict(self, sub_epic: SubEpic) -> Dict[str, Any]:
-        # Stories are ONLY serialized in story_groups, not duplicated in a flattened array
+    def _sub_epic_to_dict(self, sub_epic: SubEpic, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
         result = {
             'name': sub_epic.name,
             'sequential_order': sub_epic.sequential_order,
-            'behavior': sub_epic.behavior,  # Always include behavior (even if None)
-            'domain_concepts': [dc.to_dict() for dc in sub_epic.domain_concepts] if sub_epic.domain_concepts else [],
+            'behavior': sub_epic.behavior,
+            'domain_concepts': [dc.to_dict() for dc in sub_epic.domain_concepts] if _level_includes(_LEVEL_DOMAIN, include_level) and sub_epic.domain_concepts else [],
         }
-        
-        # Include test_file if present (critical for test links in panel)
         if sub_epic.test_file is not None:
             result['test_file'] = sub_epic.test_file
-        
-        # Serialize nested sub-epics - check all children and filter SubEpics
         nested_subepics = [child for child in sub_epic._children if isinstance(child, SubEpic)]
         result.update({
-            'sub_epics': [self._sub_epic_to_dict(child) for child in nested_subepics],
-            'story_groups': [self._story_group_to_dict(child) for child in sub_epic._children if isinstance(child, StoryGroup)]
+            'sub_epics': [self._sub_epic_to_dict(child, include_level, generate_trace) for child in nested_subepics],
+            'story_groups': [self._story_group_to_dict(child, include_level, generate_trace) for child in sub_epic._children if isinstance(child, StoryGroup)]
         })
-        
         return result
 
-    def _story_group_to_dict(self, story_group: StoryGroup) -> Dict[str, Any]:
+    def _story_group_to_dict(self, story_group: StoryGroup, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
         result = {
             'name': story_group.name,
             'sequential_order': story_group.sequential_order,
             'type': story_group.group_type,
             'connector': story_group.connector,
-            'behavior': story_group.behavior,  # Always include behavior (even if None)
-            'stories': [self._story_to_dict(child) for child in story_group.children if isinstance(child, Story)]
+            'behavior': story_group.behavior,
+            'stories': [self._story_to_dict(child, include_level, generate_trace) for child in story_group.children if isinstance(child, Story)]
         }
         return result
 
-    def _story_to_dict(self, story: Story) -> Dict[str, Any]:
-        # Extract children by type
+    def _story_to_dict(self, story: Story, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
         scenarios = []
         acceptance_criteria = []
-        
         for child in story._children:
             if isinstance(child, Scenario):
-                scenarios.append(self._scenario_to_dict(child))
+                scenarios.append(self._scenario_to_dict(child, story, include_level, generate_trace))
             elif isinstance(child, AcceptanceCriteria):
                 acceptance_criteria.append(self._acceptance_criteria_to_dict(child))
-        
         result = {
             'name': story.name,
             'sequential_order': story.sequential_order,
             'connector': story.connector,
             'story_type': story.story_type,
             'users': [str(u) for u in story.users] if story.users else [],
-            # Note: test_file belongs to SubEpic, not Story - do not serialize it here
             'test_class': story.test_class,
-            'scenarios': scenarios,
-            'acceptance_criteria': acceptance_criteria,
-            'behavior': story.behavior  # Always include behavior (even if None)
+            'scenarios': scenarios if _level_includes(_LEVEL_SCENARIOS, include_level) else [],
+            'acceptance_criteria': acceptance_criteria if _level_includes(_LEVEL_ACCEPTANCE, include_level) else [],
+            'behavior': story.behavior
         }
         if story.file_link is not None:
             result['file_link'] = story.file_link
         return result
     
-    def _scenario_to_dict(self, scenario: Scenario) -> Dict[str, Any]:
-        # Convert Step objects to newline-separated string
+    def _scenario_to_dict(self, scenario: Scenario, story: Optional['Story'] = None, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
         steps_text = '\n'.join(step.text for step in scenario.steps) if scenario.steps else ''
         result = {
             'name': scenario.name,
             'sequential_order': scenario.sequential_order,
             'type': scenario.type,
-            'background': scenario.background,
+            'background': scenario.background if _level_includes(_LEVEL_SCENARIOS, include_level) else [],
             'test_method': scenario.test_method,
-            'steps': steps_text
+            'steps': steps_text if _level_includes(_LEVEL_SCENARIOS, include_level) else ''
         }
-        # Only include examples if present
-        if scenario.examples:
+        if _level_includes(_LEVEL_EXAMPLES, include_level) and scenario.examples:
             result['examples'] = scenario.examples
+        if _level_includes(_LEVEL_TESTS, include_level) and story:
+            test_code_data = self._generate_test_code_for_scenario(scenario, story)
+            if test_code_data:
+                result['test'] = test_code_data
+        if _level_includes(_LEVEL_TESTS, include_level) and story and generate_trace and scenario.test_method and story.test_class:
+            trace_data = self._generate_trace_for_scenario(scenario, story)
+            if trace_data:
+                result['trace'] = trace_data
         return result
+
+    def _generate_test_code_for_scenario(self, scenario: 'Scenario', story: 'Story') -> Optional[Dict[str, Any]]:
+        """Extract test method code for scenario (method, file, line, code)."""
+        if not hasattr(scenario, 'test_method') or not scenario.test_method:
+            return None
+        test_file = self._get_story_test_file(story)
+        if not test_file or not hasattr(story, 'test_class') or not story.test_class:
+            return None
+        try:
+            workspace = getattr(self._bot, 'bot_paths', None) and getattr(self._bot.bot_paths, 'workspace_directory', None)
+            if not workspace:
+                workspace = Path.cwd()
+            test_dir = workspace / getattr(getattr(self._bot, 'bot_paths', None), 'test_path', Path('test'))
+            test_file_path = test_dir / test_file
+            if not test_file_path.exists():
+                return None
+            from traceability.trace_generator import TraceGenerator
+            source = test_file_path.read_text(encoding='utf-8')
+            lines = source.split('\n')
+            generator = TraceGenerator(workspace, max_depth=3)
+            code, start, _ = generator._extract_method_from_class(source, lines, story.test_class, scenario.test_method)
+            if code:
+                return {'method': scenario.test_method, 'file': str(test_file), 'line': start, 'code': code}
+        except Exception:
+            pass
+        return None
+
+    def _generate_trace_for_scenario(self, scenario: 'Scenario', story: 'Story') -> List[Dict[str, Any]]:
+        """Generate shallow trace for scenario (file/line/symbol only)."""
+        test_file = self._get_story_test_file(story)
+        if not test_file:
+            return []
+        try:
+            from traceability.trace_generator import TraceGenerator
+            workspace = getattr(self._bot, 'bot_paths', None) and getattr(self._bot.bot_paths, 'workspace_directory', None)
+            if not workspace:
+                workspace = Path.cwd()
+            test_dir = workspace / getattr(getattr(self._bot, 'bot_paths', None), 'test_path', Path('test'))
+            test_file_path = test_dir / test_file
+            if not test_file_path.exists():
+                return []
+            source = test_file_path.read_text(encoding='utf-8')
+            lines = source.split('\n')
+            generator = TraceGenerator(workspace, max_depth=1)
+            generator._build_method_index()
+            test_code, _, _ = generator._extract_method_from_class(source, lines, story.test_class, scenario.test_method)
+            if not test_code:
+                return []
+            calls = generator._find_calls_in_code(test_code)
+            trace_sections = []
+            for call in calls:
+                section = generator._resolve_call(call, depth=1, shallow=True)
+                if section:
+                    trace_sections.append(section)
+            return trace_sections
+        except Exception:
+            return []
+
+    def _get_story_test_file(self, story: 'Story') -> Optional[str]:
+        """Get test_file from parent SubEpic."""
+        parent = getattr(story, '_parent', None)
+        while parent:
+            if hasattr(parent, 'test_file') and parent.test_file:
+                return parent.test_file
+            parent = getattr(parent, '_parent', None)
+        return None
 
     def _acceptance_criteria_to_dict(self, ac: AcceptanceCriteria) -> Dict[str, Any]:
         return {
@@ -2652,18 +2730,19 @@ class StoryMap:
             'sequential_order': ac.sequential_order
         }
 
-    def node_to_dict(self, node: StoryNode) -> Dict[str, Any]:
-        """Serialize any story node to its story-graph JSON shape (for copy_json)."""
+    def node_to_dict(self, node: StoryNode, include_level: Optional[str] = None, generate_trace: bool = False) -> Dict[str, Any]:
+        """Serialize any story node to its story-graph JSON shape (for copy_json). Uses include_level like submit."""
         if isinstance(node, Epic):
-            return self._epic_to_dict(node)
+            return self._epic_to_dict(node, include_level, generate_trace)
         if isinstance(node, SubEpic):
-            return self._sub_epic_to_dict(node)
+            return self._sub_epic_to_dict(node, include_level, generate_trace)
         if isinstance(node, StoryGroup):
-            return self._story_group_to_dict(node)
+            return self._story_group_to_dict(node, include_level, generate_trace)
         if isinstance(node, Story):
-            return self._story_to_dict(node)
+            return self._story_to_dict(node, include_level, generate_trace)
         if isinstance(node, Scenario):
-            return self._scenario_to_dict(node)
+            story = getattr(node, '_parent', None) if isinstance(node, Scenario) else None
+            return self._scenario_to_dict(node, story, include_level, generate_trace)
         if isinstance(node, AcceptanceCriteria):
             return self._acceptance_criteria_to_dict(node)
         raise ValueError(f'Unknown node type: {type(node).__name__}')
