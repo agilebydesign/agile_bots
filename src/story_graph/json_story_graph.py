@@ -139,8 +139,6 @@ class JSONStoryGraph(JSONAdapter):
                     domain_concepts_serialized = epic_data['domain_concepts']
             
             result['domain_concepts'] = domain_concepts_serialized
-        else:
-            result['domain_concepts'] = []
         
         return result
     
@@ -207,17 +205,13 @@ class JSONStoryGraph(JSONAdapter):
             'test_class': story.test_class if hasattr(story, 'test_class') else None,
         }
         
-        # Include acceptance criteria if level >= 'acceptance'
+        # Include acceptance criteria only if level >= 'acceptance'
         if self._level_includes(self._LEVEL_ACCEPTANCE, include_level):
             result['acceptance_criteria'] = [self._serialize_ac(ac) for ac in story.acceptance_criteria]
-        else:
-            result['acceptance_criteria'] = []
         
-        # Include scenarios if level >= 'scenarios'
+        # Include scenarios only if level >= 'scenarios'
         if self._level_includes(self._LEVEL_SCENARIOS, include_level):
             result['scenarios'] = [self._serialize_scenario(sc, include_level, story) for sc in story.scenarios]
-        else:
-            result['scenarios'] = []
         
         return result
     
@@ -259,15 +253,10 @@ class JSONStoryGraph(JSONAdapter):
                     else:
                         main_steps.append(self._serialize_step(step))
             result['steps'] = main_steps
-        else:
-            result['background'] = []
-            result['steps'] = []
         
-        # Include examples if level >= 'examples'
+        # Include examples only if level >= 'examples'
         if self._level_includes(self._LEVEL_EXAMPLES, include_level):
             result['examples'] = scenario.examples if hasattr(scenario, 'examples') else None
-        else:
-            result['examples'] = None
         
         # Include test code if level >= 'tests'
         if self._level_includes(self._LEVEL_TESTS, include_level) and story:
