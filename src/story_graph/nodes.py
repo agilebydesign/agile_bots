@@ -2403,21 +2403,28 @@ class StoryMap:
         return self._increments.to_list()
 
     def remove_increment(self, increment_name: str) -> bool:
-        return self._increments.remove(increment_name)
+        removed = self._increments.remove(increment_name)
+        if removed:
+            self.save()
+        return removed
 
     def add_increment(self, name: str, after: Optional[str] = None) -> None:
         self._increments.add(name, after)
+        self.save()
 
     def rename_increment(self, from_name: str, to_name: str) -> None:
         self._increments.rename(from_name, to_name)
+        self.save()
 
     def add_story_to_increment(self, increment_name: str, story_name: str) -> None:
         if story_name not in {s.name for s in self.all_stories}:
             raise ValueError(f'Story "{story_name}" not found in graph')
         self._increments.add_story_to(increment_name, story_name)
+        self.save()
 
     def remove_story_from_increment(self, increment_name: str, story_name: str) -> None:
         self._increments.remove_story_from(increment_name, story_name)
+        self.save()
 
     def rename_story_in_hierarchy(self, old_name: str, new_name: str) -> None:
         story = self.find_story_by_name(old_name)
@@ -2430,6 +2437,7 @@ class StoryMap:
         story.name = new_name
         self._increments.rename_story_references(old_name, new_name)
         self.story_graph['epics'] = [self._epic_to_dict(e) for e in self._epics_list]
+        self.save()
 
     def remove_story_from_all_increments(self, story_name: str) -> None:
         self._increments.remove_story_from_all(story_name)

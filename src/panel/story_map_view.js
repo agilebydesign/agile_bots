@@ -2990,76 +2990,123 @@ ${clientScript}    </script>`;
      */
     renderIncrementView(botData, documentIconPath) {
         const increments = botData?.scope?.content?.increments || botData?.increments || [];
-        
-        if (increments.length === 0) {
-            return `
-                <div style="padding: 20px; text-align: center; color: var(--text-color-faded);">
-                    <p>No increments defined in story graph.</p>
-                    <p style="font-size: 12px;">Add increments to your story-graph.json to use the Increment view.</p>
+        const allStories = this._collectAllStoryNames(botData);
+        const assignedStories = new Set(
+            increments.flatMap(inc => (inc.stories || []).map(s => typeof s === 'string' ? s : s.name))
+        );
+        const unallocatedStories = allStories.filter(name => !assignedStories.has(name));
+
+        const storyIcon = documentIconPath
+            ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; flex-shrink: 0;" alt="Story" />`
+            : '';
+
+        let html = `
+            <div style="padding: 8px 12px 4px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--text-color-faded, #444);">
+                <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">INCREMENTS</span>
+                <button onclick="(function(){
+                    var name = prompt('New increment name:');
+                    if (!name || !name.trim()) return;
+                    vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_increment name:\\\"' + name.trim() + '\\\"' });
+                })()" style="font-size: 11px; padding: 2px 8px; cursor: pointer; background: var(--accent-color); color: #fff; border: none; border-radius: 3px; margin-left: auto;">+ Add Increment</button>
+            </div>
+            <div style="display: flex; gap: 0; overflow-x: auto; height: calc(100% - 36px);">
+        `;
+
+        if (unallocatedStories.length > 0 || increments.length === 0) {
+            html += `
+                <div style="min-width: 140px; max-width: 160px; flex-shrink: 0; background: rgba(255,255,255,0.03); border-right: 1px solid var(--text-color-faded, #444); padding: 8px; overflow-y: auto;">
+                    <div style="font-size: 11px; font-weight: 600; opacity: 0.6; margin-bottom: 6px; text-transform: uppercase;">Unallocated</div>
+                    ${unallocatedStories.length === 0
+                        ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(none)</div>`
+                        : unallocatedStories.map(name => `
+                            <div style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px;">
+                                ${storyIcon}<span style="flex: 1; word-wrap: break-word;">${this.escapeHtml(name)}</span>
+                            </div>`).join('')
+                    }
+                    ${increments.length === 0 ? `<div style="margin-top: 12px; font-size: 11px; color: var(--text-color-faded); font-style: italic;">Add an increment to start assigning stories.</div>` : ''}
                 </div>
             `;
         }
-        
-        // Build story icon HTML
-        const storyIcon = documentIconPath 
-            ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; flex-shrink: 0;" alt="Story" />`
-            : '';
-        
-        // Render increments as columns (horizontal row, scrollable)
-        let html = '<div class="increment-columns" style="display: flex; gap: 12px; padding: 12px; flex-wrap: nowrap; overflow-x: auto;">';
-        
+
         for (const increment of increments) {
+            const incName = increment.name;
+            const escapedName = this.escapeHtml(incName);
+            const jsName = incName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
             const stories = increment.stories || [];
-            // Sort stories by sequential_order
-            const sortedStories = [...stories].sort((a, b) => 
+            const sortedStories = [...stories].sort((a, b) =>
                 (a.sequential_order || 0) - (b.sequential_order || 0)
             );
-            
+
             html += `
-                <div class="increment-column" style="
-                    width: 160px;
-                    flex-shrink: 0;
-                    background: var(--card-background, rgba(255,255,255,0.05));
-                    border-radius: 6px;
-                    padding: 10px;
-                ">
-                    <div style="
-                        font-weight: 600;
-                        font-size: 13px;
-                        margin-bottom: 10px;
-                        padding-bottom: 6px;
-                        border-bottom: 1px solid var(--text-color-faded, #666);
-                        word-wrap: break-word;
-                    ">${this.escapeHtml(increment.name)}</div>
-                    <div class="increment-stories" style="display: flex; flex-direction: column; gap: 4px;">
-            `;
-            
-            if (sortedStories.length === 0) {
-                html += `<div style="color: var(--text-color-faded); font-style: italic; font-size: 12px;">(no stories)</div>`;
-            } else {
-                for (const story of sortedStories) {
-                    const storyName = typeof story === 'string' ? story : (story.name || 'Unnamed Story');
-                    html += `
-                        <div class="increment-story" style="
-                            display: flex;
-                            align-items: flex-start;
-                            font-size: 12px;
-                            line-height: 1.3;
-                            word-wrap: break-word;
-                            overflow-wrap: break-word;
-                        ">${storyIcon}<span style="flex: 1; word-wrap: break-word;">${this.escapeHtml(storyName)}</span></div>
-                    `;
-                }
-            }
-            
-            html += `
+                <div style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto;">
+                    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
+                        <span
+                            contenteditable="true"
+                            data-increment="${escapedName}"
+                            onblur="(function(el){
+                                var newName = el.innerText.trim();
+                                var oldName = el.getAttribute('data-increment');
+                                if (!newName || newName === oldName) { el.innerText = oldName; return; }
+                                vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.rename_increment from_name:\\\"' + oldName + '\\\" to_name:\\\"' + newName + '\\\"' });
+                            })(this)"
+                            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment');this.blur();}"
+                            style="flex: 1; font-weight: 600; font-size: 12px; word-wrap: break-word; outline: none; cursor: text; min-width: 0;"
+                            title="Click to rename"
+                        >${escapedName}</span>
+                        <button onclick="(function(){
+                            if (!confirm('Delete increment ${jsName}?')) return;
+                            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_increment increment_name:\\\"${jsName}\\\"' });
+                        })()" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: 1px solid var(--text-color-faded); border-radius: 3px; flex-shrink: 0;" title="Delete increment">x</button>
+                        <button onclick="(function(){
+                            var name = prompt('Add story to ${jsName}:');
+                            if (!name || !name.trim()) return;
+                            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_story_to_increment increment_name:\\\"${jsName}\\\" story_name:\\\"' + name.trim() + '\\\"' });
+                        })()" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 3px; flex-shrink: 0;" title="Add story">+</button>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                        ${sortedStories.length === 0
+                            ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(no stories)</div>`
+                            : sortedStories.map(story => {
+                                const storyName = typeof story === 'string' ? story : (story.name || '');
+                                const escapedStoryName = this.escapeHtml(storyName);
+                                const jsStoryName = storyName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+                                return `
+                                    <div style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px;">
+                                        ${storyIcon}
+                                        <span style="flex: 1; word-wrap: break-word; min-width: 0;">${escapedStoryName}</span>
+                                        <button onclick="(function(){
+                                            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_story_from_increment increment_name:\\\"${jsName}\\\" story_name:\\\"${jsStoryName}\\\"' });
+                                        })()" style="font-size: 9px; padding: 0 3px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; opacity: 0.5; line-height: 1;" title="Remove story from increment">x</button>
+                                    </div>`;
+                            }).join('')
+                        }
                     </div>
                 </div>
             `;
         }
-        
+
         html += '</div>';
         return html;
+    }
+
+    _collectAllStoryNames(botData) {
+        const names = [];
+        const epics = botData?.scope?.content?.epics || botData?.epics || [];
+        const walk = (nodes) => {
+            for (const node of nodes || []) {
+                if (node.name && node.story_type) {
+                    names.push(node.name);
+                }
+                walk(node.sub_epics);
+                for (const sg of node.story_groups || []) {
+                    for (const s of sg.stories || []) {
+                        if (s.name) names.push(s.name);
+                    }
+                }
+            }
+        };
+        walk(epics);
+        return [...new Set(names)];
     }
     
     /**
