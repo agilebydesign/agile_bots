@@ -12,7 +12,6 @@ from invoke_bot.edit_story_map.increment_helper import (
 
 
 def get_story_names_from_increment(increment):
-    """Return story names from an increment stories array."""
     return [s["name"] if isinstance(s, dict) else s for s in increment.stories]
 
 

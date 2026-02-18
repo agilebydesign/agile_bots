@@ -237,12 +237,16 @@ class StoryNode(ABC):
         return {'status': 'success', 'result': self.name}
 
     def copy_json(self, include_level: Optional[str] = None) -> dict:
-        """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit)."""
+        """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit).
+        For clipboard copy, ensures at least 'examples' so scenarios and acceptance_criteria are included."""
         if not self._bot or not hasattr(self._bot, 'story_map'):
             raise ValueError('Cannot serialize node without bot context')
         if include_level is None and hasattr(self._bot, '_scope') and self._bot._scope:
             include_level = getattr(self._bot._scope, 'include_level', 'examples') or 'examples'
         if include_level is None:
+            include_level = 'examples'
+        # Clipboard copy: always include scenarios and acceptance_criteria (min level: examples)
+        if include_level not in _LEVEL_SCENARIOS:
             include_level = 'examples'
         story_map = self._bot.story_map
         generate_trace = include_level in ('tests', 'code')
@@ -264,6 +268,8 @@ class StoryNode(ABC):
         
         # Handle Story deletion from StoryGroup
         if isinstance(parent, StoryGroup):
+            if isinstance(self, Story) and self._bot:
+                self._bot.story_map.remove_story_from_all_increments(node_name)
             parent._children.remove(self)
             parent._resequence_children()
             
@@ -276,6 +282,8 @@ class StoryNode(ABC):
             return {'node_type': node_type, 'node_name': node_name, 'operation': 'delete', 'children_deleted': children_count}
         
         # Always cascade delete
+        if isinstance(self, Story) and self._bot:
+            self._bot.story_map.remove_story_from_all_increments(node_name)
         self._children.clear()
         
         parent._children.remove(self)
@@ -2094,7 +2102,6 @@ class EpicsCollection:
 
 @dataclass
 class Increment:
-    """Domain type for a prioritized delivery slice containing story references."""
     name: str
     priority: int
     stories: List[Union[str, Dict[str, Any]]] = field(default_factory=list)
@@ -2104,32 +2111,47 @@ class Increment:
     relative_size: Optional[str] = None
     approach: Optional[str] = None
     focus: Optional[str] = None
-    
-    def _sort_stories_by_sequential_order(self) -> List[Dict[str, Any]]:
-        """Sort stories by sequential_order field if present."""
-        story_dicts = []
-        for story in self.stories:
-            if isinstance(story, dict):
-                story_dicts.append(story)
-            else:
-                story_dicts.append({'name': story, 'sequential_order': 0})
+
+    def _story_name(self, story) -> str:
+        return story['name'] if isinstance(story, dict) else str(story)
+
+    @property
+    def stories_in_order(self) -> List[Dict[str, Any]]:
+        story_dicts = [
+            s if isinstance(s, dict) else {'name': s, 'sequential_order': 0}
+            for s in self.stories
+        ]
         return sorted(story_dicts, key=lambda s: s.get('sequential_order', 0))
-    
+
     def format_for_cli(self) -> str:
-        """Format increment for CLI display (absorbs increment_views.py logic)."""
         output_lines = [f"{self.name}:"]
         if self.stories:
-            sorted_stories = self._sort_stories_by_sequential_order()
-            for story in sorted_stories:
-                story_name = story['name'] if isinstance(story, dict) else str(story)
-                output_lines.append(f"  - {story_name}")
+            for story in self.stories_in_order:
+                output_lines.append(f"  - {story['name']}")
         else:
             output_lines.append("  (no stories)")
         return "\n".join(output_lines)
-    
+
+    def add_story(self, story_name: str) -> None:
+        if any(self._story_name(s) == story_name for s in self.stories):
+            raise ValueError(f'Story "{story_name}" already in increment "{self.name}"')
+        self.stories.append({'name': story_name, 'sequential_order': len(self.stories) + 1.0})
+
+    def remove_story(self, story_name: str) -> None:
+        updated = [s for s in self.stories if self._story_name(s) != story_name]
+        if len(updated) == len(self.stories):
+            raise ValueError(f'Story "{story_name}" not in increment "{self.name}"')
+        self.stories = updated
+
+    def rename_story_reference(self, old_name: str, new_name: str) -> None:
+        self.stories = [
+            {'name': new_name, 'sequential_order': s.get('sequential_order', 1.0) if isinstance(s, dict) else 1.0}
+            if self._story_name(s) == old_name else s
+            for s in self.stories
+        ]
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Increment':
-        """Create Increment from dictionary."""
         return cls(
             name=data.get('name', ''),
             priority=data.get('priority', 0),
@@ -2141,75 +2163,113 @@ class Increment:
             approach=data.get('approach'),
             focus=data.get('focus')
         )
-    
+
     def to_dict(self) -> Dict[str, Any]:
-        """Convert Increment to dictionary for serialization."""
         result = {
             'name': self.name,
             'priority': self.priority,
-            'stories': self.stories
+            'stories': self.stories,
         }
-        if self.description is not None:
-            result['description'] = self.description
-        if self.goal is not None:
-            result['goal'] = self.goal
-        if self.estimated_stories is not None:
-            result['estimated_stories'] = self.estimated_stories
-        if self.relative_size is not None:
-            result['relative_size'] = self.relative_size
-        if self.approach is not None:
-            result['approach'] = self.approach
-        if self.focus is not None:
-            result['focus'] = self.focus
+        optional_fields = ('description', 'goal', 'estimated_stories', 'relative_size', 'approach', 'focus')
+        result.update({k: getattr(self, k) for k in optional_fields if getattr(self, k) is not None})
         return result
 
 class IncrementCollection:
-    """Collection of Increment objects with query methods."""
-    
+
     def __init__(self, increments: List[Increment]):
         self._increments = increments
-        self._by_name = {inc.name: inc for inc in increments}
-        self._by_priority = {inc.priority: inc for inc in increments}
-    
+        self._rebuild_indexes()
+
+    def _rebuild_indexes(self) -> None:
+        self._by_name = {inc.name: inc for inc in self._increments}
+        self._by_priority = {inc.priority: inc for inc in self._increments}
+
     def __iter__(self) -> Iterator[Increment]:
         return iter(self._increments)
-    
+
     def __len__(self) -> int:
         return len(self._increments)
-    
+
     def __getitem__(self, name: str) -> Increment:
-        """Access increment by name."""
         if name not in self._by_name:
             raise KeyError(f'Increment "{name}" not found')
         return self._by_name[name]
-    
+
     def find_by_name(self, name: str) -> Optional[Increment]:
-        """Find increment by name, return None if not found."""
         return self._by_name.get(name)
-    
+
     def find_by_priority(self, priority: int) -> Optional[Increment]:
-        """Find increment by priority, return None if not found."""
         return self._by_priority.get(priority)
-    
+
     @property
     def sorted_by_priority(self) -> List[Increment]:
-        """Return increments sorted by priority."""
         return sorted(self._increments, key=lambda inc: inc.priority)
-    
+
     def format_for_cli(self) -> str:
-        """Format all increments for CLI display (absorbs increment_views.py logic)."""
         if not self._increments:
             return "No increments defined in story graph"
         return "\n".join(inc.format_for_cli() for inc in self._increments)
-    
+
+    def add(self, name: str, after: Optional[str] = None) -> None:
+        if name in self._by_name:
+            raise ValueError(f'Increment "{name}" already exists')
+        if after is not None:
+            after_inc = self._by_name.get(after)
+            if after_inc is None:
+                raise ValueError(f'Increment "{after}" not found')
+            new_priority = after_inc.priority + 1
+            for inc in self._increments:
+                if inc.priority >= new_priority:
+                    inc.priority += 1
+            insert_idx = next(i for i, inc in enumerate(self._increments) if inc.name == after) + 1
+            self._increments.insert(insert_idx, Increment(name=name, priority=new_priority, stories=[]))
+        else:
+            max_priority = max((inc.priority for inc in self._increments), default=0)
+            self._increments.append(Increment(name=name, priority=max_priority + 1, stories=[]))
+        self._rebuild_indexes()
+
+    def remove(self, name: str) -> bool:
+        for i, inc in enumerate(self._increments):
+            if inc.name == name:
+                self._increments.pop(i)
+                self._rebuild_indexes()
+                return True
+        return False
+
+    def rename(self, from_name: str, to_name: str) -> None:
+        if to_name in self._by_name and to_name != from_name:
+            raise ValueError(f'Increment "{to_name}" already exists')
+        inc = self._by_name.get(from_name)
+        if inc is None:
+            raise ValueError(f'Increment "{from_name}" not found')
+        inc.name = to_name
+        self._rebuild_indexes()
+
+    def add_story_to(self, increment_name: str, story_name: str) -> None:
+        inc = self._by_name.get(increment_name)
+        if inc is None:
+            raise ValueError(f'Increment "{increment_name}" not found')
+        inc.add_story(story_name)
+
+    def remove_story_from(self, increment_name: str, story_name: str) -> None:
+        inc = self._by_name.get(increment_name)
+        if inc is None:
+            raise ValueError(f'Increment "{increment_name}" not found')
+        inc.remove_story(story_name)
+
+    def remove_story_from_all(self, story_name: str) -> None:
+        for inc in self._increments:
+            inc.stories = [s for s in inc.stories if inc._story_name(s) != story_name]
+
+    def rename_story_references(self, old_name: str, new_name: str) -> None:
+        for inc in self._increments:
+            inc.rename_story_reference(old_name, new_name)
+
     @classmethod
     def from_list(cls, increments_data: List[Dict[str, Any]]) -> 'IncrementCollection':
-        """Create IncrementCollection from list of dictionaries."""
-        increments = [Increment.from_dict(data) for data in increments_data]
-        return cls(increments)
-    
+        return cls([Increment.from_dict(data) for data in increments_data])
+
     def to_list(self) -> List[Dict[str, Any]]:
-        """Convert collection to list of dictionaries for serialization."""
         return [inc.to_dict() for inc in self._increments]
 
 class StoryMap:
@@ -2280,12 +2340,6 @@ class StoryMap:
         if hasattr(self._bot, '_story_graph'):
             self._bot._story_graph = None
 
-    def _set_bot_on_all_nodes(self, bot: Any) -> None:
-        for epic in self._epics_list:
-            epic._bot = bot
-            for node in self.walk(epic):
-                node._bot = bot
-
     @property
     def epics(self) -> EpicsCollection:
         return self._epics
@@ -2349,14 +2403,36 @@ class StoryMap:
         return self._increments.to_list()
 
     def remove_increment(self, increment_name: str) -> bool:
-        """Remove an increment by name. Returns True if found and removed."""
-        increments_list = self._increments.to_list()
-        for i, inc in enumerate(increments_list):
-            if inc.get('name') == increment_name:
-                increments_list.pop(i)
-                self._increments = IncrementCollection.from_list(increments_list)
-                return True
-        return False
+        return self._increments.remove(increment_name)
+
+    def add_increment(self, name: str, after: Optional[str] = None) -> None:
+        self._increments.add(name, after)
+
+    def rename_increment(self, from_name: str, to_name: str) -> None:
+        self._increments.rename(from_name, to_name)
+
+    def add_story_to_increment(self, increment_name: str, story_name: str) -> None:
+        if story_name not in {s.name for s in self.all_stories}:
+            raise ValueError(f'Story "{story_name}" not found in graph')
+        self._increments.add_story_to(increment_name, story_name)
+
+    def remove_story_from_increment(self, increment_name: str, story_name: str) -> None:
+        self._increments.remove_story_from(increment_name, story_name)
+
+    def rename_story_in_hierarchy(self, old_name: str, new_name: str) -> None:
+        story = self.find_story_by_name(old_name)
+        if not story:
+            raise ValueError(f'Story "{old_name}" not found')
+        if story._parent:
+            for sibling in story._parent.children:
+                if sibling is not story and sibling.name == new_name:
+                    raise ValueError(f'Story "{new_name}" already exists among siblings')
+        story.name = new_name
+        self._increments.rename_story_references(old_name, new_name)
+        self.story_graph['epics'] = [self._epic_to_dict(e) for e in self._epics_list]
+
+    def remove_story_from_all_increments(self, story_name: str) -> None:
+        self._increments.remove_story_from_all(story_name)
 
     def apply_update_report(self, report: 'UpdateReport') -> None:
         """Apply an update report to this story map.
