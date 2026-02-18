@@ -996,11 +996,23 @@ class BotPanel {
               }
               
               this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 5] Executing command via backend...`);
+              const isIncrementCmd = message.commandText.includes('_increment') || message.commandText.includes('add_increment') || message.commandText.includes('rename_story_in');
+              if (isIncrementCmd) {
+                this._log(`[INCREMENT][CLI] Received increment command: ${message.commandText}`);
+              }
               const runExecute = () => this._botView?.execute(message.commandText)
                 .then((result) => {
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] [SUCCESS] Backend command executed successfully`);
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Command: ${message.commandText}`);
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Result: ${JSON.stringify(result).substring(0, 500)}`);
+                  if (isIncrementCmd) {
+                    this._log(`[INCREMENT][CLI->UI] Result for "${message.commandText}": ${JSON.stringify(result)}`);
+                    this._panel.webview.postMessage({
+                      command: 'incrementCommandResult',
+                      commandText: message.commandText,
+                      result: result
+                    });
+                  }
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Timestamp: ${new Date().toISOString()}`);
                   
                   // Log result to file
@@ -1046,6 +1058,12 @@ class BotPanel {
                       result: result
                     });
                     this._log(`[BotPanel] Message sent to webview`);
+                  }
+                  
+                  // Increment commands always need a full refresh to show updated data
+                  if (isIncrementCmd) {
+                    this._log(`[INCREMENT] Refreshing panel after increment command`);
+                    return this._update();
                   }
                   
                   // CRITICAL: Always skip refresh for story-changing operations
@@ -4045,39 +4063,55 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
+        function _incCmd(commandText) {
+            console.log('[INCREMENT] >>> Sending command:', commandText);
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[INCREMENT][UI->CLI] ' + commandText
+            });
+            vscode.postMessage({ command: 'executeCommand', commandText: commandText });
+        }
+
         window.selectIncrement = function(name) {
+            console.log('[INCREMENT] selectIncrement:', name);
             window.selectNode('increment', name, { name: name, path: 'story_graph.increments."' + name + '"' });
-            // Highlight the selected increment column
             document.querySelectorAll('.increment-column-container').forEach(function(col) {
                 col.classList.toggle('selected', col.getAttribute('data-inc') === name);
             });
         };
 
         window.addIncrement = function() {
+            console.log('[INCREMENT] addIncrement clicked');
             var name = prompt('New increment name:');
-            if (!name || !name.trim()) return;
-            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_increment name:"' + name.trim() + '"' });
+            console.log('[INCREMENT] addIncrement name entered:', name);
+            if (!name || !name.trim()) { console.log('[INCREMENT] addIncrement cancelled'); return; }
+            _incCmd('story_graph.add_increment name:"' + name.trim() + '"');
         };
 
         window.deleteIncrement = function(incrementName) {
-            if (!confirm('Delete increment "' + incrementName + '"?')) return;
-            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_increment increment_name:"' + incrementName + '"' });
+            console.log('[INCREMENT] deleteIncrement clicked for:', incrementName);
+            if (!confirm('Delete increment "' + incrementName + '"?')) { console.log('[INCREMENT] deleteIncrement cancelled'); return; }
+            _incCmd('story_graph.remove_increment increment_name:"' + incrementName + '"');
         };
 
         window.renameIncrement = function(el, oldName) {
             var newName = el.innerText.trim();
+            console.log('[INCREMENT] renameIncrement oldName=' + oldName + ' newName=' + newName);
             if (!newName || newName === oldName) { el.innerText = oldName; return; }
-            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.rename_increment from_name:"' + oldName + '" to_name:"' + newName + '"' });
+            _incCmd('story_graph.rename_increment from_name:"' + oldName + '" to_name:"' + newName + '"');
         };
 
         window.addStoryToIncrement = function(incrementName) {
+            console.log('[INCREMENT] addStoryToIncrement for increment:', incrementName);
             var name = prompt('Add story to "' + incrementName + '":');
-            if (!name || !name.trim()) return;
-            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + name.trim() + '"' });
+            console.log('[INCREMENT] addStoryToIncrement story name entered:', name);
+            if (!name || !name.trim()) { console.log('[INCREMENT] addStoryToIncrement cancelled'); return; }
+            _incCmd('story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + name.trim() + '"');
         };
 
         window.removeStoryFromIncrement = function(incrementName, storyName) {
-            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"' });
+            console.log('[INCREMENT] removeStoryFromIncrement inc=' + incrementName + ' story=' + storyName);
+            _incCmd('story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"');
         };
 
         window.createSubEpic = function(parentName) {
@@ -5198,6 +5232,12 @@ class BotPanel {
         window.addEventListener('message', event => {
             const message = event.data;
             console.log('[WebView] Received message from extension:', message);
+            
+            if (message.command === 'incrementCommandResult') {
+                var status = (message.result && message.result.status) ? message.result.status : 'unknown';
+                console.log('[INCREMENT][CLI->UI] Response received. command=' + message.commandText + ' status=' + status + ' result=' + JSON.stringify(message.result));
+                return;
+            }
             
             if (message.command === 'saveCompleted') {
                 console.log('[ASYNC_SAVE] [WEBVIEW] [STEP 10] Received saveCompleted message from extension host success=' + message.success + ' error=' + (message.error || 'none') + ' timestamp=' + new Date().toISOString());
