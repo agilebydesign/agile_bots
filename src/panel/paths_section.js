@@ -7,6 +7,7 @@
  */
 
 const PanelView = require('./panel_view');
+const { escapeForHtml, truncatePath } = require('./utils');
 
 class PathsSection extends PanelView {
     /**
@@ -16,44 +17,7 @@ class PathsSection extends PanelView {
      */
     constructor(botPathOrCli) {
         super(botPathOrCli);
-    }
-    
-    /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-    
-    /**
-     * Truncate path with ellipsis if too long.
-     * 
-     * @param {string} path - Path to truncate
-     * @param {number} maxLength - Maximum length
-     * @returns {string} Truncated path
-     */
-    truncatePath(path, maxLength) {
-        if (!path || path.length <= maxLength) {
-            return path;
-        }
-        const ellipsis = '...';
-        const prefixLength = Math.floor((maxLength - ellipsis.length) / 2);
-        const suffixLength = maxLength - ellipsis.length - prefixLength;
-        return path.substring(0, prefixLength) + ellipsis + path.substring(path.length - suffixLength);
-    }
+    }    
     
     /**
      * Render paths section HTML.
@@ -75,10 +39,10 @@ class PathsSection extends PanelView {
         if (!botData.bot_directory) throw new Error('[PathsSection] No bot_directory in response');
         
         const maxPathLength = 80;
-        const safeWorkspaceDir = this.escapeHtml(botData.workspace_directory);
-        const safeBotDir = this.escapeHtml(botData.bot_directory);
-        const displayWorkspaceDir = this.truncatePath(safeWorkspaceDir, maxPathLength);
-        const displayBotDir = this.truncatePath(safeBotDir, maxPathLength);
+        const safeWorkspaceDir = escapeForHtml(botData.workspace_directory);
+        const safeBotDir = escapeForHtml(botData.bot_directory);
+        const displayWorkspaceDir = truncatePath(safeWorkspaceDir, maxPathLength);
+        const displayBotDir = truncatePath(safeBotDir, maxPathLength);
         
         return `
             <div class="card-secondary" style="padding: 1px 5px 2px 5px;">
