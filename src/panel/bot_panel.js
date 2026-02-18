@@ -2493,6 +2493,11 @@ class BotPanel {
             background-color: rgba(${brandColorRgb}, 0.35); /* Distinct brand color when selected */
         }
         
+        .increment-column-container.selected {
+            background-color: rgba(${brandColorRgb}, 0.2);
+            border-top: 2px solid var(--accent-color);
+        }
+        
         
         .collapsible-section {
             margin-bottom: var(--space-sm);
@@ -4040,6 +4045,14 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
+        window.selectIncrement = function(name) {
+            window.selectNode('increment', name, { name: name, path: 'story_graph.increments."' + name + '"' });
+            // Highlight the selected increment column
+            document.querySelectorAll('.increment-column-container').forEach(function(col) {
+                col.classList.toggle('selected', col.getAttribute('data-inc') === name);
+            });
+        };
+
         window.addIncrement = function() {
             var name = prompt('New increment name:');
             if (!name || !name.trim()) return;
@@ -4265,6 +4278,8 @@ class BotPanel {
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
                 // Note: submit button will be shown below if scenario has behavior_needed
+            } else if (window.selectedNode.type === 'increment') {
+                if (btnScopeTo) btnScopeTo.style.display = 'block';
             }
             
             // Show related files buttons for all non-root nodes
@@ -4485,9 +4500,12 @@ class BotPanel {
                 message: '[WebView] selectNode: type=' + type + ', name=' + name + ', options=' + JSON.stringify(options)
             });
             
-            // Remove selected class from all nodes
+            // Remove selected class from all nodes and increment columns
             document.querySelectorAll('.story-node.selected').forEach(node => {
                 node.classList.remove('selected');
+            });
+            document.querySelectorAll('.increment-column-container.selected').forEach(col => {
+                col.classList.remove('selected');
             });
             
             // Add selected class to the clicked node
@@ -4695,6 +4713,8 @@ class BotPanel {
                 scopeCommand = 'subepic ' + nodeName;
             } else if (nodeType === 'epic') {
                 scopeCommand = 'epic ' + nodeName;
+            } else if (nodeType === 'increment') {
+                scopeCommand = 'story ' + nodeName;
             } else {
                 // Fallback to just the name for unknown types
                 scopeCommand = nodeName;

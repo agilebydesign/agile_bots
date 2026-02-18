@@ -3034,18 +3034,19 @@ ${clientScript}    </script>`;
             );
 
             html += `
-                <div style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto;">
+                <div class="increment-column-container" data-inc="${escapedName}" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
                         <span
                             contenteditable="true"
                             data-increment-name="${escapedName}"
+                            onclick="event.stopPropagation();"
                             onblur="renameIncrement(this, this.getAttribute('data-increment-name'))"
                             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment-name');this.blur();}"
                             style="flex: 1; font-weight: 600; font-size: 12px; word-wrap: break-word; outline: none; cursor: text; min-width: 0;"
                             title="Click to rename"
                         >${escapedName}</span>
-                        <button data-inc="${escapedName}" onclick="deleteIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: 1px solid var(--text-color-faded); border-radius: 3px; flex-shrink: 0;" title="Delete increment">x</button>
-                        <button data-inc="${escapedName}" onclick="addStoryToIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 3px; flex-shrink: 0;" title="Add story">+</button>
+                        <button data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: 1px solid var(--text-color-faded); border-radius: 3px; flex-shrink: 0;" title="Delete increment">x</button>
+                        <button data-inc="${escapedName}" onclick="event.stopPropagation(); addStoryToIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 3px; flex-shrink: 0;" title="Add story">+</button>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
                         ${sortedStories.length === 0
