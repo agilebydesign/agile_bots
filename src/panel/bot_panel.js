@@ -4040,6 +4040,33 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
+        window.addIncrement = function() {
+            var name = prompt('New increment name:');
+            if (!name || !name.trim()) return;
+            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_increment name:"' + name.trim() + '"' });
+        };
+
+        window.deleteIncrement = function(incrementName) {
+            if (!confirm('Delete increment "' + incrementName + '"?')) return;
+            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_increment increment_name:"' + incrementName + '"' });
+        };
+
+        window.renameIncrement = function(el, oldName) {
+            var newName = el.innerText.trim();
+            if (!newName || newName === oldName) { el.innerText = oldName; return; }
+            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.rename_increment from_name:"' + oldName + '" to_name:"' + newName + '"' });
+        };
+
+        window.addStoryToIncrement = function(incrementName) {
+            var name = prompt('Add story to "' + incrementName + '":');
+            if (!name || !name.trim()) return;
+            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + name.trim() + '"' });
+        };
+
+        window.removeStoryFromIncrement = function(incrementName, storyName) {
+            vscode.postMessage({ command: 'executeCommand', commandText: 'story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"' });
+        };
+
         window.createSubEpic = function(parentName) {
             console.log('[WebView] createSubEpic called for:', parentName);
             vscode.postMessage({
