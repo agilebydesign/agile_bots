@@ -287,8 +287,8 @@ class StoryMapView extends PanelView {
         log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
         
         if (isIncrementView) {
-            // Render increment columns view (read-only)
-            contentHtml = this.renderIncrementView(botData, documentIconPath);
+            // Render increment columns view with shared toolbar so buttons exist in DOM
+            contentHtml = actionButtonsHtml + this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
         } else if (isFilesView && scopeData.type === 'files' && scopeData.content) {
