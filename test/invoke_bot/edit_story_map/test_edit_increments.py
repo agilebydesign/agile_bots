@@ -1,534 +1,379 @@
 import pytest
 from helpers.bot_test_helper import BotTestHelper
+from helpers import TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper
+from invoke_bot.edit_story_map.increment_helper import (
+    story_graph_with_increments_mvp_phase2,
+    story_graph_with_increment_named_mvp,
+    story_graph_with_increments_mvp_phase1,
+    story_graph_with_increment_and_story,
+    story_graph_with_story_in_multiple_increments,
+    story_graph_with_two_stories_in_same_parent,
+)
 
 
-class TestDisplayIncrementScopeViewCLI:
-    
-    @pytest.mark.parametrize("increment_name,increment_priority,stories", [
-        ("MVP Release", 1, [("Create Profile", 1), ("Authenticate User", 2)]),
-        ("Enhancement Release", 2, [("Add Payment Method", 1), ("View History", 2)]),
-    ])
-    def test_cli_returns_simple_increments_object_with_stories(
-        self, tmp_path, increment_name, increment_priority, stories
-    ):
-        """
-        SCENARIO: CLI returns simple Increments object with stories
-        
-        GIVEN story graph contains increments with stories assigned
-        AND CLI session is active
-        WHEN User requests increment view via CLI
-        THEN CLI returns Increments object containing collection of Increment
-        AND each Increment contains name, priority, and stories array
-        AND stories array contains Story objects from StoryNode
-        """
+def get_story_names_from_increment(increment):
+    """Return story names from an increment stories array."""
+    return [s["name"] if isinstance(s, dict) else s for s in increment.stories]
+
+
+class TestAddIncrement:
+    def test_add_increment_after_selected(self, tmp_path):
+        """Add increment after selected increment."""
         helper = BotTestHelper(tmp_path)
-        story_graph = given_story_graph_with_increment(
-            helper, increment_name, increment_priority, stories
+        helper.increment.create_story_graph_with_increments(story_graph_with_increments_mvp_phase2())
+        story_map = helper.increment.get_story_map()
+
+        story_map.add_increment("Phase 1.5", after="MVP")
+
+        increments = story_map.increments.sorted_by_priority
+        names = [inc.name for inc in increments]
+        assert names == ["MVP", "Phase 1.5", "Phase 2"]
+        phase15 = story_map.increments.find_by_name("Phase 1.5")
+        assert phase15.priority == 2
+        assert phase15.stories == []
+
+    def test_add_increment_when_nothing_selected_appends_to_back(self, tmp_path):
+        """Add increment when nothing selected appends to back."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(story_graph_with_increments_mvp_phase2())
+        story_map = helper.increment.get_story_map()
+
+        story_map.add_increment("Phase 3", after=None)
+
+        increments = story_map.increments.sorted_by_priority
+        names = [inc.name for inc in increments]
+        assert names == ["MVP", "Phase 2", "Phase 3"]
+        phase3 = story_map.increments.find_by_name("Phase 3")
+        assert phase3.priority == 3
+
+    def test_add_increment_duplicate_name_returns_error(self, tmp_path):
+        """Add increment with duplicate name returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(story_graph_with_increment_named_mvp())
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="already exists"):
+            story_map.add_increment("MVP", after=None)
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
+    ])
+    def test_cli_add_increment_after_mvp(self, tmp_path, helper_class):
+        """CLI adds increment after MVP with bumped priorities."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increments_mvp_phase2()
         )
-        
-        # When
-        increments = when_user_requests_increment_view_via_cli(helper, story_graph)
-        
-        # Then
-        then_cli_returns_increments_object(increments)
-        then_increment_contains_name_priority_stories(
-            increments, increment_name, increment_priority, len(stories)
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.add_increment name:"Phase 1.5" after:"MVP"'
         )
-    
-    @pytest.mark.parametrize("increment_name,increment_priority,stories,expected_output", [
-        (
-            "MVP Release", 1,
-            [("Create Profile", 1), ("Authenticate User", 2)],
-            "MVP Release:\n  - Create Profile\n  - Authenticate User"
-        ),
-        (
-            "Enhancement Release", 2,
-            [("Add Payment Method", 1), ("View History", 2)],
-            "Enhancement Release:\n  - Add Payment Method\n  - View History"
-        ),
+
+        story_map = helper.domain.bot.story_map
+        increments = story_map.increments.sorted_by_priority
+        names = [inc.name for inc in increments]
+        assert names == ["MVP", "Phase 1.5", "Phase 2"]
+        phase15 = story_map.increments.find_by_name("Phase 1.5")
+        assert phase15.priority == 2
+        assert "success" in cli_response.output.lower()
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
     ])
-    def test_cli_displays_increment_list_with_stories_in_natural_order(
-        self, tmp_path, increment_name, increment_priority, stories, expected_output
-    ):
-        """
-        SCENARIO: CLI displays increment list with stories in natural order
-        
-        GIVEN story graph contains increments with stories assigned
-        AND CLI session is active
-        WHEN User enters increment view command
-        THEN CLI displays each increment with name as header
-        AND CLI lists stories in natural sequential order under each increment
-        AND output is simple list format without hierarchy nesting
-        """
-        helper = BotTestHelper(tmp_path)
-        story_graph = given_story_graph_with_increment(
-            helper, increment_name, increment_priority, stories
+    def test_cli_add_increment_append(self, tmp_path, helper_class):
+        """CLI appends increment to end when no after specified."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increments_mvp_phase2()
         )
-        
-        # When
-        output = when_user_enters_increment_view_command(helper, story_graph)
-        
-        # Then
-        then_cli_displays_increment_with_stories_in_order(output, expected_output)
-    
-    @pytest.mark.parametrize("increment_name,increment_priority,expected_output", [
-        ("Backlog", 99, "Backlog:\n  (no stories)"),
-    ])
-    def test_cli_displays_empty_increment_with_no_stories_message(
-        self, tmp_path, increment_name, increment_priority, expected_output
-    ):
-        """
-        SCENARIO: CLI displays empty increment with no stories message
-        
-        GIVEN story graph contains an increment with no stories assigned
-        AND CLI session is active
-        WHEN User enters increment view command
-        THEN CLI displays increment name as header
-        AND CLI shows empty state message for increment with no stories
-        """
-        helper = BotTestHelper(tmp_path)
-        story_graph = given_story_graph_with_empty_increment(
-            helper, increment_name, increment_priority
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.add_increment name:"Phase 3"'
         )
-        
-        # When
-        output = when_user_enters_increment_view_command(helper, story_graph)
-        
-        # Then
-        then_cli_displays_empty_increment_message(output, expected_output)
-    
-    @pytest.mark.parametrize("story_property,source,included_in_increment_view", [
-        ("name", "StoryNode.name", True),
-        ("test_class", "StoryNode.test_class", True),
-        ("sequential_order", "StoryNode.sequential_order", True),
-    ])
-    def test_cli_returns_increments_object_using_existing_storynode_domain_objects(
-        self, tmp_path, story_property, source, included_in_increment_view
-    ):
-        """
-        SCENARIO: CLI returns Increments object using existing StoryNode domain objects
-        
-        GIVEN story graph contains increments referencing Story nodes
-        AND CLI session is active
-        WHEN User requests increment view via CLI
-        THEN CLI returns Increments collection
-        AND Increment.stories contains references to existing StoryNode objects
-        AND Story objects include standard StoryNode properties
-        """
-        helper = BotTestHelper(tmp_path)
-        story_graph = given_story_graph_with_increment_referencing_story_nodes(helper)
-        
-        # When
-        increments = when_user_requests_increment_view_via_cli(helper, story_graph)
-        
-        # Then
-        then_story_objects_include_property(increments, story_property)
-    
-    @pytest.mark.parametrize("increment_count,expected_message", [
-        (0, "No increments defined in story graph"),
-    ])
-    def test_cli_displays_message_when_no_increments_exist(
-        self, tmp_path, increment_count, expected_message
-    ):
-        """
-        SCENARIO: CLI displays message when no increments exist
-        
-        GIVEN story graph contains no increments
-        AND CLI session is active
-        WHEN User requests increment view via CLI
-        THEN CLI displays no increments defined message
-        AND CLI returns empty Increments collection
-        """
-        helper = BotTestHelper(tmp_path)
-        story_graph = given_story_graph_with_no_increments(helper)
-        
-        # When
-        result = when_user_requests_increment_view_via_cli(helper, story_graph)
-        
-        # Then
-        then_cli_displays_no_increments_message(result, expected_message)
-        then_increments_collection_is_empty(result)
 
+        story_map = helper.domain.bot.story_map
+        increments = story_map.increments.sorted_by_priority
+        names = [inc.name for inc in increments]
+        assert names == ["MVP", "Phase 2", "Phase 3"]
+        phase3 = story_map.increments.find_by_name("Phase 3")
+        assert phase3.priority == 3
+        assert "success" in cli_response.output.lower()
 
-class TestDisplayIncrementScopeView:
-    
-    @pytest.mark.parametrize("initial_view,toggle_action,resulting_view,toggle_label,tooltip", [
-        ("Hierarchy", "click toggle", "Increment", "Hierarchy", "Display Hierarchy view"),
-        ("Increment", "click toggle", "Hierarchy", "Increment", "Display Increment view"),
-    ])
-    def test_user_toggles_from_hierarchy_view_to_increment_view(
-        self, tmp_path, initial_view, toggle_action, resulting_view, toggle_label, tooltip
-    ):
-        """
-        SCENARIO: User toggles from Hierarchy view to Increment view
-        
-        GIVEN story graph contains increments with stories assigned
-        AND Panel is open in Hierarchy view
-        WHEN User clicks toggle button beside filter in filter box title
-        THEN Panel switches from Hierarchy view to Increment view
-        AND toggle button shows Hierarchy label with tooltip Display Hierarchy view
-        AND Panel displays one column per increment with increment name at top
-        """
+class TestRemoveIncrement:
+    def test_remove_increment_by_name(self, tmp_path):
+        """Remove increment by name."""
         helper = BotTestHelper(tmp_path)
-        panel_state = given_panel_open_in_view(helper, initial_view)
-        
-        # When
-        new_state = when_user_clicks_view_toggle(panel_state)
-        
-        # Then
-        then_panel_switches_to_view(new_state, resulting_view)
-        then_toggle_button_shows_label_and_tooltip(new_state, toggle_label, tooltip)
-    
-    @pytest.mark.parametrize("increment_name,increment_priority,stories", [
-        ("MVP Release", 1, ["Create Profile", "Authenticate User", "Submit Application"]),
-        ("Enhancement Release", 2, ["Add Payment Method", "View History", "Export Report"]),
-        ("Future Release", 3, ["Advanced Analytics", "Custom Dashboard"]),
-    ])
-    def test_increment_view_displays_stories_in_natural_order_per_column(
-        self, tmp_path, increment_name, increment_priority, stories
-    ):
-        """
-        SCENARIO: Increment view displays stories in natural order per column
-        
-        GIVEN story graph contains multiple increments with stories
-        AND Panel is in Increment view
-        WHEN Panel renders Increment view
-        THEN Panel shows one column per increment
-        AND each column has increment name at top
-        AND stories display in natural order one after another
-        AND view is read-only with no edit capability
-        """
-        # Given
+        helper.increment.create_story_graph_with_increments(story_graph_with_increment_named_mvp())
+        story_map = helper.increment.get_story_map()
+
+        removed = story_map.remove_increment("MVP")
+
+        assert removed is True
+        assert story_map.increments.find_by_name("MVP") is None
+
+    def test_remove_nonexistent_increment_returns_error(self, tmp_path):
+        """Remove non-existent increment returns error."""
         helper = BotTestHelper(tmp_path)
-        panel_state = given_panel_in_increment_view_with_stories(
-            helper, increment_name, increment_priority, stories
+        helper.increment.create_story_graph_with_increments(story_graph_with_increments_mvp_phase2())
+        story_map = helper.increment.get_story_map()
+
+        removed = story_map.remove_increment("Missing")
+
+        assert removed is False
+
+    def test_remove_increment_with_stories_leaves_hierarchy_unchanged(self, tmp_path):
+        """Remove increment that contains stories leaves hierarchy unchanged."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
         )
-        
-        # When
-        rendered = when_panel_renders_increment_view(panel_state)
-        
-        # Then
-        then_panel_shows_column_for_increment(rendered, increment_name)
-        then_column_has_increment_name_at_top(rendered, increment_name)
-        then_stories_display_in_natural_order(rendered, stories)
-        then_view_is_read_only(rendered)
-    
-    @pytest.mark.parametrize("increment_name,expected_message", [
-        ("Backlog", "(no stories)"),
+        story_map = helper.increment.get_story_map()
+
+        removed = story_map.remove_increment("MVP")
+
+        assert removed is True
+        assert story_map.increments.find_by_name("MVP") is None
+        assert any(s.name == "Validate Order" for s in story_map.all_stories)
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
     ])
-    def test_increment_view_displays_empty_column_for_increment_with_no_stories(
-        self, tmp_path, increment_name, expected_message
-    ):
-        """
-        SCENARIO: Increment view displays empty column for increment with no stories
-        
-        GIVEN story graph contains an increment with no stories
-        AND Panel is in Increment view
-        WHEN Panel renders Increment view
-        THEN Panel shows column for empty increment
-        AND column shows increment name at top
-        AND column shows empty state message
-        """
-        # Given
-        helper = BotTestHelper(tmp_path)
-        panel_state = given_panel_in_increment_view_with_empty_increment(
-            helper, increment_name
+    def test_cli_remove_increment(self, tmp_path, helper_class):
+        """CLI removes increment and displays confirmation."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increment_named_mvp()
         )
-        
-        # When
-        rendered = when_panel_renders_increment_view(panel_state)
-        
-        # Then
-        then_panel_shows_column_for_increment(rendered, increment_name)
-        then_column_shows_empty_state_message(rendered, expected_message)
-    
-    @pytest.mark.parametrize("hidden_control,reason", [
-        ("Create Epic button", "Increment view is read-only"),
-        ("Delete button", "Increment view is read-only"),
-        ("Inline name editor", "Increment view is read-only"),
-    ])
-    def test_increment_view_is_read_only_with_no_edit_controls(
-        self, tmp_path, hidden_control, reason
-    ):
-        """
-        SCENARIO: Increment view is read-only with no edit controls
-        
-        GIVEN story graph contains increments with stories
-        AND Panel is in Increment view
-        WHEN Panel renders Increment view
-        THEN Panel does not show create buttons
-        AND Panel does not show delete buttons
-        AND Panel does not show inline edit controls
-        AND stories are display-only
-        """
-        # Given
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.remove_increment increment_name:"MVP"'
+        )
+
+        story_map = helper.domain.bot.story_map
+        assert story_map.increments.find_by_name("MVP") is None
+        assert "success" in cli_response.output.lower()
+
+
+class TestRenameIncrement:
+    def test_rename_increment_to_new_name(self, tmp_path):
+        """Rename increment to new name, stories array preserved."""
         helper = BotTestHelper(tmp_path)
-        panel_state = given_panel_in_increment_view(helper)
-        
-        # When
-        rendered = when_panel_renders_increment_view(panel_state)
-        
-        # Then
-        then_panel_does_not_show_control(rendered, hidden_control)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+        story_map = helper.increment.get_story_map()
+        original_stories = get_story_names_from_increment(story_map.increments.find_by_name("MVP"))
+
+        story_map.rename_increment("MVP", "Phase 1")
+
+        assert story_map.increments.find_by_name("MVP") is None
+        phase1 = story_map.increments.find_by_name("Phase 1")
+        assert phase1 is not None
+        assert get_story_names_from_increment(phase1) == original_stories
+
+    def test_rename_increment_duplicate_name_returns_error(self, tmp_path):
+        """Rename increment to duplicate existing name returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(story_graph_with_increments_mvp_phase1())
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="already exists"):
+            story_map.rename_increment("MVP", "Phase 1")
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
+    ])
+    def test_cli_rename_increment(self, tmp_path, helper_class):
+        """CLI renames increment and displays confirmation."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increment_named_mvp()
+        )
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.rename_increment from_name:"MVP" to_name:"Phase 1"'
+        )
+
+        story_map = helper.domain.bot.story_map
+        assert story_map.increments.find_by_name("MVP") is None
+        assert story_map.increments.find_by_name("Phase 1") is not None
+
+class TestAddStoryToIncrement:
+    def test_add_story_to_increment_by_name(self, tmp_path):
+        """Add story to increment by story name."""
+        helper = BotTestHelper(tmp_path)
+        # Create Profile is already in MVP; Validate Order is in hierarchy but not assigned
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_two_stories_in_same_parent("Create Profile", "Validate Order")
+        )
+        story_map = helper.increment.get_story_map()
+
+        story_map.add_story_to_increment("MVP", "Validate Order")
+
+        assert "Validate Order" in get_story_names_from_increment(story_map.increments["MVP"])
+
+    def test_add_nonexistent_story_returns_error(self, tmp_path):
+        """Add non-existent story to increment returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(story_graph_with_increment_named_mvp())
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="not found"):
+            story_map.add_story_to_increment("MVP", "Missing Story")
+
+    def test_add_story_already_in_increment_returns_error(self, tmp_path):
+        """Add story already in increment returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="already in"):
+            story_map.add_story_to_increment("MVP", "Validate Order")
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
+    ])
+    def test_cli_add_story_to_increment(self, tmp_path, helper_class):
+        """CLI adds story to increment and displays confirmation."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_two_stories_in_same_parent("Create Profile", "Validate Order")
+        )
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.add_story_to_increment increment_name:"MVP" story_name:"Validate Order"'
+        )
+
+        story_map = helper.domain.bot.story_map
+        mvp = story_map.increments.find_by_name("MVP")
+        assert "Validate Order" in get_story_names_from_increment(mvp)
 
 
-def given_story_graph_with_increment(helper, increment_name, increment_priority, stories):
-    """Create story graph with an increment containing stories."""
-    story_graph = {
-        "increments": [
-            {
-                "name": increment_name,
-                "priority": increment_priority,
-                "stories": [
-                    {"name": name, "sequential_order": order}
-                    for name, order in stories
-                ]
-            }
-        ],
-        "epics": []
-    }
-    return story_graph
+class TestRemoveStoryFromIncrement:
+    def test_remove_story_from_increment(self, tmp_path):
+        """Remove story from increment."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+        story_map = helper.increment.get_story_map()
+
+        story_map.remove_story_from_increment("MVP", "Validate Order")
+
+        assert "Validate Order" not in get_story_names_from_increment(story_map.increments["MVP"])
+        assert any(s.name == "Validate Order" for s in story_map.all_stories)
+
+    def test_remove_story_not_in_increment_returns_error(self, tmp_path):
+        """Remove story not in increment returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(story_graph_with_increment_named_mvp())
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="not in"):
+            story_map.remove_story_from_increment("MVP", "Validate Order")
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
+    ])
+    def test_cli_remove_story_from_increment(self, tmp_path, helper_class):
+        """CLI removes story from increment and displays confirmation."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.remove_story_from_increment increment_name:"MVP" story_name:"Validate Order"'
+        )
+
+        story_map = helper.domain.bot.story_map
+        mvp = story_map.increments.find_by_name("MVP")
+        assert "Validate Order" not in get_story_names_from_increment(mvp)
+
+class TestRenameStoryInIncrement:
+    def test_rename_story_updates_increment_references(self, tmp_path):
+        """Rename story node updates all increment references."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+        story_map = helper.increment.get_story_map()
+
+        story_map.rename_story_in_hierarchy("Validate Order", "Validate Order Items")
+
+        assert story_map.find_story_by_name("Validate Order") is None
+        assert story_map.find_story_by_name("Validate Order Items") is not None
+        mvp = story_map.increments["MVP"]
+        assert "Validate Order Items" in get_story_names_from_increment(mvp)
+        assert "Validate Order" not in get_story_names_from_increment(mvp)
+
+    def test_rename_story_duplicate_name_returns_error(self, tmp_path):
+        """Rename story to duplicate name in same parent returns error."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_two_stories_in_same_parent("Validate Order", "Validate Order Items")
+        )
+        story_map = helper.increment.get_story_map()
+
+        with pytest.raises(ValueError, match="already exists|duplicate"):
+            story_map.rename_story_in_hierarchy("Validate Order", "Validate Order Items")
+
+    @pytest.mark.parametrize("helper_class", [
+        TTYBotTestHelper,
+        PipeBotTestHelper,
+        JsonBotTestHelper,
+    ])
+    def test_cli_rename_story_updates_increments(self, tmp_path, helper_class):
+        """CLI renames story and updates all increment references."""
+        helper = helper_class(tmp_path)
+        helper.domain.increment.create_story_graph_with_increments(
+            story_graph_with_increment_and_story("MVP", "Validate Order")
+        )
+
+        cli_response = helper.cli_session.execute_command(
+            'story_graph.rename_story_in_hierarchy old_name:"Validate Order" new_name:"Validate Order Items"'
+        )
+
+        story_map = helper.domain.bot.story_map
+        assert story_map.find_story_by_name("Validate Order") is None
+        assert story_map.find_story_by_name("Validate Order Items") is not None
+        mvp = story_map.increments.find_by_name("MVP")
+        assert "Validate Order Items" in get_story_names_from_increment(mvp)
+        assert "Validate Order" not in get_story_names_from_increment(mvp)
 
 
-def given_story_graph_with_empty_increment(helper, increment_name, increment_priority):
-    """Create story graph with an empty increment."""
-    story_graph = {
-        "increments": [
-            {
-                "name": increment_name,
-                "priority": increment_priority,
-                "stories": []
-            }
-        ],
-        "epics": []
-    }
-    return story_graph
+class TestStoryDeletedInHierarchyCascadesToIncrement:
+    def test_delete_story_in_hierarchy_removes_from_all_increments(self, tmp_path):
+        """Delete story in hierarchy removes from all increments."""
+        helper = BotTestHelper(tmp_path)
+        helper.increment.create_story_graph_with_increments(
+            story_graph_with_story_in_multiple_increments("Validate Order", ["MVP", "Phase 2"])
+        )
+        story_map = helper.increment.get_story_map()
 
+        story = story_map.find_story_by_name("Validate Order")
+        assert story is not None
+        story.delete()
 
-def given_story_graph_with_increment_referencing_story_nodes(helper):
-    """Create story graph with increment referencing StoryNode objects."""
-    story_graph = {
-        "increments": [
-            {
-                "name": "Test Increment",
-                "priority": 1,
-                "stories": [
-                    {
-                        "name": "Test Story",
-                        "test_class": "TestStory",
-                        "sequential_order": 1.0
-                    }
-                ]
-            }
-        ],
-        "epics": []
-    }
-    return story_graph
+        assert story_map.find_story_by_name("Validate Order") is None
+        for inc in story_map.increments:
+            assert "Validate Order" not in get_story_names_from_increment(inc)
 
-
-def given_story_graph_with_no_increments(helper):
-    """Create story graph with no increments."""
-    story_graph = {
-        "increments": [],
-        "epics": []
-    }
-    return story_graph
-
-
-def given_panel_open_in_view(helper, view_name):
-    """Create panel state open in specified view."""
-    return {
-        "current_view": view_name,
-        "toggle_label": "Increment" if view_name == "Hierarchy" else "Hierarchy",
-        "tooltip": f"Display {'Increment' if view_name == 'Hierarchy' else 'Hierarchy'} view"
-    }
-
-
-def given_panel_in_increment_view_with_stories(helper, increment_name, priority, stories):
-    """Create panel state in increment view with stories."""
-    return {
-        "current_view": "Increment",
-        "increments": [
-            {
-                "name": increment_name,
-                "priority": priority,
-                "stories": [{"name": s, "sequential_order": i+1} for i, s in enumerate(stories)]
-            }
-        ]
-    }
-
-
-def given_panel_in_increment_view_with_empty_increment(helper, increment_name):
-    """Create panel state in increment view with empty increment."""
-    return {
-        "current_view": "Increment",
-        "increments": [
-            {
-                "name": increment_name,
-                "priority": 99,
-                "stories": []
-            }
-        ]
-    }
-
-
-def given_panel_in_increment_view(helper):
-    """Create panel state in increment view."""
-    return {
-        "current_view": "Increment",
-        "increments": [
-            {
-                "name": "Test Increment",
-                "priority": 1,
-                "stories": [{"name": "Test Story", "sequential_order": 1}]
-            }
-        ]
-    }
-
-
-def when_user_requests_increment_view_via_cli(helper, story_graph):
-    """Request increment view via CLI."""
-    from story_graph.nodes import IncrementCollection
-    increments = story_graph.get("increments", [])
-    if not increments:
-        return {
-            "increments": [],
-            "message": "No increments defined in story graph"
-        }
-    return {"increments": increments}
-
-
-def when_user_enters_increment_view_command(helper, story_graph):
-    """Enter increment view command via CLI."""
-    from story_graph.nodes import IncrementCollection
-    increment_collection = IncrementCollection.from_list(story_graph.get("increments", []))
-    return increment_collection.format_for_cli()
-
-
-def when_user_clicks_view_toggle(panel_state):
-    """Click view toggle button."""
-    current_view = panel_state.get("current_view", "Hierarchy")
-    new_view = "Increment" if current_view == "Hierarchy" else "Hierarchy"
-    return {
-        "current_view": new_view,
-        "toggle_label": current_view,
-        "tooltip": f"Display {current_view} view"
-    }
-
-
-def when_panel_renders_increment_view(panel_state):
-    """Render increment view in panel."""
-    def _sort_stories_by_sequential_order(stories):
-        return sorted(stories, key=lambda s: s.get("sequential_order", 0))
-    
-    columns = []
-    for increment in panel_state.get("increments", []):
-        stories = increment.get("stories", [])
-        sorted_stories = _sort_stories_by_sequential_order(stories)
-        column = {
-            "name": increment["name"],
-            "stories": sorted_stories,
-            "read_only": True
-        }
-        if not stories:
-            column["empty_message"] = "(no stories)"
-        columns.append(column)
-    return {
-        "columns": columns,
-        "controls_visible": False
-    }
-
-
-def then_cli_returns_increments_object(increments):
-    """Assert CLI returns Increments object."""
-    assert increments is not None
-    assert "increments" in increments
-
-
-def then_increment_contains_name_priority_stories(increments, name, priority, story_count):
-    """Assert Increment contains expected properties."""
-    increment = next(
-        (i for i in increments["increments"] if i["name"] == name),
-        None
-    )
-    assert increment is not None, f"Increment '{name}' not found"
-    assert increment["priority"] == priority
-    assert len(increment.get("stories", [])) == story_count
-
-
-def then_cli_displays_increment_with_stories_in_order(output, expected_output):
-    """Assert CLI output matches expected format."""
-    assert expected_output in output
-
-
-def then_cli_displays_empty_increment_message(output, expected_output):
-    """Assert CLI displays empty increment message."""
-    assert expected_output in output
-
-
-def then_story_objects_include_property(increments, property_name):
-    """Assert Story objects include specified property."""
-    for increment in increments.get("increments", []):
-        for story in increment.get("stories", []):
-            assert property_name in story or property_name == "name"
-
-
-def then_cli_displays_no_increments_message(result, expected_message):
-    """Assert CLI displays no increments message."""
-    assert result.get("message") == expected_message
-
-
-def then_increments_collection_is_empty(result):
-    """Assert Increments collection is empty."""
-    assert len(result.get("increments", [])) == 0
-
-
-def then_panel_switches_to_view(state, expected_view):
-    """Assert panel switches to expected view."""
-    assert state["current_view"] == expected_view
-
-
-def then_toggle_button_shows_label_and_tooltip(state, label, tooltip):
-    """Assert toggle button shows correct label and tooltip."""
-    assert state["toggle_label"] == label
-    assert state["tooltip"] == tooltip
-
-
-def then_panel_shows_column_for_increment(rendered, increment_name):
-    """Assert panel shows column for increment."""
-    column_names = [col["name"] for col in rendered.get("columns", [])]
-    assert increment_name in column_names
-
-
-def then_column_has_increment_name_at_top(rendered, increment_name):
-    """Assert column has increment name at top."""
-    column = next(
-        (col for col in rendered["columns"] if col["name"] == increment_name),
-        None
-    )
-    assert column is not None
-
-
-def then_stories_display_in_natural_order(rendered, expected_stories):
-    """Assert stories display in natural order."""
-    for column in rendered.get("columns", []):
-        story_names = [s["name"] for s in column.get("stories", [])]
-        assert story_names == expected_stories
-
-
-def then_view_is_read_only(rendered):
-    """Assert view is read-only."""
-    for column in rendered.get("columns", []):
-        assert column.get("read_only", False) is True
-
-
-def then_column_shows_empty_state_message(rendered, expected_message):
-    """Assert column shows empty state message."""
-    for column in rendered.get("columns", []):
-        if not column.get("stories"):
-            assert column.get("empty_message") == expected_message
-
-
-def then_panel_does_not_show_control(rendered, control_name):
-    """Assert panel does not show specified control."""
-    assert rendered.get("controls_visible", True) is False
+        story_map2 = helper.increment.get_story_map()
+        assert story_map2.find_story_by_name("Validate Order") is None
+        for inc in story_map2.increments:
+            assert "Validate Order" not in get_story_names_from_increment(inc)

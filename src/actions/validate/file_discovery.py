@@ -5,7 +5,7 @@ from bot_path import BotPath
 
 class FileDiscovery:
     EXCLUDED_FILES = {'__init__.py'}
-    # Extensions for code behavior: Python and JavaScript/TypeScript (client and server)
+    EXCLUDED_DIRECTORIES = {'node_modules'}
     CODE_EXTENSIONS = ('.py', '.js', '.ts', '.mjs', '.cjs')
 
     def __init__(self, bot_paths: Optional[BotPath]=None, behavior_name: Optional[str]=None, exclude_patterns: List[str]=None):
@@ -15,6 +15,8 @@ class FileDiscovery:
 
     def should_include_file(self, file_path: Path) -> bool:
         if file_path.name in self.EXCLUDED_FILES:
+            return False
+        if any(part in self.EXCLUDED_DIRECTORIES for part in file_path.parts):
             return False
         if not self.exclude_patterns:
             return True

@@ -18,7 +18,8 @@ class LanguageAgnosticScanner(Scanner):
     def _get_scanner_for_file(self, file_path: Path) -> Optional[Scanner]:
         """Get the appropriate scanner based on file extension."""
         if not file_path:
-            # Default to Python for non-file contexts
+            if not self._python_scanner_class:
+                return None
             if not self._python_instance:
                 self._python_instance = self._python_scanner_class(self.rule)
             return self._python_instance
@@ -26,11 +27,14 @@ class LanguageAgnosticScanner(Scanner):
         file_ext = file_path.suffix.lower()
         js_extensions = ('.js', '.ts', '.mjs', '.cjs')
         if file_ext in js_extensions:
+            if not self._js_scanner_class:
+                return None
             if not self._js_instance:
                 self._js_instance = self._js_scanner_class(self.rule)
             return self._js_instance
         else:
-            # Default to Python for .py and other files
+            if not self._python_scanner_class:
+                return None
             if not self._python_instance:
                 self._python_instance = self._python_scanner_class(self.rule)
             return self._python_instance
@@ -51,7 +55,7 @@ class LanguageAgnosticScanner(Scanner):
         for file_path in file_list or []:
             if not file_path or not file_path.exists() or not file_path.is_file():
                 continue
-            file_context = FileScanContext(story_graph=context.story_graph, file_path=file_path)
+            file_context = FileScanContext(story_graph=context.story_graph, full_story_graph=getattr(context, 'full_story_graph', None), file_path=file_path)
             scanner = self._get_scanner_for_file(file_path)
             if scanner:
                 file_violations = scanner.scan_file_with_context(file_context)
