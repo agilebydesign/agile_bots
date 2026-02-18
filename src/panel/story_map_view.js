@@ -231,15 +231,6 @@ class StoryMapView extends PanelView {
                             data-code-icon="${submitCodeIconPath}">
                         <img id="btn-submit-alt-icon" src="${submitScenarioIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Alt" />
                     </button>
-                    <button id="btn-submit-current" 
-                            onclick="event.stopPropagation(); handleSubmitCurrent();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title=""
-                            data-refresh-icon="${refreshIconPath}">
-                        <img id="btn-submit-current-icon" src="${refreshIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Current" />
-                    </button>
                 </div>
                 
                 <!-- Separator between Scope/Submit and Related Files groups -->

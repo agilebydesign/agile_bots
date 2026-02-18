@@ -314,9 +314,7 @@ class PanelView {
             this._perfExecuteStart = perfCmdStart;
             _perfLog(`execute START: "${command}"`);
             
-            // Increase timeout for scope/status/copy_json (scope/status enrich scenarios; copy_json can be slow on large graphs)
-            const needsLongTimeout = command.includes('scope') || command.includes('status') || command.includes('copy_json');
-            const timeoutMs = needsLongTimeout ? 120000 : 30000;
+            const timeoutMs = 30000;
             console.log(`[PanelView] Using timeout: ${timeoutMs}ms for command: "${command}"`);
             
             return new Promise((resolve, reject) => {

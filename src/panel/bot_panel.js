@@ -3799,15 +3799,7 @@ class BotPanel {
                 event.stopPropagation();
             }
             console.log('[WebView] sendInstructionsToChat triggered');
-            const promptContent = window._promptContent || '';
-            if (!promptContent) {
-                console.warn('[WebView] No prompt content available to submit');
-                return;
-            }
-            vscode.postMessage({
-                command: 'sendToChat',
-                content: promptContent
-            });
+            submitToChat();
         }
 
         function refreshStatus() {
@@ -4449,29 +4441,6 @@ class BotPanel {
                 }
             } else if (btnSubmitAlt) {
                 btnSubmitAlt.style.display = 'none';
-            }
-            
-            // Update btn-submit-current button (shows beside btn-submit)
-            const btnSubmitCurrent = document.getElementById('btn-submit-current');
-            if (btnSubmitCurrent && window.selectedNode.type !== 'root' && currentBehavior) {
-                const behavior = currentBehavior;
-                const action = currentAction;
-                const btnSubmitCurrentIcon = document.getElementById('btn-submit-current-icon');
-                
-                // Use refresh icon for now (same as btn-submit)
-                const refreshIcon = btnSubmitCurrent.getAttribute('data-refresh-icon') || btnSubmit?.getAttribute('data-refresh-icon');
-                
-                const tooltip = 'Submit current behavior (' + behavior + '.' + action + ')';
-                
-                if (refreshIcon && btnSubmitCurrentIcon) {
-                    btnSubmitCurrentIcon.src = refreshIcon;
-                    btnSubmitCurrent.title = tooltip;
-                    btnSubmitCurrent.style.display = 'block';
-                } else {
-                    btnSubmitCurrent.style.display = 'none';
-                }
-            } else if (btnSubmitCurrent) {
-                btnSubmitCurrent.style.display = 'none';
             }
             
             console.log('═══════════════════════════════════════════════════════');
