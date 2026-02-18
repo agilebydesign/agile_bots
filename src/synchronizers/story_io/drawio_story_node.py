@@ -578,6 +578,12 @@ class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
             stories = [c for c in sub_epic.children if isinstance(c, Story)]
             stories.sort(key=lambda s: getattr(s, 'sequential_order', 0) or 0)
 
+            # Disambiguate duplicate story names to ensure unique cell_ids
+            slug_counts: dict = {}
+            for s in stories:
+                slug = _slug(s.name)
+                slug_counts[slug] = slug_counts.get(slug, 0) + 1
+
             if skip_stories:
                 story_count = len(stories)
                 if story_count:
@@ -593,17 +599,25 @@ class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
                 story_x = se_left
                 story_y = rows.story_y
                 seen_actors: set = set()
+                seen_slugs: dict = {}
                 for story in stories:
                     story_type = getattr(story, 'story_type', 'user') or 'user'
                     drawio_story = DrawIOStoryNodeSerializer.create_story(
                         story.name, getattr(story, 'sequential_order', 0) or 0, story_type)
-                    story_path = f'{se_path}/{_slug(drawio_story.name)}' if se_path else _slug(drawio_story.name)
+                    slug = _slug(drawio_story.name)
+                    if slug_counts.get(slug, 0) > 1:
+                        seen_slugs[slug] = seen_slugs.get(slug, 0) + 1
+                        base = f'{slug}-{seen_slugs[slug]}'
+                    else:
+                        base = slug
+                    story_path = f'{se_path}/{base}' if se_path else base
                     has_saved = layout_data and layout_data.position_for(story_path)
                     if has_saved:
                         drawio_story.render_from_domain(
                             story, story_x, story_y, rows.actor_y,
                             path_prefix=se_path, seen_actors=seen_actors,
-                            layout_data=layout_data, render_ac=render_ac)
+                            layout_data=layout_data, render_ac=render_ac,
+                            cell_id_override=story_path)
                     else:
                         if se_right and story_x + CELL_SIZE > se_right:
                             story_x = se_left
@@ -611,7 +625,8 @@ class DrawIOSubEpic(DiagramSubEpic, DrawIOStoryNode):
                         drawio_story.render_from_domain(
                             story, story_x, story_y, rows.actor_y,
                             path_prefix=se_path, seen_actors=seen_actors,
-                            layout_data=None, render_ac=render_ac)
+                            layout_data=None, render_ac=render_ac,
+                            cell_id_override=story_path)
                     self.add_child(drawio_story)
                     # Advance X by the AC width if in exploration mode,
                     # otherwise by the standard cell size.
@@ -713,8 +728,10 @@ class DrawIOStory(DiagramStory, DrawIOStoryNode):
                             path_prefix: str = '',
                             seen_actors: set = None,
                             layout_data=None,
-                            render_ac: bool = False) -> 'DrawIOStory':
-        story_path = f'{path_prefix}/{_slug(self.name)}' if path_prefix else _slug(self.name)
+                            render_ac: bool = False,
+                            cell_id_override: str = None) -> 'DrawIOStory':
+        story_path = cell_id_override if cell_id_override else (
+            f'{path_prefix}/{_slug(self.name)}' if path_prefix else _slug(self.name))
         self._element._cell_id = story_path
 
         saved = self._saved_position_for(story_path, layout_data)

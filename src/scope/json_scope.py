@@ -135,6 +135,13 @@ class JSONScope(JSONAdapter):
                     else:
                         content = {'epics': []}
                 
+                # Always include the full increments list so the panel increment view
+                # can filter columns client-side regardless of story scope filter
+                if isinstance(content, dict) and 'increments' not in content:
+                    raw_increments = story_graph.get('increments', []) if isinstance(story_graph, dict) else []
+                    if raw_increments:
+                        content['increments'] = raw_increments
+
                 result['content'] = content
                 
                 if self.scope.bot_paths:

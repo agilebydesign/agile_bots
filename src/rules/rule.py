@@ -157,6 +157,7 @@ class Rule:
     def _execute_file_by_file_scan(self, scanner_instance, config: ScanConfig):
         context = ScanFilesContext(
             story_graph=config.story_graph,
+            full_story_graph=getattr(config, 'full_story_graph', None),
             files=FileCollection(
                 test_files=config.test_files or [],
                 code_files=config.code_files or []

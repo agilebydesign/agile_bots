@@ -263,6 +263,11 @@ class BotPanel {
               }
             })();
             return;
+          case "copyText":
+            vscode.env.clipboard.writeText(message.text || '').then(() => {
+              vscode.window.showInformationMessage(message.label || 'Copied to clipboard');
+            });
+            return;
           case "openFile":
             this._log('[BotPanel] openFile message received with filePath: ' + message.filePath);
             if (message.filePath) {
@@ -3035,7 +3040,8 @@ class BotPanel {
             const target = e.target;
             
             // Handle story node double-clicks (epic, sub-epic, story)
-            if (target.classList.contains('story-node')) {
+            // Skip nodes in the increment view (data-inc-source set) — no editing there
+            if (target.classList.contains('story-node') && target.getAttribute('data-inc-source') === null) {
                 const nodePath = target.getAttribute('data-path');
                 const nodeName = target.getAttribute('data-node-name');
                 
@@ -3054,29 +3060,15 @@ class BotPanel {
             }
         }, true); // Use capture phase to catch all double-clicks
         
-        // Right-click context menu on story nodes: Copy node name / Copy full JSON (event -> CLI -> bot)
-        document.addEventListener('contextmenu', function(e) {
-            const target = e.target.closest ? e.target.closest('.story-node') : (function() {
-                let t = e.target;
-                while (t && !t.classList.contains('story-node')) t = t.parentElement;
-                return t;
-            })();
-            if (!target || !target.classList.contains('story-node')) return;
-            const nodePath = target.getAttribute('data-path');
-            if (!nodePath) return;
+        // Right-click context menu — story nodes (hierarchy) + increment view stories + increment columns
+        function _showCopyMenu(e, items) {
             e.preventDefault();
             e.stopPropagation();
-            // Remove any existing copy menu
             const existing = document.getElementById('story-node-copy-menu');
             if (existing) existing.remove();
             const menu = document.createElement('div');
             menu.id = 'story-node-copy-menu';
-            menu.dataset.nodePath = nodePath;  // Store path on menu so menu item click uses correct node
             menu.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;background:var(--vscode-dropdown-background);border:1px solid var(--vscode-dropdown-border);border-radius:4px;padding:4px 0;z-index:10001;min-width:160px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
-            const items = [
-                { label: 'Copy node name', action: 'name' },
-                { label: 'Copy full JSON', action: 'json' }
-            ];
             items.forEach(function(item) {
                 const div = document.createElement('div');
                 div.textContent = item.label;
@@ -3084,27 +3076,81 @@ class BotPanel {
                 div.onmouseover = function() { div.style.backgroundColor = 'var(--vscode-list-hoverBackground)'; };
                 div.onmouseout = function() { div.style.backgroundColor = ''; };
                 div.onclick = function(ev) {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-                    const pathToCopy = menu.dataset.nodePath;  // Read from menu, not closure
+                    ev.preventDefault(); ev.stopPropagation();
                     menu.remove();
                     document.removeEventListener('click', closeMenu);
-                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: pathToCopy, action: item.action });
+                    item.action();
                 };
                 menu.appendChild(div);
             });
-            function closeMenu() {
-                if (menu.parentNode) menu.remove();
-                document.removeEventListener('click', closeMenu);
-            }
+            function closeMenu() { if (menu.parentNode) menu.remove(); document.removeEventListener('click', closeMenu); }
             document.body.appendChild(menu);
             setTimeout(function() { document.addEventListener('click', closeMenu); }, 0);
+        }
+
+        document.addEventListener('contextmenu', function(e) {
+            // --- Increment column header right-click ---
+            let incCol = e.target;
+            let d = 6;
+            while (incCol && d-- > 0 && !incCol.classList.contains('increment-column-container')) incCol = incCol.parentElement;
+            if (incCol && incCol.classList.contains('increment-column-container')) {
+                const incName = incCol.getAttribute('data-inc');
+                const stories = Array.from(incCol.querySelectorAll('.story-node[data-inc-source]'))
+                    .map(el => el.getAttribute('data-node-name'));
+                _showCopyMenu(e, [
+                    { label: 'Copy increment name', action: function() {
+                        vscode.postMessage({ command: 'copyText', text: incName, label: 'Increment name copied' });
+                    }},
+                    { label: 'Copy as JSON', action: function() {
+                        vscode.postMessage({ command: 'copyText', text: JSON.stringify({ name: incName, stories: stories }, null, 2), label: 'Increment JSON copied' });
+                    }}
+                ]);
+                return;
+            }
+
+            // --- Story node right-click ---
+            const target = e.target.closest ? e.target.closest('.story-node') : (function() {
+                let t = e.target;
+                while (t && !t.classList.contains('story-node')) t = t.parentElement;
+                return t;
+            })();
+            if (!target || !target.classList.contains('story-node')) return;
+
+            const incSource = target.getAttribute('data-inc-source');
+            const nodeName = target.getAttribute('data-node-name');
+
+            if (incSource !== null) {
+                // Story in increment view — copy directly (no CLI path available)
+                _showCopyMenu(e, [
+                    { label: 'Copy story name', action: function() {
+                        vscode.postMessage({ command: 'copyText', text: nodeName, label: 'Story name copied' });
+                    }},
+                    { label: 'Copy as JSON', action: function() {
+                        vscode.postMessage({ command: 'copyText', text: JSON.stringify({ name: nodeName }, null, 2), label: 'Story JSON copied' });
+                    }}
+                ]);
+                return;
+            }
+
+            // Hierarchy story node — use CLI path
+            const nodePath = target.getAttribute('data-path');
+            if (!nodePath) return;
+            _showCopyMenu(e, [
+                { label: 'Copy node name', action: function() {
+                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'name' });
+                }},
+                { label: 'Copy full JSON', action: function() {
+                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'json' });
+                }}
+            ]);
         }, true);
         
         // Handle drag and drop for moving nodes
         let draggedNode = null;
+        let draggedIncrement = null; // set when dragging an increment column header handle
         let dropIndicator = null;
         let currentDropZone = null; // 'before', 'after', or 'inside'
+        let incrementDropTarget = null; // column being hovered during increment reorder
         
         // Create drop indicator line
         function createDropIndicator() {
@@ -3137,6 +3183,16 @@ class BotPanel {
                 message: '[WebView] DRAGSTART EVENT - target classList: ' + (e.target.classList ? Array.from(e.target.classList).join(', ') : 'none')
             });
             
+            // Check if dragging an increment column handle
+            if (e.target.classList && e.target.classList.contains('increment-drag-handle')) {
+                draggedIncrement = e.target.getAttribute('data-inc');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', 'increment:' + draggedIncrement);
+                e.target.style.opacity = '0.5';
+                vscode.postMessage({ command: 'logToFile', message: '[INCREMENT] Drag column started: ' + draggedIncrement });
+                return;
+            }
+
             // Find the story-node element (might be dragging a child element)
             let target = e.target;
             while (target && !target.classList.contains('story-node')) {
@@ -3148,7 +3204,8 @@ class BotPanel {
                     path: target.getAttribute('data-path'),
                     name: target.getAttribute('data-node-name'),
                     type: target.getAttribute('data-node-type'),
-                    position: parseInt(target.getAttribute('data-position') || '0')
+                    position: parseInt(target.getAttribute('data-position') || '0'),
+                    fromIncrement: target.getAttribute('data-inc-source') // null for hierarchy stories, '' for unallocated, 'IncName' for increment stories
                 };
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', draggedNode.path);
@@ -3181,17 +3238,51 @@ class BotPanel {
             
             if (target && target.classList.contains('story-node')) {
                 target.style.opacity = '1';
-                draggedNode = null;
-                removeDropIndicator();
-                vscode.postMessage({
-                    command: 'logToFile',
-                    message: '[WebView] Drag ended, cleared draggedNode'
-                });
             }
+            if (e.target.classList && e.target.classList.contains('increment-drag-handle')) {
+                e.target.style.opacity = '';
+            }
+            draggedNode = null;
+            draggedIncrement = null;
+            if (incrementDropTarget) { incrementDropTarget.style.outline = ''; incrementDropTarget = null; }
+            removeDropIndicator();
+            document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+            var unallocEl = document.querySelector('.unallocated-column');
+            if (unallocEl) unallocEl.style.outline = '';
+            vscode.postMessage({
+                command: 'logToFile',
+                message: '[WebView] Drag ended, cleared draggedNode'
+            });
         }, true);
         
         let dragoverLogCounter = 0; // Throttle dragover logs
         document.addEventListener('dragover', function(e) {
+            // Handle increment column reorder drag
+            if (draggedIncrement) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                // Find which column we're hovering over
+                let col = e.target;
+                let d = 10;
+                while (col && d-- > 0 && !col.classList.contains('increment-column-container')) col = col.parentElement;
+                if (col && col.getAttribute('data-inc') !== draggedIncrement) {
+                    if (incrementDropTarget) incrementDropTarget.style.outline = '';
+                    incrementDropTarget = col;
+                    const rect = col.getBoundingClientRect();
+                    const isLeft = e.clientX < rect.left + rect.width / 2;
+                    col.style.outline = isLeft ? '2px solid orange' : '';
+                    col.style.outlineOffset = '-2px';
+                    // Show vertical indicator line
+                    const ind = createDropIndicator();
+                    ind.style.width = '3px';
+                    ind.style.height = rect.height + 'px';
+                    ind.style.top = rect.top + 'px';
+                    ind.style.left = (isLeft ? rect.left : rect.right - 3) + 'px';
+                    ind.style.display = 'block';
+                }
+                return;
+            }
+
             // Find the story-node element
             let target = e.target;
             let searchDepth = 0;
@@ -3208,7 +3299,40 @@ class BotPanel {
                 });
             }
             
+            // Allow dropping stories onto increment columns
+            if (draggedNode && draggedNode.type === 'story') {
+                var incEl = e.target;
+                var d = 6;
+                while (incEl && d-- > 0) {
+                    if (incEl.classList && incEl.classList.contains('increment-column-container')) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'copy';
+                        incEl.style.outline = '2px solid var(--accent-color)';
+                        break;
+                    }
+                    incEl = incEl.parentElement;
+                }
+                if (!incEl || !incEl.classList.contains('increment-column-container')) {
+                    document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                }
+            }
+            
             if (target && target.classList.contains('story-node') && draggedNode) {
+                // If dragging from increment view and hovering over a story in the unallocated column,
+                // show the unallocated drop hint and suppress normal drag indicator
+                if (draggedNode.fromIncrement) {
+                    let unallocCheck = target;
+                    while (unallocCheck && !unallocCheck.classList.contains('unallocated-column')) unallocCheck = unallocCheck.parentElement;
+                    if (unallocCheck && unallocCheck.classList.contains('unallocated-column')) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        removeDropIndicator();
+                        document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                        unallocCheck.style.outline = '2px dashed rgb(255, 140, 0)';
+                        return;
+                    }
+                }
+
                 const targetType = target.getAttribute('data-node-type');
                 const targetPath = target.getAttribute('data-path');
                 const targetName = target.getAttribute('data-node-name');
@@ -3292,6 +3416,35 @@ class BotPanel {
                 }
             } else {
                 removeDropIndicator();
+                if (draggedNode && draggedNode.type === 'story') {
+                    // Check for increment column target (cross-column drop)
+                    let incTarget = e.target;
+                    let d = 8;
+                    while (incTarget && d-- > 0 && !incTarget.classList.contains('increment-column-container')) {
+                        incTarget = incTarget.parentElement;
+                    }
+                    // Also check for unallocated column (drag from increment → remove)
+                    let unallocTarget = e.target;
+                    let d2 = 8;
+                    while (unallocTarget && d2-- > 0 && !unallocTarget.classList.contains('unallocated-column')) {
+                        unallocTarget = unallocTarget.parentElement;
+                    }
+
+                    document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                    var unallocEl = document.querySelector('.unallocated-column');
+                    if (unallocEl) unallocEl.style.outline = '';
+
+                    if (incTarget && incTarget.classList.contains('increment-column-container')) {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        incTarget.style.outline = '2px solid rgb(255, 140, 0)';
+                    } else if (unallocTarget && unallocTarget.classList.contains('unallocated-column') && draggedNode.fromIncrement) {
+                        // Only show unallocated target when story is FROM an increment (has source to remove from)
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        unallocTarget.style.outline = '2px dashed rgb(255, 140, 0)';
+                    }
+                }
             }
         }, true);
         
@@ -3305,10 +3458,59 @@ class BotPanel {
             if (target && target.classList.contains('story-node')) {
                 target.style.backgroundColor = '';
             }
+            // Clear increment column + unallocated highlights when leaving
+            let incTarget = e.target;
+            let d = 8;
+            while (incTarget && d-- > 0 && !incTarget.classList.contains('increment-column-container')) {
+                incTarget = incTarget.parentElement;
+            }
+            if (incTarget && incTarget.classList.contains('increment-column-container')) {
+                incTarget.style.outline = '';
+            }
+            let unallocTarget = e.target;
+            let d2 = 8;
+            while (unallocTarget && d2-- > 0 && !unallocTarget.classList.contains('unallocated-column')) {
+                unallocTarget = unallocTarget.parentElement;
+            }
+            if (unallocTarget && unallocTarget.classList.contains('unallocated-column')) {
+                unallocTarget.style.outline = '';
+            }
         }, true);
         
         document.addEventListener('drop', function(e) {
             console.log('[WebView] ===== DROP EVENT FIRED =====');
+
+            // Handle increment column reorder — read from dataTransfer since draggedIncrement
+            // may have been cleared by dragend firing before drop in VS Code webviews
+            var transferData = '';
+            try { transferData = e.dataTransfer.getData('text/plain') || ''; } catch(_) {}
+            var isIncrementDrag = transferData.startsWith('increment:');
+            var incDragName = isIncrementDrag ? transferData.slice('increment:'.length) : (draggedIncrement || '');
+
+            if (isIncrementDrag || draggedIncrement) {
+                e.preventDefault();
+                // Find target column
+                let col = e.target;
+                let d = 10;
+                while (col && d-- > 0 && !col.classList.contains('increment-column-container')) col = col.parentElement;
+                if (col) {
+                    const targetName = col.getAttribute('data-inc');
+                    if (targetName && targetName !== incDragName) {
+                        const rect = col.getBoundingClientRect();
+                        const isLeft = e.clientX < rect.left + rect.width / 2;
+                        const cmd = isLeft
+                            ? 'story_graph.reorder_increment increment_name:"' + incDragName + '" before:"' + targetName + '"'
+                            : 'story_graph.reorder_increment increment_name:"' + incDragName + '" after:"' + targetName + '"';
+                        vscode.postMessage({ command: 'logToFile', message: '[INCREMENT] Reorder: ' + cmd });
+                        _incCmd(cmd);
+                    }
+                }
+                if (incrementDropTarget) { incrementDropTarget.style.outline = ''; incrementDropTarget = null; }
+                removeDropIndicator();
+                draggedIncrement = null;
+                return;
+            }
+
             vscode.postMessage({
                 command: 'logToFile',
                 message: '[WebView] ===== DROP EVENT FIRED ===== draggedNode: ' + (draggedNode ? draggedNode.name : 'null') + ', currentDropZone: ' + (currentDropZone || 'null')
@@ -3321,6 +3523,62 @@ class BotPanel {
             }
             
             if (target && target.classList.contains('story-node') && draggedNode && currentDropZone) {
+                // If the dragged node came FROM the increment view (has fromIncrement set),
+                // dropping onto a story-node that has data-inc-source means it's an increment move,
+                // not a story-graph reorder — redirect to the increment column drop path.
+                const targetIncSource = target.getAttribute('data-inc-source');
+                if (draggedNode.fromIncrement !== null && draggedNode.fromIncrement !== undefined && targetIncSource !== null) {
+                    e.preventDefault();
+                    removeDropIndicator();
+                    document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                    var unallocEl2 = document.querySelector('.unallocated-column');
+                    if (unallocEl2) unallocEl2.style.outline = '';
+                    // Find parent: increment column OR unallocated column
+                    let incCol = target;
+                    while (incCol && !incCol.classList.contains('increment-column-container') && !incCol.classList.contains('unallocated-column')) {
+                        incCol = incCol.parentElement;
+                    }
+                    const draggedName = draggedNode.name;
+                    const sourceInc = draggedNode.fromIncrement;
+
+                    if (incCol && incCol.classList.contains('unallocated-column')) {
+                        // Dropped into unallocated column → remove from source increment
+                        if (sourceInc) window.removeStoryFromIncrement(sourceInc, draggedName);
+                    } else {
+                        const incName = incCol ? incCol.getAttribute('data-inc') : null;
+                        if (incName && sourceInc === incName) {
+                            // Same column → reorder: insert before or after the target story
+                            const targetPos = parseInt(target.getAttribute('data-position') || '0');
+                            const rect = target.getBoundingClientRect();
+                            const insertPos = e.clientY < rect.top + rect.height / 2 ? targetPos : targetPos + 1;
+                            _incCmd('story_graph.reorder_story_in_increment increment_name:"' + incName + '" story_name:"' + draggedName + '" position:' + insertPos);
+                        } else if (incName && sourceInc !== incName) {
+                            // Cross-column: remove from source, insert at drop position in target
+                            const dropPos = _incrementDropPosition(incCol, e.clientY);
+                            if (sourceInc) window.removeStoryFromIncrement(sourceInc, draggedName);
+                            window.addStoryToIncrement(incName, draggedName, dropPos);
+                        }
+                    }
+                    draggedNode = null;
+                    return;
+                }
+
+                // Check if dropping onto the unallocated column (story-node inside unallocated)
+                if (draggedNode.fromIncrement !== null && draggedNode.fromIncrement !== undefined) {
+                    let unallocCheck = target;
+                    while (unallocCheck && !unallocCheck.classList.contains('unallocated-column')) unallocCheck = unallocCheck.parentElement;
+                    if (unallocCheck && unallocCheck.classList.contains('unallocated-column') && draggedNode.fromIncrement) {
+                        e.preventDefault();
+                        removeDropIndicator();
+                        document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                        var unallocEl3 = document.querySelector('.unallocated-column');
+                        if (unallocEl3) unallocEl3.style.outline = '';
+                        window.removeStoryFromIncrement(draggedNode.fromIncrement, draggedNode.name);
+                        draggedNode = null;
+                        return;
+                    }
+                }
+
                 e.preventDefault();
                 e.stopPropagation();
                 target.style.backgroundColor = '';
@@ -3440,6 +3698,55 @@ class BotPanel {
                         command: 'logToFile',
                         message: '[WebView] DROP ignored - same node'
                     });
+                }
+            } else if (draggedNode && draggedNode.type === 'story') {
+                function _clearIncrementHighlights() {
+                    document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
+                    var ua = document.querySelector('.unallocated-column');
+                    if (ua) ua.style.outline = '';
+                }
+
+                // Walk up to find increment column or unallocated column
+                var incTarget = e.target;
+                var maxDepth = 8;
+                while (incTarget && maxDepth-- > 0) {
+                    if (incTarget.classList && (incTarget.classList.contains('increment-column-container') || incTarget.classList.contains('unallocated-column'))) break;
+                    incTarget = incTarget.parentElement;
+                }
+
+                if (incTarget && incTarget.classList.contains('unallocated-column') && draggedNode.fromIncrement) {
+                    // Drop onto unallocated = remove from source increment
+                    e.preventDefault();
+                    removeDropIndicator();
+                    _clearIncrementHighlights();
+                    var storyName = draggedNode.name;
+                    var sourceInc = draggedNode.fromIncrement;
+                    console.log('[INCREMENT] DROP story onto unallocated (remove from increment):', storyName, 'from:', sourceInc);
+                    vscode.postMessage({ command: 'logToFile', message: '[INCREMENT] Drop to unallocated: ' + storyName + ' from:' + sourceInc });
+                    window.removeStoryFromIncrement(sourceInc, storyName);
+                    draggedNode = null;
+                } else if (incTarget && incTarget.classList.contains('increment-column-container')) {
+                    e.preventDefault();
+                    removeDropIndicator();
+                    _clearIncrementHighlights();
+                    var incName = incTarget.getAttribute('data-inc');
+                    var storyName = draggedNode.name;
+                    var sourceInc = draggedNode.fromIncrement; // '' = unallocated, 'IncName' = from another column, null = from hierarchy
+                    console.log('[INCREMENT] DROP story onto increment:', storyName, '->', incName, '(from:', sourceInc, ')');
+                    vscode.postMessage({ command: 'logToFile', message: '[INCREMENT] Drop: ' + storyName + ' -> ' + incName + ' from:' + sourceInc });
+                    var dropPos = _incrementDropPosition(incTarget, e.clientY);
+                    if (sourceInc && sourceInc !== incName) {
+                        // Moving between increment columns — remove from source, insert at position in target
+                        window.removeStoryFromIncrement(sourceInc, storyName);
+                        window.addStoryToIncrement(incName, storyName, dropPos);
+                    } else if (sourceInc !== null) {
+                        // From unallocated (sourceInc === '') — insert at position
+                        window.addStoryToIncrement(incName, storyName, dropPos);
+                    } else {
+                        // From hierarchy view — insert at position
+                        window.addStoryToIncrement(incName, storyName, dropPos);
+                    }
+                    draggedNode = null;
                 }
             } else {
                 removeDropIndicator();
@@ -4065,15 +4372,61 @@ class BotPanel {
         
         function _incCmd(commandText) {
             console.log('[INCREMENT] >>> Sending command:', commandText);
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[INCREMENT][UI->CLI] ' + commandText
-            });
+            vscode.postMessage({ command: 'logToFile', message: '[INCREMENT][UI->CLI] ' + commandText });
             vscode.postMessage({ command: 'executeCommand', commandText: commandText });
         }
 
+        function _applyIncrementCollapse(col, collapse) {
+            var body = col.querySelector('.increment-stories-body');
+            var btn = col.querySelector('button[title="Collapse / expand"]');
+            if (collapse) {
+                col.setAttribute('data-collapsed', 'true');
+                col.style.minWidth = '28px';
+                col.style.maxWidth = '28px';
+                col.style.overflowY = 'hidden';
+                if (body) body.style.display = 'none';
+                if (btn) btn.textContent = '▶';
+            } else {
+                col.setAttribute('data-collapsed', 'false');
+                col.style.minWidth = '160px';
+                col.style.maxWidth = '200px';
+                col.style.overflowY = 'auto';
+                if (body) body.style.display = 'flex';
+                if (btn) btn.textContent = '▼';
+            }
+        }
+
+        window.toggleIncrementCollapse = function(col) {
+            if (!col) return;
+            var incName = col.getAttribute('data-inc');
+            var collapsed = col.getAttribute('data-collapsed') === 'true';
+            _applyIncrementCollapse(col, !collapsed);
+            // Persist across refreshes using VS Code webview state
+            try {
+                var state = vscode.getState() || {};
+                if (!state.collapsedIncrements) state.collapsedIncrements = {};
+                if (!collapsed) {
+                    state.collapsedIncrements[incName] = true;
+                } else {
+                    delete state.collapsedIncrements[incName];
+                }
+                vscode.setState(state);
+            } catch(_) {}
+        };
+
+        // Restore collapsed state after each panel refresh
+        (function restoreIncrementCollapseState() {
+            try {
+                var state = vscode.getState() || {};
+                var collapsed = state.collapsedIncrements || {};
+                Object.keys(collapsed).forEach(function(incName) {
+                    var col = document.querySelector('.increment-column-container[data-inc="' + incName + '"]');
+                    if (col) _applyIncrementCollapse(col, true);
+                });
+            } catch(_) {}
+        })();
+
         window.selectIncrement = function(name) {
-            console.log('[INCREMENT] selectIncrement:', name);
             window.selectNode('increment', name, { name: name, path: 'story_graph.increments."' + name + '"' });
             document.querySelectorAll('.increment-column-container').forEach(function(col) {
                 col.classList.toggle('selected', col.getAttribute('data-inc') === name);
@@ -4081,37 +4434,99 @@ class BotPanel {
         };
 
         window.addIncrement = function() {
-            console.log('[INCREMENT] addIncrement clicked');
-            var name = prompt('New increment name:');
-            console.log('[INCREMENT] addIncrement name entered:', name);
-            if (!name || !name.trim()) { console.log('[INCREMENT] addIncrement cancelled'); return; }
-            _incCmd('story_graph.add_increment name:"' + name.trim() + '"');
+            var wrapper = document.querySelector('.increment-columns-wrapper');
+            if (!wrapper) { console.error('[INCREMENT] Cannot find .increment-columns-wrapper'); return; }
+
+            // Insert after the currently selected column, or append at end
+            var selectedCol = wrapper.querySelector('.increment-column-container.selected');
+
+            var col = document.createElement('div');
+            col.className = 'increment-column-container selected';
+            col.style.cssText = 'min-width:160px;max-width:200px;flex-shrink:0;border-right:1px solid var(--text-color-faded,#444);padding:8px;display:flex;flex-direction:column;border-top:2px solid var(--accent-color);';
+            col.innerHTML = '<div style="display:flex;align-items:center;gap:4px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--text-color-faded,#555);">' +
+                '<span contenteditable="true" style="flex:1;font-weight:600;font-size:12px;outline:none;min-width:0;color:var(--accent-color);">New Increment</span></div>' +
+                '<div style="font-size:11px;color:var(--text-color-faded);font-style:italic;">(no stories)</div>';
+
+            if (selectedCol) {
+                selectedCol.insertAdjacentElement('afterend', col);
+            } else {
+                wrapper.appendChild(col);
+            }
+
+            var span = col.querySelector('span[contenteditable]');
+            span.focus();
+            document.execCommand('selectAll', false, null);
+
+            var committed = false;
+            function commit() {
+                if (committed) return;
+                committed = true;
+                var name = span.innerText.trim();
+                if (!name || name === 'New Increment') { col.remove(); return; }
+                // Keep column visible (dimmed) so user sees it while backend processes
+                span.contentEditable = 'false';
+                span.style.color = '';
+                col.style.borderTop = '';
+                col.style.opacity = '0.6';
+                var afterName = selectedCol ? selectedCol.getAttribute('data-inc') : null;
+                _incCmd('story_graph.add_increment name:"' + name + '"' + (afterName ? ' after:"' + afterName + '"' : ''));
+            }
+
+            span.addEventListener('blur', commit, { once: true });
+            span.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); span.blur(); }
+                if (e.key === 'Escape') { span.innerText = ''; span.blur(); }
+            });
         };
 
+        // Mirror handleDeleteNode: remove DOM immediately, send command (no confirmation dialog)
         window.deleteIncrement = function(incrementName) {
-            console.log('[INCREMENT] deleteIncrement clicked for:', incrementName);
-            if (!confirm('Delete increment "' + incrementName + '"?')) { console.log('[INCREMENT] deleteIncrement cancelled'); return; }
+            var col = document.querySelector('.increment-column-container[data-inc="' + incrementName + '"]');
+            if (col) col.remove();
             _incCmd('story_graph.remove_increment increment_name:"' + incrementName + '"');
         };
 
+        // Mirror inline rename: contenteditable blur sends the command
         window.renameIncrement = function(el, oldName) {
             var newName = el.innerText.trim();
-            console.log('[INCREMENT] renameIncrement oldName=' + oldName + ' newName=' + newName);
             if (!newName || newName === oldName) { el.innerText = oldName; return; }
+            el.setAttribute('data-increment-name', newName);
+            el.closest('.increment-column-container').setAttribute('data-inc', newName);
             _incCmd('story_graph.rename_increment from_name:"' + oldName + '" to_name:"' + newName + '"');
         };
 
-        window.addStoryToIncrement = function(incrementName) {
-            console.log('[INCREMENT] addStoryToIncrement for increment:', incrementName);
-            var name = prompt('Add story to "' + incrementName + '":');
-            console.log('[INCREMENT] addStoryToIncrement story name entered:', name);
-            if (!name || !name.trim()) { console.log('[INCREMENT] addStoryToIncrement cancelled'); return; }
-            _incCmd('story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + name.trim() + '"');
+        // Mirror handleDeleteNode: remove the story row immediately, send command
+        window.removeStoryFromIncrement = function(incrementName, storyName) {
+            var col = document.querySelector('.increment-column-container[data-inc="' + incrementName + '"]');
+            if (col) {
+                col.querySelectorAll('[data-story]').forEach(function(row) {
+                    if (row.getAttribute('data-story') === storyName) row.closest('div').remove();
+                });
+            }
+            _incCmd('story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"');
         };
 
-        window.removeStoryFromIncrement = function(incrementName, storyName) {
-            console.log('[INCREMENT] removeStoryFromIncrement inc=' + incrementName + ' story=' + storyName);
-            _incCmd('story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"');
+        // Called when a story node is dropped onto an increment column
+        // Returns the 0-based insertion position within an increment column based on mouse Y.
+        // If mouseY is not provided, returns undefined (append to end).
+        function _incrementDropPosition(incColEl, mouseY) {
+            if (mouseY === undefined || mouseY === null || !incColEl) return undefined;
+            var rows = Array.from(incColEl.querySelectorAll('.story-node[data-inc-source]'));
+            if (!rows.length) return 0;
+            for (var i = 0; i < rows.length; i++) {
+                var rect = rows[i].getBoundingClientRect();
+                var mid = rect.top + rect.height / 2;
+                if (mouseY < mid) return i;
+            }
+            return rows.length; // append after last
+        }
+
+        // Add a known story to an increment — called by drag-drop only
+        // position: 0-based index to insert at; omit to append at end
+        window.addStoryToIncrement = function(incrementName, storyName, position) {
+            var cmd = 'story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"';
+            if (position !== undefined && position !== null) cmd += ' position:' + position;
+            _incCmd(cmd);
         };
 
         window.createSubEpic = function(parentName) {

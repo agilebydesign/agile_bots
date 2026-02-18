@@ -2132,16 +2132,28 @@ class Increment:
             output_lines.append("  (no stories)")
         return "\n".join(output_lines)
 
-    def add_story(self, story_name: str) -> None:
+    def add_story(self, story_name: str, position: Optional[int] = None) -> None:
         if any(self._story_name(s) == story_name for s in self.stories):
             raise ValueError(f'Story "{story_name}" already in increment "{self.name}"')
-        self.stories.append({'name': story_name, 'sequential_order': len(self.stories) + 1.0})
+        if position is not None:
+            idx = max(0, min(int(position), len(self.stories)))
+            self.stories.insert(idx, story_name)
+        else:
+            self.stories.append(story_name)
 
     def remove_story(self, story_name: str) -> None:
         updated = [s for s in self.stories if self._story_name(s) != story_name]
         if len(updated) == len(self.stories):
             raise ValueError(f'Story "{story_name}" not in increment "{self.name}"')
         self.stories = updated
+
+    def reorder_story(self, story_name: str, position: int) -> None:
+        story = next((s for s in self.stories if self._story_name(s) == story_name), None)
+        if story is None:
+            raise ValueError(f'Story "{story_name}" not in increment "{self.name}"')
+        self.stories.remove(story)
+        position = max(0, min(position, len(self.stories)))
+        self.stories.insert(position, story)
 
     def rename_story_reference(self, old_name: str, new_name: str) -> None:
         self.stories = [
@@ -2228,6 +2240,28 @@ class IncrementCollection:
             self._increments.append(Increment(name=name, priority=max_priority + 1, stories=[]))
         self._rebuild_indexes()
 
+    def reorder(self, name: str, before: Optional[str] = None, after: Optional[str] = None) -> None:
+        """Move increment before or after another increment, updating all priorities."""
+        if name not in self._by_name:
+            raise ValueError(f'Increment "{name}" not found')
+        anchor_name = before or after
+        if anchor_name and anchor_name not in self._by_name:
+            raise ValueError(f'Increment "{anchor_name}" not found')
+        # Remove from current position
+        inc = self._by_name[name]
+        self._increments.remove(inc)
+        # Find insertion index
+        if anchor_name:
+            anchor_idx = next(i for i, x in enumerate(self._increments) if x.name == anchor_name)
+            insert_idx = anchor_idx if before else anchor_idx + 1
+        else:
+            insert_idx = len(self._increments)
+        self._increments.insert(insert_idx, inc)
+        # Reassign priorities to match list order
+        for i, x in enumerate(self._increments):
+            x.priority = i + 1
+        self._rebuild_indexes()
+
     def remove(self, name: str) -> bool:
         for i, inc in enumerate(self._increments):
             if inc.name == name:
@@ -2245,17 +2279,23 @@ class IncrementCollection:
         inc.name = to_name
         self._rebuild_indexes()
 
-    def add_story_to(self, increment_name: str, story_name: str) -> None:
+    def add_story_to(self, increment_name: str, story_name: str, position: Optional[int] = None) -> None:
         inc = self._by_name.get(increment_name)
         if inc is None:
             raise ValueError(f'Increment "{increment_name}" not found')
-        inc.add_story(story_name)
+        inc.add_story(story_name, position=position)
 
     def remove_story_from(self, increment_name: str, story_name: str) -> None:
         inc = self._by_name.get(increment_name)
         if inc is None:
             raise ValueError(f'Increment "{increment_name}" not found')
         inc.remove_story(story_name)
+
+    def reorder_story_in(self, increment_name: str, story_name: str, position: int) -> None:
+        inc = self._by_name.get(increment_name)
+        if inc is None:
+            raise ValueError(f'Increment "{increment_name}" not found')
+        inc.reorder_story(story_name, position)
 
     def remove_story_from_all(self, story_name: str) -> None:
         for inc in self._increments:
@@ -2416,14 +2456,22 @@ class StoryMap:
         self._increments.rename(from_name, to_name)
         self.save()
 
-    def add_story_to_increment(self, increment_name: str, story_name: str) -> None:
+    def reorder_increment(self, increment_name: str, before: Optional[str] = None, after: Optional[str] = None) -> None:
+        self._increments.reorder(increment_name, before=before, after=after)
+        self.save()
+
+    def add_story_to_increment(self, increment_name: str, story_name: str, position: Optional[int] = None) -> None:
         if story_name not in {s.name for s in self.all_stories}:
             raise ValueError(f'Story "{story_name}" not found in graph')
-        self._increments.add_story_to(increment_name, story_name)
+        self._increments.add_story_to(increment_name, story_name, position=position)
         self.save()
 
     def remove_story_from_increment(self, increment_name: str, story_name: str) -> None:
         self._increments.remove_story_from(increment_name, story_name)
+        self.save()
+
+    def reorder_story_in_increment(self, increment_name: str, story_name: str, position: int) -> None:
+        self._increments.reorder_story_in(increment_name, story_name, int(position))
         self.save()
 
     def rename_story_in_hierarchy(self, old_name: str, new_name: str) -> None:

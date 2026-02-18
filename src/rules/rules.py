@@ -34,6 +34,7 @@ class ValidationContext:
     working_dir: Path
     status_writer: Optional[Any] = None
     max_cross_file_comparisons: int = 20
+    full_story_graph: Optional[Dict[str, Any]] = None
 
     @classmethod
     def from_action_context(cls, behavior, context: 'ValidateActionContext', callbacks: Optional[ValidationCallbacks] = None) -> 'ValidationContext':
@@ -42,7 +43,9 @@ class ValidationContext:
         validation_scope = ValidationScope.from_context(context, behavior.bot_paths, behavior_name=behavior.name)
         
         story_graph_content = story_graph.content
+        full_story_graph = None
         if context.scope:
+            full_story_graph = story_graph_content
             story_graph_content = validation_scope.filter_story_graph(story_graph_content)
         
         files = cls._get_files_for_validation(behavior, context)
@@ -61,7 +64,8 @@ class ValidationContext:
             behavior=behavior,
             bot_paths=behavior.bot_paths,
             working_dir=behavior.bot_paths.workspace_directory,
-            max_cross_file_comparisons=getattr(context, 'max_cross_file_comparisons', 20)
+            max_cross_file_comparisons=getattr(context, 'max_cross_file_comparisons', 20),
+            full_story_graph=full_story_graph
         )
     
     @classmethod
@@ -404,6 +408,7 @@ class Rules:
             from rules.scan_config import ScanConfig
             scan_config = ScanConfig(
                 story_graph=context.story_graph,
+                full_story_graph=getattr(context, 'full_story_graph', None),
                 files=all_files or files,
                 changed_files=changed_files,
                 skip_cross_file=context.skip_cross_file,

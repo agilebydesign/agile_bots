@@ -27,6 +27,7 @@ class Scanner(ABC):
             if file_path and file_path.exists() and file_path.is_file():
                 file_context = FileScanContext(
                     story_graph=context.story_graph,
+                    full_story_graph=getattr(context, 'full_story_graph', None),
                     file_path=file_path
                 )
                 file_violations = self.scan_file_with_context(file_context)

@@ -103,7 +103,9 @@ class StoryGraphFilter:
             
             return None
         
-        filtered_graph = {'epics': []}
+        # Preserve all top-level fields (increments, domain_concepts, etc.) — only filter epics
+        filtered_graph = {k: v for k, v in story_graph.items() if k != 'epics'}
+        filtered_graph['epics'] = []
         epics = story_graph.get('epics', [])
         
         for epic in epics:

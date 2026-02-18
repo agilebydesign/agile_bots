@@ -2661,7 +2661,7 @@ class StoryMapView extends PanelView {
                     ${permanentLinksHtml}
                 </div>
             </div>
-            <div id="scope-content" class="collapsible-content" style="max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};">
+            <div id="scope-content" class="collapsible-content" style="${isIncrementView ? `overflow: visible; display: ${scopeSectionExpanded ? 'block' : 'none'};` : `max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};`}">
                 <div class="card-secondary" style="padding: 2px 4px;">
                     <div class="input-container" style="margin-bottom: 10px; padding: 6px 8px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 28px;">
@@ -2989,42 +2989,68 @@ ${clientScript}    </script>`;
      * @returns {string} HTML string for increment columns
      */
     renderIncrementView(botData, documentIconPath) {
-        const increments = botData?.scope?.content?.increments || botData?.increments || [];
-        const allStories = this._collectAllStoryNames(botData);
+        // Always use the full increments list regardless of scope filter
+        const allIncrements = botData?.scope?.content?.increments || botData?.increments || [];
+
+        // Filter is applied client-side to increment columns only, not via the scope system
+        const filterText = (botData?.scope?.filter || '').toLowerCase().trim();
+
+        // Build the display list: filter matches increment name → full column;
+        //   filter matches story name → show that increment with only matching stories
+        const displayIncrements = filterText
+            ? allIncrements.map(inc => {
+                if (inc.name.toLowerCase().includes(filterText)) return inc; // full column
+                const matching = (inc.stories || []).filter(s =>
+                    (typeof s === 'string' ? s : s.name).toLowerCase().includes(filterText)
+                );
+                return matching.length ? { ...inc, stories: matching } : null;
+            }).filter(Boolean)
+            : allIncrements;
+
+        // Unallocated: only shown when no filter is active (filter affects increment columns, not unallocated)
         const assignedStories = new Set(
-            increments.flatMap(inc => (inc.stories || []).map(s => typeof s === 'string' ? s : s.name))
+            allIncrements.flatMap(inc => (inc.stories || []).map(s => typeof s === 'string' ? s : s.name))
         );
-        const unallocatedStories = allStories.filter(name => !assignedStories.has(name));
+        const unallocatedStories = filterText
+            ? []
+            : this._collectAllStoryNames(botData).filter(name => !assignedStories.has(name));
 
         const storyIcon = documentIconPath
             ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px; flex-shrink: 0;" alt="Story" />`
             : '';
 
+        const filterHint = filterText
+            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${this.escapeHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
+            : '';
+
         let html = `
             <div style="padding: 8px 12px 4px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--text-color-faded, #444);">
                 <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">INCREMENTS</span>
+                ${filterHint}
                 <button onclick="addIncrement()" style="font-size: 11px; padding: 2px 8px; cursor: pointer; background: var(--accent-color); color: #fff; border: none; border-radius: 3px; margin-left: auto;">+ Add Increment</button>
             </div>
-            <div style="display: flex; gap: 0; overflow-x: auto; height: calc(100% - 36px);">
+            <div class="increment-columns-wrapper" style="display: flex; gap: 0; overflow-x: auto; height: 65vh; min-height: 300px;">
         `;
 
-        if (unallocatedStories.length > 0 || increments.length === 0) {
+        if (!filterText && (unallocatedStories.length > 0 || allIncrements.length === 0)) {
             html += `
-                <div style="min-width: 140px; max-width: 160px; flex-shrink: 0; background: rgba(255,255,255,0.03); border-right: 1px solid var(--text-color-faded, #444); padding: 8px; overflow-y: auto;">
+                <div class="unallocated-column" style="min-width: 140px; max-width: 160px; flex-shrink: 0; background: rgba(255,255,255,0.03); border-right: 1px solid var(--text-color-faded, #444); padding: 8px; overflow-y: auto;">
                     <div style="font-size: 11px; font-weight: 600; opacity: 0.6; margin-bottom: 6px; text-transform: uppercase;">Unallocated</div>
                     ${unallocatedStories.length === 0
                         ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(none)</div>`
-                        : unallocatedStories.map(name => `
-                            <div style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px;">
-                                ${storyIcon}<span style="flex: 1; word-wrap: break-word;">${this.escapeHtml(name)}</span>
-                            </div>`).join('')
+                        : unallocatedStories.map(name => {
+                            const esc = this.escapeHtml(name);
+                            return `<div class="story-node" draggable="true" data-node-type="story" data-node-name="${esc}" data-path="story_graph.unallocated.${esc}" data-inc-source="" data-position="0" style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px; cursor: grab;">
+                                ${storyIcon}<span style="flex: 1; word-wrap: break-word; pointer-events: none;">${esc}</span>
+                            </div>`;
+                        }).join('')
                     }
-                    ${increments.length === 0 ? `<div style="margin-top: 12px; font-size: 11px; color: var(--text-color-faded); font-style: italic;">Add an increment to start assigning stories.</div>` : ''}
+                    ${allIncrements.length === 0 ? `<div style="margin-top: 12px; font-size: 11px; color: var(--text-color-faded); font-style: italic;">Add an increment to start assigning stories.</div>` : ''}
                 </div>
             `;
         }
 
-        for (const increment of increments) {
+        for (const increment of displayIncrements) {
             const incName = increment.name;
             const escapedName = this.escapeHtml(incName);
             const jsName = incName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
@@ -3034,8 +3060,10 @@ ${clientScript}    </script>`;
             );
 
             html += `
-                <div class="increment-column-container" data-inc="${escapedName}" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer;">
+                <div class="increment-column-container" data-inc="${escapedName}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
+                        <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
+                        <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>
                         <span
                             contenteditable="true"
                             data-increment-name="${escapedName}"
@@ -3046,19 +3074,18 @@ ${clientScript}    </script>`;
                             title="Click to rename"
                         >${escapedName}</span>
                         <button data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: 1px solid var(--text-color-faded); border-radius: 3px; flex-shrink: 0;" title="Delete increment">x</button>
-                        <button data-inc="${escapedName}" onclick="event.stopPropagation(); addStoryToIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--accent-color); border: 1px solid var(--accent-color); border-radius: 3px; flex-shrink: 0;" title="Add story">+</button>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
+                    <div class="increment-stories-body" style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
                         ${sortedStories.length === 0
                             ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(no stories)</div>`
-                            : sortedStories.map(story => {
+                            : sortedStories.map((story, si) => {
                                 const storyName = typeof story === 'string' ? story : (story.name || '');
                                 const escapedStoryName = this.escapeHtml(storyName);
                                 return `
-                                    <div style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px;">
+                                    <div class="story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}" style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px; cursor: grab;">
                                         ${storyIcon}
-                                        <span style="flex: 1; word-wrap: break-word; min-width: 0;">${escapedStoryName}</span>
-                                        <button data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" style="font-size: 9px; padding: 0 3px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; opacity: 0.5; line-height: 1;" title="Remove story from increment">x</button>
+                                        <span style="flex: 1; word-wrap: break-word; min-width: 0; pointer-events: none;">${escapedStoryName}</span>
+                                        <button data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" style="font-size: 9px; padding: 0 3px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; opacity: 0.5; line-height: 1; pointer-events: auto;" title="Remove story from increment">x</button>
                                     </div>`;
                             }).join('')
                         }

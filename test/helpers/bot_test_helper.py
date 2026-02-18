@@ -11,6 +11,7 @@ from .file_helper import FileTestHelper
 # SubEpic-specific helpers (organized by feature, in each SubEpic folder)
 from invoke_bot.edit_story_map.story_helper import StoryTestHelper
 from invoke_bot.edit_story_map.scope_helper import ScopeTestHelper
+from invoke_bot.edit_story_map.increment_helper import IncrementTestHelper
 from invoke_bot.initialize_bot.behavior_helper import BehaviorTestHelper
 from invoke_bot.navigate_behavior_actions.navigation_helper import NavigationTestHelper
 from invoke_bot.navigate_behavior_actions.activity_helper import ActivityTestHelper
@@ -102,6 +103,7 @@ class BotTestHelper:
         self.render = RenderTestHelper(parent=self)
         self.activity = ActivityTestHelper(parent=self)
         self.story = StoryTestHelper(parent=self)
+        self.increment = IncrementTestHelper(parent=self)
         self.scope = ScopeTestHelper(parent=self)
         self.drawio_story_map = DrawIOStoryMapTestHelper(parent=self)
         self.instructions = InstructionsTestHelper(parent=self)

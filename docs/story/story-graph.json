@@ -346,8 +346,8 @@
                   ],
                   "acceptance_criteria": [
                     {
-                      "name": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot → story_shape.mdc)",
-                      "text": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot → story_shape.mdc)",
+                      "name": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot â†’ story_shape.mdc)",
+                      "text": "WHEN generate context package command runs on bot, THEN Generator iterates over bot behaviors:\n- Walks bots/{bot_name}/behaviors/ directory\n- Reads each behavior.json\n- Extracts: behaviorName, description, goal, inputs, outputs\n- Creates one .mdc rule file per behavior in workspace .cursor/rules/{bot_name}_{behavior}.mdc (e.g. story_bot â†’ story_shape.mdc)",
                       "sequential_order": 1.0
                     },
                     {
@@ -361,23 +361,23 @@
                       "sequential_order": 3.0
                     },
                     {
-                      "name": "WHEN Generator adds clarification section, THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json → key questions as bullets\n- Reads guardrails/required_context/evidence.json → evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or infer—be explicit when information is missing; save to clarification.strategy",
-                      "text": "WHEN Generator adds clarification section, THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json → key questions as bullets\n- Reads guardrails/required_context/evidence.json → evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or infer—be explicit when information is missing; save to clarification.strategy",
+                      "name": "WHEN Generator adds clarification section, THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json â†’ key questions as bullets\n- Reads guardrails/required_context/evidence.json â†’ evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or inferâ€”be explicit when information is missing; save to clarification.strategy",
+                      "text": "WHEN Generator adds clarification section, THEN it:\n- Section: ## Clarification\n- Reads guardrails/required_context/key_questions.json â†’ key questions as bullets\n- Reads guardrails/required_context/evidence.json â†’ evidence list\n- Merges clarify action instructions from behavior.json actions_workflow (action name clarify)\n- Merges instructions from base_actions/clarify/action_config.json\n- Adds clarification logic: answer each question from context; if you can't answer, state [!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT; store answers to clarification.json for later session; don't guess or inferâ€”be explicit when information is missing; save to clarification.strategy",
                       "sequential_order": 4.0
                     },
                     {
-                      "name": "WHEN Generator adds strategy section, THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json → assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json → each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
-                      "text": "WHEN Generator adds strategy section, THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json → assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json → each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
+                      "name": "WHEN Generator adds strategy section, THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json â†’ assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json â†’ each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
+                      "text": "WHEN Generator adds strategy section, THEN it:\n- Section: ## Strategy\n- Reads guardrails/strategy/typical_assumptions.json â†’ assumptions as bullets\n- Reads guardrails/strategy/decision_criteria/*.json â†’ each decision (question, options) as structured bullets\n- Merges strategy action instructions from behavior.json actions_workflow (action name strategy)\n- Merges instructions from base_actions/strategy/action_config.json\n- Adds strategy logic: review context, make decisions, compile assumptions; if insufficient context state [!] NOT ENOUGH INFORMATION; save to strategy.json",
                       "sequential_order": 5.0
                     },
                     {
-                      "name": "WHEN Generator adds build section, THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)—no JSON schema for build output",
-                      "text": "WHEN Generator adds build section, THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)—no JSON schema for build output",
+                      "name": "WHEN Generator adds build section, THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)â€”no JSON schema for build output",
+                      "text": "WHEN Generator adds build section, THEN it:\n- Section: ## Build\n- Merges build action instructions from behavior.json actions_workflow (action name build)\n- Specifies templates from content/render/*.json (template paths, output formats)â€”no JSON schema for build output",
                       "sequential_order": 6.0
                     },
                     {
-                      "name": "WHEN Generator adds render section, THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template → story-map.txt)",
-                      "text": "WHEN Generator adds render section, THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template → story-map.txt)",
+                      "name": "WHEN Generator adds render section, THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template â†’ story-map.txt)",
+                      "text": "WHEN Generator adds render section, THEN it:\n- Section: ## Render\n- Walks content/render/*.json\n- For each: extracts template path, output path, instructions\n- Formats as bullets (e.g. story-map.md template â†’ story-map.txt)",
                       "sequential_order": 7.0
                     },
                     {
@@ -1990,7 +1990,7 @@
                           "type": "",
                           "background": [],
                           "test_method": "test_cli_displays_workspace_name_and_path",
-                          "steps": "Given CLI is initialized with workspace base_bot\nAnd workspace path is C:/dev/augmented-teams/agile_bot/bots/base_bot\nWhen CLI renders the dashboard header\nThen output contains 'Ã°Å¸â€œâ€š **Workspace:** base_bot' with folder emoji\nAnd output shows code block with three backticks\nAnd output shows full workspace path: 'C:\\dev\\augmented-teams\\agile_bot\\bots\\base_bot'\nAnd output closes code block with three backticks"
+                          "steps": "Given CLI is initialized with workspace base_bot\nAnd workspace path is C:/dev/augmented-teams/agile_bot/bots/base_bot\nWhen CLI renders the dashboard header\nThen output contains 'ÃƒÂ°Ã…Â¸Ã¢â‚¬Å“Ã¢â‚¬Å¡ **Workspace:** base_bot' with folder emoji\nAnd output shows code block with three backticks\nAnd output shows full workspace path: 'C:\\dev\\augmented-teams\\agile_bot\\bots\\base_bot'\nAnd output closes code block with three backticks"
                         },
                         {
                           "name": "CLI displays path change instructions",
@@ -2290,7 +2290,7 @@
                       ],
                       "acceptance_criteria": [],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Detect CLI Mode.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\ðŸ“„ Detect CLI Mode.md"
                     },
                     {
                       "name": "Initialize CLI Session",
@@ -2329,7 +2329,7 @@
                       ],
                       "acceptance_criteria": [],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Initialize CLI Session.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\ðŸ“„ Initialize CLI Session.md"
                     },
                     {
                       "name": "Open Panel",
@@ -2463,7 +2463,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\📄 Apply Visual Branding.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Initialize Bot\\Initialize Bot Interface\\ðŸ“„ Apply Visual Branding.md"
                     },
                     {
                       "name": "Exit CLI REPL",
@@ -5745,7 +5745,7 @@
             },
             {
               "name": "Edit Story Map",
-              "sequential_order": 2.0,
+              "sequential_order": 1.0,
               "behavior": null,
               "domain_concepts": [],
               "test_file": "invoke_bot/edit_story_map/test_edit_story_nodes.py",
@@ -7966,7 +7966,7 @@
                                   "Save Story Map Changes Asynchronously",
                                   "Scenario",
                                   "User moves node",
-                                  "User moves node (contains 🎯 invalid emoji)",
+                                  "User moves node (contains ðŸŽ¯ invalid emoji)",
                                   "spinner icon",
                                   "500ms",
                                   "validation",
@@ -8112,7 +8112,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\📄 Save Story Map Changes Asynchronously.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\ðŸ“„ Save Story Map Changes Asynchronously.md"
                     },
                     {
                       "name": "Automatically Refresh Story Graph Changes Panel",
@@ -8154,7 +8154,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\📄 Automatically Refresh Story Graph Changes Panel.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\ðŸ“„ Automatically Refresh Story Graph Changes Panel.md"
                     },
                     {
                       "name": "Automatically Refresh Story Graph Changes  CLI",
@@ -8196,7 +8196,532 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\📄 Automatically Refresh Story Graph Changes  CLI.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Edit Story Nodes\\ðŸ“„ Automatically Refresh Story Graph Changes  CLI.md"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Edit Increments",
+              "sequential_order": 2.0,
+              "behavior": null,
+              "domain_concepts": [],
+              "test_file": "test/invoke_bot/edit_story_map/test_edit_increments.py",
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "name": "",
+                  "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": null,
+                  "behavior": null,
+                  "stories": [
+                    {
+                      "name": "Add Increment",
+                      "sequential_order": 1.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestAddIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Add increment after selected increment",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given Story Graph has increments MVP (priority 1) and Phase 2 (priority 2)"
+                          ],
+                          "test_method": "test_add_increment_after_selected",
+                          "steps": "When User selects increment MVP AND adds increment with name Phase 1.5\nThen Story Graph inserts new increment between MVP and Phase 2\nAnd New increment has priority 2 (selected plus one)\nAnd Phase 2 and all later increments have priority increased by 1\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "Add increment when nothing selected appends to back",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given Story Graph has increments MVP (priority 1) and Phase 2 (priority 2)"
+                          ],
+                          "test_method": "test_add_increment_when_nothing_selected_appends_to_back",
+                          "steps": "When User adds increment with name Phase 3 (no increment selected)\nThen Story Graph appends increment to end of list\nAnd New increment has highest priority number (lowest delivery priority)\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "Add increment with duplicate name returns error",
+                          "sequential_order": 3.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_add_increment_duplicate_name_returns_error",
+                          "steps": "Given Story Graph has increment named MVP\nWhen User adds increment with same name MVP\nThen System identifies duplicate and returns error\nAnd Story Graph remains unchanged"
+                        },
+                        {
+                          "name": "CLI adds increment after MVP with bumped priorities",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given Story Graph has increments MVP (priority 1) and Phase 2 (priority 2)"
+                          ],
+                          "test_method": "test_cli_add_increment_after_mvp",
+                          "steps": "When User executes increments.add name:\"Phase 1.5\" after:\"MVP\"\nThen CLI inserts increment after MVP with bumped priorities\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "CLI appends increment to end when no after specified",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [
+                            "Given Story Graph has increments MVP (priority 1) and Phase 2 (priority 2)"
+                          ],
+                          "test_method": "test_cli_add_increment_append",
+                          "steps": "When User executes increments.add name:\"Phase 3\"\nThen CLI appends increment to end with highest priority number\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel Add button with selection inserts after selected and refreshes",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_add_increment_after_selected",
+                          "steps": "Given User has increment MVP selected in Panel increment view\nWhen User clicks Add button AND enters name Phase 1.5 AND submits\nThen Panel shows name input\nAnd Panel inserts new increment after MVP\nAnd Panel refreshes increment list"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User selects existing increment AND adds increment with name\nTHEN Story Graph inserts new increment after selected AND assigns new increment priority equal to selected priority plus one AND increments priority of all increments with priority greater than or equal to selected plus one by one AND initializes empty stories array AND persists to story-graph.json",
+                          "text": "WHEN User selects existing increment AND adds increment with name\nTHEN Story Graph inserts new increment after selected AND assigns new increment priority equal to selected priority plus one AND increments priority of all increments with priority greater than or equal to selected plus one by one AND initializes empty stories array AND persists to story-graph.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User adds increment with no increment selected\nTHEN Story Graph appends increment to end of list AND assigns highest priority number (lowest delivery priority) AND initializes empty stories array AND persists to story-graph.json",
+                          "text": "WHEN User adds increment with no increment selected\nTHEN Story Graph appends increment to end of list AND assigns highest priority number (lowest delivery priority) AND initializes empty stories array AND persists to story-graph.json",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User adds increment with duplicate name\nTHEN System returns validation error AND does not add increment",
+                          "text": "WHEN User adds increment with duplicate name\nTHEN System returns validation error AND does not add increment",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User adds increment via CLI increments.add name:\"Increment Name\" after:\"MVP\"\nTHEN CLI inserts increment after MVP with bumped priorities AND displays confirmation",
+                          "text": "WHEN User adds increment via CLI increments.add name:\"Increment Name\" after:\"MVP\"\nTHEN CLI inserts increment after MVP with bumped priorities AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User adds increment via CLI increments.add name:\"Increment Name\"\nTHEN CLI appends increment to end with highest priority number AND displays confirmation",
+                          "text": "WHEN User adds increment via CLI increments.add name:\"Increment Name\"\nTHEN CLI appends increment to end with highest priority number AND displays confirmation",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "WHEN User selects increment AND adds via Panel increment Add button\nTHEN Panel shows name input AND User submits AND Panel inserts new increment after selected AND Panel refreshes increment list",
+                          "text": "WHEN User selects increment AND adds via Panel increment Add button\nTHEN Panel shows name input AND User submits AND Panel inserts new increment after selected AND Panel refreshes increment list",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "WHEN User adds via Panel increment Add button with no increment selected\nTHEN Panel shows name input AND User submits AND Panel appends increment to end of list AND Panel refreshes increment list",
+                          "text": "WHEN User adds via Panel increment Add button with no increment selected\nTHEN Panel shows name input AND User submits AND Panel appends increment to end of list AND Panel refreshes increment list",
+                          "sequential_order": 7.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Remove Increment",
+                      "sequential_order": 2.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRemoveIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Remove increment by name",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_remove_increment_by_name",
+                          "steps": "Given Story Graph has increment named MVP\nWhen User removes increment MVP\nThen Story Graph removes increment from list\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "Remove non-existent increment returns error",
+                          "sequential_order": 2.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_remove_nonexistent_increment_returns_error",
+                          "steps": "Given Story Graph has no increment named Missing\nWhen User removes increment Missing\nThen System returns error\nAnd Story Graph remains unchanged"
+                        },
+                        {
+                          "name": "CLI removes increment and displays confirmation",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_remove_increment",
+                          "steps": "Given Story Graph has increment named MVP\nWhen User executes increments.remove name:\"MVP\"\nThen CLI removes increment\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel Delete button prompts confirmation and refreshes list",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_remove_increment_delete_button",
+                          "steps": "Given User has increment MVP selected in Panel increment view\nWhen User clicks Delete button AND confirms\nThen Panel prompts confirmation\nAnd Panel refreshes increment list"
+                        },
+                        {
+                          "name": "Remove increment that contains stories leaves hierarchy unchanged",
+                          "sequential_order": 5.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_remove_increment_with_stories_leaves_hierarchy_unchanged",
+                          "steps": "Given increment MVP contains story Validate Order\nWhen User removes increment MVP\nThen Story Graph removes increment from list\nAnd Story Validate Order remains in epics/sub-epics hierarchy\nAnd Story Graph persists changes"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User removes increment by name\nTHEN Story Graph removes increment from increments list AND persists to story-graph.json",
+                          "text": "WHEN User removes increment by name\nTHEN Story Graph removes increment from increments list AND persists to story-graph.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User removes increment that contains stories\nTHEN Story Graph removes increment from increments list AND stories within hierarchy are unaffected (only increment assignment list is removed)",
+                          "text": "WHEN User removes increment that contains stories\nTHEN Story Graph removes increment from increments list AND stories within hierarchy are unaffected (only increment assignment list is removed)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User removes non-existent increment\nTHEN System returns error AND does not modify story graph",
+                          "text": "WHEN User removes non-existent increment\nTHEN System returns error AND does not modify story graph",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User removes increment via CLI increments.remove name:\"MVP\"\nTHEN CLI removes increment AND displays confirmation",
+                          "text": "WHEN User removes increment via CLI increments.remove name:\"MVP\"\nTHEN CLI removes increment AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User selects increment in Panel AND clicks Delete button\nTHEN Panel prompts confirmation AND User confirms AND Panel refreshes increment list",
+                          "text": "WHEN User selects increment in Panel AND clicks Delete button\nTHEN Panel prompts confirmation AND User confirms AND Panel refreshes increment list",
+                          "sequential_order": 5.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Rename Increment",
+                      "sequential_order": 3.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRenameIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Rename increment to new name",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_rename_increment_to_new_name",
+                          "steps": "Given Story Graph has increment named MVP\nWhen User renames increment MVP to Phase 1\nThen Story Graph updates increment name\nAnd Story references in increment remain unchanged\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "CLI renames increment and displays confirmation",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_rename_increment",
+                          "steps": "Given Story Graph has increment named MVP\nWhen User executes increments.rename from:\"MVP\" to:\"Phase 1\"\nThen CLI updates increment\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel inline edit updates increment name on blur or Enter",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_rename_increment_inline_edit",
+                          "steps": "Given User views increment MVP in Panel increment view\nWhen User edits increment name inline to Phase 1 AND blurs or presses Enter\nThen Panel updates name\nAnd Panel refreshes display"
+                        },
+                        {
+                          "name": "Rename increment to duplicate existing name returns error",
+                          "sequential_order": 4.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_rename_increment_duplicate_name_returns_error",
+                          "steps": "Given Story Graph has increments MVP and Phase 1\nWhen User renames increment MVP to Phase 1\nThen System returns validation error\nAnd Story Graph remains unchanged"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User renames increment from old name to new name\nTHEN Story Graph updates increment name in increments list AND persists to story-graph.json",
+                          "text": "WHEN User renames increment from old name to new name\nTHEN Story Graph updates increment name in increments list AND persists to story-graph.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User renames increment to duplicate existing name\nTHEN System returns validation error AND does not rename",
+                          "text": "WHEN User renames increment to duplicate existing name\nTHEN System returns validation error AND does not rename",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User renames increment\nTHEN Story names in increment stories array remain unchanged (stories referenced by name)",
+                          "text": "WHEN User renames increment\nTHEN Story names in increment stories array remain unchanged (stories referenced by name)",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User renames increment via CLI increments.rename from:\"MVP\" to:\"Phase 1\"\nTHEN CLI updates increment AND displays confirmation",
+                          "text": "WHEN User renames increment via CLI increments.rename from:\"MVP\" to:\"Phase 1\"\nTHEN CLI updates increment AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User renames increment via Panel inline edit on increment name\nTHEN Panel updates name on blur or Enter AND refreshes display",
+                          "text": "WHEN User renames increment via Panel inline edit on increment name\nTHEN Panel updates name on blur or Enter AND refreshes display",
+                          "sequential_order": 5.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Add Story to Increment",
+                      "sequential_order": 4.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestAddStoryToIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Add story to increment by story name",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_add_story_to_increment_by_name",
+                          "steps": "Given Story Graph has increment MVP and story Validate Order\nWhen User adds story Validate Order to increment MVP\nThen Story Graph appends story name to increment stories array\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "Add non-existent story to increment returns error",
+                          "sequential_order": 2.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_add_nonexistent_story_returns_error",
+                          "steps": "Given Story Graph has no story named Missing Story\nWhen User adds story Missing Story to increment MVP\nThen System returns error\nAnd Increment stories array remains unchanged"
+                        },
+                        {
+                          "name": "CLI adds story to increment and displays confirmation",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_add_story_to_increment",
+                          "steps": "Given Story Graph has increment MVP and story Validate Order\nWhen User executes increments.\"MVP\".add_story story:\"Validate Order\"\nThen CLI adds story to increment\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel drag from unallocated onto increment row adds story and refreshes",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_drag_story_to_increment",
+                          "steps": "Given Panel shows unallocated area with story Validate Order AND increment row MVP\nWhen User drags story Validate Order from unallocated area onto increment MVP row\nThen Panel adds story to increment\nAnd Panel refreshes increment display"
+                        },
+                        {
+                          "name": "Add story already in increment returns error",
+                          "sequential_order": 5.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_add_story_already_in_increment_returns_error",
+                          "steps": "Given increment MVP contains story Validate Order\nWhen User adds story Validate Order to increment MVP\nThen System returns validation error\nAnd Increment stories array remains unchanged"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User adds story to increment\nTHEN Story Graph appends story name to increment stories array AND persists to story-graph.json",
+                          "text": "WHEN User adds story to increment\nTHEN Story Graph appends story name to increment stories array AND persists to story-graph.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User adds story that exists in graph\nTHEN Story Graph validates story name exists in epics/sub-epics/stories AND adds to increment",
+                          "text": "WHEN User adds story that exists in graph\nTHEN Story Graph validates story name exists in epics/sub-epics/stories AND adds to increment",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User adds story already in increment\nTHEN System returns validation error AND does not add duplicate",
+                          "text": "WHEN User adds story already in increment\nTHEN System returns validation error AND does not add duplicate",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User adds story to increment via CLI increments.\"MVP\".add_story story:\"Validate Order\"\nTHEN CLI adds story AND displays confirmation",
+                          "text": "WHEN User adds story to increment via CLI increments.\"MVP\".add_story story:\"Validate Order\"\nTHEN CLI adds story AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User views increments in Panel\nTHEN Panel shows unallocated increment area to the very left AND displays all stories not in any increment in that area",
+                          "text": "WHEN User views increments in Panel\nTHEN Panel shows unallocated increment area to the very left AND displays all stories not in any increment in that area",
+                          "sequential_order": 5.0
+                        },
+                        {
+                          "name": "WHEN User drags story from unallocated area onto increment row in Panel\nTHEN Panel adds story to increment AND refreshes increment display",
+                          "text": "WHEN User drags story from unallocated area onto increment row in Panel\nTHEN Panel adds story to increment AND refreshes increment display",
+                          "sequential_order": 6.0
+                        },
+                        {
+                          "name": "WHEN User drags story from one increment row to another increment row in Panel\nTHEN Panel adds story to target increment AND removes story from source increment AND refreshes increment display",
+                          "text": "WHEN User drags story from one increment row to another increment row in Panel\nTHEN Panel adds story to target increment AND removes story from source increment AND refreshes increment display",
+                          "sequential_order": 7.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Remove Story from Increment",
+                      "sequential_order": 5.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRemoveStoryFromIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Remove story from increment",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_remove_story_from_increment",
+                          "steps": "Given increment MVP contains story Validate Order\nWhen User removes story Validate Order from increment MVP\nThen Story Graph removes story name from increment stories array\nAnd Story node remains in graph\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "CLI removes story from increment and displays confirmation",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_remove_story_from_increment",
+                          "steps": "Given increment MVP contains story Validate Order\nWhen User executes increments.\"MVP\".remove_story story:\"Validate Order\"\nThen CLI removes story from increment\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel Remove button moves story to unallocated area",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_remove_story_from_increment",
+                          "steps": "Given User views story Validate Order in increment MVP row in Panel\nWhen User selects story AND clicks Remove in Panel increment view\nThen Panel removes story from increment\nAnd Story appears in unallocated area to the left\nAnd Panel refreshes display"
+                        },
+                        {
+                          "name": "Remove story not in increment returns error",
+                          "sequential_order": 4.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_remove_story_not_in_increment_returns_error",
+                          "steps": "Given increment MVP does not contain story Validate Order\nWhen User removes story Validate Order from increment MVP\nThen System returns error\nAnd Increment stories array remains unchanged"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User removes story from increment\nTHEN Story Graph removes story name from increment stories array AND persists to story-graph.json",
+                          "text": "WHEN User removes story from increment\nTHEN Story Graph removes story name from increment stories array AND persists to story-graph.json",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User removes story from increment\nTHEN Story node remains in epics/sub-epics hierarchy (only increment assignment changes)",
+                          "text": "WHEN User removes story from increment\nTHEN Story node remains in epics/sub-epics hierarchy (only increment assignment changes)",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User removes story not in increment\nTHEN System returns error AND does not modify increment",
+                          "text": "WHEN User removes story not in increment\nTHEN System returns error AND does not modify increment",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User removes story from increment via CLI increments.\"MVP\".remove_story story:\"Validate Order\"\nTHEN CLI removes story from increment AND displays confirmation",
+                          "text": "WHEN User removes story from increment via CLI increments.\"MVP\".remove_story story:\"Validate Order\"\nTHEN CLI removes story from increment AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User selects story in increment row AND clicks Remove in Panel increment view\nTHEN Panel removes story from increment AND story appears in unallocated area to the left AND Panel refreshes display (no delete option in increment view)",
+                          "text": "WHEN User selects story in increment row AND clicks Remove in Panel increment view\nTHEN Panel removes story from increment AND story appears in unallocated area to the left AND Panel refreshes display (no delete option in increment view)",
+                          "sequential_order": 5.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Rename Story in Increment",
+                      "sequential_order": 6.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRenameStoryInIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Rename story node updates all increment references",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_rename_story_updates_increment_references",
+                          "steps": "Given story Validate Order exists in increment MVP\nWhen User renames story node Validate Order to Validate Order Items\nThen Story Graph updates story name in epics hierarchy\nAnd Story Graph updates story name in all increments that reference it\nAnd Story Graph persists changes"
+                        },
+                        {
+                          "name": "CLI renames story and updates increment references",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_rename_story_updates_increments",
+                          "steps": "Given story Validate Order exists in increment MVP\nWhen User executes story_map.\"Epic\".\"SubEpic\".\"Validate Order\".rename name:\"Validate Order Items\"\nThen CLI updates story in graph\nAnd CLI updates increment references\nAnd CLI displays confirmation"
+                        },
+                        {
+                          "name": "Panel inline edit updates story name in hierarchy and increment view",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_rename_story_updates_both_views",
+                          "steps": "Given story Validate Order is displayed in hierarchy and in increment MVP row\nWhen User edits story name inline to Validate Order Items AND blurs or presses Enter\nThen Panel updates story name in hierarchy\nAnd Panel updates increment view to show new name\nAnd Both views reflect change"
+                        },
+                        {
+                          "name": "Rename story to duplicate name in same parent returns error",
+                          "sequential_order": 4.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_rename_story_duplicate_name_returns_error",
+                          "steps": "Given Story Graph has stories Validate Order and Validate Order Items in same parent\nWhen User renames story Validate Order to Validate Order Items\nThen System returns validation error\nAnd Story Graph remains unchanged"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User renames story node in graph\nTHEN Story Graph updates story name in epics/sub-epics hierarchy AND updates matching entries in all increment stories arrays",
+                          "text": "WHEN User renames story node in graph\nTHEN Story Graph updates story name in epics/sub-epics hierarchy AND updates matching entries in all increment stories arrays",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN Story is renamed\nTHEN All increments that contained old story name now contain new story name",
+                          "text": "WHEN Story is renamed\nTHEN All increments that contained old story name now contain new story name",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User renames story to duplicate name in same parent\nTHEN System returns validation error AND does not rename",
+                          "text": "WHEN User renames story to duplicate name in same parent\nTHEN System returns validation error AND does not rename",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User renames story via CLI story_map.\"Epic\".\"SubEpic\".\"Story\".rename name:\"New Name\"\nTHEN CLI updates story in graph AND updates increment references AND displays confirmation",
+                          "text": "WHEN User renames story via CLI story_map.\"Epic\".\"SubEpic\".\"Story\".rename name:\"New Name\"\nTHEN CLI updates story in graph AND updates increment references AND displays confirmation",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User renames story via Panel inline edit on story name\nTHEN Panel updates story name in hierarchy AND updates increment view of story to show new name (both story node and increment display reflect change)",
+                          "text": "WHEN User renames story via Panel inline edit on story name\nTHEN Panel updates story name in hierarchy AND updates increment view of story to show new name (both story node and increment display reflect change)",
+                          "sequential_order": 5.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Story Deleted in Hierarchy Cascades to Increment",
+                      "sequential_order": 7.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestStoryDeletedInHierarchyCascadesToIncrement",
+                      "scenarios": [
+                        {
+                          "name": "Delete story in hierarchy removes from all increments",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_delete_story_in_hierarchy_removes_from_all_increments",
+                          "steps": "Given story Validate Order exists in increments MVP and Phase 2\nWhen User deletes story Validate Order from story hierarchy\nThen Story Graph removes story from epics/sub-epics hierarchy\nAnd Story Graph removes story name from all increment stories arrays\nAnd Story Graph persists changes"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User deletes story in story hierarchy\nTHEN Story Graph removes story from hierarchy AND removes story name from all increment stories arrays that reference it",
+                          "text": "WHEN User deletes story in story hierarchy\nTHEN Story Graph removes story from hierarchy AND removes story name from all increment stories arrays that reference it",
+                          "sequential_order": 1.0
+                        }
+                      ],
+                      "behavior": null
                     }
                   ]
                 }
@@ -8204,7 +8729,7 @@
             },
             {
               "name": "Act With Selected Node",
-              "sequential_order": 4.0,
+              "sequential_order": 3.0,
               "behavior": null,
               "domain_concepts": [],
               "test_file": "invoke_bot/edit_story_map/test_submit_scoped_action.py",
@@ -8260,7 +8785,7 @@
                       ],
                       "acceptance_criteria": [],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\📄 Set scope to selected story node.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\ðŸ“„ Set scope to selected story node.md"
                     },
                     {
                       "name": "Submit action for selected story node",
@@ -9398,7 +9923,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Submit action for selected story node.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\ðŸ“„ Submit action for selected story node.md"
                     },
                     {
                       "name": "Submit Current Behavior Action For Selected Node",
@@ -9547,7 +10072,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Submit Current Behavior Action For Selected Node.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\ðŸ“„ Submit Current Behavior Action For Selected Node.md"
                     },
                     {
                       "name": "Set scope to selected Increment",
@@ -9559,7 +10084,7 @@
                       "scenarios": [],
                       "acceptance_criteria": [],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\📄 Set scope to selected Increment.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Edit Story Map\\Act With Selected Node\\ðŸ“„ Set scope to selected Increment.md"
                     },
                     {
                       "name": "Copy Story Node To Clipboard",
@@ -9638,7 +10163,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\📄 Copy Story Node To Clipboard.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Act With Selected Node\\ðŸ“„ Copy Story Node To Clipboard.md"
                     },
                     {
                       "name": "Render Diagram Selected Node",
@@ -9679,7 +10204,7 @@
             },
             {
               "name": "Open Story Related Files",
-              "sequential_order": 5.0,
+              "sequential_order": 4.0,
               "behavior": null,
               "domain_concepts": [],
               "test_file": "invoke_bot/edit_story_map/test_open_story_related_files.py",
@@ -9815,7 +10340,7 @@
                         }
                       ],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Open All Related Files.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\ðŸ“„ Open All Related Files.md"
                     },
                     {
                       "name": "Enrich Scope With Links",
@@ -9950,7 +10475,7 @@
                       ],
                       "acceptance_criteria": [],
                       "behavior": null,
-                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Enrich Scope With Links.md"
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\ðŸ“„ Enrich Scope With Links.md"
                     }
                   ]
                 }
@@ -9958,7 +10483,7 @@
             },
             {
               "name": "Trace Story Graph",
-              "sequential_order": 6.0,
+              "sequential_order": 5.0,
               "behavior": null,
               "domain_concepts": [],
               "sub_epics": [
@@ -10340,7 +10865,7 @@
                             }
                           ],
                           "behavior": null,
-                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\📄 Open Story Files.md"
+                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\map\\Invoke Bot\\Work With Story Map\\Open Story Related Files\\ðŸ“„ Open Story Files.md"
                         }
                       ]
                     }
@@ -11004,7 +11529,7 @@
                             }
                           ],
                           "behavior": null,
-                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Trace Story Graph\\Trace Scenario\\📄 Design Example.md"
+                          "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Trace Story Graph\\Trace Scenario\\ðŸ“„ Design Example.md"
                         },
                         {
                           "name": "Edit Example",
@@ -11793,7 +12318,7 @@
           "story_groups": [
             {
               "name": "",
-              "sequential_order": 7.0,
+              "sequential_order": 6.0,
               "type": "and",
               "connector": null,
               "behavior": null,
@@ -16962,7 +17487,7 @@
                   "realization": [
                     {
                       "scope": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content.Update graph from story map.UpdateReport lists exact fuzzy new and removed stories",
-                      "scenario": "Recursive report generation: DrawIOStoryMap delegates to DrawIOEpic which delegates to DrawIOSubEpic which delegates to DrawIOStory — each level matches its children against the original and contributes to the UpdateReport",
+                      "scenario": "Recursive report generation: DrawIOStoryMap delegates to DrawIOEpic which delegates to DrawIOSubEpic which delegates to DrawIOStory â€” each level matches its children against the original and contributes to the UpdateReport",
                       "walks": [
                         {
                           "covers": "Complete recursive delegation chain (Epic -> SubEpic -> Story report generation)",
@@ -16979,7 +17504,7 @@
                             "                return [DrawIOStory('Load Config'), DrawIOStory('Register Behaviors')]",
                             "            -> originalStories: [Story] = originalSubEpic.get_stories()",
                             "                return [Story('Load Config'), Story('Register Behaviors')]",
-                            "            -> // Match each story — exact match first, then fuzzy, then new/removed",
+                            "            -> // Match each story â€” exact match first, then fuzzy, then new/removed",
                             "            -> DrawIOStory('Load Config').generate_update_report_for_story(original: Story('Load Config'))",
                             "                -> name_compare: exact = ('load config' == 'load config')",
                             "                -> report.add(match_type: 'exact', extracted: 'Load Config', original: 'Load Config', confidence: 1.0)",
@@ -16996,9 +17521,9 @@
                         }
                       ],
                       "model_updates": [
-                        "Validated: Recursive delegation pattern (DrawIOEpic -> DrawIOSubEpic -> DrawIOStory) is viable for report generation — each level matches its direct children and delegates to the next",
+                        "Validated: Recursive delegation pattern (DrawIOEpic -> DrawIOSubEpic -> DrawIOStory) is viable for report generation â€” each level matches its direct children and delegates to the next",
                         "Validated: Sub-epic matching uses name comparison (same as story matching) before delegating to story-level",
-                        "Note: When sub-epics don't match (e.g., deleted sub-epic), stories under it need reassignment by containment — this is handled by DrawIOStoryMap.assign_stories_to_sub_epics_by_containment on load, before report generation"
+                        "Note: When sub-epics don't match (e.g., deleted sub-epic), stories under it need reassignment by containment â€” this is handled by DrawIOStoryMap.assign_stories_to_sub_epics_by_containment on load, before report generation"
                       ]
                     }
                   ],
@@ -17203,7 +17728,7 @@
                   "realization": [
                     {
                       "scope": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content.Render story map.Render outline diagram from StoryMap with default layout",
-                      "scenario": "StoryMap with 1 epic, 1 sub-epic, 2 stories rendered to DrawIO outline XML with no prior layout data — validates render responsibility chain and default positioning",
+                      "scenario": "StoryMap with 1 epic, 1 sub-epic, 2 stories rendered to DrawIO outline XML with no prior layout data â€” validates render responsibility chain and default positioning",
                       "walks": [
                         {
                           "covers": "Steps 1-2 (Given: load StoryMap, no LayoutData)",
@@ -17219,7 +17744,7 @@
                           ]
                         },
                         {
-                          "covers": "Steps 3-9 (When/Then: render outline — recursive node creation, position, style)",
+                          "covers": "Steps 3-9 (When/Then: render outline â€” recursive node creation, position, style)",
                           "object_flow": [
                             "DrawIOStoryMap",
                             "    drawIOStoryMap: DrawIOStoryMap = DrawIOStoryMap(diagramType: 'outline')",
@@ -17288,12 +17813,12 @@
                         }
                       ],
                       "model_updates": [
-                        "Added 'Compute container dimensions from children' responsibility to DrawIOStoryNode (Base) with collaborators [StoryNodeChildren, Spacing, Boundary] — needed for epic width = sum(sub-epic widths) and sub-epic width = sum(story widths + spacing)"
+                        "Added 'Compute container dimensions from children' responsibility to DrawIOStoryNode (Base) with collaborators [StoryNodeChildren, Spacing, Boundary] â€” needed for epic width = sum(sub-epic widths) and sub-epic width = sum(story widths + spacing)"
                       ]
                     },
                     {
                       "scope": "Invoke Bot.Perform Action.Synchronized Graph with Rendered Diagram Content.Update graph from story map.Story graph updated with renamed added and removed stories from diagram",
-                      "scenario": "User renames 'Load Configuration' to 'Load Settings', adds 'Validate Config', removes 'Register Behaviors' in DrawIO — validates end-to-end load, report generation, and update flow",
+                      "scenario": "User renames 'Load Configuration' to 'Load Settings', adds 'Validate Config', removes 'Register Behaviors' in DrawIO â€” validates end-to-end load, report generation, and update flow",
                       "walks": [
                         {
                           "covers": "Background (Load StoryMap and DrawIOStoryMap from edited diagram file)",
@@ -17318,7 +17843,7 @@
                           ]
                         },
                         {
-                          "covers": "Step 1 (When: generateUpdateReport — recursive matching with fuzzy via SequenceMatcher)",
+                          "covers": "Step 1 (When: generateUpdateReport â€” recursive matching with fuzzy via SequenceMatcher)",
                           "object_flow": [
                             "DrawIOStoryMap",
                             "    report: UpdateReport = drawIOStoryMap.generate_update_report(storyMap: storyMap)",
@@ -17337,7 +17862,7 @@
                             "                -> // Unmatched original: 'Register Behaviors'",
                             "                -> report.add(match_type: 'removed', story: 'Register Behaviors', parent: 'Initialize Bot')",
                             "        -> // Large deletion detection (part of generate_update_report)",
-                            "        -> drawIOStoryMap.detect_large_deletions(storyMap: storyMap, report: report)  // all epics/sub-epics present — no large_deletions",
+                            "        -> drawIOStoryMap.detect_large_deletions(storyMap: storyMap, report: report)  // all epics/sub-epics present â€” no large_deletions",
                             "        return report: {exact_matches: [{name: 'Load Config', confidence: 1.0}], fuzzy_matches: [{extracted: 'Load Settings', original: 'Load Configuration', confidence: 0.85}], new_stories: ['Validate Config'], removed_stories: ['Register Behaviors']}"
                           ]
                         },
@@ -17346,17 +17871,17 @@
                           "object_flow": [
                             "StoryMap",
                             "    storyMap.update(drawIOStoryMap: drawIOStoryMap, report: report)",
-                            "        -> // Apply exact matches — update sequential_order from diagram position",
+                            "        -> // Apply exact matches â€” update sequential_order from diagram position",
                             "        -> Story('Load Config').apply_update_from_other(other: DrawIOStory('Load Config'), report: report)",
                             "            -> Story.sequential_order: 1.0 (unchanged)",
-                            "        -> // Apply fuzzy matches — rename and update fields",
+                            "        -> // Apply fuzzy matches â€” rename and update fields",
                             "        -> Story('Load Configuration').apply_update_from_other(other: DrawIOStory('Load Settings'), report: report)",
                             "            -> Story.name: 'Load Settings' (renamed from 'Load Configuration')",
                             "            -> Story.sequential_order: 2.0 (updated from diagram position)",
                             "        -> // Add new stories from diagram",
                             "        -> newStory: Story = Story(name: 'Validate Config', sequential_order: 3.0, story_type: 'user')",
                             "        -> SubEpic('Initialize Bot').add_story(newStory)",
-                            "        -> // Flag removed stories (not deleted — preserved for safety)",
+                            "        -> // Flag removed stories (not deleted â€” preserved for safety)",
                             "        -> Story('Register Behaviors').status: 'removed'",
                             "        -> // Persist layout for next render",
                             "        -> drawIOStoryMap.persist_layout_data(path: 'story-map-layout.json')",
@@ -17366,9 +17891,9 @@
                         }
                       ],
                       "model_updates": [
-                        "Validated: DrawIOStoryMap.load() correctly chains assign_stories_to_sub_epics_by_containment, assign_sequential_order_from_position, and extract_layout — all three are needed on load",
+                        "Validated: DrawIOStoryMap.load() correctly chains assign_stories_to_sub_epics_by_containment, assign_sequential_order_from_position, and extract_layout â€” all three are needed on load",
                         "Validated: Recursive report generation (DrawIOStoryMap -> DrawIOEpic -> DrawIOSubEpic -> DrawIOStory) works for mixed match types",
-                        "Note: Fuzzy matching uses SequenceMatcher (difflib) with threshold 0.7 and context bonuses for same epic/sub-epic — implementation detail inside DrawIOStory.generate_update_report_for_story"
+                        "Note: Fuzzy matching uses SequenceMatcher (difflib) with threshold 0.7 and context bonuses for same epic/sub-epic â€” implementation detail inside DrawIOStory.generate_update_report_for_story"
                       ]
                     },
                     {
@@ -17376,7 +17901,7 @@
                       "scenario": "High-level: DrawIOStoryMap branches on diagramType 'increments' to render outline plus increment lanes with stories assigned by membership",
                       "walks": [
                         {
-                          "covers": "Steps 1-7 (Complete increments render — diagramType branching, outline + lane rendering)",
+                          "covers": "Steps 1-7 (Complete increments render â€” diagramType branching, outline + lane rendering)",
                           "object_flow": [
                             "DrawIOStoryMap",
                             "    drawIOStoryMap: DrawIOStoryMap = DrawIOStoryMap(diagramType: 'increments')",
@@ -17385,7 +17910,7 @@
                             "        -> // Phase 1: Render outline section (same as outline diagramType)",
                             "        -> //   ... DrawIOEpic, DrawIOSubEpic, DrawIOStory nodes created and positioned ...",
                             "        -> // Phase 2: Render increment lanes below outline",
-                            "        -> increments: [Increment] = storyGraph.get_increments()  // StoryGraph (extended) — increments live on graph, not StoryMap",
+                            "        -> increments: [Increment] = storyGraph.get_increments()  // StoryGraph (extended) â€” increments live on graph, not StoryMap",
                             "        -> for each increment ('MVP' priority: 1, 'Phase 2' priority: 2):",
                             "            -> laneCells: DrawIOElement = DrawIOStoryNodeSerializer.create_node(node: IncrementLane(name: 'MVP'))",
                             "                -> DrawIOElement.cell_style(fill: '#f5f5f5', stroke: '#666666', font: 'bold', font_color: 'black')",
@@ -17403,7 +17928,7 @@
                       "scenario": "High-level: DrawIOStoryMap branches on diagramType 'acceptance_criteria' to render outline plus AC boxes below stories that have acceptance criteria",
                       "walks": [
                         {
-                          "covers": "Steps 1-6 (Complete AC render — outline + AC box creation with When/Then formatting)",
+                          "covers": "Steps 1-6 (Complete AC render â€” outline + AC box creation with When/Then formatting)",
                           "object_flow": [
                             "DrawIOStoryMap",
                             "    drawIOStoryMap: DrawIOStoryMap = DrawIOStoryMap(diagramType: 'acceptance_criteria')",
@@ -22308,17 +22833,6 @@
                   "behavior": null
                 },
                 {
-                  "name": "Remove Context File",
-                  "sequential_order": 6.0,
-                  "connector": null,
-                  "story_type": "user",
-                  "users": [],
-                  "test_class": null,
-                  "scenarios": [],
-                  "acceptance_criteria": [],
-                  "behavior": null
-                },
-                {
                   "name": "Generate  Context Converter",
                   "sequential_order": 7.0,
                   "connector": null,
@@ -22364,58 +22878,71 @@
       "name": "Bot Behavior",
       "priority": 1,
       "stories": [
-        "Apply Visual Branding",
         "Build Story Graph",
-        "Build Story Graph Using CLI",
-        "Change Workspace Path panel",
         "Clarify Requirements",
-        "Clarify Requirements Using CLI",
-        "Decide Strategy",
-        "Decide Strategy Using CLI",
         "Deploy MCP BOT Server",
+        "Display Piped Mode Instructions for AI Agents",
+        "Display Rules",
+        "Display Session Status panel",
+        "Decide Strategy",
+        "Execute Behavior Action",
+        "Execute Behavior Action Panel",
+        "Filter Story Scope By Stories",
+        "Generate Behavior Action Tools",
+        "Generate Bot Tools",
+        "Get Help",
+        "Inject Context Into Instructions",
+        "Load Actions",
+        "Load Bot Behaviors",
+        "Manage Bot Registry",
+        "Navigate Sequentially",
+        "Navigate To First Behavior Action",
+        "Persist Behavior Action State",
+        "Proceed across End To End Workflow",
+        "Record Activity Metrics And Paths",
+        "Render story map",
+        "Resolve Bot Path",
+        "Restart MCP Server To Load Code Changes",
+        "Save Clarification Answers",
+        "Save Clarification Evidence",
+        "Save File Isolation",
+        "Save Multiple Guardrails Together",
+        "Save Strategy Decisions",
+        "Show Remaining Actions After Completion",
+        "Submit Scope Instructions",
+        "Toggle Panel Section",
+        "Track Action Completion",
+        "Track Action Start",
+        "Track Activity For Workspace",
+        "Update and Find Current Behavior",
+        "Validate Rules"
+      ]
+    },
+    {
+      "name": "CLI",
+      "priority": 2,
+      "stories": [
+        "Build Story Graph Using CLI",
+        "Clarify Requirements Using CLI",
         "Detect CLI Mode",
-        "Display Action Help Using CLI",
-        "Display Base Instructions Panel",
-        "Display Bot Hierarchy Tree with Progress Indicators CLI",
-        "Display Build Instructions Panel",
-        "Display CLI Bot Command in Navigation Menu Footer",
-        "Display CLI Header",
         "Display CLI Navigation Menu Footer",
         "Display Clarification Data Through CLI",
-        "Display Clarify Instructions Panel",
         "Display Command Examples Using CLI",
         "Display Context Using CLI",
         "Display Current Position in CLI",
         "Display Headless Mode Status in CLI",
         "Display Help Using CLI",
-        "Display Hierarchy In Panel",
         "Display Parameter Help Using CLI",
-        "Display Piped Mode Instructions for AI Agents",
-        "Display Raw Format Instructions In Panel",
         "Display Render Configurations Through CLI",
-        "Display Render Instructions Panel",
-        "Display Rules",
         "Display Rules Using CLI",
-        "Display Session Status panel",
         "Display Strategy Data Through CLI",
-        "Display Strategy Instructions Panel",
         "Display Synchronizer Output Through CLI",
-        "Display Validate Instructions Panel",
         "Display Validation Results Through CLI",
-        "Display Validation Scanners Through CLI",
-        "Execute Behavior Action",
-        "Execute Behavior Action Panel",
         "Execute End To End Workflow Using CLI",
         "Exit CLI REPL",
-        "Filter Scope By Stories Using CLI",
-        "Filter Story Scope By Stories",
-        "Filter Story Scope by Stories Panel",
-        "Generate Behavior Action Tools",
-        "Generate Bot Tools",
         "Get Action Instructions Through CLI",
         "Get Build Instructions Through CLI",
         "Get Clarify Instructions Through CLI",
-        "Get Help",
         "Get Help Using CLI",
         "Get Render Instructions Through CLI",
         "Get Rules Instructions Through CLI",
@@ -22423,59 +22950,55 @@
         "Get Validate Instructions Through CLI",
         "Handle Operation Errors and Validation in CLI",
         "Initialize CLI Session",
-        "Inject Context Into Instructions",
-        "Load Actions",
         "Load Actions Using CLI",
-        "Load Bot Behaviors",
         "Load Bot Behaviors Using CLI",
         "Load Bot Using CLI",
         "Load and Display Workspace Context in CLI",
         "Manage Behavior Action State Using CLI",
         "Manage Behaviors Using CLI",
-        "Manage Bot Registry",
-        "Navigate Behavior Action Panel",
-        "Navigate Sequentially",
         "Navigate Sequentially Using CLI",
         "Navigate Sequentially Using CLI Commands",
         "Navigate To Behavior Action And Execute Using CLI",
-        "Navigate To First Behavior Action",
         "Navigate Using CLI Dot Notation",
-        "Open Panel",
-        "Persist Behavior Action State",
-        "Proceed across End To End Workflow",
         "Re-execute Current Operation Using CLI",
-        "Record Activity Metrics And Paths",
         "Render Output Using CLI",
-        "Render story map",
-        "Resolve Bot Path",
         "Resolve Bot Path Using CLI",
-        "Restart MCP Server To Load Code Changes",
-        "Save Clarification Answers",
-        "Save Clarification Evidence",
-        "Save File Isolation",
         "Save Guardrails Through CLI",
-        "Save Guardrails Through Panel",
-        "Save Multiple Guardrails Together",
-        "Save Strategy Decisions",
-        "Show Remaining Actions After Completion",
-        "Submit Behavior Rules Through Panel",
-        "Submit Instructions Through CLI",
-        "Submit Instructions To AI Agent Panel",
-        "Submit Scope Instructions",
-        "Switch Bot panel",
         "Switch Registered Bots in CLI",
-        "Toggle Panel Section",
-        "Track Action Completion",
-        "Track Action Start",
-        "Track Activity For Workspace",
-        "Update and Find Current Behavior",
-        "Validate Rules",
-        "Validate Rules Using CLI"
+        "Submit Instructions Through CLI",
+        "Validate Rules Using CLI",
+        "Display Action Help Using CLI",
+        "Display CLI Bot Command in Navigation Menu Footer",
+        "Display CLI Header",
+        "Decide Strategy Using CLI",
+        "Display Validation Scanners Through CLI"
+      ]
+    },
+    {
+      "name": "Panel",
+      "priority": 3,
+      "stories": [
+        "Display Build Instructions Panel",
+        "Switch Bot panel",
+        "Submit Instructions To AI Agent Panel",
+        "Submit Behavior Rules Through Panel",
+        "Open Panel",
+        "Navigate Behavior Action Panel",
+        "Display Validate Instructions Panel",
+        "Display Strategy Instructions Panel",
+        "Display Render Instructions Panel",
+        "Display Raw Format Instructions In Panel",
+        "Display Hierarchy In Panel",
+        "Display Clarify Instructions Panel",
+        "Change Workspace Path panel",
+        "Save Guardrails Through Panel",
+        "Apply Visual Branding",
+        "Display Base Instructions Panel"
       ]
     },
     {
       "name": "Story Map Scoping",
-      "priority": 2,
+      "priority": 4,
       "stories": [
         "Automatically Refresh Story Graph Changes  CLI",
         "Automatically Refresh Story Graph Changes Panel",
@@ -22517,89 +23040,90 @@
     },
     {
       "name": "Render Diagrams",
-      "priority": 3,
+      "priority": 5,
       "stories": [
         "Create Rule Files From Bot Behavior",
-        {
-          "name": "Build Story Graph Using API"
-        },
-        {
-          "name": "Render Output Usng Story API"
-        },
-        {
-          "name": "Render acceptance criteria"
-        },
-        {
-          "name": "Render epic and sub-epic hierarchy"
-        },
-        {
-          "name": "Render increment lanes"
-        },
-        {
-          "name": "Render stories and actors"
-        },
-        {
-          "name": "Report acceptance criteria changes"
-        },
-        {
-          "name": "Report epic and sub-epic changes"
-        },
-        {
-          "name": "Report increment changes"
-        },
-        {
-          "name": "Report story moves between parents"
-        },
-        {
-          "name": "Update acceptance criteria from diagram"
-        },
-        {
-          "name": "Update epics and sub-epics from diagram"
-        },
-        {
-          "name": "Update increments from diagram"
-        },
-        {
-          "name": "Update stories from diagram"
-        }
+        "Build Story Graph Using API",
+        "Render Output Usng Story API",
+        "Render acceptance criteria",
+        "Render epic and sub-epic hierarchy",
+        "Render increment lanes",
+        "Render stories and actors",
+        "Report acceptance criteria changes",
+        "Report epic and sub-epic changes",
+        "Report increment changes",
+        "Report story moves between parents",
+        "Update acceptance criteria from diagram",
+        "Update epics and sub-epics from diagram",
+        "Update increments from diagram",
+        "Update stories from diagram"
       ]
     },
     {
-      "name": "Addtional Scoping",
-      "priority": 4,
+      "name": "Increments On Panel",
+      "priority": 6,
       "stories": [
-        "Add Filter Part To File Scope",
-        "Add Filter Part To Story Scope",
-        "Add Increment",
-        "Add Increment CLI",
-        "Add Increment Filter Part To Story Scope",
-        "Add Increment Panel",
-        "Delete Increment",
-        "Delete Increment CLI",
-        "Delete Increment Panel",
-        "Display Increment Scope View CLI",
-        "Filter File Scope  By Files",
-        "Move Story to Increment",
-        "Move Story to Increment CLI",
-        "Move Story to Increment Panel",
-        "Remove Filter Part From File Scope",
-        "Remove Filter Part From Story Scope",
-        "Remove Increment Filter Part From Story Scope",
-        "Show All Increment Scope",
-        {
-          "name": "Filter File Scope By Stories"
-        },
-        {
-          "name": "Filter Story Scope By Increments"
-        },
-        {
-          "name": "Set scope to selected Increment"
-        }
+        "Remove Increment",
+        "Rename Increment",
+        "Add Story to Increment",
+        "Rename Story in Increment",
+        "Story Deleted in Hierarchy Cascades to Increment",
+        "Display Bot Hierarchy Tree with Progress Indicators CLI",
+        "Set scope to selected Increment",
+        "Remove Story from Increment",
+        "Add Increment"
+      ]
+    },
+    {
+      "name": "Behavior Action Ux Improvements",
+      "priority": 7,
+      "stories": [
+        "Auto execute Consolidated Queue",
+        "Add special instructon",
+        "Render as Part of Build and Validate Actions",
+        "Display Rules in Queue",
+        "Render Diagram Selected Node"
+      ]
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "priority": 9,
+      "stories": [
+        "Add Context Files",
+        "Associate Guard rail with scope",
+        "Auto Refresh State Changing Events",
+        "Build Story Graph Through Queue",
+        "Clarify in Queue",
+        "Conssolidate and Expand Behavior Aciton Queies",
+        "Convert Context",
+        "Display  Behavior Action Qs",
+        "Display  Context BAQ",
+        "Display Bot  Help",
+        "Display Chopices in Queue",
+        "Display Syncing Message",
+        "Display clarification answers in Queue",
+        "Drop Context into Queue",
+        "Drop Story Node in  Behavor Action Queue",
+        "Execute Scope \"Runs\"",
+        "Generate  Context Converter",
+        "MAke Choices in queue",
+        "Provide Bot Guidance",
+        "Queue Behavior Action Workflow",
+        "Re-Scan Existing Context File",
+        "Remove Context File",
+        "Reset Scanned Context",
+        "Save  / Load Queue Consolidation",
+        "Scan Worspace for Context Fies",
+        "Skip Behavior and Action Queie",
+        "Update Queie based on selectged Node",
+        "Validate In Queue",
+        "Warn when Workspace  not setup",
+        "Report and Update InQ"
       ]
     },
     {
       "name": "Trace and Edit",
-      "priority": 5,
+      "priority": 11,
       "stories": [
         "Add / Remove Examples",
         "Display Code Trace",
@@ -22616,115 +23140,6 @@
         "Open Source File",
         "Open Story Files",
         "Design Example"
-      ]
-    },
-    {
-      "name": "Queue Behavior Action Workflow",
-      "priority": 6,
-      "stories": [
-        {
-          "name": "Add Context Files"
-        },
-        {
-          "name": "Add special instructon"
-        },
-        {
-          "name": "Associate Guard rail with scope"
-        },
-        {
-          "name": "Auto Refresh State Changing Events"
-        },
-        {
-          "name": "Auto execute Consolidated Queue"
-        },
-        {
-          "name": "Build Story Graph Through Queue"
-        },
-        {
-          "name": "Clarify in Queue"
-        },
-        {
-          "name": "Conssolidate and Expand Behavior Aciton Queies"
-        },
-        {
-          "name": "Convert Context"
-        },
-        {
-          "name": "Display  Behavior Action Qs"
-        },
-        {
-          "name": "Display  Context BAQ"
-        },
-        {
-          "name": "Display Bot  Help"
-        },
-        {
-          "name": "Display Chopices in Queue"
-        },
-        {
-          "name": "Display Rules in Queue"
-        },
-        {
-          "name": "Display Syncing Message"
-        },
-        {
-          "name": "Display clarification answers in Queue"
-        },
-        {
-          "name": "Drop Context into Queue"
-        },
-        {
-          "name": "Drop Story Node in  Behavor Action Queue"
-        },
-        {
-          "name": "Execute Scope \"Runs\""
-        },
-        {
-          "name": "Generate  Context Converter"
-        },
-        {
-          "name": "MAke Choices in queue"
-        },
-        {
-          "name": "Provide Bot Guidance"
-        },
-        {
-          "name": "Queue Behavior Action Workflow"
-        },
-        {
-          "name": "Re-Scan Existing Context File"
-        },
-        {
-          "name": "Remove Context File"
-        },
-        {
-          "name": "Render Diagram Selected Node"
-        },
-        {
-          "name": "Render as Part of Build and Validate Actions"
-        },
-        {
-          "name": "Reset Scanned Context"
-        },
-        {
-          "name": "Save  / Load Queue Consolidation"
-        },
-        {
-          "name": "Scan Worspace for Context Fies"
-        },
-        {
-          "name": "Skip Behavior and Action Queie"
-        },
-        {
-          "name": "Update Queie based on selectged Node"
-        },
-        {
-          "name": "Validate In Queue"
-        },
-        {
-          "name": "Warn when Workspace  not setup"
-        },
-        "Report and Update InQ"
       ]
     }
   ]

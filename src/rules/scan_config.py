@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 class ScanConfig:
     # Core scan data
     story_graph: Dict[str, Any]
+    full_story_graph: Optional[Dict[str, Any]] = None
     files: Optional[Dict[str, List[Path]]] = None
     changed_files: Optional[Dict[str, List[Path]]] = None
     

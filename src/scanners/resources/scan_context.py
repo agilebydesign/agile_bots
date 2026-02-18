@@ -6,6 +6,7 @@ from typing import Dict, List, Any, Optional, Callable
 @dataclass
 class ScanContext:
     story_graph: Optional[Dict[str, Any]] = None
+    full_story_graph: Optional[Dict[str, Any]] = None
     
     def __post_init__(self):
         if self.story_graph is None:

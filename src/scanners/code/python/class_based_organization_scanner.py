@@ -39,7 +39,8 @@ class ClassBasedOrganizationScanner(TestScanner):
         
         sub_epic_names = self._extract_sub_epic_names(story_graph)
         file_name = file_path.stem
-        violation = self._check_file_name_matches_sub_epic(file_name, sub_epic_names, file_path, story_graph)
+        full_story_graph = getattr(context, 'full_story_graph', None)
+        violation = self._check_file_name_matches_sub_epic(file_name, sub_epic_names, file_path, story_graph, full_story_graph)
         if violation:
             violations.append(violation)
         
@@ -360,9 +361,13 @@ class ClassBasedOrganizationScanner(TestScanner):
         name = re.sub(r'[^a-zA-Z0-9_]', '', name)
         return name.lower()
     
-    def _check_file_name_matches_sub_epic(self, file_name: str, sub_epic_names: List[str], file_path: Path, story_graph: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        # Accept if file is explicitly listed as test_file in story graph
-        story_graph_test_stems = self._extract_test_file_stems_from_story_graph(story_graph)
+    def _check_file_name_matches_sub_epic(self, file_name: str, sub_epic_names: List[str], file_path: Path, story_graph: Dict[str, Any], full_story_graph: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+        # Accept if file is explicitly listed as test_file in story graph.
+        # Use full_story_graph (unfiltered) when scope filtering is applied, so test files
+        # mapped to sibling sub-epics (e.g. test_edit_increments.py for Edit Increments when
+        # scope is Edit Story Map) are still accepted.
+        graph_for_stems = full_story_graph if full_story_graph else story_graph
+        story_graph_test_stems = self._extract_test_file_stems_from_story_graph(graph_for_stems)
         if file_name in story_graph_test_stems:
             return None
         
