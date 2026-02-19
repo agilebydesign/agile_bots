@@ -1,0 +1,1437 @@
+{
+  "epics": [
+    {
+      "name": "Build Agile Bots",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Generate MCP Tools",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Generate Bot Tools",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate Behavior Action Tools",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Deploy MCP BOT Server",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Restart MCP Server To Load Code Changes",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Generate CLI",
+          "sequential_order": 2.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Create Rule Files From Bot Behavior",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 2.0,
+      "sub_epics": [
+        {
+          "name": "Initialize Bot",
+          "sequential_order": 1.0,
+          "sub_epics": [
+            {
+              "name": "Load Behavior, and Actions",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Load Bot Behaviors",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Load Actions",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Load Bot Behaviors Using CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Load Actions Using CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Render Bot Interface",
+              "sequential_order": 2.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Display CLI Header",
+                      "sequential_order": 1.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Detect CLI Mode",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display CLI Bot Command in Navigation Menu Footer",
+                      "sequential_order": 3.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Initialize CLI Session",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Piped Mode Instructions for AI Agents",
+                      "sequential_order": 5.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Open Panel",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Headless Mode Status in CLI",
+                      "sequential_order": 7.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Apply Visual Branding",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Session Status panel",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Exit CLI REPL",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Toggle Panel Section",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Auto Refresh State Changing Events",
+                      "sequential_order": 12.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Syncing Message",
+                      "sequential_order": 13.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Bot  Help",
+                      "sequential_order": 14.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Provide Bot Guidance",
+                      "sequential_order": 15.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Load Bot",
+              "sequential_order": 3.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Resolve Bot Path",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Manage Bot Registry",
+                      "sequential_order": 2.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Resolve Bot Path Using CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Load and Display Workspace Context in CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Switch Registered Bots in CLI",
+                      "sequential_order": 5.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Change Workspace Path panel",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Switch Bot panel",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Load Bot Using CLI",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "story_groups": []
+        },
+        {
+          "name": "Work With Story Map",
+          "sequential_order": 2.0,
+          "sub_epics": [
+            {
+              "name": "Filter Scope",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Add Filter Part To File Scope",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Filter File Scope  By Files",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Remove Filter Part From File Scope",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Edit Story Map",
+              "sequential_order": 2.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Navigate Story Graph",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate Story Graph Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Story Hierarchy Panel",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Create Child Story Node",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Create Child Story Node Under Parent Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Create Child Story Node Under Parent CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Create Epic",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Delete Story Node",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Delete Story Node From Parent CLI",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Delete Story Node From Parent Panel",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Move Story Node To Parent",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Move Story Node  CLI",
+                      "sequential_order": 12.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Move Story Node Panel",
+                      "sequential_order": 13.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update Story Node name  CLI",
+                      "sequential_order": 14.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update Story Node name Panel",
+                      "sequential_order": 15.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update Story Node Name",
+                      "sequential_order": 16.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Story Map Changes Asynchronously",
+                      "sequential_order": 17.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Automatically Refresh Story Graph Changes Panel",
+                      "sequential_order": 18.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Automatically Refresh Story Graph Changes  CLI",
+                      "sequential_order": 19.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Edit Increments",
+              "sequential_order": 3.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Add Increment",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Remove Increment",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Rename Increment",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Add Story to Increment",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Remove Story from Increment",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Rename Story in Increment",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Story Deleted in Hierarchy Cascades to Increment",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Act With Selected Node",
+              "sequential_order": 4.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Set scope to selected story node",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit action for selected story node",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Current Behavior Action For Selected Node",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Set scope to selected Increment",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Copy Story Node To Clipboard",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render Diagram Selected Node",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update Queie based on selectged Node",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Execute Scope \"Runs\"",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Open Story Related Files",
+              "sequential_order": 5.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Open All Related Files",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Enrich Scope With Links",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Trace Story Graph",
+              "sequential_order": 6.0,
+              "sub_epics": [
+                {
+                  "name": "Trace Story",
+                  "sequential_order": 1.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Display Stories",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Edit Stories in Trace Editor",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Open Story Files",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Trace Scenario",
+                  "sequential_order": 2.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Display Scenario Steps",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Edit Scenarios in Trace Editor",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Open Scenario Source",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Display Examples Table",
+                          "sequential_order": 4.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Add / Remove Examples",
+                          "sequential_order": 5.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Design Example",
+                          "sequential_order": 6.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Edit Example",
+                          "sequential_order": 7.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Edit Example Cell Data",
+                          "sequential_order": 8.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Trace Code",
+                  "sequential_order": 3.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Display Code Trace",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Edit Code Step",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Open Source File",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Navigate Code Trace",
+                          "sequential_order": 4.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "story_groups": []
+            }
+          ],
+          "story_groups": []
+        },
+        {
+          "name": "Navigate Behavior Actions",
+          "sequential_order": 3.0,
+          "sub_epics": [
+            {
+              "name": "Navigate Behavior And Actions",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Navigate Sequentially",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate To First Behavior Action",
+                      "sequential_order": 2.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Navigate Using CLI Dot Notation",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate Sequentially Using CLI Commands",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate Behavior Action Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Manage Behaviors Using CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate To Behavior Action And Execute Using CLI",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Navigate Sequentially Using CLI",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Perform Behavior Action In Bot Workflow",
+              "sequential_order": 2.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Execute Behavior Action",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Execute Behavior Action Panel",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Update and Find Current Behavior",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Persist Behavior Action State",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Track Activity For Workspace",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Track Action Start",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Track Action Completion",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Proceed across End To End Workflow",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Record Activity Metrics And Paths",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Re-execute Current Operation Using CLI",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Execute End To End Workflow Using CLI",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Conssolidate and Expand Behavior Aciton Queies",
+                      "sequential_order": 12.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Auto execute Consolidated Queue",
+                      "sequential_order": 13.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Skip Behavior and Action Queie",
+                      "sequential_order": 14.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save  / Load Queue Consolidation",
+                      "sequential_order": 15.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Display Behavior Action State",
+              "sequential_order": 3.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Display Bot Hierarchy Tree with Progress Indicators CLI",
+                      "sequential_order": 1.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Show Remaining Actions After Completion",
+                      "sequential_order": 2.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Display Current Position in CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Display CLI Navigation Menu Footer",
+                      "sequential_order": 4.0,
+                      "story_type": "system"
+                    },
+                    {
+                      "name": "Display Hierarchy In Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Manage Behavior Action State Using CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Context Using CLI",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display  Context BAQ",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Drop Context into Queue",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display  Behavior Action Qs",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Drop Story Node in  Behavor Action Queue",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "story_groups": []
+        },
+        {
+          "name": "Perform Action",
+          "sequential_order": 4.0,
+          "sub_epics": [
+            {
+              "name": "Prepare Common Instructions For Behavior, Action, and Scope",
+              "sequential_order": 1.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Inject Context Into Instructions",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Action Instructions Through CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Instructions Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Base Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Raw Format Instructions In Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Clarification Answers",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Clarification Evidence",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Strategy Decisions",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Multiple Guardrails Together",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save File Isolation",
+                      "sequential_order": 10.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Guardrails Through Panel",
+                      "sequential_order": 11.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Scope Instructions",
+                      "sequential_order": 12.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Handle Operation Errors and Validation in CLI",
+                      "sequential_order": 13.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Save Guardrails Through CLI",
+                      "sequential_order": 14.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Add special instructon",
+                      "sequential_order": 15.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Clarify Requirements",
+              "sequential_order": 2.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Clarify Requirements",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Clarify Requirements Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Clarification Data Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Clarify Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Clarify Instructions Through CLI",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Clarify in Queue",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display clarification answers in Queue",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Associate Guard rail with scope",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Decide Strategy",
+              "sequential_order": 3.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Decide Strategy",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Decide Strategy Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Strategy Data Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Strategy Instructions Panel",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Instructions To AI Agent Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Strategy Instructions Through CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "MAke Choices in queue",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Chopices in Queue",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Build Story Graph",
+              "sequential_order": 4.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Build Story Graph",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Build Story Graph Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Build Instructions Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Build Story Graph Using API",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Build Instructions Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Build Story Graph Through Queue",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Render Content",
+              "sequential_order": 5.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Render Output Usng Story API",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render Output Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Synchronizer Output Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Render Configurations Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Render Instructions Through CLI",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Render Instructions Panel",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Render as Part of Build and Validate Actions",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Report and Update InQ",
+                      "sequential_order": 8.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Rules in Queue",
+                      "sequential_order": 9.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Render DrawIO Diagrams",
+              "sequential_order": 6.0,
+              "sub_epics": [
+                {
+                  "name": "Synchronize Epics and Sub-Epics",
+                  "sequential_order": 1.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render epic and sub-epic hierarchy",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report epic and sub-epic changes",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update epics and sub-epics from diagram",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Synchronize Stories and Actors",
+                  "sequential_order": 2.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render stories and actors",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Render acceptance criteria",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report story moves between parents",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report acceptance criteria changes",
+                          "sequential_order": 4.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update stories from diagram",
+                          "sequential_order": 5.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update acceptance criteria from diagram",
+                          "sequential_order": 6.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Synchronize Increments",
+                  "sequential_order": 3.0,
+                  "sub_epics": [],
+                  "story_groups": [
+                    {
+                      "type": "and",
+                      "connector": null,
+                      "stories": [
+                        {
+                          "name": "Render increment lanes",
+                          "sequential_order": 1.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Report increment changes",
+                          "sequential_order": 2.0,
+                          "story_type": "user"
+                        },
+                        {
+                          "name": "Update increments from diagram",
+                          "sequential_order": 3.0,
+                          "story_type": "user"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "story_groups": []
+            },
+            {
+              "name": "Validate With Rules",
+              "sequential_order": 7.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Validate Rules",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Validate Rules Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validation Results Through CLI",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validation Scanners Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Validate Instructions Panel",
+                      "sequential_order": 5.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Validate Instructions Through CLI",
+                      "sequential_order": 6.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Validate In Queue",
+                      "sequential_order": 7.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Use Rules In Prompt",
+              "sequential_order": 8.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": [
+                    {
+                      "name": "Display Rules",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Display Rules Using CLI",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Submit Behavior Rules Through Panel",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Get Rules Instructions Through CLI",
+                      "sequential_order": 4.0,
+                      "story_type": "user"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "story_groups": []
+        },
+        {
+          "name": "Get Help",
+          "sequential_order": 5.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Get Help",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Parameter Help Using CLI",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Action Help Using CLI",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Command Examples Using CLI",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Get Help Using CLI",
+                  "sequential_order": 5.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Display Help Using CLI",
+                  "sequential_order": 6.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Provide Context",
+          "sequential_order": 6.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Warn when Workspace  not setup",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Scan Worspace for Context Fies",
+                  "sequential_order": 2.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Add Context Files",
+                  "sequential_order": 3.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Remove Context File",
+                  "sequential_order": 4.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Re-Scan Existing Context File",
+                  "sequential_order": 5.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Generate  Context Converter",
+                  "sequential_order": 6.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Convert Context",
+                  "sequential_order": 7.0,
+                  "story_type": "user"
+                },
+                {
+                  "name": "Reset Scanned Context",
+                  "sequential_order": 8.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
