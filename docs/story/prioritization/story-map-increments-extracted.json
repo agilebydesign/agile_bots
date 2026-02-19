@@ -24,13 +24,7 @@
             {
               "type": "and",
               "connector": null,
-              "stories": [
-                {
-                  "name": "Create Rule Files From Bot Behavior",
-                  "sequential_order": 1.0,
-                  "story_type": "user"
-                }
-              ]
+              "stories": []
             }
           ]
         }
@@ -64,28 +58,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Auto Refresh State Changing Events",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Syncing Message",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Bot  Help",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Provide Bot Guidance",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -106,48 +79,33 @@
         },
         {
           "name": "Work With Story Map",
-          "sequential_order": 3.0,
+          "sequential_order": 2.0,
           "sub_epics": [
             {
               "name": "Filter Scope",
               "sequential_order": 1.0,
-              "sub_epics": [
-                {
-                  "name": "Filter Stories",
-                  "sequential_order": 1.0,
-                  "sub_epics": [],
-                  "story_groups": [
-                    {
-                      "type": "and",
-                      "connector": null,
-                      "stories": []
-                    }
-                  ]
-                },
-                {
-                  "name": "Filter Increments",
-                  "sequential_order": 2.0,
-                  "sub_epics": [],
-                  "story_groups": [
-                    {
-                      "type": "and",
-                      "connector": null,
-                      "stories": []
-                    }
-                  ]
-                }
-              ],
-              "story_groups": []
-            },
-            {
-              "name": "Filter Files",
-              "sequential_order": 6.0,
               "sub_epics": [],
               "story_groups": [
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": []
+                  "stories": [
+                    {
+                      "name": "Add Filter Part To File Scope",
+                      "sequential_order": 1.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Filter File Scope  By Files",
+                      "sequential_order": 2.0,
+                      "story_type": "user"
+                    },
+                    {
+                      "name": "Remove Filter Part From File Scope",
+                      "sequential_order": 3.0,
+                      "story_type": "user"
+                    }
+                  ]
                 }
               ]
             },
@@ -164,35 +122,19 @@
               ]
             },
             {
-              "name": "Act With Selected Node",
+              "name": "Edit Increments",
               "sequential_order": 3.0,
               "sub_epics": [],
               "story_groups": [
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Execute Scope \"Runs\"",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Render Diagram Selected Node",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Update Queie based on selectged Node",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
             {
-              "name": "Open Story Related Files",
+              "name": "Act With Selected Node",
               "sequential_order": 4.0,
               "sub_epics": [],
               "story_groups": [
@@ -204,8 +146,20 @@
               ]
             },
             {
-              "name": "Trace Story Graph",
+              "name": "Open Story Related Files",
               "sequential_order": 5.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": []
+                }
+              ]
+            },
+            {
+              "name": "Trace Story Graph",
+              "sequential_order": 6.0,
               "sub_epics": [
                 {
                   "name": "Trace Story",
@@ -251,7 +205,7 @@
         },
         {
           "name": "Navigate Behavior Actions",
-          "sequential_order": 5.0,
+          "sequential_order": 3.0,
           "sub_epics": [
             {
               "name": "Navigate Behavior And Actions",
@@ -273,28 +227,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Conssolidate and Expand Behavior Aciton Queies",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Auto execute Consolidated Queue",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Skip Behavior and Action Queie",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Save  / Load Queue Consolidation",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -306,28 +239,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Display  Context BAQ",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Drop Context into Queue",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display  Behavior Action Qs",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Drop Story Node in  Behavor Action Queue",
-                      "sequential_order": 4.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             }
@@ -336,7 +248,7 @@
         },
         {
           "name": "Perform Action",
-          "sequential_order": 6.0,
+          "sequential_order": 4.0,
           "sub_epics": [
             {
               "name": "Prepare Common Instructions For Behavior, Action, and Scope",
@@ -346,13 +258,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Add special instructon",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -364,23 +270,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Clarify in Queue",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display clarification answers in Queue",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Associate Guard rail with scope",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -392,18 +282,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "MAke Choices in queue",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Chopices in Queue",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -415,13 +294,7 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Build Story Graph Through Queue",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    }
-                  ]
+                  "stories": []
                 }
               ]
             },
@@ -433,59 +306,13 @@
                 {
                   "type": "and",
                   "connector": null,
-                  "stories": [
-                    {
-                      "name": "Render as Part of Build and Validate Actions",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Report and Update InQ",
-                      "sequential_order": 2.0,
-                      "story_type": "user"
-                    },
-                    {
-                      "name": "Display Rules in Queue",
-                      "sequential_order": 3.0,
-                      "story_type": "user"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Validate With Rules",
-              "sequential_order": 6.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "type": "and",
-                  "connector": null,
-                  "stories": [
-                    {
-                      "name": "Validate In Queue",
-                      "sequential_order": 1.0,
-                      "story_type": "user"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "Use Rules In Prompt",
-              "sequential_order": 7.0,
-              "sub_epics": [],
-              "story_groups": [
-                {
-                  "type": "and",
-                  "connector": null,
                   "stories": []
                 }
               ]
             },
             {
               "name": "Render DrawIO Diagrams",
-              "sequential_order": 8.0,
+              "sequential_order": 6.0,
               "sub_epics": [
                 {
                   "name": "Synchronize Epics and Sub-Epics",
@@ -495,23 +322,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Render epic and sub-epic hierarchy",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Report epic and sub-epic changes",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Update epics and sub-epics from diagram",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -523,38 +334,7 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Render stories and actors",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Render acceptance criteria",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Report story moves between parents",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Report acceptance criteria changes",
-                          "sequential_order": 4.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Update stories from diagram",
-                          "sequential_order": 5.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Update acceptance criteria from diagram",
-                          "sequential_order": 6.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 },
@@ -566,35 +346,43 @@
                     {
                       "type": "and",
                       "connector": null,
-                      "stories": [
-                        {
-                          "name": "Render increment lanes",
-                          "sequential_order": 1.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Report increment changes",
-                          "sequential_order": 2.0,
-                          "story_type": "user"
-                        },
-                        {
-                          "name": "Update increments from diagram",
-                          "sequential_order": 3.0,
-                          "story_type": "user"
-                        }
-                      ]
+                      "stories": []
                     }
                   ]
                 }
               ],
               "story_groups": []
+            },
+            {
+              "name": "Validate With Rules",
+              "sequential_order": 7.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": []
+                }
+              ]
+            },
+            {
+              "name": "Use Rules In Prompt",
+              "sequential_order": 8.0,
+              "sub_epics": [],
+              "story_groups": [
+                {
+                  "type": "and",
+                  "connector": null,
+                  "stories": []
+                }
+              ]
             }
           ],
           "story_groups": []
         },
         {
           "name": "Get Help",
-          "sequential_order": 4.0,
+          "sequential_order": 5.0,
           "sub_epics": [],
           "story_groups": [
             {
@@ -606,59 +394,13 @@
         },
         {
           "name": "Provide Context",
-          "sequential_order": 2.0,
+          "sequential_order": 6.0,
           "sub_epics": [],
           "story_groups": [
             {
               "type": "and",
               "connector": null,
-              "stories": [
-                {
-                  "name": "Warn when Workspace  not setup",
-                  "sequential_order": 1.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Scan Worspace for Context Fies",
-                  "sequential_order": 2.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Add Context Files",
-                  "sequential_order": 3.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Remove Context File",
-                  "sequential_order": 4.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Re-Scan Existing Context File",
-                  "sequential_order": 5.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Remove Context File",
-                  "sequential_order": 6.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Generate  Context Converter",
-                  "sequential_order": 7.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Convert Context",
-                  "sequential_order": 8.0,
-                  "story_type": "user"
-                },
-                {
-                  "name": "Reset Scanned Context",
-                  "sequential_order": 9.0,
-                  "story_type": "user"
-                }
-              ]
+              "stories": []
             }
           ]
         }

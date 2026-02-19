@@ -5656,92 +5656,56 @@
               "sequential_order": 0.0,
               "behavior": null,
               "domain_concepts": [],
-              "sub_epics": [
+              "sub_epics": [],
+              "story_groups": [
                 {
-                  "name": "Filter Stories",
+                  "name": "",
                   "sequential_order": 0.0,
+                  "type": "and",
+                  "connector": null,
                   "behavior": null,
-                  "domain_concepts": [],
-                  "test_file": "invoke_bot/edit_story_map/test_scope_files.py",
-                  "sub_epics": [],
-                  "story_groups": [
+                  "stories": [
                     {
-                      "name": "",
+                      "name": "Add Filter Part To File Scope",
                       "sequential_order": 0.0,
-                      "type": "and",
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": "TestAddFilterPartToFileScope",
+                      "scenarios": [],
+                      "acceptance_criteria": [],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Filter File Scope  By Files",
+                      "sequential_order": 1.0,
                       "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [],
                       "behavior": null,
-                      "stories": [
-                        {
-                          "name": "Add Filter Part To File Scope",
-                          "sequential_order": 0.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_class": "TestAddFilterPartToFileScope",
-                          "scenarios": [],
-                          "acceptance_criteria": [],
-                          "behavior": null
-                        },
-                        {
-                          "name": "Remove Filter Part From File Scope",
-                          "sequential_order": 3.0,
-                          "connector": "or",
-                          "story_type": "user",
-                          "users": [
-                            "Bot Behavior"
-                          ],
-                          "test_class": "TestRemoveFilterPartFromFileScope",
-                          "scenarios": [],
-                          "acceptance_criteria": [],
-                          "behavior": null
-                        }
-                      ]
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Work With Story Map\\Filter Scope\\Filter Stories\\📄 Filter File Scope  By Files.md"
+                    },
+                    {
+                      "name": "Remove Filter Part From File Scope",
+                      "sequential_order": 2.0,
+                      "connector": "or",
+                      "story_type": "user",
+                      "users": [
+                        "Bot Behavior"
+                      ],
+                      "test_class": "TestRemoveFilterPartFromFileScope",
+                      "scenarios": [],
+                      "acceptance_criteria": [],
+                      "behavior": null
                     }
                   ]
-                },
-                {
-                  "name": "Filter Increments",
-                  "sequential_order": 1.0,
-                  "behavior": null,
-                  "domain_concepts": [],
-                  "test_file": "invoke_bot/edit_story_map/test_scope_files.py",
-                  "sub_epics": [],
-                  "story_groups": [
-                    {
-                      "name": "",
-                      "sequential_order": 0.0,
-                      "type": "and",
-                      "connector": null,
-                      "behavior": null,
-                      "stories": [
-                        {
-                          "name": "Filter File Scope  By Files",
-                          "sequential_order": 0.0,
-                          "connector": null,
-                          "story_type": "user",
-                          "users": [],
-                          "test_class": null,
-                          "scenarios": [],
-                          "acceptance_criteria": [],
-                          "behavior": null
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "name": "Filter Files",
-                  "sequential_order": 2.0,
-                  "behavior": null,
-                  "domain_concepts": [],
-                  "sub_epics": [],
-                  "story_groups": []
                 }
-              ],
-              "story_groups": []
+              ]
             },
             {
               "name": "Edit Story Map",
@@ -22887,7 +22851,6 @@
         "Decide Strategy",
         "Execute Behavior Action",
         "Execute Behavior Action Panel",
-        "Filter Story Scope By Stories",
         "Generate Behavior Action Tools",
         "Generate Bot Tools",
         "Get Help",
@@ -22900,7 +22863,6 @@
         "Persist Behavior Action State",
         "Proceed across End To End Workflow",
         "Record Activity Metrics And Paths",
-        "Render story map",
         "Resolve Bot Path",
         "Restart MCP Server To Load Code Changes",
         "Save Clarification Answers",
@@ -23002,40 +22964,29 @@
       "stories": [
         "Automatically Refresh Story Graph Changes  CLI",
         "Automatically Refresh Story Graph Changes Panel",
-        "Clear Scope",
         "Copy Story Node To Clipboard",
         "Create Child Story Node",
         "Create Child Story Node Under Parent CLI",
         "Create Child Story Node Under Parent Panel",
         "Create Epic",
-        "Create Scope",
-        "Create Scope Using CLI",
         "Delete Story Node",
         "Delete Story Node From Parent CLI",
         "Delete Story Node From Parent Panel",
-        "Display Increment Scope View",
-        "Display Scope Using CLI",
         "Display Story Hierarchy Panel",
         "Enrich Scope With Links",
-        "Execute Action Scoped To Story Node",
-        "Execute Actions With Scope",
-        "Execute Actions With Scope Using CLI",
         "Move Story Node  CLI",
         "Move Story Node Panel",
         "Move Story Node To Parent",
         "Navigate Story Graph",
         "Navigate Story Graph Using CLI",
         "Open All Related Files",
-        "Persist Scope",
         "Save Story Map Changes Asynchronously",
         "Set scope to selected story node",
-        "Show All Scope Through Panel",
         "Submit Current Behavior Action For Selected Node",
         "Submit action for selected story node",
         "Update Story Node Name",
         "Update Story Node name  CLI",
-        "Update Story Node name Panel",
-        "Render Diagrams"
+        "Update Story Node name Panel"
       ]
     },
     {
@@ -23087,7 +23038,7 @@
     },
     {
       "name": "Queue Behavior Action Workflow",
-      "priority": 9,
+      "priority": 8,
       "stories": [
         "Add Context Files",
         "Associate Guard rail with scope",
@@ -23108,7 +23059,6 @@
         "Generate  Context Converter",
         "MAke Choices in queue",
         "Provide Bot Guidance",
-        "Queue Behavior Action Workflow",
         "Re-Scan Existing Context File",
         "Remove Context File",
         "Reset Scanned Context",
@@ -23123,7 +23073,7 @@
     },
     {
       "name": "Trace and Edit",
-      "priority": 11,
+      "priority": 9,
       "stories": [
         "Add / Remove Examples",
         "Display Code Trace",
