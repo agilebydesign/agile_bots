@@ -10137,7 +10137,33 @@
                       "users": [],
                       "test_class": null,
                       "scenarios": [],
-                      "acceptance_criteria": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User selects story node in Panel story tree\nTHEN Panel action bar shows [Render diagram] [Save layout] [Clear layout] [Update graph] buttons",
+                          "text": "WHEN User selects story node in Panel story tree\nTHEN Panel action bar shows [Render diagram] [Save layout] [Clear layout] [Update graph] buttons",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User clicks [Render diagram] in Panel\nTHEN Panel renders diagram for selected node scope",
+                          "text": "WHEN User clicks [Render diagram] in Panel\nTHEN Panel renders diagram for selected node scope",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User clicks [Save layout] in Panel\nTHEN Panel persists layout to DrawIO file",
+                          "text": "WHEN User clicks [Save layout] in Panel\nTHEN Panel persists layout to DrawIO file",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User clicks [Update graph] in Panel\nTHEN Panel generates update report AND Panel applies changes to story-graph.json",
+                          "text": "WHEN User clicks [Update graph] in Panel\nTHEN Panel generates update report AND Panel applies changes to story-graph.json",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User runs cli.story_graph.\"Invoke Bot\".\"Act With Selected Node\".render_diagram\nTHEN CLI renders diagram for current scope AND CLI reports completion",
+                          "text": "WHEN User runs cli.story_graph.\"Invoke Bot\".\"Act With Selected Node\".render_diagram\nTHEN CLI renders diagram for current scope AND CLI reports completion",
+                          "sequential_order": 5.0
+                        }
+                      ],
                       "behavior": null
                     },
                     {
@@ -14025,14 +14051,52 @@
                       "behavior": null
                     },
                     {
-                      "name": "Auto execute Consolidated Queue",
+                      "name": "Configure Action Execution",
                       "sequential_order": 12.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
                       "test_class": null,
                       "scenarios": [],
-                      "acceptance_criteria": [],
+                      "acceptance_criteria": [
+                        {"name": "WHEN User opens behavior in Panel THEN Panel shows list of actions for that behavior AND Panel shows a toggle button group (Auto | Skip | Manual) per action", "text": "WHEN User opens behavior in Panel THEN Panel shows list of actions for that behavior AND Panel shows a toggle button group (Auto | Skip | Manual) per action", "sequential_order": 1.0},
+                        {"name": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel skips that action", "text": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel skips that action", "sequential_order": 2.0},
+                        {"name": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel executes that action as soon as previous action completes", "text": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel executes that action as soon as previous action completes", "sequential_order": 3.0},
+                        {"name": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel requires User to click Execute for that action", "text": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel requires User to click Execute for that action", "sequential_order": 4.0},
+                        {"name": "WHEN User runs cli.behaviors.shape.clarify.set_execution auto THEN CLI sets that action to auto execution", "text": "WHEN User runs cli.behaviors.shape.clarify.set_execution auto THEN CLI sets that action to auto execution", "sequential_order": 5.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Configure Behavior Execute",
+                      "sequential_order": 12.5,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "WHEN User sets behavior execute to skip in Panel behavior dropdown AND User executes that behavior THEN Panel skips all actions in that behavior regardless of per-action setting", "text": "WHEN User sets behavior execute to skip in Panel behavior dropdown AND User executes that behavior THEN Panel skips all actions in that behavior regardless of per-action setting", "sequential_order": 1.0},
+                        {"name": "WHEN User sets behavior execute to auto in Panel AND User executes that behavior THEN Panel runs auto and manual actions AND Panel skips actions marked skip", "text": "WHEN User sets behavior execute to auto in Panel AND User executes that behavior THEN Panel runs auto and manual actions AND Panel skips actions marked skip", "sequential_order": 2.0},
+                        {"name": "WHEN User sets behavior execute to manual in Panel AND User executes that behavior THEN Panel performs each action according to that action's skip/auto/manual setting", "text": "WHEN User sets behavior execute to manual in Panel AND User executes that behavior THEN Panel performs each action according to that action's skip/auto/manual setting", "sequential_order": 3.0},
+                        {"name": "WHEN User runs cli.behaviors.shape.set_execute auto THEN CLI sets behavior execute to auto for that behavior", "text": "WHEN User runs cli.behaviors.shape.set_execute auto THEN CLI sets behavior execute to auto for that behavior", "sequential_order": 4.0}
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Add Special Instructions",
+                      "sequential_order": 12.6,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": null,
+                      "scenarios": [],
+                      "acceptance_criteria": [
+                        {"name": "WHEN User enters text in Panel behavior-level Special Instructions text area (beside shape, after toggle group above) THEN Panel stores that text for that behavior", "text": "WHEN User enters text in Panel behavior-level Special Instructions text area (beside shape, after toggle group above) THEN Panel stores that text for that behavior", "sequential_order": 1.0},
+                        {"name": "WHEN User enters text in Panel action-level Special Instructions text area (e.g. beside shape.clarify, same row) THEN Panel stores that text for that behavior and action", "text": "WHEN User enters text in Panel action-level Special Instructions text area (e.g. beside shape.clarify, same row) THEN Panel stores that text for that behavior and action", "sequential_order": 2.0},
+                        {"name": "WHEN User clicks Submit in Panel THEN Panel injects all special instructions from behavior and action levels into the prompt", "text": "WHEN User clicks Submit in Panel THEN Panel injects all special instructions from behavior and action levels into the prompt", "sequential_order": 3.0},
+                        {"name": "WHEN User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\" THEN CLI stores that instruction for shape.clarify AND CLI includes it in next prompt", "text": "WHEN User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\" THEN CLI stores that instruction for shape.clarify AND CLI includes it in next prompt", "sequential_order": 4.0}
+                      ],
                       "behavior": null
                     },
                     {
@@ -17184,7 +17248,11 @@
                       "users": [],
                       "test_class": null,
                       "scenarios": [],
-                      "acceptance_criteria": [],
+                      "acceptance_criteria": [
+                        {"name": "WHEN User runs build from Panel THEN Panel invokes CLI AND CLI subscribes and runs build AND CLI reports BuildInProcess AND Panel watches CLI and shows BuildInProcess AND CLI watches story-graph and on save and debounce starts render AND CLI reports RenderInProcess AND Panel shows it AND on success CLI reports completion and Panel shows completion AND on failure CLI reports failed and Panel shows failed AND Panel refreshes images and is passive", "text": "WHEN User runs build from Panel THEN Panel invokes CLI (e.g. cli.behaviors.shape.build) AND CLI subscribes to story-graph with debounce and runs build AND CLI reports BuildInProcess while build is running AND Panel watches CLI for status and shows BuildInProcess indicator AND CLI is watching story-graph; when save is detected and debounce passes CLI starts render AND CLI reports RenderInProcess while render is running AND Panel shows RenderInProcess indicator AND when render finishes successfully CLI reports completion and Panel shows completion indicator (e.g. checkmark) AND when build or render fails CLI reports failed and Panel shows failed indicator AND Panel periodically refreshes images so User sees updated render output AND Panel is passive: it does not own the subscription or render trigger; CLI does", "sequential_order": 1.0},
+                        {"name": "WHEN User runs validate from Panel THEN Panel invokes CLI AND CLI runs validate and watches validation status (periodic) AND CLI reports ValidationInProcess AND Panel watches CLI and shows it AND validation report at end; on save and debounce CLI starts render AND CLI reports RenderInProcess AND Panel shows it AND on success or failure CLI reports and Panel shows completion or failed AND Panel refreshes and is passive", "text": "WHEN User runs validate from Panel THEN Panel invokes CLI (e.g. cli.behaviors.shape.validate) AND CLI runs validate and watches validation status (updated periodically) for ValidationInProcess AND CLI reports ValidationInProcess while validate is running AND Panel watches CLI for status and shows ValidationInProcess indicator AND validation report is written only at end; when save of validation report is detected and debounce passes CLI starts render AND CLI reports RenderInProcess while render is running AND Panel shows RenderInProcess indicator AND when render finishes successfully CLI reports completion and Panel shows completion indicator AND when validate or render fails CLI reports failed and Panel shows failed indicator AND Panel periodically refreshes images AND Panel is passive: it does not own the subscription or render trigger; CLI does", "sequential_order": 2.0},
+                        {"name": "WHEN User runs build or validate from CLI (no Panel) THEN the same CLI flow runs AND for build CLI subscribes to story-graph AND for validate CLI watches validation status (periodic) and validation report (at end) AND CLI runs the action AND CLI reports BuildInProcess or ValidationInProcess AND when save of output is detected and debounce passes CLI starts render AND CLI reports RenderInProcess AND when done CLI reports completion or failed AND CLI reports to the terminal so the flow works without Panel", "text": "WHEN User runs build or validate from CLI (no Panel) THEN the same CLI flow runs AND for build CLI subscribes to story-graph AND for validate CLI watches validation status (periodic) and validation report (at end) AND CLI runs the action AND CLI reports BuildInProcess or ValidationInProcess AND when save of output is detected and debounce passes CLI starts render AND CLI reports RenderInProcess AND when done CLI reports completion or failed AND CLI reports to the terminal so the flow works without Panel", "sequential_order": 3.0}
+                      ],
                       "behavior": null
                     },
                     {
@@ -23029,10 +23097,10 @@
       "name": "Behavior Action Ux Improvements",
       "priority": 7,
       "stories": [
-        "Auto execute Consolidated Queue",
-        "Add special instructon",
+        "Configure Action Execution",
+        "Configure Behavior Execute",
+        "Add Special Instructions",
         "Render as Part of Build and Validate Actions",
-        "Display Rules in Queue",
         "Render Diagram Selected Node"
       ]
     },
@@ -23043,6 +23111,7 @@
         "Add Context Files",
         "Associate Guard rail with scope",
         "Auto Refresh State Changing Events",
+        "Display Rules in Queue",
         "Build Story Graph Through Queue",
         "Clarify in Queue",
         "Conssolidate and Expand Behavior Aciton Queies",
