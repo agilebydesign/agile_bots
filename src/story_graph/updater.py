@@ -88,6 +88,7 @@ class StoryMapUpdater:
         self._apply_renames(report)
         self._apply_new_nodes(report)
         self._apply_moves(report)
+        self._apply_sub_epic_moves(report)
         self._apply_increment_changes(report)
     
     def _apply_renames(self, report: 'UpdateReport') -> None:
@@ -120,7 +121,32 @@ class StoryMapUpdater:
                 except ValueError as e:
                     # Skip moves that violate hierarchy rules (e.g., moving to non-leaf sub-epic)
                     print(f"Warning: Skipping move of '{moved.name}' to '{moved.to_parent}': {e}")
-    
+
+    def _apply_sub_epic_moves(self, report: 'UpdateReport') -> None:
+        """Apply sub-epic moves from report (re-parent sub-epics)."""
+        from story_graph.nodes import SubEpic
+        for moved in report.moved_sub_epics:
+            node = self._target_map.find_node(moved.name)
+            to_parent = self._target_map.find_node(moved.to_parent) if moved.to_parent else None
+            if not isinstance(node, SubEpic) or not to_parent:
+                continue
+            if not hasattr(to_parent, '_children') or not hasattr(to_parent, 'create_sub_epic'):
+                continue
+            old_parent = getattr(node, '_parent', None)
+            if not old_parent or old_parent is to_parent:
+                continue
+            try:
+                # Remove from old parent
+                if hasattr(old_parent, '_children') and node in old_parent._children:
+                    old_parent._children.remove(node)
+                # Add to new parent
+                to_parent._children.append(node)
+                node._parent = to_parent
+                if hasattr(node, 'save'):
+                    node.save()
+            except (ValueError, AttributeError) as e:
+                print(f"Warning: Skipping sub-epic move '{moved.name}' to '{moved.to_parent}': {e}")
+
     def _apply_increment_changes(self, report: 'UpdateReport') -> None:
         """Apply increment changes from report."""
         from story_graph.nodes import IncrementCollection

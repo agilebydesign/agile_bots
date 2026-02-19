@@ -314,7 +314,7 @@ class PanelView {
             this._perfExecuteStart = perfCmdStart;
             _perfLog(`execute START: "${command}"`);
             
-            const timeoutMs = 30000;
+            const timeoutMs = 60000;
             console.log(`[PanelView] Using timeout: ${timeoutMs}ms for command: "${command}"`);
             
             return new Promise((resolve, reject) => {

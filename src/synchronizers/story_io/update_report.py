@@ -49,6 +49,14 @@ class StoryMove:
 
 
 @dataclass
+class SubEpicMove:
+    """A sub-epic that moved from one parent (epic or sub-epic) to another."""
+    name: str
+    from_parent: str
+    to_parent: str
+
+
+@dataclass
 class ACChange:
     """Delta for acceptance criteria on a single story."""
     story_name: str
@@ -80,6 +88,7 @@ class UpdateReport:
         self._large_deletions = LargeDeletions()
         self._matched_count = 0
         self._moved_stories: List[StoryMove] = []
+        self._moved_sub_epics: List[SubEpicMove] = []
         self._increment_changes: List[IncrementChange] = []
         self._increment_moves: List[IncrementMove] = []
         self._removed_increments: List[str] = []
@@ -130,6 +139,10 @@ class UpdateReport:
     @property
     def moved_stories(self) -> List[StoryMove]:
         return list(self._moved_stories)
+
+    @property
+    def moved_sub_epics(self) -> List[SubEpicMove]:
+        return list(self._moved_sub_epics)
 
     @property
     def increment_changes(self) -> List[IncrementChange]:
@@ -211,6 +224,7 @@ class UpdateReport:
                 or len(self._removed_stories) > 0
                 or len(self._removed_sub_epics) > 0 or len(self._removed_epics) > 0
                 or len(self._moved_stories) > 0
+                or len(self._moved_sub_epics) > 0
                 or len(self._large_deletions.missing_epics) > 0
                 or len(self._large_deletions.missing_sub_epics) > 0
                 or len(self._increment_changes) > 0
@@ -258,9 +272,13 @@ class UpdateReport:
         self._large_deletions.missing_sub_epics.append(sub_epic_name)
 
     def reconcile_moves(self, original_story_map=None, extracted_increments=None):
-        """Post-process: detect stories that are actually moves, not new+removed.
+        """Post-process: detect stories and sub-epics that are actually moves, not new+removed.
 
-        Three cases:
+        Sub-epics: if a sub-epic appears in both new_sub_epics and removed_sub_epics
+        (same name), it was re-parented in the diagram (e.g. from epic to a sibling
+        sub-epic). Remove from both so it is not treated as deleted.
+
+        Stories (three cases):
         1. A story appears in both new_stories and removed_stories with
            different parents → it was moved between sub-epics.
         2. A story appears in new_stories and its name existed under a
@@ -273,6 +291,27 @@ class UpdateReport:
         removed from removed_stories if they're in increment lanes.
         """
         moved_names: set = set()
+
+        # --- Sub-epics: same name in both new and removed = move (re-parent) ---
+        new_se_by_name: Dict[str, StoryEntry] = {s.name: s for s in self._new_sub_epics}
+        removed_se_by_name: Dict[str, StoryEntry] = {s.name: s for s in self._removed_sub_epics}
+        reconciled_se_names = set(new_se_by_name.keys()) & set(removed_se_by_name.keys())
+        if reconciled_se_names:
+            for name in reconciled_se_names:
+                removed_entry = removed_se_by_name[name]
+                new_entry = new_se_by_name[name]
+                self._moved_sub_epics.append(SubEpicMove(
+                    name=name,
+                    from_parent=removed_entry.parent,
+                    to_parent=new_entry.parent))
+            self._new_sub_epics = [s for s in self._new_sub_epics
+                                  if s.name not in reconciled_se_names]
+            self._removed_sub_epics = [s for s in self._removed_sub_epics
+                                      if s.name not in reconciled_se_names]
+            for name in reconciled_se_names:
+                self._large_deletions.missing_sub_epics = [
+                    n for n in self._large_deletions.missing_sub_epics
+                    if n != name]
 
         # --- Case 1: direct overlap between new and removed ---
         new_by_name: Dict[str, StoryEntry] = {}
@@ -393,6 +432,10 @@ class UpdateReport:
             result['moved_stories'] = [
                 {'name': m.name, 'from_parent': m.from_parent, 'to_parent': m.to_parent}
                 for m in self._moved_stories]
+        if self._moved_sub_epics:
+            result['moved_sub_epics'] = [
+                {'name': m.name, 'from_parent': m.from_parent, 'to_parent': m.to_parent}
+                for m in self._moved_sub_epics]
         if self._removed_stories:
             result['removed_stories'] = [{'name': s.name, 'parent': s.parent} for s in self._removed_stories]
         if self._large_deletions.missing_epics or self._large_deletions.missing_sub_epics:
@@ -466,6 +509,11 @@ class UpdateReport:
                 StoryMove(name=m['name'],
                           from_parent=m.get('from_parent', ''),
                           to_parent=m.get('to_parent', '')))
+        for m in data.get('moved_sub_epics', []):
+            report._moved_sub_epics.append(
+                SubEpicMove(name=m['name'],
+                            from_parent=m.get('from_parent', ''),
+                            to_parent=m.get('to_parent', '')))
         for s in data.get('removed_epics', []):
             report.add_removed_epic(s['name'], s.get('parent', ''))
         for s in data.get('removed_sub_epics', []):
