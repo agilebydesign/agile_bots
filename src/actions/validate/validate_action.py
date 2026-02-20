@@ -36,13 +36,13 @@ class ValidateRulesAction(Action):
         
         scope_text = self._format_scope_description(context)
         
-        scanner_output = self._run_scanners_and_format_results(context)
+        scanner_output = self._format_scanner_list_for_instructions(context)
         
         replacements = {
             'rules': rules_text if rules_text else 'No rules defined',
             'scanner_output': scanner_output,
             'schema': f'**Schema:** Story graph at `{schema_path}`',
-            'description': f'Validate **{self.behavior.name}** artifacts against rules. Scanner results shown above.',
+            'description': f'Validate **{self.behavior.name}** artifacts against rules. Run the scanners listed below with the given params; you are in control of the whole flow.',
             'scope': scope_text
         }
         
@@ -86,42 +86,38 @@ class ValidateRulesAction(Action):
                     rule_files.append(rule_path)
             instructions._data['rules'] = rule_files
 
-    def _run_scanners_and_format_results(self, context: ValidateActionContext) -> str:
-        logger.info('Running scanners for instructions display...')
-        
-        try:
-            result = self._executor.execute_synchronous(context)
-            
-            instructions_dict = result.get('instructions', {})
-            report_link = instructions_dict.get('report_link', '')
-            
-            if report_link:
-                import re
-                match = re.search(r'\[.*?\]\((.*?)\)', report_link)
-                if match:
-                    report_path = match.group(1)
-                    from pathlib import Path
-                    report_file = Path(report_path)
-                    if not report_file.is_absolute():
-                        report_file = self.behavior.bot_paths.workspace_directory / report_path
-                    
-                    if report_file.exists():
-                        report_content = report_file.read_text(encoding='utf-8')
-                        return f'**Scanner Results:**\n\n{report_content}\n\n**Full Report:** {report_link}'
-            
-            violation_summary = self._rules.violation_summary if hasattr(self._rules, 'violation_summary') else []
-            if violation_summary:
-                return '\n'.join(['**Scanner Violations Found:**', ''] + violation_summary)
-            
-            return 'âœ… **No scanner violations detected.**\n\nAll automated rule scanners passed successfully.'
-            
-        except Exception as e:
-            logger.error(f'Error running scanners: {e}')
-            import traceback
-            logger.error(traceback.format_exc())
-            violations_dir = self.behavior.bot_paths.story_graph_paths.behavior_path(self.behavior.name) / 'violations'
-            violations_dir_relative = violations_dir.relative_to(self.behavior.bot_paths.workspace_directory)
-            return f'Error running scanners: {e}\n\nPlease review the validation report files in `{violations_dir_relative}`.'
+    def _format_scanner_list_for_instructions(self, context: ValidateActionContext) -> str:
+        """Build exact list of scanners to run and params (scope, files). No execution - AI runs them. Used when building validate instructions (e.g. combined flow)."""
+        rules_data = self.inject_behavior_specific_rules()
+        all_rules = rules_data.get('validation_rules', [])
+        if not all_rules:
+            return '**Scanners to run:** None defined. Validate against the rules manually.'
+        all_rules = sorted(all_rules, key=lambda r: r.get('rule_content', {}).get('priority', 99))
+        lines = [
+            '**Scanners you must run (with params below). Do not assume pre-run results.**',
+            '',
+            '| Rule | Rule file | Scanner module |',
+            '|------|-----------|----------------|',
+        ]
+        for rule in all_rules:
+            rule_file = rule.get('rule_file', 'unknown')
+            rule_content = rule.get('rule_content', {})
+            name = rule_content.get('name', rule_file.split('/')[-1].replace('.json', '').replace('_', ' ').title())
+            scanner_path = rule_content.get('scanner') or rule_content.get('scanners')
+            if isinstance(scanner_path, list):
+                scanner_path = scanner_path[0] if scanner_path else ''
+            scanner_str = scanner_path if scanner_path else '[Manual check - no scanner]'
+            lines.append(f'| {name} | `{rule_file}` | `{scanner_str}` |')
+        lines.extend([
+            '',
+            '**Params to pass when running scanners:**',
+            f'- **Scope:** {self._format_scope_description(context)}',
+            f'- **Workspace:** `{self.behavior.bot_paths.workspace_directory}`',
+            '- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)',
+            '',
+            'Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.',
+        ])
+        return '\n'.join(lines)
     
     def _format_scope_description(self, context: ValidateActionContext) -> str:
         if context.scope:

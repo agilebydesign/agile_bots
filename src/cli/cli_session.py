@@ -2,7 +2,7 @@
 import sys
 import logging
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from cli.adapter_factory import AdapterFactory
 from cli.cli_results import CLICommandResponse
@@ -161,7 +161,15 @@ class CLISession:
         # If so, route to behavior action instead of domain navigator
         has_dash_params = '--' in command
         
-        if '.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params:
+        # behavior.action or behavior.action.set_execution/get_execution must go to behavior action (execute), not domain navigator,
+        # so we get combined instructions (current+next when auto) and execution mode handling.
+        verb_parts = verb.split('.')
+        is_set_execution = len(verb_parts) == 3 and verb_parts[2] == 'set_execution'
+        is_get_execution = len(verb_parts) == 3 and verb_parts[2] == 'get_execution'
+        is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0])
+        
+        if ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
+                and not is_set_execution and not is_get_execution and not is_behavior_action):
             return self._execute_domain_object_command(command)
         
         return self._execute_action_or_route(verb, args, command)
@@ -284,13 +292,13 @@ class CLISession:
             rules_response = self._check_routed_rules_submit(command, result)
             if rules_response:
                 return rules_response, False
-            
+
             # Return as Instructions with navigation flag to trigger status tree display
             # This ensures behavior.action commands show the status tree just like individual commands
             return result, True
         except ValueError:
             return self._build_error_response(verb), False
-    
+
     def _check_routed_rules_submit(self, command: str, result) -> CLICommandResponse:
         if '.rules' not in command.lower():
             return None
@@ -318,7 +326,17 @@ class CLISession:
     def _build_response(self, result, is_navigation_command: bool, cli_terminated: bool) -> CLICommandResponse:
         if isinstance(result, CLICommandResponse):
             return result
-        
+
+        # get_execution: show one clear line (e.g. "shape.clarify: combine_next") instead of full dict
+        if isinstance(result, dict) and set(result.keys()) >= {'behavior', 'action', 'execution_mode'} and result.get('execution_mode') in ('combine_next', 'auto', 'skip', 'manual'):
+            b, a, m = result.get('behavior', ''), result.get('action', ''), result.get('execution_mode', 'manual')
+            if self.mode == 'json':
+                import json
+                output = json.dumps(result, indent=2)
+            else:
+                output = f"{b}.{a}: {m}"
+            return CLICommandResponse(output=output, status=result.get('status'), cli_terminated=cli_terminated)
+
         # Special handling for status command in JSON mode - wrap bot data consistently
         from bot.bot import Bot
         if isinstance(result, Bot) and self.mode == 'json':
@@ -581,7 +599,18 @@ class CLISession:
             command_parts = command_core.split('.')
             behavior_name = command_parts[0]
             action_name = command_parts[1] if len(command_parts) > 1 else None
-            
+            subcommand = command_parts[2] if len(command_parts) > 2 else None
+
+            if subcommand == 'set_execution' and action_name and hasattr(self.bot, 'set_action_execution'):
+                mode = args_string.strip().lower() or 'manual'
+                if mode not in ('combine_next', 'auto', 'skip', 'manual'):
+                    raise ValueError(f"Invalid execution mode: {mode}. Use combine_next, skip, or manual.")
+                return self.bot.set_action_execution(behavior_name, action_name, mode)
+
+            if subcommand == 'get_execution' and action_name and hasattr(self.bot, 'get_execution_mode'):
+                mode = self.bot.get_execution_mode(behavior_name, action_name)
+                return {'status': 'success', 'behavior': behavior_name, 'action': action_name, 'execution_mode': mode}
+
             if hasattr(self.bot, 'execute'):
                 return self.bot.execute(behavior_name, action_name, params)
         else:

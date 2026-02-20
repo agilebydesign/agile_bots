@@ -1,0 +1,7 @@
+{
+  "story_bot.shape.clarify": "combine_next",
+  "story_bot.shape.submit": "combine_next",
+  "story_bot.shape.strategy": "auto",
+  "story_bot.shape.build": "combine_next",
+  "story_bot.shape.validate": "manual"
+}

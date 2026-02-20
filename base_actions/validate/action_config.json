@@ -8,11 +8,11 @@
   "instructions": [
     "IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.",
     "",
-    "## Step 1: Scanner Violation Review",
+    "## Step 1: Run Scanners Then Review Violations",
     "",
     "{{scanner_output}}",
     "",
-    "Carefully review all scanner-reported violations as follows:",
+    "Run each scanner with the params above, then review the violations they report as follows:",
     "1. For each violation message, locate the corresponding element in the story graph.",
     "2. Open the relevant rule file and read all DO and DON'T examples thoroughly.",
     "3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).",

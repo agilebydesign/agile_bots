@@ -66,6 +66,11 @@ class Action:
         self.auto_confirm = self._base_config.get('auto_confirm', False)
         self.skip_confirm = self._base_config.get('skip_confirm', False)
         self.skip_confirm = self._base_config.get('skip_confirm', False)
+        # wait_until_complete: False = send current+next instructions together (clarify, strategy). True = set action_is_done false, send current, poll until true (build, validate).
+        if 'wait_until_complete' in self._base_config:
+            self.wait_until_complete = self._base_config['wait_until_complete']
+        else:
+            self.wait_until_complete = self._action_name in ('build', 'validate')
 
     def _derive_action_name_from_class(self) -> str:
         class_name = self.__class__.__name__
@@ -365,11 +370,6 @@ class Action:
             context.scope.apply_to_bot()
         
         instructions = self.instructions.copy()
-        if hasattr(context, 'scope') and context.scope:
-            instructions._scope = context.scope.copy() if hasattr(context.scope, 'copy') else context.scope
-            scope_type_val = getattr(getattr(context.scope, 'type', None), 'value', '')
-            if not include_scope and (context.scope.value or scope_type_val == 'showAll'):
-                include_scope = True  # Include scope in display when context has scope
         
         if self.action_config and 'instructions' in self.action_config:
             behavior_instructions = self.action_config.get('instructions', [])
