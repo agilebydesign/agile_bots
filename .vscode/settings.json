@@ -1,7 +1,7 @@
 {
   "jest.enable": false,
   
-  "python.languageServer": "None",
+  "python.languageServer": "Pylance",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.typeCheckingMode": "off",
   

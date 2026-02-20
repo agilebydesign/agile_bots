@@ -8,13 +8,13 @@
 const vscode = require("vscode");
 const BotPanel = require("./bot_panel.js");
 const BotPanelSidebarProvider = require("./bot_panel_sidebar.js");
-const { logToChannel, enableLogging } = require("./utils");
+const { Logger } = require("./utils");
 
 let outputChannel = null;
 
 function log(message) {  
   // pass the output channel to the logger utility for integrated logging
-  logToChannel(message, outputChannel);  
+  Logger.logToChannel(message, outputChannel);  
 }
 
 /**
@@ -28,10 +28,12 @@ function activate(context) {
   // ===== PERFORMANCE: Extension activation =====
   const perfActivateStart = performance.now();
 
-  try {   
+  try {     
+    Logger.initializeLogger(context.extensionPath); // Initialize logger with default log folder based on extension path
+
     if (typeof process.env.DEBUG_LOGGING !== 'undefined') {
       // override vscode setting with environment variable for easier debugging without changing user settings
-      enableLogging(process.env.DEBUG_LOGGING);
+      Logger.enableLogging(process.env.DEBUG_LOGGING);
     }
 
     // #region agent log

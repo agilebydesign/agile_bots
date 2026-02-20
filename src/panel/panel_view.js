@@ -9,20 +9,10 @@ const fs = require('fs');
 const os = require('os');
 const vscode = require("vscode");
 const branding = require('./branding');
+const { Logger } = require("./utils");
 
-// Shared log path - set when PanelView is created with bot path (workspace root)
-let _panelLogPath = null;
-
-function _getPanelLogPath() {
-    return _panelLogPath || path.join(process.cwd(), 'panel-debug.log');
-}
-
-function _perfLog(msg) {
-    const ts = new Date().toISOString();
-    try {
-        fs.appendFileSync(_getPanelLogPath(), `${ts} [PERF] ${msg}\n`);
-    } catch (_) {}
-    console.log(`[PERF] ${msg}`);
+function _perfLog(msg) {        
+    Logger.log(`[PERF] ${msg}`);
 }
 
 /**
@@ -75,7 +65,7 @@ class PanelView {
      * @param {string} message - Message to log
      */
     static _log(message) {
-        console.log(message);
+        Logger.log(message);
     }
     
     /**
@@ -96,9 +86,7 @@ class PanelView {
             // Derive workspace from bot path (bot is at workspace/bots/botname)
             const path = require('path');
             this._workspaceDir = path.resolve(this._botPath, '..', '..');
-            this._pythonProcess = null;
-            // Use workspace root for panel-debug.log (same as bot_panel)
-            _panelLogPath = path.join(this._workspaceDir, 'panel-debug.log');
+            this._pythonProcess = null;            
         }
         this._pendingResolve = null;
         this._pendingReject = null;
@@ -369,5 +357,4 @@ class PanelView {
     }
 }
 
-PanelView.getPanelLogPath = _getPanelLogPath;
 module.exports = PanelView;

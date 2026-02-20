@@ -8,10 +8,7 @@
 
 const escapes = require('./escapes');
 const paths = require('./paths');
-const Logger = require('./logger');
-
-// Create logger instance
-const logger = new Logger();
+const Logger = require('./logger.js');
 
 module.exports = {
     // HTML escaping
@@ -22,7 +19,5 @@ module.exports = {
     truncatePath: paths.truncatePath,
     
     // Logging
-    log: logger.log.bind(logger),
-    logToChannel: logger.logToChannel.bind(logger),
-    enableLogging: logger.enableLogging.bind(logger)
+    Logger: Logger
 };

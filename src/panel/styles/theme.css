@@ -11,12 +11,11 @@
     --accent-color: {{brandColor}};
     --border-color: {{brandColor}};
     --divider-color: {{brandColor}};
-    --hover-bg: {{isLightBg ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)'}};
-    
+    --hover-bg: {{hoverBg}};
     /* Input styling - chat-like appearance */
-    --input-bg: {{isLightBg ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)'}};
-    --input-bg-focus: {{isLightBg ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)'}};
-    --input-border: {{isLightBg ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)'}};
+    --input-bg: {{inputBg}};
+    --input-bg-focus: {{inputBgFocus}};
+    --input-border: {{inputBorder}};
     --input-border-focus: var(--accent-color);
     --input-padding: 6px;
     --input-border-radius: 6px;
@@ -188,11 +187,11 @@ img {
 }
 
 .story-node:hover {
-    background-color: rgba({{brandColorRgb}, 0.15); /* Faded brand color on hover */
+    background-color: rgba({{brandColorRgb}}, 0.15); /* Faded brand color on hover */
 }
 
 .story-node.selected {
-    background-color: rgba({{brandColorRgb}, 0.35); /* Distinct brand color when selected */
+    background-color: rgba({{brandColorRgb}}, 0.35); /* Distinct brand color when selected */
 }
 
 
@@ -206,7 +205,7 @@ img {
     transform: rotate(0deg);
     font-style: normal;
     min-width: var(--space-md);
-    color: {{brandColor} !important;
+    color: {{brandColor}} !important;
     font-size: 28px;
     margin-right: 8px;
 }

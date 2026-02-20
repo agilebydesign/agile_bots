@@ -13,17 +13,10 @@ const StoryMapView = require('./story_map_view');
 const InstructionsSection = require('./instructions_view');
 const fs = require('fs');
 const path = require('path');
+const { Logger } = require('./utils');
 
-// Simple file logger
 function log(msg) {
-    const timestamp = new Date().toISOString();
-    try {
-        const logFile = path.join(process.cwd(), 'panel-debug.log');
-        fs.appendFileSync(logFile, `${timestamp} ${msg}\n`);
-    } catch (e) {
-        // Ignore
-    }
-    console.log(msg);
+    Logger.log(msg);
 }
 
 class BotView extends PanelView {

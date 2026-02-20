@@ -10,7 +10,7 @@ const PanelView = require('./panel_view');
 const branding = require('./branding');
 const vscode = require('vscode');
 const path = require('path');
-const { escapeForHtml, escapeForJs, log } = require('./utils');
+const { escapeForHtml, escapeForJs, Logger } = require('./utils');
 
 class InstructionsSection extends PanelView {
     /**
@@ -37,7 +37,7 @@ class InstructionsSection extends PanelView {
      */
     async render() {
         const perfRenderStart = performance.now();
-        log('[InstructionsSection] [PERF] render() START');
+        Logger.log('[InstructionsSection] [PERF] render() START');
         
         // Prefer the most recent CLI response (navigation returns unified {bot,instructions})
         const lastResponse = PanelView._lastResponse || {};
@@ -71,10 +71,10 @@ class InstructionsSection extends PanelView {
                     botData?.behaviors?.current_action;
             } else {
                 // Only fetch if we have no cached data at all
-                log('[InstructionsSection] [PERF] No cached data, fetching status...');
+                Logger.log('[InstructionsSection] [PERF] No cached data, fetching status...');
                 const tFetchStart = performance.now();
                 const fetchedData = await this.execute('status');
-                log(`[InstructionsSection] [PERF] execute('status') for instructions: ${(performance.now() - tFetchStart).toFixed(0)}ms`);
+                Logger.log(`[InstructionsSection] [PERF] execute('status') for instructions: ${(performance.now() - tFetchStart).toFixed(0)}ms`);
                 instructionsData = fetchedData?.instructions || {};
                 currentActionFromResponse = currentActionFromResponse ||
                     fetchedData?.current_action ||
@@ -90,7 +90,7 @@ class InstructionsSection extends PanelView {
         }
         
         if (!instructionsData || Object.keys(instructionsData).length === 0) {
-            log(`[InstructionsSection] [PERF] render() DONE (empty): ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
+            Logger.log(`[InstructionsSection] [PERF] render() DONE (empty): ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
             return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">
@@ -497,7 +497,7 @@ class InstructionsSection extends PanelView {
         const promptContentStr = typeof this.promptContent === 'string' ? this.promptContent : (this.promptContent ? String(this.promptContent) : '');
         const escapedPromptContent = promptContentStr.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
         
-        log(`[InstructionsSection] [PERF] render() DONE: ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
+        Logger.log(`[InstructionsSection] [PERF] render() DONE: ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
         return `
     <div class="section card-primary">
         <div class="collapsible-section expanded">

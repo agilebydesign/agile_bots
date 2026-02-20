@@ -15,18 +15,7 @@ const StoryGraphAsyncSaveController = require('./story_graph/async_save_controll
 const branding = require('./branding');
 const fs = require('fs');
 const path = require('path');
-
-// Simple file logger - uses same path as bot_panel (workspace root)
-function log(msg) {
-    const timestamp = new Date().toISOString();
-    try {
-        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
-        fs.appendFileSync(logFile, `${timestamp} ${msg}\n`);
-    } catch (e) {
-        // Ignore
-    }
-    console.log(msg);
-}
+const { escapeForHtml, escapeForJs, Logger } = require('./utils');
 
 class StoryMapView extends PanelView {
     /**
@@ -63,39 +52,6 @@ class StoryMapView extends PanelView {
     }
     
     /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-    
-    /**
-     * Escape for JavaScript string.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeForJs(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-    }
-    
-    /**
      * Create scenario anchor ID from scenario name (matches synchronizer format).
      * 
      * @param {string} scenarioName - Scenario name
@@ -123,17 +79,16 @@ class StoryMapView extends PanelView {
     async render() {
         // ===== PERFORMANCE: Start story map rendering =====
         const perfRenderStart = performance.now();
-        log('[StoryMapView] [PERF] render() START');
+        Logger.log('[StoryMapView] [PERF] render() START');
         
         // Use cached botData from parent if available, otherwise fetch it
         const perfStatusStart = performance.now();
         const botData = this.parentView?.botData || await this.execute('status');
         const perfStatusEnd = performance.now();
         const dataSource = this.parentView?.botData ? 'cached' : 'fetched';
-        log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
-        // PanelView returns { bot: {...} }; BotView returns bot object directly. Support both.
-        const scopeData = (botData.bot?.scope || botData.scope) || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
+        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
         const perfIconsStart = performance.now();
@@ -166,9 +121,9 @@ class StoryMapView extends PanelView {
         const submitTestIconPath = getIcon('submit_tests.png');
         const submitCodeIconPath = getIcon('submit_code.png');
         const refreshIconPath = getIcon('refresh.png');
-        log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
-        log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
+        Logger.log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `
@@ -261,7 +216,7 @@ class StoryMapView extends PanelView {
         
         const linksHtml = scopeData.graphLinks && scopeData.graphLinks.length > 0
             ? scopeData.graphLinks.map(link =>
-                `<span onclick="openFile('${this.escapeForJs(link.url)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${this.escapeHtml(link.text).toLowerCase()}</span>`
+                `<span onclick="openFile('${escapeForJs(link.url)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${escapeForHtml(link.text).toLowerCase()}</span>`
             ).join('')
             : '';
         
@@ -271,8 +226,8 @@ class StoryMapView extends PanelView {
         const storyMapPath = workspaceDir ? `${workspaceDir}/docs/story/story-map/story-map.md` : '';
         
         const permanentLinksHtml = `
-            <span onclick="openFile('${this.escapeForJs(storyGraphPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
-            <span onclick="openFile('${this.escapeForJs(storyMapPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
+            <span onclick="openFile('${escapeForJs(storyGraphPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
+            <span onclick="openFile('${escapeForJs(storyMapPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
         `;
         
         // ===== PERFORMANCE: Content rendering =====
@@ -284,10 +239,10 @@ class StoryMapView extends PanelView {
         const actualViewMode = this.currentViewMode || 'Hierarchy';
         const isFilesView = actualViewMode === 'Files';
         const isIncrementView = actualViewMode === 'Increment';
-        log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
+        Logger.log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
         
         if (isIncrementView) {
-            // Render increment columns view with shared toolbar so buttons exist in DOM
+            // Render increment columns view (read-only)
             contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
@@ -302,12 +257,12 @@ class StoryMapView extends PanelView {
             const perfRootNodeStart = performance.now();
             const rootNode = this.renderRootNode(actionButtonsHtml);
             const perfRootNodeEnd = performance.now();
-            log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
+            Logger.log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
             
             const perfTreeStart = performance.now();
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
             const perfTreeEnd = performance.now();
-            log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
+            Logger.log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
             
             contentHtml = rootNode + treeHtml;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
@@ -316,9 +271,9 @@ class StoryMapView extends PanelView {
             contentSummary = 'all files';
         }
         const perfContentEnd = performance.now();
-        log(`[StoryMapView] [PERF] Content rendering: ${(perfContentEnd - perfContentStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Content rendering: ${(perfContentEnd - perfContentStart).toFixed(2)}ms`);
         
-        const filterValue = this.escapeHtml(scopeData.filter || '');
+        const filterValue = escapeForHtml(scopeData.filter || '');
         const hasFilter = filterValue.length > 0;
         
         // ===== PERFORMANCE: Final HTML assembly =====
@@ -2755,12 +2710,12 @@ class StoryMapView extends PanelView {
     <script>
 ${clientScript}    </script>`;
         const perfAssemblyEnd = performance.now();
-        log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
         
         // ===== PERFORMANCE: Log total render time =====
         const perfRenderEnd = performance.now();
         const totalRenderTime = (perfRenderEnd - perfRenderStart).toFixed(2);
-        log(`[StoryMapView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
+        Logger.log(`[StoryMapView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
         
         return result;
     }
@@ -2804,15 +2759,15 @@ ${clientScript}    </script>`;
             
             // Make epic name a hyperlink if document exists, clickable to select, double-click to edit
             // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-            const epicPath = this.escapeHtml(`story_graph."${epic.name}"`);
+            const epicPath = escapeForHtml(`story_graph."${epic.name}"`);
             const epicBehavior = epic.behavior_needed || '';
             const epicNameHtml = epicDocLink
-                ? `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" data-file-link="${this.escapeHtml(epicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
-                : `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
+                ? `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" data-file-link="${escapeForHtml(epicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(epic.name)}</span>`
+                : `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" style="cursor: pointer;">${escapeForHtml(epic.name)}</span>`;
             
             // Render test tube icon for epic test link
             const epicTestIcon = (epicTestLink && testTubeIconPath)
-                ? ` <span onclick="openFile('${this.escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
+                ? ` <span onclick="openFile('${escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
                 : '';
             
             // Epic nodes - no inline action buttons (all actions are in the toolbar)
@@ -2833,7 +2788,7 @@ ${clientScript}    </script>`;
                 // For nested: story_graph."Epic"."ParentSubEpic"."NestedSubEpic"
                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
                 const baseStoryGraphPath = parentStoryGraphPath || `story_graph."${epic.name}"`;
-                const subEpicPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"`);
+                const subEpicPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"`);
                 
                 // Determine which buttons to show for SubEpic based on children
                 const nestedSubEpics = subEpic.sub_epics || [];
@@ -2846,14 +2801,14 @@ ${clientScript}    </script>`;
                 const subEpicBehavior = subEpic.behavior_needed || '';
                 const subEpicBehaviors = subEpic.behaviors_needed ? JSON.stringify(subEpic.behaviors_needed) : `["${subEpicBehavior}"]`;
                 const subEpicNameHtml = subEpicDocLink
-                    ? `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" data-file-link="${this.escapeHtml(subEpicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
-                    : `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
+                    ? `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" data-file-link="${escapeForHtml(subEpicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`
+                    : `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" style="cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`;
                 
                 // Only render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick HTML parse errors)
                 const subEpicTestIcon = testTubeIconPath && (subEpic.test_files?.length > 0 || subEpicTestLink)
                     ? (subEpic.test_files && subEpic.test_files.length > 0
-                        ? ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                        : ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([subEpicTestLink.url]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
+                        ? ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
+                        : ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([subEpicTestLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
                     : '';
                 
                 // No inline action buttons (all actions are in the toolbar)
@@ -2885,7 +2840,7 @@ ${clientScript}    </script>`;
                                 
                                 // Build story path for edit mode - use full parent chain for nested sub-epics
                                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                const storyPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"`);
+                                const storyPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"`);
                                 
                                 html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
                                 
@@ -2904,19 +2859,19 @@ ${clientScript}    </script>`;
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
                                 if (storyDocLink) {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" data-file-link="${this.escapeHtml(storyDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" data-file-link="${escapeForHtml(storyDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
                                 } else {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
                                 }
                                 
                                 // Render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick parse errors)
                                 if (testTubeIconPath && (story.test_files?.length > 0 || (story.links && story.links.find(l => l.icon === 'test_tube')))) {
                                     if (story.test_files && story.test_files.length > 0) {
-                                        html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(story.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                        html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(story.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                     } else {
                                         const testLink = story.links.find(l => l.icon === 'test_tube');
                                         if (testLink) {
-                                            html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([testLink.url]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                            html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([testLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                         }
                                     }
                                 }
@@ -2936,25 +2891,25 @@ ${clientScript}    </script>`;
                                         // Create scenario anchor ID from scenario name (matches synchronizer format)
                                         const scenarioAnchor = this.createScenarioAnchor(scenario.name);
                                         // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                        const scenarioPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
+                                        const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
                                         
                                         // Link scenario name to story file with scenario anchor
                                         // Make scenarios draggable and renameable like other nodes
                                         const scenarioBehavior = scenario.behavior_needed || '';
                                         if (storyDocLink) {
                                             const scenarioLink = `${storyDocLink.url}#${scenarioAnchor}`;
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" data-file-link="${this.escapeHtml(scenarioLink)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
+                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" data-file-link="${escapeForHtml(scenarioLink)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
                                         } else {
                                             // No story doc link - just display scenario name with drag/rename support
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
+                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
                                         }
                                         
                                         // Render test tube icon: open all matching test files when test_files set, else single test_file (data attr avoids JSON-in-onclick parse errors)
                                         if (testTubeIconPath && (scenario.test_files?.length > 0 || scenario.test_file)) {
                                             if (scenario.test_files && scenario.test_files.length > 0) {
-                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                                html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                             } else {
-                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([scenario.test_file]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
+                                                html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([scenario.test_file]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
                                             }
                                         }
                                         
@@ -3020,7 +2975,7 @@ ${clientScript}    </script>`;
             : '';
 
         const filterHint = filterText
-            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${this.escapeHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
+            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
             : '';
 
         let html = `
@@ -3039,7 +2994,7 @@ ${clientScript}    </script>`;
                     ${unallocatedStories.length === 0
                         ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(none)</div>`
                         : unallocatedStories.map(name => {
-                            const esc = this.escapeHtml(name);
+                            const esc = escapeForHtml(name);
                             return `<div class="story-node" draggable="true" data-node-type="story" data-node-name="${esc}" data-path="story_graph.unallocated.${esc}" data-inc-source="" data-position="0" style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px; cursor: grab;">
                                 ${storyIcon}<span style="flex: 1; word-wrap: break-word; pointer-events: none;">${esc}</span>
                             </div>`;
@@ -3052,7 +3007,7 @@ ${clientScript}    </script>`;
 
         for (const increment of displayIncrements) {
             const incName = increment.name;
-            const escapedName = this.escapeHtml(incName);
+            const escapedName = escapeForHtml(incName);
             const jsName = incName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
             const stories = increment.stories || [];
             const sortedStories = [...stories].sort((a, b) =>
@@ -3080,7 +3035,7 @@ ${clientScript}    </script>`;
                             ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(no stories)</div>`
                             : sortedStories.map((story, si) => {
                                 const storyName = typeof story === 'string' ? story : (story.name || '');
-                                const escapedStoryName = this.escapeHtml(storyName);
+                                const escapedStoryName = escapeForHtml(storyName);
                                 return `
                                     <div class="story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}" style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px; cursor: grab;">
                                         ${storyIcon}
@@ -3126,7 +3081,7 @@ ${clientScript}    </script>`;
      */
     renderFileList(files) {
         return '<div style="margin-top: 5px;">' + files.map(file => 
-            `<div style="margin-left: 5px; font-family: monospace; font-size: 12px; margin-top: 2px;">- ${this.escapeHtml(file.path)}</div>`
+            `<div style="margin-left: 5px; font-family: monospace; font-size: 12px; margin-top: 2px;">- ${escapeForHtml(file.path)}</div>`
         ).join('') + '</div>';
     }
     
@@ -3151,4 +3106,3 @@ ${clientScript}    </script>`;
 }
 
 module.exports = StoryMapView;
-

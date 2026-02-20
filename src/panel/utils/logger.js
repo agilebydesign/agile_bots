@@ -13,11 +13,24 @@ class Logger {
     static logFilePath = "";
     static debugLogEnabled = "";
 
-    constructor() {        
-        Logger.logFilePath = path.join(vscode.workspace.getConfiguration('agileBotsPanel').get('logFolder', "./logs"), 'panel-debug.log');             
+    constructor() {}
+
+    /**
+     * Initialize static Logger with a default folder passed from extension host.
+     * @param {string} defaultLogFolder 
+     */
+    static initializeLogger(defaultLogFolder) {
+        var configLogFolder = vscode.workspace.getConfiguration('agileBotsPanel').get('logFolder');
+        if (typeof configLogFolder === 'undefined' || configLogFolder === "") {
+            configLogFolder = path.join(defaultLogFolder, 'logs');
+        }
+        Logger.logFilePath = path.join(configLogFolder, 'panel-debug.log');   
+
         if (typeof process.env.PWD !== 'undefined') {
+            // overwite with debug config
             Logger.logFilePath = path.join(process.env.PWD, 'logs', 'panel-debug.log');
         }
+
         Logger.debugLogEnabled = vscode.workspace.getConfiguration('agileBotsPanel').get('enableDebugLog', false) 
     }    
 
@@ -25,7 +38,7 @@ class Logger {
      * Set this to true to enable logging and overwrite VS Code setting - "Agile Bots Panel: Enable Debug Log". 
      * @param {boolean} enableLogging 
      */
-    enableLogging(enableLogging) {
+    static enableLogging(enableLogging) {
         Logger.debugLogEnabled = enableLogging;
     }
 
@@ -35,7 +48,7 @@ class Logger {
      * 
      * @param {string} msg - Message to log
      */
-    log(msg) {
+    static log(msg) {
         if (Logger.debugLogEnabled === false) return;
         const timestamp = new Date().toISOString();
         try {        
@@ -53,7 +66,7 @@ class Logger {
      * @param {string} message - Message to log
      * @param {Object|null} outputChannel - VS Code output channel (optional)
      */
-    logToChannel(message, outputChannel = null) {
+    static logToChannel(message, outputChannel = null) {
         const timestamp = new Date().toISOString();
         const logMessage = `[${timestamp}] ${message}`;
         console.log(logMessage);
