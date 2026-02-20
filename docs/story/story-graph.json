@@ -13336,30 +13336,41 @@
                       "collaborators": [
                         "Content"
                       ]
+                    },
+                    {
+                      "name": "Get save file",
+                      "collaborators": [
+                        "Path"
+                      ]
+                    },
+                    {
+                      "name": "Execution gates on save file watch",
+                      "collaborators": [
+                        "SaveFileWatcher",
+                        "Debounce",
+                        "Next Action"
+                      ]
                     }
                   ],
                   "module": "actions",
                   "_source_path": "Invoke Bot.Invoke Bot Directly"
                 },
                 {
-                  "name": "Base Action",
+                  "name": "SaveFileWatcher",
                   "responsibilities": [
                     {
-                      "name": "Inject Instructions",
+                      "name": "Watch save file for writes",
                       "collaborators": [
-                        "Behavior"
+                        "Path",
+                        "File System"
                       ]
                     },
                     {
-                      "name": "Load Relevant Content + Inject Into Instructions",
+                      "name": "Report when file stable past debounce",
                       "collaborators": [
-                        "Content"
-                      ]
-                    },
-                    {
-                      "name": "Save content changes",
-                      "collaborators": [
-                        "Content"
+                        "Path",
+                        "Debounce",
+                        "Boolean"
                       ]
                     }
                   ],
@@ -14057,13 +14068,120 @@
                       "story_type": "user",
                       "users": [],
                       "test_class": null,
-                      "scenarios": [],
+                      "scenarios": [
+                        {
+                          "name": "Panel shows actions and execution toggle per action",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior is loaded with at least one Action\nWhen User opens that Behavior in Panel\nThen Panel invokes CLI and CLI invokes Bot and Bot loads Behavior and Actions\nAnd Panel shows the list of Actions for that Behavior and a toggle button group (Auto | Skip | Manual) per Action",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "User sets action to Skip via toggle and executes then Panel skips that action",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior with at least two Actions is selected in Panel\nAnd the second Action has execution set to Skip\nWhen User clicks Submit Instructions\nThen Panel invokes CLI and CLI invokes Bot and Bot runs the Behavior and skips that action",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "User sets action to Auto via toggle and executes then Panel runs it after previous completes",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior with at least two Actions is selected in Panel\nAnd the second Action has execution set to Auto\nWhen User clicks Submit Instructions\nThen Panel invokes CLI and CLI invokes Bot and Bot runs the Behavior and executes that action as soon as previous action completes",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "User sets action to Manual via toggle and executes then Panel requires Execute click",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior with at least two Actions is selected in Panel\nAnd the second Action has execution set to Manual\nWhen User clicks Submit Instructions\nThen Panel invokes CLI and CLI invokes Bot and Bot runs the Behavior and requires User to submit instructions for that action",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "User sets action execution from Panel then Panel invokes CLI and CLI persists",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior and action are selected in Panel (e.g. shape.clarify)\nWhen User sets that action execution to auto via Panel toggle\nThen Panel invokes CLI and CLI invokes Bot (e.g. cli.behaviors.shape.clarify.set_execution auto)\nAnd Bot persists the execution setting for that Behavior and Action\nAnd CLI reports completion and Panel watches CLI for status and shows completion or failed",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "User runs set_execution from CLI then CLI persists and reports to terminal",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given User is in CLI (no Panel)\nWhen User runs cli.behaviors.shape.clarify.set_execution auto\nThen CLI invokes Bot and Bot persists that Behavior and Action to auto execution\nAnd CLI reports completion or failed to the terminal so the flow works without Panel",
+                          "context_source": {"file": "behavior-action-ux-improvements-exploration.md", "section": "Configure Action Execution"}
+                        },
+                        {
+                          "name": "Persisted execution setting is used when User runs the behavior",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given User has run cli.behaviors.shape.clarify.set_execution skip\nWhen User runs the clarify action (Panel invokes CLI and CLI invokes Bot, or User runs from CLI)\nThen Bot uses the persisted setting for that Behavior and Action and skips that action",
+                          "context_source": {"type": "inferred", "basis": "Persistence of execution setting"}
+                        },
+                        {
+                          "name": "When Clarification is Auto and User executes behavior then it runs automatically",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior has Clarification action\nAnd Clarification has execution set to Auto\nWhen User executes that Behavior\nThen Panel invokes CLI and CLI invokes Bot and Bot runs the Behavior and runs Clarification automatically without User clicking Execute",
+                          "context_source": {"type": "inferred", "basis": "Auto execution runs action when behavior is executed"}
+                        },
+                        {
+                          "name": "When Strategy is Auto and User executes behavior then it runs automatically",
+                          "sequential_order": 9.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior has Strategy action and previous action (e.g. Clarification) has a save_file property (e.g. clarification.json)\nAnd Strategy has execution set to Auto\nWhen User executes that Behavior\nThen Panel invokes CLI and CLI invokes Bot and Bot runs the current action like normal and when that action saves to its save_file CLI debounce-checks then Bot runs next action (Strategy)\nAnd Panel watches CLI for status",
+                          "context_source": {"type": "inferred", "basis": "Chained auto: run action, check action save_file (property), debounce, run next"}
+                        },
+                        {
+                          "name": "When last action of behavior is Auto then Auto does nothing",
+                          "sequential_order": 10.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior whose last action (e.g. render) has execution set to Auto\nWhen User executes that Behavior and Bot reaches that last action\nThen Bot runs that action like normal\nAnd there is no next action so Auto does nothing (no chained run)",
+                          "context_source": {"type": "inferred", "basis": "Last action of behavior with Auto does nothing"}
+                        },
+                        {
+                          "name": "Combined instructions deduplicate shared content and include combining text",
+                          "sequential_order": 11.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior with actions Clarify, Strategy, Build in order\nAnd Clarify and Strategy have execution set to Combine (combine_next)\nAnd User navigates to shape.clarify and submits instructions\nWhen Bot combines instructions for Clarify and Strategy\nThen Bot shows scope in the combined instructions only once\nAnd Bot shows clarification, questions and answers, assumptions, evidence, strategy decisions, and choices only once\nAnd Bot lists context files and instructions only once\nAnd Bot lists the overarching behavior instructions only once at the top\nAnd Bot includes text at the top or between each Action that clearly indicates multiple actions are combined and performed one after another",
+                          "context_source": {"file": "Configure Action Execution.md", "section": "Combined instruction formatting"}
+                        },
+                        {
+                          "name": "Build and Validate combined rules described once",
+                          "sequential_order": 12.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "steps": "Given a Behavior with Build and Validate actions\nAnd Build and Validate have execution set to Combine (combine_next)\nWhen Bot combines instructions for Build and Validate\nThen Bot mentions rules and describes them only once\nAnd Bot refers to those rules in the other action instead of repeating the full description",
+                          "context_source": {"file": "Configure Action Execution.md", "section": "Combined instruction formatting"}
+                        }
+                      ],
                       "acceptance_criteria": [
-                        {"name": "WHEN User opens behavior in Panel THEN Panel shows list of actions for that behavior AND Panel shows a toggle button group (Auto | Skip | Manual) per action", "text": "WHEN User opens behavior in Panel THEN Panel shows list of actions for that behavior AND Panel shows a toggle button group (Auto | Skip | Manual) per action", "sequential_order": 1.0},
-                        {"name": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel skips that action", "text": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel skips that action", "sequential_order": 2.0},
-                        {"name": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel executes that action as soon as previous action completes", "text": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel executes that action as soon as previous action completes", "sequential_order": 3.0},
-                        {"name": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel requires User to click Execute for that action", "text": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel requires User to click Execute for that action", "sequential_order": 4.0},
-                        {"name": "WHEN User runs cli.behaviors.shape.clarify.set_execution auto THEN CLI sets that action to auto execution", "text": "WHEN User runs cli.behaviors.shape.clarify.set_execution auto THEN CLI sets that action to auto execution", "sequential_order": 5.0}
+                        {"name": "WHEN User selects behavior in Panel and clicks Submit Instructions THEN Panel shows list of actions and toggle (Auto | Skip | Manual) per action with current state toggled on", "text": "WHEN User selects behavior in Panel and clicks Submit Instructions THEN Panel shows list of actions and toggle (Auto | Skip | Manual) per action with current state toggled on", "sequential_order": 1.0},
+                        {"name": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and skips that action", "text": "WHEN User sets action to Skip via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and skips that action", "sequential_order": 2.0},
+                        {"name": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and executes that action as soon as previous action completes", "text": "WHEN User sets action to Auto via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and executes that action as soon as previous action completes", "sequential_order": 3.0},
+                        {"name": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and requires User to submit instructions for that action", "text": "WHEN User sets action to Manual via toggle AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs Behavior and requires User to submit instructions for that action", "sequential_order": 4.0},
+                        {"name": "WHEN User sets action execution from Panel THEN Panel invokes CLI and CLI invokes Bot AND Bot persists the setting for that Behavior and Action AND CLI reports completion AND Panel watches CLI for status", "text": "WHEN User sets action execution from Panel THEN Panel invokes CLI and CLI invokes Bot AND Bot persists the setting for that Behavior and Action AND CLI reports completion AND Panel watches CLI for status", "sequential_order": 5.0},
+                        {"name": "WHEN User runs set_execution from CLI (no Panel) THEN CLI invokes Bot and Bot persists the action execution setting AND CLI reports completion or failed to the terminal", "text": "WHEN User runs set_execution from CLI (no Panel) THEN CLI invokes Bot and Bot persists the action execution setting AND CLI reports completion or failed to the terminal", "sequential_order": 6.0},
+                        {"name": "WHEN an action (e.g. Clarification) is set to Auto AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs that action automatically without User clicking Execute", "text": "WHEN an action (e.g. Clarification) is set to Auto AND User executes that behavior THEN Panel invokes CLI and CLI invokes Bot and Bot runs that action automatically without User clicking Execute", "sequential_order": 7.0},
+                        {"name": "WHEN a following action (e.g. Strategy) is set to Auto AND User executes that behavior THEN Bot runs current action like normal AND each action has a save_file property AND CLI debounce-checks that save_file THEN Bot runs next action AND Panel invokes CLI and CLI invokes Bot and Panel watches status", "text": "WHEN a following action (e.g. Strategy) is set to Auto AND User executes that behavior THEN Bot runs current action like normal AND each action has a save_file property (e.g. clarification.json) AND CLI debounce-checks that save_file THEN Bot runs next action AND Panel invokes CLI and CLI invokes Bot and Panel watches status", "sequential_order": 8.0},
+                        {"name": "WHEN the last action of a behavior has execution set to Auto THEN Bot runs that action like normal AND Auto does nothing (no next action to run)", "text": "WHEN the last action of a behavior has execution set to Auto THEN Bot runs that action like normal AND Auto does nothing (no next action to run)", "sequential_order": 9.0},
+                        {"name": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot shows scope in the instructions only once", "text": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot shows scope in the instructions only once", "sequential_order": 10.0},
+                        {"name": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot shows clarification, questions and answers, assumptions, evidence, strategy decisions, and choices only once", "text": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot shows clarification, questions and answers, assumptions, evidence, strategy decisions, and choices only once", "sequential_order": 11.0},
+                        {"name": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot lists context files and instructions only once", "text": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot lists context files and instructions only once", "sequential_order": 12.0},
+                        {"name": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot lists the overarching behavior instructions only once at the top", "text": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot lists the overarching behavior instructions only once at the top", "sequential_order": 13.0},
+                        {"name": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot includes text at the top or between each Action that clearly indicates multiple actions are combined and performed one after another", "text": "WHEN Bot combines Action Instructions because of Combine Next THEN Bot includes text at the top or between each Action that clearly indicates multiple actions are combined and performed one after another", "sequential_order": 14.0},
+                        {"name": "WHEN Bot combines Build and Validate actions (or both appear in a combined block) THEN Bot mentions rules and describes them only once AND Bot refers to those rules in the other action instead of repeating the full description", "text": "WHEN Bot combines Build and Validate actions (or both appear in a combined block) THEN Bot mentions rules and describes them only once AND Bot refers to those rules in the other action instead of repeating the full description", "sequential_order": 15.0}
                       ],
                       "behavior": null
                     },
