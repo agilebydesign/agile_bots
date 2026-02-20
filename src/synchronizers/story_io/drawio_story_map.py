@@ -1035,25 +1035,53 @@ class DrawIOStoryMap(StoryMap):
                 parent_from_attr.add_child(node)
                 continue
 
-        # ── Phase 2a: Position-based sub-epic → sub-epic nesting ──
-        # For orphan sub-epics without a hierarchical ID (e.g. user-added
-        # cells with ids like "3"), try to find a containing *sub-epic*
-        # that already has a parent.  Prefer the narrowest container so
-        # "Load Bot" (x 559–1025) nests under "Initialize Bot" (x 560–1955)
-        # rather than directly under the epic.
+        # ── Phase 1b: Reparent sub-epics by vertical stacking (bar above = parent) ──
+        # When cell_id assigns sub-epics to the epic in Phase 1, reparent so the bar directly
+        # above (largest Y among bars above that contain this one) is the parent.
+        for se in sub_epics:
+            parent = getattr(se, '_parent', None)
+            if not parent or not isinstance(parent, DrawIOEpic):
+                continue
+            se_cx = se.boundary.center.x
+            se_y = se.boundary.y
+            best_parent_se = None
+            best_y = -1.0
+            for candidate_se in parent.get_sub_epics():
+                if candidate_se is se:
+                    continue
+                cand_y = candidate_se.boundary.y
+                if cand_y >= se_y:
+                    continue
+                cl = candidate_se.boundary.x
+                cr = candidate_se.boundary.x + candidate_se.boundary.width
+                if cl <= se_cx <= cr and cand_y > best_y:
+                    best_y = cand_y
+                    best_parent_se = candidate_se
+            if best_parent_se:
+                parent._children.remove(se)
+                se._parent = None
+                best_parent_se.add_child(se)
+
+        # ── Phase 2a: Orphan sub-epics → nest under the bar directly above ──
+        # For orphan sub-epics (no hierarchical ID), find a sub-epic that already has a parent
+        # and is directly above (largest Y among those above that contain this one).
         for se in sub_epics:
             if se._parent is not None:
                 continue
             se_cx = se.boundary.center.x
+            se_y = se.boundary.y
             best_parent_se = None
-            best_width = float('inf')
+            best_y = -1.0
             for candidate_se in sub_epics:
                 if candidate_se is se or candidate_se._parent is None:
                     continue
+                cand_y = candidate_se.boundary.y
+                if cand_y >= se_y:
+                    continue
                 cl = candidate_se.boundary.x
                 cr = candidate_se.boundary.x + candidate_se.boundary.width
-                if cl <= se_cx <= cr and candidate_se.boundary.width < best_width:
-                    best_width = candidate_se.boundary.width
+                if cl <= se_cx <= cr and cand_y > best_y:
+                    best_y = cand_y
                     best_parent_se = candidate_se
             if best_parent_se:
                 best_parent_se.add_child(se)
@@ -1076,6 +1104,48 @@ class DrawIOStoryMap(StoryMap):
                         best_epic = epic
             if best_epic:
                 best_epic.add_child(se)
+
+        # ── Phase 2c: Reparent sub-epics by vertical stacking (higher bar = parent of lower bar) ──
+        # Runs after Phase 2b so flat-ID sub-epics get nested. The bar directly above (smaller Y)
+        # whose X span contains this bar is the parent. Among bars above that contain this one,
+        # pick the one with largest Y = immediate parent in the stack. Repeat for multiple levels.
+        def _reparent_sub_epics_under_containing_sibling():
+            changed = False
+            by_y = sorted(sub_epics, key=lambda n: (getattr(n.boundary, 'y', 0), getattr(n.boundary, 'x', 0)))
+            for se in by_y:
+                parent = getattr(se, '_parent', None)
+                if not parent:
+                    continue
+                if isinstance(parent, DrawIOEpic):
+                    siblings = parent.get_sub_epics()
+                elif hasattr(parent, 'get_sub_epics'):
+                    siblings = parent.get_sub_epics()
+                else:
+                    continue
+                se_cx = se.boundary.center.x
+                se_y = se.boundary.y
+                best_parent_se = None
+                best_y = -1.0
+                for candidate_se in siblings:
+                    if candidate_se is se:
+                        continue
+                    cand_y = candidate_se.boundary.y
+                    if cand_y >= se_y:
+                        continue
+                    cl = candidate_se.boundary.x
+                    cr = candidate_se.boundary.x + candidate_se.boundary.width
+                    if cl <= se_cx <= cr and cand_y > best_y:
+                        best_y = cand_y
+                        best_parent_se = candidate_se
+                if best_parent_se:
+                    parent._children.remove(se)
+                    se._parent = None
+                    best_parent_se.add_child(se)
+                    changed = True
+            return changed
+
+        while _reparent_sub_epics_under_containing_sibling():
+            pass
 
         # ── Phase 3: Position-based story → sub-epic assignment ──
         # Always use position for stories (never IDs) because the visual

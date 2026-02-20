@@ -272,13 +272,16 @@ class StoryNode(ABC):
                 self._bot.story_map.remove_story_from_all_increments(node_name)
             parent._children.remove(self)
             parent._resequence_children()
-            
-            # Save changes from PARENT
-            parent.save()
-            
+            # If the story group is now empty, remove it from the sub-epic
+            if len(parent._children) == 0:
+                sub_epic = parent._parent
+                if sub_epic is not None and hasattr(sub_epic, '_children'):
+                    sub_epic._children.remove(parent)
+                    sub_epic.save()
+            else:
+                parent.save()
             elapsed = time.time() - start_time
             print(f"[DELETE TIMING] Deleted {node_type} '{node_name}' in {elapsed:.3f}s")
-            
             return {'node_type': node_type, 'node_name': node_name, 'operation': 'delete', 'children_deleted': children_count}
         
         # Always cascade delete
@@ -422,9 +425,14 @@ class StoryNode(ABC):
         
         # Perform the move
         _log(f"[move_to] BEFORE MOVE - actual_target type: {type(actual_target).__name__}, name: {actual_target.name}, children count: {len(actual_target._children)}")
+        old_parent = self._parent
         self._parent._children.remove(self)
         self._parent._resequence_siblings()
-        old_parent = self._parent
+        # If we moved the last story out of a StoryGroup, remove the empty group from the sub-epic
+        if isinstance(old_parent, StoryGroup) and len(old_parent._children) == 0:
+            sub_epic = old_parent._parent
+            if sub_epic is not None and hasattr(sub_epic, '_children'):
+                sub_epic._children.remove(old_parent)
         self._parent = actual_target
         if position is not None:
             adjusted_position = min(position, len(actual_target.children))

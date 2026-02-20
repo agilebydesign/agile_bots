@@ -1,0 +1,32 @@
+{
+  "matched_count": 236,
+  "removed_sub_epics": [
+    {
+      "name": "Filter Stories",
+      "parent": "Filter Scope"
+    }
+  ],
+  "moved_stories": [
+    {
+      "name": "Add Filter Part To File Scope",
+      "from_parent": "Filter Stories",
+      "to_parent": "Filter Scope"
+    },
+    {
+      "name": "Filter File Scope  By Files",
+      "from_parent": "Filter Stories",
+      "to_parent": "Filter Scope"
+    },
+    {
+      "name": "Remove Filter Part From File Scope",
+      "from_parent": "Filter Stories",
+      "to_parent": "Filter Scope"
+    }
+  ],
+  "large_deletions": {
+    "missing_epics": [],
+    "missing_sub_epics": [
+      "Filter Stories"
+    ]
+  }
+}

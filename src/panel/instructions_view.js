@@ -985,6 +985,13 @@ class InstructionsSection extends PanelView {
         return html;
     }
 
+    _formatDiagramInstructions(value) {
+        if (!value || !value.diagrams) return '';
+        const DiagramSectionView = require('./diagram_section_view');
+        const view = new DiagramSectionView(value.diagrams);
+        return view.renderSection();
+    }
+
     _formatRenderConfig(config) {
         if (!config) return '';
 

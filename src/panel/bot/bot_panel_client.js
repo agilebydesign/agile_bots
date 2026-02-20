@@ -2337,3 +2337,54 @@ const vscode = acquireVsCodeApi();
                 console.log('[WebView] Revert rename command received but not needed');
             }
         });
+        
+        // Switch between Hierarchy, Increment, and Files views
+        window.switchViewMode = function(viewMode) {
+            console.log('[switchViewMode] Switching to', viewMode);
+            
+            // Get current view from active button
+            var previousView = 'Hierarchy';
+            var btnHierarchy = document.getElementById('btn-view-hierarchy');
+            var btnIncrement = document.getElementById('btn-view-increment');
+            var btnFiles = document.getElementById('btn-view-files');
+            
+            if (btnHierarchy && btnHierarchy.style.color && !btnHierarchy.style.color.includes('faded')) previousView = 'Hierarchy';
+            else if (btnIncrement && btnIncrement.style.color && !btnIncrement.style.color.includes('faded')) previousView = 'Increment';
+            else if (btnFiles && btnFiles.style.color && !btnFiles.style.color.includes('faded')) previousView = 'Files';
+            
+            // Update button styles to reflect selected state
+            if (btnHierarchy) {
+                var isSelected = viewMode === 'Hierarchy';
+                btnHierarchy.style.color = isSelected ? 'var(--text-color, #fff)' : 'var(--text-color-faded)';
+            }
+            if (btnIncrement) {
+                var isSelected = viewMode === 'Increment';
+                btnIncrement.style.color = isSelected ? 'var(--text-color, #fff)' : 'var(--text-color-faded)';
+            }
+            if (btnFiles) {
+                var isSelected = viewMode === 'Files';
+                btnFiles.style.color = isSelected ? 'var(--text-color, #fff)' : 'var(--text-color-faded)';
+            }
+            
+            // Send message to extension to switch view
+            if (typeof vscode !== 'undefined') {
+                vscode.postMessage({
+                    command: 'switchViewMode',
+                    viewMode: viewMode
+                });
+            }
+        };
+        
+        // Switch include level (Stories, Domain, criteria, Scenarios, Examples, Tests, Code)
+        window.switchIncludeLevel = function(level) {
+            var levels = ['stories', 'domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code'];
+            var ids = { stories: 'btn-include-stories', domain_concepts: 'btn-include-domain', acceptance: 'btn-include-acceptance', scenarios: 'btn-include-scenarios', examples: 'btn-include-examples', tests: 'btn-include-tests', code: 'btn-include-code' };
+            for (var i = 0; i < levels.length; i++) {
+                var btn = document.getElementById(ids[levels[i]]);
+                if (btn) {
+                    var isSelected = level === levels[i];
+                    btn.style.color = isSelected ? 'var(--text-color, #fff)' : 'var(--text-color-faded)';
+                }
+            }
+            if (typeof updateIncludeLevel === 'function') updateIncludeLevel(level);
+        };

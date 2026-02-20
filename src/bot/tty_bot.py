@@ -131,6 +131,12 @@ class TTYBot(BaseBotAdapter, TTYAdapter):
         
         if self.bot.behaviors:
             lines.append(self.progress)
+            if hasattr(self.bot, 'get_execution_settings'):
+                settings = self.bot.get_execution_settings()
+                if settings:
+                    parts = [f"{k}={v}" for k, v in sorted(settings.items())]
+                    lines.append("")
+                    lines.append(self.add_bold('Execution:') + " " + ", ".join(parts))
             lines.append(self.run_instructions)
         
         lines.append(self.commands)

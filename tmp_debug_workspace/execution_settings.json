@@ -1,0 +1,5 @@
+{
+  "story_bot.shape.clarify": "combine_next",
+  "story_bot.shape.strategy": "combine_next",
+  "story_bot.shape.build": "combine_next"
+}

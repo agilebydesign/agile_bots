@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 from pathlib import Path
 from typing import Dict, Any, List, Tuple, Optional
 import json
@@ -12,6 +13,8 @@ from navigation import NavigationResult
 from exit_result import ExitResult
 from utils import read_json_file
 from story_graph import StoryMap
+
+logger = logging.getLogger(__name__)
 __all__ = ['Bot', 'BotResult', 'Behavior']
 
 class BotResult:
@@ -608,8 +611,51 @@ class Bot:
                     setattr(context, 'scope', self._scope)
                     include_scope = True  # Include scope in display when we have active scope
             
+            execution_mode = self.get_execution_mode(behavior_name, action.action_name)
+            current_action_name = action.action_name
+            action_names = behavior.action_names
+
+            # Skip: don't process this action; advance to next (and past any consecutive skips), then run that one
+            if execution_mode == 'combine_next':
+                pass  # normalize: 'auto' read from file becomes combine_next in get_execution_mode
+            if execution_mode == 'skip':
+                try:
+                    idx = action_names.index(current_action_name)
+                    while idx + 1 < len(action_names):
+                        idx += 1
+                        next_name = action_names[idx]
+                        if self.get_execution_mode(behavior_name, next_name) != 'skip':
+                            behavior.actions.navigate_to(next_name)
+                            self.behaviors.save_state()
+                            action = behavior.actions.current
+                            current_action_name = action.action_name
+                            context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
+                            if params:
+                                if 'scope' in params and isinstance(params.get('scope'), dict):
+                                    from scope.scope import Scope, ScopeType
+                                    scope_dict = params.pop('scope', {})
+                                    scope = Scope(self.workspace_directory, self.bot_paths)
+                                    scope_type = ScopeType(scope_dict.get('type', 'all'))
+                                    scope_value = scope_dict.get('value', [])
+                                    if not isinstance(scope_value, list):
+                                        scope_value = [scope_value]
+                                    scope.filter(scope_type, scope_value)
+                                    setattr(context, 'scope', scope)
+                                for key, value in params.items():
+                                    setattr(context, key, value)
+                            elif hasattr(context, 'scope'):
+                                self._scope.load()
+                                if self._scope.value or self._scope.type.value == 'showAll':
+                                    setattr(context, 'scope', self._scope)
+                                    include_scope = True
+                            execution_mode = self.get_execution_mode(behavior_name, current_action_name)
+                            break
+                except (ValueError, IndexError):
+                    pass
+
+            # Run the current action: get its instructions only. No combining on navigation.
+            # Combining happens only on submit (submit_current_action).
             instructions = action.get_instructions(context, include_scope=include_scope)
-            
             return instructions
         except Exception as e:
             return {
@@ -617,6 +663,131 @@ class Bot:
                 'message': f'Error executing {behavior_name}.{action.action_name}: {str(e)}'
             }
     
+    def _append_next_action_instructions_if_combine_next(
+        self,
+        behavior,
+        behavior_name: str,
+        current_action_name: str,
+        action,
+        instructions,
+        context=None,
+        include_scope: bool = False,
+    ) -> Optional[str]:
+        """Combine with next: run current then run the next one too. Only Skip is skipped. Returns last appended action name, or None.
+        When combining: scope, clarification, context files, behavior instructions shown only once (in first action).
+        Subsequent actions use action-only content. Combining text added at top and between actions."""
+        if self.get_execution_mode(behavior_name, current_action_name) != 'combine_next':
+            return None
+        action_names = behavior.action_names
+        try:
+            idx = action_names.index(current_action_name)
+        except ValueError:
+            return None
+        last_appended: Optional[str] = None
+        first_append = True
+        while idx + 1 < len(action_names):
+            next_action_name = action_names[idx + 1]
+            next_mode = self.get_execution_mode(behavior_name, next_action_name)
+            if next_mode == 'skip':
+                idx += 1
+                continue
+            if next_mode == 'combine_next':
+                next_action = behavior.actions.find_by_name(next_action_name)
+                if not next_action:
+                    break
+                if first_append:
+                    instructions._display_content.insert(0, '')
+                    instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
+                    first_append = False
+                next_instructions = next_action.get_instructions(None, include_scope=False)
+                instructions.add_display('', '---', f'## Next action: {next_action_name}', '**Next:** Perform the following action.', '')
+                from instructions.markdown_instructions import MarkdownInstructions
+                action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
+                action_only_lines = action_only_md.serialize().split('\n')
+                for line in action_only_lines:
+                    instructions.add_display(line)
+                last_appended = next_action_name
+                idx += 1
+            else:
+                break
+        return last_appended
+
+    ACTION_IS_DONE_FILENAME = 'action_is_done.json'
+
+    def _action_is_done_path(self) -> Path:
+        return self.workspace_directory / self.ACTION_IS_DONE_FILENAME
+
+    def set_action_is_done(self, value: bool) -> None:
+        """Set action_is_done flag so AI can signal completion (build/validate). Code sets False when starting; AI sets True when done."""
+        path = self._action_is_done_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({'action_is_done': value}, indent=2), encoding='utf-8')
+
+    def get_action_is_done(self) -> bool:
+        """Read action_is_done flag from workspace file."""
+        path = self._action_is_done_path()
+        if not path.exists():
+            return False
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            return data.get('action_is_done', False)
+        except (json.JSONDecodeError, OSError):
+            return False
+
+    def wait_until_action_done(self, timeout_seconds: float = 3600.0, poll_interval: float = 2.0) -> bool:
+        """Block until action_is_done is True or timeout. Returns True if done, False if timeout."""
+        import time
+        deadline = time.monotonic() + timeout_seconds
+        while time.monotonic() < deadline:
+            if self.get_action_is_done():
+                return True
+            time.sleep(poll_interval)
+        return False
+
+    def get_execution_mode(self, behavior_name: str, action_name: str) -> str:
+        """Return 'combine_next' | 'skip' | 'manual' from execution_settings.json. Default 'manual'. Normalizes 'auto' -> 'combine_next'."""
+        path = self.workspace_directory / 'execution_settings.json'
+        if not path.exists():
+            return 'manual'
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            key = f"{self.bot_name}.{behavior_name}.{action_name}"
+            mode = data.get(key, 'manual')
+            return 'combine_next' if mode == 'auto' else mode
+        except (json.JSONDecodeError, OSError):
+            return 'manual'
+
+    def set_action_execution(self, behavior_name: str, action_name: str, mode: str) -> Dict[str, Any]:
+        """Persist execution mode ('combine_next' | 'skip' | 'manual') for behavior.action in execution_settings.json. Accepts 'auto' as alias for combine_next."""
+        path = self.workspace_directory / 'execution_settings.json'
+        data = {}
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding='utf-8'))
+            except (json.JSONDecodeError, OSError):
+                pass
+        key = f"{self.bot_name}.{behavior_name}.{action_name}"
+        data[key] = 'combine_next' if mode == 'auto' else mode
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2), encoding='utf-8')
+        return {'status': 'success', 'message': f'{behavior_name}.{action_name} set to {mode}', 'key': key}
+
+    def get_execution_settings(self) -> Dict[str, str]:
+        """Return all behavior.action execution modes from execution_settings.json (key without bot prefix -> mode)."""
+        path = self.workspace_directory / 'execution_settings.json'
+        if not path.exists():
+            return {}
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            prefix = f"{self.bot_name}."
+            result = {}
+            for key, mode in data.items():
+                if isinstance(mode, str) and key.startswith(prefix):
+                    result[key[len(prefix):]] = 'combine_next' if mode == 'auto' else mode  # normalize for Panel
+            return result
+        except (json.JSONDecodeError, OSError):
+            return {}
+
     def save(self, answers: Optional[Dict[str, str]] = None,
              evidence_provided: Optional[Dict[str, str]] = None,
              decisions: Optional[Dict[str, str]] = None,
@@ -828,9 +999,25 @@ class Bot:
             
             # Include scope when submitting to chat (user explicitly requested)
             instructions = action.get_instructions(include_scope=True)
-            
-            # Use the submit_instructions method to do the actual submission
-            return self.submit_instructions(instructions, current_behavior.name, current_action_name)
+            # Combine with next when combine_next; advance current after submit
+            last_appended = self._append_next_action_instructions_if_combine_next(
+                current_behavior, current_behavior.name, current_action_name, action, instructions,
+                context=None, include_scope=True
+            )
+            result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
+            # Advance current to the action after the last one we combined (or to last if we ran through end)
+            if last_appended is not None:
+                action_names = current_behavior.action_names
+                try:
+                    next_idx = action_names.index(last_appended) + 1
+                    if next_idx < len(action_names):
+                        current_behavior.actions.navigate_to(action_names[next_idx])
+                    else:
+                        current_behavior.actions.navigate_to(last_appended)  # ran through end; current = last run
+                    self.behaviors.save_state()
+                except ValueError:
+                    pass
+            return result
             
         except Exception as e:
             logger.error(f'Error in submit_current_action: {str(e)}', exc_info=True)

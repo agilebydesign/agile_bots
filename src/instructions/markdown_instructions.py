@@ -4,11 +4,14 @@ from instructions.instructions import Instructions
 
 class MarkdownInstructions(MarkdownAdapter):
     
-    def __init__(self, instructions: Instructions, include_scope: bool = False):
+    def __init__(self, instructions: Instructions, include_scope: bool = False, action_only: bool = False):
         self.instructions = instructions
         self.include_scope = include_scope
+        self.action_only = action_only
     
     def serialize(self) -> str:
+        if self.action_only:
+            return self._serialize_action_only()
         instructions_dict = self.instructions.to_dict()
         output_lines = []
         
@@ -253,6 +256,45 @@ class MarkdownInstructions(MarkdownAdapter):
         if display_content:
             output_lines.append("")
             output_lines.extend(display_content)
+        
+        return "\n".join(output_lines)
+    
+    def _serialize_action_only(self) -> str:
+        """Serialize only action-specific content (no scope, behavior, clarification, strategy, context files). Used when combining instructions."""
+        instructions_dict = self.instructions.to_dict()
+        output_lines = []
+        
+        action_metadata = instructions_dict.get('action_metadata', {})
+        if action_metadata:
+            action_name = action_metadata.get('name', 'unknown')
+            output_lines.append(f"## Action Instructions - {action_name}")
+            output_lines.append("")
+            action_description = action_metadata.get('description', '')
+            if action_description:
+                output_lines.append(f"The purpose of this action is to {action_description.lower()}")
+                output_lines.append("")
+            action_instructions = action_metadata.get('instructions', [])
+            if action_instructions:
+                output_lines.extend(action_instructions)
+                output_lines.append("")
+        
+        output_lines.append("---")
+        output_lines.append("")
+        
+        base_instructions = instructions_dict.get('base_instructions', [])
+        try:
+            context_sources = set(s.strip() for s in self.instructions.context_sources_text)
+            for line in base_instructions:
+                stripped = line.strip()
+                if stripped in context_sources:
+                    continue
+                if stripped.startswith("- `") and ("story graph" in stripped or "strategy" in stripped or "clarification" in stripped or "/test/" in stripped or "/src/" in stripped or "context/" in stripped):
+                    continue
+                if stripped == "" and not output_lines:
+                    continue
+                output_lines.append(line)
+        except (ValueError, AttributeError):
+            output_lines.extend(base_instructions)
         
         return "\n".join(output_lines)
     

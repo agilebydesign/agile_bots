@@ -98,13 +98,13 @@
   "EPIC|Invoke Bot": {
     "x": 350.0,
     "y": 120.0,
-    "width": 13730.0,
+    "width": 12210.0,
     "height": 60.0
   },
   "invoke-bot": {
     "x": 350.0,
     "y": 120.0,
-    "width": 13730.0,
+    "width": 12210.0,
     "height": 60.0
   },
   "SUB_EPIC|Initialize Bot": {
@@ -482,2616 +482,2388 @@
   "SUB_EPIC|Work With Story Map": {
     "x": 2015.0,
     "y": 195.0,
-    "width": 3330.0,
+    "width": 3340.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map": {
     "x": 2015.0,
     "y": 195.0,
-    "width": 3330.0,
+    "width": 3340.0,
     "height": 60.0
   },
   "SUB_EPIC|Filter Scope": {
     "x": 2020.0,
     "y": 270.0,
-    "width": 180.0,
+    "width": 190.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/filter-scope": {
     "x": 2020.0,
     "y": 270.0,
-    "width": 180.0,
+    "width": 190.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Filter Scope|Add Filter Part To File Scope": {
-    "x": 2025.0,
+    "x": 2030.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
-  "invoke-bot/work-with-story-map/filter-scope/add-filter-part-to-file-scope": {
-    "x": 2025.0,
+  "invoke-bot/work-with-story-map/filter-scope/filter-stories/add-filter-part-to-file-scope": {
+    "x": 2030.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Filter Scope|Filter File Scope  By Files": {
-    "x": 2085.0,
+    "x": 2090.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
-  "invoke-bot/work-with-story-map/filter-scope/filter-file-scope--by-files": {
-    "x": 2085.0,
+  "invoke-bot/work-with-story-map/filter-scope/filter-stories/filter-file-scope--by-files": {
+    "x": 2090.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Filter Scope|Remove Filter Part From File Scope": {
-    "x": 2145.0,
+    "x": 2150.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
-  "invoke-bot/work-with-story-map/filter-scope/remove-filter-part-from-file-scope": {
-    "x": 2145.0,
+  "invoke-bot/work-with-story-map/filter-scope/filter-stories/remove-filter-part-from-file-scope": {
+    "x": 2150.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Edit Story Map": {
-    "x": 2210.0,
+    "x": 2220.0,
     "y": 270.0,
     "width": 1140.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/edit-story-map": {
-    "x": 2210.0,
+    "x": 2220.0,
     "y": 270.0,
     "width": 1140.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph": {
-    "x": 2215.0,
+    "x": 2225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/navigate-story-graph": {
-    "x": 2215.0,
+    "x": 2225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Navigate Story Graph Using CLI": {
-    "x": 2275.0,
+    "x": 2285.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/navigate-story-graph-using-cli": {
-    "x": 2275.0,
+    "x": 2285.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Display Story Hierarchy Panel": {
-    "x": 2335.0,
+    "x": 2345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/display-story-hierarchy-panel": {
-    "x": 2335.0,
+    "x": 2345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Create Child Story Node": {
-    "x": 2395.0,
+    "x": 2405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/create-child-story-node": {
-    "x": 2395.0,
+    "x": 2405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent Panel": {
-    "x": 2455.0,
+    "x": 2465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/create-child-story-node-under-parent-panel": {
-    "x": 2455.0,
+    "x": 2465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Create Child Story Node Under Parent CLI": {
-    "x": 2515.0,
+    "x": 2525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/create-child-story-node-under-parent-cli": {
-    "x": 2515.0,
+    "x": 2525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Create Epic": {
-    "x": 2575.0,
+    "x": 2585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/create-epic": {
-    "x": 2575.0,
+    "x": 2585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Delete Story Node": {
-    "x": 2635.0,
+    "x": 2645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/delete-story-node": {
-    "x": 2635.0,
+    "x": 2645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent CLI": {
-    "x": 2695.0,
+    "x": 2705.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/delete-story-node-from-parent-cli": {
-    "x": 2695.0,
+    "x": 2705.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Delete Story Node From Parent Panel": {
-    "x": 2755.0,
+    "x": 2765.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/delete-story-node-from-parent-panel": {
-    "x": 2755.0,
+    "x": 2765.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Move Story Node To Parent": {
-    "x": 2815.0,
+    "x": 2825.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/move-story-node-to-parent": {
-    "x": 2815.0,
+    "x": 2825.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Move Story Node  CLI": {
-    "x": 2875.0,
+    "x": 2885.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/move-story-node--cli": {
-    "x": 2875.0,
+    "x": 2885.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Move Story Node Panel": {
-    "x": 2935.0,
+    "x": 2945.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/move-story-node-panel": {
-    "x": 2935.0,
+    "x": 2945.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Update Story Node name  CLI": {
-    "x": 2995.0,
+    "x": 3005.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/update-story-node-name--cli": {
-    "x": 2995.0,
+    "x": 3005.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Update Story Node name Panel": {
-    "x": 3055.0,
+    "x": 3065.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/update-story-node-name-panel": {
-    "x": 3055.0,
+    "x": 3065.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Update Story Node Name": {
-    "x": 3115.0,
+    "x": 3125.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/update-story-node-name": {
-    "x": 3115.0,
+    "x": 3125.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Save Story Map Changes Asynchronously": {
-    "x": 3175.0,
+    "x": 3185.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/save-story-map-changes-asynchronously": {
-    "x": 3175.0,
+    "x": 3185.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes Panel": {
-    "x": 3235.0,
+    "x": 3245.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/automatically-refresh-story-graph-changes-panel": {
-    "x": 3235.0,
+    "x": 3245.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Story Map|Automatically Refresh Story Graph Changes  CLI": {
-    "x": 3295.0,
+    "x": 3305.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-story-map/automatically-refresh-story-graph-changes--cli": {
-    "x": 3295.0,
+    "x": 3305.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Edit Increments": {
-    "x": 3360.0,
+    "x": 3370.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/edit-increments": {
-    "x": 3360.0,
+    "x": 3370.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Edit Increments|Add Increment": {
-    "x": 3365.0,
+    "x": 3375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/add-increment": {
-    "x": 3365.0,
+    "x": 3375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Remove Increment": {
-    "x": 3425.0,
+    "x": 3435.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/remove-increment": {
-    "x": 3425.0,
+    "x": 3435.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Rename Increment": {
-    "x": 3485.0,
+    "x": 3495.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/rename-increment": {
-    "x": 3485.0,
+    "x": 3495.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Add Story to Increment": {
-    "x": 3545.0,
+    "x": 3555.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/add-story-to-increment": {
-    "x": 3545.0,
+    "x": 3555.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Remove Story from Increment": {
-    "x": 3605.0,
+    "x": 3615.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/remove-story-from-increment": {
-    "x": 3605.0,
+    "x": 3615.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Rename Story in Increment": {
-    "x": 3665.0,
+    "x": 3675.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/rename-story-in-increment": {
-    "x": 3665.0,
+    "x": 3675.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Edit Increments|Story Deleted in Hierarchy Cascades to Increment": {
-    "x": 3725.0,
+    "x": 3735.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/edit-increments/story-deleted-in-hierarchy-cascades-to-increment": {
-    "x": 3725.0,
+    "x": 3735.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Act With Selected Node": {
-    "x": 3790.0,
+    "x": 3800.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node": {
-    "x": 3790.0,
+    "x": 3800.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Set scope to selected story node": {
-    "x": 3795.0,
+    "x": 3805.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/set-scope-to-selected-story-node": {
-    "x": 3795.0,
+    "x": 3805.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Submit action for selected story node": {
-    "x": 3855.0,
+    "x": 3865.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/submit-action-for-selected-story-node": {
-    "x": 3855.0,
+    "x": 3865.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Submit Current Behavior Action For Selected Node": {
-    "x": 3915.0,
+    "x": 3925.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/submit-current-behavior-action-for-selected-node": {
-    "x": 3915.0,
+    "x": 3925.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Set scope to selected Increment": {
-    "x": 3975.0,
+    "x": 3985.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/set-scope-to-selected-increment": {
-    "x": 3975.0,
+    "x": 3985.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Copy Story Node To Clipboard": {
-    "x": 4035.0,
+    "x": 4045.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/copy-story-node-to-clipboard": {
-    "x": 4035.0,
+    "x": 4045.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Render Diagram Selected Node": {
-    "x": 4095.0,
+    "x": 4105.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/render-diagram-selected-node": {
-    "x": 4095.0,
+    "x": 4105.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Update Queie based on selectged Node": {
-    "x": 4155.0,
+    "x": 4165.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/update-queie-based-on-selectged-node": {
-    "x": 4155.0,
+    "x": 4165.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Act With Selected Node|Execute Scope \"Runs\"": {
-    "x": 4215.0,
+    "x": 4225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/act-with-selected-node/execute-scope-\"runs\"": {
-    "x": 4215.0,
+    "x": 4225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Open Story Related Files": {
-    "x": 4280.0,
+    "x": 4290.0,
     "y": 270.0,
     "width": 120.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/open-story-related-files": {
-    "x": 4280.0,
+    "x": 4290.0,
     "y": 270.0,
     "width": 120.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Open Story Related Files|Open All Related Files": {
-    "x": 4285.0,
+    "x": 4295.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/open-story-related-files/open-all-related-files": {
-    "x": 4285.0,
+    "x": 4295.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Open Story Related Files|Enrich Scope With Links": {
-    "x": 4345.0,
+    "x": 4355.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/open-story-related-files/enrich-scope-with-links": {
-    "x": 4345.0,
+    "x": 4355.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Trace Story Graph": {
-    "x": 4410.0,
+    "x": 4420.0,
     "y": 270.0,
     "width": 930.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph": {
-    "x": 4410.0,
+    "x": 4420.0,
     "y": 270.0,
     "width": 930.0,
     "height": 60.0
   },
   "SUB_EPIC|Trace Story": {
-    "x": 4415.0,
+    "x": 4425.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story": {
-    "x": 4415.0,
+    "x": 4425.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Trace Story|Display Stories": {
-    "x": 4420.0,
+    "x": 4430.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story/display-stories": {
-    "x": 4420.0,
+    "x": 4430.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Story|Edit Stories in Trace Editor": {
-    "x": 4480.0,
+    "x": 4490.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story/edit-stories-in-trace-editor": {
-    "x": 4480.0,
+    "x": 4490.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Story|Open Story Files": {
-    "x": 4540.0,
+    "x": 4550.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-story/open-story-files": {
-    "x": 4540.0,
+    "x": 4550.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Trace Scenario": {
-    "x": 4605.0,
+    "x": 4615.0,
     "y": 345.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario": {
-    "x": 4605.0,
+    "x": 4615.0,
     "y": 345.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Trace Scenario|Display Scenario Steps": {
-    "x": 4610.0,
+    "x": 4620.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/display-scenario-steps": {
-    "x": 4610.0,
+    "x": 4620.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Edit Scenarios in Trace Editor": {
-    "x": 4670.0,
+    "x": 4680.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-scenarios-in-trace-editor": {
-    "x": 4670.0,
+    "x": 4680.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Open Scenario Source": {
-    "x": 4730.0,
+    "x": 4740.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/open-scenario-source": {
-    "x": 4730.0,
+    "x": 4740.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Display Examples Table": {
-    "x": 4790.0,
+    "x": 4800.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/display-examples-table": {
-    "x": 4790.0,
+    "x": 4800.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Add / Remove Examples": {
-    "x": 4850.0,
+    "x": 4860.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/add-/-remove-examples": {
-    "x": 4850.0,
+    "x": 4860.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Design Example": {
-    "x": 4910.0,
+    "x": 4920.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/design-example": {
-    "x": 4910.0,
+    "x": 4920.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Edit Example": {
-    "x": 4970.0,
+    "x": 4980.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-example": {
-    "x": 4970.0,
+    "x": 4980.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Scenario|Edit Example Cell Data": {
-    "x": 5030.0,
+    "x": 5040.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-scenario/edit-example-cell-data": {
-    "x": 5030.0,
+    "x": 5040.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Trace Code": {
-    "x": 5095.0,
+    "x": 5105.0,
     "y": 345.0,
     "width": 240.0,
     "height": 60.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code": {
-    "x": 5095.0,
+    "x": 5105.0,
     "y": 345.0,
     "width": 240.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Trace Code|Display Code Trace": {
-    "x": 5100.0,
+    "x": 5110.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code/display-code-trace": {
-    "x": 5100.0,
+    "x": 5110.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Code|Edit Code Step": {
-    "x": 5160.0,
+    "x": 5170.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code/edit-code-step": {
-    "x": 5160.0,
+    "x": 5170.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Code|Open Source File": {
-    "x": 5220.0,
+    "x": 5230.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code/open-source-file": {
-    "x": 5220.0,
+    "x": 5230.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Trace Code|Navigate Code Trace": {
-    "x": 5280.0,
+    "x": 5290.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/work-with-story-map/trace-story-graph/trace-code/navigate-code-trace": {
-    "x": 5280.0,
+    "x": 5290.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Navigate Behavior Actions": {
-    "x": 5355.0,
+    "x": 5365.0,
     "y": 195.0,
     "width": 2070.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions": {
-    "x": 5355.0,
+    "x": 5365.0,
     "y": 195.0,
     "width": 2070.0,
     "height": 60.0
   },
   "SUB_EPIC|Navigate Behavior And Actions": {
-    "x": 5360.0,
+    "x": 5370.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions": {
-    "x": 5360.0,
+    "x": 5370.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially": {
-    "x": 5365.0,
+    "x": 5375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially": {
-    "x": 5365.0,
+    "x": 5375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate To First Behavior Action": {
-    "x": 5425.0,
+    "x": 5435.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-to-first-behavior-action": {
-    "x": 5425.0,
+    "x": 5435.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Using CLI Dot Notation": {
-    "x": 5485.0,
+    "x": 5495.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-using-cli-dot-notation": {
-    "x": 5485.0,
+    "x": 5495.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially Using CLI Commands": {
-    "x": 5545.0,
+    "x": 5555.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially-using-cli-commands": {
-    "x": 5545.0,
+    "x": 5555.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Behavior Action Panel": {
-    "x": 5605.0,
+    "x": 5615.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-behavior-action-panel": {
-    "x": 5605.0,
+    "x": 5615.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Manage Behaviors Using CLI": {
-    "x": 5665.0,
+    "x": 5675.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/manage-behaviors-using-cli": {
-    "x": 5665.0,
+    "x": 5675.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate To Behavior Action And Execute Using CLI": {
-    "x": 5725.0,
+    "x": 5735.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-to-behavior-action-and-execute-using-cli": {
-    "x": 5725.0,
+    "x": 5735.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Navigate Behavior And Actions|Navigate Sequentially Using CLI": {
-    "x": 5785.0,
+    "x": 5795.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/navigate-behavior-and-actions/navigate-sequentially-using-cli": {
-    "x": 5785.0,
+    "x": 5795.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Perform Behavior Action In Bot Workflow": {
-    "x": 5850.0,
+    "x": 5860.0,
     "y": 270.0,
     "width": 900.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow": {
-    "x": 5850.0,
+    "x": 5860.0,
     "y": 270.0,
     "width": 900.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute Behavior Action": {
-    "x": 5855.0,
+    "x": 5865.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-behavior-action": {
-    "x": 5855.0,
+    "x": 5865.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute Behavior Action Panel": {
-    "x": 5915.0,
+    "x": 5925.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-behavior-action-panel": {
-    "x": 5915.0,
+    "x": 5925.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Update and Find Current Behavior": {
-    "x": 5975.0,
+    "x": 5985.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/update-and-find-current-behavior": {
-    "x": 5975.0,
+    "x": 5985.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Persist Behavior Action State": {
-    "x": 6035.0,
+    "x": 6045.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/persist-behavior-action-state": {
-    "x": 6035.0,
+    "x": 6045.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Activity For Workspace": {
-    "x": 6095.0,
+    "x": 6105.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-activity-for-workspace": {
-    "x": 6095.0,
+    "x": 6105.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Action Start": {
-    "x": 6155.0,
+    "x": 6165.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-action-start": {
-    "x": 6155.0,
+    "x": 6165.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Track Action Completion": {
-    "x": 6215.0,
+    "x": 6225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/track-action-completion": {
-    "x": 6215.0,
+    "x": 6225.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Proceed across End To End Workflow": {
-    "x": 6275.0,
+    "x": 6285.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/proceed-across-end-to-end-workflow": {
-    "x": 6275.0,
+    "x": 6285.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Record Activity Metrics And Paths": {
-    "x": 6335.0,
+    "x": 6345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/record-activity-metrics-and-paths": {
-    "x": 6335.0,
+    "x": 6345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Re-execute Current Operation Using CLI": {
-    "x": 6395.0,
+    "x": 6405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/re-execute-current-operation-using-cli": {
-    "x": 6395.0,
+    "x": 6405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Execute End To End Workflow Using CLI": {
-    "x": 6455.0,
+    "x": 6465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/execute-end-to-end-workflow-using-cli": {
-    "x": 6455.0,
+    "x": 6465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Conssolidate and Expand Behavior Aciton Queies": {
-    "x": 6515.0,
+    "x": 6525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/conssolidate-and-expand-behavior-aciton-queies": {
-    "x": 6515.0,
+    "x": 6525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Auto execute Consolidated Queue": {
-    "x": 6575.0,
+    "x": 6585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/auto-execute-consolidated-queue": {
-    "x": 6575.0,
+    "x": 6585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Skip Behavior and Action Queie": {
-    "x": 6635.0,
+    "x": 6645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/skip-behavior-and-action-queie": {
-    "x": 6635.0,
+    "x": 6645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Perform Behavior Action In Bot Workflow|Save  / Load Queue Consolidation": {
-    "x": 6695.0,
+    "x": 6705.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/perform-behavior-action-in-bot-workflow/save--/-load-queue-consolidation": {
-    "x": 6695.0,
+    "x": 6705.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Display Behavior Action State": {
-    "x": 6760.0,
+    "x": 6770.0,
     "y": 270.0,
     "width": 660.0,
     "height": 60.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state": {
-    "x": 6760.0,
+    "x": 6770.0,
     "y": 270.0,
     "width": 660.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display Bot Hierarchy Tree with Progress Indicators CLI": {
-    "x": 6765.0,
+    "x": 6775.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-bot-hierarchy-tree-with-progress-indicators-cli": {
-    "x": 6765.0,
+    "x": 6775.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Show Remaining Actions After Completion": {
-    "x": 6825.0,
+    "x": 6835.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/show-remaining-actions-after-completion": {
-    "x": 6825.0,
+    "x": 6835.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display Current Position in CLI": {
-    "x": 6885.0,
+    "x": 6895.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-current-position-in-cli": {
-    "x": 6885.0,
+    "x": 6895.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display CLI Navigation Menu Footer": {
-    "x": 6945.0,
+    "x": 6955.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-cli-navigation-menu-footer": {
-    "x": 6945.0,
+    "x": 6955.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display Hierarchy In Panel": {
-    "x": 7005.0,
+    "x": 7015.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-hierarchy-in-panel": {
-    "x": 7005.0,
+    "x": 7015.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Manage Behavior Action State Using CLI": {
-    "x": 7065.0,
+    "x": 7075.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/manage-behavior-action-state-using-cli": {
-    "x": 7065.0,
+    "x": 7075.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display Context Using CLI": {
-    "x": 7125.0,
+    "x": 7135.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display-context-using-cli": {
-    "x": 7125.0,
+    "x": 7135.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display  Context BAQ": {
-    "x": 7185.0,
+    "x": 7195.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display--context-baq": {
-    "x": 7185.0,
+    "x": 7195.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Drop Context into Queue": {
-    "x": 7245.0,
+    "x": 7255.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/drop-context-into-queue": {
-    "x": 7245.0,
+    "x": 7255.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Display  Behavior Action Qs": {
-    "x": 7305.0,
+    "x": 7315.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/display--behavior-action-qs": {
-    "x": 7305.0,
+    "x": 7315.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Display Behavior Action State|Drop Story Node in  Behavor Action Queue": {
-    "x": 7365.0,
+    "x": 7375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/navigate-behavior-actions/display-behavior-action-state/drop-story-node-in--behavor-action-queue": {
-    "x": 7365.0,
+    "x": 7375.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Perform Action": {
-    "x": 7435.0,
+    "x": 7445.0,
     "y": 195.0,
     "width": 4250.0,
     "height": 60.0
   },
   "invoke-bot/perform-action": {
-    "x": 7435.0,
+    "x": 7445.0,
     "y": 195.0,
     "width": 4250.0,
     "height": 60.0
   },
   "SUB_EPIC|Prepare Common Instructions For Behavior, Action, and Scope": {
-    "x": 7440.0,
+    "x": 7450.0,
     "y": 270.0,
     "width": 900.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope": {
-    "x": 7440.0,
+    "x": 7450.0,
     "y": 270.0,
     "width": 900.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Inject Context Into Instructions": {
-    "x": 7445.0,
+    "x": 7455.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/inject-context-into-instructions": {
-    "x": 7445.0,
+    "x": 7455.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Get Action Instructions Through CLI": {
-    "x": 7505.0,
+    "x": 7515.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/get-action-instructions-through-cli": {
-    "x": 7505.0,
+    "x": 7515.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Submit Instructions Through CLI": {
-    "x": 7565.0,
+    "x": 7575.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/submit-instructions-through-cli": {
-    "x": 7565.0,
+    "x": 7575.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Display Base Instructions Panel": {
-    "x": 7625.0,
+    "x": 7635.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/display-base-instructions-panel": {
-    "x": 7625.0,
+    "x": 7635.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Display Raw Format Instructions In Panel": {
-    "x": 7685.0,
+    "x": 7695.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/display-raw-format-instructions-in-panel": {
-    "x": 7685.0,
+    "x": 7695.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Clarification Answers": {
-    "x": 7745.0,
+    "x": 7755.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-clarification-answers": {
-    "x": 7745.0,
+    "x": 7755.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Clarification Evidence": {
-    "x": 7805.0,
+    "x": 7815.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-clarification-evidence": {
-    "x": 7805.0,
+    "x": 7815.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Strategy Decisions": {
-    "x": 7865.0,
+    "x": 7875.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-strategy-decisions": {
-    "x": 7865.0,
+    "x": 7875.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Multiple Guardrails Together": {
-    "x": 7925.0,
+    "x": 7935.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-multiple-guardrails-together": {
-    "x": 7925.0,
+    "x": 7935.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save File Isolation": {
-    "x": 7985.0,
+    "x": 7995.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-file-isolation": {
-    "x": 7985.0,
+    "x": 7995.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Guardrails Through Panel": {
-    "x": 8045.0,
+    "x": 8055.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-guardrails-through-panel": {
-    "x": 8045.0,
+    "x": 8055.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Submit Scope Instructions": {
-    "x": 8105.0,
+    "x": 8115.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/submit-scope-instructions": {
-    "x": 8105.0,
+    "x": 8115.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Handle Operation Errors and Validation in CLI": {
-    "x": 8165.0,
+    "x": 8175.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/handle-operation-errors-and-validation-in-cli": {
-    "x": 8165.0,
+    "x": 8175.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Save Guardrails Through CLI": {
-    "x": 8225.0,
+    "x": 8235.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/save-guardrails-through-cli": {
-    "x": 8225.0,
+    "x": 8235.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Add special instructon": {
-    "x": 8285.0,
+    "x": 8295.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/prepare-common-instructions-for-behavior,-action,-and-scope/add-special-instructon": {
-    "x": 8285.0,
+    "x": 8295.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Clarify Requirements": {
-    "x": 8350.0,
+    "x": 8360.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/clarify-requirements": {
-    "x": 8350.0,
+    "x": 8360.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Clarify Requirements": {
-    "x": 8355.0,
+    "x": 8365.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/clarify-requirements": {
-    "x": 8355.0,
+    "x": 8365.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Clarify Requirements Using CLI": {
-    "x": 8415.0,
+    "x": 8425.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/clarify-requirements-using-cli": {
-    "x": 8415.0,
+    "x": 8425.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Display Clarification Data Through CLI": {
-    "x": 8475.0,
+    "x": 8485.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/display-clarification-data-through-cli": {
-    "x": 8475.0,
+    "x": 8485.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Display Clarify Instructions Panel": {
-    "x": 8535.0,
+    "x": 8545.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/display-clarify-instructions-panel": {
-    "x": 8535.0,
+    "x": 8545.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Get Clarify Instructions Through CLI": {
-    "x": 8595.0,
+    "x": 8605.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/get-clarify-instructions-through-cli": {
-    "x": 8595.0,
+    "x": 8605.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Clarify in Queue": {
-    "x": 8655.0,
+    "x": 8665.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/clarify-in-queue": {
-    "x": 8655.0,
+    "x": 8665.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Display clarification answers in Queue": {
-    "x": 8715.0,
+    "x": 8725.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/display-clarification-answers-in-queue": {
-    "x": 8715.0,
+    "x": 8725.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Clarify Requirements|Associate Guard rail with scope": {
-    "x": 8775.0,
+    "x": 8785.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/clarify-requirements/associate-guard-rail-with-scope": {
-    "x": 8775.0,
+    "x": 8785.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Decide Strategy": {
-    "x": 8840.0,
+    "x": 8850.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/decide-strategy": {
-    "x": 8840.0,
+    "x": 8850.0,
     "y": 270.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Decide Strategy|Decide Strategy": {
-    "x": 8845.0,
+    "x": 8855.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/decide-strategy": {
-    "x": 8845.0,
+    "x": 8855.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Decide Strategy Using CLI": {
-    "x": 8905.0,
+    "x": 8915.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/decide-strategy-using-cli": {
-    "x": 8905.0,
+    "x": 8915.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Display Strategy Data Through CLI": {
-    "x": 8965.0,
+    "x": 8975.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/display-strategy-data-through-cli": {
-    "x": 8965.0,
+    "x": 8975.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Display Strategy Instructions Panel": {
-    "x": 9025.0,
+    "x": 9035.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/display-strategy-instructions-panel": {
-    "x": 9025.0,
+    "x": 9035.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Submit Instructions To AI Agent Panel": {
-    "x": 9085.0,
+    "x": 9095.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/submit-instructions-to-ai-agent-panel": {
-    "x": 9085.0,
+    "x": 9095.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Get Strategy Instructions Through CLI": {
-    "x": 9145.0,
+    "x": 9155.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/get-strategy-instructions-through-cli": {
-    "x": 9145.0,
+    "x": 9155.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|MAke Choices in queue": {
-    "x": 9205.0,
+    "x": 9215.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/make-choices-in-queue": {
-    "x": 9205.0,
+    "x": 9215.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Decide Strategy|Display Chopices in Queue": {
-    "x": 9265.0,
+    "x": 9275.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/decide-strategy/display-chopices-in-queue": {
-    "x": 9265.0,
+    "x": 9275.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Build Story Graph": {
-    "x": 9330.0,
+    "x": 9340.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/build-story-graph": {
-    "x": 9330.0,
+    "x": 9340.0,
     "y": 270.0,
     "width": 360.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Build Story Graph|Build Story Graph": {
-    "x": 9335.0,
+    "x": 9345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/build-story-graph": {
-    "x": 9335.0,
+    "x": 9345.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Build Story Graph|Build Story Graph Using CLI": {
-    "x": 9395.0,
+    "x": 9405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/build-story-graph-using-cli": {
-    "x": 9395.0,
+    "x": 9405.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Build Story Graph|Get Build Instructions Through CLI": {
-    "x": 9455.0,
+    "x": 9465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/get-build-instructions-through-cli": {
-    "x": 9455.0,
+    "x": 9465.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Build Story Graph|Build Story Graph Using API": {
-    "x": 9515.0,
+    "x": 9525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/build-story-graph-using-api": {
-    "x": 9515.0,
+    "x": 9525.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Build Story Graph|Display Build Instructions Panel": {
-    "x": 9575.0,
+    "x": 9585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/display-build-instructions-panel": {
-    "x": 9575.0,
+    "x": 9585.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Build Story Graph|Build Story Graph Through Queue": {
-    "x": 9635.0,
+    "x": 9645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/build-story-graph/build-story-graph-through-queue": {
-    "x": 9635.0,
+    "x": 9645.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Render Content": {
-    "x": 9700.0,
+    "x": 9710.0,
     "y": 270.0,
     "width": 540.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-content": {
-    "x": 9700.0,
+    "x": 9710.0,
     "y": 270.0,
     "width": 540.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Render Content|Render Output Usng Story API": {
-    "x": 9705.0,
+    "x": 9715.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/render-output-usng-story-api": {
-    "x": 9705.0,
+    "x": 9715.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Render Output Using CLI": {
-    "x": 9765.0,
+    "x": 9775.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/render-output-using-cli": {
-    "x": 9765.0,
+    "x": 9775.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Display Synchronizer Output Through CLI": {
-    "x": 9825.0,
+    "x": 9835.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/display-synchronizer-output-through-cli": {
-    "x": 9825.0,
+    "x": 9835.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Display Render Configurations Through CLI": {
-    "x": 9885.0,
+    "x": 9895.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/display-render-configurations-through-cli": {
-    "x": 9885.0,
+    "x": 9895.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Get Render Instructions Through CLI": {
-    "x": 9945.0,
+    "x": 9955.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/get-render-instructions-through-cli": {
-    "x": 9945.0,
+    "x": 9955.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Display Render Instructions Panel": {
-    "x": 10005.0,
+    "x": 10015.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/display-render-instructions-panel": {
-    "x": 10005.0,
+    "x": 10015.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Render as Part of Build and Validate Actions": {
-    "x": 10065.0,
+    "x": 10075.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/render-as-part-of-build-and-validate-actions": {
-    "x": 10065.0,
+    "x": 10075.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Report and Update InQ": {
-    "x": 10125.0,
+    "x": 10135.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/report-and-update-inq": {
-    "x": 10125.0,
+    "x": 10135.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Render Content|Display Rules in Queue": {
-    "x": 10185.0,
+    "x": 10195.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-content/display-rules-in-queue": {
-    "x": 10185.0,
+    "x": 10195.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Render DrawIO Diagrams": {
-    "x": 10250.0,
+    "x": 10260.0,
     "y": 270.0,
     "width": 750.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams": {
-    "x": 10250.0,
+    "x": 10260.0,
     "y": 270.0,
     "width": 750.0,
     "height": 60.0
   },
   "SUB_EPIC|Synchronize Epics and Sub-Epics": {
-    "x": 10255.0,
+    "x": 10265.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-epics-and-sub-epics": {
-    "x": 10255.0,
+    "x": 10265.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Render epic and sub-epic hierarchy": {
-    "x": 10260.0,
+    "x": 10270.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-epics-and-sub-epics/render-epic-and-sub-epic-hierarchy": {
-    "x": 10260.0,
+    "x": 10270.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Report epic and sub-epic changes": {
-    "x": 10320.0,
+    "x": 10330.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-epics-and-sub-epics/report-epic-and-sub-epic-changes": {
-    "x": 10320.0,
+    "x": 10330.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Epics and Sub-Epics|Update epics and sub-epics from diagram": {
-    "x": 10380.0,
+    "x": 10390.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-epics-and-sub-epics/update-epics-and-sub-epics-from-diagram": {
-    "x": 10380.0,
+    "x": 10390.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Synchronize Stories and Actors": {
-    "x": 10445.0,
+    "x": 10455.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors": {
-    "x": 10445.0,
+    "x": 10455.0,
     "y": 345.0,
     "width": 360.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Render stories and actors": {
-    "x": 10450.0,
+    "x": 10460.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/render-stories-and-actors": {
-    "x": 10450.0,
+    "x": 10460.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Render acceptance criteria": {
-    "x": 10510.0,
+    "x": 10520.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/render-acceptance-criteria": {
-    "x": 10510.0,
+    "x": 10520.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Report story moves between parents": {
-    "x": 10570.0,
+    "x": 10580.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/report-story-moves-between-parents": {
-    "x": 10570.0,
+    "x": 10580.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Report acceptance criteria changes": {
-    "x": 10630.0,
+    "x": 10640.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/report-acceptance-criteria-changes": {
-    "x": 10630.0,
+    "x": 10640.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Update stories from diagram": {
-    "x": 10690.0,
+    "x": 10700.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/update-stories-from-diagram": {
-    "x": 10690.0,
+    "x": 10700.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Stories and Actors|Update acceptance criteria from diagram": {
-    "x": 10750.0,
+    "x": 10760.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-stories-and-actors/update-acceptance-criteria-from-diagram": {
-    "x": 10750.0,
+    "x": 10760.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Synchronize Increments": {
-    "x": 10815.0,
+    "x": 10825.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-increments": {
-    "x": 10815.0,
+    "x": 10825.0,
     "y": 345.0,
     "width": 180.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Render increment lanes": {
-    "x": 10820.0,
+    "x": 10830.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-increments/render-increment-lanes": {
-    "x": 10820.0,
+    "x": 10830.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Report increment changes": {
-    "x": 10880.0,
+    "x": 10890.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-increments/report-increment-changes": {
-    "x": 10880.0,
+    "x": 10890.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Synchronize Increments|Update increments from diagram": {
-    "x": 10940.0,
+    "x": 10950.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/render-drawio-diagrams/synchronize-increments/update-increments-from-diagram": {
-    "x": 10940.0,
+    "x": 10950.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Validate With Rules": {
-    "x": 11010.0,
+    "x": 11020.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/validate-with-rules": {
-    "x": 11010.0,
+    "x": 11020.0,
     "y": 270.0,
     "width": 420.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Validate With Rules|Validate Rules": {
-    "x": 11015.0,
+    "x": 11025.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/validate-rules": {
-    "x": 11015.0,
+    "x": 11025.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Validate Rules Using CLI": {
-    "x": 11075.0,
+    "x": 11085.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/validate-rules-using-cli": {
-    "x": 11075.0,
+    "x": 11085.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Display Validation Results Through CLI": {
-    "x": 11135.0,
+    "x": 11145.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/display-validation-results-through-cli": {
-    "x": 11135.0,
+    "x": 11145.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Display Validation Scanners Through CLI": {
-    "x": 11195.0,
+    "x": 11205.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/display-validation-scanners-through-cli": {
-    "x": 11195.0,
+    "x": 11205.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Display Validate Instructions Panel": {
-    "x": 11255.0,
+    "x": 11265.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/display-validate-instructions-panel": {
-    "x": 11255.0,
+    "x": 11265.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Get Validate Instructions Through CLI": {
-    "x": 11315.0,
+    "x": 11325.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/get-validate-instructions-through-cli": {
-    "x": 11315.0,
+    "x": 11325.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Validate With Rules|Validate In Queue": {
-    "x": 11375.0,
+    "x": 11385.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/validate-with-rules/validate-in-queue": {
-    "x": 11375.0,
+    "x": 11385.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Use Rules In Prompt": {
-    "x": 11440.0,
+    "x": 11450.0,
     "y": 270.0,
     "width": 240.0,
     "height": 60.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt": {
-    "x": 11440.0,
+    "x": 11450.0,
     "y": 270.0,
     "width": 240.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Use Rules In Prompt|Display Rules": {
-    "x": 11445.0,
+    "x": 11455.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt/display-rules": {
-    "x": 11445.0,
+    "x": 11455.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Use Rules In Prompt|Display Rules Using CLI": {
-    "x": 11505.0,
+    "x": 11515.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt/display-rules-using-cli": {
-    "x": 11505.0,
+    "x": 11515.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Use Rules In Prompt|Submit Behavior Rules Through Panel": {
-    "x": 11565.0,
+    "x": 11575.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt/submit-behavior-rules-through-panel": {
-    "x": 11565.0,
+    "x": 11575.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Use Rules In Prompt|Get Rules Instructions Through CLI": {
-    "x": 11625.0,
+    "x": 11635.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/perform-action/use-rules-in-prompt/get-rules-instructions-through-cli": {
-    "x": 11625.0,
+    "x": 11635.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Get Help": {
-    "x": 11695.0,
+    "x": 11705.0,
     "y": 195.0,
     "width": 360.0,
     "height": 60.0
   },
   "invoke-bot/get-help": {
-    "x": 11695.0,
+    "x": 11705.0,
     "y": 195.0,
     "width": 360.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Get Help|Get Help": {
-    "x": 11700.0,
+    "x": 11710.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/get-help": {
-    "x": 11700.0,
+    "x": 11710.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Get Help|Display Parameter Help Using CLI": {
-    "x": 11760.0,
+    "x": 11770.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/display-parameter-help-using-cli": {
-    "x": 11760.0,
+    "x": 11770.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Get Help|Display Action Help Using CLI": {
-    "x": 11820.0,
+    "x": 11830.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/display-action-help-using-cli": {
-    "x": 11820.0,
+    "x": 11830.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Get Help|Display Command Examples Using CLI": {
-    "x": 11880.0,
+    "x": 11890.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/display-command-examples-using-cli": {
-    "x": 11880.0,
+    "x": 11890.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Get Help|Get Help Using CLI": {
-    "x": 11940.0,
+    "x": 11950.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/get-help-using-cli": {
-    "x": 11940.0,
+    "x": 11950.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Get Help|Display Help Using CLI": {
-    "x": 12000.0,
+    "x": 12010.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/get-help/display-help-using-cli": {
-    "x": 12000.0,
+    "x": 12010.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "SUB_EPIC|Provide Context": {
-    "x": 12065.0,
+    "x": 12075.0,
     "y": 195.0,
     "width": 480.0,
     "height": 60.0
   },
   "invoke-bot/provide-context": {
-    "x": 12065.0,
+    "x": 12075.0,
     "y": 195.0,
     "width": 480.0,
     "height": 60.0
   },
   "STORY|Invoke Bot|Provide Context|Warn when Workspace  not setup": {
-    "x": 12070.0,
+    "x": 12080.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/warn-when-workspace--not-setup": {
-    "x": 12070.0,
+    "x": 12080.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Scan Worspace for Context Fies": {
-    "x": 12130.0,
+    "x": 12140.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/scan-worspace-for-context-fies": {
-    "x": 12130.0,
+    "x": 12140.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Add Context Files": {
-    "x": 12190.0,
+    "x": 12200.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/add-context-files": {
-    "x": 12190.0,
+    "x": 12200.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Remove Context File": {
-    "x": 12250.0,
+    "x": 12260.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/remove-context-file": {
-    "x": 12250.0,
+    "x": 12260.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Re-Scan Existing Context File": {
-    "x": 12310.0,
+    "x": 12320.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/re-scan-existing-context-file": {
-    "x": 12310.0,
+    "x": 12320.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Generate  Context Converter": {
-    "x": 12370.0,
+    "x": 12380.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/generate--context-converter": {
-    "x": 12370.0,
+    "x": 12380.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Convert Context": {
-    "x": 12430.0,
+    "x": 12440.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/convert-context": {
-    "x": 12430.0,
+    "x": 12440.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "STORY|Invoke Bot|Provide Context|Reset Scanned Context": {
-    "x": 12490.0,
+    "x": 12500.0,
     "y": 495.0,
     "width": 50.0,
     "height": 50.0
   },
   "invoke-bot/provide-context/reset-scanned-context": {
-    "x": 12490.0,
+    "x": 12500.0,
     "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "SUB_EPIC|New": {
-    "x": 12555.0,
-    "y": 195.0,
-    "width": 380.0,
-    "height": 60.0
-  },
-  "invoke-bot/new": {
-    "x": 12555.0,
-    "y": 195.0,
-    "width": 380.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|New 1": {
-    "x": 12560.0,
-    "y": 270.0,
-    "width": 120.0,
-    "height": 60.0
-  },
-  "invoke-bot/new/new-1": {
-    "x": 12560.0,
-    "y": 270.0,
-    "width": 120.0,
-    "height": 60.0
-  },
-  "STORY|Invoke Bot|New 1|New 1.1": {
-    "x": 12565.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-1/new-1.1": {
-    "x": 12565.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|New 1|New 2.2": {
-    "x": 12625.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-1/new-2.2": {
-    "x": 12625.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "SUB_EPIC|New 2": {
-    "x": 12690.0,
-    "y": 270.0,
-    "width": 240.0,
-    "height": 60.0
-  },
-  "invoke-bot/new/new-2": {
-    "x": 12690.0,
-    "y": 270.0,
-    "width": 240.0,
-    "height": 60.0
-  },
-  "STORY|Invoke Bot|New 2|New 2.1": {
-    "x": 12695.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-2/new-2.1": {
-    "x": 12695.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|New 2|New 1.2": {
-    "x": 12755.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-2/new-1.2": {
-    "x": 12755.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|New 2|New 2.3": {
-    "x": 12815.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-2/new-2.3": {
-    "x": 12815.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|New 2|New 1.3": {
-    "x": 12875.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "invoke-bot/new/new-2/new-1.3": {
-    "x": 12875.0,
-    "y": 495.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "SUB_EPIC|Morer": {
-    "x": 12950.0,
-    "y": 195.0,
-    "width": 1130.0,
-    "height": 60.0
-  },
-  "2": {
-    "x": 12950.0,
-    "y": 195.0,
-    "width": 1130.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|More 1": {
-    "x": 12953.0,
-    "y": 270.0,
-    "width": 547.0,
-    "height": 60.0
-  },
-  "3": {
-    "x": 12953.0,
-    "y": 270.0,
-    "width": 547.0,
-    "height": 60.0
-  },
-  "SUB_EPIC|More 3": {
-    "x": 12953.0,
-    "y": 340.0,
-    "width": 265.0,
-    "height": 60.0
-  },
-  "9": {
-    "x": 12953.0,
-    "y": 340.0,
-    "width": 265.0,
-    "height": 60.0
-  },
-  "STORY|Invoke Bot|More 3|More 1.1": {
-    "x": 12960.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "7": {
-    "x": 12960.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|More 3|More 1.2": {
-    "x": 13020.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "8": {
-    "x": 13020.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|More 3|More 2.1": {
-    "x": 13080.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "6": {
-    "x": 13080.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|More 3|More 2.2": {
-    "x": 13138.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "5": {
-    "x": 13138.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "SUB_EPIC|More 2": {
-    "x": 13230.0,
-    "y": 340.0,
-    "width": 265.0,
-    "height": 60.0
-  },
-  "4": {
-    "x": 13230.0,
-    "y": 340.0,
-    "width": 265.0,
-    "height": 60.0
-  },
-  "STORY|Invoke Bot|More 2|aaa": {
-    "x": 13260.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "11": {
-    "x": 13260.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "STORY|Invoke Bot|More 2|bbb": {
-    "x": 13318.0,
-    "y": 500.0,
-    "width": 50.0,
-    "height": 50.0
-  },
-  "10": {
-    "x": 13318.0,
-    "y": 500.0,
     "width": 50.0,
     "height": 50.0
   }

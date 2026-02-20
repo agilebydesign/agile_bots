@@ -70,7 +70,11 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
         }
         if self._behaviors_adapter:
             result['behaviors'] = self._behaviors_adapter.to_dict() if hasattr(self._behaviors_adapter, 'to_dict') else {}
-        
+        if hasattr(self.bot, 'get_execution_settings'):
+            settings = self.bot.get_execution_settings()
+            if settings:
+                result['execution'] = settings  # e.g. {"shape.clarify": "auto"} for Panel toggles
+
         if hasattr(self.bot, '_scope') and self.bot._scope:
             import time
             # Reload scope from file to ensure we have the latest persisted state
