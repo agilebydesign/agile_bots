@@ -37,9 +37,7 @@ class BehaviorsView extends PanelView {
         if (!botData.behaviors) throw new Error('[BehaviorsView] No behaviors in response');
         if (!botData.behaviors.all_behaviors) throw new Error('[BehaviorsView] No all_behaviors in response');
         return botData.behaviors.all_behaviors;
-    }
-    
-    // escapeHtml and escapeForJs now imported from ./utils
+    }    
     
     /**
      * Get status marker for behavior/action/operation.

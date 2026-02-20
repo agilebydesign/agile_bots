@@ -6,6 +6,11 @@ module.exports = {
     env: {
         uriScheme: 'vscode'
     },
+    ProgressLocation: {
+        Notification: 15,
+        SourceControl: 1,
+        Window: 10
+    },
     Uri: {
         file: (path) => ({ fsPath: path, toString: () => path }),
         joinPath: (base, ...paths) => {
@@ -31,6 +36,7 @@ module.exports = {
         showErrorMessage: () => Promise.resolve(),
         showInformationMessage: () => Promise.resolve(),
         showTextDocument: () => Promise.resolve(),
+        withProgress: (options, task) => task({ report: () => {} }),
         createOutputChannel: () => ({
             appendLine: () => {},
             show: () => {}

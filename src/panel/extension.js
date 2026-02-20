@@ -9,6 +9,7 @@ const vscode = require("vscode");
 const BotPanel = require("./bot_panel.js");
 const BotPanelSidebarProvider = require("./bot_panel_sidebar.js");
 const { Logger } = require("./utils");
+const path = require("path");
 
 let outputChannel = null;
 
@@ -29,7 +30,7 @@ function activate(context) {
   const perfActivateStart = performance.now();
 
   try {     
-    Logger.initializeLogger(context.extensionPath); // Initialize logger with default log folder based on extension path
+    Logger.initializeLogger(path.join(context.extensionPath, 'logs')); // Initialize logger with default log folder based on extension path
 
     if (typeof process.env.DEBUG_LOGGING !== 'undefined') {
       // override vscode setting with environment variable for easier debugging without changing user settings

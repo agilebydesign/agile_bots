@@ -1,14 +1,49 @@
 /**
- * Panel debug logger utility.
- * 
- * Centralized logging for panel debugging with file output
- * and console logging support.
+ * Panel shared utilities — flat file so require('./utils') resolves without a subdirectory.
  */
 
 const fs = require('fs');
 const path = require('path');
 const vscode = require('vscode');
 
+// ── HTML / JS escaping ────────────────────────────────────────────────────────
+
+function escapeForHtml(text) {
+    if (text === null || text === undefined) return '';
+    if (typeof text !== 'string') text = String(text);
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+function escapeForJs(text) {
+    if (text === null || text === undefined) return '';
+    if (typeof text !== 'string') text = String(text);
+    return text
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
+}
+
+// ── Path utilities ────────────────────────────────────────────────────────────
+
+function truncatePath(pathStr, maxLength) {
+    if (!pathStr || pathStr.length <= maxLength) return pathStr || '';
+    const ellipsis = '...';
+    const prefixLength = Math.floor((maxLength - ellipsis.length) / 2);
+    const suffixLength = maxLength - ellipsis.length - prefixLength;
+    return pathStr.substring(0, prefixLength) + ellipsis + pathStr.substring(pathStr.length - suffixLength);
+}
+
+// ── Logger ────────────────────────────────────────────────────────────────────
+
+/**
+ * Panel debug logger utility.
+ * 
+ * Centralized logging for panel debugging with file output
+ * and console logging support.
+ */
 class Logger {
     static logFilePath = "";
     static debugLogEnabled = "";
@@ -22,7 +57,7 @@ class Logger {
     static initializeLogger(defaultLogFolder) {
         var configLogFolder = vscode.workspace.getConfiguration('agileBotsPanel').get('logFolder');
         if (typeof configLogFolder === 'undefined' || configLogFolder === "") {
-            configLogFolder = path.join(defaultLogFolder, 'logs');
+            configLogFolder = path.join(defaultLogFolder);
         }
         Logger.logFilePath = path.join(configLogFolder, 'panel-debug.log');   
 
@@ -76,4 +111,9 @@ class Logger {
     }
 }
 
-module.exports = Logger;
+module.exports = {
+    escapeForHtml,
+    escapeForJs,
+    truncatePath,
+    Logger
+};

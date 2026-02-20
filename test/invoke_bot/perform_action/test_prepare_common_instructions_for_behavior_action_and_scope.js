@@ -173,7 +173,7 @@ function createTestBotPanel() {
     };
     
         
-    const botPanel = new BotPanel(mockVscodePanel, repoRoot, null);
+    const botPanel = new BotPanel(mockVscodePanel, repoRoot, path.join(repoRoot, 'src', 'panel'));
 
     // Register the handler (mirrors onDidReceiveMessage in bot_panel.js)    
     botPanel._panel.webview.onDidReceiveMessage(handleMessage);    

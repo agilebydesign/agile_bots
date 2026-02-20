@@ -1,20 +1,14 @@
 {
 	"version": "0.0.1",
-	"configurations": [
-		{
-			"name": "Python Debugger: Attach using Process Id",
-			"type": "debugpy",
-			"request": "attach",
-			"processId": "${command:pickProcess}"
-		},
-		{
-			"args": [
+	"configurations": [		
+		{			
+			"args": [												
 				"--extensionDevelopmentPath=${workspaceFolder}/src/panel"
 			],
 			"env": {
 				"PWD": "${workspaceFolder}",
 				"DEBUG_LOGGING": "true"
-			},
+			},			
 			"name": "Debug Panel",
 			"outFiles": [
 				"${workspaceFolder}/src/panel/out/**/*.js"
