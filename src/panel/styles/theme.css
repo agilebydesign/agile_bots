@@ -59,10 +59,11 @@ body {
     font-weight: var(--font-weight-normal);
 }
 
-/* Prevent images from scaling with panel width */
+/* Prevent images from scaling with panel width; black background for consistent look */
 img {
     flex-shrink: 0;
     min-width: 0;
+    background-color: #000;
 }
 
 .bot-view {
@@ -161,6 +162,28 @@ img {
     font-size: var(--font-size-sm);
     color: var(--text-color-faded);
 }
+
+.execution-toggle-btn {
+    padding: 2px 4px;
+    font-size: 10px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 2px;
+    background: #000;
+    color: var(--text-color-faded);
+    cursor: pointer;
+    opacity: 0.5;
+    transition: background-color 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
+}
+.execution-toggle-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-color);
+}
+.execution-toggle-btn.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-color);
+    opacity: 1;
+}
+
 .collapsible-content {
     padding-left: 0;
 }

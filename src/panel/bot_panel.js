@@ -1,10 +1,4 @@
-/**
- * Bot Panel Controller
- * 
- * Manages webview panel lifecycle and coordinates data fetching,
- * parsing, and rendering using the new domain-oriented BotView.
- * Implements singleton pattern.
- */
+
 
 const vscode = require("vscode");
 const path = require("path");
@@ -15,10 +9,10 @@ const branding = require("./branding");
 
 class BotPanel {
   constructor(panel, workspaceRoot, extensionUri) {
-    // ===== PERFORMANCE: Start constructor timing =====
+
     const perfConstructorStart = performance.now();
     try {
-      // Setup file logging first
+
       const logFile = path.join(workspaceRoot || 'c:\\dev\\augmented-teams', 'panel-debug.log');
       this.logFilePath = logFile;
       this._log = (msg) => {
@@ -50,13 +44,13 @@ class BotPanel {
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};
-      this._currentStoryMapView = 'Hierarchy'; // 'Hierarchy', 'Increment', or 'Files'
+      this._currentStoryMapView = 'Hierarchy';
       
-      // Initialize branding with repo root
+
       branding.setRepoRoot(workspaceRoot);
       this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
-      // Read panel version from package.json
+
       const perfVersionStart = performance.now();
       console.log("[BotPanel] Reading panel version");
       this._panelVersion = this._readPanelVersion();
@@ -64,15 +58,15 @@ class BotPanel {
       console.log(`[BotPanel] Panel version: ${this._panelVersion}`);
       this._log(`[PERF] Read panel version: ${(perfVersionEnd - perfVersionStart).toFixed(2)}ms`);
       
-      // Determine bot directory (from env var or default to story_bot)
+
       let botDirectory = process.env.BOT_DIRECTORY || path.join(workspaceRoot, 'bots', 'story_bot');
-      // Ensure bot directory is absolute
+
       if (!path.isAbsolute(botDirectory)) {
         botDirectory = path.join(workspaceRoot, botDirectory);
       }
       console.log(`[BotPanel] Bot directory: ${botDirectory}`);
       
-      // Create shared PanelView instance for CLI operations
+
       const perfPanelViewStart = performance.now();
       console.log("[BotPanel] Creating shared PanelView instance");
       this._sharedCLI = new PanelView(botDirectory);
@@ -80,14 +74,14 @@ class BotPanel {
       console.log("[BotPanel] Shared PanelView instance created successfully");
       this._log(`[PERF] PanelView creation: ${(perfPanelViewEnd - perfPanelViewStart).toFixed(2)}ms`);
       
-      // Initialize BotView (uses shared CLI)
+
       this._botView = null;
       
-      // Set initial loading HTML
+
       console.log("[BotPanel] Setting initial loading HTML");
       this._panel.webview.html = this._getWebviewContent('<div style="padding: 20px;">Loading bot panel...</div>');
       
-      // Update content asynchronously (can't await in constructor)
+
       console.log("[BotPanel] Calling _update()");
       this._update().catch(err => {
         console.error(`[BotPanel] ERROR in async _update: ${err.message}`);
@@ -95,7 +89,7 @@ class BotPanel {
         vscode.window.showErrorMessage(`Bot Panel Error: ${err.message}`);
       });
       
-      // ===== PERFORMANCE: End constructor timing =====
+
       const perfConstructorEnd = performance.now();
       const constructorDuration = (perfConstructorEnd - perfConstructorStart).toFixed(2);
       console.log("[BotPanel] Constructor completed successfully");
@@ -107,15 +101,15 @@ class BotPanel {
       throw error;
     }
 
-    // Listen for when the panel is disposed
+
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Note: We don't refresh when the panel becomes visible - once loaded, the webview content persists
-    // This preserves user state (scroll position, expanded nodes, etc.) when switching tabs
-    // The panel only refreshes when explicitly requested (refresh button, certain operations)
+
+
+
     this._panel.onDidChangeViewState(
       (e) => {
-        // Reset flag after a short delay to allow file opening to complete
+
         if (this._isOpeningFile) {
           setTimeout(() => { this._isOpeningFile = false; }, 500);
         }
@@ -124,7 +118,7 @@ class BotPanel {
       this._disposables
     );
 
-    // Handle messages from the webview
+
     this._log('[BotPanel] Registering onDidReceiveMessage handler');
     this._panel.webview.onDidReceiveMessage(
       (message) => {
@@ -132,13 +126,11 @@ class BotPanel {
         this._log('[BotPanel] Received message from webview: ' + message.command + ' ' + JSON.stringify(message));
         switch (message.command) {
           case "hidePanel":
-            // Close/dispose the panel - user can reopen via command
+
             this._log('[BotPanel] Closing panel');
             this._panel.dispose();
             return;
           case "refresh":
-            // Delete the enriched cache to force regeneration of test links
-            const fs = require('fs');
             const cachePath = path.join(this._workspaceRoot, 'docs', 'stories', '.story-graph-enriched-cache.json');
             try {
               if (fs.existsSync(cachePath)) {
@@ -148,7 +140,7 @@ class BotPanel {
             } catch (err) {
               this._log(`[BotPanel] Warning: Could not delete cache: ${err.message}`);
             }
-            // Clear the story graph cache in the Bot instance to force reload
+
             (async () => {
               try {
                 this._log('[BotPanel] Clearing story graph cache...');
@@ -157,10 +149,10 @@ class BotPanel {
               } catch (err) {
                 this._log(`[BotPanel] Warning: Could not clear story graph cache: ${err.message}`);
               }
-              // Proceed with refresh after clearing cache
+
               try {
                 await this._update();
-                // After refresh, re-expand the current action's section
+
                 const botData = this._botView?.botData;
                 const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
                 if (currentAction) {
@@ -182,10 +174,10 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-            // Legacy support for toggle (now handled by switchViewMode)
+
             this._log('[BotPanel] toggleIncrementView: switching to ' + message.currentView);
             this._currentStoryMapView = message.currentView;
-            // Refresh the panel to show the new view
+
             (async () => {
               try {
                 await this._update();
@@ -195,10 +187,10 @@ class BotPanel {
             })();
             return;
           case "switchViewMode":
-            // Switch between Hierarchy, Increment, and Files views
+
             this._log('[BotPanel] switchViewMode: switching to ' + message.viewMode);
             this._currentStoryMapView = message.viewMode;
-            // Refresh the panel to show the new view
+
             (async () => {
               try {
                 await this._update();
@@ -209,16 +201,31 @@ class BotPanel {
             return;
           case "logToFile":
             if (message.message) {
-              const fs = require('fs');
               const logPath = path.join(this._workspaceRoot, 'panel_clicks.log');
               const timestamp = new Date().toISOString();
               fs.appendFileSync(logPath, `[${timestamp}] ${message.message}\n`);
             }
             return;
+          case "logScopeDebug":
+            if (message.message) {
+              const logDir = path.join(this._workspaceRoot, 'logs');
+              try { fs.mkdirSync(logDir, { recursive: true }); } catch (_) {}
+              const scopeLogPath = path.join(logDir, 'scope_debug.log');
+              const timestamp = new Date().toISOString();
+              fs.appendFileSync(scopeLogPath, `[${timestamp}] [PANEL] ${message.message}\n`);
+            }
+            return;
+          case "showScopeError":
+            if (message.message) {
+              const errMsg = message.message;
+              this._log(`[BotPanel] Scope error from webview: ${errMsg}`);
+              vscode.window.showErrorMessage(errMsg);
+            }
+            return;
           case "copyNodeToClipboard":
             (() => {
               const nodePath = message.nodePath;
-              const action = message.action; // 'name' or 'json'
+              const action = message.action;
               if (!nodePath || !action) return;
               const method = action === 'json' ? 'copy_json' : 'copy_name';
               const command = nodePath + '.' + method;
@@ -229,7 +236,7 @@ class BotPanel {
                 if (action === 'json') {
                   text = (typeof result === 'string' ? result : JSON.stringify(result, null, 2));
                 } else {
-                  // Copy name: result should be string; extract from object if backend returns wrong shape
+
                   if (typeof result === 'string') {
                     text = result;
                   } else if (result && typeof result === 'object') {
@@ -288,7 +295,7 @@ class BotPanel {
                 }
               }
               
-              // Normalize file path; handle file:// URIs and encoded characters
+
               let absolutePath;
               if (cleanPath.startsWith('file://')) {
                 absolutePath = vscode.Uri.parse(cleanPath).fsPath;
@@ -300,28 +307,26 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // Check if path is a directory
-              const fs = require('fs');
               if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
-                // Reveal directory in VS Code file explorer
+
                 vscode.commands.executeCommand('revealInExplorer', fileUri).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to reveal folder: ${message.filePath}\n${error.message}`);
                 });
               } else {
                 const fileExtension = cleanPath.split('.').pop().toLowerCase();
                 const binaryOrSpecialExtensions = ['drawio', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'];
-                // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
                 const useVscodeOpenExtensions = ['json'];
                 
-                // Check file size - use vscode.open for large files (>10MB) to avoid VS Code text editor limit
-                const MAX_TEXT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+                const MAX_TEXT_FILE_SIZE = 10 * 1024 * 1024;
                 let fileSize = 0;
                 try {
                   if (fs.existsSync(absolutePath)) {
                     fileSize = fs.statSync(absolutePath).size;
                   }
                 } catch (e) {
-                  // Ignore errors, proceed with default handling
+
                 }
                 
                 if (binaryOrSpecialExtensions.includes(fileExtension)) {
@@ -329,18 +334,18 @@ class BotPanel {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                   });
                 } else if (useVscodeOpenExtensions.includes(fileExtension)) {
-                  // Use vscode.open for JSON to avoid showTextDocument bugs
+
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                   });
                 } else if (fileSize > MAX_TEXT_FILE_SIZE) {
-                  // Large file - use vscode.open to avoid text editor memory limit
+
                   this._log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                   });
                 } else if (fileExtension === 'md') {
-                  // Open markdown files in preview mode
+
                   vscode.commands.executeCommand('markdown.showPreview', fileUri).catch((error) => {
                     vscode.window.showErrorMessage(`Failed to open markdown preview: ${message.filePath}\n${error.message}`);
                   });
@@ -410,7 +415,6 @@ class BotPanel {
                   const decoded = decodeURIComponent(rawPath);
                   absolutePath = path.isAbsolute(decoded) ? decoded : path.join(this._workspaceRoot, decoded);
                 }
-                const fs = require('fs');
                 if (!fs.existsSync(absolutePath) || fs.statSync(absolutePath).isDirectory()) continue;
                 const fileExtension = rawPath.split('.').pop().toLowerCase();
                 const uri = lineNumber
@@ -450,7 +454,7 @@ class BotPanel {
               };
               const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.One;
               
-              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json') {
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
@@ -466,7 +470,7 @@ class BotPanel {
           case "openFileWithState":
             this._log('[BotPanel] openFileWithState message received');
             if (message.filePath) {
-              // Open file and apply state (collapse/expand)
+
               const rawPath = message.filePath;
               const cleanPath = rawPath.split('#')[0];
               let absolutePath;
@@ -480,14 +484,13 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // Use vscode.open for JSON files (not openTextDocument) to avoid extension sync / text editor limits
+
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json' && message.state && message.state.selectedNode) {
-                // JSON with selectedNode: read via fs, find line, open with vscode.open + fragment
+
                 const node = message.state.selectedNode;
                 let startLine = 0;
                 try {
-                  const fs = require('fs');
                   const text = fs.readFileSync(absolutePath, 'utf8');
                   const lines = text.split('\n');
                   const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -519,7 +522,7 @@ class BotPanel {
                 });
                 this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
               } else if (fileExtension === 'json') {
-                // JSON files without selectedNode - just open
+
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                 });
@@ -535,7 +538,7 @@ class BotPanel {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                 });
               } else if (message.state && message.state.selectedNode) {
-                // Need to search document for node - use openTextDocument
+
                 vscode.workspace.openTextDocument(fileUri).then(
                   (doc) => {
                     const node = message.state.selectedNode;
@@ -556,7 +559,7 @@ class BotPanel {
                     let options = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
                     
                     if (nameLineIndex >= 0) {
-                      // Find the opening brace of this object (search backwards)
+
                       let startLine = nameLineIndex;
                       for (let i = nameLineIndex - 1; i >= 0; i--) {
                         const line = lines[i].trim();
@@ -569,7 +572,7 @@ class BotPanel {
                         }
                       }
                       
-                      // Find the matching closing brace (count braces forward)
+
                       let braceCount = 0;
                       let endLine = nameLineIndex;
                       let started = false;
@@ -591,7 +594,7 @@ class BotPanel {
                         if (started && braceCount === 0) break;
                       }
                       
-                      // Select from start of opening brace line to end of closing brace line
+
                       const endLineLength = lines[endLine] ? lines[endLine].length : 0;
                       options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
                     }
@@ -601,14 +604,14 @@ class BotPanel {
                     });
                   },
                   (error) => {
-                    // Fallback: open file without positioning
+
                     vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch(() => {
                       vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                     });
                   }
                 );
               } else {
-                // No state - just open the file directly
+
                 vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((error) => {
                   vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
                 });
@@ -619,7 +622,7 @@ class BotPanel {
           case "openTestFiles":
           case "openCodeFiles":
           case "openAllRelatedFiles":
-            // These commands need to query story graph data, so delegate to bot
+
             this._log(`[BotPanel] ${message.command} message received for node: ${message.nodeName}`);
             this._handleOpenRelatedFiles(message);
             return;
@@ -655,7 +658,7 @@ class BotPanel {
               return;
             }
             
-            // Execute scope include_level command to update bot and persist to scope.json
+
             const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
             this._botView.execute(scopeIncludeCmd)
               .then(() => {
@@ -682,7 +685,7 @@ class BotPanel {
             
             if (message.filter && message.filter.trim()) {
               const filterValue = message.filter.trim();
-              // If in Files mode, prefix filter with "file:"
+
               const prefixedFilter = this._currentStoryMapView === 'Files' ? `file:${filterValue}` : filterValue;
               const scopeCmd = `scope "${prefixedFilter}"`;
               this._log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
@@ -701,10 +704,10 @@ class BotPanel {
                   this._log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
-                  // Don't re-throw - show error but don't crash panel
+
                 });
             } else {
-              // Empty filter = clear filter
+
               this._log('[BotPanel] Clearing scope filter');
               
               this._botView.execute('scope all')
@@ -718,7 +721,7 @@ class BotPanel {
                   this._log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
-                  // Don't re-throw - show error but don't crash panel
+
                 });
             }
             return;
@@ -749,12 +752,12 @@ class BotPanel {
               if (folders && folders.length > 0) {
                 const folderPath = folders[0].fsPath;
                 this._log('[BotPanel] User selected folder: ' + folderPath);
-                // Update the workspace input in the webview
+
                 this._panel.webview.postMessage({
                   command: 'setWorkspacePath',
                   path: folderPath
                 });
-                // Trigger workspace update
+
                 this._botView?.handleEvent('updateWorkspace', { workspacePath: folderPath })
                   .then((result) => {
                     this._log('[BotPanel] browseWorkspace updateWorkspace result: ' + JSON.stringify(result));
@@ -782,13 +785,13 @@ class BotPanel {
               this._log(`[BotPanel] getBehaviorRules -> ${message.behaviorName}`);
               this._log(`[getBehaviorRules] STARTED for behavior: ${message.behaviorName}`);
               
-              // Execute submitrules CLI command to submit rules to chat
+
               this._botView?.execute(`submitrules:${message.behaviorName}`)
                 .then((result) => {
                   this._log('[BotPanel] Rules submitted:', result);
                   this._log(`[getBehaviorRules] Result received: ${JSON.stringify(result, null, 2)}`);
                   
-                  // Handle dictionary response from Python
+
                   if (result && typeof result === 'object') {
                     this._log(`[getBehaviorRules] Result is object with status: ${result.status}`);
                     if (result.status === 'success') {
@@ -800,7 +803,7 @@ class BotPanel {
                       this._log(`[getBehaviorRules] ERROR status - showing error: ${errorMsg}`);
                       vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
                     } else {
-                      // Legacy format: check output field
+
                       const outputStr = typeof result.output === 'string' ? result.output : '';
                       this._log(`[getBehaviorRules] Legacy format - output: ${outputStr}`);
                       if (outputStr.includes('submitted')) {
@@ -817,7 +820,7 @@ class BotPanel {
                     vscode.window.showWarningMessage('Submit completed with unknown result');
                   }
                   
-                  // Refresh panel to show current position
+
                   this._log(`[getBehaviorRules] About to refresh panel`);
                   return this._update();
                 })
@@ -843,6 +846,36 @@ class BotPanel {
                 });
             }
             return;
+          case "setExecutionMode":
+            if (message.behaviorName && message.actionName && message.mode) {
+              const cmd = `${message.behaviorName}.${message.actionName}.set_execution ${message.mode}`;
+              this._log(`[BotPanel] setExecutionMode -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setExecutionMode success: ${cmd}`);
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setExecutionMode ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set execution mode: ${error.message}`);
+                });
+            }
+            return;
+          case "setBehaviorExecuteMode":
+            if (message.behaviorName && message.mode) {
+              const cmd = `${message.behaviorName}.set_execution ${message.mode}`;
+              this._log(`[BotPanel] setBehaviorExecuteMode -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setBehaviorExecuteMode success: ${cmd}`);
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setBehaviorExecuteMode ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set behavior execution mode: ${error.message}`);
+                });
+            }
+            return;
           case "renameNode":
             this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
             this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Received renameNode message`, {
@@ -851,7 +884,7 @@ class BotPanel {
               timestamp: new Date().toISOString()
             });
             if (message.nodePath && message.currentName) {
-              // Prompt for new name
+
               this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Prompting user for new name`);
               vscode.window.showInputBox({
                 prompt: `Rename "${message.currentName}"`,
@@ -864,14 +897,14 @@ class BotPanel {
                   changed: newName && newName !== message.currentName
                 });
                 if (newName && newName !== message.currentName) {
-                  // Strip any surrounding quotes from the input first (user shouldn't need to quote the name)
+
                   const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
-                  // Escape quotes and backslashes in the new name
+
                   const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
                   const command = `${message.nodePath}.rename name:"${escapedName}"`;
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Built rename command: ${command}`);
                   
-                  // Send optimistic update message to webview
+
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Sending optimistic update to webview`);
                   this._panel.webview.postMessage({
                     command: 'optimisticRename',
@@ -880,8 +913,6 @@ class BotPanel {
                     newName: trimmedName
                   });
                   
-                  // Log to file
-                  const fs = require('fs');
                   const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
                   const timestamp = new Date().toISOString();
                   const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
@@ -892,14 +923,14 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
                   }
                   
-                  // Execute backend command with optimistic flag
+
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Executing rename command via backend (optimistic)...`);
                   this._botView?.execute(command)
                     .then((result) => {
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [SUCCESS] Backend rename executed successfully`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
                       
-                      // Log result to file
+
                       const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
                       try {
                         fs.appendFileSync(logPath, resultLog);
@@ -907,14 +938,14 @@ class BotPanel {
                         this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                       }
                       
-                      // Send saveCompleted message for optimistic update handling
+
                       this._panel.webview.postMessage({
                         command: 'saveCompleted',
                         success: true,
                         result: result
                       });
                       
-                      // Don't refresh - optimistic update already handled in webview
+
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Optimistic update - skipping panel refresh`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION COMPLETE ==========`);
                     })
@@ -923,14 +954,14 @@ class BotPanel {
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Error: ${error.message}`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Stack: ${error.stack}`);
                       
-                      // Send error message to webview for SaveQueue rollback
+
                       this._panel.webview.postMessage({
                         command: 'saveCompleted',
                         success: false,
                         error: error.message
                       });
                       
-                      // Log error to file
+
                       const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
                       try {
                         fs.appendFileSync(logPath, errorLog);
@@ -940,7 +971,7 @@ class BotPanel {
                       
                       vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
                       
-                      // Always refresh on error to show accurate backend state
+
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Refreshing panel after error...`);
                       this._update().catch(err => {
                         this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
@@ -956,8 +987,8 @@ class BotPanel {
               this._log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
               this._log(`[BotPanel] commandText: ${message.commandText}`);
               
-              // Detect operation types
-              // Create operations can be: .create_epic, .create_story, .create (for sub-epics), create child, create epic
+
+
               const isCreateOp = message.commandText.includes('.create_') || 
                                  message.commandText.includes('.create ') || 
                                  message.commandText.match(/\.create(?:$| name:)/) ||
@@ -968,11 +999,11 @@ class BotPanel {
               const isRenameOp = message.commandText.includes('.rename');
               const isStoryGraphOp = isCreateOp || isDeleteOp || isMoveOp || isRenameOp;
               
-              // ALL story-changing operations use optimistic updates and skip refresh
-              // This preserves the optimistic DOM updates made in the frontend
-              // No need to check optimistic flag - story-changing ops always skip refresh
+
+
+
               
-              // Special debug for submit commands
+
               const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
                 message.commandText.includes('submit_instructions') ||
                 message.commandText.includes('submit_current_instructions');
@@ -988,8 +1019,6 @@ class BotPanel {
                 isDeleteOp
               });
               
-              // Log to file for create/delete/rename operations
-              const fs = require('fs');
               const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
               const timestamp = new Date().toISOString();
               const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RECEIVED COMMAND: ${message.commandText}\n`;
@@ -1020,7 +1049,7 @@ class BotPanel {
                   }
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Timestamp: ${new Date().toISOString()}`);
                   
-                  // Log result to file
+
                   const resultLog = `[${timestamp}] SUCCESS RESULT: ${JSON.stringify(result, null, 2)}\n`;
                   try {
                     fs.appendFileSync(logPath, resultLog);
@@ -1028,11 +1057,11 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                   }
                   
-                  // Check if this is submit_required_behavior_instructions - show submit result
+
                   const isSubmitInstructions = message.commandText.includes('submit_required_behavior_instructions');
                   if (isSubmitInstructions && result) {
                     this._log(`[BotPanel] Submit result from CLI: ${JSON.stringify(result).substring(0, 500)}`);
-                    // Show success/error message from CLI submit
+
                     if (result.status === 'success') {
                       const msg = result.message || 'Instructions submitted to chat!';
                       vscode.window.showInformationMessage(msg);
@@ -1040,12 +1069,12 @@ class BotPanel {
                       const errorMsg = result.message || result.error || 'Failed to submit instructions';
                       vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                     }
-                    // Don't refresh panel after submit - it's a read-only operation that doesn't change the story graph
+
                     this._log(`[BotPanel] Submit completed - skipping panel refresh (no story graph changes)`);
                     return Promise.resolve();
                   }
                   
-                  // Log timestamp for when panel made a change (for behavior cache invalidation)
+
                   const timestampFile = path.join(this._workspaceRoot, 'docs', 'stories', '.story-graph-panel-edit-time');
                   try {
                     fs.writeFileSync(timestampFile, Date.now().toString());
@@ -1054,7 +1083,7 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write timestamp file: ${err.message}`);
                   }
                   
-                  // Notify webview of successful save
+
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
                     this._log(`[BotPanel] Sending saveCompleted(success=true) to webview`);
                     this._panel.webview.postMessage({
@@ -1065,29 +1094,29 @@ class BotPanel {
                     this._log(`[BotPanel] Message sent to webview`);
                   }
                   
-                  // Increment commands always need a full refresh to show updated data
+
                   if (isIncrementCmd) {
                     this._log(`[INCREMENT] Refreshing panel after increment command`);
                     return this._update();
                   }
                   
-                  // CRITICAL: Always skip refresh for story-changing operations
-                  // All story-changing operations use optimistic updates in the frontend
-                  // Refreshing would remove those optimistic updates, so we never refresh
+
+
+
                   if (isStoryGraphOp) {
                     this._log(`[BotPanel] Story-changing operation - skipping panel refresh`);
                     this._log(`[BotPanel] Operation type: create=${isCreateOp}, move=${isMoveOp}, delete=${isDeleteOp}, rename=${isRenameOp}`);
                     this._log(`[BotPanel] Panel will NOT refresh - optimistic updates remain visible`);
                     return Promise.resolve();
                   } else {
-                    // Check if this is a scope command - needs refresh to show filtered view
+
                     const isScopeCommand = message.commandText.startsWith('scope ');
                     if (isScopeCommand) {
                       this._log(`[BotPanel] Scope command detected - refreshing panel to show filtered view...`);
                       return this._update();
                     }
                     
-                    // Non-story operations (like submit) don't need refresh
+
                     this._log(`[BotPanel] Non-story operation - skipping refresh`);
                     return Promise.resolve();
                   }
@@ -1104,7 +1133,7 @@ class BotPanel {
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Stack: ${error.stack}`);
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Timestamp: ${new Date().toISOString()}`);
                   
-                  // Log error to file
+
                   const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
                   try {
                     fs.appendFileSync(logPath, errorLog);
@@ -1114,7 +1143,7 @@ class BotPanel {
                   
                   vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
                   
-                  // Notify webview of save error
+
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
                     this._log(`[BotPanel] Sending saveCompleted(success=false) to webview`);
                     this._panel.webview.postMessage({
@@ -1125,8 +1154,8 @@ class BotPanel {
                     this._log(`[BotPanel] Error message sent to webview`);
                   }
                   
-                  // Always refresh on error to show accurate backend state
-                  // (rollback should have already happened in SaveQueue)
+
+
                   if (!isOptimistic) {
                     this._log(`[BotPanel] Refreshing panel after error...`);
                     this._update().catch(err => {
@@ -1157,14 +1186,14 @@ class BotPanel {
               const cmd = `${message.behaviorName}`;
               this._botView?.execute(cmd)
                 .then((result) => {
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();
@@ -1188,24 +1217,24 @@ class BotPanel {
                   if (result?.instructions) {
                     this._log(`[BotPanel] result.instructions keys: ${Object.keys(result.instructions).join(', ')}`);
                   }
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                       this._log(`[BotPanel] Copied instructions into botData`);
                     } else {
                       this._log(`[BotPanel] WARNING: No instructions in result to copy!`);
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   } else {
                     this._log(`[BotPanel] WARNING: No result.bot - not caching!`);
                   }
                   return this._updateWithCachedData().then(() => {
-                    // After panel update, expand the instructions section for this action
-                    // Use setTimeout to ensure DOM is ready after webview.html is set
+
+
                     setTimeout(() => {
                       try {
                         this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
@@ -1233,14 +1262,14 @@ class BotPanel {
               this._botView?.execute(command)
                 .then((result) => {
                   this._log(`[BotPanel] navigateAndExecute success: ${command} | result keys: ${Object.keys(result || {})}`);
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();
@@ -1254,7 +1283,7 @@ class BotPanel {
             return;
           case "toggleSection":
             if (message.sectionId) {
-              // Expansion state is handled client-side via JavaScript
+
             }
             return;
           case "sectionExpansion":
@@ -1265,18 +1294,18 @@ class BotPanel {
             return;
           case "toggleCollapse":
             if (message.elementId) {
-              // Expansion state is handled client-side via JavaScript
+
             }
             return;
           case "sendToChat":
             this._log('sendToChat - calling bot submit command');
             
-            // Call the bot's submit command (Python handles everything)
+
             this._botView?.execute('submit')
               .then((output) => {
                 this._log('Bot submit command output:', output);
                 
-                // Handle dictionary response from Python
+
                 if (output && typeof output === 'object' && output.status) {
                   if (output.status === 'success') {
                     const msg = output.message || 'Instructions submitted to chat!';
@@ -1286,7 +1315,7 @@ class BotPanel {
                     vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                   }
                 }
-                // Handle string response (legacy/CLI format)
+
                 else {
                   const outputStr = typeof output === 'string' ? output : JSON.stringify(output || '');
                   
@@ -1344,7 +1373,7 @@ class BotPanel {
           case "saveStrategyDecision":
             if (message.criteriaKey && message.selectedOption) {
               this._log(`[BotPanel] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
-              // Build decisions object with just this one decision
+
               const decisions = {};
               decisions[message.criteriaKey] = message.selectedOption;
               const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
@@ -1363,7 +1392,7 @@ class BotPanel {
           case "saveStrategyMultiDecision":
             if (message.criteriaKey && message.selectedOptions) {
               this._log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
-              // Build decisions object with array of selected options
+
               const multiDecisions = {};
               multiDecisions[message.criteriaKey] = message.selectedOptions;
               const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
@@ -1399,11 +1428,11 @@ class BotPanel {
                 const result = await this._botView.execute(renderCmd);
                 if (result?.status === 'success') {
                   vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
-                  // Open the rendered diagram file (use vscode.open so DrawIO editor opens, not XML)
+
                   if (message.path) {
                     try {
-                      // Resolve scoped filename using the same logic
-                      // the Python backend applies.
+
+
                       let openPath = message.path;
                       if (diagramScope) {
                         const sanitized = diagramScope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
@@ -1545,7 +1574,7 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to update story graph');
                 }
-                // Clear cached data so panel reloads fresh story map
+
                 if (this._botView) {
                   this._botView.botData = null;
                 }
@@ -1588,7 +1617,7 @@ class BotPanel {
       const column = vscode.ViewColumn.Two;
       console.log(`[BotPanel] >>> Column set: ${column}`);
 
-      // If we already have a panel, show it
+
       if (BotPanel.currentPanel) {
         console.log("[BotPanel] >>> Reusing existing panel");
         BotPanel.currentPanel._panel.reveal(column);
@@ -1596,7 +1625,7 @@ class BotPanel {
       }
 
       console.log("[BotPanel] >>> Creating new webview panel");
-      // Otherwise, create a new panel
+
       const panel = vscode.window.createWebviewPanel(
         BotPanel.viewType,
         "Bot Panel",
@@ -1622,27 +1651,19 @@ class BotPanel {
     }
   }
 
-  /**
-   * Create a BotPanel instance for use in a sidebar WebviewView.
-   * Unlike createOrShow, this doesn't create a new WebviewPanel - it uses an existing WebviewView.
-   * 
-   * @param {vscode.WebviewView} webviewView - The sidebar webview view
-   * @param {string} workspaceRoot - Workspace root path
-   * @param {vscode.Uri} extensionUri - Extension URI for resources
-   * @returns {BotPanel} The BotPanel instance
-   */
+
   static createForSidebar(webviewView, workspaceRoot, extensionUri) {
     console.log("[BotPanel] Creating for sidebar view");
     
-    // Create a wrapper object that mimics WebviewPanel interface
+
     const panelWrapper = {
       webview: webviewView.webview,
       onDidDispose: webviewView.onDidDispose.bind(webviewView),
-      // WebviewView doesn't have these, so provide no-ops that return disposables
+
       onDidChangeViewState: (callback, thisArg, disposables) => {
-        // WebviewView has onDidChangeVisibility instead
+
         return webviewView.onDidChangeVisibility(() => {
-          // Create a fake event object
+
           callback({ webviewView: webviewView });
         }, thisArg, disposables);
       },
@@ -1650,10 +1671,10 @@ class BotPanel {
       dispose: () => {}
     };
     
-    // Create new BotPanel instance using the wrapper
+
     const botPanel = new BotPanel(panelWrapper, workspaceRoot, extensionUri);
     
-    // Don't set as currentPanel - sidebar and editor panels can coexist
+
     console.log("[BotPanel] Sidebar instance created successfully");
     
     return botPanel;
@@ -1661,7 +1682,7 @@ class BotPanel {
 
   _readPanelVersion() {
     try {
-      // Try multiple locations for package.json
+
       const possiblePaths = [
         path.join(__dirname, "package.json"),
         path.join(__dirname, "..", "package.json"),
@@ -1701,7 +1722,7 @@ class BotPanel {
         return;
       }
       
-      // Verify story graph is available (but don't fail if it's not in the expected format)
+
       try {
         const storyGraph = await this._botView.execute('story_graph');
         this._log(`[BotPanel] Story graph check result: ${JSON.stringify(storyGraph)}`);
@@ -1709,18 +1730,16 @@ class BotPanel {
         this._log(`[BotPanel] Story graph check failed (continuing anyway): ${error.message}`);
       }
       
-      const fs = require('fs');
-      const path = require('path');
       const workspaceRoot = this._workspaceRoot;
       
-      // Helper to resolve file path
+
       const resolvePath = (filePath) => {
         if (!filePath) return null;
         if (path.isAbsolute(filePath)) return filePath;
         return path.join(workspaceRoot, filePath);
       };
       
-      // Helper to open file in column
+
       const openInColumn = async (filePath, column, options = {}) => {
         const absolutePath = resolvePath(filePath);
         if (!absolutePath || !fs.existsSync(absolutePath)) {
@@ -1729,7 +1748,7 @@ class BotPanel {
         }
         const fileUri = vscode.Uri.file(absolutePath);
         
-        // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
         const fileExtension = filePath.split('.').pop().toLowerCase();
         if (fileExtension === 'json') {
           await vscode.commands.executeCommand('vscode.open', fileUri);
@@ -1737,7 +1756,7 @@ class BotPanel {
         }
         
         const doc = await vscode.workspace.openTextDocument(fileUri);
-        // Open as a new tab (preview: false) without taking focus (preserveFocus: true)
+
         const openOptions = { 
           viewColumn: column, 
           preview: false,
@@ -1748,19 +1767,19 @@ class BotPanel {
       };
       
       if (command === 'openStoryFiles') {
-        // Open story markdown files
+
         if (singleFileLink) {
-          // Single story - open normally
+
           await openInColumn(singleFileLink, vscode.ViewColumn.One);
         } else {
-          // Query for all story files under node
+
           this._log(`[BotPanel] Opening story files for ${nodeType} "${nodeName}"`);
           
-          // Use the openStoryFile domain API to get all story files
+
           try {
             const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
             if (result && result.files && Array.isArray(result.files)) {
-              // Open files normally (not in separate panes)
+
               for (const filePath of result.files) {
                 await openInColumn(filePath, vscode.ViewColumn.One);
               }
@@ -1768,12 +1787,12 @@ class BotPanel {
             }
           } catch (error) {
             this._log(`[BotPanel] Error getting story files: ${error.message}`);
-            // Fallback: try to discover files from story graph structure
-            // TODO: Implement story file discovery from story graph
+
+
           }
         }
       } else if (command === 'openTestFiles') {
-        // Open test files - use vscode.open (not openTextDocument) to avoid extension sync issues
+
         this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
         
         try {
@@ -1787,7 +1806,7 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open test files: ${error.message}`);
         }
       } else if (command === 'openCodeFiles') {
-        // Trace imports in test files to find and open code files
+
         this._log(`[BotPanel] Opening code files traced from tests for ${nodeType} "${nodeName}"`);
         
         try {
@@ -1822,7 +1841,7 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
         }
       } else if (command === 'openAllRelatedFiles') {
-        // Use internal helper methods
+
         const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/story/story-graph.json');
         const testFiles = message.testFiles || [];
         const storyFiles = message.storyFiles || [];
@@ -1830,11 +1849,11 @@ class BotPanel {
         
         this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
         
-        // 1. Open story graph with node selected
+
         await this._openGraphWithNodeSelected(graphPath, selectedNode);
         
         if (nodeType === 'sub-epic' || nodeType === 'epic') {
-          // For sub-epics/epics: open exploration doc (sub-epic's own file link) + all child story files
+
           if (singleFileLink) {
             this._log(`[BotPanel] Opening exploration file for sub-epic "${nodeName}": ${singleFileLink}`);
             await this._openStoryFile(singleFileLink);
@@ -1844,18 +1863,18 @@ class BotPanel {
             await this._openStoryFile(storyFilePath);
           }
         } else {
-          // 2. Open single story file
+
           if (singleFileLink) {
             await this._openStoryFile(singleFileLink);
           }
         }
         
-        // 3. Open test files
+
         if (testFiles.length > 0) {
           await this._openTestFiles(testFiles);
         }
         
-        // 3.5. Open code files traced from imports in test files
+
         try {
           const codeResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openCode()`);
           if (codeResult && codeResult.files && Array.isArray(codeResult.files)) {
@@ -1886,7 +1905,7 @@ class BotPanel {
           this._log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
         }
         
-        // 4. Activate the story graph tab as the last step (use vscode.open for JSON, not openTextDocument)
+
         const graphAbsPath = path.isAbsolute(graphPath) ? graphPath : path.join(workspaceRoot, graphPath);
         try {
           await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(graphAbsPath));
@@ -1900,26 +1919,19 @@ class BotPanel {
     }
   }
 
-  /**
-   * Open story graph JSON file with a specific node selected and scrolled into view.
-   * @param {string} graphPath - Path to story-graph.json
-   * @param {object} selectedNode - Node to select (with name, type, path properties)
-   */
+
   async _openGraphWithNodeSelected(graphPath, selectedNode) {
-    const fs = require('fs');
-    const path = require('path');
-    
     const absolutePath = path.isAbsolute(graphPath) 
       ? graphPath 
       : path.join(this._workspaceRoot, graphPath);
     
-    // Use vscode.open for JSON (not openTextDocument) to avoid extension sync / text editor limits
+
     if (!selectedNode || !selectedNode.name) {
       await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(absolutePath));
       return;
     }
     
-    // Read file via fs to find node line - avoids openTextDocument which fails for large JSON
+
     let startLine = 0;
     try {
       const text = fs.readFileSync(absolutePath, 'utf8');
@@ -1954,13 +1966,8 @@ class BotPanel {
     this._log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
   }
 
-  /**
-   * Open a story markdown file.
-   * @param {string} filePath - Path to the story .md file
-   */
+
   async _openStoryFile(filePath) {
-    const fs = require('fs');
-    const path = require('path');
     
     if (!filePath) return;
     
@@ -1984,13 +1991,8 @@ class BotPanel {
     this._log(`[BotPanel] Story file opened: ${filePath}`);
   }
 
-  /**
-   * Open test files in a split editor.
-   * @param {string[]} testFiles - Array of test file paths
-   */
+
   async _openTestFiles(testFiles) {
-    const fs = require('fs');
-    const path = require('path');
     
     for (const testFilePath of testFiles) {
       try {
@@ -2026,17 +2028,17 @@ class BotPanel {
   dispose() {
     BotPanel.currentPanel = undefined;
 
-    // Clean up BotView
+
       this._botView = null;
 
-    // Clean up shared CLI
+
     console.log("[BotPanel] Cleaning up shared PanelView CLI");
     if (this._sharedCLI) {
       this._sharedCLI.cleanup();
       this._sharedCLI = null;
     }
 
-    // Clean up resources
+
     this._panel.dispose();
 
     while (this._disposables.length) {
@@ -2047,11 +2049,7 @@ class BotPanel {
     }
   }
 
-  /**
-   * Update panel using already-cached data from navigation.
-   * Skips the refresh() call since botData is already populated.
-   * This significantly improves performance for navigation clicks.
-   */
+
   async _updateWithCachedData() {
     return vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
@@ -2065,7 +2063,7 @@ class BotPanel {
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
       
-      // Initialize BotView if needed (uses shared CLI)
+
       if (!this._botView) {
         const perfBotViewStart = performance.now();
         this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
@@ -2073,16 +2071,16 @@ class BotPanel {
         this._log(`[PERF] BotView creation: ${(perfBotViewEnd - perfBotViewStart).toFixed(2)}ms`);
       }
       
-      // Skip refresh - data already cached from navigation command
+
       this._log('[BotPanel] Skipping refresh() - using cached botData from navigation');
       
-      // Pass view state to story map (preserve expansion across updates)
+
       if (this._botView.storyMapView) {
         this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
         this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
       }
       
-      // Render HTML using cached data
+
       const perfRenderStart = performance.now();
       const botData = this._botView.botData;
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
@@ -2094,7 +2092,7 @@ class BotPanel {
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
       
-      // Clear cached response after rendering
+
       PanelView._lastResponse = null;
       
       const perfUpdateEnd = performance.now();
@@ -2104,21 +2102,19 @@ class BotPanel {
     } catch (err) {
       console.error(`[BotPanel] ERROR in _updateWithCachedData: ${err.message}`);
       this._log(`[BotPanel] ERROR in _updateWithCachedData, falling back to full _update: ${err.message}`);
-      // Fall back to full update on error
+
       return this._update();
     }
     });
   }
 
-  /**
-   * Public refresh method - can be called from external code (e.g., sidebar provider)
-   */
+
   async refresh() {
     return this._update();
   }
 
   _setupDiagramFileWatchers(botData) {
-    // Disabled – file watchers were overwriting user edits to .drawio files
+
     if (this._diagramWatchers) {
       this._diagramWatchers.forEach(function(w) { w.dispose(); });
     }
@@ -2132,7 +2128,7 @@ class BotPanel {
       title: 'Reloading panel...',
       cancellable: false
     }, async () => {
-    // ===== PERFORMANCE: Start overall timing =====
+
     const perfUpdateStart = performance.now();
     try {
       this._log('[BotPanel] _update() START');
@@ -2140,9 +2136,9 @@ class BotPanel {
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
       
-      // Initialize BotView if needed (uses shared CLI)
+
       if (!this._botView) {
-        // ===== PERFORMANCE: BotView creation =====
+
         const perfBotViewStart = performance.now();
         console.log("[BotPanel] Creating BotView");
         this._log('[BotPanel] Creating BotView');
@@ -2161,14 +2157,14 @@ class BotPanel {
         }
       }
       
-      // Pass current story map view state to the view
+
       if (this._botView.storyMapView) {
         this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
         this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
       }
       
-      // CRITICAL: Refresh data BEFORE rendering to show latest changes
-      // ===== PERFORMANCE: Data refresh =====
+
+
       const perfRefreshStart = performance.now();
       console.log("[BotPanel] Refreshing bot data...");
       this._log('[BotPanel] Calling _botView.refresh() to fetch latest data');
@@ -2178,11 +2174,11 @@ class BotPanel {
       this._log(`[BotPanel] Data refreshed successfully in ${refreshDuration}ms`);
       this._log(`[PERF] Data refresh: ${refreshDuration}ms`);
       
-      // ===== PERFORMANCE: HTML rendering =====
+
       const perfRenderStart = performance.now();
       console.log("[BotPanel] Rendering HTML");
       this._log('[BotPanel] _botView.render() starting');
-      // Render HTML using BotView (async now)
+
       const botData = this._botView.botData || await this._botView.execute('status');
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
       const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
@@ -2191,10 +2187,10 @@ class BotPanel {
       const renderDuration = (perfRenderEnd - perfRenderStart).toFixed(2);
       this._log(`[PERF] HTML rendering: ${renderDuration}ms`)
       
-      // ===== PERFORMANCE: HTML update =====
+
       const perfHtmlUpdateStart = performance.now();
       
-      // Log HTML update details
+
       const htmlPreview = html.substring(0, 500).replace(/\s+/g, ' ');
       this._log(`[BotPanel] Setting webview HTML (length: ${html.length}, preview: ${htmlPreview}...)`);
       this._log(`[BotPanel] Current HTML length: ${this._lastHtmlLength || 0}, New HTML length: ${html.length}`);
@@ -2215,9 +2211,9 @@ class BotPanel {
       this._log('[BotPanel] Webview HTML property set');
       this._log(`[PERF] HTML update (set webview.html): ${htmlUpdateDuration}ms`);
       
-      // Give webview time to load
+
       setTimeout(() => {
-        // Show refreshing status (will auto-hide after 1 second)
+
         this._panel.webview.postMessage({
           command: 'refreshStatus',
           state: 'refreshing',
@@ -2226,7 +2222,7 @@ class BotPanel {
         this._log('[BotPanel] Sent refreshStatus refreshing message to webview');
       }, 100);
       
-      // ===== PERFORMANCE: Log total duration =====
+
       const perfUpdateEnd = performance.now();
       const totalDuration = (perfUpdateEnd - perfUpdateStart).toFixed(2);
       console.log("[BotPanel] _update() completed successfully");
@@ -2240,13 +2236,13 @@ class BotPanel {
       console.error(`[BotPanel] ERROR stack: ${err.stack}`);
       this._log(`[BotPanel] ERROR in _update: ${err.message} | Stack: ${err.stack}`);
       
-      // Show error in VSCode notification
+
       const errorMsg = err.isCliError 
         ? `CLI Error: ${err.message}` 
         : `Bot Panel Update Error: ${err.message}`;
       vscode.window.showErrorMessage(errorMsg);
       
-      // Display error in panel with retry button
+
       const errorType = err.errorType || err.constructor.name;
       const command = err.command ? `Command: ${this._escapeHtml(err.command)}` : '';
       
@@ -2293,13 +2289,13 @@ class BotPanel {
   }
 
   _getWebviewContent(contentHtml, currentBehavior = null, currentAction = null, botData = null) {
-    // Get branding colors for CSS theming
+
     const brandColor = branding.getTitleColor();
     const bgColor = branding.getBackgroundColor();
     const textColor = branding.getTextColor();
     const textColorFaded = branding.getTextColorFaded();
     const fontWeight = branding.getFontWeight();
-    // Convert hex to RGB for rgba() usage
+
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 140, 0';
@@ -2319,13 +2315,10 @@ class BotPanel {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bot Panel</title>
     <style>
-        /* ============================================================
-           THEME SYSTEM - All styling variables in one place
-           Branding: ${branding.getBranding()} (${brandColor})
-           ============================================================ */
+
         
         :root {
-            /* Colors - from branding config */
+
             --bg-base: ${bgColor};
             --text-color: ${textColor};
             --text-color-faded: ${textColorFaded};
@@ -2334,7 +2327,7 @@ class BotPanel {
             --divider-color: ${brandColor};
             --hover-bg: ${isLightBg ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.03)'};
             
-            /* Input styling - chat-like appearance */
+
             --input-bg: ${isLightBg ? 'rgba(0, 0, 0, 0.03)' : 'rgba(255, 255, 255, 0.05)'};
             --input-bg-focus: ${isLightBg ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.08)'};
             --input-border: ${isLightBg ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.1)'};
@@ -2347,19 +2340,19 @@ class BotPanel {
             --input-header-border-width-focus: 2px;
             --input-transition: border-color 150ms ease, background-color 150ms ease;
             
-            /* Borders */
+
             --border-width: 1px;
             --border-radius: 0;
             --border-radius-sm: 0;
             --active-border-width: 2px;
             
-            /* Spacing */
+
             --space-xs: 2px;
             --space-sm: 4px;
             --space-md: 6px;
             --space-lg: 8px;
             
-            /* Typography */
+
             --font-size-base: 13px;
             --font-size-sm: 12px;
             --font-size-xs: 11px;
@@ -2380,7 +2373,7 @@ class BotPanel {
             font-weight: var(--font-weight-normal);
         }
         
-        /* Prevent images from scaling with panel width */
+
         img {
             flex-shrink: 0;
             min-width: 0;
@@ -2392,9 +2385,7 @@ class BotPanel {
             gap: 0;
         }
         
-        /* ============================================================
-           CARDS & SECTIONS
-           ============================================================ */
+
         
         .card-primary {
             margin-bottom: var(--space-lg);
@@ -2439,9 +2430,7 @@ class BotPanel {
             border-top: var(--border-width) solid var(--divider-color);
         }
         
-        /* ============================================================
-           HIERARCHY & COLLAPSIBLE ITEMS
-           ============================================================ */
+
         
         .behavior-item, .action-item, .operation-item {
             margin: var(--space-xs) 0;
@@ -2498,9 +2487,28 @@ class BotPanel {
             background-color: transparent;
         }
         
-        /* ============================================================
-           STORY TREE NODE INTERACTION
-           ============================================================ */
+        .execution-toggle-btn {
+            padding: 2px 4px;
+            font-size: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 2px;
+            background: #000;
+            color: var(--text-color-faded);
+            cursor: pointer;
+            opacity: 0.5;
+            transition: background-color 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
+        }
+        .execution-toggle-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-color);
+        }
+        .execution-toggle-btn.active {
+            background: rgba(255,255,255,0.12);
+            color: var(--text-color);
+            opacity: 1;
+        }
+        
+
         
         .story-node {
             padding: 2px 4px;
@@ -2509,11 +2517,11 @@ class BotPanel {
         }
         
         .story-node:hover {
-            background-color: rgba(${brandColorRgb}, 0.15); /* Faded brand color on hover */
+            background-color: rgba(${brandColorRgb}, 0.15);
         }
         
         .story-node.selected {
-            background-color: rgba(${brandColorRgb}, 0.35); /* Distinct brand color when selected */
+            background-color: rgba(${brandColorRgb}, 0.35);
         }
         
         .increment-column-container.selected {
@@ -2539,7 +2547,7 @@ class BotPanel {
         .collapsible-section.expanded .expand-icon {
             transform: rotate(90deg);
         }
-        /* Ensure nested subsections have smaller icons */
+
         .collapsible-content .collapsible-section .expand-icon {
             font-size: 20px;
         }
@@ -2579,9 +2587,7 @@ class BotPanel {
             border: none;
         }
         
-        /* ============================================================
-           INPUTS & INTERACTIVE ELEMENTS
-           ============================================================ */
+
         
         .input-container {
             border: var(--input-border-width) solid var(--accent-color);
@@ -2685,7 +2691,7 @@ class BotPanel {
             animation: spin 1s linear infinite;
         }
         
-        /* Save status indicator styles - matches input container design */
+
         .save-status {
             display: flex;
             align-items: center;
@@ -2693,7 +2699,7 @@ class BotPanel {
             padding: 6px 12px;
             border: var(--input-border-width) solid var(--accent-color);
             border-radius: var(--input-border-radius);
-            background-color: rgba(255, 140, 0, 0.1); /* Dark black with orange tint */
+            background-color: rgba(255, 140, 0, 0.1);
             color: var(--text-color);
             font-size: var(--font-size-sm);
             transition: opacity 0.3s, background-color 150ms ease;
@@ -2702,7 +2708,7 @@ class BotPanel {
         
         .save-status.saving,
         .save-status.refreshing {
-            background-color: rgba(255, 140, 0, 0.15); /* Slightly brighter when active */
+            background-color: rgba(255, 140, 0, 0.15);
             border-color: var(--accent-color);
         }
         
@@ -2781,7 +2787,7 @@ class BotPanel {
             transform: scale(0.98);
         }
         
-        /* Ensure button images maintain fixed size */
+
         button img {
             flex-shrink: 0;
             display: block;
@@ -2837,19 +2843,19 @@ class BotPanel {
         console.log('[WebView] vscode.postMessage available:', typeof vscode.postMessage);
         
         
-        // Restore collapse state and selected node when DOM is ready
+
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                // Restore collapse state
+
                 const savedState = sessionStorage.getItem('collapseState');
                 if (savedState) {
                     const state = JSON.parse(savedState);
-                    // Use setTimeout to ensure DOM is fully rendered
+
                     setTimeout(() => window.restoreCollapseState(state), 50);
                     console.log('[WebView] Restored collapse state for', Object.keys(state).length, 'nodes');
                 }
                 
-                // Restore selected node
+
                 const savedSelection = sessionStorage.getItem('selectedNode');
                 if (savedSelection) {
                     const selection = JSON.parse(savedSelection);
@@ -2861,7 +2867,7 @@ class BotPanel {
                     }, 100);
                 }
                 
-                // Restore scroll position and expand clarify boxes after content is rendered
+
                 setTimeout(() => {
                     if (window.restoreScrollPosition) {
                         window.restoreScrollPosition();
@@ -2875,14 +2881,14 @@ class BotPanel {
             }
         });
         
-        // Save scroll position when page loses visibility (e.g., when opening a file)
+
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'hidden') {
                 if (window.saveScrollPosition) {
                     window.saveScrollPosition();
                 }
             } else if (document.visibilityState === 'visible') {
-                // Restore scroll position when becoming visible again
+
                 setTimeout(() => {
                     if (window.restoreScrollPosition) {
                         window.restoreScrollPosition();
@@ -2891,7 +2897,7 @@ class BotPanel {
             }
         });
         
-        // Global click handler using event delegation (CSP blocks inline onclick)
+
         document.addEventListener('click', function(e) {
             const target = e.target;
             const targetInfo = {
@@ -2907,19 +2913,21 @@ class BotPanel {
                 message: '[WebView] CLICK: ' + JSON.stringify(targetInfo)
             });
             
-            // Handle story node clicks (epic, sub-epic, story)
-            if (target.classList.contains('story-node')) {
+
+
+            const storyNode = target.closest && target.closest('.story-node');
+            if (storyNode) {
                 console.log('═══════════════════════════════════════════════════════');
                 console.log('[WebView] STORY NODE CLICKED');
-                const nodeType = target.getAttribute('data-node-type');
-                const nodeName = target.getAttribute('data-node-name');
-                const hasChildren = target.getAttribute('data-has-children') === 'true';
-                const hasStories = target.getAttribute('data-has-stories') === 'true';
-                const hasNestedSubEpics = target.getAttribute('data-has-nested-sub-epics') === 'true';
-                const nodePath = target.getAttribute('data-path');
-                const fileLink = target.getAttribute('data-file-link');
-                const behavior = target.getAttribute('data-behavior-needed') || null;
-                const behaviorsAttr = target.getAttribute('data-behaviors-needed');
+                const nodeType = storyNode.getAttribute('data-node-type');
+                const nodeName = storyNode.getAttribute('data-node-name');
+                const hasChildren = storyNode.getAttribute('data-has-children') === 'true';
+                const hasStories = storyNode.getAttribute('data-has-stories') === 'true';
+                const hasNestedSubEpics = storyNode.getAttribute('data-has-nested-sub-epics') === 'true';
+                const nodePath = storyNode.getAttribute('data-path');
+                const fileLink = storyNode.getAttribute('data-file-link');
+                const behavior = storyNode.getAttribute('data-behavior-needed') || null;
+                const behaviorsAttr = storyNode.getAttribute('data-behaviors-needed');
                 const behaviors = behaviorsAttr ? JSON.parse(behaviorsAttr) : (behavior ? [behavior] : []);
                 
                 console.log('[WebView]   nodeType:', nodeType);
@@ -2942,7 +2950,7 @@ class BotPanel {
                     message: '[WebView] Story node clicked: type=' + nodeType + ', name=' + nodeName + ', path=' + nodePath
                 });
                 
-                // Call selectNode
+
                 if (window.selectNode && nodeType && nodeName !== null) {
                     const options = {
                         hasChildren: hasChildren,
@@ -2956,7 +2964,7 @@ class BotPanel {
                     window.selectNode(nodeType, nodeName, options);
                 }
                 
-                // Call openFile if there's a file link
+
                 if (window.openFile && fileLink) {
                     console.log('[WebView]   Opening file:', fileLink);
                     window.openFile(fileLink);
@@ -2966,8 +2974,8 @@ class BotPanel {
                 console.log('═══════════════════════════════════════════════════════');
             }
             
-            // Handle behavior and action clicks (CSP-safe event delegation)
-            // Traverse up the DOM tree to find element with data-action attribute
+
+
             let actionElement = target;
             let action = actionElement.getAttribute('data-action');
             let searchDepth = 0;
@@ -3031,16 +3039,42 @@ class BotPanel {
                         e.stopPropagation();
                         e.preventDefault();
                     }
+                } else if (action === 'setExecutionMode') {
+                    const behaviorName = actionElement.getAttribute('data-behavior-name');
+                    const actionName = actionElement.getAttribute('data-action-name');
+                    const mode = actionElement.getAttribute('data-mode');
+                    if (behaviorName && actionName && mode) {
+                        vscode.postMessage({
+                            command: 'setExecutionMode',
+                            behaviorName: behaviorName,
+                            actionName: actionName,
+                            mode: mode
+                        });
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                } else if (action === 'setBehaviorExecuteMode') {
+                    const behaviorName = actionElement.getAttribute('data-behavior-name');
+                    const mode = actionElement.getAttribute('data-mode');
+                    if (behaviorName && mode) {
+                        vscode.postMessage({
+                            command: 'setBehaviorExecuteMode',
+                            behaviorName: behaviorName,
+                            mode: mode
+                        });
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
                 }
             }
-        }, true); // Use capture phase to catch all clicks
+        }, true);
         
-        // Handle double-click on story nodes to enable edit mode
+
         document.addEventListener('dblclick', function(e) {
             const target = e.target;
             
-            // Handle story node double-clicks (epic, sub-epic, story)
-            // Skip nodes in the increment view (data-inc-source set) — no editing there
+
+
             if (target.classList.contains('story-node') && target.getAttribute('data-inc-source') === null) {
                 const nodePath = target.getAttribute('data-path');
                 const nodeName = target.getAttribute('data-node-name');
@@ -3058,9 +3092,9 @@ class BotPanel {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        }, true); // Use capture phase to catch all double-clicks
+        }, true);
         
-        // Right-click context menu — story nodes (hierarchy) + increment view stories + increment columns
+
         function _showCopyMenu(e, items) {
             e.preventDefault();
             e.stopPropagation();
@@ -3089,7 +3123,7 @@ class BotPanel {
         }
 
         document.addEventListener('contextmenu', function(e) {
-            // --- Increment column header right-click ---
+
             let incCol = e.target;
             let d = 6;
             while (incCol && d-- > 0 && !incCol.classList.contains('increment-column-container')) incCol = incCol.parentElement;
@@ -3108,7 +3142,7 @@ class BotPanel {
                 return;
             }
 
-            // --- Story node right-click ---
+
             const target = e.target.closest ? e.target.closest('.story-node') : (function() {
                 let t = e.target;
                 while (t && !t.classList.contains('story-node')) t = t.parentElement;
@@ -3120,7 +3154,7 @@ class BotPanel {
             const nodeName = target.getAttribute('data-node-name');
 
             if (incSource !== null) {
-                // Story in increment view — copy directly (no CLI path available)
+
                 _showCopyMenu(e, [
                     { label: 'Copy story name', action: function() {
                         vscode.postMessage({ command: 'copyText', text: nodeName, label: 'Story name copied' });
@@ -3132,7 +3166,7 @@ class BotPanel {
                 return;
             }
 
-            // Hierarchy story node — use CLI path
+
             const nodePath = target.getAttribute('data-path');
             if (!nodePath) return;
             _showCopyMenu(e, [
@@ -3145,24 +3179,24 @@ class BotPanel {
             ]);
         }, true);
         
-        // Handle drag and drop for moving nodes
+
         let draggedNode = null;
-        let draggedIncrement = null; // set when dragging an increment column header handle
+        let draggedIncrement = null;
         let dropIndicator = null;
-        let currentDropZone = null; // 'before', 'after', or 'inside'
-        let incrementDropTarget = null; // column being hovered during increment reorder
+        let currentDropZone = null;
+        let incrementDropTarget = null;
         
-        // Create drop indicator line
+
         function createDropIndicator() {
             if (!dropIndicator) {
                 dropIndicator = document.createElement('div');
                 dropIndicator.style.position = 'fixed';
                 dropIndicator.style.height = '2px';
-                dropIndicator.style.backgroundColor = 'rgb(255, 140, 0)'; // Orange to match UI
+                dropIndicator.style.backgroundColor = 'rgb(255, 140, 0)';
                 dropIndicator.style.pointerEvents = 'none';
                 dropIndicator.style.zIndex = '10000';
                 dropIndicator.style.transition = 'all 0.1s ease';
-                dropIndicator.style.display = 'none'; // Start hidden
+                dropIndicator.style.display = 'none';
                 document.body.appendChild(dropIndicator);
             }
             return dropIndicator;
@@ -3183,7 +3217,7 @@ class BotPanel {
                 message: '[WebView] DRAGSTART EVENT - target classList: ' + (e.target.classList ? Array.from(e.target.classList).join(', ') : 'none')
             });
             
-            // Check if dragging an increment column handle
+
             if (e.target.classList && e.target.classList.contains('increment-drag-handle')) {
                 draggedIncrement = e.target.getAttribute('data-inc');
                 e.dataTransfer.effectAllowed = 'move';
@@ -3193,7 +3227,7 @@ class BotPanel {
                 return;
             }
 
-            // Find the story-node element (might be dragging a child element)
+
             let target = e.target;
             while (target && !target.classList.contains('story-node')) {
                 target = target.parentElement;
@@ -3205,7 +3239,7 @@ class BotPanel {
                     name: target.getAttribute('data-node-name'),
                     type: target.getAttribute('data-node-type'),
                     position: parseInt(target.getAttribute('data-position') || '0'),
-                    fromIncrement: target.getAttribute('data-inc-source') // null for hierarchy stories, '' for unallocated, 'IncName' for increment stories
+                    fromIncrement: target.getAttribute('data-inc-source')
                 };
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData('text/plain', draggedNode.path);
@@ -3230,7 +3264,7 @@ class BotPanel {
                 message: '[WebView] DRAGEND EVENT'
             });
             
-            // Find the story-node element
+
             let target = e.target;
             while (target && !target.classList.contains('story-node')) {
                 target = target.parentElement;
@@ -3255,13 +3289,13 @@ class BotPanel {
             });
         }, true);
         
-        let dragoverLogCounter = 0; // Throttle dragover logs
+        let dragoverLogCounter = 0;
         document.addEventListener('dragover', function(e) {
-            // Handle increment column reorder drag
+
             if (draggedIncrement) {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
-                // Find which column we're hovering over
+
                 let col = e.target;
                 let d = 10;
                 while (col && d-- > 0 && !col.classList.contains('increment-column-container')) col = col.parentElement;
@@ -3272,7 +3306,7 @@ class BotPanel {
                     const isLeft = e.clientX < rect.left + rect.width / 2;
                     col.style.outline = isLeft ? '2px solid orange' : '';
                     col.style.outlineOffset = '-2px';
-                    // Show vertical indicator line
+
                     const ind = createDropIndicator();
                     ind.style.width = '3px';
                     ind.style.height = rect.height + 'px';
@@ -3283,7 +3317,7 @@ class BotPanel {
                 return;
             }
 
-            // Find the story-node element
+
             let target = e.target;
             let searchDepth = 0;
             while (target && !target.classList.contains('story-node') && searchDepth < 10) {
@@ -3291,7 +3325,7 @@ class BotPanel {
                 searchDepth++;
             }
             
-            // Log every 20th dragover event to avoid spam
+
             if (dragoverLogCounter++ % 20 === 0 && draggedNode) {
                 vscode.postMessage({
                     command: 'logToFile',
@@ -3299,7 +3333,7 @@ class BotPanel {
                 });
             }
             
-            // Allow dropping stories onto increment columns
+
             if (draggedNode && draggedNode.type === 'story') {
                 var incEl = e.target;
                 var d = 6;
@@ -3318,8 +3352,8 @@ class BotPanel {
             }
             
             if (target && target.classList.contains('story-node') && draggedNode) {
-                // If dragging from increment view and hovering over a story in the unallocated column,
-                // show the unallocated drop hint and suppress normal drag indicator
+
+
                 if (draggedNode.fromIncrement) {
                     let unallocCheck = target;
                     while (unallocCheck && !unallocCheck.classList.contains('unallocated-column')) unallocCheck = unallocCheck.parentElement;
@@ -3337,25 +3371,25 @@ class BotPanel {
                 const targetPath = target.getAttribute('data-path');
                 const targetName = target.getAttribute('data-node-name');
                 
-                // Don't allow dropping on self
+
                 if (draggedNode.path === targetPath) {
                     removeDropIndicator();
                     return;
                 }
                 
-                // Check if target can contain dragged node
+
                 const canContain = (targetType === 'epic' && draggedNode.type === 'sub-epic') ||
                                   (targetType === 'sub-epic' && (draggedNode.type === 'sub-epic' || draggedNode.type === 'story')) ||
                                   (targetType === 'story' && draggedNode.type === 'scenario');
                 
-                // Check if nodes are same type for reordering
+
                 const sameType = draggedNode.type === targetType;
                 
                 if (canContain || sameType) {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
                     
-                    // Get mouse position relative to target element
+
                     const rect = target.getBoundingClientRect();
                     const mouseY = e.clientY;
                     const targetTop = rect.top;
@@ -3363,22 +3397,22 @@ class BotPanel {
                     const relativeY = mouseY - targetTop;
                     const percentY = relativeY / targetHeight;
                     
-                    // Determine drop zone based on mouse position
+
                     let dropZone;
                     const indicator = createDropIndicator();
                     
-                    // Check if target can contain the dragged node
+
                     const hasStories = target.getAttribute('data-has-stories') === 'true';
                     const hasNestedSubEpics = target.getAttribute('data-has-nested-sub-epics') === 'true';
                     const isEmptyContainer = !hasStories && !hasNestedSubEpics;
                     
-                    // "ON" vs "AFTER" logic:
-                    // - If hovering directly on item (middle 60%) AND can nest inside: show "inside" (orange background, no line)
-                    // - Otherwise: show "after" (orange line below item)
+
+
+
                     if (canContain && percentY >= 0.2 && percentY <= 0.8) {
-                        // Hovering ON the item - nest inside
+
                         dropZone = 'inside';
-                        target.style.backgroundColor = 'rgba(255, 140, 0, 0.3)'; // Orange tint for nesting
+                        target.style.backgroundColor = 'rgba(255, 140, 0, 0.3)';
                         indicator.style.display = 'none';
                         if (dragoverLogCounter % 20 === 0) {
                             vscode.postMessage({
@@ -3387,14 +3421,14 @@ class BotPanel {
                             });
                         }
                     } else if (sameType) {
-                        // Same type: insert after
+
                         dropZone = 'after';
                         target.style.backgroundColor = '';
                         indicator.style.display = 'block';
                         indicator.style.left = rect.left + 'px';
                         indicator.style.top = (rect.top + rect.height) + 'px';
                         indicator.style.width = rect.width + 'px';
-                        // Log indicator positioning
+
                         if (dragoverLogCounter % 20 === 0) {
                             vscode.postMessage({
                                 command: 'logToFile',
@@ -3417,13 +3451,13 @@ class BotPanel {
             } else {
                 removeDropIndicator();
                 if (draggedNode && draggedNode.type === 'story') {
-                    // Check for increment column target (cross-column drop)
+
                     let incTarget = e.target;
                     let d = 8;
                     while (incTarget && d-- > 0 && !incTarget.classList.contains('increment-column-container')) {
                         incTarget = incTarget.parentElement;
                     }
-                    // Also check for unallocated column (drag from increment → remove)
+
                     let unallocTarget = e.target;
                     let d2 = 8;
                     while (unallocTarget && d2-- > 0 && !unallocTarget.classList.contains('unallocated-column')) {
@@ -3439,7 +3473,7 @@ class BotPanel {
                         e.dataTransfer.dropEffect = 'move';
                         incTarget.style.outline = '2px solid rgb(255, 140, 0)';
                     } else if (unallocTarget && unallocTarget.classList.contains('unallocated-column') && draggedNode.fromIncrement) {
-                        // Only show unallocated target when story is FROM an increment (has source to remove from)
+
                         e.preventDefault();
                         e.dataTransfer.dropEffect = 'move';
                         unallocTarget.style.outline = '2px dashed rgb(255, 140, 0)';
@@ -3449,7 +3483,7 @@ class BotPanel {
         }, true);
         
         document.addEventListener('dragleave', function(e) {
-            // Find the story-node element
+
             let target = e.target;
             while (target && !target.classList.contains('story-node')) {
                 target = target.parentElement;
@@ -3458,7 +3492,7 @@ class BotPanel {
             if (target && target.classList.contains('story-node')) {
                 target.style.backgroundColor = '';
             }
-            // Clear increment column + unallocated highlights when leaving
+
             let incTarget = e.target;
             let d = 8;
             while (incTarget && d-- > 0 && !incTarget.classList.contains('increment-column-container')) {
@@ -3480,8 +3514,8 @@ class BotPanel {
         document.addEventListener('drop', function(e) {
             console.log('[WebView] ===== DROP EVENT FIRED =====');
 
-            // Handle increment column reorder — read from dataTransfer since draggedIncrement
-            // may have been cleared by dragend firing before drop in VS Code webviews
+
+
             var transferData = '';
             try { transferData = e.dataTransfer.getData('text/plain') || ''; } catch(_) {}
             var isIncrementDrag = transferData.startsWith('increment:');
@@ -3489,7 +3523,7 @@ class BotPanel {
 
             if (isIncrementDrag || draggedIncrement) {
                 e.preventDefault();
-                // Find target column
+
                 let col = e.target;
                 let d = 10;
                 while (col && d-- > 0 && !col.classList.contains('increment-column-container')) col = col.parentElement;
@@ -3516,16 +3550,16 @@ class BotPanel {
                 message: '[WebView] ===== DROP EVENT FIRED ===== draggedNode: ' + (draggedNode ? draggedNode.name : 'null') + ', currentDropZone: ' + (currentDropZone || 'null')
             });
             
-            // Find the story-node element (might be dropping on a child element)
+
             let target = e.target;
             while (target && !target.classList.contains('story-node')) {
                 target = target.parentElement;
             }
             
             if (target && target.classList.contains('story-node') && draggedNode && currentDropZone) {
-                // If the dragged node came FROM the increment view (has fromIncrement set),
-                // dropping onto a story-node that has data-inc-source means it's an increment move,
-                // not a story-graph reorder — redirect to the increment column drop path.
+
+
+
                 const targetIncSource = target.getAttribute('data-inc-source');
                 if (draggedNode.fromIncrement !== null && draggedNode.fromIncrement !== undefined && targetIncSource !== null) {
                     e.preventDefault();
@@ -3533,7 +3567,7 @@ class BotPanel {
                     document.querySelectorAll('.increment-column-container').forEach(function(c) { c.style.outline = ''; });
                     var unallocEl2 = document.querySelector('.unallocated-column');
                     if (unallocEl2) unallocEl2.style.outline = '';
-                    // Find parent: increment column OR unallocated column
+
                     let incCol = target;
                     while (incCol && !incCol.classList.contains('increment-column-container') && !incCol.classList.contains('unallocated-column')) {
                         incCol = incCol.parentElement;
@@ -3542,18 +3576,18 @@ class BotPanel {
                     const sourceInc = draggedNode.fromIncrement;
 
                     if (incCol && incCol.classList.contains('unallocated-column')) {
-                        // Dropped into unallocated column → remove from source increment
+
                         if (sourceInc) window.removeStoryFromIncrement(sourceInc, draggedName);
                     } else {
                         const incName = incCol ? incCol.getAttribute('data-inc') : null;
                         if (incName && sourceInc === incName) {
-                            // Same column → reorder: insert before or after the target story
+
                             const targetPos = parseInt(target.getAttribute('data-position') || '0');
                             const rect = target.getBoundingClientRect();
                             const insertPos = e.clientY < rect.top + rect.height / 2 ? targetPos : targetPos + 1;
                             _incCmd('story_graph.reorder_story_in_increment increment_name:"' + incName + '" story_name:"' + draggedName + '" position:' + insertPos);
                         } else if (incName && sourceInc !== incName) {
-                            // Cross-column: remove from source, insert at drop position in target
+
                             const dropPos = _incrementDropPosition(incCol, e.clientY);
                             if (sourceInc) window.removeStoryFromIncrement(sourceInc, draggedName);
                             window.addStoryToIncrement(incName, draggedName, dropPos);
@@ -3563,7 +3597,7 @@ class BotPanel {
                     return;
                 }
 
-                // Check if dropping onto the unallocated column (story-node inside unallocated)
+
                 if (draggedNode.fromIncrement !== null && draggedNode.fromIncrement !== undefined) {
                     let unallocCheck = target;
                     while (unallocCheck && !unallocCheck.classList.contains('unallocated-column')) unallocCheck = unallocCheck.parentElement;
@@ -3583,7 +3617,7 @@ class BotPanel {
                 e.stopPropagation();
                 target.style.backgroundColor = '';
                 
-                // Save dropZone BEFORE removeDropIndicator clears it
+
                 const dropZone = currentDropZone;
                 removeDropIndicator();
                 
@@ -3609,7 +3643,7 @@ class BotPanel {
                         message: '[WebView] DROP DETECTED - Dragged: ' + draggedNode.name + ' (type: ' + draggedNode.type + ', pos: ' + draggedNode.position + ') onto Target: ' + targetName + ' (type: ' + targetType + '), dropZone: ' + dropZone
                     });
                     
-                    // Optimistic update disabled - full refresh preserves structure correctly
+
                     console.log('[WebView] Move operation - waiting for backend and full refresh');
                     
                     let command;
@@ -3620,12 +3654,12 @@ class BotPanel {
                     });
                     
                     if (dropZone === 'inside') {
-                        // ON: Nest inside the target container - use FULL PATH not just name to avoid ambiguity
-                        // targetPath is like: story_graph."Epic1"."Child1"
-                        // Backend expects: target:"Epic1"."Child1" (path with internal quotes, no outer wrapping)
+
+
+
                         var targetForCommand = targetPath.replace(/^story_graph\./, '');
-                        // targetForCommand already has quotes around each segment (e.g., "Epic1"."Child1")
-                        // Do NOT wrap in additional quotes
+
+
                         command = draggedNode.path + '.move_to target:' + targetForCommand;
                         vscode.postMessage({
                             command: 'logToFile',
@@ -3635,13 +3669,13 @@ class BotPanel {
                         var targetPos = parseInt(target.getAttribute('data-position') || '0');
                         var draggedPos = draggedNode.position;
                         
-                        // Extract parent path (everything except the last segment)
-                        // targetPath is like: story_graph."Epic1"."Child1"."Story1"
-                        // parentPath should be: story_graph."Epic1"."Child1"
+
+
+
                         var parentMatch = targetPath.match(/(.*)\."[^"]+"/);
                         var parentPath = parentMatch ? parentMatch[1] : 'story_graph';
                         
-                        // Strip off "story_graph." prefix to get the target parameter value
+
                         var targetForCommand = parentPath.replace(/^story_graph\./, '');
                         
                         vscode.postMessage({
@@ -3649,8 +3683,8 @@ class BotPanel {
                             message: '[WebView] AFTER CALCULATION - targetPos: ' + targetPos + ', draggedPos: ' + draggedPos + ', parentPath: ' + parentPath + ', targetForCommand: ' + targetForCommand
                         });
                         
-                        // When moving DOWN (to later position), use targetPos as-is (item shifts down)
-                        // When moving UP (to earlier position), use targetPos + 1 (drop after target)
+
+
                         var finalPos = (draggedPos < targetPos) ? targetPos : (targetPos + 1);
                         
                         command = draggedNode.path + '.move_to target:' + targetForCommand + ' at_position:' + finalPos;
@@ -3660,24 +3694,24 @@ class BotPanel {
                         });
                     }
                     
-                    // ========== ASYNC SAVE FLOW: MOVE OPERATION ==========
-                    // Use StoryMapView handler for optimistic updates
+
+
                     if (dropZone === 'after' && typeof window.handleMoveNode === 'function') {
-                        // Calculate parent path and position
+
                         var parentMatch = targetPath.match(/(.*)\."[^"]+"/);
                         var parentPath = parentMatch ? parentMatch[1] : 'story_graph';
                         var finalPos = (draggedNode.position < targetPos) ? targetPos : (targetPos + 1);
                         
-                        // Call StoryMapView handler - pass targetPath so we can insert after the specific node
+
                         window.handleMoveNode({
                             sourceNodePath: draggedNode.path,
                             targetParentPath: parentPath,
-                            targetNodePath: targetPath,  // Pass target node path for "after" positioning
+                            targetNodePath: targetPath,
                             position: finalPos,
                             dropZone: 'after'
                         });
                     } else if (dropZone === 'inside' && typeof window.handleMoveNode === 'function') {
-                        // Moving inside target
+
                         window.handleMoveNode({
                             sourceNodePath: draggedNode.path,
                             targetParentPath: targetPath,
@@ -3685,12 +3719,12 @@ class BotPanel {
                             dropZone: 'inside'
                         });
                     } else {
-                        // Fallback: send command directly (defaults to optimistic for story-changing ops)
+
                         console.warn('[WebView] handleMoveNode not available, sending command directly');
                         vscode.postMessage({
                             command: 'executeCommand',
                             commandText: command
-                            // optimistic defaults to true for story-changing operations
+
                         });
                     }
                 } else {
@@ -3706,7 +3740,7 @@ class BotPanel {
                     if (ua) ua.style.outline = '';
                 }
 
-                // Walk up to find increment column or unallocated column
+
                 var incTarget = e.target;
                 var maxDepth = 8;
                 while (incTarget && maxDepth-- > 0) {
@@ -3715,7 +3749,7 @@ class BotPanel {
                 }
 
                 if (incTarget && incTarget.classList.contains('unallocated-column') && draggedNode.fromIncrement) {
-                    // Drop onto unallocated = remove from source increment
+
                     e.preventDefault();
                     removeDropIndicator();
                     _clearIncrementHighlights();
@@ -3731,19 +3765,19 @@ class BotPanel {
                     _clearIncrementHighlights();
                     var incName = incTarget.getAttribute('data-inc');
                     var storyName = draggedNode.name;
-                    var sourceInc = draggedNode.fromIncrement; // '' = unallocated, 'IncName' = from another column, null = from hierarchy
+                    var sourceInc = draggedNode.fromIncrement;
                     console.log('[INCREMENT] DROP story onto increment:', storyName, '->', incName, '(from:', sourceInc, ')');
                     vscode.postMessage({ command: 'logToFile', message: '[INCREMENT] Drop: ' + storyName + ' -> ' + incName + ' from:' + sourceInc });
                     var dropPos = _incrementDropPosition(incTarget, e.clientY);
                     if (sourceInc && sourceInc !== incName) {
-                        // Moving between increment columns — remove from source, insert at position in target
+
                         window.removeStoryFromIncrement(sourceInc, storyName);
                         window.addStoryToIncrement(incName, storyName, dropPos);
                     } else if (sourceInc !== null) {
-                        // From unallocated (sourceInc === '') — insert at position
+
                         window.addStoryToIncrement(incName, storyName, dropPos);
                     } else {
-                        // From hierarchy view — insert at position
+
                         window.addStoryToIncrement(incName, storyName, dropPos);
                     }
                     draggedNode = null;
@@ -3757,14 +3791,14 @@ class BotPanel {
             }
         }, true);
         
-        // Test if onclick handlers can access functions
+
         window.testFunction = function() {
             console.log('[WebView] TEST FUNCTION CALLED - functions are accessible!');
             alert('Test function works!');
         };
         console.log('[WebView] window.testFunction defined:', typeof window.testFunction);
         
-        // Hide panel - sends message to extension to collapse the panel
+
         window.hidePanel = function() {\n            console.log('[hidePanel] Requesting panel collapse');\n            vscode.postMessage({ command: 'hidePanel' });\n        };\n        \n        window.toggleSection = function(sectionId) {
             console.log('[toggleSection] Called with sectionId:', sectionId);
             const content = document.getElementById(sectionId);
@@ -3775,30 +3809,30 @@ class BotPanel {
                 const isExpanded = section && section.classList.contains('expanded');
                 console.log('[toggleSection] isExpanded:', isExpanded);
                 
-                // Toggle visibility
+
                 if (isExpanded) {
-                    // Collapsing
+
                     content.style.maxHeight = '0px';
                     content.style.overflow = 'hidden';
                     content.style.display = 'none';
                 } else {
-                    // Expanding
+
                     content.style.maxHeight = '2000px';
                     content.style.overflow = 'visible';
                     content.style.display = 'block';
-                    // Expand clarify boxes once visible (they need layout to compute scrollHeight)
+
                     if (content.querySelector('[id^="clarify-answer-"]')) {
                         setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
                     }
                 }
                 
-                // Toggle expanded class (CSS handles icon rotation - ▸ rotates 90deg when expanded)
+
                 const header = content.previousElementSibling;
                 console.log('[toggleSection] Header element:', header);
                 if (header && section) {
                     section.classList.toggle('expanded', !isExpanded);
                     console.log('[toggleSection] After toggle, section classes:', section.className);
-                    // Keep icon as ▸ always - CSS rotation handles the visual state
+
                     const icon = header.querySelector('.expand-icon');
                     console.log('[toggleSection] Icon element:', icon);
                     if (icon) {
@@ -3806,20 +3840,20 @@ class BotPanel {
                         console.log('[toggleSection] Icon transform:', window.getComputedStyle(icon).transform);
                     }
                 }
-                // Persist scope-content expansion so it survives scope/filter updates
+
                 if (sectionId === 'scope-content' && typeof vscode !== 'undefined') {
                     vscode.postMessage({ command: 'sectionExpansion', sectionId: sectionId, expanded: !isExpanded });
                 }
             }
         };
         
-        // Expand the instructions section for a specific action (clarify, strategy, build, validate)
-        // This should ALWAYS expand, never toggle - collapsing is only done by explicit user clicks
+
+
         window.expandInstructionsSection = function(actionName) {
             console.log('[expandInstructionsSection] Called with actionName:', actionName);
             if (!actionName) return;
             
-            // Map action names to section header text
+
             const actionToSectionName = {
                 'clarify': 'Clarify',
                 'strategy': 'Strategy',
@@ -3834,7 +3868,7 @@ class BotPanel {
                 return;
             }
             
-            // First, collapse all instruction sections (instr-section-*)
+
             document.querySelectorAll('[id^="instr-section-"]').forEach(content => {
                 const section = content.closest('.collapsible-section');
                 if (section) {
@@ -3845,41 +3879,41 @@ class BotPanel {
                 }
             });
             
-            // Find the section by looking for header text containing the section name
+
             const headers = document.querySelectorAll('.collapsible-header');
             for (const header of headers) {
                 const headerText = header.textContent || '';
-                // Match section name but avoid matching subsections (e.g., "Clarify" but not "Base Instructions")
+
                 if (headerText.includes(sectionName) && !headerText.includes('Base')) {
                     const section = header.closest('.collapsible-section');
                     const content = header.nextElementSibling;
                     
                     if (section && content && content.classList.contains('collapsible-content')) {
                         console.log('[expandInstructionsSection] Expanding section:', sectionName);
-                        // Always expand - we already collapsed all sections above
+
                         content.style.maxHeight = '2000px';
                         content.style.overflow = 'visible';
                         content.style.display = 'block';
                         section.classList.add('expanded');
                         
-                        // Expand clarify boxes once visible (need layout for scrollHeight)
+
                         if (sectionName === 'Clarify' && content.querySelector('[id^="clarify-answer-"]')) {
                             setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
                         }
                         
-                        // Update icon
+
                         const icon = header.querySelector('.expand-icon');
                         if (icon) {
                             icon.textContent = '▸';
                         }
-                        return; // Found and processed, exit
+                        return;
                     }
                 }
             }
             console.log('[expandInstructionsSection] Section not found for:', sectionName);
         };
         
-        // Save/restore collapse state across panel refreshes
+
         window.getCollapseState = function() {
             const state = {};
             document.querySelectorAll('.collapsible-content').forEach(content => {
@@ -3898,7 +3932,7 @@ class BotPanel {
                     const shouldBeExpanded = state[id];
                     content.style.display = shouldBeExpanded ? 'block' : 'none';
                     
-                    // Update icon
+
                     const header = content.previousElementSibling;
                     if (header) {
                         const icon = header.querySelector('span[id$="-icon"]');
@@ -3927,7 +3961,7 @@ class BotPanel {
                 if (header) {
                     const icon = header.querySelector('span[id$="-icon"]');
                     if (icon) {
-                        // Update image src instead of text content - no emojis
+
                         const plusSrc = icon.getAttribute('data-plus');
                         const subtractSrc = icon.getAttribute('data-subtract');
                         if (plusSrc && subtractSrc) {
@@ -3935,7 +3969,7 @@ class BotPanel {
                             if (img) {
                                 img.src = isHidden ? subtractSrc : plusSrc;
                             } else {
-                                // Create img if it doesn't exist
+
                                 const imgSrc = isHidden ? subtractSrc : plusSrc;
                                 const imgAlt = isHidden ? 'Collapse' : 'Expand';
                                 icon.innerHTML = '<img src="' + imgSrc + '" style="width: 12px; height: 12px; vertical-align: middle;" alt="' + imgAlt + '" />';
@@ -3944,21 +3978,21 @@ class BotPanel {
                     }
                 }
                 
-                // Save state to sessionStorage
+
                 const currentState = window.getCollapseState();
                 sessionStorage.setItem('collapseState', JSON.stringify(currentState));
             }
         };
         
         window.openFile = function(filePath, event) {
-            // Prevent default link behavior (scroll to top)
+
             if (event) {
                 event.preventDefault();
                 event.stopPropagation();
             }
-            // Resolve scoped diagram filename when a node is selected.
-            // For specs that had {scope} (resolved to -all), replace -all with -slug.
-            // For other specs, append -slug before .drawio.
+
+
+
             var resolvedPath = filePath;
             if (window.diagramScope && filePath && filePath.indexOf('.drawio') !== -1) {
                 var slug = window.diagramScope.toLowerCase().split(' ').join('-').split('').filter(function(c) {
@@ -3973,7 +4007,7 @@ class BotPanel {
                 }
             }
             console.log('[WebView] openFile called with:', resolvedPath);
-            // Save scroll position before opening file (which may cause focus change)
+
             var savedScrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
             sessionStorage.setItem('scrollPosition', savedScrollY.toString());
             console.log('[WebView] Saved scroll position before file open:', savedScrollY);
@@ -3987,7 +4021,7 @@ class BotPanel {
                 filePath: resolvedPath
             });
             
-            // Ensure scroll position is preserved after message sending (prevents any DOM reflow issues)
+
             setTimeout(() => {
                 window.scrollTo(0, savedScrollY);
             }, 0);
@@ -4019,7 +4053,7 @@ class BotPanel {
             return false;
         };
         
-        // Expand clarification answer boxes to show full content (no scroll) on load/refresh
+
         window.expandClarifyBoxes = function() {
             const textareas = document.querySelectorAll('[id^="clarify-answer-"]');
             textareas.forEach((ta) => {
@@ -4033,7 +4067,7 @@ class BotPanel {
             });
         };
         
-        // Scroll position preservation functions
+
         window.saveScrollPosition = function() {
             const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
             sessionStorage.setItem('scrollPosition', scrollY.toString());
@@ -4060,7 +4094,7 @@ class BotPanel {
             console.log('[WebView] postMessage sent');
         };
         
-        // Test if updateFilter is defined
+
         console.log('[WebView] updateFilter function exists:', typeof updateFilter);
         
         window.updateIncludeLevel = function(level) {
@@ -4129,6 +4163,15 @@ class BotPanel {
                 event.stopPropagation();
             }
             console.log('[WebView] sendInstructionsToChat triggered');
+
+            if (window.selectedNode && window.selectedNode.name) {
+                const nodePath = resolveNodePath(window.selectedNode);
+                if (nodePath) {
+                    handleSubmitCurrent();
+                    return;
+                }
+            }
+
             submitToChat();
         }
 
@@ -4138,7 +4181,7 @@ class BotPanel {
             });
         }
         
-        // Async save status indicator functions
+
         let pendingOperations = 0;
         
         function showSaveStatus(operationCount) {
@@ -4224,7 +4267,7 @@ class BotPanel {
             }
         }
         
-        // Optimistic DOM update for move operations
+
         function applyOptimisticMove(draggedNodeElement, targetElement, dropZone, finalPosition) {
             var draggedNodeName = draggedNodeElement ? draggedNodeElement.getAttribute('data-node-name') : null;
             var targetNodeName = targetElement ? targetElement.getAttribute('data-node-name') : null;
@@ -4235,7 +4278,7 @@ class BotPanel {
                 return;
             }
             
-            // Find the parent container
+
             const draggedParent = draggedNodeElement.parentElement;
             const targetParent = dropZone === 'inside' ? targetElement : targetElement.parentElement;
             
@@ -4246,19 +4289,19 @@ class BotPanel {
                 return;
             }
             
-            // If moving within same parent, reorder
+
             if (draggedParent === targetParent && dropZone === 'after') {
                 const targetPos = parseInt(targetElement.getAttribute('data-position') || '0');
                 const draggedPos = parseInt(draggedNodeElement.getAttribute('data-position') || '0');
                 
                 console.log('[ASYNC_SAVE] [OPTIMISTIC] Moving within same parent draggedPos=' + draggedPos + ' targetPos=' + targetPos + ' finalPosition=' + finalPosition + ' dropZone=' + dropZone);
                 
-                // Remove dragged node from its current position
+
                 const draggedClone = draggedNodeElement.cloneNode(true);
                 draggedNodeElement.remove();
                 console.log('[ASYNC_SAVE] [OPTIMISTIC] Removed dragged node from original position');
                 
-                // Find insertion point
+
                 const children = Array.from(targetParent.children).filter(child => 
                     child.classList.contains('story-node') || 
                     child.querySelector && child.querySelector('.story-node')
@@ -4281,12 +4324,12 @@ class BotPanel {
                     }
                 }
                 
-                // Update position attributes
+
                 updateNodePositions(targetParent);
                 
                 console.log('[ASYNC_SAVE] [OPTIMISTIC] [SUCCESS] Optimistic move applied - node moved in DOM');
             } else if (dropZone === 'inside') {
-                // Moving into a container - this is more complex and may require full refresh
+
                 console.log('[ASYNC_SAVE] [OPTIMISTIC] Moving to inside container - will rely on backend refresh');
             } else {
                 console.warn('[ASYNC_SAVE] [OPTIMISTIC] Unhandled move scenario dropZone=' + dropZone + ' sameParent=' + (draggedParent === targetParent));
@@ -4341,7 +4384,7 @@ class BotPanel {
             });
         };
         
-        // Story Graph Edit functions
+
         window.createEpic = function() {
             console.log('═══════════════════════════════════════════════════════');
             console.log('[WebView] createEpic CALLED');
@@ -4350,13 +4393,13 @@ class BotPanel {
                 message: '[WebView] createEpic called'
             });
             
-            // Use optimistic update handler from story_map_view.js if available
+
             if (typeof window.handleCreateNode === 'function') {
                 console.log('[WebView] Using optimistic create handler');
                 window.handleCreateNode({
                     parentPath: 'story_graph',
                     nodeType: 'epic'
-                    // placeholderName will be auto-generated (Epic1, Epic2, etc.)
+
                 });
             } else {
                 console.warn('[WebView] handleCreateNode not available, falling back to direct command');
@@ -4401,7 +4444,7 @@ class BotPanel {
             var incName = col.getAttribute('data-inc');
             var collapsed = col.getAttribute('data-collapsed') === 'true';
             _applyIncrementCollapse(col, !collapsed);
-            // Persist across refreshes using VS Code webview state
+
             try {
                 var state = vscode.getState() || {};
                 if (!state.collapsedIncrements) state.collapsedIncrements = {};
@@ -4414,7 +4457,7 @@ class BotPanel {
             } catch(_) {}
         };
 
-        // Restore collapsed state after each panel refresh
+
         (function restoreIncrementCollapseState() {
             try {
                 var state = vscode.getState() || {};
@@ -4437,7 +4480,7 @@ class BotPanel {
             var wrapper = document.querySelector('.increment-columns-wrapper');
             if (!wrapper) { console.error('[INCREMENT] Cannot find .increment-columns-wrapper'); return; }
 
-            // Insert after the currently selected column, or append at end
+
             var selectedCol = wrapper.querySelector('.increment-column-container.selected');
 
             var col = document.createElement('div');
@@ -4463,7 +4506,7 @@ class BotPanel {
                 committed = true;
                 var name = span.innerText.trim();
                 if (!name || name === 'New Increment') { col.remove(); return; }
-                // Keep column visible (dimmed) so user sees it while backend processes
+
                 span.contentEditable = 'false';
                 span.style.color = '';
                 col.style.borderTop = '';
@@ -4479,14 +4522,14 @@ class BotPanel {
             });
         };
 
-        // Mirror handleDeleteNode: remove DOM immediately, send command (no confirmation dialog)
+
         window.deleteIncrement = function(incrementName) {
             var col = document.querySelector('.increment-column-container[data-inc="' + incrementName + '"]');
             if (col) col.remove();
             _incCmd('story_graph.remove_increment increment_name:"' + incrementName + '"');
         };
 
-        // Mirror inline rename: contenteditable blur sends the command
+
         window.renameIncrement = function(el, oldName) {
             var newName = el.innerText.trim();
             if (!newName || newName === oldName) { el.innerText = oldName; return; }
@@ -4495,7 +4538,7 @@ class BotPanel {
             _incCmd('story_graph.rename_increment from_name:"' + oldName + '" to_name:"' + newName + '"');
         };
 
-        // Mirror handleDeleteNode: remove the story row immediately, send command
+
         window.removeStoryFromIncrement = function(incrementName, storyName) {
             var col = document.querySelector('.increment-column-container[data-inc="' + incrementName + '"]');
             if (col) {
@@ -4506,9 +4549,9 @@ class BotPanel {
             _incCmd('story_graph.remove_story_from_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"');
         };
 
-        // Called when a story node is dropped onto an increment column
-        // Returns the 0-based insertion position within an increment column based on mouse Y.
-        // If mouseY is not provided, returns undefined (append to end).
+
+
+
         function _incrementDropPosition(incColEl, mouseY) {
             if (mouseY === undefined || mouseY === null || !incColEl) return undefined;
             var rows = Array.from(incColEl.querySelectorAll('.story-node[data-inc-source]'));
@@ -4518,11 +4561,11 @@ class BotPanel {
                 var mid = rect.top + rect.height / 2;
                 if (mouseY < mid) return i;
             }
-            return rows.length; // append after last
+            return rows.length;
         }
 
-        // Add a known story to an increment — called by drag-drop only
-        // position: 0-based index to insert at; omit to append at end
+
+
         window.addStoryToIncrement = function(incrementName, storyName, position) {
             var cmd = 'story_graph.add_story_to_increment increment_name:"' + incrementName + '" story_name:"' + storyName + '"';
             if (position !== undefined && position !== null) cmd += ' position:' + position;
@@ -4578,7 +4621,7 @@ class BotPanel {
         window.deleteNode = function(nodePath) {
             console.log('[WebView] deleteNode called for:', nodePath);
             
-            // Use optimistic update handler from story_map_view.js if available
+
             if (typeof window.handleDeleteNode === 'function') {
                 console.log('[WebView] Using optimistic delete handler');
                 window.handleDeleteNode({
@@ -4586,11 +4629,11 @@ class BotPanel {
                 });
             } else {
                 console.warn('[WebView] handleDeleteNode not available, falling back to direct command');
-                // Fallback: send command directly (defaults to optimistic for story-changing ops)
+
                 vscode.postMessage({
                     command: 'executeCommand',
                     commandText: nodePath + '.delete'
-                    // optimistic defaults to true for story-changing operations
+
                 });
             }
         };
@@ -4598,8 +4641,8 @@ class BotPanel {
         window.deleteNodeIncludingChildren = function(nodePath) {
             console.log('[WebView] deleteNodeIncludingChildren called for:', nodePath);
             
-            // Use optimistic update handler from story_map_view.js if available
-            // Delete ALWAYS includes children - no version without children
+
+
             if (typeof window.handleDeleteNode === 'function') {
                 console.log('[WebView] Using optimistic delete handler (always includes children)');
                 window.handleDeleteNode({
@@ -4607,12 +4650,12 @@ class BotPanel {
                 });
             } else {
                 console.warn('[WebView] handleDeleteNode not available, falling back to direct command');
-                // Fallback: send command directly (defaults to optimistic for story-changing ops)
-                // Backend delete() method defaults to cascade=True (always includes children)
+
+
                 vscode.postMessage({
                     command: 'executeCommand',
                     commandText: nodePath + '.delete()'
-                    // optimistic defaults to true for story-changing operations
+
                 });
             }
         };
@@ -4620,8 +4663,8 @@ class BotPanel {
         window.enableEditMode = function(nodePath) {
             console.log('[ASYNC_SAVE] ========== RENAME OPERATION START ==========');
             console.log('[ASYNC_SAVE] [USER_ACTION] User double-clicked node to rename nodePath=' + nodePath + ' timestamp=' + new Date().toISOString());
-            // Extract the current node name from the path
-            // Path format: story_graph."Epic"."SubEpic"."Story"
+
+
             const matches = nodePath.match(/"([^"]+)"[^"]*$/);
             const currentName = matches ? matches[1] : '';
             
@@ -4635,11 +4678,11 @@ class BotPanel {
             console.log('[ASYNC_SAVE] ========== RENAME OPERATION INITIATED ==========');
         };
         
-        // Track selected node for contextual actions (initialize window.selectedNode)
+
         window.selectedNode = {
-            type: 'root', // root, epic, sub-epic, story
+            type: 'root',
             name: null,
-            path: null, // Full path like story_graph."Epic"."SubEpic"
+            path: null,
             canHaveSubEpic: false,
             canHaveStory: false,
             canHaveTests: false,
@@ -4648,7 +4691,7 @@ class BotPanel {
             hasNestedSubEpics: false
         };
         
-        // Map behavior names from backend to tooltip text (global function)
+
         window.behaviorToTooltipText = function(behavior) {
             var behaviorMap = {
                 'shape': 'Shape',
@@ -4661,7 +4704,7 @@ class BotPanel {
         };
         
         
-        // Update contextual action buttons based on selection
+
         window.updateContextualButtons = function() {
             vscode.postMessage({
                 command: 'logToFile',
@@ -4679,7 +4722,7 @@ class BotPanel {
             const btnOpenGraph = document.getElementById('btn-open-graph');
             const btnOpenAll = document.getElementById('btn-open-all');
             
-            // Hide all buttons first
+
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';
             if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'none';
             if (btnCreateStory) btnCreateStory.style.display = 'none';
@@ -4691,7 +4734,7 @@ class BotPanel {
             if (btnOpenGraph) btnOpenGraph.style.display = 'none';
             if (btnOpenAll) btnOpenAll.style.display = 'none';
             
-            // Show buttons based on selection
+
             if (window.selectedNode.type === 'root') {
                 if (btnCreateEpic) btnCreateEpic.style.display = 'block';
             } else if (window.selectedNode.type === 'epic') {
@@ -4699,48 +4742,48 @@ class BotPanel {
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
             } else if (window.selectedNode.type === 'sub-epic') {
-                // Sub-epics can have EITHER sub-epics OR stories, not both
-                // If it has stories, only show create story button
-                // If it has sub-epics, only show create sub-epic button
-                // If empty, show both options
+
+
+
+
                 if (window.selectedNode.hasStories) {
-                    // Has stories - only allow adding more stories
+
                     if (btnCreateStory) btnCreateStory.style.display = 'block';
                 } else if (window.selectedNode.hasNestedSubEpics) {
-                    // Has nested sub-epics - only allow adding more sub-epics
+
                     if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
                 } else {
-                    // Empty - show both options
+
                     if (btnCreateSubEpic) btnCreateSubEpic.style.display = 'block';
                     if (btnCreateStory) btnCreateStory.style.display = 'block';
                 }
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
             } else if (window.selectedNode.type === 'story') {
-                // Stories can have both scenarios and acceptance criteria
+
                 if (btnCreateScenario) btnCreateScenario.style.display = 'block';
                 if (btnCreateAcceptanceCriteria) btnCreateAcceptanceCriteria.style.display = 'block';
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
             } else if (window.selectedNode.type === 'scenario') {
-                // Scenarios can also be scoped to and submitted
+
                 if (btnDelete) btnDelete.style.display = 'block';
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
-                // Note: submit button will be shown below if scenario has behavior_needed
+
             } else if (window.selectedNode.type === 'increment') {
                 if (btnScopeTo) btnScopeTo.style.display = 'block';
             }
             
-            // Show related files buttons for all non-root nodes
+
             if (window.selectedNode.type !== 'root') {
                 if (btnOpenGraph) btnOpenGraph.style.display = 'block';
                 if (btnOpenAll) btnOpenAll.style.display = 'block';
             }
             
-            // Update diagram scope global and button labels.
-            // The onclick handlers read window.diagramScope at click time,
-            // so we never need to rewrite onclick attributes (avoids
-            // backslash/escaping issues inside this template literal).
+
+
+
+
             var dScope = (window.selectedNode.type !== 'root' && window.selectedNode.name)
                 ? window.selectedNode.name : '';
             window.diagramScope = dScope;
@@ -4766,7 +4809,7 @@ class BotPanel {
                 updateBtns[ui].textContent = dScope ? 'Update Graph for "' + dScope + '"' : 'Update Graph';
             }
             
-            // Update diagram file link to show the scoped filename
+
             var scopeSlug = dScope ? dScope.toLowerCase().split(' ').join('-').split('').filter(function(c) {
                 return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c === '-';
             }).join('') : '';
@@ -4784,7 +4827,7 @@ class BotPanel {
                 }
             }
             
-            // Update submit button based on current behavior and action
+
             console.log('═══════════════════════════════════════════════════════');
             console.log('[SUBMIT BUTTON DEBUG] Starting submit button update');
             console.log('[SUBMIT BUTTON DEBUG] Node clicked:', window.selectedNode.name);
@@ -4796,10 +4839,10 @@ class BotPanel {
             console.log('[SUBMIT BUTTON DEBUG] Is root?', window.selectedNode.type === 'root');
             console.log('[SUBMIT BUTTON DEBUG] Has behaviorNeeded?', !!window.selectedNode.behaviorNeeded);
             
-            // btn-submit uses behavior_needed (required next behavior), not current behavior
+
             const requiredBehavior = window.selectedNode.behaviorNeeded;
             const currentBehavior = window.currentBehavior || window.selectedNode.behavior;
-            const currentAction = window.currentAction || 'build'; // Default to 'build' if no action
+            const currentAction = window.currentAction || 'build';
             
             if (btnSubmit && window.selectedNode.type !== 'root' && requiredBehavior) {
                 const behavior = requiredBehavior;
@@ -4810,7 +4853,7 @@ class BotPanel {
                 console.log('[SUBMIT BUTTON DEBUG] Proceeding with button update...');
                 console.log('[SUBMIT BUTTON DEBUG] btnSubmitIcon exists:', !!btnSubmitIcon);
                 
-                // Map behavior to icon and tooltip
+
                 const behaviorMap = {
                     'shape': {
                         icon: btnSubmit.getAttribute('data-shape-icon'),
@@ -4885,17 +4928,17 @@ class BotPanel {
                 }
             }
             
-            // Update btn-submit-alt button (shows when there are multiple behaviors_needed)
+
             const btnSubmitAlt = document.getElementById('btn-submit-alt');
             const behaviorsNeeded = window.selectedNode.behaviorsNeeded || [];
             console.log('[SUBMIT BUTTON DEBUG] behaviorsNeeded:', behaviorsNeeded);
             
             if (btnSubmitAlt && behaviorsNeeded.length > 1 && window.selectedNode.type !== 'root') {
-                const altBehavior = behaviorsNeeded[1]; // Second behavior option
+                const altBehavior = behaviorsNeeded[1];
                 const nodeType = window.selectedNode.type;
                 const btnSubmitAltIcon = document.getElementById('btn-submit-alt-icon');
                 
-                // Map behavior to icon and tooltip for alt button
+
                 const altBehaviorMap = {
                     'shape': {
                         icon: btnSubmitAlt.getAttribute('data-shape-icon'),
@@ -4924,7 +4967,7 @@ class BotPanel {
                     btnSubmitAltIcon.src = altBehaviorConfig.icon;
                     btnSubmitAlt.title = altBehaviorConfig.tooltip;
                     btnSubmitAlt.style.display = 'block';
-                    // Store alt behavior for handleSubmitAlt
+
                     btnSubmitAlt.setAttribute('data-current-behavior', altBehavior);
                     console.log('[SUBMIT BUTTON DEBUG] Alt button shown for behavior:', altBehavior);
                 } else {
@@ -4937,7 +4980,7 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
-        // Select a node (called when clicking on node name/icon)
+
         window.selectNode = function(type, name, options = {}) {
             console.log('═══════════════════════════════════════════════════════');
             console.log('[WebView] selectNode CALLED');
@@ -4949,7 +4992,7 @@ class BotPanel {
                 message: '[WebView] selectNode: type=' + type + ', name=' + name + ', options=' + JSON.stringify(options)
             });
             
-            // Remove selected class from all nodes and increment columns
+
             document.querySelectorAll('.story-node.selected').forEach(node => {
                 node.classList.remove('selected');
             });
@@ -4957,10 +5000,10 @@ class BotPanel {
                 col.classList.remove('selected');
             });
             
-            // Add selected class to the clicked node
+
             let targetNode = null;
             
-            // First try to find by path if available (more specific for nested nodes)
+
             if (options.path) {
                 const allNodes = document.querySelectorAll('.story-node[data-path]');
                 for (const node of allNodes) {
@@ -4972,7 +5015,7 @@ class BotPanel {
                 }
             }
             
-            // Fallback to name+type if path not found
+
             if (!targetNode) {
                 const nodeName = name || 'Story Map';
                 targetNode = document.querySelector('.story-node[data-node-type="' + type + '"][data-node-name="' + nodeName + '"]');
@@ -4986,7 +5029,7 @@ class BotPanel {
                 console.log('[WebView]   WARNING: Target node not found');
             }
             
-            // Store both current behavior and behavior_needed
+
             const behavior = window.currentBehavior || options.behavior || null;
             const behaviors = options.behaviors || (options.behavior ? [options.behavior] : []);
             
@@ -4994,9 +5037,9 @@ class BotPanel {
                 type: type,
                 name: name,
                 path: options.path || null,
-                behavior: behavior, // Current behavior in progress
-                behaviorNeeded: options.behavior || null, // Required next behavior from story graph
-                behaviorsNeeded: behaviors, // List of applicable behaviors (may have multiple for empty nodes)
+                behavior: behavior,
+                behaviorNeeded: options.behavior || null,
+                behaviorsNeeded: behaviors,
                 canHaveSubEpic: options.canHaveSubEpic || false,
                 canHaveStory: options.canHaveStory || false,
                 canHaveTests: options.canHaveTests || false,
@@ -5023,7 +5066,7 @@ class BotPanel {
                 message: '[WebView] window.selectedNode.behavior_needed set to: "' + window.selectedNode.behavior + '" for node: ' + name
             });
             
-            // Save selection to sessionStorage
+
             try {
                 sessionStorage.setItem('selectedNode', JSON.stringify(window.selectedNode));
             } catch (err) {
@@ -5035,7 +5078,7 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
-        // Handle contextual create actions
+
         window.handleContextualCreate = function(actionType) {
             console.log('═══════════════════════════════════════════════════════');
             console.log('[WebView] handleContextualCreate CALLED');
@@ -5056,7 +5099,7 @@ class BotPanel {
                 return;
             }
             
-            // Validate path: must contain node name, not just "story_graph."
+
             const hasValidPath = window.selectedNode.path && 
                                 window.selectedNode.path.length > 'story_graph.'.length &&
                                 window.selectedNode.path.includes(window.selectedNode.name);
@@ -5064,7 +5107,7 @@ class BotPanel {
             console.log('[WebView]   path:', window.selectedNode.path);
             console.log('[WebView]   hasValidPath:', hasValidPath);
             
-            // Use optimistic update handler from story_map_view.js if available
+
             if (typeof window.handleCreateNode === 'function') {
                 var parentPath = hasValidPath ? window.selectedNode.path : \`story_graph."\${window.selectedNode.name}"\`;
                 
@@ -5072,11 +5115,11 @@ class BotPanel {
                 window.handleCreateNode({
                     parentPath: parentPath,
                     nodeType: actionType
-                    // placeholderName will be auto-generated (Epic1, SubEpic1, Story1, etc.)
+
                 });
             } else {
                 console.warn('[WebView] handleCreateNode not available, falling back to direct command');
-                // Fallback: send command directly
+
                 let commandText;
                 switch(actionType) {
                     case 'sub-epic':
@@ -5106,7 +5149,7 @@ class BotPanel {
             console.log('═══════════════════════════════════════════════════════');
         };
         
-        // Handle delete action (always cascade)
+
         window.handleDelete = function() {
             console.log('[WebView] handleDelete called for node:', window.selectedNode);
             
@@ -5115,25 +5158,25 @@ class BotPanel {
                 return;
             }
             
-            // Build node path
+
             let nodePath = window.selectedNode.path;
             if (!nodePath || nodePath.length <= 'story_graph.'.length) {
-                // Fallback: construct path from name
+
                 nodePath = \`story_graph."\${window.selectedNode.name}"\`;
             }
             
             console.log('[WebView] Calling handleDeleteNode with path:', nodePath);
             
-            // Call handleDeleteNode for optimistic update (removes from DOM immediately)
-            // Delete ALWAYS includes children - no version without children
+
+
             if (typeof window.handleDeleteNode === 'function') {
                 window.handleDeleteNode({
                     nodePath: nodePath
                 });
             } else {
                 console.warn('[WebView] handleDeleteNode not available, falling back to direct command');
-                // Fallback: send command directly (will still work, but no optimistic update)
-                // Backend delete() method defaults to cascade=True (always includes children)
+
+
                 const commandText = nodePath + '.delete()';
                 vscode.postMessage({
                     command: 'executeCommand',
@@ -5142,7 +5185,7 @@ class BotPanel {
             }
         };
         
-        // Handle scope to action - set filter to selected node
+
         window.handleScopeTo = function() {
             console.log('[WebView] handleScopeTo called for node:', window.selectedNode);
             
@@ -5151,7 +5194,7 @@ class BotPanel {
                 return;
             }
             
-            // Build scope command with node type prefix (matches nodes.py _scope_command_for_node)
+
             const nodeName = window.selectedNode.name;
             const nodeType = window.selectedNode.type;
             let scopeCommand;
@@ -5165,7 +5208,7 @@ class BotPanel {
             } else if (nodeType === 'increment') {
                 scopeCommand = 'story ' + nodeName;
             } else {
-                // Fallback to just the name for unknown types
+
                 scopeCommand = nodeName;
             }
             
@@ -5175,67 +5218,81 @@ class BotPanel {
                 message: '[WebView] SENDING SCOPE TO COMMAND: scope ' + scopeCommand
             });
             
-            // Execute scope command with the node type and name
+
             vscode.postMessage({
                 command: 'executeCommand',
                 commandText: 'scope ' + scopeCommand
             });
         };
         
+
+        function resolveNodePath(selectedNode) {
+            if (selectedNode.path && selectedNode.path.length > 'story_graph.'.length) {
+                return selectedNode.path;
+            }
+            const nodes = document.querySelectorAll('.story-node[data-path]');
+            for (var i = 0; i < nodes.length; i++) {
+                var el = nodes[i];
+                if (el.getAttribute('data-node-type') === selectedNode.type && el.getAttribute('data-node-name') === selectedNode.name) {
+                    var path = el.getAttribute('data-path');
+                    if (path) {
+                        console.log('[WebView] Resolved path from DOM:', path);
+                        selectedNode.path = path;
+                        return path;
+                    }
+                }
+            }
+            return null;
+        }
+        
         window.handleSubmit = function() {
             console.log('[WebView] ========== handleSubmit CALLED ==========');
-            console.log('[WebView] handleSubmit called for node:', window.selectedNode);
-            console.log('[WebView] Node name:', window.selectedNode?.name);
-            console.log('[WebView] Node path:', window.selectedNode?.path);
-            console.log('[WebView] Node behavior:', window.selectedNode?.behavior);
+            vscode.postMessage({
+                command: 'logScopeDebug',
+                message: 'handleSubmit CALLED | selectedNode=' + JSON.stringify(window.selectedNode || null)
+            });
             
             if (!window.selectedNode || !window.selectedNode.name) {
-                console.error('[WebView] ERROR: No node selected for submit');
-                vscode.postMessage({
-                    command: 'logToFile',
-                    message: '[WebView] ERROR: handleSubmit called but no node selected'
-                });
+                vscode.postMessage({ command: 'logScopeDebug', message: 'ERROR: No node selected' });
                 return;
             }
             
             if (!window.selectedNode.behaviorNeeded) {
-                console.error('[WebView] ERROR: No behaviorNeeded for selected node');
-                vscode.postMessage({
-                    command: 'logToFile',
-                    message: '[WebView] ERROR: handleSubmit called but node has no behaviorNeeded: ' + window.selectedNode.name
-                });
+                vscode.postMessage({ command: 'logScopeDebug', message: 'ERROR: No behaviorNeeded for ' + window.selectedNode.name });
                 return;
             }
             
             const nodeName = window.selectedNode.name;
-            const nodePath = window.selectedNode.path;
+            const nodePath = resolveNodePath(window.selectedNode);
             
-            console.log('[WebView] Submit: Submitting required behavior instructions for', nodeName);
             vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] SUBMIT: Submitting required behavior instructions for node=' + nodeName + ', path=' + nodePath
+                command: 'logScopeDebug',
+                message: 'resolveNodePath: nodeName=' + nodeName + ' | nodePath=' + (nodePath || 'NULL') + ' | hadPath=' + !!window.selectedNode.path
             });
             
-            // Call submit_required_behavior_instructions with the build action
-            const action = 'build';
-            const commandText = nodePath 
-                ? nodePath + '.submit_required_behavior_instructions action:"' + action + '"'
-                : 'story_graph."' + nodeName + '".submit_required_behavior_instructions action:"' + action + '"';
+            if (!nodePath) {
+                vscode.postMessage({
+                    command: 'logScopeDebug',
+                    message: 'ERROR: Could not resolve node path - story map may not be visible. Click the node again to refresh.'
+                });
+            vscode.postMessage({
+                command: 'showScopeError',
+                message: 'Scope not available: Could not resolve node path. Try clicking the story/epic node again, then submit.'
+            });
+                return;
+            }
             
-            console.log('[WebView] ========== SENDING COMMAND ==========');
-            console.log('[WebView] Executing command:', commandText);
-            console.log('[WebView] Command type:', typeof commandText);
-            console.log('[WebView] Command length:', commandText.length);
+            const action = 'build';
+            const commandText = nodePath + '.submit_required_behavior_instructions action:"' + action + '"';
+            
+            vscode.postMessage({
+                command: 'logScopeDebug',
+                message: 'SENDING COMMAND: ' + commandText
+            });
             
             vscode.postMessage({
                 command: 'executeCommand',
                 commandText: commandText
-            });
-            
-            console.log('[WebView] ========== COMMAND SENT ==========');
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] SUBMIT: Command sent: ' + commandText
             });
         };
         
@@ -5254,21 +5311,17 @@ class BotPanel {
                 return;
             }
             
-            const altBehavior = behaviorsNeeded[1]; // Second behavior option
+            const altBehavior = behaviorsNeeded[1];
             const nodeName = window.selectedNode.name;
-            const nodePath = window.selectedNode.path;
+            const nodePath = resolveNodePath(window.selectedNode);
             
-            console.log('[WebView] Submit Alt: Submitting', altBehavior, 'behavior instructions for', nodeName);
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] SUBMIT ALT: Submitting ' + altBehavior + ' behavior instructions for node=' + nodeName
-            });
+            if (!nodePath) {
+                vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
+                return;
+            }
             
-            // Navigate to the alt behavior first, then submit
             const action = 'build';
-            const commandText = nodePath 
-                ? nodePath + '.submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"'
-                : 'story_graph."' + nodeName + '".submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"';
+            const commandText = nodePath + '.submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"';
             
             console.log('[WebView] Executing command:', commandText);
             vscode.postMessage({
@@ -5291,26 +5344,23 @@ class BotPanel {
             }
             
             const nodeName = window.selectedNode.name;
-            const nodePath = window.selectedNode.path;
+            const nodePath = resolveNodePath(window.selectedNode);
             
-            console.log('[WebView] Submit Current: Submitting current instructions for', nodeName);
-            console.log('[WebView] Submit Current: nodeName =', nodeName);
-            console.log('[WebView] Submit Current: nodePath =', nodePath);
-            console.log('[WebView] Submit Current: nodePath exists?', !!nodePath);
+            if (!nodePath) {
+                vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
+                return;
+            }
             
-            vscode.postMessage({
-                command: 'logToFile',
-                message: '[WebView] SUBMIT CURRENT: node=' + nodeName + ', path=' + nodePath + ', pathExists=' + !!nodePath
-            });
-            
-            // Call submit_current_instructions which uses current behavior and action
-            const commandText = nodePath 
-                ? nodePath + '.submit_current_instructions'
-                : 'story_graph."' + nodeName + '".submit_current_instructions';
+
+            const behavior = window.currentBehavior || null;
+            const action = window.currentAction || null;
+            const commandText = (behavior && action)
+                ? nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"'
+                : nodePath + '.submit_current_instructions';
             
             console.log('[WebView] ========== SUBMIT CURRENT COMMAND ==========');
             console.log('[WebView] Command constructed:', commandText);
-            console.log('[WebView] Command length:', commandText.length);
+            console.log('[WebView] Using panel state: behavior=' + (behavior || '(bot current)') + ' action=' + (action || '(bot current)'));
             
             vscode.postMessage({
                 command: 'executeCommand',
@@ -5320,30 +5370,30 @@ class BotPanel {
             console.log('[WebView] ========== COMMAND SENT ==========');
         };
         
-        // Helper function to get file link from selected node DOM element
+
         function getSelectedNodeFileLink() {
             if (!window.selectedNode || !window.selectedNode.name) return null;
             const nodeElement = document.querySelector('.story-node[data-node-type="' + window.selectedNode.type + '"][data-node-name="' + window.selectedNode.name + '"]');
             return nodeElement ? nodeElement.getAttribute('data-file-link') : null;
         }
         
-        // Helper function to get workspace directory
+
         function getWorkspaceDir() {
-            // Try to get from botData if available
+
             if (window.botData && window.botData.workspace_directory) {
                 return window.botData.workspace_directory;
             }
-            // Fallback: try to infer from story graph path
+
             const storyGraphPath = 'docs/story/story-graph.json';
-            return ''; // Will be resolved relative to workspace root
+            return '';
         }
         
-        // Helper function to open file in specific view column (for split editors)
+
         function openFileInColumn(filePath, viewColumn) {
             vscode.postMessage({
                 command: 'openFileInColumn',
                 filePath: filePath,
-                viewColumn: viewColumn // 'One', 'Two', 'Three', 'Four', 'Beside', 'Active'
+                viewColumn: viewColumn
             });
         }
         
@@ -5366,7 +5416,7 @@ class BotPanel {
             console.log('[WebView] Opening story graph:', storyGraphPath);
             console.log('[WebView] Node path:', window.selectedNode.path);
             
-            // Open story graph and request to collapse all, expand selected node path, position cursor
+
             vscode.postMessage({
                 command: 'openFileWithState',
                 filePath: storyGraphPath,
@@ -5374,7 +5424,7 @@ class BotPanel {
                     collapseAll: true,
                     expandPath: window.selectedNode.path || null,
                     selectedNode: window.selectedNode,
-                    positionCursor: true // Request cursor positioning at expanded section
+                    positionCursor: true
                 }
             });
         };
@@ -5388,7 +5438,7 @@ class BotPanel {
                 return;
             }
             
-            // Request story files for selected node
+
             vscode.postMessage({
                 command: 'openStoryFiles',
                 nodeType: window.selectedNode.type,
@@ -5414,7 +5464,7 @@ class BotPanel {
             const workspaceDir = getWorkspaceDir();
             const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
             
-            // Find the selected node element in DOM by iterating (querySelector fails with quoted paths)
+
             let testFiles = [];
             let storyFiles = [];
             const selectedNodePath = window.selectedNode.path;
@@ -5432,13 +5482,13 @@ class BotPanel {
                 
                 if (nodeEl) {
                     if (nodeType === 'sub-epic' || nodeType === 'epic') {
-                        // For sub-epics/epics: collect story files and test files from ALL child stories
-                        // The collapsible content div is a sibling of the node's parent div
+
+
                         const parentDiv = nodeEl.closest('div');
                         const collapsibleDiv = parentDiv ? parentDiv.nextElementSibling : null;
                         
                         if (collapsibleDiv && collapsibleDiv.classList.contains('collapsible-content')) {
-                            // Collect all story file links from child story nodes
+
                             const childStoryNodes = collapsibleDiv.querySelectorAll('.story-node[data-node-type="story"]');
                             childStoryNodes.forEach(function(storyEl) {
                                 const link = storyEl.getAttribute('data-file-link');
@@ -5447,7 +5497,7 @@ class BotPanel {
                                 }
                             });
                             
-                            // Collect all test files from child elements
+
                             const testFileEls = collapsibleDiv.querySelectorAll('[data-test-files]');
                             testFileEls.forEach(function(el) {
                                 try {
@@ -5464,7 +5514,7 @@ class BotPanel {
                         }
                         console.log('[WebView] Sub-epic/epic: found', storyFiles.length, 'story files and', testFiles.length, 'test files');
                     } else {
-                        // For stories/scenarios: get test files from sibling element
+
                         if (nodeEl.parentElement) {
                             const testFilesEl = nodeEl.parentElement.querySelector('[data-test-files]');
                             if (testFilesEl) {
@@ -5485,7 +5535,7 @@ class BotPanel {
             console.log('[WebView] handleOpenAll - storyFiles:', storyFiles);
             console.log('[WebView] handleOpenAll - testFiles:', testFiles);
             
-            // Open all files in split editors
+
             vscode.postMessage({
                 command: 'openAllRelatedFiles',
                 nodeType: window.selectedNode.type,
@@ -5495,37 +5545,37 @@ class BotPanel {
                 storyFiles: storyFiles,
                 testFiles: testFiles,
                 storyGraphPath: storyGraphPath,
-                selectedNode: window.selectedNode  // Pass full node for story graph positioning
+                selectedNode: window.selectedNode
             });
         };
         
         
-        // Initialize: show Create Epic button by default
+
         setTimeout(function() {
             window.selectNode('root', null);
         }, 100);
         
-        // Escape key deselects the current node and resets buttons
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                // Clear session storage so refresh doesn't restore
+
                 try { sessionStorage.removeItem('selectedNode'); } catch(err) {}
                 window.diagramScope = '';
                 window.selectNode('root', null);
             }
         });
         
-        // Toggle Q&A expand/collapse
+
         window.toggleQAExpand = function(idx) {
             const textarea = document.getElementById('clarify-answer-' + idx);
             const toggleBtn = document.getElementById('qa-toggle-' + idx);
             if (!textarea) return;
             
             const isCollapsed = textarea.getAttribute('data-collapsed') === 'true';
-            const defaultHeight = 60; // Default collapsed height in px
+            const defaultHeight = 60;
             
             if (isCollapsed) {
-                // Expand to full content
+
                 textarea.style.height = 'auto';
                 const fullHeight = textarea.scrollHeight;
                 textarea.style.height = fullHeight + 'px';
@@ -5533,7 +5583,7 @@ class BotPanel {
                 textarea.setAttribute('data-collapsed', 'false');
                 if (toggleBtn) toggleBtn.textContent = '▲';
             } else {
-                // Collapse to default height
+
                 textarea.style.height = defaultHeight + 'px';
                 textarea.style.overflow = 'hidden';
                 textarea.setAttribute('data-collapsed', 'true');
@@ -5541,7 +5591,7 @@ class BotPanel {
             }
         };
         
-        // Save functions for guardrails
+
         window.saveClarifyAnswers = function() {
             console.log('[WebView] saveClarifyAnswers triggered');
             const answers = {};
@@ -5570,7 +5620,7 @@ class BotPanel {
             if (evidenceTextarea) {
                 const evidenceText = evidenceTextarea.value?.trim();
                 if (evidenceText) {
-                    // Parse evidence text as key:value pairs
+
                     const evidenceProvided = {};
                     evidenceText.split('\\n').forEach(line => {
                         const colonIdx = line.indexOf(':');
@@ -5603,13 +5653,13 @@ class BotPanel {
             });
         };
         
-        // Multi-select version: collects all checked checkboxes with given name
+
         window.saveStrategyMultiDecision = function(criteriaKey, inputName) {
             console.log('[WebView] saveStrategyMultiDecision triggered:', criteriaKey, inputName);
             const checkboxes = document.querySelectorAll('input[name="' + inputName + '"]:checked');
             const selectedOptions = [];
             checkboxes.forEach(cb => {
-                // Get the option text from the label's span
+
                 const label = cb.closest('label');
                 if (label) {
                     const span = label.querySelector('span');
@@ -5642,8 +5692,8 @@ class BotPanel {
             }
         };
         
-        // Listen for messages from extension host (e.g. error displays)
-        // Listen for messages from extension host (e.g. error displays)
+
+
         window.addEventListener('message', event => {
             const message = event.data;
             console.log('[WebView] Received message from extension:', message);
@@ -5669,7 +5719,7 @@ class BotPanel {
             
             if (message.command === 'optimisticRename') {
                 console.log('[WebView] Received optimisticRename message:', message);
-                // Use optimistic update handler from story_map_view.js if available
+
                 if (typeof window.handleRenameNode === 'function') {
                     console.log('[WebView] Using optimistic rename handler');
                     window.handleRenameNode({
@@ -5738,16 +5788,16 @@ class BotPanel {
             }
             
             if (message.command === 'displayError') {
-                // Display error prominently in the panel
+
                 const errorDiv = document.createElement('div');
                 errorDiv.style.cssText = 'position: fixed; top: 10px; left: 10px; right: 10px; z-index: 10000; background: #f44336; color: white; padding: 16px; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 80vh; overflow-y: auto;';
                 errorDiv.textContent = '[ERROR] ' + message.error;
                 
-                // Add button container
+
                 const btnContainer = document.createElement('div');
                 btnContainer.style.cssText = 'margin-top: 12px; display: flex; gap: 8px;';
                 
-                // Add retry button
+
                 const retryBtn = document.createElement('button');
                 retryBtn.textContent = '🔄 Retry';
                 retryBtn.style.cssText = 'background: white; color: #f44336; border: none; padding: 8px 16px; cursor: pointer; border-radius: 3px; font-weight: bold;';
@@ -5756,7 +5806,7 @@ class BotPanel {
                     vscode.postMessage({ command: 'refresh' });
                 };
                 
-                // Add close button
+
                 const closeBtn = document.createElement('button');
                 closeBtn.textContent = 'Close';
                 closeBtn.style.cssText = 'background: rgba(255,255,255,0.8); color: #f44336; border: none; padding: 8px 16px; cursor: pointer; border-radius: 3px;';
@@ -5768,11 +5818,11 @@ class BotPanel {
                 
                 document.body.appendChild(errorDiv);
                 
-                // Auto-remove after 30 seconds
+
                 setTimeout(() => errorDiv.remove(), 30000);
             }
             
-            // Handle explicit collapse state restoration after refresh
+
             if (message.command === 'restoreCollapseState') {
                 console.log('[WebView] Restoring collapse state after refresh');
                 const savedState = sessionStorage.getItem('collapseState');
@@ -5789,14 +5839,14 @@ class BotPanel {
                 }
             }
             
-            // Optimistic update disabled - full refresh preserves icons and structure
-            // (textContent wiped out icon HTML, causing icons to disappear)
+
+
             if (message.command === 'optimisticRename') {
                 console.log('[WebView] Optimistic rename disabled - waiting for full refresh');
-                // Panel will refresh after backend rename completes
+
             }
             
-            // Revert rename disabled - no longer needed without optimistic updates
+
             if (message.command === 'revertRename') {
                 console.log('[WebView] Revert rename command received but not needed');
             }
@@ -5807,7 +5857,7 @@ class BotPanel {
   }
 }
 
-// Static properties (assigned after class definition for compatibility)
+
 BotPanel.currentPanel = undefined;
 BotPanel.viewType = "agilebot.botPanel";
 
