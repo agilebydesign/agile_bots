@@ -1,7 +1,25 @@
 {
   "story_bot.shape.clarify": "combine_next",
   "story_bot.shape.submit": "combine_next",
-  "story_bot.shape.strategy": "auto",
+  "story_bot.shape.strategy": "combine_next",
   "story_bot.shape.build": "combine_next",
-  "story_bot.shape.validate": "manual"
+  "story_bot.shape.validate": "combine_next",
+  "story_bot.shape.render": "manual",
+  "story_bot.exploration.clarify": "skip",
+  "story_bot.exploration.strategy": "skip",
+  "story_bot.exploration.build": "combine_next",
+  "story_bot.exploration.validate": "combine_next",
+  "story_bot.scenarios.clarify": "skip",
+  "story_bot.scenarios.strategy": "skip",
+  "story_bot.scenarios.build": "combine_next",
+  "story_bot.scenarios.validate": "combine_next",
+  "story_bot.tests.clarify": "skip",
+  "story_bot.tests.strategy": "skip",
+  "story_bot.tests.build": "combine_next",
+  "story_bot.code.build": "combine_next",
+  "story_bot.tests.validate": "combine_next",
+  "story_bot._behavior.shape": "combine_with_next",
+  "story_bot._behavior.scenarios": "combine_with_next",
+  "story_bot._behavior.tests": "combine_with_next",
+  "story_bot._behavior.code": "manual"
 }
