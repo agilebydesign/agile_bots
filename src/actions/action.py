@@ -368,8 +368,13 @@ class Action:
         
         if hasattr(context, 'scope') and context.scope:
             context.scope.apply_to_bot()
+            # When context has scope, include it in display_content by default
+            if not include_scope and (context.scope.value or context.scope.type.value == 'showAll'):
+                include_scope = True
         
         instructions = self.instructions.copy()
+        if hasattr(context, 'scope') and context.scope:
+            instructions._scope = context.scope
         
         if self.action_config and 'instructions' in self.action_config:
             behavior_instructions = self.action_config.get('instructions', [])

@@ -1,9 +1,1 @@
-{
-  "type": "story",
-  "value": [
-    "configure"
-  ],
-  "exclude": [],
-  "skiprule": [],
-  "include_level": "stories"
-}
+{"type": "showAll", "value": [], "exclude": [], "skiprule": [], "include_level": "code"}
