@@ -162,10 +162,10 @@ class CLISession:
         has_dash_params = '--' in command
         
         verb_parts = verb.split('.')
-        # Story graph node submit: command contains story_graph + submit method.
-        # Must go to domain navigator; otherwise "story_graph" gets mis-parsed as a behavior name.
+        # Any story_graph command must go to domain navigator; otherwise "story_graph" gets mis-parsed as a behavior name.
+        is_story_graph_command = command.strip().lower().startswith('story_graph')
         is_story_graph_submit = (
-            'story_graph' in command and any(
+            is_story_graph_command and any(
                 m in command for m in
                 ('submit_current_instructions', 'submit_required_behavior_instructions', 'submit_instructions')
             )
@@ -177,7 +177,7 @@ class CLISession:
         is_get_execution = len(verb_parts) == 3 and verb_parts[2] == 'get_execution'
         is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0])
         
-        if (is_story_graph_submit or
+        if (is_story_graph_command or
                 ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
                  and not is_set_execution and not is_get_execution and not is_behavior_action)):
             return self._execute_domain_object_command(command)
@@ -603,15 +603,9 @@ class CLISession:
         command_core = parts[0]
         args_string = parts[1] if len(parts) > 1 else ''
         
-        # Story graph node submit: command contains story_graph + submit method.
-        # Must NOT parse as behavior.action or "story_graph" becomes a behavior name.
-        is_story_graph_submit = (
-            'story_graph' in command and any(
-                m in command for m in
-                ('submit_current_instructions', 'submit_required_behavior_instructions', 'submit_instructions')
-            )
-        )
-        if is_story_graph_submit:
+        # Any story_graph command must go to domain navigator; do NOT parse as behavior.action.
+        is_story_graph_command = command.strip().lower().startswith('story_graph')
+        if is_story_graph_command:
             return self._execute_domain_object_command(command)
         
         params = self._parse_action_params(args_string) if args_string else None
