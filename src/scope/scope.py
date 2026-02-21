@@ -17,21 +17,73 @@ class ScopeType(Enum):
 @dataclass
 class StoryGraphFilter:
     search_terms: List[str] = field(default_factory=list)
-    increments: List[int] = field(default_factory=list)
+    increments: List[Union[int, str]] = field(default_factory=list)
     
     def matches_node(self, node_name: str) -> bool:
         if not self.search_terms:
             return True
         return node_name in self.search_terms
     
+    def _story_names_from_increments(self, story_graph: Dict[str, Any]) -> set:
+        """Extract story names from increments matching self.increments (names or priorities)."""
+        names = set()
+        inc_list = story_graph.get('increments', [])
+        for inc in inc_list:
+            inc_name = (inc.get('name') or '').strip()
+            inc_priority = inc.get('priority')
+            match = False
+            for v in self.increments:
+                if isinstance(v, int) and inc_priority == v:
+                    match = True
+                    break
+                if isinstance(v, str):
+                    v_lower = (v or '').strip().lower()
+                    inc_lower = inc_name.lower()
+                    # Require non-empty increment name when matching by name - empty = "unallocated"
+                    if inc_lower and (v_lower in inc_lower or inc_lower in v_lower):
+                        match = True
+                        break
+            if match:
+                for s in inc.get('stories', []):
+                    sn = s.get('name', s) if isinstance(s, dict) else s
+                    if sn:
+                        names.add(sn)
+        return names
+    
     def filter_story_graph(self, story_graph: Dict[str, Any]) -> Dict[str, Any]:
         if not self.search_terms and not self.increments:
             return story_graph
         
-        all_filter_names = self.search_terms
+        all_filter_names = list(self.search_terms)
+        if self.increments:
+            story_names = self._story_names_from_increments(story_graph)
+            all_filter_names = list(story_names) if story_names else all_filter_names
+            # Filter increments to matching ones (exclude empty-named "unallocated" when matching by name)
+            inc_list = story_graph.get('increments', [])
+            filtered_inc = []
+            for inc in inc_list:
+                inc_name = (inc.get('name') or '').strip()
+                inc_priority = inc.get('priority')
+                for v in self.increments:
+                    if isinstance(v, int) and inc_priority == v:
+                        filtered_inc.append(inc)
+                        break
+                    if isinstance(v, str):
+                        v_lower = (v or '').strip().lower()
+                        inc_lower = inc_name.lower()
+                        if inc_lower and (v_lower in inc_lower or inc_lower in v_lower):
+                            filtered_inc.append(inc)
+                            break
+            story_graph = {**story_graph, 'increments': filtered_inc}
+        
+        filter_set = {f.strip().lower() for f in all_filter_names}
+        use_exact = bool(self.increments)
         
         def name_matches(name: str) -> bool:
-            return any(filter_name.lower() in name.lower() for filter_name in all_filter_names)
+            n = (name or '').strip().lower()
+            if use_exact:
+                return n in filter_set
+            return any(f in n or n in f for f in filter_set)
         
         def filter_sub_epic(sub_epic: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             sub_epic_name = sub_epic.get('name', '')
@@ -214,10 +266,10 @@ class Scope:
         new_scope.include_level = self.include_level
         new_scope._story_graph_filter = self._story_graph_filter
         new_scope._file_filter = self._file_filter
-        if hasattr(self, '_cached_results'):
-            new_scope._cached_results = self._cached_results
-        if hasattr(self, '_results_dirty'):
-            new_scope._results_dirty = self._results_dirty
+        # Do NOT copy cached results - they may be stale (e.g. from when scope was 'all').
+        # Force fresh fetch so increment/story filtering is applied correctly.
+        new_scope._results_dirty = True
+        new_scope._cached_results = None
         return new_scope
     
     def filter(self, type: ScopeType, value: List[str] = None, exclude: List[str] = None, skiprule: List[str] = None):

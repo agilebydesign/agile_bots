@@ -696,7 +696,12 @@ class BotPanel {
             if (message.filter && message.filter.trim()) {
               const filterValue = message.filter.trim();
 
-              const prefixedFilter = this._currentStoryMapView === 'Files' ? `file:${filterValue}` : filterValue;
+              let prefixedFilter = filterValue;
+              if (this._currentStoryMapView === 'Files') {
+                prefixedFilter = `file:${filterValue}`;
+              } else if (this._currentStoryMapView === 'Increment') {
+                prefixedFilter = `increment ${filterValue}`;
+              }
               const scopeCmd = `scope "${prefixedFilter}"`;
               this._log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
               

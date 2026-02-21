@@ -298,6 +298,13 @@ class StoryMapView extends PanelView {
             contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
+            // Include epics section with increment's stories when scope is filtered to increment (injection level applies)
+            const epics = (scopeData.type === 'increment' && scopeData.content?.epics) || [];
+            if (epics.length > 0) {
+                const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
+                const rootNode = this.renderRootNode(treeHtml, plusIconPath, subtractIconPath);
+                contentHtml += '<div style="margin-top: 12px; border-top: 1px solid var(--accent-color); padding-top: 8px;"><span style="font-size: 12px; font-weight: 600; opacity: 0.8;">Epics</span></div>' + rootNode;
+            }
         } else if (isFilesView && scopeData.type === 'files' && scopeData.content) {
             // Files view - only when toggle is Files AND scope has file data
             contentHtml = this.renderFileList(scopeData.content);

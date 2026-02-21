@@ -96,8 +96,12 @@ class JSONScope(JSONAdapter):
                     # Generate and enrich content (cache miss or invalid)
                     from story_graph.json_story_graph import JSONStoryGraph
                     graph_adapter = JSONStoryGraph(story_graph)
-                    # Panel/scope view: use examples (fast, no trace). Instructions: use scope.include_level
-                    include_level = self.scope.include_level if apply_include_level else 'examples'
+                    # Instructions: use scope.include_level. Panel: use examples (fast) except when scope is
+                    # increment with filter - then use include_level so epics section shows injection-level detail.
+                    use_include = apply_include_level or (
+                        self.scope.type.value == 'increment' and bool(self.scope.value)
+                    )
+                    include_level = self.scope.include_level if use_include else 'examples'
                     # Trace is expensive - only for instructions when level is tests/code
                     generate_trace = strip_links_for_instructions and include_level in ('tests', 'code')
                     content = graph_adapter.to_dict(include_level=include_level, generate_trace=generate_trace).get('content', [])
