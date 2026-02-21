@@ -143,6 +143,8 @@ class JSONScope(JSONAdapter):
                 # may have already added increments to content; we always apply the filter.
                 if isinstance(content, dict) and content.get('increments'):
                     content['increments'] = self._filter_increments(content['increments'], self.scope.value)
+                    # Enrich increments with behavior_needed from first (least-completed) story, same as epic
+                    self._enrich_increments_with_behavior(content['increments'], content.get('epics', []))
 
                 result['content'] = content
                 
@@ -162,6 +164,49 @@ class JSONScope(JSONAdapter):
         
         return result
     
+    def _find_story_behavior_in_epics(self, epics: list, story_name: str) -> Optional[str]:
+        """Walk epics dict to find story by name, return its behavior_needed. Same logic as epic hierarchy."""
+        for epic in epics or []:
+            for sub_epic in epic.get('sub_epics', []):
+                bn = self._find_story_behavior_in_sub_epic(sub_epic, story_name)
+                if bn:
+                    return bn
+            for sg in epic.get('story_groups', []):
+                for story in sg.get('stories', []):
+                    if (story.get('name') or '').strip() == (story_name or '').strip():
+                        return story.get('behavior_needed') or 'shape'
+            for story in epic.get('stories', []):
+                if (story.get('name') or '').strip() == (story_name or '').strip():
+                    return story.get('behavior_needed') or 'shape'
+        return None
+
+    def _find_story_behavior_in_sub_epic(self, sub_epic: dict, story_name: str) -> Optional[str]:
+        """Recursively search sub_epic for story by name."""
+        for nested in sub_epic.get('sub_epics', []):
+            bn = self._find_story_behavior_in_sub_epic(nested, story_name)
+            if bn:
+                return bn
+        for sg in sub_epic.get('story_groups', []):
+            for story in sg.get('stories', []):
+                if (story.get('name') or '').strip() == (story_name or '').strip():
+                    return story.get('behavior_needed') or 'shape'
+        for story in sub_epic.get('stories', []):
+            if (story.get('name') or '').strip() == (story_name or '').strip():
+                return story.get('behavior_needed') or 'shape'
+        return None
+
+    def _enrich_increments_with_behavior(self, increments: list, epics: list) -> None:
+        """Add behavior_needed to each increment from first (least-completed) story, same as epic."""
+        for inc in increments or []:
+            stories = inc.get('stories', [])
+            if not stories:
+                inc['behavior_needed'] = 'shape'
+                continue
+            first = stories[0]
+            story_name = first.get('name', first) if isinstance(first, dict) else first
+            bn = self._find_story_behavior_in_epics(epics, story_name)
+            inc['behavior_needed'] = bn or 'shape'
+
     def _filter_increments(self, increments: list, filter_terms: list) -> list:
         """Keep increments where increment name, priority, or any story name matches filter. Empty filter = all."""
         if not filter_terms:

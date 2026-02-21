@@ -4611,8 +4611,8 @@ class BotPanel {
             } catch(_) {}
         })();
 
-        window.selectIncrement = function(name) {
-            window.selectNode('increment', name, { name: name, path: 'story_graph.increments."' + name + '"' });
+        window.selectIncrement = function(name, behaviorNeeded) {
+            window.selectNode('increment', name, { name: name, path: 'story_graph.increments."' + name + '"', behavior: behaviorNeeded || 'shape' });
             document.querySelectorAll('.increment-column-container').forEach(function(col) {
                 col.classList.toggle('selected', col.getAttribute('data-inc') === name);
             });
@@ -4985,9 +4985,11 @@ class BotPanel {
             const requiredBehavior = window.selectedNode.behaviorNeeded;
             const currentBehavior = window.currentBehavior || window.selectedNode.behavior;
             const currentAction = window.currentAction || 'build';
+            // For increments: use current behavior (no behaviorNeeded on increment nodes)
+            const effectiveBehavior = window.selectedNode.type === 'increment' ? currentBehavior : requiredBehavior;
             
-            if (btnSubmit && window.selectedNode.type !== 'root' && requiredBehavior) {
-                const behavior = requiredBehavior;
+            if (btnSubmit && window.selectedNode.type !== 'root' && effectiveBehavior) {
+                const behavior = effectiveBehavior;
                 const action = currentAction;
                 const nodeType = window.selectedNode.type;
                 const btnSubmitIcon = document.getElementById('btn-submit-icon');
@@ -5064,9 +5066,13 @@ class BotPanel {
                 if (window.selectedNode.type === 'root') {
                     console.log('[SUBMIT BUTTON DEBUG] ✗ Node is root (submit not shown for root)');
                 }
-                if (!window.selectedNode.behavior) {
-                    console.log('[SUBMIT BUTTON DEBUG] ✗ No behavior_needed set on node');
-                    console.log('[SUBMIT BUTTON DEBUG]   This may indicate behavior_needed is not being read from story graph');
+                if (!effectiveBehavior) {
+                    console.log('[SUBMIT BUTTON DEBUG] ✗ No behavior for submit');
+                    if (window.selectedNode.type === 'increment') {
+                        console.log('[SUBMIT BUTTON DEBUG]   Increment needs current behavior from bot');
+                    } else {
+                        console.log('[SUBMIT BUTTON DEBUG]   behavior_needed may not be set on node');
+                    }
                 }
             }
             
@@ -5486,19 +5492,25 @@ class BotPanel {
             }
             
             const nodeName = window.selectedNode.name;
-            const nodePath = resolveNodePath(window.selectedNode);
+            const behavior = window.currentBehavior || window.selectedNode.behaviorNeeded || null;
+            const action = window.currentAction || 'build';
+            let commandText;
             
-            if (!nodePath) {
-                vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
-                return;
+            if (window.selectedNode.type === 'increment') {
+                // Increment uses story_graph.submit_increment_instructions (Increment has no submit_instructions)
+                commandText = (behavior && action)
+                    ? 'story_graph.submit_increment_instructions name:"' + nodeName + '" behavior:"' + behavior + '" action:"' + action + '"'
+                    : 'story_graph.submit_increment_instructions name:"' + nodeName + '"';
+            } else {
+                const nodePath = resolveNodePath(window.selectedNode);
+                if (!nodePath) {
+                    vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
+                    return;
+                }
+                commandText = (behavior && action)
+                    ? nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"'
+                    : nodePath + '.submit_current_instructions';
             }
-            
-
-            const behavior = window.currentBehavior || null;
-            const action = window.currentAction || null;
-            const commandText = (behavior && action)
-                ? nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"'
-                : nodePath + '.submit_current_instructions';
             
             console.log('[WebView] ========== SUBMIT CURRENT COMMAND ==========');
             console.log('[WebView] Command constructed:', commandText);

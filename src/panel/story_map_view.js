@@ -3072,9 +3072,10 @@ ${clientScript}    </script>`;
             const sortedStories = [...stories].sort((a, b) =>
                 (a.sequential_order || 0) - (b.sequential_order || 0)
             );
+            const behaviorNeeded = increment.behavior_needed || 'shape';
 
             html += `
-                <div class="increment-column-container" data-inc="${escapedName}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
+                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${this.escapeHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
                         <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
                         <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>
