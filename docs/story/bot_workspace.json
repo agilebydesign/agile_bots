@@ -1,0 +1,16 @@
+{
+  "execution": {
+    "_behavior.shape": "skip",
+    "shape.clarify": "combine_next",
+    "shape.strategy": "combine_next",
+    "shape.validate": "combine_next",
+    "scenarios.strategy": "skip",
+    "scenarios.build": "combine_next",
+    "scenarios.clarify": "skip",
+    "scenarios.validate": "combine_next",
+    "_behavior.scenarios": "combine_with_next"
+  },
+  "special_instructions": {
+    "shape": ""
+  }
+}

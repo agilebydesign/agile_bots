@@ -83,8 +83,9 @@ class BehaviorsView extends PanelView {
         }
         
         const executionSettings = botData.execution || {};
+        const specialInstructions = botData.special_instructions || {};
         const behaviorsHtml = behaviorsData.map((behavior, bIdx) => {
-            return this.renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings);
+            return this.renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings, specialInstructions);
         }).join('');
 
 
@@ -289,7 +290,7 @@ class BehaviorsView extends PanelView {
     }
     
 
-    renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}) {
+    renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}, specialInstructions = {}) {
         const isCurrent = behavior.isCurrent || behavior.is_current || false;
         const isCompleted = behavior.isCompleted || behavior.is_completed || false;
         const behaviorMarker = isCurrent 
@@ -330,7 +331,10 @@ class BehaviorsView extends PanelView {
         }).join('');
         const behaviorExecToggleId = `${behaviorId}-exec-toggle`;
         const behaviorCollapsedBtn = behaviorCurrentModeObj.iconPath ? `<button class="execution-toggle-btn active execution-toggle-collapsed" data-action="toggleExecutionToggle" data-target="${behaviorExecToggleId}" title="${behaviorCurrentModeObj.tooltip}"><img src="${behaviorCurrentModeObj.iconPath}" alt="${behaviorCurrentModeObj.tooltip}" style="width: 22px; height: 22px; object-fit: contain; display: block;" /></button>` : '';
-        const behaviorExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${behaviorToggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${behaviorExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
+        const behaviorSpecialInstructions = specialInstructions[behaviorNameRaw] || '';
+        const behaviorSpecialInstructionsEscaped = escapeForHtml(behaviorSpecialInstructions);
+        const behaviorSpecialInstructionsInput = `<textarea class="special-instructions-input" data-action="setBehaviorSpecialInstructions" data-behavior-name="${behaviorNameJs}" placeholder="Special instructions for ${behaviorName}" title="Special instructions for this behavior" style="min-width: 80px; max-width: 200px; font-size: 10px; padding: 2px 4px; resize: vertical; min-height: 18px; max-height: 80px;" onblur="if(window.setBehaviorSpecialInstructions) window.setBehaviorSpecialInstructions(this)" onclick="event.stopPropagation();">${behaviorSpecialInstructionsEscaped}</textarea>`;
+        const behaviorExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${behaviorSpecialInstructionsInput}${behaviorToggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${behaviorExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const behaviorToggleGroup = `<span class="execution-toggle-container" id="${behaviorExecToggleId}" onclick="event.stopPropagation();">${behaviorCollapsedBtn}${behaviorExpandedGroup}</span>`;
         let html = `<div class="collapsible-header card-item${behaviorActiveClass}" data-behavior="${behaviorName}" title="${behaviorTooltip}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;"><span><span id="${behaviorId}-icon" class="${behaviorIconClass}" style="display: inline-block; min-width: 12px; cursor: pointer;" data-action="toggleCollapse" data-target="${behaviorId}" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}">${plusIconPath && subtractIconPath ? `<img src="${behaviorIconSrc}" alt="${behaviorIconAlt}" style="width: 12px; height: 12px; vertical-align: middle;" />` : ''}</span> <span class="behavior-name-clickable" style="cursor: pointer; text-decoration: underline;" data-action="navigateToBehavior" data-behavior-name="${behaviorNameJs}">${behaviorMarker}${behaviorName}</span>${clipboardIconPath ? `<button class="behavior-rules-button" data-action="getBehaviorRules" data-behavior-name="${behaviorNameJs}" style="background: #000; border: none; padding: 2px 6px; margin: 0 0 0 8px; cursor: pointer; vertical-align: middle; display: inline-flex; align-items: center; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Get rules for ${behaviorName} and send to chat"><img src="${clipboardIconPath}" style="width: 22px; height: 22px; object-fit: contain;" alt="Get Rules" /></button>` : ''}</span>${behaviorToggleGroup}</div>`;
         
@@ -338,7 +342,7 @@ class BehaviorsView extends PanelView {
         const actionsArray = behavior.actions?.all_actions || behavior.actions || [];
         const hasActions = Array.isArray(actionsArray) && actionsArray.length > 0;
         const actionsHtml = hasActions ? actionsArray.map((action, aIdx) => {
-            return this.renderAction(action, bIdx, aIdx, behaviorName, behaviorNameJs, behaviorNameRaw, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings);
+            return this.renderAction(action, bIdx, aIdx, behaviorName, behaviorNameJs, behaviorNameRaw, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings, specialInstructions);
         }).join('') : '';
         
         html += `<div id="${behaviorId}" class="collapsible-content" style="display: ${behaviorDisplay};">${actionsHtml}</div>`;
@@ -347,7 +351,7 @@ class BehaviorsView extends PanelView {
     }
     
 
-    renderAction(action, bIdx, aIdx, behaviorName, behaviorNameJs, behaviorNameRaw, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}) {
+    renderAction(action, bIdx, aIdx, behaviorName, behaviorNameJs, behaviorNameRaw, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}, specialInstructions = {}) {
         const isCurrent = action.isCurrent || action.is_current || false;
         const isCompleted = action.isCompleted || action.is_completed || false;
         const actionMarker = isCurrent
@@ -376,7 +380,11 @@ class BehaviorsView extends PanelView {
         }).join('');
         const actionExecToggleId = `action-${bIdx}-${aIdx}-exec-toggle`;
         const actionCollapsedBtn = currentModeObj.iconPath ? `<button class="execution-toggle-btn active execution-toggle-collapsed" data-action="toggleExecutionToggle" data-target="${actionExecToggleId}" title="${currentModeObj.tooltip}"><img src="${currentModeObj.iconPath}" alt="${currentModeObj.tooltip}" style="width: 22px; height: 22px; object-fit: contain; display: block;" /></button>` : '';
-        const actionExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${toggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${actionExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
+        const actionSpecialInstructionsKey = `${behaviorNameRaw}.${actionNameRaw}`;
+        const actionSpecialInstructions = specialInstructions[actionSpecialInstructionsKey] || '';
+        const actionSpecialInstructionsEscaped = escapeForHtml(actionSpecialInstructions);
+        const actionSpecialInstructionsInput = `<textarea class="special-instructions-input" data-action="setActionSpecialInstructions" data-behavior-name="${behaviorNameJs}" data-action-name="${actionNameJs}" placeholder="Special instructions for ${behaviorName}.${actionNameRaw}" title="Special instructions for ${behaviorName}.${actionNameRaw}" style="min-width: 80px; max-width: 200px; font-size: 10px; padding: 2px 4px; resize: vertical; min-height: 18px; max-height: 80px;" onblur="if(window.setActionSpecialInstructions) window.setActionSpecialInstructions(this)" onclick="event.stopPropagation();">${actionSpecialInstructionsEscaped}</textarea>`;
+        const actionExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${actionSpecialInstructionsInput}${toggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${actionExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const actionToggleGroup = `<span class="execution-toggle-container" id="${actionExecToggleId}" onclick="event.stopPropagation();">${actionCollapsedBtn}${actionExpandedGroup}</span>`;
         const actionActiveClass = isCurrent ? ' active' : '';
         const actionHtml = `<div class="collapsible-header action-item card-item${actionActiveClass}" title="${actionTooltip}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">

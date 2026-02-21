@@ -201,7 +201,9 @@ class PanelView {
                             
                             const jsonData = JSON.parse(sanitizedJson);
                             _perfLog(`JSON parse done: ${(performance.now() - tParseStart).toFixed(0)}ms, size ${jsonOutput.length}`);
-                            
+                            if (jsonData.status && (jsonData.behavior || jsonData.instructions_length !== undefined)) {
+                                console.log('[SUBMIT_DEBUG] PanelView: received submit response, status=', jsonData.status, 'clipboard_status=', jsonData.clipboard_status, 'instructions_length=', jsonData.instructions_length);
+                            }
                             // Check if response indicates an error from CLI
                             if (jsonData.status === 'error' && jsonData.error) {
                                 console.error('[PanelView] CLI returned error:', jsonData.error);
@@ -230,7 +232,12 @@ class PanelView {
         });
         
         this._pythonProcess.stderr.on('data', (data) => {
-            console.error('[PanelView] Python stderr:', data.toString());
+            const msg = data.toString();
+            if (msg.includes('[PERF]')) {
+                console.log('[PanelView] Python stderr:', msg);
+            } else {
+                console.error('[PanelView] Python stderr:', msg);
+            }
         });
         
         this._pythonProcess.on('error', (err) => {
@@ -303,15 +310,24 @@ class PanelView {
         const runCommand = async () => {
             // Delegate to injected CLI if present
             if (this._cli) {
+                if (command === 'submit' || command.includes('submit')) {
+                    console.log('[SUBMIT_DEBUG] PanelView.execute: delegating to _cli (injected)');
+                }
                 return this._cli.execute(command);
             }
             
             if (!this._pythonProcess) {
+                if (command === 'submit' || command.includes('submit')) {
+                    console.log('[SUBMIT_DEBUG] PanelView.execute: spawning Python process');
+                }
                 this._spawnProcess();
             }
             
             const perfCmdStart = performance.now();
             this._perfExecuteStart = perfCmdStart;
+            if (command === 'submit' || command.includes('submit')) {
+                console.log('[SUBMIT_DEBUG] PanelView.execute: sending to Python stdin:', command);
+            }
             _perfLog(`execute START: "${command}"`);
             
             const timeoutMs = 60000;
@@ -350,7 +366,13 @@ class PanelView {
                 try {
                     const cmd = command.includes('--format json') ? command : `${command} --format json`;
                     const tBeforeWrite = performance.now();
+                    if (command === 'submit' || command.includes('submit')) {
+                        console.log('[SUBMIT_DEBUG] PanelView: writing to stdin:', cmd);
+                    }
                     this._pythonProcess.stdin.write(cmd + '\n');
+                    if (command === 'submit' || command.includes('submit')) {
+                        console.log('[SUBMIT_DEBUG] PanelView: stdin.write done, waiting for response');
+                    }
                     _perfLog(`stdin.write sent: ${(performance.now() - tBeforeWrite).toFixed(0)}ms, ${(performance.now() - perfCmdStart).toFixed(0)}ms since start`);
                 } catch (err) {
                     clearTimeout(timeoutId);
@@ -363,8 +385,13 @@ class PanelView {
 
         const previous = this._commandQueue;
         const queued = previous.then(() => runCommand());
-        // Keep queue alive even if a command fails
-        this._commandQueue = queued.catch(() => {});
+        // Keep queue alive for next command even if this one fails - report to both log and display, never swallow
+        this._commandQueue = queued.catch((err) => {
+            const msg = err?.message || String(err);
+            const stack = err?.stack || '';
+            console.error('[PanelView] Command failed (queue continues):', msg, stack);
+            try { vscode.window.showErrorMessage(`Command failed: ${msg}`); } catch (e) { console.error('[PanelView] Could not show error:', e); }
+        });
         return queued;
     }
 }

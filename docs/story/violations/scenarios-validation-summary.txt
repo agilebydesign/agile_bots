@@ -1,0 +1,5 @@
+=== SCENARIOS VALIDATION (scope: Add Special Instructions) ===
+
+Rule scenarios_cover_all_cases.json: 2 file-by-file, 0 cross-file violations
+
+Total: 1 rule(s) with violations

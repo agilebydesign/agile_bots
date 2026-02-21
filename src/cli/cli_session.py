@@ -161,15 +161,25 @@ class CLISession:
         # If so, route to behavior action instead of domain navigator
         has_dash_params = '--' in command
         
+        verb_parts = verb.split('.')
+        # Story graph node submit: command contains story_graph + submit method.
+        # Must go to domain navigator; otherwise "story_graph" gets mis-parsed as a behavior name.
+        is_story_graph_submit = (
+            'story_graph' in command and any(
+                m in command for m in
+                ('submit_current_instructions', 'submit_required_behavior_instructions', 'submit_instructions')
+            )
+        )
+        
         # behavior.action or behavior.action.set_execution/get_execution must go to behavior action (execute), not domain navigator,
         # so we get combined instructions (current+next when auto) and execution mode handling.
-        verb_parts = verb.split('.')
         is_set_execution = len(verb_parts) == 3 and verb_parts[2] == 'set_execution'
         is_get_execution = len(verb_parts) == 3 and verb_parts[2] == 'get_execution'
         is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0])
         
-        if ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
-                and not is_set_execution and not is_get_execution and not is_behavior_action):
+        if (is_story_graph_submit or
+                ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
+                 and not is_set_execution and not is_get_execution and not is_behavior_action)):
             return self._execute_domain_object_command(command)
         
         return self._execute_action_or_route(verb, args, command)
@@ -593,6 +603,17 @@ class CLISession:
         command_core = parts[0]
         args_string = parts[1] if len(parts) > 1 else ''
         
+        # Story graph node submit: command contains story_graph + submit method.
+        # Must NOT parse as behavior.action or "story_graph" becomes a behavior name.
+        is_story_graph_submit = (
+            'story_graph' in command and any(
+                m in command for m in
+                ('submit_current_instructions', 'submit_required_behavior_instructions', 'submit_instructions')
+            )
+        )
+        if is_story_graph_submit:
+            return self._execute_domain_object_command(command)
+        
         params = self._parse_action_params(args_string) if args_string else None
         
         if '.' in command_core:
@@ -618,6 +639,14 @@ class CLISession:
             if subcommand == 'get_execution' and action_name and hasattr(self.bot, 'get_execution_mode'):
                 mode = self.bot.get_execution_mode(behavior_name, action_name)
                 return {'status': 'success', 'behavior': behavior_name, 'action': action_name, 'execution_mode': mode}
+
+            if subcommand == 'special_instructions' and action_name and hasattr(self.bot, 'set_action_special_instructions'):
+                instruction_text = args_string.strip().strip('"').strip("'")
+                return self.bot.set_action_special_instructions(behavior_name, action_name, instruction_text)
+
+            if action_name == 'set_special_instructions' and hasattr(self.bot, 'set_behavior_special_instructions'):
+                instruction_text = args_string.strip().strip('"').strip("'")
+                return self.bot.set_behavior_special_instructions(behavior_name, instruction_text)
 
             if hasattr(self.bot, 'execute'):
                 return self.bot.execute(behavior_name, action_name, params)

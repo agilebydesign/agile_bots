@@ -35,6 +35,16 @@ class BotPanel {
           });
         }
       };
+      /** Report error to both log and display - never swallow. */
+      this._reportError = (err, context = '') => {
+        const msg = err?.message || String(err);
+        const stack = err?.stack || '';
+        const full = context ? `[${context}] ${msg}` : msg;
+        this._log(`[BotPanel] ERROR: ${full}`);
+        if (stack) this._log(`[BotPanel] Stack: ${stack}`);
+        console.error('[BotPanel]', full, stack);
+        vscode.window.showErrorMessage(full);
+      };
       
       this._log("[BotPanel] Constructor invoked");
       this._log(`[PERF] Constructor start`);
@@ -138,7 +148,7 @@ class BotPanel {
                 this._log('[BotPanel] Deleted enriched cache file');
               }
             } catch (err) {
-              this._log(`[BotPanel] Warning: Could not delete cache: ${err.message}`);
+              this._reportError(err, 'Could not delete cache');
             }
 
             (async () => {
@@ -147,7 +157,7 @@ class BotPanel {
                 await this._botView.execute('reload_story_graph --format json');
                 this._log('[BotPanel] Story graph cache cleared');
               } catch (err) {
-                this._log(`[BotPanel] Warning: Could not clear story graph cache: ${err.message}`);
+                this._reportError(err, 'Could not clear story graph cache');
               }
 
               try {
@@ -164,12 +174,12 @@ class BotPanel {
                         actionName: currentAction
                       });
                     } catch (postErr) {
-                      this._log(`[BotPanel] Error sending expandInstructionsSection after refresh: ${postErr.message}`);
+                      this._reportError(postErr, 'expandInstructionsSection after refresh');
                     }
                   }, 200);
                 }
               } catch (err) {
-                console.error(`[BotPanel] Refresh error: ${err.message}`);
+                this._reportError(err, 'Refresh');
               }
             })();
             return;
@@ -182,7 +192,7 @@ class BotPanel {
               try {
                 await this._update();
               } catch (err) {
-                console.error(`[BotPanel] Toggle view error: ${err.message}`);
+                this._reportError(err, 'Toggle view');
               }
             })();
             return;
@@ -195,7 +205,7 @@ class BotPanel {
               try {
                 await this._update();
               } catch (err) {
-                console.error(`[BotPanel] Switch view error: ${err.message}`);
+                this._reportError(err, 'Switch view');
               }
             })();
             return;
@@ -209,7 +219,7 @@ class BotPanel {
           case "logScopeDebug":
             if (message.message) {
               const logDir = path.join(this._workspaceRoot, 'logs');
-              try { fs.mkdirSync(logDir, { recursive: true }); } catch (_) {}
+              try { fs.mkdirSync(logDir, { recursive: true }); } catch (e) { console.error('[BotPanel] Could not create log dir:', e?.message); vscode.window.showErrorMessage(`Could not create log dir: ${e?.message}`); }
               const scopeLogPath = path.join(logDir, 'scope_debug.log');
               const timestamp = new Date().toISOString();
               fs.appendFileSync(scopeLogPath, `[${timestamp}] [PANEL] ${message.message}\n`);
@@ -310,7 +320,7 @@ class BotPanel {
               if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
 
                 vscode.commands.executeCommand('revealInExplorer', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to reveal folder: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to reveal folder: ${message.filePath}`);
                 });
               } else {
                 const fileExtension = cleanPath.split('.').pop().toLowerCase();
@@ -326,28 +336,28 @@ class BotPanel {
                     fileSize = fs.statSync(absolutePath).size;
                   }
                 } catch (e) {
-
+                  this._reportError(e, 'Could not stat file for open');
                 }
                 
                 if (binaryOrSpecialExtensions.includes(fileExtension)) {
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (useVscodeOpenExtensions.includes(fileExtension)) {
 
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (fileSize > MAX_TEXT_FILE_SIZE) {
 
                   this._log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (fileExtension === 'md') {
 
                   vscode.commands.executeCommand('markdown.showPreview', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open markdown preview: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open markdown preview: ${message.filePath}`);
                   });
                 } else {
                 const openOptions = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
@@ -355,7 +365,7 @@ class BotPanel {
                 if (lineNumber && !symbolName) {
                   openOptions.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
                   vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (symbolName) {
                   vscode.workspace.openTextDocument(fileUri).then(
@@ -383,12 +393,12 @@ class BotPanel {
                       vscode.window.showTextDocument(doc, openOptions);
                     },
                     (error) => {
-                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                      this._reportError(error, `Failed to open file: ${message.filePath}`);
                     }
                   );
                 } else {
                   vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 }
                 }
@@ -421,7 +431,7 @@ class BotPanel {
                   ? vscode.Uri.file(absolutePath).with({ fragment: `L${lineNumber}` })
                   : vscode.Uri.file(absolutePath);
                 vscode.commands.executeCommand('vscode.open', uri).catch((err) => {
-                  this._log(`[BotPanel] openFiles failed for ${pathStr}: ${err.message}`);
+                  this._reportError(err, `openFiles failed for ${pathStr}`);
                 });
               }
             }
@@ -458,11 +468,11 @@ class BotPanel {
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json') {
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else {
                 vscode.window.showTextDocument(fileUri, { viewColumn: targetColumn, preserveFocus: false }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               }
             }
@@ -514,17 +524,17 @@ class BotPanel {
                     }
                   }
                 } catch (e) {
-                  this._log(`[BotPanel] Could not search for node: ${e.message}`);
+                  this._reportError(e, 'Could not search for node');
                 }
                 const uriWithFragment = vscode.Uri.file(absolutePath).with({ fragment: `L${startLine + 1}` });
                 vscode.commands.executeCommand('vscode.open', uriWithFragment).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
                 this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
               } else if (fileExtension === 'json') {
 
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else if (message.state && message.state.lineNumber) {
                 const options = {
@@ -535,7 +545,7 @@ class BotPanel {
                 vscode.window.showTextDocument(fileUri, options).then(() => {
                   this._log(`[BotPanel] File opened with state: lineNumber=${message.state.lineNumber}`);
                 }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else if (message.state && message.state.selectedNode) {
 
@@ -605,15 +615,15 @@ class BotPanel {
                   },
                   (error) => {
 
-                    vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch(() => {
-                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((err) => {
+                      this._reportError(err, `Failed to open file: ${message.filePath}`);
                     });
                   }
                 );
               } else {
 
                 vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               }
             }
@@ -776,7 +786,7 @@ class BotPanel {
               this._botView?.headerView?.handleEvent('switchBot', { botName: message.botName })
                 .then(() => this._update())
                 .catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to switch bot: ${error.message}`);
+                  this._reportError(error, 'Failed to switch bot');
                 });
             }
             return;
@@ -875,6 +885,40 @@ class BotPanel {
                 .catch((error) => {
                   this._log(`[BotPanel] setBehaviorExecuteMode ERROR: ${error.message}`);
                   vscode.window.showErrorMessage(`Failed to set behavior execution mode: ${error.message}`);
+                });
+            }
+            return;
+          case "setBehaviorSpecialInstructions":
+            if (message.behaviorName !== undefined) {
+              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
+              const cmd = `${message.behaviorName}.set_special_instructions "${escaped}"`;
+              this._log(`[BotPanel] setBehaviorSpecialInstructions -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setBehaviorSpecialInstructions success`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setBehaviorSpecialInstructions ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
+                });
+            }
+            return;
+          case "setActionSpecialInstructions":
+            if (message.behaviorName && message.actionName !== undefined) {
+              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
+              const cmd = `${message.behaviorName}.${message.actionName}.special_instructions "${escaped}"`;
+              this._log(`[BotPanel] setActionSpecialInstructions -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setActionSpecialInstructions success`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setActionSpecialInstructions ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
                 });
             }
             return;
@@ -1009,6 +1053,10 @@ class BotPanel {
               const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
                 message.commandText.includes('submit_instructions') ||
                 message.commandText.includes('submit_current_instructions');
+              if (isSubmitOp) {
+                this._log(`[SUBMIT_DEBUG] executeCommand: submit op received, commandText=${message.commandText?.substring(0, 80)}`);
+                console.log('[SUBMIT_DEBUG] executeCommand: submit op received');
+              }
               if (message.commandText.includes('submit_required_behavior_instructions')) {
                 this._log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
                 this._log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
@@ -1060,9 +1108,9 @@ class BotPanel {
                   }
                   
 
-                  const isSubmitInstructions = message.commandText.includes('submit_required_behavior_instructions');
-                  if (isSubmitInstructions && result) {
-                    this._log(`[BotPanel] Submit result from CLI: ${JSON.stringify(result).substring(0, 500)}`);
+                  if (isSubmitOp && result) {
+                    this._log(`[SUBMIT_DEBUG] executeCommand submit path: result status=${result?.status} clipboard_status=${result?.clipboard_status}`);
+                    console.log('[SUBMIT_DEBUG] executeCommand submit path: result status=', result?.status, 'clipboard_status=', result?.clipboard_status);
 
                     if (result.status === 'success') {
                       const msg = result.message || 'Instructions submitted to chat!';
@@ -1300,12 +1348,20 @@ class BotPanel {
             }
             return;
           case "sendToChat":
-            this._log('sendToChat - calling bot submit command');
-            
-
-            this._botView?.execute('submit')
+            this._log('[SUBMIT_DEBUG] 1. sendToChat received');
+            console.log('[SUBMIT_DEBUG] 1. sendToChat received');
+            if (!this._botView) {
+              const err = new Error('_botView is null - panel not properly initialized');
+              console.error('[BotPanel]', err.message, err.stack);
+              vscode.window.showErrorMessage(`Submit failed: ${err.message}`);
+              throw err;
+            }
+            this._log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
+            console.log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
+            this._botView.execute('submit')
               .then((output) => {
-                this._log('Bot submit command output:', output);
+                this._log(`[SUBMIT_DEBUG] 3. execute resolved, status=${output?.status} clipboard_status=${output?.clipboard_status} instructions_length=${output?.instructions_length}`);
+                console.log('[SUBMIT_DEBUG] 3. execute resolved, status:', output?.status, 'clipboard_status:', output?.clipboard_status, 'instructions_length:', output?.instructions_length);
                 
 
                 if (output && typeof output === 'object' && output.status) {
@@ -1313,7 +1369,7 @@ class BotPanel {
                     const msg = output.message || 'Instructions submitted to chat!';
                     vscode.window.showInformationMessage(msg);
                   } else {
-                    const errorMsg = output.message || 'Unknown error';
+                    const errorMsg = output.message || output.error || 'Unknown error';
                     vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                   }
                 }
@@ -1336,7 +1392,8 @@ class BotPanel {
                 }
               })
               .catch((error) => {
-                this._log('Submit command failed:', error);
+                this._log(`[SUBMIT_DEBUG] 4. execute REJECTED: ${error?.message}`);
+                console.error('[SUBMIT_DEBUG] 4. execute REJECTED:', error?.message, error?.stack);
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
             return;
@@ -2511,7 +2568,7 @@ class BotPanel {
         .execution-toggle-container.expanded .execution-toggle-collapsed { opacity: 0; max-width: 0; min-width: 0; padding: 0; margin: 0; border: none; pointer-events: none; }
         .execution-toggle-expanded { display: inline-flex; gap: 4px; align-items: center; min-width: 0; overflow: hidden; transition: max-width 0.28s ease, opacity 0.22s ease; }
         .execution-toggle-container:not(.expanded) .execution-toggle-expanded { max-width: 0; opacity: 0; padding: 0; margin: 0; pointer-events: none; }
-        .execution-toggle-container.expanded .execution-toggle-expanded { max-width: 200px; opacity: 1; }
+        .execution-toggle-container.expanded .execution-toggle-expanded { max-width: 380px; opacity: 1; }
         .execution-toggle-collapse-btn { background: transparent; border: none; padding: 2px; cursor: pointer; opacity: 0.6; }
         .execution-toggle-collapse-btn:hover { opacity: 1; }
         .execution-toggle-btn:hover {
@@ -3067,6 +3124,12 @@ class BotPanel {
                     const actionName = actionElement.getAttribute('data-action-name');
                     const mode = actionElement.getAttribute('data-mode');
                     if (behaviorName && actionName && mode) {
+                        const container = actionElement.closest('.execution-toggle-container');
+                        if (container && container.id && container.classList.contains('expanded')) {
+                            container.classList.remove('expanded');
+                            const currentState = window.getCollapseState();
+                            sessionStorage.setItem('collapseState', JSON.stringify(currentState));
+                        }
                         vscode.postMessage({
                             command: 'setExecutionMode',
                             behaviorName: behaviorName,
@@ -3080,6 +3143,12 @@ class BotPanel {
                     const behaviorName = actionElement.getAttribute('data-behavior-name');
                     const mode = actionElement.getAttribute('data-mode');
                     if (behaviorName && mode) {
+                        const container = actionElement.closest('.execution-toggle-container');
+                        if (container && container.id && container.classList.contains('expanded')) {
+                            container.classList.remove('expanded');
+                            const currentState = window.getCollapseState();
+                            sessionStorage.setItem('collapseState', JSON.stringify(currentState));
+                        }
                         vscode.postMessage({
                             command: 'setBehaviorExecuteMode',
                             behaviorName: behaviorName,
@@ -3944,19 +4013,29 @@ class BotPanel {
                     state[content.id] = content.style.display !== 'none';
                 }
             });
+            document.querySelectorAll('.execution-toggle-container').forEach(container => {
+                if (container.id) {
+                    state[container.id] = container.classList.contains('expanded');
+                }
+            });
             return state;
         };
         
         window.restoreCollapseState = function(state) {
             if (!state) return;
             Object.keys(state).forEach(id => {
-                const content = document.getElementById(id);
-                if (content) {
-                    const shouldBeExpanded = state[id];
-                    content.style.display = shouldBeExpanded ? 'block' : 'none';
-                    
-
-                    const header = content.previousElementSibling;
+                const el = document.getElementById(id);
+                if (!el) return;
+                const shouldBeExpanded = state[id];
+                if (el.classList && el.classList.contains('execution-toggle-container')) {
+                    if (shouldBeExpanded) {
+                        el.classList.add('expanded');
+                    } else {
+                        el.classList.remove('expanded');
+                    }
+                } else if (el.classList && el.classList.contains('collapsible-content')) {
+                    el.style.display = shouldBeExpanded ? 'block' : 'none';
+                    const header = el.previousElementSibling;
                     if (header) {
                         const icon = header.querySelector('span[id$="-icon"]');
                         if (icon) {
@@ -3978,6 +4057,8 @@ class BotPanel {
             const container = document.getElementById(containerId);
             if (container && container.classList.contains('execution-toggle-container')) {
                 container.classList.toggle('expanded');
+                const currentState = window.getCollapseState();
+                sessionStorage.setItem('collapseState', JSON.stringify(currentState));
             }
         };
         
@@ -4182,7 +4263,36 @@ class BotPanel {
             });
         };
         
+        window.setBehaviorSpecialInstructions = function(textareaEl) {
+            if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
+            const behaviorName = textareaEl.getAttribute('data-behavior-name');
+            const instructionText = (textareaEl.value || '').trim();
+            if (behaviorName !== null) {
+                vscode.postMessage({
+                    command: 'setBehaviorSpecialInstructions',
+                    behaviorName: behaviorName,
+                    instructionText: instructionText
+                });
+            }
+        };
+        
+        window.setActionSpecialInstructions = function(textareaEl) {
+            if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
+            const behaviorName = textareaEl.getAttribute('data-behavior-name');
+            const actionName = textareaEl.getAttribute('data-action-name');
+            const instructionText = (textareaEl.value || '').trim();
+            if (behaviorName !== null && actionName !== null) {
+                vscode.postMessage({
+                    command: 'setActionSpecialInstructions',
+                    behaviorName: behaviorName,
+                    actionName: actionName,
+                    instructionText: instructionText
+                });
+            }
+        };
+        
         function submitToChat() {
+            console.log('[SUBMIT_DEBUG] WebView: submitToChat() posting sendToChat');
             vscode.postMessage({
                 command: 'sendToChat'
             });
@@ -4192,16 +4302,18 @@ class BotPanel {
             if (event) {
                 event.stopPropagation();
             }
-            console.log('[WebView] sendInstructionsToChat triggered');
+            console.log('[SUBMIT_DEBUG] WebView: sendInstructionsToChat triggered');
 
             if (window.selectedNode && window.selectedNode.name) {
                 const nodePath = resolveNodePath(window.selectedNode);
                 if (nodePath) {
+                    console.log('[SUBMIT_DEBUG] WebView: taking handleSubmitCurrent path (story map node selected)');
                     handleSubmitCurrent();
                     return;
                 }
             }
 
+            console.log('[SUBMIT_DEBUG] WebView: taking submitToChat path (behaviors submit)');
             submitToChat();
         }
 

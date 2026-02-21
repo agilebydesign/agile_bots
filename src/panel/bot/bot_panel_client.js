@@ -884,6 +884,34 @@ const vscode = acquireVsCodeApi();
                 operationName: operationName
             });
         };
+
+        window.setBehaviorSpecialInstructions = function(textareaEl) {
+            if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
+            const behaviorName = textareaEl.getAttribute('data-behavior-name');
+            const instructionText = (textareaEl.value || '').trim();
+            if (behaviorName !== null) {
+                vscode.postMessage({
+                    command: 'setBehaviorSpecialInstructions',
+                    behaviorName: behaviorName,
+                    instructionText: instructionText
+                });
+            }
+        };
+
+        window.setActionSpecialInstructions = function(textareaEl) {
+            if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
+            const behaviorName = textareaEl.getAttribute('data-behavior-name');
+            const actionName = textareaEl.getAttribute('data-action-name');
+            const instructionText = (textareaEl.value || '').trim();
+            if (behaviorName !== null && actionName !== null) {
+                vscode.postMessage({
+                    command: 'setActionSpecialInstructions',
+                    behaviorName: behaviorName,
+                    actionName: actionName,
+                    instructionText: instructionText
+                });
+            }
+        };
         
         function submitToChat() {
             vscode.postMessage({

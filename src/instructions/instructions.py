@@ -27,7 +27,12 @@ class Instructions:
         for line in lines:
             self._display_content.append(line)
         return self
-    
+
+    def prepend_display(self, *lines: str) -> 'Instructions':
+        for line in reversed(lines):
+            self._display_content.insert(0, line)
+        return self
+
     @property
     def display_content(self) -> List[str]:
         return list(self._display_content)

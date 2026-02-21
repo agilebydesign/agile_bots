@@ -65,6 +65,12 @@ class StoryGraphPaths:
         return self.docs_root / behavior
     
     @property
+    def bot_workspace_config_path(self) -> Path:
+        """Path for bot workspace config: docs/<bot>/bot_workspace.json.
+        Stores behavior/action configuration: execution mode, special instructions."""
+        return self.docs_root / 'bot_workspace.json'
+
+    @property
     def scenarios_path(self) -> Path:
         """Path for scenario markdown files.
         

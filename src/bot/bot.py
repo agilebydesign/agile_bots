@@ -891,6 +891,83 @@ class Bot:
         except (json.JSONDecodeError, OSError):
             return {}
 
+    def _bot_workspace_path(self) -> Path:
+        return self.bot_paths.story_graph_paths.bot_workspace_config_path
+
+    def _load_special_instructions(self) -> Dict[str, str]:
+        path = self._bot_workspace_path()
+        if not path.exists():
+            return {}
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            return dict(data.get('special_instructions', {}))
+        except (json.JSONDecodeError, OSError):
+            return {}
+
+    def _save_special_instructions(self, si_data: Dict[str, str]) -> None:
+        path = self._bot_workspace_path()
+        data = {}
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding='utf-8'))
+            except (json.JSONDecodeError, OSError):
+                pass
+        data['special_instructions'] = si_data
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2), encoding='utf-8')
+
+    def get_special_instructions_settings(self) -> Dict[str, str]:
+        result = {}
+        for behavior in self.behaviors:
+            text = self.get_behavior_special_instructions(behavior.name)
+            if text:
+                result[behavior.name] = text
+            for action in behavior.actions:
+                text = self.get_action_special_instructions(behavior.name, action.action_name)
+                if text:
+                    result[f"{behavior.name}.{action.action_name}"] = text
+        return result
+
+    def set_behavior_special_instructions(self, behavior_name: str, instruction_text: str) -> Dict[str, Any]:
+        behavior = self.behaviors.find_by_name(behavior_name)
+        if not behavior:
+            return {'status': 'error', 'message': f'Behavior {behavior_name} not found'}
+        si_data = self._load_special_instructions()
+        si_data[behavior_name] = instruction_text
+        self._save_special_instructions(si_data)
+        return {'status': 'success', 'message': f'Stored special instructions for {behavior_name}'}
+
+    def set_action_special_instructions(self, behavior_name: str, action_name: str, instruction_text: str) -> Dict[str, Any]:
+        behavior = self.behaviors.find_by_name(behavior_name)
+        if not behavior:
+            return {'status': 'error', 'message': f'Behavior {behavior_name} not found'}
+        action = behavior.actions.find_by_name(action_name)
+        if not action:
+            return {'status': 'error', 'message': f'Action {action_name} not found in {behavior_name}'}
+        si_data = self._load_special_instructions()
+        key = f"{behavior_name}.{action_name}"
+        si_data[key] = instruction_text
+        self._save_special_instructions(si_data)
+        return {'status': 'success', 'message': f'Stored special instructions for {behavior_name}.{action_name}'}
+
+    def get_behavior_special_instructions(self, behavior_name: str) -> Optional[str]:
+        si_data = self._load_special_instructions()
+        return si_data.get(behavior_name) or None
+
+    def get_action_special_instructions(self, behavior_name: str, action_name: str) -> Optional[str]:
+        si_data = self._load_special_instructions()
+        return si_data.get(f"{behavior_name}.{action_name}") or None
+
+    def _collect_special_instructions_for_prompt(self, behavior_name: str, action_name: str) -> List[str]:
+        lines = []
+        behavior_instruction = self.get_behavior_special_instructions(behavior_name)
+        if behavior_instruction:
+            lines.append(f"**Special Instructions (behavior {behavior_name}):** {behavior_instruction}")
+        action_instruction = self.get_action_special_instructions(behavior_name, action_name)
+        if action_instruction:
+            lines.append(f"**Special Instructions ({behavior_name}.{action_name}):** {action_instruction}")
+        return lines
+
     def save(self, answers: Optional[Dict[str, str]] = None,
              evidence_provided: Optional[Dict[str, str]] = None,
              decisions: Optional[Dict[str, str]] = None,
@@ -1027,7 +1104,7 @@ class Bot:
             clipboard_status = 'success'
             time.sleep(0.2)
 
-            cursor = os.environ.get('IDE').lower() == 'cursor'
+            cursor = (os.environ.get('IDE') or '').lower() == 'cursor'
             mac = platform.system().lower() == 'darwin'            
 
 
@@ -1135,6 +1212,12 @@ class Bot:
             
 
             instructions = action.get_instructions(context, include_scope=True)
+
+            special_lines = self._collect_special_instructions_for_prompt(current_behavior.name, current_action_name)
+            if special_lines:
+                instructions.prepend_display("", "---", "")
+                for line in reversed(special_lines):
+                    instructions.prepend_display(line)
 
             last_appended = self._append_next_action_instructions_if_combine_next(
                 current_behavior, current_behavior.name, current_action_name, action, instructions,

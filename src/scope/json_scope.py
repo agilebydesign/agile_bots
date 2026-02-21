@@ -54,15 +54,19 @@ class JSONScope(JSONAdapter):
             'includeLevel': self.scope.include_level
         }
         
-        if self.scope.type.value in ('story', 'showAll'):
+        # story, showAll, increment, all: story graph content. Both story and increment can have showAll/all (no filter).
+        if self.scope.type.value in ('story', 'showAll', 'increment', 'all'):
             import time
             t0 = time.perf_counter()
             story_graph = self.scope._get_story_graph_results()
             t1 = time.perf_counter()
             if story_graph:
                 # Check if we can use disk-cached enriched content
-                # Only use cache when there's no active filter (showAll or story with no filter values)
-                has_active_filter = self.scope.type.value == 'story' and self.scope.value
+                # Only use cache when there's no active filter (showAll/all or story/increment with no filter values)
+                has_active_filter = (
+                    (self.scope.type.value == 'story' and self.scope.value) or
+                    (self.scope.type.value == 'increment' and self.scope.value)
+                )
                 
                 # Use centralized path resolution
                 if self.scope.bot_paths:
@@ -135,12 +139,10 @@ class JSONScope(JSONAdapter):
                     else:
                         content = {'epics': []}
                 
-                # Always include the full increments list so the panel increment view
-                # can filter columns client-side regardless of story scope filter
-                if isinstance(content, dict) and 'increments' not in content:
-                    raw_increments = story_graph.get('increments', []) if isinstance(story_graph, dict) else []
-                    if raw_increments:
-                        content['increments'] = raw_increments
+                # Filter increments by scope (increment name, priority, or story name matches). JSONStoryGraph
+                # may have already added increments to content; we always apply the filter.
+                if isinstance(content, dict) and content.get('increments'):
+                    content['increments'] = self._filter_increments(content['increments'], self.scope.value)
 
                 result['content'] = content
                 
@@ -160,6 +162,37 @@ class JSONScope(JSONAdapter):
         
         return result
     
+    def _filter_increments(self, increments: list, filter_terms: list) -> list:
+        """Keep increments where increment name, priority, or any story name matches filter. Empty filter = all."""
+        if not filter_terms:
+            return increments
+        scope_type = self.scope.type.value
+        terms_lower = [str(t).lower() for t in filter_terms]
+        result = []
+        for inc in increments:
+            # Match increment name/priority only when scope is increment type (filter = increment names/priorities)
+            if scope_type == 'increment':
+                inc_name = (inc.get('name') or '').lower()
+                if any(t in inc_name or inc_name in t for t in terms_lower):
+                    result.append(inc)
+                    continue
+                inc_priority = inc.get('priority')
+                if inc_priority is not None:
+                    p_str = str(inc_priority)
+                    if any(str(t) == p_str for t in filter_terms):
+                        result.append(inc)
+                        continue
+            # Match story name in increment (story scope or increment scope - story can be in increment)
+            stories = inc.get('stories', [])
+            for s in stories:
+                story_name = (s.get('name', s) if isinstance(s, dict) else s)
+                story_name = (story_name or '').lower()
+                # Exact or filter-term is substring of story name (e.g. filter "Generate" matches "Generate Bot Tools")
+                if any(t in story_name or story_name == t for t in terms_lower):
+                    result.append(inc)
+                    break
+        return result
+
     # For instructions: only keep name + structure from epic to story (stories level = name only)
     _EPIC_KEEP = frozenset(['name', 'sub_epics', 'domain_concepts'])
     _SUB_EPIC_KEEP = frozenset(['name', 'sub_epics', 'story_groups', 'domain_concepts'])

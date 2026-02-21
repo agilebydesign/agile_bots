@@ -145,9 +145,8 @@ class StoryNode(ABC):
         self._bot.scope(self._scope_command_for_node())
         try:
             instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
-            # Submit to clipboard/IDE (side effect only)
-            self._bot.submit_instructions(instructions, behavior, action)
-            return instructions
+            result = self._bot.submit_instructions(instructions, behavior, action)
+            return result
         finally:
             # Always restore scope to original state
             with open(scope_file, 'w') as f:
