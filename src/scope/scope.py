@@ -78,13 +78,27 @@ class StoryGraphFilter:
         
         filter_set = {f.strip().lower() for f in all_filter_names}
         use_exact = bool(self.increments)
-        
+
         def name_matches(name: str) -> bool:
             n = (name or '').strip().lower()
+            if not n:
+                return False  # Empty names must not match (e.g. scenario name "" in "filter" is True)
             if use_exact:
                 return n in filter_set
             return any(f in n or n in f for f in filter_set)
-        
+
+        def epic_matches(epic_name: str) -> bool:
+            """Return True only if epic should be included. Exclude when filter is a path to a child
+            (e.g. filter='Invoke Bot.Navigate Behavior Actions' would match epic 'Invoke Bot' via
+            substring - we want only the child sub_epic, not the whole epic with siblings)."""
+            if not name_matches(epic_name):
+                return False
+            n = (epic_name or '').strip().lower()
+            for f in filter_set:
+                if f != n and '.' in f and f.startswith(n + '.'):
+                    return False
+            return True
+
         def filter_sub_epic(sub_epic: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             sub_epic_name = sub_epic.get('name', '')
             
@@ -162,8 +176,8 @@ class StoryGraphFilter:
         
         for epic in epics:
             epic_name = epic.get('name', '')
-            
-            if name_matches(epic_name):
+
+            if epic_matches(epic_name):
                 filtered_graph['epics'].append(epic)
                 continue
             

@@ -8,6 +8,7 @@ Domain tests verify core bot logic.
 CLI tests verify command parsing and output formatting across TTY, Pipe, and JSON channels.
 """
 import pytest
+from unittest.mock import patch
 
 # TEMPORARILY DISABLED: Activity tracking tests - TinyDB was causing file corruption issues
 _activity_skip = pytest.mark.skip(reason="Activity tracking disabled due to TinyDB corruption issues")
@@ -494,6 +495,157 @@ def then_cli_invokes_bot_and_fails_to_persist(helper):
 
 def then_cli_reports_failed(result):
     assert result is not None
+
+
+def then_cli_reports_failed_for_special_instructions(result):
+    assert result is not None
+    if isinstance(result, dict):
+        assert result.get("status") == "error", f"Expected error status, got {result}"
+    else:
+        assert "error" in str(result).lower() or "failed" in str(result).lower()
+
+
+# ============================================================================
+# STORY: Add Special Instructions
+# ============================================================================
+
+class TestAddSpecialInstructions:
+
+    def test_panel_stores_behavior_level_special_instructions(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        given_panel_displays_behavior_with_no_special_instructions(helper, "shape")
+        panel = when_user_enters_behavior_level_special_instructions(helper, "shape", "focus on edge cases")
+        then_panel_stores_for_behavior(panel, "shape", "focus on edge cases")
+
+    def test_panel_stores_action_level_special_instructions(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        given_panel_displays_action_with_no_special_instructions(helper, "shape", "clarify")
+        panel = when_user_enters_action_level_special_instructions(helper, "shape", "clarify", "emphasize validation")
+        then_panel_stores_for_behavior_and_action(panel, "shape", "clarify", "emphasize validation")
+
+    def test_panel_injects_special_instructions_on_submit(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        given_panel_has_behavior_level_instructions(helper, "shape", "focus on edge cases")
+        given_panel_has_action_level_instructions(helper, "shape", "clarify", "emphasize validation")
+        instructions = when_user_submits_instructions_in_panel(helper)
+        then_instructions_contain_special_instructions(instructions, "focus on edge cases", "emphasize validation")
+
+    def test_cli_stores_and_includes_special_instructions_in_next_prompt(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        result = when_user_runs_special_instructions_cli(helper, "focus on edge cases")
+        then_cli_stores_for_shape_clarify(helper, "focus on edge cases")
+        then_cli_includes_in_next_prompt(helper, "focus on edge cases")
+
+    def test_panel_injects_only_behavior_level_instructions_when_no_action_level_set(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        given_panel_has_behavior_level_instructions(helper, "shape", "focus on edge cases")
+        given_panel_has_no_action_level_instructions(helper, "shape")
+        instructions = when_user_submits_instructions_in_panel(helper)
+        then_instructions_contain_behavior_level_only(instructions, "focus on edge cases")
+
+    def test_cli_reports_failed_when_special_instructions_command_fails(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        with patch.object(helper.bot, "set_action_special_instructions") as mock_set:
+            mock_set.side_effect = OSError("Workspace not writable")
+            result = when_user_runs_special_instructions_cli(helper, "focus on edge cases")
+        then_cli_reports_failed_for_special_instructions(result)
+
+
+def given_panel_displays_behavior_with_no_special_instructions(helper, behavior_name):
+    helper.bot.behaviors.navigate_to(behavior_name)
+
+
+def given_panel_displays_action_with_no_special_instructions(helper, behavior_name, action_name):
+    helper.bot.behaviors.navigate_to(behavior_name)
+    helper.bot.behaviors.current.actions.navigate_to(action_name)
+
+
+def when_user_enters_behavior_level_special_instructions(helper, behavior_name, instruction_text):
+    helper.bot.set_behavior_special_instructions(behavior_name, instruction_text)
+    return helper.bot
+
+
+def then_panel_stores_for_behavior(panel, behavior_name, instruction_text):
+    stored = panel.get_behavior_special_instructions(behavior_name)
+    assert stored == instruction_text
+
+
+def when_user_enters_action_level_special_instructions(helper, behavior_name, action_name, instruction_text):
+    helper.bot.set_action_special_instructions(behavior_name, action_name, instruction_text)
+    return helper.bot
+
+
+def then_panel_stores_for_behavior_and_action(panel, behavior_name, action_name, instruction_text):
+    stored = panel.get_action_special_instructions(behavior_name, action_name)
+    assert stored == instruction_text
+
+
+def given_panel_has_behavior_level_instructions(helper, behavior_name, instruction_text):
+    helper.bot.set_behavior_special_instructions(behavior_name, instruction_text)
+
+
+def given_panel_has_action_level_instructions(helper, behavior_name, action_name, instruction_text):
+    helper.bot.set_action_special_instructions(behavior_name, action_name, instruction_text)
+
+
+def given_panel_has_no_action_level_instructions(helper, behavior_name):
+    pass
+
+
+def when_user_submits_instructions_in_panel(helper):
+    result = helper.bot.submit_current_action()
+    if isinstance(result, dict) and "instructions" in result:
+        return result["instructions"]
+    return result
+
+
+def then_instructions_contain_special_instructions(instructions, behavior_text, action_text):
+    content = str(instructions) if instructions else ""
+    if hasattr(instructions, "display_content"):
+        content = "\n".join(instructions.display_content)
+    assert behavior_text in content, f"Expected '{behavior_text}' in instructions"
+    assert action_text in content, f"Expected '{action_text}' in instructions"
+
+
+def when_user_runs_special_instructions_cli(helper, instruction_text):
+    try:
+        return helper.bot.set_action_special_instructions("shape", "clarify", instruction_text)
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+def then_cli_stores_for_shape_clarify(helper, instruction_text):
+    stored = helper.bot.get_action_special_instructions("shape", "clarify")
+    assert stored == instruction_text
+
+
+def then_cli_includes_in_next_prompt(helper, instruction_text):
+    result = helper.bot.submit_current_action()
+    content = result.get("instructions", "") if isinstance(result, dict) else str(result)
+    if isinstance(content, dict):
+        display = content.get("display_content", [])
+        content = "\n".join(display) if isinstance(display, list) else str(content)
+    elif not isinstance(content, str):
+        content = str(content)
+    assert instruction_text in content, f"Expected '{instruction_text}' in prompt"
+
+
+def then_instructions_contain_behavior_level_only(instructions, behavior_text):
+    content = str(instructions) if instructions else ""
+    if hasattr(instructions, "display_content"):
+        content = "\n".join(instructions.display_content)
+    assert behavior_text in content, f"Expected '{behavior_text}' in instructions"
 
 
 # ============================================================================

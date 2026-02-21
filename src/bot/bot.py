@@ -1088,7 +1088,8 @@ class Bot:
                 'status': 'success',
                 'message': 'Instructions generated (test mode - clipboard/GUI skipped)',
                 'clipboard_status': 'skipped',
-                'cursor_status': 'skipped'
+                'cursor_status': 'skipped',
+                'instructions': content_str
             }
         
         clipboard_status = 'failed'

@@ -14283,8 +14283,57 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestAddSpecialInstructions",
+                      "scenarios": [
+                        {
+                          "name": "Panel stores behavior-level special instructions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_stores_behavior_level_special_instructions",
+                          "steps": "Given Panel displays shape Behavior with no special instructions stored\nWhen User enters \"focus on edge cases\" in Panel behavior-level Special Instructions for shape\nThen Panel stores \"focus on edge cases\" for shape Behavior"
+                        },
+                        {
+                          "name": "Panel stores action-level special instructions",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_stores_action_level_special_instructions",
+                          "steps": "Given Panel displays shape Behavior with clarify Action and no special instructions stored for that Action\nWhen User enters \"emphasize validation\" in Panel action-level Special Instructions for shape and clarify\nThen Panel stores \"emphasize validation\" for shape Behavior and clarify Action"
+                        },
+                        {
+                          "name": "Panel injects special instructions on Submit",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_injects_special_instructions_on_submit",
+                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has action-level special instructions \"emphasize validation\" for shape and clarify\nWhen User submits instructions in Panel\nThen Panel injects behavior-level and action-level special instructions into Instructions"
+                        },
+                        {
+                          "name": "CLI stores and includes special instructions in next prompt",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_stores_and_includes_special_instructions_in_next_prompt",
+                          "steps": "Given CLI is at shape.clarify\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI stores that instruction for shape.clarify\nAnd CLI includes it in next prompt"
+                        },
+                        {
+                          "name": "Panel injects only behavior-level instructions when no action-level set",
+                          "sequential_order": 5.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_panel_injects_only_behavior_level_instructions_when_no_action_level_set",
+                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has no action-level special instructions for shape\nWhen User submits instructions in Panel\nThen Panel injects behavior-level special instructions into Instructions"
+                        },
+                        {
+                          "name": "CLI reports failed when special_instructions command fails",
+                          "sequential_order": 6.0,
+                          "type": "error_case",
+                          "background": [],
+                          "test_method": "test_cli_reports_failed_when_special_instructions_command_fails",
+                          "steps": "Given CLI is at shape.clarify\nAnd Bot or workspace is misconfigured\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI reports failed to Terminal"
+                        }
+                      ],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User enters text in Panel behavior-level Special Instructions text area (beside shape, after toggle group above) THEN Panel stores that text for that behavior",
