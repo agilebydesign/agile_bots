@@ -853,6 +853,7 @@ class BotPanel {
               this._botView?.execute(cmd)
                 .then((result) => {
                   this._log(`[BotPanel] setExecutionMode success: ${cmd}`);
+                  if (this._botView) this._botView.botData = null;
                   return this._update();
                 })
                 .catch((error) => {
@@ -868,6 +869,7 @@ class BotPanel {
               this._botView?.execute(cmd)
                 .then((result) => {
                   this._log(`[BotPanel] setBehaviorExecuteMode success: ${cmd}`);
+                  if (this._botView) this._botView.botData = null;
                   return this._update();
                 })
                 .catch((error) => {
@@ -2508,7 +2510,7 @@ class BotPanel {
         .execution-toggle-container:not(.expanded) .execution-toggle-collapsed { opacity: 1; max-width: 40px; }
         .execution-toggle-container.expanded .execution-toggle-collapsed { opacity: 0; max-width: 0; min-width: 0; padding: 0; margin: 0; border: none; pointer-events: none; }
         .execution-toggle-expanded { display: inline-flex; gap: 4px; align-items: center; min-width: 0; overflow: hidden; transition: max-width 0.28s ease, opacity 0.22s ease; }
-        .execution-toggle-container:not(.expanded) .execution-toggle-expanded { max-width: 0; opacity: 0; padding: 0; margin: 0; }
+        .execution-toggle-container:not(.expanded) .execution-toggle-expanded { max-width: 0; opacity: 0; padding: 0; margin: 0; pointer-events: none; }
         .execution-toggle-container.expanded .execution-toggle-expanded { max-width: 200px; opacity: 1; }
         .execution-toggle-collapse-btn { background: transparent; border: none; padding: 2px; cursor: pointer; opacity: 0.6; }
         .execution-toggle-collapse-btn:hover { opacity: 1; }

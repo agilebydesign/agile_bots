@@ -601,6 +601,14 @@ class CLISession:
             action_name = command_parts[1] if len(command_parts) > 1 else None
             subcommand = command_parts[2] if len(command_parts) > 2 else None
 
+            # behavior.set_execution (2 parts) -> set_behavior_execute
+            if action_name == 'set_execution' and subcommand is None and hasattr(self.bot, 'set_behavior_execute'):
+                mode = args_string.strip().lower() or 'manual'
+                if mode not in ('combine_with_next', 'auto', 'skip', 'manual'):
+                    raise ValueError(f"Invalid behavior execution mode: {mode}. Use combine_with_next, skip, or manual.")
+                return self.bot.set_behavior_execute(behavior_name, mode)
+
+            # behavior.action.set_execution (3 parts) -> set_action_execution
             if subcommand == 'set_execution' and action_name and hasattr(self.bot, 'set_action_execution'):
                 mode = args_string.strip().lower() or 'manual'
                 if mode not in ('combine_next', 'auto', 'skip', 'manual'):

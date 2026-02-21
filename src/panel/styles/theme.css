@@ -217,6 +217,7 @@ img {
     opacity: 0;
     padding: 0;
     margin: 0;
+    pointer-events: none;
 }
 .execution-toggle-container.expanded .execution-toggle-expanded {
     max-width: 200px;
