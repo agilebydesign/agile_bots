@@ -2488,16 +2488,30 @@ class BotPanel {
         }
         
         .execution-toggle-btn {
-            padding: 2px 4px;
-            font-size: 10px;
+            padding: 0;
+            font-size: 12px;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 2px;
+            border-radius: 3px;
             background: #000;
             color: var(--text-color-faded);
             cursor: pointer;
             opacity: 0.5;
+            min-width: 28px;
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition: background-color 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
         }
+        .execution-toggle-container { display: inline-flex; align-items: center; overflow: visible; }
+        .execution-toggle-collapsed { display: inline-flex; align-items: center; justify-content: center; transition: opacity 0.2s ease, max-width 0.25s ease; overflow: hidden; }
+        .execution-toggle-container:not(.expanded) .execution-toggle-collapsed { opacity: 1; max-width: 40px; }
+        .execution-toggle-container.expanded .execution-toggle-collapsed { opacity: 0; max-width: 0; min-width: 0; padding: 0; margin: 0; border: none; pointer-events: none; }
+        .execution-toggle-expanded { display: inline-flex; gap: 4px; align-items: center; min-width: 0; overflow: hidden; transition: max-width 0.28s ease, opacity 0.22s ease; }
+        .execution-toggle-container:not(.expanded) .execution-toggle-expanded { max-width: 0; opacity: 0; padding: 0; margin: 0; }
+        .execution-toggle-container.expanded .execution-toggle-expanded { max-width: 200px; opacity: 1; }
+        .execution-toggle-collapse-btn { background: transparent; border: none; padding: 2px; cursor: pointer; opacity: 0.6; }
+        .execution-toggle-collapse-btn:hover { opacity: 1; }
         .execution-toggle-btn:hover {
             background: rgba(255,255,255,0.08);
             color: var(--text-color);
@@ -3012,6 +3026,13 @@ class BotPanel {
                     if (targetId && window.toggleCollapse) {
                         console.log('[WebView] Calling toggleCollapse with:', targetId);
                         window.toggleCollapse(targetId);
+                        e.stopPropagation();
+                        e.preventDefault();
+                    }
+                } else if (action === 'toggleExecutionToggle') {
+                    const targetId = actionElement.getAttribute('data-target');
+                    if (targetId && window.toggleExecutionToggle) {
+                        window.toggleExecutionToggle(targetId);
                         e.stopPropagation();
                         e.preventDefault();
                     }
@@ -3949,6 +3970,13 @@ class BotPanel {
                     }
                 }
             });
+        };
+        
+        window.toggleExecutionToggle = function(containerId) {
+            const container = document.getElementById(containerId);
+            if (container && container.classList.contains('execution-toggle-container')) {
+                container.classList.toggle('expanded');
+            }
         };
         
         window.toggleCollapse = function(elementId) {
