@@ -139,7 +139,7 @@ class StoryMapView extends PanelView {
         const perfIconsStart = performance.now();
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
-        const magnifyingGlassIconPath = getIcon('magnifying_glass.png');
+        const scopeMapIconPath = getIcon('scope_map.png');
         const clearIconPath = getIcon('close.png');
         const showAllIconPath = getIcon('show_all.png');
         const jsonIconPath = getIcon('json.png');
@@ -306,17 +306,17 @@ class StoryMapView extends PanelView {
             // Hierarchy view - content is an object with 'epics' property
             const epics = scopeData.content.epics || [];
             
-            const perfRootNodeStart = performance.now();
-            const rootNode = this.renderRootNode(actionButtonsHtml);
-            const perfRootNodeEnd = performance.now();
-            log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
-            
             const perfTreeStart = performance.now();
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
             const perfTreeEnd = performance.now();
             log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
             
-            contentHtml = rootNode + treeHtml;
+            const perfRootNodeStart = performance.now();
+            const rootNode = this.renderRootNode(treeHtml, plusIconPath, subtractIconPath);
+            const perfRootNodeEnd = performance.now();
+            log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
+            
+            contentHtml = actionButtonsHtml + rootNode;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
         } else {
             contentHtml = '<div class="empty-state">All files in workspace</div>';
@@ -2615,8 +2615,8 @@ class StoryMapView extends PanelView {
             ">
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
-                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
+                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope Icon" />` : ''}
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;
@@ -2773,22 +2773,29 @@ ${clientScript}    </script>`;
     }
     
     /**
-     * Render root "Story Map" node with contextual action buttons.
+     * Render root "Story Map" node as collapsible container (like epics).
+     * When collapsed, all epics are hidden; when expanded, epics are visible.
+     * Story Map is the first row of the hierarchy (below the toolbar buttons).
+     * Epics are indented one level under Story Map.
      * 
-     * @param {string} actionButtonsHtml - HTML for contextual action buttons
+     * @param {string} treeHtml - HTML for epics tree (wrapped in collapsible div)
+     * @param {string} plusIconPath - Icon for collapsed state (expand)
+     * @param {string} subtractIconPath - Icon for expanded state (collapse)
      * @returns {string} HTML string
      */
-    renderRootNode(actionButtonsHtml) {
-        return `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+    renderRootNode(treeHtml, plusIconPath, subtractIconPath) {
+        const headerRow = `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center;">
-                <span class="story-node" data-node-type="root" data-node-name="Story Map" style="display: inline-block; cursor: pointer;" onclick="selectNode('root', null)">Story Map</span>
-                ${actionButtonsHtml}
+                <span id="story-map-root-icon" onclick="event.stopPropagation(); toggleCollapse('story-map-root');" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath || ''}" data-subtract="${subtractIconPath || ''}"><img class="collapse-icon" src="${subtractIconPath || ''}" data-state="expanded" style="width: 9px; height: 9px; vertical-align: middle;" alt="Collapse" /></span>
+                <span class="story-node" data-node-type="root" data-node-name="Story Map" style="display: inline-block; cursor: pointer; margin-left: 4px;" onclick="selectNode('root', null)">Story Map</span>
             </div>
             <div id="save-status-indicator" class="save-status" style="display: none;">
                 <span id="save-status-spinner" class="save-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 140, 0, 0.3); border-top-color: #ff8c00; border-radius: 50%;"></span>
                 <span id="save-status-message" style="font-size: 12px; color: var(--text-color-faded); margin-left: 6px;"></span>
             </div>
         </div>`;
+        const contentDiv = `<div id="story-map-root" class="collapsible-content" style="display: block; padding-left: 12px;">${treeHtml}</div>`;
+        return headerRow + contentDiv;
     }
     
     /**
