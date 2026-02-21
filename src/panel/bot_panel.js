@@ -280,6 +280,33 @@ class BotPanel {
               }
             })();
             return;
+          case "copyIncrementStoriesJson":
+            (() => {
+              const incName = message.incName;
+              if (!incName) return;
+              const command = 'story_graph.copy_increment_stories_json name:"' + incName + '"';
+              const doCopy = async () => {
+                const response = await this._botView.execute(command);
+                const result = response && (response.result !== undefined ? response.result : response);
+                const arr = Array.isArray(result) ? result : (result && result.result ? result.result : []);
+                const text = JSON.stringify(arr, null, 2);
+                await vscode.env.clipboard.writeText(text);
+                vscode.window.showInformationMessage('Increment stories JSON copied to clipboard');
+              };
+              vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: 'Injecting increment stories to clipboard...',
+                cancellable: false
+              }, async () => {
+                try {
+                  await doCopy();
+                } catch (err) {
+                  this._log(`[BotPanel] copyIncrementStoriesJson failed: ${err.message}`);
+                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+                }
+              });
+            })();
+            return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
               vscode.window.showInformationMessage(message.label || 'Copied to clipboard');
@@ -3221,59 +3248,40 @@ class BotPanel {
 
         document.addEventListener('contextmenu', function(e) {
 
-            let incCol = e.target;
-            let d = 6;
-            while (incCol && d-- > 0 && !incCol.classList.contains('increment-column-container')) incCol = incCol.parentElement;
-            if (incCol && incCol.classList.contains('increment-column-container')) {
-                const incName = incCol.getAttribute('data-inc');
-                const stories = Array.from(incCol.querySelectorAll('.story-node[data-inc-source]'))
-                    .map(el => el.getAttribute('data-node-name'));
-                _showCopyMenu(e, [
-                    { label: 'Copy increment name', action: function() {
-                        vscode.postMessage({ command: 'copyText', text: incName, label: 'Increment name copied' });
-                    }},
-                    { label: 'Copy as JSON', action: function() {
-                        vscode.postMessage({ command: 'copyText', text: JSON.stringify({ name: incName, stories: stories }, null, 2), label: 'Increment JSON copied' });
-                    }}
-                ]);
-                return;
-            }
-
-
             const target = e.target.closest ? e.target.closest('.story-node') : (function() {
                 let t = e.target;
                 while (t && !t.classList.contains('story-node')) t = t.parentElement;
                 return t;
             })();
-            if (!target || !target.classList.contains('story-node')) return;
-
-            const incSource = target.getAttribute('data-inc-source');
-            const nodeName = target.getAttribute('data-node-name');
-
-            if (incSource !== null) {
-
-                _showCopyMenu(e, [
-                    { label: 'Copy story name', action: function() {
-                        vscode.postMessage({ command: 'copyText', text: nodeName, label: 'Story name copied' });
-                    }},
-                    { label: 'Copy as JSON', action: function() {
-                        vscode.postMessage({ command: 'copyText', text: JSON.stringify({ name: nodeName }, null, 2), label: 'Story JSON copied' });
-                    }}
-                ]);
-                return;
+            if (target && target.classList.contains('story-node')) {
+                const nodePath = target.getAttribute('data-path');
+                if (nodePath) {
+                    _showCopyMenu(e, [
+                        { label: 'Copy node name', action: function() {
+                            vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'name' });
+                        }},
+                        { label: 'Copy full JSON', action: function() {
+                            vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'json' });
+                        }}
+                    ]);
+                    return;
+                }
             }
 
-
-            const nodePath = target.getAttribute('data-path');
-            if (!nodePath) return;
-            _showCopyMenu(e, [
-                { label: 'Copy node name', action: function() {
-                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'name' });
-                }},
-                { label: 'Copy full JSON', action: function() {
-                    vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'json' });
-                }}
-            ]);
+            let incCol = e.target;
+            let d = 6;
+            while (incCol && d-- > 0 && !incCol.classList.contains('increment-column-container')) incCol = incCol.parentElement;
+            if (incCol && incCol.classList.contains('increment-column-container')) {
+                const incName = incCol.getAttribute('data-inc');
+                _showCopyMenu(e, [
+                    { label: 'Copy increment name', action: function() {
+                        vscode.postMessage({ command: 'copyText', text: incName, label: 'Increment name copied' });
+                    }},
+                    { label: 'Copy as JSON', action: function() {
+                        vscode.postMessage({ command: 'copyIncrementStoriesJson', incName: incName });
+                    }}
+                ]);
+            }
         }, true);
         
 
@@ -5359,7 +5367,7 @@ class BotPanel {
             } else if (nodeType === 'epic') {
                 scopeCommand = 'epic ' + nodeName;
             } else if (nodeType === 'increment') {
-                scopeCommand = 'story ' + nodeName;
+                scopeCommand = 'increment "' + nodeName + '"';
             } else {
 
                 scopeCommand = nodeName;
@@ -5410,33 +5418,32 @@ class BotPanel {
                 return;
             }
             
-            if (!window.selectedNode.behaviorNeeded) {
-                vscode.postMessage({ command: 'logScopeDebug', message: 'ERROR: No behaviorNeeded for ' + window.selectedNode.name });
-                return;
-            }
-            
             const nodeName = window.selectedNode.name;
-            const nodePath = resolveNodePath(window.selectedNode);
-            
-            vscode.postMessage({
-                command: 'logScopeDebug',
-                message: 'resolveNodePath: nodeName=' + nodeName + ' | nodePath=' + (nodePath || 'NULL') + ' | hadPath=' + !!window.selectedNode.path
-            });
-            
-            if (!nodePath) {
-                vscode.postMessage({
-                    command: 'logScopeDebug',
-                    message: 'ERROR: Could not resolve node path - story map may not be visible. Click the node again to refresh.'
-                });
-            vscode.postMessage({
-                command: 'showScopeError',
-                message: 'Scope not available: Could not resolve node path. Try clicking the story/epic node again, then submit.'
-            });
-                return;
-            }
-            
+            const nodeType = window.selectedNode.type;
             const action = 'build';
-            const commandText = nodePath + '.submit_required_behavior_instructions action:"' + action + '"';
+            let commandText;
+            
+            if (nodeType === 'increment') {
+                if (!window.selectedNode.behaviorNeeded) {
+                    vscode.postMessage({ command: 'logScopeDebug', message: 'ERROR: No behaviorNeeded for increment ' + nodeName });
+                    return;
+                }
+                commandText = 'story_graph.submit_increment_instructions name:"' + nodeName + '" behavior:"' + window.selectedNode.behaviorNeeded + '" action:"' + action + '"';
+            } else {
+                if (!window.selectedNode.behaviorNeeded) {
+                    vscode.postMessage({ command: 'logScopeDebug', message: 'ERROR: No behaviorNeeded for ' + nodeName });
+                    return;
+                }
+                const nodePath = resolveNodePath(window.selectedNode);
+                if (!nodePath) {
+                    vscode.postMessage({
+                        command: 'showScopeError',
+                        message: 'Scope not available: Could not resolve node path. Try clicking the story/epic node again, then submit.'
+                    });
+                    return;
+                }
+                commandText = nodePath + '.submit_required_behavior_instructions action:"' + action + '"';
+            }
             
             vscode.postMessage({
                 command: 'logScopeDebug',
@@ -5466,15 +5473,20 @@ class BotPanel {
             
             const altBehavior = behaviorsNeeded[1];
             const nodeName = window.selectedNode.name;
-            const nodePath = resolveNodePath(window.selectedNode);
-            
-            if (!nodePath) {
-                vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
-                return;
-            }
-            
+            const nodeType = window.selectedNode.type;
             const action = 'build';
-            const commandText = nodePath + '.submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"';
+            let commandText;
+            
+            if (nodeType === 'increment') {
+                commandText = 'story_graph.submit_increment_instructions name:"' + nodeName + '" behavior:"' + altBehavior + '" action:"' + action + '"';
+            } else {
+                const nodePath = resolveNodePath(window.selectedNode);
+                if (!nodePath) {
+                    vscode.postMessage({ command: 'showScopeError', message: 'Scope not available: Could not resolve node path. Click the node again, then submit.' });
+                    return;
+                }
+                commandText = nodePath + '.submit_instructions behavior:"' + altBehavior + '" action:"' + action + '"';
+            }
             
             console.log('[WebView] Executing command:', commandText);
             vscode.postMessage({

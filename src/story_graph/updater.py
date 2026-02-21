@@ -198,7 +198,7 @@ class StoryMapUpdater:
             ]
         
         # Update the IncrementCollection with modified increments
-        self._target_map._increments = IncrementCollection.from_list(increments)
+        self._target_map._increments = IncrementCollection.from_list(increments, story_map=self._target_map)
         # Keep story_graph dict in sync for serialization and legacy access
         self._target_map.story_graph['increments'] = increments
     

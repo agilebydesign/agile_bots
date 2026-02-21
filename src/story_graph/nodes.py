@@ -242,16 +242,12 @@ class StoryNode(ABC):
         return {'status': 'success', 'result': self.name}
 
     def copy_json(self, include_level: Optional[str] = None) -> dict:
-        """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit).
-        For clipboard copy, ensures at least 'examples' so scenarios and acceptance_criteria are included."""
+        """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit)."""
         if not self._bot or not hasattr(self._bot, 'story_map'):
             raise ValueError('Cannot serialize node without bot context')
         if include_level is None and hasattr(self._bot, '_scope') and self._bot._scope:
             include_level = getattr(self._bot._scope, 'include_level', 'examples') or 'examples'
         if include_level is None:
-            include_level = 'examples'
-        # Clipboard copy: always include scenarios and acceptance_criteria (min level: examples)
-        if include_level not in _LEVEL_SCENARIOS:
             include_level = 'examples'
         story_map = self._bot.story_map
         generate_trace = include_level in ('tests', 'code')
@@ -2124,6 +2120,19 @@ class Increment:
     relative_size: Optional[str] = None
     approach: Optional[str] = None
     focus: Optional[str] = None
+    _story_map: Optional['StoryMap'] = field(default=None, repr=False)
+
+    def __getitem__(self, story_name: str) -> 'Story':
+        """Allow story access by name for path resolution: increment['Story Name'] -> Story node."""
+        story_names = [self._story_name(s) for s in self.stories]
+        if story_name not in story_names:
+            raise KeyError(f'Story "{story_name}" not found in increment "{self.name}"')
+        if not self._story_map:
+            raise ValueError('Increment has no story_map reference for story lookup')
+        story = self._story_map.find_story_by_name(story_name)
+        if not story:
+            raise KeyError(f'Story "{story_name}" not found in story graph')
+        return story
 
     def _story_name(self, story) -> str:
         return story['name'] if isinstance(story, dict) else str(story)
@@ -2201,8 +2210,12 @@ class Increment:
 
 class IncrementCollection:
 
-    def __init__(self, increments: List[Increment]):
+    def __init__(self, increments: List[Increment], story_map: Optional['StoryMap'] = None):
         self._increments = increments
+        self._story_map = story_map
+        if story_map:
+            for inc in self._increments:
+                inc._story_map = story_map
         self._rebuild_indexes()
 
     def _rebuild_indexes(self) -> None:
@@ -2247,10 +2260,12 @@ class IncrementCollection:
                 if inc.priority >= new_priority:
                     inc.priority += 1
             insert_idx = next(i for i, inc in enumerate(self._increments) if inc.name == after) + 1
-            self._increments.insert(insert_idx, Increment(name=name, priority=new_priority, stories=[]))
+            new_inc = Increment(name=name, priority=new_priority, stories=[], _story_map=self._story_map)
+            self._increments.insert(insert_idx, new_inc)
         else:
             max_priority = max((inc.priority for inc in self._increments), default=0)
-            self._increments.append(Increment(name=name, priority=max_priority + 1, stories=[]))
+            new_inc = Increment(name=name, priority=max_priority + 1, stories=[], _story_map=self._story_map)
+            self._increments.append(new_inc)
         self._rebuild_indexes()
 
     def reorder(self, name: str, before: Optional[str] = None, after: Optional[str] = None) -> None:
@@ -2319,8 +2334,8 @@ class IncrementCollection:
             inc.rename_story_reference(old_name, new_name)
 
     @classmethod
-    def from_list(cls, increments_data: List[Dict[str, Any]]) -> 'IncrementCollection':
-        return cls([Increment.from_dict(data) for data in increments_data])
+    def from_list(cls, increments_data: List[Dict[str, Any]], story_map: Optional['StoryMap'] = None) -> 'IncrementCollection':
+        return cls([Increment.from_dict(data) for data in increments_data], story_map=story_map)
 
     def to_list(self) -> List[Dict[str, Any]]:
         return [inc.to_dict() for inc in self._increments]
@@ -2334,7 +2349,7 @@ class StoryMap:
         for epic_data in story_graph.get('epics', []):
             self._epics_list.append(Epic.from_dict(epic_data, bot=bot))
         self._epics = EpicsCollection(self._epics_list)
-        self._increments = IncrementCollection.from_list(story_graph.get('increments', []))
+        self._increments = IncrementCollection.from_list(story_graph.get('increments', []), story_map=self)
 
     @classmethod
     def from_bot(cls, bot: Any) -> 'StoryMap':
@@ -2504,22 +2519,60 @@ class StoryMap:
         self._increments.remove_story_from_all(story_name)
 
     def submit_increment_instructions(self, name: str, behavior: str = None, action: str = None):
-        """Set scope to increment and submit instructions. Same flow as epic/sub-epic submit."""
+        """Submit instructions for each story in the increment. Same flow as hierarchy view per story."""
         if not self._bot:
             raise ValueError('StoryMap has no bot reference')
+        inc = self._increments.find_by_name(name)
+        if not inc:
+            raise ValueError(f'Increment "{name}" not found')
+        story_names = [inc._story_name(s) for s in inc.stories]
+        if not story_names:
+            return {'status': 'skipped', 'message': f'Increment "{name}" has no stories'}
         scope_file = self._bot.workspace_directory / 'scope.json'
         with open(scope_file, 'r') as f:
             scope_before = json.load(f)
-        self._bot.scope(f'increment "{name}"')
+        results = []
         try:
-            if behavior and action:
-                instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
-                return self._bot.submit_instructions(instructions, behavior, action)
-            return self._bot.submit_current_action()
+            for story_name in story_names:
+                self._bot.scope(f'story "{story_name}"')
+                try:
+                    if behavior and action:
+                        instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
+                        result = self._bot.submit_instructions(instructions, behavior, action)
+                    else:
+                        result = self._bot.submit_current_action()
+                    results.append({'story': story_name, 'result': result})
+                except Exception as e:
+                    results.append({'story': story_name, 'error': str(e)})
         finally:
             with open(scope_file, 'w') as f:
                 json.dump(scope_before, f)
             self._bot._scope.load()
+        last = results[-1] if results else None
+        return last.get('result', last) if last and 'result' in last else {'status': 'ok', 'submitted': len(results), 'results': results}
+
+    def copy_increment_stories_json(self, name: str, include_level: Optional[str] = None) -> dict:
+        """Return each story in the increment as story-graph JSON (same as copy_json per story). Respects scope.include_level."""
+        if not self._bot:
+            raise ValueError('StoryMap has no bot reference')
+        inc = self._increments.find_by_name(name)
+        if not inc:
+            raise ValueError(f'Increment "{name}" not found')
+        story_names = [inc._story_name(s) for s in inc.stories]
+        if not story_names:
+            return {'status': 'success', 'result': []}
+        if include_level is None and hasattr(self._bot, '_scope') and self._bot._scope:
+            include_level = getattr(self._bot._scope, 'include_level', 'examples') or 'examples'
+        if include_level is None:
+            include_level = 'examples'
+        generate_trace = include_level in ('tests', 'code')
+        result = []
+        for story_name in story_names:
+            story = self.find_story_by_name(story_name)
+            if story:
+                node_dict = self.node_to_dict(story, include_level=include_level, generate_trace=generate_trace)
+                result.append(node_dict)
+        return {'status': 'success', 'result': result}
 
     def apply_update_report(self, report: 'UpdateReport') -> None:
         """Apply an update report to this story map.

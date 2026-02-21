@@ -1340,8 +1340,9 @@ class TestCopyStoryNodeToClipboard:
         assert json.loads(json.dumps(d)) == d
 
     def test_copy_json_for_story_includes_scenarios(self, tmp_path):
-        """copy_json for a Story node includes scenarios and acceptance_criteria in same shape as file."""
+        """copy_json for a Story node includes scenarios and acceptance_criteria when include_level includes them."""
         helper = BotTestHelper(tmp_path)
+        helper.bot._scope.include_level = "examples"  # Ensure scenarios/acceptance included
         graph_data = {
             "epics": [
                 {
@@ -1388,6 +1389,100 @@ class TestCopyStoryNodeToClipboard:
         assert len(d["scenarios"]) == 1
         assert d["scenarios"][0]["name"] == "Scenario one"
         assert "steps" in d["scenarios"][0]
+
+    def test_copy_json_respects_include_level_stories(self, tmp_path):
+        """copy_json with scope.include_level='stories' excludes scenarios and acceptance_criteria."""
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "E1",
+                    "sub_epics": [],
+                    "story_groups": [
+                        {
+                            "name": "",
+                            "sequential_order": 0,
+                            "type": "and",
+                            "connector": None,
+                            "stories": [
+                                {
+                                    "name": "S1",
+                                    "sequential_order": 0,
+                                    "connector": None,
+                                    "story_type": "user",
+                                    "users": [],
+                                    "scenarios": [
+                                        {
+                                            "name": "Scenario one",
+                                            "sequential_order": 0,
+                                            "type": "happy_path",
+                                            "background": [],
+                                            "steps": "Given x"
+                                        }
+                                    ],
+                                    "acceptance_criteria": [{"text": "AC1"}],
+                                    "behavior": None
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+        helper.story.create_story_graph(graph_data)
+        helper.bot._scope.include_level = "stories"
+        story = helper.bot.story_map.epics["E1"].children[0].children[0]
+
+        result = story.copy_json()
+        assert result["status"] == "success"
+        d = result["result"]
+        assert d["name"] == "S1"
+        assert d.get("scenarios") == [], "stories level should exclude scenarios"
+        assert d.get("acceptance_criteria") == [], "stories level should exclude acceptance_criteria"
+
+    def test_copy_increment_stories_json_respects_include_level(self, tmp_path):
+        """copy_increment_stories_json respects scope.include_level (e.g. stories excludes scenarios)."""
+        helper = BotTestHelper(tmp_path)
+        graph_data = {
+            "epics": [
+                {
+                    "name": "E1",
+                    "sub_epics": [],
+                    "story_groups": [
+                        {
+                            "name": "",
+                            "sequential_order": 0,
+                            "type": "and",
+                            "connector": None,
+                            "stories": [
+                                {
+                                    "name": "StoryInInc",
+                                    "sequential_order": 0,
+                                    "connector": None,
+                                    "story_type": "user",
+                                    "users": [],
+                                    "scenarios": [{"name": "S1", "sequential_order": 0, "type": "happy_path", "background": [], "steps": ""}],
+                                    "acceptance_criteria": [{"text": "AC1"}],
+                                    "behavior": None
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "increments": [{"name": "Inc1", "priority": 1, "stories": ["StoryInInc"]}],
+        }
+        helper.story.create_story_graph(graph_data)
+        helper.bot._scope.include_level = "stories"
+
+        result = helper.bot.story_map.copy_increment_stories_json("Inc1")
+        assert result["status"] == "success"
+        stories = result["result"]
+        assert len(stories) == 1
+        d = stories[0]
+        assert d["name"] == "StoryInInc"
+        assert d.get("scenarios") == [], "stories level should exclude scenarios"
+        assert d.get("acceptance_criteria") == [], "stories level should exclude acceptance_criteria"
 
     def test_node_to_dict_serializes_each_node_type(self, tmp_path):
         """StoryMap.node_to_dict dispatches correctly for Epic, SubEpic, Story, Scenario."""
