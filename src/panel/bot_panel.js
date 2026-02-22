@@ -4978,9 +4978,10 @@ class BotPanel {
                 if (btnOpenAll) btnOpenAll.style.display = 'block';
             }
             
-
-
-
+            var diagramActionGroup = document.getElementById('diagram-action-buttons-group');
+            if (diagramActionGroup) {
+                diagramActionGroup.style.display = (window.selectedNode.type !== 'root') ? 'flex' : 'none';
+            }
 
             var dScope = (window.selectedNode.type !== 'root' && window.selectedNode.name)
                 ? window.selectedNode.name : '';

@@ -51,11 +51,11 @@ class IntentionRevealingNamesScanner(CodeScanner):
         
         docstring_ranges = self._get_docstring_ranges(tree)
         
-        violations.extend(self._check_variable_names(tree, file_path, self.rule, content, domain_terms, docstring_ranges))
+        violations.extend(self._check_variable_names(tree, file_path, content, domain_terms, docstring_ranges))
         
-        violations.extend(self._check_function_names(tree, file_path, self.rule, domain_terms))
+        violations.extend(self._check_function_names(tree, file_path, domain_terms))
         
-        violations.extend(self._check_class_names(tree, file_path, self.rule, domain_terms))
+        violations.extend(self._check_class_names(tree, file_path, domain_terms))
         
         return violations
     

@@ -49,7 +49,7 @@ function setupTestWorkspace() {
     
     // Set environment variable so Python backend uses temp workspace for data
     process.env.WORKING_AREA = tempWorkspaceDir;
-    
+
     // Verify WORKING_AREA is set to temp directory before creating PanelView
     const { verifyTestWorkspace } = require('../../helpers/prevent_production_writes');
     verifyTestWorkspace();
@@ -744,6 +744,65 @@ test('TestDisplayBehaviorHierarchyEdgeCases', { concurrency: false }, async (t) 
     
     await t.test('testBehaviorWithNoActions', async () => {
         await suite.testBehaviorWithNoActions();
+    });
+});
+
+// ============================================================================
+// STORY: Execute Behavior Action Panel
+// ============================================================================
+
+class TestExecuteBehaviorActionPanel {
+
+    async test_skip_behavior_shows_grayed_unchecked_circle() {
+        /**
+         * Scenario: Skip behavior shows grayed unchecked circle and is non-interactive
+         * GIVEN Panel displays behavior hierarchy
+         * AND prioritization behavior has execute set to skip
+         * WHEN Panel renders the behavior list
+         * THEN Panel shows prioritization's circle as grayed out
+         * AND Panel shows prioritization's circle as unchecked (no checkmark)
+         */
+        await helper._cli.execute('prioritization.set_execution skip');
+        const html = await helper.render_html();
+        helper.assert_skip_behavior_dimmed(html, 'prioritization');
+    }
+
+    async test_submit_button_exists_in_value_stream_header() {
+        /**
+         * GIVEN Panel displays behavior hierarchy
+         * WHEN Panel renders
+         * THEN Submit button exists in Value Stream header
+         */
+        const html = await helper.render_html();
+        assert.ok(html.includes('submit-to-chat-btn') || html.includes('sendInstructionsToChat'),
+            'Submit button should exist in behaviors section');
+    }
+
+    async test_behavior_has_navigate_to_behavior_handler() {
+        /**
+         * GIVEN Panel displays behavior hierarchy
+         * WHEN Panel renders
+         * THEN Each behavior has navigateToBehavior data-action for collapsed click
+         */
+        const html = await helper.render_html();
+        assert.ok(html.includes('data-action="navigateToBehavior"'),
+            'Behaviors should have navigateToBehavior handler');
+    }
+}
+
+test('TestExecuteBehaviorActionPanel', { concurrency: false, timeout: 60000 }, async (t) => {
+    const suite = new TestExecuteBehaviorActionPanel();
+
+    await t.test('test_skip_behavior_shows_grayed_unchecked_circle', async () => {
+        await suite.test_skip_behavior_shows_grayed_unchecked_circle();
+    });
+
+    await t.test('test_submit_button_exists_in_value_stream_header', async () => {
+        await suite.test_submit_button_exists_in_value_stream_header();
+    });
+
+    await t.test('test_behavior_has_navigate_to_behavior_handler', async () => {
+        await suite.test_behavior_has_navigate_to_behavior_handler();
     });
 });
 

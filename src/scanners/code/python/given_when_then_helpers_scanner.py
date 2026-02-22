@@ -40,7 +40,7 @@ class GivenWhenThenHelpersScanner(TestScanner):
         for function in functions.get_many_functions:
             if function.node.name.startswith('test_'):
                 test_violations = self._check_test_method(
-                    function.node, content, file_path, self.rule, helper_functions, tree
+                    function.node, content, file_path, helper_functions, tree
                 )
                 violations.extend(test_violations)
         

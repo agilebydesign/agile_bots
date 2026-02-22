@@ -1,6 +1,6 @@
 # 📄 Submit Current Behavior Action For Selected Node
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1079)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1081)
 
 **User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Act With Selected Node](.)  
@@ -21,7 +21,7 @@ Submit Current Behavior Action For Selected Node functionality for the mob minio
 ## Scenarios
 
 <a id="scenario-submit-current-behavior-action-for-selected-node"></a>
-### Scenario: [Submit Current Behavior Action For Selected Node](#scenario-submit-current-behavior-action-for-selected-node) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1090)
+### Scenario: [Submit Current Behavior Action For Selected Node](#scenario-submit-current-behavior-action-for-selected-node) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1092)
 
 **Steps:**
 ```gherkin
@@ -72,7 +72,7 @@ And Scope is set to <node_type> <node_name>
 
 
 <a id="scenario-submit-current-instructions-via-cli-json-format"></a>
-### Scenario: [Submit Current Instructions Via CLI JSON Format](#scenario-submit-current-instructions-via-cli-json-format) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1143)
+### Scenario: [Submit Current Instructions Via CLI JSON Format](#scenario-submit-current-instructions-via-cli-json-format) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1145)
 
 **Steps:**
 ```gherkin

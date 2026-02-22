@@ -1,6 +1,6 @@
 # 📄 Submit action for selected story node
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L22)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L24)
 
 **User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Act With Selected Node](.)  
@@ -20,7 +20,7 @@ Submit action for selected story node functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-determine-behavior-for-story-and-get-instructions"></a>
-### Scenario: [Determine Behavior For Story And Get Instructions](#scenario-determine-behavior-for-story-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L173)
+### Scenario: [Determine Behavior For Story And Get Instructions](#scenario-determine-behavior-for-story-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L175)
 
 **Steps:**
 ```gherkin
@@ -68,7 +68,7 @@ And Instructions contain required sections for <expected_behavior> behavior
 
 
 <a id="scenario-determine-behavior-for-sub-epic"></a>
-### Scenario: [Determine Behavior For Sub Epic](#scenario-determine-behavior-for-sub-epic) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L448)
+### Scenario: [Determine Behavior For Sub Epic](#scenario-determine-behavior-for-sub-epic) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L450)
 
 **Steps:**
 ```gherkin
@@ -89,7 +89,7 @@ Then Bot returns behavior <expected_behavior>
 
 
 <a id="scenario-determine-behavior-for-epic-and-get-instructions"></a>
-### Scenario: [Determine Behavior For Epic And Get Instructions](#scenario-determine-behavior-for-epic-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L891)
+### Scenario: [Determine Behavior For Epic And Get Instructions](#scenario-determine-behavior-for-epic-and-get-instructions) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L893)
 
 **Steps:**
 ```gherkin
@@ -117,7 +117,7 @@ And Instructions contain required sections for <expected_behavior> behavior
 
 
 <a id="scenario-display-behavior-needed-via-cli-with-json-format"></a>
-### Scenario: [Display behavior needed via CLI with JSON format](#scenario-display-behavior-needed-via-cli-with-json-format) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L947)
+### Scenario: [Display behavior needed via CLI with JSON format](#scenario-display-behavior-needed-via-cli-with-json-format) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L949)
 
 **Steps:**
 ```gherkin

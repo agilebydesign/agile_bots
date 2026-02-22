@@ -78,5 +78,5 @@
                                   }
                               ]
              },
-    "scanner":  "scanners.domain_language_scanner.DomainLanguageScanner"
+    "scanner":  "scanners.code.python.domain_language_code_scanner.DomainLanguageCodeScanner"
 }

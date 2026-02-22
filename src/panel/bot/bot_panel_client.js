@@ -1418,6 +1418,11 @@ const vscode = acquireVsCodeApi();
                 if (btnOpenAll) btnOpenAll.style.display = 'block';
             }
             
+            var diagramActionGroup = document.getElementById('diagram-action-buttons-group');
+            if (diagramActionGroup) {
+                diagramActionGroup.style.display = (window.selectedNode.type !== 'root') ? 'flex' : 'none';
+            }
+            
             // Update submit button based on current behavior and action
             console.log('═══════════════════════════════════════════════════════');
             console.log('[SUBMIT BUTTON DEBUG] Starting submit button update');

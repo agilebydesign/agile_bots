@@ -214,6 +214,14 @@ class StoryMapView extends PanelView {
                     </button>
                 </div>
                 
+                <!-- Diagram action buttons: Render, Save layout, Clear layout, Update graph -->
+                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 4px;">
+                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Render diagram for selected node">Render diagram</button>
+                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Save layout to DrawIO file">Save layout</button>
+                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Clear layout">Clear layout</button>
+                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Update story graph from diagram">Update graph</button>
+                </div>
+                
                 <!-- Separator between Scope and Related Files groups -->
                 <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
                 </div>

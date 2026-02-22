@@ -1,0 +1,23 @@
+=== TESTS VALIDATION (scope: Render Diagram Selected Node) ===
+
+Rule use_class_based_organization.json: 34 file-by-file, 0 cross-file violations
+Rule use_domain_language.json: 143 file-by-file, 0 cross-file violations
+Rule domain_oriented_test_inheritance.json: 9 file-by-file, 0 cross-file violations
+Rule no_defensive_code_in_tests.json: 4 file-by-file, 0 cross-file violations
+Rule production_code_clean_functions.json: 97 file-by-file, 0 cross-file violations
+Rule call_production_code_directly.json: 8 file-by-file, 0 cross-file violations
+Rule cover_all_behavior_paths.json: 5 file-by-file, 0 cross-file violations
+Rule design_api_through_failing_tests.json: 1 file-by-file, 0 cross-file violations
+Rule helper_extraction_and_reuse.json: 475 file-by-file, 0 cross-file violations
+Rule match_specification_scenarios.json: 702 file-by-file, 0 cross-file violations
+Rule place_imports_at_top.json: 80 file-by-file, 0 cross-file violations
+Rule object_oriented_test_helpers.json: 13 file-by-file, 0 cross-file violations
+Rule self_documenting_tests.json: 39 file-by-file, 0 cross-file violations
+Rule standard_test_data_sets.json: 3 file-by-file, 0 cross-file violations
+Rule assert_full_results.json: 88 file-by-file, 0 cross-file violations
+Rule use_ascii_only.json: 85 file-by-file, 0 cross-file violations
+Rule pytest_bdd_orchestrator_pattern.json: 261 file-by-file, 0 cross-file violations
+Rule use_exact_variable_names.json: 161 file-by-file, 0 cross-file violations
+Rule use_given_when_then_helpers.json: 633 file-by-file, 0 cross-file violations
+
+Total: 19 rule(s) with violations

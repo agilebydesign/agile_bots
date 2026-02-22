@@ -1,7 +1,7 @@
 {
-  "story_bot.shape.clarify": "manual",
+  "story_bot.shape.clarify": "skip",
   "story_bot.shape.submit": "combine_next",
-  "story_bot.shape.strategy": "combine_next",
+  "story_bot.shape.strategy": "skip",
   "story_bot.shape.build": "combine_next",
   "story_bot.shape.validate": "combine_next",
   "story_bot.shape.render": "manual",
@@ -18,8 +18,10 @@
   "story_bot.tests.build": "combine_next",
   "story_bot.code.build": "combine_next",
   "story_bot.tests.validate": "combine_next",
-  "story_bot._behavior.shape": "manual",
+  "story_bot._behavior.shape": "skip",
   "story_bot._behavior.scenarios": "combine_with_next",
   "story_bot._behavior.tests": "combine_with_next",
-  "story_bot._behavior.code": "manual"
+  "story_bot._behavior.code": "manual",
+  "story_bot._behavior.prioritization": "skip",
+  "story_bot._behavior.exploration": "skip"
 }

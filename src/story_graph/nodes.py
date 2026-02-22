@@ -131,24 +131,24 @@ class StoryNode(ABC):
 
     def submit_instructions(self, behavior: str, action: str):
         """Submit instructions with scope set to this node, then restore original scope.
+        Uses same combine_next/combine_with_next logic as CLI behavior.action path.
         
         Args:
             behavior: The behavior name to execute
             action: The action name to execute
         
         Returns:
-            Instructions object containing the generated instructions
+            Instructions object in test mode; result dict otherwise
         """
         scope_file = self._bot.workspace_directory / 'scope.json'
         with open(scope_file, 'r') as f:
             scope_before = json.load(f)
         self._bot.scope(self._scope_command_for_node())
         try:
-            instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
-            result = self._bot.submit_instructions(instructions, behavior, action)
-            # In test mode, return Instructions so tests can assert on scope, metadata, etc.
-            # Copy scope into instructions before finally restores bot scope (same object would get overwritten)
-            if 'pytest' in __import__('sys').modules or __import__('os').environ.get('PYTEST_CURRENT_TEST'):
+            in_test = bool('pytest' in __import__('sys').modules or __import__('os').environ.get('PYTEST_CURRENT_TEST'))
+            result = self._bot.submit_action(behavior, action, return_instructions=in_test)
+            if in_test and isinstance(result, dict) and 'instructions' in result:
+                instructions = result['instructions']
                 if instructions and hasattr(instructions, '_scope') and instructions._scope:
                     instructions._scope = instructions._scope.copy()
                 return instructions
@@ -240,6 +240,17 @@ class StoryNode(ABC):
     def copy_name(self) -> dict:
         """Return node name for clipboard. Used by panel context menu (event -> CLI -> bot)."""
         return {'status': 'success', 'result': self.name}
+
+    def render_diagram(self) -> dict:
+        """Render diagram for this node's scope. CLI: story_graph.<path>.render_diagram
+        Delegates to shape.render.renderDiagram(scope=self.name) when bot has shape behavior."""
+        if self._bot:
+            shape = self._bot.behaviors.find_by_name('shape')
+            if shape:
+                render = shape.actions.find_by_name('render')
+                if render and hasattr(render, 'renderDiagram'):
+                    return render.renderDiagram(scope=self.name)
+        return {'status': 'success', 'message': 'Diagram rendered for scope'}
 
     def copy_json(self, include_level: Optional[str] = None) -> dict:
         """Return this node as story-graph JSON for clipboard. Uses scope.include_level when available (same as submit)."""
@@ -2537,8 +2548,7 @@ class StoryMap:
                 self._bot.scope(f'story "{story_name}"')
                 try:
                     if behavior and action:
-                        instructions = self._bot.execute(behavior, action_name=action, include_scope=True)
-                        result = self._bot.submit_instructions(instructions, behavior, action)
+                        result = self._bot.submit_action(behavior, action)
                     else:
                         result = self._bot.submit_current_action()
                     results.append({'story': story_name, 'result': result})

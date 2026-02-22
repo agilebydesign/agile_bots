@@ -1,7 +1,9 @@
 {
-  "type": "showAll",
-  "value": [],
+  "type": "story",
+  "value": [
+    "Render Diagram Selected Node"
+  ],
   "exclude": [],
   "skiprule": [],
-  "include_level": "examples"
+  "include_level": "code"
 }

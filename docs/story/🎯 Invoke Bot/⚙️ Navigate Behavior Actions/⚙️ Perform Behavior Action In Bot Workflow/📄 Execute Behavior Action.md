@@ -15,7 +15,11 @@ Execute Behavior Action functionality for the mob minion system.
 
 ### Behavioral Acceptance Criteria
 
-- **When** action executes, **then** action completes successfully
+- **When** User submits behavior (collapsed in Panel)
+  **then** Bot runs the whole behavior (all actions) using manual / combine_with_next / skip logic
+
+- **When** User submits action (expanded in Panel)
+  **then** Bot runs the selected action or the first executable action
 
 ## Scenarios
 
@@ -49,6 +53,28 @@ Then Forwards to current action (strategy)
 Given No behavior_action_state.json exists
 When Bot.execute_behavior('shape') is called
 Then Executes directly (entry workflow handling was in removed wrapper)
+```
+
+
+<a id="scenario-submit-behavior-collapsed-runs-whole-behavior"></a>
+### Scenario: [Submit behavior (collapsed) runs whole behavior](#scenario-submit-behavior-collapsed-runs-whole-behavior) (happy_path)
+
+**Steps:**
+```gherkin
+Given Panel has shape behavior collapsed and selected
+When Panel invokes submit (behavior-level)
+Then Bot runs shape behavior (all actions) using manual / combine_with_next / skip logic
+```
+
+
+<a id="scenario-submit-action-expanded-runs-selected-action"></a>
+### Scenario: [Submit action (expanded) runs selected action](#scenario-submit-action-expanded-runs-selected-action) (happy_path)
+
+**Steps:**
+```gherkin
+Given Panel has shape behavior expanded with shape.strategy selected
+When Panel invokes submit (action-level)
+Then Bot runs shape.strategy
 ```
 
 

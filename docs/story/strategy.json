@@ -78,36 +78,34 @@
   },
   "tests": {
     "decisions": {
-      "test_scope": "Integration tests",
-      "helper_structure": "Create drawio_story_map_helper.py in test/invoke_bot/perform_action/ extending BaseHelper",
-      "test_data_fixtures": "Create test/invoke_bot/perform_action/fixtures/ directory with JSON/XML test data files"
+      "test_scope": [
+        "Integration tests - Test interactions between components",
+        "End-to-end tests - Test complete user workflows",
+        "All levels - Comprehensive test coverage across all levels"
+      ],
+      "helper_structure": "Feature helpers extend BaseHelper(parent), in test/invoke_bot/<subepic>/",
+      "test_data_fixtures": "Fixtures in test/invoke_bot/<subepic>/fixtures/ as needed"
     },
     "assumptions": [
-      "Tests call NEW domain model classes (DrawIOStoryMap, DrawIOElement, DrawIOStoryNode, UpdateReport, LayoutData) - NOT old synchronizers code",
+      "Tests call domain model classes",
       "Domain model sources guide implementation: walkthrough realizations (object flows), CRC cards (responsibilities), acceptance criteria (behavior)",
-      "Old synchronizers code (StoryIODiagram, DrawIORenderer, DrawIOSynchronizer) used ONLY for algorithm reference - architecture is replaced",
-      "Tests use tmp_path workspace for all file operations - no writes to production bot workspace or production story graph",
-      "Helper pattern: drawio_story_map_helper.py extends BaseHelper(parent), accessed via helper.drawio_story_map",
-      "Test structure: test/invoke_bot/perform_action/test_render_drawio_diagrams.py with classes per story",
-      "Test methods named after scenarios: test_render_outline_diagram_from_story_map_with_default_layout",
-      "Node panel tests in test/invoke_bot/perform_action/test_synchronized_graph_with_rendered_diagram_content.js test DOM rendering with jsdom (same location and naming as .py file)",
+      "Tests use tmp_path workspace for all file operations - no writes to production",
+      "Helper pattern: feature helpers extend BaseHelper(parent), accessed via helper.feature_name",
       "All test code uses ASCII-only characters (no Unicode in code, docstrings OK)",
-      "Tests should fail naturally if production code doesn't exist - write tests FIRST per TDD"
+      "Tests should fail naturally if production code doesn't exist - write tests FIRST per TDD",
+      "Bulk of business logic tests done against domain layer objects directly - no CLI",
+      "Minimal happy path testing done with separate tests that go through CLI",
+      "Panel tests (JS node test) focus on rendering and button layout - route through CLI and domain where possible, do not stub",
+      "Use generic fixture names - no story-specific identifiers in test code"
     ]
   },
   "code": {
-    "decisions": {
-      "architecture_and_design": "DrawIO classes MUST inherit from base StoryNode/StoryMap hierarchy"
-    },
+    "decisions": {},
     "assumptions": [
-      "DrawIOStoryNode inherits from BOTH DrawIOElement AND StoryNode - shares .children, __iter__, __getitem__, walk(), node_type",
-      "DrawIOEpic inherits from DrawIOStoryNode (which inherits StoryNode) - shares .sub_epics, .all_stories, .children iteration",
-      "DrawIOSubEpic inherits from DrawIOStoryNode - shares .children iteration",
-      "DrawIOStory inherits from DrawIOStoryNode - shares .story_type, .users, .acceptance_criteria, .scenarios",
-      "DrawIOStoryMap inherits from StoryMap - shares .epics, .walk(), .all_stories, .save() with no params",
-      "DrawIOStoryMap.save() derives output path internally from diagram_type: workspace/docs/story/story-map-{diagram_type}.drawio",
-      "DrawIOStoryMap.save() takes no parameters - it knows its own path like StoryMap.save()",
-      "No parallel hierarchy - one unified tree where DrawIO nodes ARE StoryNodes with added position/style/serialization"
+      "Domain has the most business logic",
+      "CLI has minimum logic - wraps parameters from STDIO into domain and wraps results back",
+      "Main objects have format-specific extensions",
+      "Panel is responsible for rendering, display, and user-specific actions - minimal business logic, routes to CLI for everything"
     ]
   }
 }

@@ -89,7 +89,8 @@ class FunctionSizeScanner(JSCodeScanner):
             
             # Function Declaration: function foo() {}
             if node_type == 'FunctionDeclaration':
-                name = node.get('id', {}).get('name', '<anonymous>')
+                id_node = node.get('id') or {}
+                name = id_node.get('name', '<anonymous>') if isinstance(id_node, dict) else '<anonymous>'
                 loc = node.get('loc', {})
                 start = loc.get('start', {}).get('line', 0)
                 end = loc.get('end', {}).get('line', 0)
@@ -106,8 +107,10 @@ class FunctionSizeScanner(JSCodeScanner):
             
             # Function Expression: const foo = function() {}
             elif node_type == 'FunctionExpression':
-                # Try to get name from function itself or parent
-                name = node.get('id', {}).get('name') or parent_name or '<anonymous>'
+                # Try to get name from function itself or parent (id may be None)
+                id_node = node.get('id') or {}
+                name = id_node.get('name') if isinstance(id_node, dict) else None
+                name = name or parent_name or '<anonymous>'
                 loc = node.get('loc', {})
                 start = loc.get('start', {}).get('line', 0)
                 end = loc.get('end', {}).get('line', 0)
@@ -115,7 +118,8 @@ class FunctionSizeScanner(JSCodeScanner):
             
             # Method Definition: class X { method() {} }
             elif node_type == 'MethodDefinition':
-                name = node.get('key', {}).get('name', '<method>')
+                key_node = node.get('key') or {}
+                name = key_node.get('name', '<method>') if isinstance(key_node, dict) else '<method>'
                 func_node = node.get('value', {})
                 loc = func_node.get('loc', {})
                 start = loc.get('start', {}).get('line', 0)
@@ -124,7 +128,8 @@ class FunctionSizeScanner(JSCodeScanner):
             
             # Variable Declarator: const foo = ... (pass name to children)
             elif node_type == 'VariableDeclarator':
-                var_name = node.get('id', {}).get('name')
+                id_node = node.get('id') or {}
+                var_name = id_node.get('name') if isinstance(id_node, dict) else None
                 if var_name:
                     visit_node(node.get('init'), var_name)
                     return

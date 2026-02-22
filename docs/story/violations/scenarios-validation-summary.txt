@@ -1,5 +1,3 @@
-=== SCENARIOS VALIDATION (scope: Add Special Instructions) ===
+=== SCENARIOS VALIDATION (scope: Render Diagram Selected Node) ===
 
-Rule scenarios_cover_all_cases.json: 2 file-by-file, 0 cross-file violations
-
-Total: 1 rule(s) with violations
+No violations found.

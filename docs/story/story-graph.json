@@ -8695,7 +8695,16 @@
               "name": "Act With Selected Node",
               "sequential_order": 3.0,
               "behavior": null,
-              "domain_concepts": [],
+              "domain_concepts": [
+                {"name": "StoryMapView", "responsibilities": [{"name": "Shows diagram action buttons", "collaborators": ["RenderDiagram", "SaveLayout", "ClearLayout", "UpdateGraph"]}]},
+                {"name": "RenderDiagram", "responsibilities": [{"name": "Renders diagram for scope", "collaborators": ["StoryNode", "StoryMap"]}]},
+                {"name": "SaveLayout", "responsibilities": [{"name": "Persists layout to DrawIO", "collaborators": ["DrawIO"]}]},
+                {"name": "ClearLayout", "responsibilities": [{"name": "Clears diagram layout", "collaborators": ["DrawIO"]}]},
+                {"name": "UpdateGraph", "responsibilities": [{"name": "Applies changes to story graph", "collaborators": ["UpdateReport", "StoryMap"]}]},
+                {"name": "DrawIO", "responsibilities": [{"name": "Persists layout", "collaborators": ["File"]}]},
+                {"name": "UpdateReport", "responsibilities": [{"name": "Reports changes", "collaborators": ["StoryMap"]}]},
+                {"name": "render_diagram", "responsibilities": [{"name": "CLI command to render diagram for scope", "collaborators": ["RenderDiagram"]}]}
+              ],
               "test_file": "invoke_bot/edit_story_map/test_submit_scoped_action.py",
               "sub_epics": [],
               "story_groups": [
@@ -10135,8 +10144,65 @@
                       "connector": null,
                       "story_type": "user",
                       "users": [],
-                      "test_class": null,
-                      "scenarios": [],
+                      "test_class": "TestRenderDiagramSelectedNode",
+                      "scenarios": [
+                        {
+                          "name": "Panel action bar successfully shows diagram buttons when StoryNode selected",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_action_bar_shows_diagram_buttons_when_story_node_selected",
+                          "steps": "Given StoryNode is selected in StoryMap tree\nWhen Panel displays action bar for selected node\nThen Panel shows Render diagram, Save layout, Clear layout, Update graph buttons"
+                        },
+                        {
+                          "name": "Panel renders diagram for selected node scope",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_renders_diagram_for_selected_node_scope",
+                          "steps": "Given StoryNode is selected in StoryMap tree\nWhen User clicks Render diagram in Panel\nThen Panel renders diagram for selected node scope"
+                        },
+                        {
+                          "name": "Panel persists layout to DrawIO file",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_persists_layout_to_drawio_file",
+                          "steps": "Given StoryNode is selected and diagram is rendered\nWhen User clicks Save layout in Panel\nThen Panel persists layout to DrawIO file"
+                        },
+                        {
+                          "name": "Panel generates update report and applies changes to story graph",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_panel_generates_update_report_and_applies_changes_to_story_graph",
+                          "steps": "Given Diagram has changes from StoryMap\nWhen User clicks Update graph in Panel\nThen Panel generates UpdateReport\nAnd Panel applies changes to story-graph.json"
+                        },
+                        {
+                          "name": "CLI renders diagram for current scope and reports completion",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_renders_diagram_for_current_scope_and_reports_completion",
+                          "steps": "Given scope is set to Act With Selected Node path\nWhen User runs cli.story_graph render_diagram\nThen CLI renders diagram for current scope\nAnd CLI reports completion"
+                        },
+                        {
+                          "name": "Diagram renders for empty StoryNode scope",
+                          "sequential_order": 6.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_diagram_renders_for_empty_story_node_scope",
+                          "steps": "Given StoryNode scope is empty\nWhen User clicks Render diagram in Panel\nThen Panel renders diagram with empty layout"
+                        },
+                        {
+                          "name": "Diagram render fails when StoryNode not found",
+                          "sequential_order": 7.0,
+                          "type": "error_case",
+                          "background": [],
+                          "test_method": "test_diagram_render_fails_when_story_node_not_found",
+                          "steps": "Given StoryNode is not in StoryMap\nWhen User clicks Render diagram in Panel\nThen Panel reports error and does not render"
+                        }
+                      ],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User selects story node in Panel story tree\nTHEN Panel action bar shows [Render diagram] [Save layout] [Clear layout] [Update graph] buttons",
@@ -13561,6 +13627,22 @@
                           "steps": "Given No behavior_action_state.json exists\nWhen Bot.execute_behavior('shape') is called\nThen Executes directly (entry workflow handling was in removed wrapper)"
                         },
                         {
+                          "name": "Submit behavior (collapsed) runs whole behavior",
+                          "sequential_order": 3.5,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel has shape behavior collapsed and selected\nWhen Panel invokes submit (behavior-level)\nThen Bot runs shape behavior (all actions) using manual / combine_with_next / skip logic"
+                        },
+                        {
+                          "name": "Submit action (expanded) runs selected action",
+                          "sequential_order": 3.6,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel has shape behavior expanded with shape.strategy selected\nWhen Panel invokes submit (action-level)\nThen Bot runs shape.strategy"
+                        },
+                        {
                           "name": "Behavior action order determines next action from current_action",
                           "sequential_order": 4.0,
                           "type": "happy_path",
@@ -13617,7 +13699,18 @@
                           "steps": ""
                         }
                       ],
-                      "acceptance_criteria": [],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User submits behavior (collapsed in Panel) THEN Bot runs the whole behavior (all actions) using manual / combine_with_next / skip logic",
+                          "text": "WHEN User submits behavior (collapsed in Panel) THEN Bot runs the whole behavior (all actions) using manual / combine_with_next / skip logic",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User submits action (expanded in Panel) THEN Bot runs the selected action or the first executable action",
+                          "text": "WHEN User submits action (expanded in Panel) THEN Bot runs the selected action or the first executable action",
+                          "sequential_order": 2.0
+                        }
+                      ],
                       "behavior": null
                     },
                     {
@@ -13631,25 +13724,41 @@
                       "test_class": "TestExecuteBehaviorAction",
                       "scenarios": [
                         {
-                          "name": "",
+                          "name": "Skip behavior shows grayed unchecked circle and is non-interactive",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
                           "test_method": null,
-                          "steps": "Given Panel displays behavior hierarchy\nAnd Bot is at shape.clarify\nWhen User clicks discovery behavior\nThen Bot navigates to discovery.clarify (first action)\nAnd Panel displays discovery behavior as current\nAnd Panel expands discovery behavior\nAnd Panel displays discovery.clarify as current action\nAnd Bot executes discovery.clarify.instructions operation"
+                          "steps": "Given Panel displays behavior hierarchy\nAnd prioritization behavior has execute set to skip\nWhen Panel renders the behavior list\nThen Panel shows prioritization's circle as grayed out\nAnd Panel shows prioritization's circle as unchecked (no checkmark)\nAnd User click on prioritization does nothing"
                         },
                         {
-                          "name": "",
+                          "name": "Collapsed behavior click selects only",
                           "sequential_order": 2.0,
-                          "type": "",
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays behavior hierarchy\nAnd discovery behavior is collapsed and not skip\nWhen User clicks discovery behavior\nThen Panel selects discovery behavior (empty circle → checkmark)\nAnd Panel does not navigate to an action\nAnd Bot does not execute"
+                        },
+                        {
+                          "name": "Collapsed Submit submits whole behavior",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays behavior hierarchy\nAnd shape behavior is collapsed and selected\nWhen User clicks Submit\nThen Panel submits the whole shape behavior (all actions)\nAnd Bot runs shape using manual / combine_with_next / skip logic"
+                        },
+                        {
+                          "name": "Expanded action click navigates and executes",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
                           "background": [],
                           "test_method": null,
                           "steps": "Given Panel displays expanded shape behavior\nAnd Bot is at shape.clarify\nWhen User clicks shape.strategy action\nThen Bot navigates to shape.strategy\nAnd Panel displays shape.strategy as current action\nAnd Panel expands shape.strategy showing operations\nAnd Bot executes shape.strategy.instructions operation"
                         },
                         {
-                          "name": "",
-                          "sequential_order": 3.0,
-                          "type": "",
+                          "name": "Operation click executes and updates current",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
                           "background": [],
                           "test_method": null,
                           "steps": "Given Panel displays expanded shape.clarify action\nAnd Operations are visible (instructions, execute, confirm)\nWhen User clicks clarify.confirm operation\nThen Bot executes clarify.confirm operation\nAnd Panel displays confirm operation as current"
@@ -13657,14 +13766,29 @@
                       ],
                       "acceptance_criteria": [
                         {
-                          "name": "WHEN User clicks behavior\nTHEN System displays that behavior as current AND System expands behavior AND System expands first action to display operations AND System sets first action as current AND System sets first operation as current AND System executes first operation of first action of that behavior",
-                          "text": "WHEN User clicks behavior\nTHEN System displays that behavior as current AND System expands behavior AND System expands first action to display operations AND System sets first action as current AND System sets first operation as current AND System executes first operation of first action of that behavior",
+                          "name": "WHEN User clicks collapsed behavior (not skip) THEN System selects that behavior (empty circle → checkmark) AND System does not navigate to an action AND System does not execute",
+                          "text": "WHEN User clicks collapsed behavior (not skip) THEN System selects that behavior (empty circle → checkmark) AND System does not navigate to an action AND System does not execute",
                           "sequential_order": 1.0
                         },
                         {
-                          "name": "WHEN User clicks action\nTHEN System displays that action as current AND System expands action to display operations AND System sets first operation as current AND System executes first operation of that action",
-                          "text": "WHEN User clicks action\nTHEN System displays that action as current AND System expands action to display operations AND System sets first operation as current AND System executes first operation of that action",
+                          "name": "WHEN Behavior has execute set to skip THEN System displays that behavior's circle as grayed out and unchecked (no checkmark) AND System treats that behavior as non-interactive (click does nothing)",
+                          "text": "WHEN Behavior has execute set to skip THEN System displays that behavior's circle as grayed out and unchecked (no checkmark) AND System treats that behavior as non-interactive (click does nothing)",
                           "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User clicks Submit and behavior is collapsed THEN System submits the whole behavior (all actions) using manual / combine_with_next / skip logic",
+                          "text": "WHEN User clicks Submit and behavior is collapsed THEN System submits the whole behavior (all actions) using manual / combine_with_next / skip logic",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User clicks Submit and behavior is expanded THEN System submits the selected action or the first executable action",
+                          "text": "WHEN User clicks Submit and behavior is expanded THEN System submits the selected action or the first executable action",
+                          "sequential_order": 4.0
+                        },
+                        {
+                          "name": "WHEN User clicks action (behavior expanded) THEN System displays that action as current AND System expands action to display operations AND System sets first operation as current AND System executes first operation of that action",
+                          "text": "WHEN User clicks action (behavior expanded) THEN System displays that action as current AND System expands action to display operations AND System sets first operation as current AND System executes first operation of that action",
+                          "sequential_order": 5.0
                         }
                       ],
                       "behavior": null
@@ -14164,6 +14288,22 @@
                           "background": [],
                           "test_method": null,
                           "steps": "Given a Behavior with Build and Validate actions\nAnd Build and Validate have execution set to Combine (combine_next)\nWhen Bot combines instructions for Build and Validate\nThen Bot mentions rules and describes them only once\nAnd Bot refers to those rules in the other action instead of repeating the full description"
+                        },
+                        {
+                          "name": "Collapsed submit with skip action skips that action within behavior",
+                          "sequential_order": 13.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given shape behavior is collapsed and selected\nAnd shape.strategy has execution set to Skip\nWhen User clicks Submit\nThen Panel submits whole shape behavior\nAnd Bot runs shape and skips shape.strategy"
+                        },
+                        {
+                          "name": "Collapsed submit with combine_next actions combines within behavior",
+                          "sequential_order": 14.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given shape behavior is collapsed and selected\nAnd shape.clarify and shape.strategy have execution set to combine_next\nWhen User clicks Submit\nThen Panel submits whole shape behavior\nAnd Bot combines clarify and strategy instructions within shape"
                         }
                       ],
                       "acceptance_criteria": [
@@ -14241,6 +14381,16 @@
                           "name": "WHEN Bot combines Build and Validate actions (or both appear in a combined block) THEN Bot mentions rules and describes them only once AND Bot refers to those rules in the other action instead of repeating the full description",
                           "text": "WHEN Bot combines Build and Validate actions (or both appear in a combined block) THEN Bot mentions rules and describes them only once AND Bot refers to those rules in the other action instead of repeating the full description",
                           "sequential_order": 15.0
+                        },
+                        {
+                          "name": "WHEN User submits behavior (collapsed) and behavior has actions set to skip THEN Bot skips those actions within the behavior",
+                          "text": "WHEN User submits behavior (collapsed) and behavior has actions set to skip THEN Bot skips those actions within the behavior",
+                          "sequential_order": 16.0
+                        },
+                        {
+                          "name": "WHEN User submits behavior (collapsed) and behavior has actions set to combine_next THEN Bot combines those actions' instructions within the behavior",
+                          "text": "WHEN User submits behavior (collapsed) and behavior has actions set to combine_next THEN Bot combines those actions' instructions within the behavior",
+                          "sequential_order": 17.0
                         }
                       ],
                       "behavior": null
@@ -14252,7 +14402,32 @@
                       "story_type": "user",
                       "users": [],
                       "test_class": null,
-                      "scenarios": [],
+                      "scenarios": [
+                        {
+                          "name": "Skip behavior is dimmed and non-interactive",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given prioritization behavior has execute set to skip\nWhen Panel displays behavior hierarchy\nThen Panel shows prioritization as dimmed and non-interactive\nAnd User click on prioritization does nothing"
+                        },
+                        {
+                          "name": "Manual behavior submit runs each action per its setting",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given shape behavior has execute set to manual\nAnd shape has actions clarify (manual), strategy (auto)\nWhen User selects collapsed shape and clicks Submit\nThen Panel submits whole shape behavior\nAnd Bot runs clarify (waits for submit) then strategy (auto after clarify completes)"
+                        },
+                        {
+                          "name": "Combine with next behavior submit aggregates actions",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given shape has execute combine_with_next, scenarios has execute manual\nAnd shape and scenarios are consecutive non-skip behaviors\nWhen User selects collapsed shape and clicks Submit\nThen Panel submits whole shape behavior\nAnd Bot combines shape's non-skip actions with scenarios' non-skip actions (or runs shape alone if scenarios is skip)"
+                        }
+                      ],
                       "acceptance_criteria": [
                         {
                           "name": "WHEN User sets behavior execute to skip in Panel behavior dropdown AND User executes that behavior THEN Panel skips all actions in that behavior regardless of per-action setting",
@@ -15147,7 +15322,7 @@
                         {
                           "name": "User submits current action instructions",
                           "sequential_order": 1.0,
-                          "type": "",
+                          "type": "happy_path",
                           "background": [],
                           "test_method": "test_user_submits_current_action_instructions",
                           "steps": "GIVEN: CLI is at shape.clarify\nWHEN: user enters 'submit'\nTHEN: CLI tracks instruction submission\nAND: CLI returns success message with behavior and action\nAND: CLI includes timestamp of submission"
@@ -15155,17 +15330,142 @@
                         {
                           "name": "Submit command fails when no current action",
                           "sequential_order": 2.0,
-                          "type": "",
+                          "type": "error",
                           "background": [],
                           "test_method": "test_submit_command_fails_when_no_current_action",
                           "steps": "GIVEN: CLI has no current action set\nWHEN: user enters 'submit'\nTHEN: CLI displays error message\nAND: Error indicates no current action"
+                        },
+                        {
+                          "name": "CLI submit with behavior only prepares whole-behavior instructions",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given User is in CLI (no Panel)\nWhen User runs behaviors.shape.submit\nThen CLI/Bot prepares instructions for whole shape behavior (all actions per manual/combine_with_next/skip)\nAnd CLI returns success message with behavior name and timestamp"
+                        },
+                        {
+                          "name": "CLI submit with behavior and action prepares action instructions",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given User is in CLI (no Panel)\nWhen User runs behaviors.shape.clarify.submit\nThen CLI/Bot prepares instructions for shape.clarify\nAnd CLI returns success message with behavior and action and timestamp"
                         }
                       ],
                       "acceptance_criteria": [
                         {
-                          "name": "WHEN User executes submit command\nTHEN System tracks instruction submission AND System returns success status with timestamp",
-                          "text": "WHEN User executes submit command\nTHEN System tracks instruction submission AND System returns success status with timestamp",
+                          "name": "WHEN User executes submit command THEN System tracks instruction submission AND System returns success status with timestamp",
+                          "text": "WHEN User executes submit command THEN System tracks instruction submission AND System returns success status with timestamp",
                           "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User runs CLI submit with behavior only (e.g. behaviors.shape.submit) THEN System prepares instructions for the whole behavior (all actions per manual / combine_with_next / skip) AND System returns success status with timestamp",
+                          "text": "WHEN User runs CLI submit with behavior only (e.g. behaviors.shape.submit) THEN System prepares instructions for the whole behavior (all actions per manual / combine_with_next / skip) AND System returns success status with timestamp",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User runs CLI submit with behavior and action (e.g. behaviors.shape.clarify.submit) THEN System prepares instructions for that action AND System returns success status with timestamp",
+                          "text": "WHEN User runs CLI submit with behavior and action (e.g. behaviors.shape.clarify.submit) THEN System prepares instructions for that action AND System returns success status with timestamp",
+                          "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Submit Instructions To AI Agent Panel",
+                      "sequential_order": 3.5,
+                      "connector": "and",
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestSubmitInstructionsToAIAgent",
+                      "scenarios": [
+                        {
+                          "name": "Panel submit with collapsed behavior prepares whole-behavior instructions",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel has shape behavior collapsed and selected\nWhen Panel invokes submit (via CLI)\nThen CLI/Bot prepares instructions for whole shape behavior (all actions per manual/combine_with_next/skip)"
+                        },
+                        {
+                          "name": "Panel submit with expanded behavior prepares instructions for selected action",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel has shape behavior expanded\nAnd shape.clarify is the selected action\nWhen Panel invokes submit (via CLI)\nThen CLI/Bot prepares instructions for shape.clarify"
+                        },
+                        {
+                          "name": "Panel submit with expanded behavior prepares instructions for first executable when none selected",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel has shape behavior expanded\nAnd no action is explicitly selected (first action is current)\nWhen Panel invokes submit (via CLI)\nThen CLI/Bot prepares instructions for the first executable action in shape"
+                        },
+                        {
+                          "name": "Submit sends instructions to AI chat",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays instructions for current action\nWhen User clicks submit button\nThen System sends instructions to Cursor AI chat\nAnd Panel displays success confirmation message\nAnd AI chat receives instructions"
+                        },
+                        {
+                          "name": "Submit fails when chat unavailable",
+                          "sequential_order": 5.0,
+                          "type": "error",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays instructions\nAnd Cursor AI chat is not available\nWhen User clicks submit button\nThen Panel displays error message\nAnd Error message indicates chat unavailable"
+                        },
+                        {
+                          "name": "Copy then submit",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given Panel displays instructions\nWhen User clicks copy button\nThen Instructions are copied to clipboard\nWhen User clicks submit button\nThen Instructions are also sent to AI chat"
+                        },
+                        {
+                          "name": "Submitted instructions include scope",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_submitted_instructions_include_complete_scope_with_story_tree",
+                          "steps": "Given Bot has scope set to story Open Panel\nAnd Scope.results contains full story graph hierarchy\nWhen User clicks submit in panel\nThen Submitted instructions contain Scope section at top\nAnd Scope section shows Story Scope: Open Panel\nAnd Scope section shows complete epic/sub-epic/story hierarchy"
+                        },
+                        {
+                          "name": "Submitted instructions include guardrails",
+                          "sequential_order": 8.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_submitted_instructions_include_all_guardrails",
+                          "steps": "Given Bot is at shape.build\nAnd User has answered clarify questions\nAnd User has made strategy decisions\nWhen User clicks submit in panel\nThen Submitted instructions include Clarify section with answers\nAnd Submitted instructions include Strategy section with decisions and assumptions\nAnd All saved guardrails are visible in submitted markdown"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User clicks Submit and behavior is collapsed in Panel THEN Panel invokes CLI AND System prepares instructions for the whole behavior (all actions per manual / combine_with_next / skip)",
+                          "text": "WHEN User clicks Submit and behavior is collapsed in Panel THEN Panel invokes CLI AND System prepares instructions for the whole behavior (all actions per manual / combine_with_next / skip)",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN User clicks Submit and behavior is expanded in Panel THEN Panel invokes CLI AND System prepares instructions for the selected action or the first executable action",
+                          "text": "WHEN User clicks Submit and behavior is expanded in Panel THEN Panel invokes CLI AND System prepares instructions for the selected action or the first executable action",
+                          "sequential_order": 2.0
+                        },
+                        {
+                          "name": "WHEN User clicks submit button THEN Submitted instructions include scope section AND Scope section includes scope type (story/files/all) AND Scope section includes scope filter values AND Scope section includes complete story graph tree when scope is story-based",
+                          "text": "WHEN User clicks submit button THEN Submitted instructions include scope section AND Scope section includes scope type (story/files/all) AND Scope section includes scope filter values AND Scope section includes complete story graph tree when scope is story-based",
+                          "sequential_order": 3.0
+                        },
+                        {
+                          "name": "WHEN User has answered clarify questions or made strategy decisions THEN Submitted instructions include all saved guardrails",
+                          "text": "WHEN User has answered clarify questions or made strategy decisions THEN Submitted instructions include all saved guardrails",
+                          "sequential_order": 4.0
                         }
                       ],
                       "behavior": null
@@ -16439,76 +16739,6 @@
                           "name": "WHEN User is on non-strategy actions (clarify, build, validate, render)\nTHEN System displays saved strategy decisions and criteria as read-only",
                           "text": "WHEN User is on non-strategy actions (clarify, build, validate, render)\nTHEN System displays saved strategy decisions and criteria as read-only",
                           "sequential_order": 4.0
-                        }
-                      ],
-                      "behavior": null
-                    },
-                    {
-                      "name": "Submit Instructions To AI Agent Panel",
-                      "sequential_order": 4.0,
-                      "connector": "and",
-                      "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestSubmitInstructionsToAIAgent",
-                      "scenarios": [
-                        {
-                          "name": "",
-                          "sequential_order": 1.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel displays instructions for current action\nWhen User clicks submit button\nThen System sends instructions to Cursor AI chat\nAnd Panel displays success confirmation message\nAnd AI chat receives instructions"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 2.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel displays instructions\nAnd Cursor AI chat is not available\nWhen User clicks submit button\nThen Panel displays error message\nAnd Error message indicates chat unavailable"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 3.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": null,
-                          "steps": "Given Panel displays instructions\nWhen User clicks copy button\nThen Instructions are copied to clipboard\nWhen User clicks submit button\nThen Instructions are also sent to AI chat"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 4.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_submitted_instructions_include_complete_scope_with_story_tree",
-                          "steps": "Given Bot has scope set to story Open Panel\nAnd Scope.results contains full story graph hierarchy\nWhen User clicks submit in panel\nThen Submitted instructions contain Scope section at top\nAnd Scope section shows Story Scope: Open Panel\nAnd Scope section shows complete epic/sub-epic/story hierarchy"
-                        },
-                        {
-                          "name": "",
-                          "sequential_order": 5.0,
-                          "type": "",
-                          "background": [],
-                          "test_method": "test_submitted_instructions_include_all_guardrails",
-                          "steps": "Given Bot is at shape.build\nAnd User has answered clarify questions\nAnd User has made strategy decisions\nWhen User clicks submit in panel\nThen Submitted instructions include Clarify section with answers\nAnd Submitted instructions include Strategy section with decisions and assumptions\nAnd All saved guardrails are visible in submitted markdown"
-                        }
-                      ],
-                      "acceptance_criteria": [
-                        {
-                          "name": "When user has clicked on a Behavior Action's Instructions AND User clicks submit button THEN System sends instructions to AI chat",
-                          "text": "When user has clicked on a Behavior Action's Instructions AND User clicks submit button THEN System sends instructions to AI chat",
-                          "sequential_order": 1.0
-                        },
-                        {
-                          "name": "WHEN User clicks submit button\nTHEN Submitted instructions include scope section AND Scope section includes scope type (story/files/all) AND Scope section includes scope filter values AND Scope section includes complete story graph tree when scope is story-based",
-                          "text": "WHEN User clicks submit button\nTHEN Submitted instructions include scope section AND Scope section includes scope type (story/files/all) AND Scope section includes scope filter values AND Scope section includes complete story graph tree when scope is story-based",
-                          "sequential_order": 2.0
-                        },
-                        {
-                          "name": "WHEN User has answered clarify questions or made strategy decisions\nTHEN Submitted instructions include all saved guardrails",
-                          "text": "WHEN User has answered clarify questions or made strategy decisions\nTHEN Submitted instructions include all saved guardrails",
-                          "sequential_order": 3.0
                         }
                       ],
                       "behavior": null

@@ -34,7 +34,7 @@ class SpecificationMatchScanner(TestScanner):
         violations.extend(self._check_assertions(tree, content, file_path))
         
         if story_graph:
-            violations.extend(self._check_specification_matches(tree, content, file_path, self.rule, story_graph))
+            violations.extend(self._check_specification_matches(tree, content, file_path, story_graph))
         
         return violations
     

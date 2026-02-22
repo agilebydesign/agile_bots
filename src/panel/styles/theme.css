@@ -138,6 +138,12 @@ img {
     background-color: var(--hover-bg);
 }
 
+/* Skip state: grayed out, not clickable, no hover highlight */
+.card-item.behavior-skip:hover,
+.card-item.action-skip:hover {
+    background-color: transparent;
+}
+
 .collapsible-header {
     margin: var(--space-xs) 0;
     padding: var(--space-sm);

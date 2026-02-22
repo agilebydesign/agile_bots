@@ -1,6 +1,6 @@
 # 📄 Add Special Instructions
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L634)
 
 **User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Navigate Behavior Actions](..) / [⚙️ Perform Behavior Action In Bot Workflow](.)  
@@ -15,7 +15,7 @@ Add Special Instructions functionality for the mob minion system.
 
 ### Behavioral Acceptance Criteria
 
-- **When** User enters text in Panel behavior-level Special Instructions text area (beside shape, before toggle group)
+- **When** User enters text in Panel behavior-level Special Instructions text area (beside shape, after toggle group above)
   **then** Panel stores that text for that behavior
 
 - **When** User enters text in Panel action-level Special Instructions text area (e.g. beside shape.clarify, same row)
@@ -30,7 +30,8 @@ Add Special Instructions functionality for the mob minion system.
 
 ## Scenarios
 
-### Scenario: Panel stores behavior-level special instructions (happy_path)
+<a id="scenario-panel-stores-behavior-level-special-instructions"></a>
+### Scenario: [Panel stores behavior-level special instructions](#scenario-panel-stores-behavior-level-special-instructions) (happy_path)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L636)
 
 **Steps:**
 ```gherkin
@@ -39,7 +40,9 @@ When User enters "focus on edge cases" in Panel behavior-level Special Instructi
 Then Panel stores "focus on edge cases" for shape Behavior
 ```
 
-### Scenario: Panel stores action-level special instructions (happy_path)
+
+<a id="scenario-panel-stores-action-level-special-instructions"></a>
+### Scenario: [Panel stores action-level special instructions](#scenario-panel-stores-action-level-special-instructions) (happy_path)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L643)
 
 **Steps:**
 ```gherkin
@@ -48,7 +51,9 @@ When User enters "emphasize validation" in Panel action-level Special Instructio
 Then Panel stores "emphasize validation" for shape Behavior and clarify Action
 ```
 
-### Scenario: Panel injects special instructions on Submit (happy_path)
+
+<a id="scenario-panel-injects-special-instructions-on-submit"></a>
+### Scenario: [Panel injects special instructions on Submit](#scenario-panel-injects-special-instructions-on-submit) (happy_path)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L651)
 
 **Steps:**
 ```gherkin
@@ -58,7 +63,9 @@ When User submits instructions in Panel
 Then Panel injects behavior-level and action-level special instructions into Instructions
 ```
 
-### Scenario: CLI stores and includes special instructions in next prompt (happy_path)
+
+<a id="scenario-cli-stores-and-includes-special-instructions-in-next-prompt"></a>
+### Scenario: [CLI stores and includes special instructions in next prompt](#scenario-cli-stores-and-includes-special-instructions-in-next-prompt) (happy_path)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L660)
 
 **Steps:**
 ```gherkin
@@ -68,7 +75,9 @@ Then CLI stores that instruction for shape.clarify
 And CLI includes it in next prompt
 ```
 
-### Scenario: Panel injects only behavior-level instructions when no action-level set (edge_case)
+
+<a id="scenario-panel-injects-only-behavior-level-instructions-when-no-action-level-set"></a>
+### Scenario: [Panel injects only behavior-level instructions when no action-level set](#scenario-panel-injects-only-behavior-level-instructions-when-no-action-level-set) (edge_case)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L668)
 
 **Steps:**
 ```gherkin
@@ -78,7 +87,9 @@ When User submits instructions in Panel
 Then Panel injects behavior-level special instructions into Instructions
 ```
 
-### Scenario: CLI reports failed when special_instructions command fails (error_case)
+
+<a id="scenario-cli-reports-failed-when-special_instructions-command-fails"></a>
+### Scenario: [CLI reports failed when special_instructions command fails](#scenario-cli-reports-failed-when-special_instructions-command-fails) (error_case)  | [Test](/test/invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py#L677)
 
 **Steps:**
 ```gherkin
@@ -87,3 +98,4 @@ And Bot or workspace is misconfigured
 When User runs cli.behaviors.shape.clarify.special_instructions "focus on edge cases"
 Then CLI reports failed to Terminal
 ```
+

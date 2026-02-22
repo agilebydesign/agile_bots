@@ -9,9 +9,7 @@
 
 ## Story Description
 
-Configure Behavior Execute functionality for the mob minion system. **Behavior-level** configuration (skip, combine with next, manual per behavior), not action-level.
-
-**Flow example:** shape (combine with next), prioritization (skip), exploration (skip), scenarios (manual) → run shape's non-skip actions together, skip prioritization, skip exploration, run scenarios (each action per its setting). Behavior skip is the same as action skip: skip entire behavior.
+Configure Behavior Execute functionality for the mob minion system.
 
 ## Acceptance Criteria
 
@@ -20,23 +18,52 @@ Configure Behavior Execute functionality for the mob minion system. **Behavior-l
 - **When** User sets behavior execute to skip in Panel behavior dropdown AND User executes that behavior
   **then** Panel skips all actions in that behavior regardless of per-action setting
 
-- **When** User sets behavior execute to combine with next in Panel AND User selects behavior (actions collapsed inside) AND User clicks Submit Instructions
-  **then** Panel combines that behavior's non-skip actions with the next non-skip behavior's non-skip actions into one aggregated instruction block (or runs that behavior's actions alone if next is skip, then continues to the next behavior after that and runs it if able)
+- **When** User sets behavior execute to auto in Panel AND User executes that behavior
+  **then** Panel runs auto and manual actions
   **and** Panel skips actions marked skip
 
 - **When** User sets behavior execute to manual in Panel AND User executes that behavior
-  **then** Panel performs each action according to that action's auto/manual setting
+  **then** Panel performs each action according to that action's skip/auto/manual setting
 
-- **When** User runs cli.behaviors.shape.set_execute combine_with_next
-  **then** CLI sets behavior execute to combine with next for that behavior
+- **When** User runs cli.behaviors.shape.set_execute auto
+  **then** CLI sets behavior execute to auto for that behavior
 
 ## Scenarios
 
-### Scenario: Configure Behavior Execute (happy_path)
+<a id="scenario-skip-behavior-is-dimmed-and-non-interactive"></a>
+### Scenario: [Skip behavior is dimmed and non-interactive](#scenario-skip-behavior-is-dimmed-and-non-interactive) (happy_path)
 
 **Steps:**
 ```gherkin
-Given system is ready
-When action executes
-Then action completes successfully
+Given prioritization behavior has execute set to skip
+When Panel displays behavior hierarchy
+Then Panel shows prioritization as dimmed and non-interactive
+And User click on prioritization does nothing
 ```
+
+
+<a id="scenario-manual-behavior-submit-runs-each-action-per-its-setting"></a>
+### Scenario: [Manual behavior submit runs each action per its setting](#scenario-manual-behavior-submit-runs-each-action-per-its-setting) (happy_path)
+
+**Steps:**
+```gherkin
+Given shape behavior has execute set to manual
+And shape has actions clarify (manual), strategy (auto)
+When User selects collapsed shape and clicks Submit
+Then Panel submits whole shape behavior
+And Bot runs clarify (waits for submit) then strategy (auto after clarify completes)
+```
+
+
+<a id="scenario-combine-with-next-behavior-submit-aggregates-actions"></a>
+### Scenario: [Combine with next behavior submit aggregates actions](#scenario-combine-with-next-behavior-submit-aggregates-actions) (happy_path)
+
+**Steps:**
+```gherkin
+Given shape has execute combine_with_next, scenarios has execute manual
+And shape and scenarios are consecutive non-skip behaviors
+When User selects collapsed shape and clicks Submit
+Then Panel submits whole shape behavior
+And Bot combines shape's non-skip actions with scenarios' non-skip actions (or runs shape alone if scenarios is skip)
+```
+

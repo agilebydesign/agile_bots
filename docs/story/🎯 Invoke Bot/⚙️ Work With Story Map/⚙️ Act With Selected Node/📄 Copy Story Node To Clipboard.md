@@ -1,6 +1,6 @@
 # 📄 Copy Story Node To Clipboard
 
-**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1210)
+**Navigation:** [📄‹ Story Map](../../../../story-map.drawio) | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1212)
 
 **User:** System
 **Path:** [🎯 Invoke Bot](../..) / [⚙️ Work With Story Map](..) / [⚙️ Act With Selected Node](.)  
@@ -20,7 +20,7 @@ Copy Story Node To Clipboard functionality for the mob minion system.
 ## Scenarios
 
 <a id="scenario-storynode-copy_name-returns-node-name-for-clipboard"></a>
-### Scenario: [StoryNode copy_name returns node name for clipboard](#scenario-storynode-copy_name-returns-node-name-for-clipboard) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1213)
+### Scenario: [StoryNode copy_name returns node name for clipboard](#scenario-storynode-copy_name-returns-node-name-for-clipboard) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1215)
 
 **Steps:**
 ```gherkin
@@ -34,7 +34,7 @@ AND: the result can be written to system clipboard by the panel
 
 
 <a id="scenario-storynode-copy_json-returns-node-as-story-graph-json"></a>
-### Scenario: [StoryNode copy_json returns node as story-graph JSON](#scenario-storynode-copy_json-returns-node-as-story-graph-json) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1283)
+### Scenario: [StoryNode copy_json returns node as story-graph JSON](#scenario-storynode-copy_json-returns-node-as-story-graph-json) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1285)
 
 **Steps:**
 ```gherkin
@@ -48,7 +48,7 @@ AND: the result can be serialized to JSON and written to system clipboard by the
 
 
 <a id="scenario-cli-resolves-story_graph-path-and-copy_name-returns-node-name"></a>
-### Scenario: [CLI resolves story_graph path and copy_name returns node name](#scenario-cli-resolves-story_graph-path-and-copy_name-returns-node-name) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1477)
+### Scenario: [CLI resolves story_graph path and copy_name returns node name](#scenario-cli-resolves-story_graph-path-and-copy_name-returns-node-name) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1574)
 
 **Steps:**
 ```gherkin
@@ -61,7 +61,7 @@ AND: response result is the SubEpic node name "Manage Bot"
 
 
 <a id="scenario-cli-resolves-story_graph-path-and-copy_json-returns-node-dict"></a>
-### Scenario: [CLI resolves story_graph path and copy_json returns node dict](#scenario-cli-resolves-story_graph-path-and-copy_json-returns-node-dict) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1507)
+### Scenario: [CLI resolves story_graph path and copy_json returns node dict](#scenario-cli-resolves-story_graph-path-and-copy_json-returns-node-dict) (happy_path)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1604)
 
 **Steps:**
 ```gherkin
@@ -74,7 +74,7 @@ AND: response result is a dict with name "Manage Bot" and story-graph shape for 
 
 
 <a id="scenario-cli-copy_name-on-non-existent-node-path-returns-error"></a>
-### Scenario: [CLI copy_name on non-existent node path returns error](#scenario-cli-copy_name-on-non-existent-node-path-returns-error) (error_case)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1539)
+### Scenario: [CLI copy_name on non-existent node path returns error](#scenario-cli-copy_name-on-non-existent-node-path-returns-error) (error_case)  | [Test](/test/invoke_bot/edit_story_map/test_submit_scoped_action.py#L1636)
 
 **Steps:**
 ```gherkin

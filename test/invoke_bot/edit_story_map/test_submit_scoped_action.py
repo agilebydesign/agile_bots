@@ -1650,3 +1650,5 @@ class TestCopyStoryNodeToClipboardCLI:
 
         assert "not found" in cli_response.output or "error" in cli_response.output.lower()
         assert "Non-existent Node" in cli_response.output
+
+

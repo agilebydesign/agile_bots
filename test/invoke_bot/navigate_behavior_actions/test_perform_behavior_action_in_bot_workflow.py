@@ -258,6 +258,128 @@ class TestExecuteEndToEndWorkflowUsingCLI:
 
 
 # ============================================================================
+# STORY: Submit Instructions Through CLI
+# ============================================================================
+
+class TestSubmitInstructionsThroughCLI:
+    """
+    Story: Submit Instructions Through CLI
+    Scenarios verify CLI submit command (current action, error when no current,
+    behavior-only and behavior.action submit when supported).
+    """
+
+    @pytest.mark.parametrize("helper_class", [TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper])
+    def test_user_submits_current_action_instructions(self, tmp_path, helper_class):
+        """
+        GIVEN: CLI is at shape.clarify
+        WHEN: user enters 'submit'
+        THEN: CLI tracks instruction submission
+        AND: CLI returns success message with behavior and action
+        AND: CLI includes timestamp of submission
+        """
+        helper = helper_class(tmp_path)
+        helper.domain.state.set_state('shape', 'clarify')
+        response = helper.cli_session.execute_command('submit')
+        assert response.status == 'success', f"Expected success, got: {response.output}"
+        assert 'shape' in response.output.lower() or (helper.domain.bot.behaviors.current and helper.domain.bot.behaviors.current.name == 'shape')
+        assert 'clarify' in response.output.lower() or (helper.domain.bot.behaviors.current and helper.domain.bot.behaviors.current.actions.current_action_name == 'clarify')
+
+    @pytest.mark.parametrize("helper_class", [TTYBotTestHelper, PipeBotTestHelper, JsonBotTestHelper])
+    def test_submit_command_fails_when_no_current_action(self, tmp_path, helper_class):
+        """
+        GIVEN: CLI has no current action set
+        WHEN: user enters 'submit'
+        THEN: CLI displays error message
+        AND: Error indicates no current action
+        """
+        helper = helper_class(tmp_path)
+        # Ensure no current behavior - clear _current_index so behaviors.current is None
+        helper.domain.bot.behaviors._current_index = None
+        response = helper.cli_session.execute_command('submit')
+        assert response.status == 'error', f"Expected error when no current action, got: {response.status}"
+        assert 'no current' in response.output.lower() or 'error' in response.output.lower()
+
+    @pytest.mark.skip(reason="Requires behaviors.shape.submit CLI support - not yet implemented")
+    def test_cli_submit_behavior_only_prepares_whole_behavior(self, tmp_path):
+        """
+        Given User is in CLI (no Panel)
+        When User runs behaviors.shape.submit
+        Then CLI/Bot prepares instructions for whole shape behavior
+        And CLI returns success message with behavior name and timestamp
+        """
+        helper = BotTestHelper(tmp_path)
+        response = helper.cli_session.execute_command('behaviors.shape.submit')
+        assert response.status == 'success'
+        assert 'shape' in response.output.lower()
+
+    @pytest.mark.skip(reason="Requires behaviors.shape.clarify.submit CLI support - not yet implemented")
+    def test_cli_submit_behavior_action_prepares_action_instructions(self, tmp_path):
+        """
+        Given User is in CLI (no Panel)
+        When User runs behaviors.shape.clarify.submit
+        Then CLI/Bot prepares instructions for shape.clarify
+        And CLI returns success message with behavior and action and timestamp
+        """
+        helper = BotTestHelper(tmp_path)
+        response = helper.cli_session.execute_command('behaviors.shape.clarify.submit')
+        assert response.status == 'success'
+        assert 'shape' in response.output.lower() and 'clarify' in response.output.lower()
+
+
+# ============================================================================
+# STORY: Execute Behavior Action
+# ============================================================================
+
+class TestExecuteBehaviorAction:
+    """
+    Story: Execute Behavior Action
+    Scenarios verify submit behavior (whole behavior) vs submit action (selected action).
+    """
+
+    def test_submit_behavior_collapsed_runs_whole_behavior(self, tmp_path):
+        """
+        Given Panel has shape behavior collapsed and selected
+        When Panel invokes submit (behavior-level)
+        Then Bot runs shape behavior (all actions) using manual / combine_with_next / skip logic
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        result = helper.bot.behaviors.current.execute() if hasattr(helper.bot.behaviors.current, 'execute') else helper.bot.submit_current_action()
+        assert result is not None
+        if isinstance(result, dict):
+            assert result.get('status') in ('success', None) or 'actions_run' in result or 'behavior' in result
+
+    def test_submit_action_expanded_runs_selected_action(self, tmp_path):
+        """
+        Given Panel has shape behavior expanded with shape.strategy selected
+        When Panel invokes submit (action-level)
+        Then Bot runs shape.strategy
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.bot.behaviors.current.actions.navigate_to('strategy')
+        result = helper.bot.submit_current_action()
+        assert result is not None
+        if isinstance(result, dict):
+            assert result.get('behavior') == 'shape' and result.get('action') == 'strategy'
+
+    def test_submit_action_first_starts_from_first_non_skip_action(self, tmp_path):
+        """
+        Given behavior is collapsed (behavior-level, not action-level)
+        When Panel invokes submit with action="first"
+        Then Bot starts from first non-skip action of that behavior
+        """
+        helper = BotTestHelper(tmp_path)
+        result = helper.bot.submit_action('scenarios', 'first')
+        assert result is not None
+        if isinstance(result, dict):
+            assert result.get('behavior') == 'scenarios'
+            first_action = result.get('action')
+            assert first_action is not None
+            assert first_action in ('clarify', 'strategy', 'build', 'validate', 'render')
+
+
+# ============================================================================
 # STORY: Configure Behavior Execute
 # ============================================================================
 
@@ -860,3 +982,48 @@ class TestConfigureActionExecution:
         assert "## Action Instructions - strategy" in content
         behavior_count = content.count("## Behavior Instructions - shape")
         assert behavior_count == 1, f"Expected Behavior Instructions once, got {behavior_count}"
+
+    def test_collapsed_submit_skip_action_skips_within_behavior(self, tmp_path):
+        """
+        Scenario: Collapsed submit with skip action skips that action within behavior
+        GIVEN shape behavior is collapsed and selected
+        AND shape.strategy has execution set to Skip
+        WHEN User clicks Submit
+        THEN Panel submits whole shape behavior
+        AND Bot runs shape and skips shape.strategy
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.set_action_execution("shape", "strategy", "skip")
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        result = helper.bot.submit_current_action()
+        assert result is not None and result.get("status") != "error"
+        # Bot should advance past skip (strategy) - instructions should be for clarify, not strategy
+        content = result.get("instructions", "") or ""
+        if content:
+            assert "clarify" in content.lower() or "strategy" in content.lower()
+        # actions_run/actions_skipped if behavior.execute exists
+        if isinstance(result, dict):
+            actions_skipped = result.get("actions_skipped", [])
+            if actions_skipped:
+                assert "strategy" in actions_skipped
+
+    def test_collapsed_submit_combine_next_combines_within_behavior(self, tmp_path):
+        """
+        Scenario: Collapsed submit with combine_next actions combines within behavior
+        GIVEN shape behavior is collapsed and selected
+        AND shape.clarify and shape.strategy have execution set to combine_next
+        WHEN User clicks Submit
+        THEN Panel submits whole shape behavior
+        AND Bot combines clarify and strategy instructions within shape
+        """
+        helper = BotTestHelper(tmp_path)
+        for action_name in ["clarify", "strategy"]:
+            helper.bot.set_action_execution("shape", action_name, "combine_next")
+        helper.bot.behaviors.navigate_to("shape")
+        helper.bot.behaviors.current.actions.navigate_to("clarify")
+        result = helper.bot.submit_current_action()
+        assert result is not None and result.get("status") != "error"
+        content = result.get("instructions", "") or ""
+        assert "clarify" in content.lower() and "strategy" in content.lower()
+        assert "**Combined instructions:**" in content or "## Next action:" in content

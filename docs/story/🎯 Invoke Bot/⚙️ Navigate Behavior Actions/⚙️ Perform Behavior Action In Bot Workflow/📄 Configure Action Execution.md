@@ -69,6 +69,12 @@ Configure Action Execution functionality for the mob minion system.
   **then** Bot mentions rules and describes them only once
   **and** Bot refers to those rules in the other action instead of repeating the full description
 
+- **When** User submits behavior (collapsed) and behavior has actions set to skip
+  **then** Bot skips those actions within the behavior
+
+- **When** User submits behavior (collapsed) and behavior has actions set to combine_next
+  **then** Bot combines those actions' instructions within the behavior
+
 ## Scenarios
 
 <a id="scenario-panel-shows-actions-and-execution-toggle-per-action"></a>
@@ -219,5 +225,31 @@ And Build and Validate have execution set to Combine (combine_next)
 When Bot combines instructions for Build and Validate
 Then Bot mentions rules and describes them only once
 And Bot refers to those rules in the other action instead of repeating the full description
+```
+
+
+<a id="scenario-collapsed-submit-with-skip-action-skips-that-action-within-behavior"></a>
+### Scenario: [Collapsed submit with skip action skips that action within behavior](#scenario-collapsed-submit-with-skip-action-skips-that-action-within-behavior) (happy_path)
+
+**Steps:**
+```gherkin
+Given shape behavior is collapsed and selected
+And shape.strategy has execution set to Skip
+When User clicks Submit
+Then Panel submits whole shape behavior
+And Bot runs shape and skips shape.strategy
+```
+
+
+<a id="scenario-collapsed-submit-with-combine_next-actions-combines-within-behavior"></a>
+### Scenario: [Collapsed submit with combine_next actions combines within behavior](#scenario-collapsed-submit-with-combine_next-actions-combines-within-behavior) (happy_path)
+
+**Steps:**
+```gherkin
+Given shape behavior is collapsed and selected
+And shape.clarify and shape.strategy have execution set to combine_next
+When User clicks Submit
+Then Panel submits whole shape behavior
+And Bot combines clarify and strategy instructions within shape
 ```
 

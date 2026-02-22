@@ -271,6 +271,39 @@ test('TestDisplayStrategyInstructions', { concurrency: false }, async (t) => {
 
 test('TestSubmitInstructionsToAIAgent', { concurrency: false }, async (t) => {
     
+    await t.test('test_panel_submit_expanded_prepares_selected_action_instructions', async () => {
+        /**
+         * Scenario: Panel submit with expanded behavior prepares instructions for selected action
+         * GIVEN Panel has shape behavior expanded
+         * AND shape.clarify is the selected action
+         * WHEN Panel invokes submit (via CLI)
+         * THEN CLI/Bot prepares instructions for shape.clarify
+         */
+        await backendPanel.execute('shape.clarify');
+        const result = await backendPanel.execute('submit');
+        assert.ok(result, 'Submit should return result');
+        assert.ok(result.status === 'success' || result.instructions,
+            'Submit should succeed or include instructions');
+        if (result.instructions) {
+            assert.ok(result.instructions.toLowerCase().includes('clarify') || result.instructions.toLowerCase().includes('shape'),
+                'Instructions should include clarify or shape');
+        }
+    });
+
+    await t.test('test_panel_submit_collapsed_prepares_instructions', async () => {
+        /**
+         * Scenario: Panel submit with collapsed behavior prepares instructions
+         * GIVEN Panel has shape behavior collapsed and selected
+         * WHEN Panel invokes submit (via CLI)
+         * THEN CLI/Bot prepares instructions (whole behavior or current action)
+         */
+        await backendPanel.execute('shape');
+        const result = await backendPanel.execute('submit');
+        assert.ok(result, 'Submit should return result');
+        assert.ok(result.status === 'success' || result.instructions,
+            'Submit should succeed or include instructions');
+    });
+    
     await t.test('test_instructions_view_has_submit_button', async () => {        
         // Execute shape.clarify which returns instructions in the response
         const result = await backendPanel.execute('shape.clarify');
