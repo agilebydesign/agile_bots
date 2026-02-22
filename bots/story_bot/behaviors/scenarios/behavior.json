@@ -7,7 +7,7 @@
   "outputs": "Individual story .md files with detailed scenarios (no variables/examples tables)",
   "baseActionsPath": "agile_bot/base_actions",
   "instructions": [
-    "Organize stories into delivery increments based on business value, dependencies, and risk"
+    "Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story"
   ],
   "actions_workflow": {
     "actions": [
