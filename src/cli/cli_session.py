@@ -235,8 +235,8 @@ class CLISession:
         
         from behaviors.behavior import Behavior
         if isinstance(attr, Behavior):
-            result = self.bot.execute(attr.name, None)
-            return result, True
+            # getattr already navigated with behavior_only=True - do not execute first action
+            return {'status': 'success', 'message': f'Navigated to {attr.name}', 'behavior': attr.name}, True
         
         # Special handling for story_graph property - return the dict, not the object
         if verb == 'story_graph' and hasattr(attr, 'story_graph'):

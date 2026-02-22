@@ -200,7 +200,7 @@ class Behaviors:
     def check_exists(self, behavior_name: str) -> bool:
         return self.find_by_name(behavior_name) is not None
 
-    def navigate_to(self, behavior_name: str):
+    def navigate_to(self, behavior_name: str, behavior_only: bool = False):
         behavior = self.find_by_name(behavior_name)
         if behavior is None:
             raise ValueError(f"Behavior '{behavior_name}' not found")
@@ -211,7 +211,10 @@ class Behaviors:
                 break
         
         if self.current and self.current.actions:
-            self.current.actions.load_state()
+            if behavior_only:
+                self.current.actions._current_index = None
+            else:
+                self.current.actions.load_state()
         
         self.save_state()
 
@@ -278,6 +281,8 @@ class Behaviors:
         state_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'
         if self.current.actions and self.current.actions.current:
             state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'
+        else:
+            state_data.pop('current_action', None)
         state_data['timestamp'] = datetime.now().isoformat()
         state_file.parent.mkdir(parents=True, exist_ok=True)
         state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')
