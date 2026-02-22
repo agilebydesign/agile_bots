@@ -84,8 +84,11 @@ class BehaviorsView extends PanelView {
         
         const executionSettings = botData.execution || {};
         const specialInstructions = botData.special_instructions || {};
+        const currentBehavior = botData.current_behavior || botData.behaviors?.current || null;
+        const currentAction = botData.current_action || null;
+        const atActionLevel = !!(currentBehavior && currentAction);
         const behaviorsHtml = behaviorsData.map((behavior, bIdx) => {
-            return this.renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings, specialInstructions);
+            return this.renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings, specialInstructions, { atActionLevel, currentBehavior });
         }).join('');
 
 
@@ -290,8 +293,10 @@ class BehaviorsView extends PanelView {
     }
     
 
-    renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}, specialInstructions = {}) {
-        const isCurrent = behavior.isCurrent || behavior.is_current || false;
+    renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}, specialInstructions = {}, navContext = {}) {
+        const { atActionLevel = false, currentBehavior = null } = navContext;
+        const isCurrentBehavior = behavior.name === currentBehavior;
+        const isCurrent = (behavior.isCurrent || behavior.is_current || false) && !(atActionLevel && isCurrentBehavior);
         const isCompleted = behavior.isCompleted || behavior.is_completed || false;
         const behaviorMarker = isCurrent 
             ? (tickIconPath ? `<img src="${tickIconPath}" alt="Current" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '')
@@ -318,6 +323,8 @@ class BehaviorsView extends PanelView {
         const behaviorActiveClass = isCurrent ? ' active' : '';
         const behaviorExecutionKey = `_behavior.${behaviorNameRaw}`;
         const behaviorCurrentMode = executionSettings[behaviorExecutionKey] || 'manual';
+        const isSkipBehavior = behaviorCurrentMode === 'skip';
+        const behaviorSkipClass = isSkipBehavior ? ' behavior-skip' : '';
         const behaviorModes = [
             { value: 'combine_with_next', iconPath: combinedIconPath, tooltip: 'combine with next' },
             { value: 'manual', iconPath: manualIconPath, tooltip: 'manual' },
@@ -336,7 +343,11 @@ class BehaviorsView extends PanelView {
         const behaviorSpecialInstructionsInput = `<textarea class="special-instructions-input" data-action="setBehaviorSpecialInstructions" data-behavior-name="${behaviorNameJs}" placeholder="Special instructions for ${behaviorName}" title="Special instructions for this behavior" style="min-width: 80px; max-width: 200px; font-size: 10px; padding: 2px 4px; resize: vertical; min-height: 18px; max-height: 80px;" onblur="if(window.setBehaviorSpecialInstructions) window.setBehaviorSpecialInstructions(this)" onclick="event.stopPropagation();">${behaviorSpecialInstructionsEscaped}</textarea>`;
         const behaviorExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${behaviorSpecialInstructionsInput}${behaviorToggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${behaviorExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const behaviorToggleGroup = `<span class="execution-toggle-container" id="${behaviorExecToggleId}" onclick="event.stopPropagation();">${behaviorCollapsedBtn}${behaviorExpandedGroup}</span>`;
-        let html = `<div class="collapsible-header card-item${behaviorActiveClass}" data-behavior="${behaviorName}" title="${behaviorTooltip}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;"><span><span id="${behaviorId}-icon" class="${behaviorIconClass}" style="display: inline-block; min-width: 12px; cursor: pointer;" data-action="toggleCollapse" data-target="${behaviorId}" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}">${plusIconPath && subtractIconPath ? `<img src="${behaviorIconSrc}" alt="${behaviorIconAlt}" style="width: 12px; height: 12px; vertical-align: middle;" />` : ''}</span> <span class="behavior-name-clickable" style="cursor: pointer; text-decoration: underline;" data-action="navigateToBehavior" data-behavior-name="${behaviorNameJs}">${behaviorMarker}${behaviorName}</span>${clipboardIconPath ? `<button class="behavior-rules-button" data-action="getBehaviorRules" data-behavior-name="${behaviorNameJs}" style="background: #000; border: none; padding: 2px 6px; margin: 0 0 0 8px; cursor: pointer; vertical-align: middle; display: inline-flex; align-items: center; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Get rules for ${behaviorName} and send to chat"><img src="${clipboardIconPath}" style="width: 22px; height: 22px; object-fit: contain;" alt="Get Rules" /></button>` : ''}</span>${behaviorToggleGroup}</div>`;
+        const behaviorRowStyle = 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;';
+        const behaviorNameClickable = !behaviorExpanded && !isSkipBehavior;
+        const behaviorNameStyle = isSkipBehavior ? 'cursor: default; text-decoration: none; opacity: 0.6;' : (behaviorNameClickable ? 'cursor: pointer; text-decoration: underline;' : 'cursor: default; text-decoration: none;');
+        const behaviorNameDataAction = behaviorNameClickable ? ` data-action="navigateToBehavior" data-behavior-name="${behaviorNameJs}" data-skip="${isSkipBehavior}"` : '';
+        let html = `<div class="collapsible-header card-item${behaviorActiveClass}${behaviorSkipClass}" data-behavior="${behaviorName}" data-skip="${isSkipBehavior}" title="${behaviorTooltip}" style="${behaviorRowStyle}"><span><span id="${behaviorId}-icon" class="${behaviorIconClass}" style="display: inline-block; min-width: 12px; cursor: pointer;" data-action="toggleCollapse" data-target="${behaviorId}" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}">${plusIconPath && subtractIconPath ? `<img src="${behaviorIconSrc}" alt="${behaviorIconAlt}" style="width: 12px; height: 12px; vertical-align: middle;" />` : ''}</span> <span class="behavior-name-clickable" style="${behaviorNameStyle}"${behaviorNameDataAction}>${behaviorMarker}${behaviorName}</span>${clipboardIconPath && !isSkipBehavior ? `<button class="behavior-rules-button" data-action="getBehaviorRules" data-behavior-name="${behaviorNameJs}" style="background: #000; border: none; padding: 2px 6px; margin: 0 0 0 8px; cursor: pointer; vertical-align: middle; display: inline-flex; align-items: center; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Get rules for ${behaviorName} and send to chat"><img src="${clipboardIconPath}" style="width: 22px; height: 22px; object-fit: contain;" alt="Get Rules" /></button>` : ''}</span>${behaviorToggleGroup}</div>`;
         
 
         const actionsArray = behavior.actions?.all_actions || behavior.actions || [];
@@ -386,9 +397,12 @@ class BehaviorsView extends PanelView {
         const actionSpecialInstructionsInput = `<textarea class="special-instructions-input" data-action="setActionSpecialInstructions" data-behavior-name="${behaviorNameJs}" data-action-name="${actionNameJs}" placeholder="Special instructions for ${behaviorName}.${actionNameRaw}" title="Special instructions for ${behaviorName}.${actionNameRaw}" style="min-width: 80px; max-width: 200px; font-size: 10px; padding: 2px 4px; resize: vertical; min-height: 18px; max-height: 80px;" onblur="if(window.setActionSpecialInstructions) window.setActionSpecialInstructions(this)" onclick="event.stopPropagation();">${actionSpecialInstructionsEscaped}</textarea>`;
         const actionExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${actionSpecialInstructionsInput}${toggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${actionExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const actionToggleGroup = `<span class="execution-toggle-container" id="${actionExecToggleId}" onclick="event.stopPropagation();">${actionCollapsedBtn}${actionExpandedGroup}</span>`;
+        const isSkipAction = currentMode === 'skip';
+        const actionSkipClass = isSkipAction ? ' action-skip' : '';
+        const actionNameStyle = isSkipAction ? 'cursor: default; text-decoration: none; opacity: 0.6;' : 'cursor: pointer; text-decoration: underline;';
         const actionActiveClass = isCurrent ? ' active' : '';
-        const actionHtml = `<div class="collapsible-header action-item card-item${actionActiveClass}" title="${actionTooltip}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
-            <span class="action-name-clickable" style="cursor: pointer; text-decoration: underline;" data-action="navigateToAction" data-behavior-name="${behaviorNameJs}" data-action-name="${actionNameJs}">${actionMarker}${actionName}</span>
+        const actionHtml = `<div class="collapsible-header action-item card-item${actionActiveClass}${actionSkipClass}" data-skip="${isSkipAction}" title="${actionTooltip}" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px;">
+            <span class="action-name-clickable" style="${actionNameStyle}" data-action="navigateToAction" data-behavior-name="${behaviorNameJs}" data-action-name="${actionNameJs}" data-skip="${isSkipAction}">${actionMarker}${actionName}</span>
             ${actionToggleGroup}
         </div>`;
         
