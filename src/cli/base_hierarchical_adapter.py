@@ -1,4 +1,4 @@
-﻿from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 from typing import List, Optional
 from cli.adapter_factory import AdapterFactory
 
@@ -63,12 +63,22 @@ class BaseBehaviorsAdapter(BaseHierarchicalAdapter):
             if self.behaviors.current
             else None
         )
+        current_action_name = (
+            self.behaviors.current.actions.current.action_name
+            if self.behaviors.current
+            and self.behaviors.current.actions
+            and self.behaviors.current.actions.current
+            else None
+        )
+        at_action_level = current_action_name is not None
         sorted_behaviors = sorted(list(self.behaviors), key=lambda b: b.order)
 
         for behavior in sorted_behaviors:
-            is_current = behavior.name == current_behavior_name
+            is_current_behavior = behavior.name == current_behavior_name
+            is_current = is_current_behavior and not at_action_level
             behavior_adapter = self.factory.create(behavior, self.channel)
             behavior_adapter.is_current = is_current
+            behavior_adapter.is_current_behavior = is_current_behavior
             if hasattr(behavior_adapter, 'behavior'):
                 behavior_adapter.behavior = behavior
             self._behavior_adapters.append(behavior_adapter)

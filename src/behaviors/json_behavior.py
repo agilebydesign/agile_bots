@@ -1,4 +1,4 @@
-﻿
+
 import json
 from cli.adapters import JSONAdapter
 from cli.base_hierarchical_adapter import BaseBehaviorsAdapter, BaseBehaviorAdapter
@@ -51,7 +51,12 @@ class JSONBehavior(BaseBehaviorAdapter, JSONAdapter):
             'is_current': self.is_current
         }
         
-        if self.is_current and self._actions_adapter and hasattr(self._actions_adapter, 'to_dict'):
+        use_actions_adapter = (
+            getattr(self, 'is_current_behavior', self.is_current)
+            and self._actions_adapter
+            and hasattr(self._actions_adapter, 'to_dict')
+        )
+        if use_actions_adapter:
             result['actions'] = self._actions_adapter.to_dict()
         elif self.behavior.actions:
             result['actions'] = {
