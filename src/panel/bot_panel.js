@@ -3099,7 +3099,8 @@ class BotPanel {
                 
                 if (action === 'navigateToBehavior') {
                     const behaviorName = actionElement.getAttribute('data-behavior-name');
-                    if (behaviorName && window.navigateToBehavior) {
+                    const isSkip = actionElement.getAttribute('data-skip') === 'true';
+                    if (behaviorName && window.navigateToBehavior && !isSkip) {
                         window.navigateToBehavior(behaviorName);
                         e.stopPropagation();
                         e.preventDefault();
@@ -3107,7 +3108,8 @@ class BotPanel {
                 } else if (action === 'navigateToAction') {
                     const behaviorName = actionElement.getAttribute('data-behavior-name');
                     const actionName = actionElement.getAttribute('data-action-name');
-                    if (behaviorName && actionName && window.navigateToAction) {
+                    const isSkip = actionElement.getAttribute('data-skip') === 'true';
+                    if (behaviorName && actionName && window.navigateToAction && !isSkip) {
                         window.navigateToAction(behaviorName, actionName);
                         e.stopPropagation();
                         e.preventDefault();
@@ -4061,6 +4063,26 @@ class BotPanel {
                                 }
                             }
                         }
+                        if (id && id.startsWith('behavior-')) {
+                            const behaviorNameSpan = header.querySelector('.behavior-name-clickable');
+                            if (behaviorNameSpan) {
+                                const isSkip = header.getAttribute('data-skip') === 'true';
+                                if (shouldBeExpanded || isSkip) {
+                                    behaviorNameSpan.removeAttribute('data-action');
+                                    behaviorNameSpan.removeAttribute('data-behavior-name');
+                                    behaviorNameSpan.removeAttribute('data-skip');
+                                    behaviorNameSpan.style.cursor = 'default';
+                                    behaviorNameSpan.style.textDecoration = 'none';
+                                } else {
+                                    const behaviorName = header.getAttribute('data-behavior') || '';
+                                    behaviorNameSpan.setAttribute('data-action', 'navigateToBehavior');
+                                    behaviorNameSpan.setAttribute('data-behavior-name', behaviorName);
+                                    behaviorNameSpan.setAttribute('data-skip', 'false');
+                                    behaviorNameSpan.style.cursor = 'pointer';
+                                    behaviorNameSpan.style.textDecoration = 'underline';
+                                }
+                            }
+                        }
                     }
                 }
             });
@@ -4097,6 +4119,27 @@ class BotPanel {
                                 const imgSrc = isHidden ? subtractSrc : plusSrc;
                                 const imgAlt = isHidden ? 'Collapse' : 'Expand';
                                 icon.innerHTML = '<img src="' + imgSrc + '" style="width: 12px; height: 12px; vertical-align: middle;" alt="' + imgAlt + '" />';
+                            }
+                        }
+                    }
+                    if (elementId && elementId.startsWith('behavior-')) {
+                        const behaviorNameSpan = header.querySelector('.behavior-name-clickable');
+                        if (behaviorNameSpan) {
+                            const isSkip = header.getAttribute('data-skip') === 'true';
+                            const expanded = content.style.display !== 'none';
+                            if (expanded || isSkip) {
+                                behaviorNameSpan.removeAttribute('data-action');
+                                behaviorNameSpan.removeAttribute('data-behavior-name');
+                                behaviorNameSpan.removeAttribute('data-skip');
+                                behaviorNameSpan.style.cursor = 'default';
+                                behaviorNameSpan.style.textDecoration = 'none';
+                            } else {
+                                const behaviorName = header.getAttribute('data-behavior') || '';
+                                behaviorNameSpan.setAttribute('data-action', 'navigateToBehavior');
+                                behaviorNameSpan.setAttribute('data-behavior-name', behaviorName);
+                                behaviorNameSpan.setAttribute('data-skip', 'false');
+                                behaviorNameSpan.style.cursor = 'pointer';
+                                behaviorNameSpan.style.textDecoration = 'underline';
                             }
                         }
                     }
@@ -5510,7 +5553,13 @@ class BotPanel {
             
             const nodeName = window.selectedNode.name;
             const behavior = window.currentBehavior || window.selectedNode.behaviorNeeded || null;
-            const action = window.currentAction || 'build';
+            let action = window.currentAction || 'build';
+            const behaviorHeader = behavior && document.querySelector('[data-behavior="' + behavior + '"]');
+            const behaviorContent = behaviorHeader && behaviorHeader.nextElementSibling;
+            const isBehaviorCollapsed = behaviorContent && behaviorContent.classList && behaviorContent.classList.contains('collapsible-content') && behaviorContent.style.display === 'none';
+            if (isBehaviorCollapsed) {
+                action = 'first';
+            }
             let commandText;
             
             if (window.selectedNode.type === 'increment') {
