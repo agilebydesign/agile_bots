@@ -212,17 +212,10 @@ class StoryMapView extends PanelView {
                     </button>
                 </div>
                 
-                <!-- Separator between Create/Delete and Scope/Submit groups -->
+                <!-- Separator between Create/Delete and Diagram groups -->
                 <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
                 
-                <!-- Scope buttons group with space for additional scope buttons -->
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
-                        <img src="${scopeToIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Scope To" />
-                    </button>
-                </div>
-                
-                <!-- Diagram action buttons: Render, Save layout, Clear layout, Update graph -->
+                <!-- Diagram action buttons: Render, Save layout, Clear layout, Generate report, Update graph -->
                 <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 2px;">
                     <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram for current behavior">
                         <img src="${renderDiagramIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Render Diagram" />
@@ -2770,12 +2763,15 @@ class StoryMapView extends PanelView {
                                 </button>
                             </div>
                         </div>
-                        <div style="border-top: 1px solid var(--accent-color); padding-top: 6px;">
-                        <input type="text" id="scopeFilterInput" style="padding: 4px 8px;"
+                        <div style="border-top: 1px solid var(--accent-color); padding-top: 6px; display: flex; align-items: center; gap: 4px;">
+                        <input type="text" id="scopeFilterInput" style="padding: 4px 8px; flex: 1;"
                                value="${filterValue}" 
                                placeholder="Epic or Story name"
                                onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
+                        <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
+                            <img src="${scopeToIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Scope To" />
+                        </button>
                         </div>
                         <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 1px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
                         <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
