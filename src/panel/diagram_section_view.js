@@ -22,7 +22,7 @@ class DiagramSectionView {
         const jsPath = this._escapeForJs(filePath);
 
         if (!exists) {
-            return `<div class="diagram-item" style="margin: 4px 0;">
+            return `<div class="diagram-item" style="margin: 2px 0;">
                 <span style="color: var(--vscode-errorForeground); font-size: 12px;">Not found: ${this._escapeHtml(this._fileName(filePath))}</span>
             </div>`;
         }
@@ -36,7 +36,7 @@ class DiagramSectionView {
             fileLinks += `<a href="#" class="report-link" onclick="openFile('${jsReportPath}', event); return false;" style="color: var(--vscode-textLink-foreground); cursor: pointer; font-size: 12px;">${this._escapeHtml(this._fileName(reportPath))}</a>`;
         }
 
-        return `<div class="diagram-item" style="margin: 3px 0;">
+        return `<div class="diagram-item" style="margin: 2px 0;">
             <div style="display: flex; align-items: center; flex-wrap: wrap;">${fileLinks}</div>
         </div>`;
     }

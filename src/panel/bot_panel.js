@@ -3105,11 +3105,6 @@ class BotPanel {
                 }
                 
 
-                if (window.openFile && fileLink) {
-                    console.log('[WebView]   Opening file:', fileLink);
-                    window.openFile(fileLink);
-                }
-                
                 e.stopPropagation();
                 console.log('═══════════════════════════════════════════════════════');
             }
@@ -4977,6 +4972,8 @@ class BotPanel {
             const btnSubmit = document.getElementById('btn-submit');
             const btnOpenGraph = document.getElementById('btn-open-graph') || document.getElementById('ws-btn-open-graph');
             const btnOpenAll = document.getElementById('btn-open-all') || document.getElementById('ws-btn-open-all');
+            const btnOpenFile = document.getElementById('ws-btn-open-file');
+            const btnOpenTest = document.getElementById('ws-btn-open-test');
             
 
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';
@@ -4989,7 +4986,9 @@ class BotPanel {
             if (btnSubmit) btnSubmit.style.display = 'none';
             if (btnOpenGraph) btnOpenGraph.style.display = 'none';
             if (btnOpenAll) btnOpenAll.style.display = 'none';
-            
+            if (btnOpenFile) btnOpenFile.style.display = 'none';
+            if (btnOpenTest) btnOpenTest.style.display = 'none';
+
 
             if (window.selectedNode.type === 'root') {
                 if (btnCreateEpic) btnCreateEpic.style.display = 'block';
@@ -5031,10 +5030,14 @@ class BotPanel {
             }
             
 
-            if (window.selectedNode.type !== 'root') {
-                if (btnOpenGraph) btnOpenGraph.style.display = 'block';
-                if (btnOpenAll) btnOpenAll.style.display = 'block';
-            }
+            // Open Graph and Open All work on entire story graph - always show them (including when root selected)
+            if (btnOpenGraph) btnOpenGraph.style.display = 'block';
+            if (btnOpenAll) btnOpenAll.style.display = 'block';
+            // File and Test buttons: show when non-root and selected node has file/test link
+            const fileLink = getSelectedNodeFileLink && getSelectedNodeFileLink();
+            const testFiles = getSelectedNodeTestFiles && getSelectedNodeTestFiles();
+            if (btnOpenFile) btnOpenFile.style.display = (window.selectedNode.type !== 'root' && fileLink) ? 'block' : 'none';
+            if (btnOpenTest) btnOpenTest.style.display = (window.selectedNode.type !== 'root' && testFiles && testFiles.length > 0) ? 'block' : 'none';
             
             var diagramActionGroup = document.getElementById('diagram-action-buttons-group');
             if (diagramActionGroup) {
@@ -5658,6 +5661,20 @@ class BotPanel {
         }
         
 
+        function getSelectedNodeTestFiles() {
+            if (!window.selectedNode || !window.selectedNode.name) return [];
+            const nodeElement = document.querySelector('.story-node[data-node-type="' + window.selectedNode.type + '"][data-node-name="' + window.selectedNode.name + '"]');
+            const raw = nodeElement ? nodeElement.getAttribute('data-test-files') : null;
+            if (!raw) return [];
+            try {
+                const arr = JSON.parse(raw);
+                return Array.isArray(arr) ? arr : [];
+            } catch (e) {
+                return [];
+            }
+        }
+        
+
         function getWorkspaceDir() {
 
             if (window.botData && window.botData.workspace_directory) {
@@ -5676,6 +5693,22 @@ class BotPanel {
                 viewColumn: viewColumn
             });
         }
+        
+        window.handleOpenFile = function() {
+            const fileLink = getSelectedNodeFileLink();
+            if (!window.selectedNode || !window.selectedNode.name) return;
+            if (fileLink && window.openFile) {
+                window.openFile(fileLink);
+            }
+        };
+        
+        window.handleOpenTest = function() {
+            const testFiles = getSelectedNodeTestFiles();
+            if (!window.selectedNode || !window.selectedNode.name) return;
+            if (testFiles.length > 0 && window.openFiles) {
+                window.openFiles(testFiles);
+            }
+        };
         
         window.handleOpenGraph = function() {
             console.log('[WebView] handleOpenGraph called');
@@ -5778,7 +5811,7 @@ class BotPanel {
                             });
                             
 
-                            const testFileEls = collapsibleDiv.querySelectorAll('[data-test-files]');
+                            const testFileEls = collapsibleDiv.querySelectorAll('.story-node[data-test-files]');
                             testFileEls.forEach(function(el) {
                                 try {
                                     var files = JSON.parse(el.getAttribute('data-test-files'));
@@ -5795,15 +5828,13 @@ class BotPanel {
                         console.log('[WebView] Sub-epic/epic: found', storyFiles.length, 'story files and', testFiles.length, 'test files');
                     } else {
 
-                        if (nodeEl.parentElement) {
-                            const testFilesEl = nodeEl.parentElement.querySelector('[data-test-files]');
-                            if (testFilesEl) {
-                                try {
-                                    testFiles = JSON.parse(testFilesEl.getAttribute('data-test-files'));
-                                    console.log('[WebView] Found test_files from DOM:', testFiles);
-                                } catch (e) {
-                                    console.error('[WebView] Error parsing test_files:', e);
-                                }
+                        const testFilesAttr = nodeEl.getAttribute('data-test-files');
+                        if (testFilesAttr) {
+                            try {
+                                testFiles = JSON.parse(testFilesAttr);
+                                console.log('[WebView] Found test_files from DOM:', testFiles);
+                            } catch (e) {
+                                console.error('[WebView] Error parsing test_files:', e);
                             }
                         }
                     }

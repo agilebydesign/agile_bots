@@ -139,7 +139,6 @@ class StoryMapView extends PanelView {
         const perfIconsStart = performance.now();
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
-        const scopeMapIconPath = getIcon('scope_map.png');
         const clearIconPath = getIcon('close.png');
         const showAllIconPath = getIcon('show_all.png');
         const jsonIconPath = getIcon('json.png');
@@ -2594,7 +2593,6 @@ class StoryMapView extends PanelView {
             ">
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
                 </div>
@@ -2753,28 +2751,21 @@ ${clientScript}    </script>`;
             const epicId = `epic-${epicIndex}`;
             const epicIcon = epicIconPath ? `<img src="${epicIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Epic" />` : '';
             
-            // Find document and test links for epic
+            // Find document and test links for epic (data attrs for toolbar File/Test buttons)
             const epicDocLink = epic.links && epic.links.find(l => l.icon === 'document');
             const epicTestLink = epic.links && epic.links.find(l => l.icon === 'test_tube');
+            const epicTestFilesJson = epicTestLink ? this.escapeHtml(JSON.stringify([epicTestLink.url])) : '';
             
             // Check if epic has children
             const epicHasChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
             
-            // Make epic name a hyperlink if document exists, clickable to select, double-click to edit
-            // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
+            // Epic name: plain text, clickable to select, double-click to edit (File/Test via toolbar)
             const epicPath = this.escapeHtml(`story_graph."${epic.name}"`);
             const epicBehavior = epic.behavior_needed || '';
-            const epicNameHtml = epicDocLink
-                ? `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" data-file-link="${this.escapeHtml(epicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(epic.name)}</span>`
-                : `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
+            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${this.escapeHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
             
-            // Render test tube icon for epic test link
-            const epicTestIcon = (epicTestLink && testTubeIconPath)
-                ? ` <span onclick="openFile('${this.escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                : '';
-            
-            // Epic nodes - no inline action buttons (all actions are in the toolbar)
-            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}</div>`;
+            // Epic nodes - no inline links (File/Test via toolbar buttons)
+            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}</div>`;
             
             html += `<div id="${epicId}" class="collapsible-content" style="display: none;">`;
             // Helper function to recursively render a sub-epic (can be nested any number of levels)
@@ -2782,9 +2773,11 @@ ${clientScript}    </script>`;
                 const subEpicId = `${parentPath}-${subEpicIndex}`;
                 const subEpicIcon = gearIconPath ? `<img src="${gearIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Sub-Epic" />` : '';
                 
-                // Find document and test links
+                // Find document and test links (data attrs for toolbar File/Test buttons)
                 const subEpicDocLink = subEpic.links && subEpic.links.find(l => l.icon === 'document');
                 const subEpicTestLink = subEpic.links && subEpic.links.find(l => l.icon === 'test_tube');
+                const subEpicTestFiles = subEpic.test_files?.length > 0 ? subEpic.test_files : (subEpicTestLink ? [subEpicTestLink.url] : []);
+                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(subEpicTestFiles)) : '';
                 
                 // Build the full path to this SubEpic
                 // For first-level: story_graph."Epic"."SubEpic"
@@ -2800,24 +2793,14 @@ ${clientScript}    </script>`;
                 const hasNoChildren = !hasStories && !hasNestedSubEpics;
                 const subEpicHasChildren = hasStories || hasNestedSubEpics;
                 
-                // Make sub-epic name a hyperlink if document exists, clickable to select, double-click to edit
+                // Sub-epic name: plain text, clickable to select (File/Test via toolbar)
                 const subEpicBehavior = subEpic.behavior_needed || '';
                 const subEpicBehaviors = subEpic.behaviors_needed ? JSON.stringify(subEpic.behaviors_needed) : `["${subEpicBehavior}"]`;
-                const subEpicNameHtml = subEpicDocLink
-                    ? `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" data-file-link="${this.escapeHtml(subEpicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`
-                    : `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
+                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${this.escapeHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
                 
-                // Only render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick HTML parse errors)
-                const subEpicTestIcon = testTubeIconPath && (subEpic.test_files?.length > 0 || subEpicTestLink)
-                    ? (subEpic.test_files && subEpic.test_files.length > 0
-                        ? ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                        : ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([subEpicTestLink.url]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
-                    : '';
+                const marginLeft = 7 + (depth * 7);
                 
-                // No inline action buttons (all actions are in the toolbar)
-                const marginLeft = 7 + (depth * 7); // Increase margin for nested sub-epics
-                
-                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}</div>`;
+                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}</div>`;
                 
                 html += `<div id="${subEpicId}" class="collapsible-content" style="display: none;">`;
                 
@@ -2855,29 +2838,16 @@ ${clientScript}    </script>`;
                                     html += `<span style="display: inline-block; min-width: 9px;"><img src="${emptyIconPath}" style="width: 9px; height: 9px; vertical-align: middle;" alt="" /></span> `;
                                 }
                                 
-                                // Find story doc link (if exists)
+                                // Find story doc and test links (data attrs for toolbar File/Test buttons)
                                 const storyDocLink = story.links && story.links.find(l => l.text === 'story');
+                                const storyTestLink = story.links && story.links.find(l => l.icon === 'test_tube');
+                                const storyTestFiles = story.test_files?.length > 0 ? story.test_files : (storyTestLink ? [storyTestLink.url] : []);
+                                const storyTestFilesJson = storyTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(storyTestFiles)) : '';
                                 
-                                // Story name with double-click to edit, clickable to select
+                                // Story name: plain text, clickable to select (File/Test via toolbar)
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
-                                if (storyDocLink) {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" data-file-link="${this.escapeHtml(storyDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
-                                } else {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
-                                }
-                                
-                                // Render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick parse errors)
-                                if (testTubeIconPath && (story.test_files?.length > 0 || (story.links && story.links.find(l => l.icon === 'test_tube')))) {
-                                    if (story.test_files && story.test_files.length > 0) {
-                                        html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(story.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                    } else {
-                                        const testLink = story.links.find(l => l.icon === 'test_tube');
-                                        if (testLink) {
-                                            html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([testLink.url]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                        }
-                                    }
-                                }
+                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${this.escapeHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 
                                 // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
@@ -2896,25 +2866,12 @@ ${clientScript}    </script>`;
                                         // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
                                         const scenarioPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
                                         
-                                        // Link scenario name to story file with scenario anchor
-                                        // Make scenarios draggable and renameable like other nodes
+                                        // Scenario: plain text, clickable to select (File/Test via toolbar)
                                         const scenarioBehavior = scenario.behavior_needed || '';
-                                        if (storyDocLink) {
-                                            const scenarioLink = `${storyDocLink.url}#${scenarioAnchor}`;
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" data-file-link="${this.escapeHtml(scenarioLink)}" style="text-decoration: underline; cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
-                                        } else {
-                                            // No story doc link - just display scenario name with drag/rename support
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
-                                        }
-                                        
-                                        // Render test tube icon: open all matching test files when test_files set, else single test_file (data attr avoids JSON-in-onclick parse errors)
-                                        if (testTubeIconPath && (scenario.test_files?.length > 0 || scenario.test_file)) {
-                                            if (scenario.test_files && scenario.test_files.length > 0) {
-                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                            } else {
-                                                html += ` <span class="test-files-link" data-test-files="${this.escapeHtml(JSON.stringify([scenario.test_file]))}" onclick="openFilesFromEl(this, event)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                            }
-                                        }
+                                        const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
+                                        const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
+                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(scenarioTestFiles)) : '';
+                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${this.escapeHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
                                         
                                         html += '</div>';
                                     });

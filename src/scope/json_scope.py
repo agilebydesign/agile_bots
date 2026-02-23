@@ -162,12 +162,101 @@ class JSONScope(JSONAdapter):
                             'text': 'map',
                             'url': str(story_map_file)
                         })
+                    # Add drawio diagram links from shape behavior render configs (same source as diagram buttons)
+                    self._add_drawio_links_to_graph(result)
+                    # Add render output links (txt, drawio, etc.) from all behavior render configs - show if files exist
+                    self._add_render_output_links_to_graph(result)
         elif self.scope.type.value == 'files':
             files = self.scope._get_file_results()
             result['content'] = [{'path': str(f)} for f in files]
         
         return result
     
+    def _add_drawio_links_to_graph(self, result: dict) -> None:
+        """Add drawio diagram links from shape behavior render configs to graphLinks."""
+        try:
+            bot_paths = self.scope.bot_paths
+            if not bot_paths or not hasattr(bot_paths, 'bot_directory'):
+                return
+            bot_dir = Path(bot_paths.bot_directory)
+            workspace_dir = Path(bot_paths.workspace_directory)
+            render_folder = bot_dir / 'behaviors' / 'shape' / 'content' / 'render'
+            if not render_folder.exists() or not render_folder.is_dir():
+                return
+            from utils import read_json_file
+            seen_outputs = set()
+            for config_file in render_folder.glob('*.json'):
+                if config_file.name == 'instructions.json':
+                    continue
+                try:
+                    config = read_json_file(config_file)
+                    output = config.get('output') or config.get('drawio_file')
+                    if not output or not str(output).endswith('.drawio'):
+                        continue
+                    output_name = str(output).replace('{scope}', 'all')
+                    if output_name in seen_outputs:
+                        continue
+                    seen_outputs.add(output_name)
+                    path_prefix = config.get('path', str(bot_paths.story_graph_paths.docs_root))
+                    diagram_path = workspace_dir / path_prefix / output_name
+                    result['graphLinks'].append({
+                        'text': diagram_path.stem,
+                        'url': str(diagram_path.resolve())
+                    })
+                except Exception:
+                    continue
+        except Exception:
+            pass
+
+    def _add_render_output_links_to_graph(self, result: dict) -> None:
+        """Add render output file links from all behavior render configs. Only include if file exists."""
+        try:
+            if 'renderOutputLinks' not in result:
+                result['renderOutputLinks'] = []
+            bot_paths = self.scope.bot_paths
+            if not bot_paths or not hasattr(bot_paths, 'bot_directory'):
+                return
+            bot_dir = Path(bot_paths.bot_directory)
+            workspace_dir = Path(bot_paths.workspace_directory)
+            docs_root = Path(bot_paths.story_graph_paths.docs_root) if bot_paths.story_graph_paths else workspace_dir / 'docs'
+            from utils import read_json_file
+            seen_urls = set()
+            # Scan all behaviors' render folders
+            behaviors_dir = bot_dir / 'behaviors'
+            if not behaviors_dir.exists():
+                return
+            for behavior_dir in behaviors_dir.iterdir():
+                if not behavior_dir.is_dir():
+                    continue
+                render_folder = behavior_dir / 'content' / 'render'
+                if not render_folder.exists() or not render_folder.is_dir():
+                    continue
+                for config_file in render_folder.glob('*.json'):
+                    if config_file.name == 'instructions.json':
+                        continue
+                    try:
+                        config = read_json_file(config_file)
+                        output = config.get('output') or config.get('drawio_file')
+                        if not output:
+                            continue
+                        output_name = str(output).replace('{scope}', 'all')
+                        path_prefix = config.get('path', str(docs_root))
+                        output_path = workspace_dir / path_prefix / output_name
+                        output_resolved = str(output_path.resolve())
+                        if output_resolved in seen_urls:
+                            continue
+                        seen_urls.add(output_resolved)
+                        output_path_obj = Path(output_resolved)
+                        if output_path_obj.exists():
+                            result['renderOutputLinks'].append({
+                                'url': output_resolved,
+                                'exists': True
+                            })
+                    except Exception:
+                        continue
+        except Exception:
+            pass
+
     def _find_story_behavior_in_epics(self, epics: list, story_name: str) -> Optional[str]:
         """Walk epics dict to find story by name, return its behavior_needed. Same logic as epic hierarchy."""
         for epic in epics or []:
