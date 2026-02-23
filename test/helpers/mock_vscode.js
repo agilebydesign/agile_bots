@@ -14,6 +14,11 @@ module.exports = {
         Window: 10,
         SourceControl: 1
     },
+    ProgressLocation: {
+        Notification: 15,
+        SourceControl: 1,
+        Window: 10
+    },
     Uri: {
         file: (path) => ({ fsPath: path, toString: () => path }),
         joinPath: (base, ...paths) => {
@@ -43,6 +48,7 @@ module.exports = {
         showOpenDialog: () => Promise.resolve([]),
         showInputBox: () => Promise.resolve(undefined),
         withProgress: (options, task) => task(),
+        // withProgress: (options, task) => task({ report: () => {} })
         createOutputChannel: () => ({
             appendLine: () => {},
             show: () => {}

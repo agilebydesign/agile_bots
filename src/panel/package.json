@@ -11,11 +11,26 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "onView:agilebot.botPanelView"
+    "activationEvents": [        
     ],
     "main": "./extension.js",
     "contributes": {
+        "configuration": {
+            "title": "Agile Bots Panel",
+            "type": "object",
+            "properties": {
+                "agileBotsPanel.enableDebugLog": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables Debug logging in agileBotsPanel.logFolder"
+                },
+                "agileBotsPanel.logFolder": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Folder where debug log will be stored. Log file name is panel-debug.log."
+                }
+            }
+        },
         "commands": [
             {
                 "command": "agilebot.viewPanel",
@@ -33,6 +48,13 @@
             ]
         },
         "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "agilebot-sidebar",
+                    "title": "AgileBot",
+                    "icon": "img/company_icon.png"
+                }
+            ],
             "secondarySideBar": [
                 {
                     "id": "agilebot-sidebar",
@@ -47,12 +69,9 @@
         "test:watch": "node --test --watch ../../test/panel/test_*.js",
         "test:verbose": "node --test ../../test/panel/test_*.js --test-reporter=spec"
     },
-    "files": [
-        "*.js",
-        "bot",
-        "utils",
-        "styles",
-        "story_graph",
+    "files": [        
+        "**/*.js",
+        "**/*.css",        
         "img/**/*.png",
         "LICENSE"
     ],
