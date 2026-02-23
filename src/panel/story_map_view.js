@@ -2706,9 +2706,9 @@ ${clientScript}    </script>`;
             const epicHasChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
             
             // Epic name: plain text, clickable to select, double-click to edit (File/Test via toolbar)
-            const epicPath = this.escapeHtml(`story_graph."${epic.name}"`);
+            const epicPath = escapeForHtml(`story_graph."${epic.name}"`);
             const epicBehavior = epic.behavior_needed || '';
-            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${this.escapeHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
+            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${escapeForHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(epic.name)}</span>`;
             
             // Epic nodes - no inline links (File/Test via toolbar buttons)
             let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}</div>`;
@@ -2723,7 +2723,7 @@ ${clientScript}    </script>`;
                 const subEpicDocLink = subEpic.links && subEpic.links.find(l => l.icon === 'document');
                 const subEpicTestLink = subEpic.links && subEpic.links.find(l => l.icon === 'test_tube');
                 const subEpicTestFiles = subEpic.test_files?.length > 0 ? subEpic.test_files : (subEpicTestLink ? [subEpicTestLink.url] : []);
-                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(subEpicTestFiles)) : '';
+                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? escapeForHtml(JSON.stringify(subEpicTestFiles)) : '';
                 
                 // Build the full path to this SubEpic
                 // For first-level: story_graph."Epic"."SubEpic"
@@ -2742,7 +2742,7 @@ ${clientScript}    </script>`;
                 // Sub-epic name: plain text, clickable to select (File/Test via toolbar)
                 const subEpicBehavior = subEpic.behavior_needed || '';
                 const subEpicBehaviors = subEpic.behaviors_needed ? JSON.stringify(subEpic.behaviors_needed) : `["${subEpicBehavior}"]`;
-                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${this.escapeHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
+                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${escapeForHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`;
                 
                 const marginLeft = 7 + (depth * 7);
                 
@@ -2753,7 +2753,7 @@ ${clientScript}    </script>`;
                 // Render nested sub_epics if they exist (recursive)
                 // Pass the current sub-epic's full path as the parent for nested children
                 if (nestedSubEpics.length > 0) {
-                    const currentSubEpicStoryGraphPath = `${baseStoryGraphPath}."${subEpic.name}"`;
+                    const currentSubEpicStoryGraphPath = `${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"`;
                     nestedSubEpics.forEach((nested, nestedIndex) => {
                         renderSubEpic(nested, nestedIndex, subEpicId, depth + 1, currentSubEpicStoryGraphPath);
                     });
@@ -2788,12 +2788,12 @@ ${clientScript}    </script>`;
                                 const storyDocLink = story.links && story.links.find(l => l.text === 'story');
                                 const storyTestLink = story.links && story.links.find(l => l.icon === 'test_tube');
                                 const storyTestFiles = story.test_files?.length > 0 ? story.test_files : (storyTestLink ? [storyTestLink.url] : []);
-                                const storyTestFilesJson = storyTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(storyTestFiles)) : '';
+                                const storyTestFilesJson = storyTestFiles.length > 0 ? escapeForHtml(JSON.stringify(storyTestFiles)) : '';
                                 
                                 // Story name: plain text, clickable to select (File/Test via toolbar)
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
-                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${this.escapeHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${escapeForHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
                                 
                                 // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
@@ -2810,14 +2810,14 @@ ${clientScript}    </script>`;
                                         // Create scenario anchor ID from scenario name (matches synchronizer format)
                                         const scenarioAnchor = this.createScenarioAnchor(scenario.name);
                                         // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                        const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
+                                        const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"."${escapeForHtml(story.name)}"."${escapeForHtml(scenario.name)}"`);
                                         
                                         // Scenario: plain text, clickable to select (File/Test via toolbar)
                                         const scenarioBehavior = scenario.behavior_needed || '';
                                         const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
                                         const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
-                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(scenarioTestFiles)) : '';
-                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${this.escapeHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
+                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? escapeForHtml(JSON.stringify(scenarioTestFiles)) : '';
+                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${escapeForHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
                                         
                                         html += '</div>';
                                     });
@@ -2922,7 +2922,7 @@ ${clientScript}    </script>`;
             const behaviorNeeded = increment.behavior_needed || 'shape';
 
             html += `
-                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${this.escapeHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
+                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${escapeForHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
                         <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
                         <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>
