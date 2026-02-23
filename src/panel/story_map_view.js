@@ -94,7 +94,7 @@ class StoryMapView extends PanelView {
         const perfIconsStart = performance.now();
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
-        const magnifyingGlassIconPath = getIcon('magnifying_glass.png');
+        const scopeMapIconPath = getIcon('scope_map.png');
         const clearIconPath = getIcon('close.png');
         const showAllIconPath = getIcon('show_all.png');
         const jsonIconPath = getIcon('json.png');
@@ -120,10 +120,25 @@ class StoryMapView extends PanelView {
         const submitScenarioIconPath = getIcon('submit_ac.png');
         const submitTestIconPath = getIcon('submit_tests.png');
         const submitCodeIconPath = getIcon('submit_code.png');
+        const renderDiagramIconPath = getIcon('render_diagram.png');
+        const saveLayoutIconPath = getIcon('save_layout.png');
+        const clearLayoutIconPath = getIcon('clear_layout.png');
+        const generateReportIconPath = getIcon('generate_report.png');
+        const updateGraphIconPath = getIcon('update_graph.png');
         const refreshIconPath = getIcon('refresh.png');
+        const injectStoriesIconPath = getIcon('inject_stories.png');
+        const injectDomainIconPath = getIcon('inject_domain.png');
+        const injectCriteriaIconPath = getIcon('inject_criteria.png');
+        const injectScenariosIconPath = getIcon('inject_scenarios.png');
+        const injectExamplesIconPath = getIcon('inject_examples.png');
+        const injectTestsIconPath = getIcon('inject_tests.png');
+        const injectCodeIconPath = getIcon('inject_code.png');
         Logger.log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
         Logger.log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
+
+        const drawioLink = (scopeData.graphLinks || []).find(l => l.url && l.url.endsWith('.drawio'));
+        const drawioPath = drawioLink ? this.escapeForJs(drawioLink.url) : '';
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `
@@ -160,6 +175,49 @@ class StoryMapView extends PanelView {
                     <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
                         <img src="${scopeToIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Scope To" />
                     </button>
+                </div>
+                
+                <!-- Diagram action buttons: Render, Save layout, Clear layout, Update graph -->
+                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 2px;">
+                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram for current behavior">
+                        <img src="${renderDiagramIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Render Diagram" />
+                    </button>
+                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Save diagram layout for current behavior">
+                        <img src="${saveLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Save Layout" />
+                    </button>
+                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear diagram layout for current behavior">
+                        <img src="${clearLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Clear Layout" />
+                    </button>
+                    <button id="btn-generate-report" class="generate-report-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'generateDiagramReport', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Generate update report from diagram">
+                        <img src="${generateReportIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Generate Report" />
+                    </button>
+                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Update graph from diagram for current behavior">
+                        <img src="${updateGraphIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Update Graph" />
+                    </button>
+                </div>
+                
+                <!-- Separator between Scope and Related Files groups -->
+                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
+                </div>
+                
+                <!-- Right side: Related Files and Submit button group -->
+                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
+                    <button id="btn-open-graph" 
+                            onclick="event.stopPropagation(); handleOpenGraph();" 
+                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 52px; height: 52px; flex-shrink: 0;" 
+                            onmouseover="this.style.opacity='0.7'" 
+                            onmouseout="this.style.opacity='1'" 
+                            title="Open story graph with selected node expanded">
+                        <img src="${jsonIconPath}" style="width: 48px; height: 48px; object-fit: contain; display: block;" alt="Graph" />
+                    </button>
+                    <button id="btn-open-all" 
+                            onclick="event.stopPropagation(); handleOpenAll();" 
+                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px; flex-shrink: 0;" 
+                            onmouseover="this.style.opacity='0.7'" 
+                            onmouseout="this.style.opacity='1'" 
+                            title="Open all related files in split editors">
+                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
+                    </button>
                     <button id="btn-submit" 
                             onclick="event.stopPropagation(); handleSubmit();" 
                             style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
@@ -185,30 +243,6 @@ class StoryMapView extends PanelView {
                             data-tests-icon="${submitTestIconPath}"
                             data-code-icon="${submitCodeIconPath}">
                         <img id="btn-submit-alt-icon" src="${submitScenarioIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Alt" />
-                    </button>
-                </div>
-                
-                <!-- Separator between Scope/Submit and Related Files groups -->
-                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
-                </div>
-                
-                <!-- Right side: Related Files button group -->
-                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
-                    <button id="btn-open-graph" 
-                            onclick="event.stopPropagation(); handleOpenGraph();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 52px; height: 52px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open story graph with selected node expanded">
-                        <img src="${jsonIconPath}" style="width: 48px; height: 48px; object-fit: contain; display: block;" alt="Graph" />
-                    </button>
-                    <button id="btn-open-all" 
-                            onclick="event.stopPropagation(); handleOpenAll();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open all related files in split editors">
-                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
                     </button>
                 </div>
             </div>
@@ -246,6 +280,13 @@ class StoryMapView extends PanelView {
             contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
+            // Include epics section with increment's stories when scope is filtered to increment (injection level applies)
+            const epics = (scopeData.type === 'increment' && scopeData.content?.epics) || [];
+            if (epics.length > 0) {
+                const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
+                const rootNode = this.renderRootNode(treeHtml, plusIconPath, subtractIconPath);
+                contentHtml += '<div style="margin-top: 12px; border-top: 1px solid var(--accent-color); padding-top: 8px;"><span style="font-size: 12px; font-weight: 600; opacity: 0.8;">Epics</span></div>' + rootNode;
+            }
         } else if (isFilesView && scopeData.type === 'files' && scopeData.content) {
             // Files view - only when toggle is Files AND scope has file data
             contentHtml = this.renderFileList(scopeData.content);
@@ -254,17 +295,17 @@ class StoryMapView extends PanelView {
             // Hierarchy view - content is an object with 'epics' property
             const epics = scopeData.content.epics || [];
             
-            const perfRootNodeStart = performance.now();
-            const rootNode = this.renderRootNode(actionButtonsHtml);
-            const perfRootNodeEnd = performance.now();
-            Logger.log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
-            
             const perfTreeStart = performance.now();
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
             const perfTreeEnd = performance.now();
             Logger.log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
             
-            contentHtml = rootNode + treeHtml;
+            const perfRootNodeStart = performance.now();
+            const rootNode = this.renderRootNode(treeHtml, plusIconPath, subtractIconPath);
+            const perfRootNodeEnd = performance.now();
+            Logger.log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
+            
+            contentHtml = actionButtonsHtml + rootNode;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
         } else {
             contentHtml = '<div class="empty-state">All files in workspace</div>';
@@ -2563,8 +2604,8 @@ class StoryMapView extends PanelView {
             ">
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${magnifyingGlassIconPath ? `<img src="${magnifyingGlassIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Story Map Icon" />` : ''}
-                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Story Map</span>
+                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope Icon" />` : ''}
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
                     ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
                         background: transparent;
@@ -2691,15 +2732,15 @@ class StoryMapView extends PanelView {
                                onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
                         </div>
-                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 2px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
+                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 1px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
                         <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
-                        <button id="btn-include-stories" onclick="event.stopPropagation(); switchIncludeLevel('stories');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'stories') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'stories') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'stories') this.style.color='var(--text-color-faded)'" title="Include up to stories">stories</button>
-                        <button id="btn-include-domain" onclick="event.stopPropagation(); switchIncludeLevel('domain_concepts');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'domain_concepts') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'domain_concepts') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'domain_concepts') this.style.color='var(--text-color-faded)'" title="Include up to domain concepts">domain</button>
-                        <button id="btn-include-acceptance" onclick="event.stopPropagation(); switchIncludeLevel('acceptance');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'acceptance') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'acceptance') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'acceptance') this.style.color='var(--text-color-faded)'" title="Include up to acceptance criteria">criteria</button>
-                        <button id="btn-include-scenarios" onclick="event.stopPropagation(); switchIncludeLevel('scenarios');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'scenarios') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'scenarios') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'scenarios') this.style.color='var(--text-color-faded)'" title="Include up to scenarios">scenarios</button>
-                        <button id="btn-include-examples" onclick="event.stopPropagation(); switchIncludeLevel('examples');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(!scopeData.includeLevel || scopeData.includeLevel === 'examples') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'examples') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'examples') this.style.color='var(--text-color-faded)'" title="Include up to examples">examples</button>
-                        <button id="btn-include-tests" onclick="event.stopPropagation(); switchIncludeLevel('tests');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'tests') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'tests') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'tests') this.style.color='var(--text-color-faded)'" title="Include up to tests">tests</button>
-                        <button id="btn-include-code" onclick="event.stopPropagation(); switchIncludeLevel('code');" style="display: flex; align-items: center; padding: 2px 6px; line-height: 1.2; cursor: pointer; font-size: 12px; color: ${(scopeData.includeLevel === 'code') ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'}; border: none; background: transparent; transition: all 0.15s ease;" onmouseover="if('${scopeData.includeLevel || 'examples'}' !== 'code') this.style.color='var(--text-color)'" onmouseout="if('${scopeData.includeLevel || 'examples'}' !== 'code') this.style.color='var(--text-color-faded)'" title="Include up to code">code</button>
+                        <button id="btn-include-stories" onclick="event.stopPropagation(); switchIncludeLevel('stories');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to stories">${injectStoriesIconPath ? `<img src="${injectStoriesIconPath}" style="width: 20px; height: 20px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'stories') ? '1' : '0.5'};" alt="stories" />` : 'stories'}</button>
+                        <button id="btn-include-domain" onclick="event.stopPropagation(); switchIncludeLevel('domain_concepts');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to domain concepts">${injectDomainIconPath ? `<img src="${injectDomainIconPath}" style="width: 28px; height: 28px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'domain_concepts') ? '1' : '0.5'};" alt="domain" />` : 'domain'}</button>
+                        <button id="btn-include-acceptance" onclick="event.stopPropagation(); switchIncludeLevel('acceptance');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to acceptance criteria">${injectCriteriaIconPath ? `<img src="${injectCriteriaIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'acceptance') ? '1' : '0.5'};" alt="criteria" />` : 'criteria'}</button>
+                        <button id="btn-include-scenarios" onclick="event.stopPropagation(); switchIncludeLevel('scenarios');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to scenarios">${injectScenariosIconPath ? `<img src="${injectScenariosIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'scenarios') ? '1' : '0.5'};" alt="scenarios" />` : 'scenarios'}</button>
+                        <button id="btn-include-examples" onclick="event.stopPropagation(); switchIncludeLevel('examples');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to examples">${injectExamplesIconPath ? `<img src="${injectExamplesIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(!scopeData.includeLevel || scopeData.includeLevel === 'examples') ? '1' : '0.5'};" alt="examples" />` : 'examples'}</button>
+                        <button id="btn-include-tests" onclick="event.stopPropagation(); switchIncludeLevel('tests');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to tests">${injectTestsIconPath ? `<img src="${injectTestsIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'tests') ? '1' : '0.5'};" alt="tests" />` : 'tests'}</button>
+                        <button id="btn-include-code" onclick="event.stopPropagation(); switchIncludeLevel('code');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to code">${injectCodeIconPath ? `<img src="${injectCodeIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'code') ? '1' : '0.5'};" alt="code" />` : 'code'}</button>
                         </div>
                     </div>
                     ${contentHtml}
@@ -2721,22 +2762,29 @@ ${clientScript}    </script>`;
     }
     
     /**
-     * Render root "Story Map" node with contextual action buttons.
+     * Render root "Story Map" node as collapsible container (like epics).
+     * When collapsed, all epics are hidden; when expanded, epics are visible.
+     * Story Map is the first row of the hierarchy (below the toolbar buttons).
+     * Epics are indented one level under Story Map.
      * 
-     * @param {string} actionButtonsHtml - HTML for contextual action buttons
+     * @param {string} treeHtml - HTML for epics tree (wrapped in collapsible div)
+     * @param {string} plusIconPath - Icon for collapsed state (expand)
+     * @param {string} subtractIconPath - Icon for expanded state (collapse)
      * @returns {string} HTML string
      */
-    renderRootNode(actionButtonsHtml) {
-        return `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+    renderRootNode(treeHtml, plusIconPath, subtractIconPath) {
+        const headerRow = `<div style="margin-top: 8px; margin-bottom: 4px; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center;">
-                <span class="story-node" data-node-type="root" data-node-name="Story Map" style="display: inline-block; cursor: pointer;" onclick="selectNode('root', null)">Story Map</span>
-                ${actionButtonsHtml}
+                <span id="story-map-root-icon" onclick="event.stopPropagation(); toggleCollapse('story-map-root');" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath || ''}" data-subtract="${subtractIconPath || ''}"><img class="collapse-icon" src="${subtractIconPath || ''}" data-state="expanded" style="width: 9px; height: 9px; vertical-align: middle;" alt="Collapse" /></span>
+                <span class="story-node" data-node-type="root" data-node-name="Story Map" style="display: inline-block; cursor: pointer; margin-left: 4px;" onclick="selectNode('root', null)">Story Map</span>
             </div>
             <div id="save-status-indicator" class="save-status" style="display: none;">
                 <span id="save-status-spinner" class="save-spinner" style="display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 140, 0, 0.3); border-top-color: #ff8c00; border-radius: 50%;"></span>
                 <span id="save-status-message" style="font-size: 12px; color: var(--text-color-faded); margin-left: 6px;"></span>
             </div>
         </div>`;
+        const contentDiv = `<div id="story-map-root" class="collapsible-content" style="display: block; padding-left: 12px;">${treeHtml}</div>`;
+        return headerRow + contentDiv;
     }
     
     /**
@@ -3013,9 +3061,10 @@ ${clientScript}    </script>`;
             const sortedStories = [...stories].sort((a, b) =>
                 (a.sequential_order || 0) - (b.sequential_order || 0)
             );
+            const behaviorNeeded = increment.behavior_needed || 'shape';
 
             html += `
-                <div class="increment-column-container" data-inc="${escapedName}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
+                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${this.escapeHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
                         <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
                         <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>

@@ -147,6 +147,29 @@ class Behavior:
         # If not found, raise AttributeError as expected
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
     
+    def execute(self) -> Dict[str, Any]:
+        """Execute this behavior. Uses submit_current_action for combine flow, bot.execute for skip."""
+        if not self.bot:
+            return {'status': 'error', 'message': 'No bot instance available', 'actions_run': [], 'actions_skipped': []}
+        # When behavior is skip, bot.execute returns early with actions_skipped
+        if self.bot.get_behavior_execute(self.name) == 'skip':
+            return self.bot.execute(self.name, include_scope=True)
+        # Otherwise use submit_current_action (handles combine_next, manual, etc.)
+        self.bot.behaviors.navigate_to(self.name)
+        result = self.bot.submit_current_action()
+        if not isinstance(result, dict):
+            result = {}
+        # Ensure actions_run/actions_skipped for test assertions
+        result.setdefault('actions_run', [])
+        actions_skipped = [a for a in self.action_names if self.bot.get_execution_mode(self.name, a) == 'skip']
+        # For combine_with_next, include skipped actions from next behavior too
+        if self.bot.get_behavior_execute(self.name) == 'combine_with_next':
+            next_b = self.bot.behaviors.next_after(self)
+            if next_b and self.bot.get_behavior_execute(next_b.name) != 'skip':
+                actions_skipped.extend([a for a in next_b.action_names if self.bot.get_execution_mode(next_b.name, a) == 'skip'])
+        result.setdefault('actions_skipped', actions_skipped)
+        return result
+
     def submitRules(self) -> Dict[str, Any]:
         """Submit behavior rules instructions to AI chat.
         

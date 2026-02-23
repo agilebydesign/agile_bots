@@ -4,7 +4,15 @@
 
 module.exports = {
     env: {
-        uriScheme: 'vscode'
+        uriScheme: 'vscode',
+        clipboard: {
+            writeText: (text) => Promise.resolve()
+        }
+    },
+    ProgressLocation: {
+        Notification: 15,
+        Window: 10,
+        SourceControl: 1
     },
     ProgressLocation: {
         Notification: 15,
@@ -35,8 +43,12 @@ module.exports = {
     window: {
         showErrorMessage: () => Promise.resolve(),
         showInformationMessage: () => Promise.resolve(),
+        showWarningMessage: () => Promise.resolve(),
         showTextDocument: () => Promise.resolve(),
-        withProgress: (options, task) => task({ report: () => {} }),
+        showOpenDialog: () => Promise.resolve([]),
+        showInputBox: () => Promise.resolve(undefined),
+        withProgress: (options, task) => task(),
+        // withProgress: (options, task) => task({ report: () => {} })
         createOutputChannel: () => ({
             appendLine: () => {},
             show: () => {}
@@ -55,6 +67,12 @@ module.exports = {
         openTextDocument: () => Promise.resolve({
             getText: () => '',
             lineCount: 0
+        }),
+        getConfiguration: () => ({
+            get: (key, defaultValue) => defaultValue !== undefined ? defaultValue : undefined,
+            has: () => false,
+            inspect: () => undefined,
+            update: () => Promise.resolve()
         })
     },
     commands: {

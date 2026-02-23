@@ -36,8 +36,12 @@ function isTempPath(filePath) {
 /**
  * Verify WORKING_AREA is set to a temp directory in tests
  * This should be called before creating PanelView instances
+ * Also sets AGILE_BOTS_SKIP_CHAT_SUBMIT so Python backend skips clipboard/hotkey
+ * submission to chat (prevents pasting to real IDE during tests)
  */
 function verifyTestWorkspace() {
+    process.env.AGILE_BOTS_SKIP_CHAT_SUBMIT = '1';
+
     const workingArea = process.env.WORKING_AREA;
     
     if (!workingArea) {

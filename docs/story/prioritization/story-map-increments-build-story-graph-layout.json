@@ -1,0 +1,26 @@
+{
+  "EPIC|Invoke Bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 370.0,
+    "height": 60.0
+  },
+  "invoke-bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 370.0,
+    "height": 60.0
+  },
+  "SUB_EPIC|Build Story Graph": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 360.0,
+    "height": 60.0
+  },
+  "invoke-bot/build-story-graph": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 360.0,
+    "height": 60.0
+  }
+}

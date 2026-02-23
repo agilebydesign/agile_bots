@@ -315,6 +315,21 @@ class BehaviorsViewTestHelper {
     }
     
     /**
+     * Assert skip behavior is dimmed and has skip styling
+     * @param {string} html - HTML string
+     * @param {string} behaviorName - Behavior that should be skip (grayed, unchecked)
+     */
+    assert_skip_behavior_dimmed(html, behaviorName) {
+        const doc = parseHTML(html);
+        const behaviorElement = doc.querySelector(`[data-behavior="${behaviorName}"]`);
+        assert.ok(behaviorElement, `Behavior "${behaviorName}" should be in HTML`);
+        assert.ok(
+            behaviorElement.classList.contains('behavior-skip') || behaviorElement.getAttribute('data-skip') === 'true',
+            `Behavior "${behaviorName}" should have behavior-skip class or data-skip="true"`
+        );
+    }
+
+    /**
      * Assert action is expanded (visible) in the UI
      * @param {string} html - HTML string
      * @param {string} behaviorName - Behavior containing the action

@@ -98,10 +98,23 @@ class DomainNavigator:
                 try:
                     current_object = current_object[part]
                 except (KeyError, TypeError):
-                    return {
-                        'status': 'error',
-                        'message': f"Cannot access '{part}' on {type(current_object).__name__}"
-                    }
+                    # Fallback: when at SubEpic and direct child lookup fails, try find_node
+                    # (handles path mismatches when Story/SubEpic is under nested hierarchy)
+                    if (type(current_object).__name__ == 'SubEpic' and
+                            hasattr(self.bot, 'story_graph') and self.bot.story_graph):
+                        node = self.bot.story_graph.find_node(part)
+                        if node:
+                            current_object = node
+                        else:
+                            return {
+                                'status': 'error',
+                                'message': f"Cannot access '{part}' on {type(current_object).__name__}"
+                            }
+                    else:
+                        return {
+                            'status': 'error',
+                            'message': f"Cannot access '{part}' on {type(current_object).__name__}"
+                        }
             else:
                 return {
                     'status': 'error',

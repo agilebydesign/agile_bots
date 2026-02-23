@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import json
 import logging
 import traceback
@@ -107,7 +107,16 @@ class Behaviors:
         if next_index < len(self._behaviors):
             return self._behaviors[next_index]
         return None
-    
+
+    def next_after(self, behavior: 'Behavior') -> Optional['Behavior']:
+        """Return the behavior that comes after the given behavior in sequence."""
+        for i, b in enumerate(self._behaviors):
+            if b.name == behavior.name:
+                if i + 1 < len(self._behaviors):
+                    return self._behaviors[i + 1]
+                return None
+        return None
+
     def previous(self) -> Optional['Behavior']:
         if self._current_index is None or self._current_index <= 0:
             return None

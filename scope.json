@@ -1,9 +1,9 @@
 {
   "type": "story",
   "value": [
-    "configure"
+    "Perform Action"
   ],
   "exclude": [],
   "skiprule": [],
-  "include_level": "examples"
+  "include_level": "acceptance"
 }

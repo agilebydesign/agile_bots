@@ -115,6 +115,71 @@ class TestFilterScopeByStories:
         helper.scope.assert_story_graph_contains_story(filtered_graph, 'Story A1')
         helper.scope.assert_story_graph_contains_epic(filtered_graph, 'Epic A')
 
+    def test_filter_by_increment_name_excludes_unallocated_stories(self, tmp_path):
+        """
+        SCENARIO: Filter by increment name excludes empty-named "unallocated" increment
+        GIVEN: Story graph with unallocated increment (empty name) and named increment (CLI)
+        WHEN: Filter with increment name 'CLI'
+        THEN: Only CLI increment and its stories are returned
+        AND: Unallocated increment and its stories are excluded
+        """
+        from scope.scope import StoryGraphFilter
+
+        story_graph = {
+            "increments": [
+                {"name": "", "priority": 1, "stories": ["Build Story Graph", "Clarify Requirements"]},
+                {"name": "CLI", "priority": 2, "stories": ["Build Story Graph Using CLI", "Clarify Requirements Using CLI"]},
+            ],
+            "epics": [
+                {
+                    "name": "Epic A",
+                    "sub_epics": [
+                        {
+                            "name": "SubEpic A1",
+                            "sub_epics": [],
+                            "story_groups": [
+                                {
+                                    "stories": [
+                                        {"name": "Build Story Graph"},
+                                        {"name": "Clarify Requirements"},
+                                        {"name": "Build Story Graph Using CLI"},
+                                        {"name": "Clarify Requirements Using CLI"},
+                                    ]
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+        }
+
+        f = StoryGraphFilter(increments=["CLI"])
+        filtered = f.filter_story_graph(story_graph)
+
+        # Only CLI increment, not unallocated
+        inc_names = [inc.get("name") for inc in filtered.get("increments", [])]
+        assert inc_names == ["CLI"], f"Expected only CLI increment, got {inc_names}"
+
+        # Must include CLI stories
+        def all_story_names(epics):
+            names = []
+            for e in epics:
+                for se in e.get("sub_epics", []):
+                    for sg in se.get("story_groups", []):
+                        for st in sg.get("stories", []):
+                            names.append(st.get("name"))
+                    for st in se.get("stories", []):
+                        names.append(st.get("name"))
+            return names
+
+        story_names = all_story_names(filtered.get("epics", []))
+        assert "Build Story Graph Using CLI" in story_names
+        assert "Clarify Requirements Using CLI" in story_names
+
+        # Must NOT include unallocated stories
+        assert "Build Story Graph" not in story_names, "Unallocated story should be excluded"
+        assert "Clarify Requirements" not in story_names, "Unallocated story should be excluded"
+
 # ============================================================================
 # CLI TESTS - Scope Operations via CLI Commands
 # ============================================================================

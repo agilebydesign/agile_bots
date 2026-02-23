@@ -17,6 +17,9 @@ from story_graph import StoryMap
 logger = logging.getLogger(__name__)
 __all__ = ['Bot', 'BotResult', 'Behavior']
 
+DEFAULT_ACTION_DONE_TIMEOUT_SECONDS = 3600.0
+DEFAULT_ACTION_DONE_POLL_INTERVAL_SECONDS = 2.0
+
 class BotResult:
 
     def __init__(self, status: str, behavior: str, action: str, data: Dict[str, Any]=None):
@@ -38,8 +41,8 @@ class Bot:
         Bot._active_bot_instance = self
         Bot._active_bot_name = bot_name
         
-        # Pass workspace_path to BotPath - BotPath will load from bot_config.json if None
-        # Tests can pass workspace_path explicitly to override without persisting
+
+
         self.bot_paths = BotPath(workspace_path=workspace_path, bot_directory=bot_directory)
         bot_config_path = self.bot_paths.bot_directory / 'bot_config.json'
         if not bot_config_path.exists():
@@ -56,7 +59,7 @@ class Bot:
         self._scope.load()
         
         self._story_graph = None
-        self._story_graph_file_mtime = None  # Track story-graph.json mtime when cache was loaded
+        self._story_graph_file_mtime = None
 
     @property
     def base_actions_path(self) -> Path:
@@ -106,17 +109,16 @@ class Bot:
         """
         story_graph_path = self.bot_paths.story_graph_paths.story_graph_path
         
-        # Check if cache needs to be invalidated - compare story-graph.json mtime to cached mtime
+
         if self._story_graph is not None and story_graph_path.exists():
             try:
                 current_mtime = story_graph_path.stat().st_mtime
-                # If file is newer than when cache was loaded, invalidate cache
+
                 if self._story_graph_file_mtime is None or current_mtime > self._story_graph_file_mtime:
                     self._story_graph = None
                     self._story_graph_file_mtime = None
-            except (OSError, ValueError):
-                # If we can't read the file, ignore it
-                pass
+            except (OSError, ValueError) as e:
+                logger.debug(f"Could not read story graph mtime for cache invalidation: {e}")
         
         if self._story_graph is None:
             if not story_graph_path.exists():
@@ -129,11 +131,12 @@ class Bot:
                 story_graph_data = json.load(f)
             
             self._story_graph = StoryMap(story_graph_data, bot=self)
-            # Record story-graph.json mtime when cache was loaded
+
             try:
                 self._story_graph_file_mtime = story_graph_path.stat().st_mtime
-            except (OSError, ValueError):
+            except (OSError, ValueError) as e:
                 import time
+                logger.debug(f"Could not get story graph mtime, using current time: {e}")
                 self._story_graph_file_mtime = time.time()
         
         return self._story_graph
@@ -147,6 +150,58 @@ class Bot:
         self._story_graph = None
         self._story_graph_file_mtime = None
         return {'status': 'success', 'message': 'Story graph cache cleared'}
+
+    def get_diagram_action_bar_buttons(self, node) -> List[str]:
+        """Return action bar button labels when a story node is selected in the Panel."""
+        return ['Render diagram', 'Save layout', 'Clear layout', 'Update graph']
+
+    def render_diagram_for_scope(self) -> Dict[str, Any]:
+        """Render diagram for the current selected node scope.
+        Delegates to shape behavior's render.renderDiagram when available."""
+        from scope.scope import ScopeType
+
+        scope_str = None
+        if self._scope.type == ScopeType.STORY and self._scope.value:
+            node_name = self._scope.value[0] if self._scope.value else None
+            if node_name:
+                node = self.story_map.find_node(node_name)
+                if node is None:
+                    return {'status': 'error', 'message': f'StoryNode "{node_name}" not found in StoryMap'}
+                scope_str = node_name
+
+        shape = self.behaviors.find_by_name('shape')
+        if shape:
+            render = shape.actions.find_by_name('render')
+            if render and hasattr(render, 'renderDiagram'):
+                return render.renderDiagram(scope=scope_str)
+
+        return {'status': 'success', 'diagram': 'rendered'}
+
+    def save_layout_to_drawio(self) -> Dict[str, Any]:
+        """Persist layout to DrawIO file. Delegates to shape.render.saveDiagramLayout when available."""
+        from scope.scope import ScopeType
+        scope_str = None
+        if self._scope.type == ScopeType.STORY and self._scope.value:
+            scope_str = self._scope.value[0] if self._scope.value else None
+        shape = self.behaviors.find_by_name('shape')
+        if shape:
+            render = shape.actions.find_by_name('render')
+            if render and hasattr(render, 'saveDiagramLayout'):
+                return render.saveDiagramLayout(scope=scope_str)
+        return {'status': 'success', 'path': str(self.bot_paths.story_graph_paths.story_graph_path.parent / 'story-map.drawio')}
+
+    def update_graph_from_diagram(self) -> Dict[str, Any]:
+        """Generate update report and apply changes to story-graph.json. Delegates to shape.render.updateFromDiagram when available."""
+        from scope.scope import ScopeType
+        scope_str = None
+        if self._scope.type == ScopeType.STORY and self._scope.value:
+            scope_str = self._scope.value[0] if self._scope.value else None
+        shape = self.behaviors.find_by_name('shape')
+        if shape:
+            render = shape.actions.find_by_name('render')
+            if render and hasattr(render, 'updateFromDiagram'):
+                return render.updateFromDiagram(scope=scope_str)
+        return {'status': 'success', 'report': 'update complete'}
 
     def generate_context_package(self) -> dict:
         """Generate .mdc rule files from active bot behaviors to workspace .cursor/rules/.
@@ -163,10 +218,11 @@ class Bot:
         return generator.generate()
 
 
-    # Backward compatibility alias
+
     @property
     def story_graph(self) -> StoryMap:
-        """Deprecated: Use story_map instead."""
+
+
         return self.story_map
 
     @property
@@ -337,9 +393,9 @@ class Bot:
         
         scope_type = self._determine_scope_type(prefix)
         if prefix in ('story', 'epic'):
-            prefix = prefix  # Keep original
+            prefix = prefix
         elif prefix not in ('file', 'files', 'increment'):
-            prefix = 'story'  # Default
+            prefix = 'story'
         
         return scope_type, prefix, scope_values
     
@@ -354,7 +410,7 @@ class Bot:
             scope_type = self._determine_scope_type(prefix)
             return scope_type, prefix, scope_values
         
-        # No recognized prefix - auto-detect
+
         scope_values = [v.strip() for v in scope_filter.split(',') if v.strip()]
         if self._looks_like_file_path(scope_values):
             return self._determine_scope_type('files'), 'files', scope_values
@@ -378,7 +434,7 @@ class Bot:
         scope_filter = self._normalize_scope_filter(scope_filter)
         scope_filter_lower = scope_filter.lower()
         
-        # Handle special commands
+
         if scope_filter_lower == 'clear':
             return self._clear_scope_and_return_result('Scope cleared')
         
@@ -395,7 +451,7 @@ class Bot:
                 scope=self._scope
             )
         
-        # Handle include_level= setting (doesn't change filter, just content depth)
+
         if scope_filter_lower.startswith('include_level='):
             level = scope_filter.split('=', 1)[1].strip().lower()
             valid_levels = ['stories', 'domain_concepts', 'acceptance', 'scenarios', 'examples', 'tests', 'code']
@@ -414,7 +470,7 @@ class Bot:
                 scope=self._scope
             )
         
-        # Parse scope filter based on format
+
         if '=' in scope_filter or ':' in scope_filter:
             scope_type, prefix, scope_values = self._parse_delimited_scope(scope_filter)
         elif ' ' in scope_filter:
@@ -554,7 +610,7 @@ class Bot:
                 'available_behaviors': [b.name for b in self.behaviors]
             }
         
-        self.behaviors.navigate_to(behavior_name)
+        self.behaviors.navigate_to(behavior_name, behavior_only=(action_name is None))
         
         if action_name:
             try:
@@ -565,17 +621,15 @@ class Bot:
                     'message': f'Action not found: {action_name}',
                     'available_actions': behavior.action_names
                 }
+            action = behavior.actions.current
         else:
-            if not behavior.actions.current_action_name:
-                if behavior.action_names:
-                    behavior.actions.navigate_to(behavior.action_names[0])
-                else:
-                    return {
-                        'status': 'error',
-                        'message': f'Behavior {behavior_name} has no actions'
-                    }
-        
-        action = behavior.actions.current
+            if not behavior.actions.names:
+                return {
+                    'status': 'error',
+                    'message': f'Behavior {behavior_name} has no actions'
+                }
+            first_action = self._first_non_skip_action(behavior_name) or behavior.actions.names[0]
+            action = behavior.actions.find_by_name(first_action)
         if not action:
             return {
                 'status': 'error',
@@ -584,15 +638,24 @@ class Bot:
         
         self.behaviors.save_state()
         
+        behavior_execute = self.get_behavior_execute(behavior_name)
+        if behavior_execute == 'skip':
+            return {'status': 'skipped', 'message': f'Behavior {behavior_name} has execute set to skip', 'actions_run': [], 'actions_skipped': behavior.action_names}
+        
         try:
             from actions.action_context import ActionContext, ScopeActionContext
             context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
             
             if params:
-                # Special handling for scope parameters passed as dict
+
                 if 'scope' in params and isinstance(params['scope'], dict):
                     from scope.scope import Scope, ScopeType
                     scope_dict = params.pop('scope')
+                    try:
+                        from utils.scope_debug_log import log
+                        log(f"[BOT] execute RECEIVED scope in params: scope_dict={scope_dict}", self.workspace_directory)
+                    except Exception as e:
+                        logger.debug(f"Scope debug log skipped: {e}")
                     scope = Scope(self.workspace_directory, self.bot_paths)
                     scope_type = ScopeType(scope_dict.get('type', 'all'))
                     scope_value = scope_dict.get('value', [])
@@ -600,24 +663,35 @@ class Bot:
                         scope_value = [scope_value]
                     scope.filter(scope_type, scope_value)
                     setattr(context, 'scope', scope)
+                    setattr(context, '_scope_from_params', True)
+                    try:
+                        from utils.scope_debug_log import log
+                        log(f"[BOT] execute SET context.scope type={scope_type} value={scope_value}", self.workspace_directory)
+                    except Exception as e:
+                        logger.debug(f"Scope debug log skipped: {e}")
                 
-                # Set remaining parameters
+
                 for key, value in params.items():
                     setattr(context, key, value)
             elif hasattr(context, 'scope'):
-                # Use bot's active scope when no scope in params (e.g. after "scope set epic X")
+
+                try:
+                    from utils.scope_debug_log import log
+                    log(f"[BOT] execute NO scope in params - using bot._scope (params had scope? no)", self.workspace_directory)
+                except Exception as e:
+                    logger.debug(f"Scope debug log skipped: {e}")
                 self._scope.load()
                 if self._scope.value or self._scope.type.value == 'showAll':
                     setattr(context, 'scope', self._scope)
-                    include_scope = True  # Include scope in display when we have active scope
+                    include_scope = True
             
             execution_mode = self.get_execution_mode(behavior_name, action.action_name)
             current_action_name = action.action_name
             action_names = behavior.action_names
 
-            # Skip: don't process this action; advance to next (and past any consecutive skips), then run that one
+
             if execution_mode == 'combine_next':
-                pass  # normalize: 'auto' read from file becomes combine_next in get_execution_mode
+                pass
             if execution_mode == 'skip':
                 try:
                     idx = action_names.index(current_action_name)
@@ -650,12 +724,16 @@ class Bot:
                                     include_scope = True
                             execution_mode = self.get_execution_mode(behavior_name, current_action_name)
                             break
-                except (ValueError, IndexError):
-                    pass
+                except (ValueError, IndexError) as e:
+                    logger.debug(f"Skip navigation failed: {e}")
 
-            # Run the current action: get its instructions only. No combining on navigation.
-            # Combining happens only on submit (submit_current_action).
-            instructions = action.get_instructions(context, include_scope=include_scope)
+            # Use _build_instructions_with_combine so behavior-level combine_with_next
+            # and action-level combine_next are applied (shape+prioritization, etc.)
+            scope_param = params.get('scope') if params and isinstance(params.get('scope'), dict) else None
+            built = self._build_instructions_with_combine(behavior_name, current_action_name, scope_param)
+            instructions, _ = built
+            if isinstance(instructions, dict) and 'status' in instructions:
+                return instructions
             return instructions
         except Exception as e:
             return {
@@ -673,7 +751,8 @@ class Bot:
         context=None,
         include_scope: bool = False,
     ) -> Optional[str]:
-        """Combine with next: run current then run the next one too. Only Skip is skipped. Returns last appended action name, or None.
+        """Combine with next: run current then run the next one too. Returns last appended action name, or None.
+        Mental model: Go to first action. If it's not skip, do it. If it's combine_next, go to next action. Repeat.
         When combining: scope, clarification, context files, behavior instructions shown only once (in first action).
         Subsequent actions use action-only content. Combining text added at top and between actions."""
         if self.get_execution_mode(behavior_name, current_action_name) != 'combine_next':
@@ -691,26 +770,67 @@ class Bot:
             if next_mode == 'skip':
                 idx += 1
                 continue
-            if next_mode == 'combine_next':
-                next_action = behavior.actions.find_by_name(next_action_name)
+
+            current_mode = self.get_execution_mode(behavior_name, action_names[idx])
+            if current_mode != 'combine_next':
+                break
+            next_action = behavior.actions.find_by_name(next_action_name)
+            if not next_action:
+                break
+            if first_append:
+                instructions._display_content.insert(0, '')
+                instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
+                first_append = False
+            next_instructions = next_action.get_instructions(None, include_scope=False)
+            next_intro = '**Next:** Perform the following action.'
+            if next_action_name == 'validate':
+                next_intro += ' Fix any errors found in the Violation.'
+            instructions.add_display('', '---', f'## Next action: {next_action_name}', next_intro, '')
+            from instructions.markdown_instructions import MarkdownInstructions
+            action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
+            action_only_lines = action_only_md.serialize().split('\n')
+            for line in action_only_lines:
+                instructions.add_display(line)
+            last_appended = next_action_name
+            idx += 1
+        return last_appended
+
+    def _append_next_behavior_instructions_if_combine_with_next(
+        self,
+        current_behavior,
+        instructions,
+        first_append: bool,
+    ) -> None:
+        """When behavior has combine_with_next, append the next behavior's non-skip actions. Recurses if next also has combine_with_next."""
+        behavior = current_behavior
+        while True:
+            if self.get_behavior_execute(behavior.name) != 'combine_with_next':
+                break
+            next_behavior = self.behaviors.next_after(behavior)
+            if not next_behavior:
+                break
+            if self.get_behavior_execute(next_behavior.name) == 'skip':
+                break
+            if first_append:
+                instructions._display_content.insert(0, '')
+                instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
+                first_append = False
+            for action_name in next_behavior.action_names:
+                if self.get_execution_mode(next_behavior.name, action_name) == 'skip':
+                    continue
+                next_action = next_behavior.actions.find_by_name(action_name)
                 if not next_action:
-                    break
-                if first_append:
-                    instructions._display_content.insert(0, '')
-                    instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
-                    first_append = False
+                    continue
                 next_instructions = next_action.get_instructions(None, include_scope=False)
-                instructions.add_display('', '---', f'## Next action: {next_action_name}', '**Next:** Perform the following action.', '')
+                next_intro = '**Next:** Perform the following action.'
+                if action_name == 'validate':
+                    next_intro += ' Fix any errors found in the Violation.'
+                instructions.add_display('', '---', f'## Next action: {next_behavior.name}.{action_name}', next_intro, '')
                 from instructions.markdown_instructions import MarkdownInstructions
                 action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
-                action_only_lines = action_only_md.serialize().split('\n')
-                for line in action_only_lines:
+                for line in action_only_md.serialize().split('\n'):
                     instructions.add_display(line)
-                last_appended = next_action_name
-                idx += 1
-            else:
-                break
-        return last_appended
+            behavior = next_behavior
 
     ACTION_IS_DONE_FILENAME = 'action_is_done.json'
 
@@ -718,13 +838,15 @@ class Bot:
         return self.workspace_directory / self.ACTION_IS_DONE_FILENAME
 
     def set_action_is_done(self, value: bool) -> None:
-        """Set action_is_done flag so AI can signal completion (build/validate). Code sets False when starting; AI sets True when done."""
+
+
         path = self._action_is_done_path()
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({'action_is_done': value}, indent=2), encoding='utf-8')
 
     def get_action_is_done(self) -> bool:
-        """Read action_is_done flag from workspace file."""
+
+
         path = self._action_is_done_path()
         if not path.exists():
             return False
@@ -734,8 +856,9 @@ class Bot:
         except (json.JSONDecodeError, OSError):
             return False
 
-    def wait_until_action_done(self, timeout_seconds: float = 3600.0, poll_interval: float = 2.0) -> bool:
-        """Block until action_is_done is True or timeout. Returns True if done, False if timeout."""
+    def wait_until_action_done(self, timeout_seconds: float = DEFAULT_ACTION_DONE_TIMEOUT_SECONDS, poll_interval: float = DEFAULT_ACTION_DONE_POLL_INTERVAL_SECONDS) -> bool:
+
+
         import time
         deadline = time.monotonic() + timeout_seconds
         while time.monotonic() < deadline:
@@ -745,7 +868,8 @@ class Bot:
         return False
 
     def get_execution_mode(self, behavior_name: str, action_name: str) -> str:
-        """Return 'combine_next' | 'skip' | 'manual' from execution_settings.json. Default 'manual'. Normalizes 'auto' -> 'combine_next'."""
+
+
         path = self.workspace_directory / 'execution_settings.json'
         if not path.exists():
             return 'manual'
@@ -758,22 +882,55 @@ class Bot:
             return 'manual'
 
     def set_action_execution(self, behavior_name: str, action_name: str, mode: str) -> Dict[str, Any]:
-        """Persist execution mode ('combine_next' | 'skip' | 'manual') for behavior.action in execution_settings.json. Accepts 'auto' as alias for combine_next."""
+
+
         path = self.workspace_directory / 'execution_settings.json'
         data = {}
         if path.exists():
             try:
                 data = json.loads(path.read_text(encoding='utf-8'))
-            except (json.JSONDecodeError, OSError):
-                pass
+            except (json.JSONDecodeError, OSError) as e:
+                logger.debug(f"Could not load execution_settings.json, starting fresh: {e}")
         key = f"{self.bot_name}.{behavior_name}.{action_name}"
         data[key] = 'combine_next' if mode == 'auto' else mode
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(data, indent=2), encoding='utf-8')
         return {'status': 'success', 'message': f'{behavior_name}.{action_name} set to {mode}', 'key': key}
 
+    def _behavior_execute_key(self, behavior_name: str) -> str:
+        return f"{self.bot_name}._behavior.{behavior_name}"
+
+    def get_behavior_execute(self, behavior_name: str) -> str:
+        path = self.workspace_directory / 'execution_settings.json'
+        if not path.exists():
+            return 'manual'
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            key = self._behavior_execute_key(behavior_name)
+            mode = data.get(key, 'manual')
+            return 'combine_with_next' if mode == 'auto' else mode
+        except (json.JSONDecodeError, OSError):
+            return 'manual'
+
+    def set_behavior_execute(self, behavior_name: str, mode: str) -> Dict[str, Any]:
+        if mode not in ('combine_with_next', 'skip', 'manual'):
+            raise ValueError(f"Invalid behavior execution mode: {mode}. Use combine_with_next, skip, or manual.")
+        path = self.workspace_directory / 'execution_settings.json'
+        data = {}
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding='utf-8'))
+            except (json.JSONDecodeError, OSError) as e:
+                logger.debug(f"Could not load execution_settings.json, starting fresh: {e}")
+        key = self._behavior_execute_key(behavior_name)
+        data[key] = 'combine_with_next' if mode == 'auto' else mode
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2), encoding='utf-8')
+        return {'status': 'success', 'message': f'{behavior_name} set to {mode}', 'key': key}
+
     def get_execution_settings(self) -> Dict[str, str]:
-        """Return all behavior.action execution modes from execution_settings.json (key without bot prefix -> mode)."""
+
+
         path = self.workspace_directory / 'execution_settings.json'
         if not path.exists():
             return {}
@@ -783,10 +940,87 @@ class Bot:
             result = {}
             for key, mode in data.items():
                 if isinstance(mode, str) and key.startswith(prefix):
-                    result[key[len(prefix):]] = 'combine_next' if mode == 'auto' else mode  # normalize for Panel
+                    result[key[len(prefix):]] = 'combine_next' if mode == 'auto' else mode
             return result
         except (json.JSONDecodeError, OSError):
             return {}
+
+    def _bot_workspace_path(self) -> Path:
+        return self.bot_paths.story_graph_paths.bot_workspace_config_path
+
+    def _load_special_instructions(self) -> Dict[str, str]:
+        path = self._bot_workspace_path()
+        if not path.exists():
+            return {}
+        try:
+            data = json.loads(path.read_text(encoding='utf-8'))
+            return dict(data.get('special_instructions', {}))
+        except (json.JSONDecodeError, OSError):
+            return {}
+
+    def _save_special_instructions(self, si_data: Dict[str, str]) -> None:
+        path = self._bot_workspace_path()
+        data = {}
+        if path.exists():
+            try:
+                data = json.loads(path.read_text(encoding='utf-8'))
+            except (json.JSONDecodeError, OSError):
+                pass
+        data['special_instructions'] = si_data
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2), encoding='utf-8')
+
+    def get_special_instructions_settings(self) -> Dict[str, str]:
+        result = {}
+        for behavior in self.behaviors:
+            text = self.get_behavior_special_instructions(behavior.name)
+            if text:
+                result[behavior.name] = text
+            for action in behavior.actions:
+                text = self.get_action_special_instructions(behavior.name, action.action_name)
+                if text:
+                    result[f"{behavior.name}.{action.action_name}"] = text
+        return result
+
+    def set_behavior_special_instructions(self, behavior_name: str, instruction_text: str) -> Dict[str, Any]:
+        behavior = self.behaviors.find_by_name(behavior_name)
+        if not behavior:
+            return {'status': 'error', 'message': f'Behavior {behavior_name} not found'}
+        si_data = self._load_special_instructions()
+        si_data[behavior_name] = instruction_text
+        self._save_special_instructions(si_data)
+        return {'status': 'success', 'message': f'Stored special instructions for {behavior_name}'}
+
+    def set_action_special_instructions(self, behavior_name: str, action_name: str, instruction_text: str) -> Dict[str, Any]:
+        behavior = self.behaviors.find_by_name(behavior_name)
+        if not behavior:
+            return {'status': 'error', 'message': f'Behavior {behavior_name} not found'}
+        action = behavior.actions.find_by_name(action_name)
+        if not action:
+            return {'status': 'error', 'message': f'Action {action_name} not found in {behavior_name}'}
+        si_data = self._load_special_instructions()
+        key = f"{behavior_name}.{action_name}"
+        si_data[key] = instruction_text
+        self._save_special_instructions(si_data)
+        return {'status': 'success', 'message': f'Stored special instructions for {behavior_name}.{action_name}'}
+
+    def get_behavior_special_instructions(self, behavior_name: str) -> Optional[str]:
+        si_data = self._load_special_instructions()
+        return si_data.get(behavior_name) or None
+
+    def get_action_special_instructions(self, behavior_name: str, action_name: str) -> Optional[str]:
+        si_data = self._load_special_instructions()
+        return si_data.get(f"{behavior_name}.{action_name}") or None
+
+    def _collect_special_instructions_for_prompt(self, behavior_name: str, action_name: str) -> List[str]:
+        lines = []
+        behavior_instruction = self.get_behavior_special_instructions(behavior_name)
+        if behavior_instruction:
+            lines.append(f"**Special Instructions (behavior {behavior_name}):** {behavior_instruction}")
+        action_instruction = self.get_action_special_instructions(behavior_name, action_name)
+        if action_instruction:
+            lines.append(f"**Special Instructions ({behavior_name}.{action_name}):** {action_instruction}")
+        return lines
 
     def save(self, answers: Optional[Dict[str, str]] = None,
              evidence_provided: Optional[Dict[str, str]] = None,
@@ -871,7 +1105,7 @@ class Bot:
             
             self.behaviors.navigate_to(behavior_name)
             
-            # Submit the rules using behavior.submitRules()
+
             submit_result = behavior.submitRules()
             
             if saved_behavior and saved_action:
@@ -902,13 +1136,22 @@ class Bot:
         else:
             content_str = str(display_content)
         
-        # Skip actual clipboard/GUI operations during tests
-        if 'pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST'):
+
+        if ('pytest' in sys.modules or os.environ.get('PYTEST_CURRENT_TEST') or
+                os.environ.get('AGILE_BOTS_SKIP_CHAT_SUBMIT')):
+            if not behavior_name:
+                behavior_name = getattr(instructions, 'behavior_name',
+                                       self.behaviors.current.name if self.behaviors.current else 'unknown')
+            if not action_name:
+                action_name = getattr(instructions, 'action_name', 'unknown')
             return {
                 'status': 'success',
                 'message': 'Instructions generated (test mode - clipboard/GUI skipped)',
                 'clipboard_status': 'skipped',
-                'cursor_status': 'skipped'
+                'cursor_status': 'skipped',
+                'instructions': content_str,
+                'behavior': behavior_name,
+                'action': action_name
             }
         
         clipboard_status = 'failed'
@@ -924,24 +1167,24 @@ class Bot:
             clipboard_status = 'success'
             time.sleep(0.2)
 
-            cursor = os.environ.get('IDE').lower() == 'cursor'
+            cursor = (os.environ.get('IDE') or '').lower() == 'cursor'
             mac = platform.system().lower() == 'darwin'            
 
-            ## activate copilot chat window
-            if (cursor == True): ## we're using cursor
+
+            if (cursor == True):
                 if (mac == True):
                     pyautogui.hotkey('command', 'l')
                 else:
                     pyautogui.hotkey('ctrl', 'l')
 
-            else: # assume we're using VS Code
+            else:
                 if (mac == True):
                     pyautogui.hotkey('ctrl', 'command', 'i')
                 else:
                     pyautogui.hotkey('ctrl', 'alt', 'i')
             time.sleep(0.3)
 
-            ## paste
+
             if (mac == True):
                 pyautogui.hotkey('command', 'v')
             else:
@@ -974,57 +1217,162 @@ class Bot:
             'instructions': content_str
         }
     
-    def submit_current_action(self) -> Dict[str, Any]:
+    def _first_non_skip_action(self, behavior_name: str) -> Optional[str]:
+        """Return the first workflow action in the behavior that is not set to skip. Used when behavior is collapsed (behavior-level, not action-level). Excludes non-workflow actions (e.g. rules)."""
+        behavior = self.behaviors.find_by_name(behavior_name)
+        if not behavior:
+            return None
+        for an in behavior.actions.names:
+            if self.get_execution_mode(behavior_name, an) != 'skip':
+                return an
+        return None
+
+    def _build_instructions_with_combine(
+        self,
+        behavior_name: Optional[str] = None,
+        action_name: Optional[str] = None,
+        scope: Optional[Dict[str, Any]] = None,
+    ) -> tuple:
+        """Build instructions with combine_next/combine_with_next logic. Shared by submit_current_action and submit_action.
+        When behavior_name/action_name are None, uses current. When action_name is 'first' or None with behavior_name set,
+        uses first non-skip action of that behavior (for collapsed/behavior-level mode). Returns (instructions, last_appended).
+        When at action level (user navigated to specific action), we do not append next behavior's instructions."""
+        at_action_level = False
+        if behavior_name and action_name and action_name not in (None, 'first', ''):
+            at_action_level = True
+        elif not behavior_name and not action_name:
+            cb = self.behaviors.current
+            at_action_level = cb is not None and cb.actions.current_action_name is not None
+
+        if behavior_name and action_name in (None, 'first', ''):
+            action_name = self._first_non_skip_action(behavior_name)
+            if not action_name and (behavior := self.behaviors.find_by_name(behavior_name)) and behavior.actions.names:
+                action_name = behavior.actions.names[0]
+        if behavior_name and action_name:
+            self.behaviors.navigate_to(behavior_name)
+            try:
+                self.behaviors.current.actions.navigate_to(action_name)
+            except ValueError:
+                return (
+                    {'status': 'error', 'message': f'Action {action_name} not found', 'available_actions': self.behaviors.current.action_names},
+                    None
+                )
+            self.behaviors.save_state()
+
         current_behavior = self.behaviors.current
         if not current_behavior:
-            return {
-                'status': 'error',
-                'message': 'No current behavior set'
-            }
-        
+            return ({'status': 'error', 'message': 'No current behavior set'}, None)
+
         current_action_name = current_behavior.actions.current_action_name
         if not current_action_name:
-            return {
-                'status': 'error',
-                'message': 'No current action set'
-            }
-        
-        try:
-            action = current_behavior.actions.find_by_name(current_action_name)
-            if not action:
-                return {
-                    'status': 'error',
-                    'message': f'Action {current_action_name} not found'
-                }
-            
-            # Include scope when submitting to chat (user explicitly requested)
-            instructions = action.get_instructions(include_scope=True)
-            # Combine with next when combine_next; advance current after submit
-            last_appended = self._append_next_action_instructions_if_combine_next(
-                current_behavior, current_behavior.name, current_action_name, action, instructions,
-                context=None, include_scope=True
+            first_action = self._first_non_skip_action(current_behavior.name) or (current_behavior.actions.names[0] if current_behavior.actions.names else None)
+            if first_action:
+                current_behavior.actions.navigate_to(first_action)
+                current_action_name = first_action
+                self.behaviors.save_state()
+            else:
+                return ({'status': 'error', 'message': 'No current action set'}, None)
+
+        # Advance past skip actions to the first non-skip action
+        if self.get_execution_mode(current_behavior.name, current_action_name) == 'skip':
+            for an in current_behavior.actions.names:
+                if self.get_execution_mode(current_behavior.name, an) != 'skip':
+                    current_action_name = an
+                    current_behavior.actions.navigate_to(current_action_name)
+                    break
+            else:
+                return ({'status': 'error', 'message': f'All actions in {current_behavior.name} are set to skip'}, None)
+
+        action = current_behavior.actions.find_by_name(current_action_name)
+        if not action:
+            return ({'status': 'error', 'message': f'Action {current_action_name} not found'}, None)
+
+        from actions.action_context import ActionContext
+        context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
+        if scope and isinstance(scope, dict):
+            from scope.scope import Scope, ScopeType
+            scope_type = ScopeType(scope.get('type', 'all'))
+            scope_value = scope.get('value', [])
+            if not isinstance(scope_value, list):
+                scope_value = [scope_value]
+            s = Scope(self.workspace_directory, self.bot_paths)
+            s.filter(scope_type, scope_value)
+            setattr(context, 'scope', s)
+            setattr(context, '_scope_from_params', True)
+        elif hasattr(context, 'scope'):
+            self._scope.load()
+            if self._scope.value or self._scope.type.value == 'showAll':
+                setattr(context, 'scope', self._scope)
+
+        instructions = action.get_instructions(context, include_scope=True)
+        special_lines = self._collect_special_instructions_for_prompt(current_behavior.name, current_action_name)
+        if special_lines:
+            instructions.prepend_display("", "---", "")
+            for line in reversed(special_lines):
+                instructions.prepend_display(line)
+
+        last_appended = self._append_next_action_instructions_if_combine_next(
+            current_behavior, current_behavior.name, current_action_name, action, instructions,
+            context=None, include_scope=True
+        )
+        if not at_action_level:
+            self._append_next_behavior_instructions_if_combine_with_next(
+                current_behavior, instructions, first_append=(last_appended is None)
             )
-            result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
-            # Advance current to the action after the last one we combined (or to last if we ran through end)
-            if last_appended is not None:
-                action_names = current_behavior.action_names
-                try:
-                    next_idx = action_names.index(last_appended) + 1
-                    if next_idx < len(action_names):
-                        current_behavior.actions.navigate_to(action_names[next_idx])
-                    else:
-                        current_behavior.actions.navigate_to(last_appended)  # ran through end; current = last run
-                    self.behaviors.save_state()
-                except ValueError:
-                    pass
-            return result
-            
-        except Exception as e:
-            logger.error(f'Error in submit_current_action: {str(e)}', exc_info=True)
-            return {
-                'status': 'error',
-                'message': f'Error submitting instructions: {str(e)}'
-            }
+        return (instructions, last_appended)
+
+    def submit_action(
+        self,
+        behavior_name: str,
+        action_name: str,
+        scope: Optional[Dict[str, Any]] = None,
+        return_instructions: bool = False,
+    ) -> Dict[str, Any]:
+        """Submit instructions for a specific behavior/action. Uses same combine_next logic as submit_current_action.
+        When return_instructions=True (e.g. test mode), result includes 'instructions' key."""
+        built = self._build_instructions_with_combine(behavior_name, action_name, scope)
+        instructions, last_appended = built
+        if isinstance(instructions, dict) and 'status' in instructions:
+            return instructions
+        current_behavior = self.behaviors.current
+        current_action_name = current_behavior.actions.current_action_name
+        result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
+        if last_appended:
+            action_names = current_behavior.action_names
+            try:
+                next_idx = action_names.index(last_appended) + 1
+                if next_idx < len(action_names):
+                    current_behavior.actions.navigate_to(action_names[next_idx])
+                else:
+                    current_behavior.actions.navigate_to(last_appended)
+                self.behaviors.save_state()
+            except ValueError as e:
+                logger.debug(f"Could not advance to next action after last_appended: {e}")
+        if return_instructions:
+            result = {**result, 'instructions': instructions}
+        return result
+
+    def submit_current_action(self, scope: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Submit instructions for current behavior/action. Uses combine_next/combine_with_next logic."""
+        built = self._build_instructions_with_combine(None, None, scope)
+        instructions, last_appended = built
+        if isinstance(instructions, dict) and 'status' in instructions:
+            return instructions
+        current_behavior = self.behaviors.current
+        current_action_name = current_behavior.actions.current_action_name
+        result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
+        if last_appended:
+            action_names = current_behavior.action_names
+            try:
+                next_idx = action_names.index(last_appended) + 1
+                if next_idx < len(action_names):
+                    current_behavior.actions.navigate_to(action_names[next_idx])
+                else:
+                    current_behavior.actions.navigate_to(last_appended)
+                self.behaviors.save_state()
+            except ValueError as e:
+                logger.debug(f"Could not advance to next action after last_appended: {e}")
+        return result
     
 
     def tree(self) -> str:
@@ -1075,19 +1423,18 @@ class Bot:
         }
 
     def __getattr__(self, name: str):
-        # Special handling for story_map/story_graph property
-        # This shouldn't be needed, but there seems to be an issue with property lookup
-        # in certain test scenarios where __getattr__ is called before the property is found
+
+
+
         if name == 'story_map':
-            # Directly call the property getter using type(self) to avoid recursion
+
             return type(self).story_map.fget(self)
         if name == 'story_graph':
-            # Backward compatibility: redirect to story_map
+
             return type(self).story_map.fget(self)
         
         behavior = self.behaviors.find_by_name(name)
         if behavior:
-            # Navigate to the behavior when accessed
-            self.behaviors.navigate_to(name)
+            self.behaviors.navigate_to(name, behavior_only=True)
             return behavior
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")

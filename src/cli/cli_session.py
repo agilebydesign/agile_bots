@@ -161,15 +161,25 @@ class CLISession:
         # If so, route to behavior action instead of domain navigator
         has_dash_params = '--' in command
         
+        verb_parts = verb.split('.')
+        # Any story_graph command must go to domain navigator; otherwise "story_graph" gets mis-parsed as a behavior name.
+        is_story_graph_command = command.strip().lower().startswith('story_graph')
+        is_story_graph_submit = (
+            is_story_graph_command and any(
+                m in command for m in
+                ('submit_current_instructions', 'submit_required_behavior_instructions', 'submit_instructions')
+            )
+        )
+        
         # behavior.action or behavior.action.set_execution/get_execution must go to behavior action (execute), not domain navigator,
         # so we get combined instructions (current+next when auto) and execution mode handling.
-        verb_parts = verb.split('.')
         is_set_execution = len(verb_parts) == 3 and verb_parts[2] == 'set_execution'
         is_get_execution = len(verb_parts) == 3 and verb_parts[2] == 'get_execution'
         is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0])
         
-        if ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
-                and not is_set_execution and not is_get_execution and not is_behavior_action):
+        if (is_story_graph_command or
+                ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params
+                 and not is_set_execution and not is_get_execution and not is_behavior_action)):
             return self._execute_domain_object_command(command)
         
         return self._execute_action_or_route(verb, args, command)
@@ -225,8 +235,8 @@ class CLISession:
         
         from behaviors.behavior import Behavior
         if isinstance(attr, Behavior):
-            result = self.bot.execute(attr.name, None)
-            return result, True
+            # getattr already navigated with behavior_only=True - do not execute first action
+            return {'status': 'success', 'message': f'Navigated to {attr.name}', 'behavior': attr.name}, True
         
         # Special handling for story_graph property - return the dict, not the object
         if verb == 'story_graph' and hasattr(attr, 'story_graph'):
@@ -593,6 +603,11 @@ class CLISession:
         command_core = parts[0]
         args_string = parts[1] if len(parts) > 1 else ''
         
+        # Any story_graph command must go to domain navigator; do NOT parse as behavior.action.
+        is_story_graph_command = command.strip().lower().startswith('story_graph')
+        if is_story_graph_command:
+            return self._execute_domain_object_command(command)
+        
         params = self._parse_action_params(args_string) if args_string else None
         
         if '.' in command_core:
@@ -601,6 +616,14 @@ class CLISession:
             action_name = command_parts[1] if len(command_parts) > 1 else None
             subcommand = command_parts[2] if len(command_parts) > 2 else None
 
+            # behavior.set_execution (2 parts) -> set_behavior_execute
+            if action_name == 'set_execution' and subcommand is None and hasattr(self.bot, 'set_behavior_execute'):
+                mode = args_string.strip().lower() or 'manual'
+                if mode not in ('combine_with_next', 'auto', 'skip', 'manual'):
+                    raise ValueError(f"Invalid behavior execution mode: {mode}. Use combine_with_next, skip, or manual.")
+                return self.bot.set_behavior_execute(behavior_name, mode)
+
+            # behavior.action.set_execution (3 parts) -> set_action_execution
             if subcommand == 'set_execution' and action_name and hasattr(self.bot, 'set_action_execution'):
                 mode = args_string.strip().lower() or 'manual'
                 if mode not in ('combine_next', 'auto', 'skip', 'manual'):
@@ -610,6 +633,14 @@ class CLISession:
             if subcommand == 'get_execution' and action_name and hasattr(self.bot, 'get_execution_mode'):
                 mode = self.bot.get_execution_mode(behavior_name, action_name)
                 return {'status': 'success', 'behavior': behavior_name, 'action': action_name, 'execution_mode': mode}
+
+            if subcommand == 'special_instructions' and action_name and hasattr(self.bot, 'set_action_special_instructions'):
+                instruction_text = args_string.strip().strip('"').strip("'")
+                return self.bot.set_action_special_instructions(behavior_name, action_name, instruction_text)
+
+            if action_name == 'set_special_instructions' and hasattr(self.bot, 'set_behavior_special_instructions'):
+                instruction_text = args_string.strip().strip('"').strip("'")
+                return self.bot.set_behavior_special_instructions(behavior_name, instruction_text)
 
             if hasattr(self.bot, 'execute'):
                 return self.bot.execute(behavior_name, action_name, params)

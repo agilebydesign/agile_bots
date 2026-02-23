@@ -109,12 +109,18 @@ class ScannerRegistry:
                 js_scanner, error = self._load_language_scanner(module_path, class_name, 'javascript')
                 if js_scanner:
                     return js_scanner, None
+                direct_scanner, _ = self._load_single_scanner(module_path, class_name)
+                if direct_scanner:
+                    return direct_scanner, None
                 return None, error or f"JavaScript scanner not found: {scanner_module_path}"
             
             if target_language == 'python':
                 py_scanner, error = self._load_language_scanner(module_path, class_name, 'python')
                 if py_scanner:
                     return py_scanner, None
+                direct_scanner, _ = self._load_single_scanner(module_path, class_name)
+                if direct_scanner:
+                    return direct_scanner, None
                 return None, error or f"Python scanner not found: {scanner_module_path}"
             
             # No target language specified - load language-agnostic scanner (both Python and JavaScript)

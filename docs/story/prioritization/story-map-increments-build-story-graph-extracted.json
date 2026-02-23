@@ -1,0 +1,22 @@
+{
+  "epics": [
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Build Story Graph",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

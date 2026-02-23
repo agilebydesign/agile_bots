@@ -27,7 +27,7 @@ class RealImplementationsScanner(TestScanner):
         content, lines, tree = parsed
         
         method_violations = self._check_test_methods_call_production_code(
-            content, lines, file_path, self.rule, story_graph
+            content, lines, file_path, story_graph
         )
         violations.extend(method_violations)
         

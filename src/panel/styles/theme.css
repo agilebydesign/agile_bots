@@ -194,6 +194,11 @@ img {
     background-color: rgba({{brandColorRgb}}, 0.35); /* Distinct brand color when selected */
 }
 
+.increment-column-container.selected {
+    background-color: rgba({{brandColorRgb}}, 0.2);
+    border-top: 2px solid var(--accent-color);
+}
+
 
 .collapsible-section {
     margin-bottom: var(--space-sm);

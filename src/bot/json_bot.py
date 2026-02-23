@@ -75,6 +75,11 @@ class JSONBot(BaseBotAdapter, JSONAdapter):
             if settings:
                 result['execution'] = settings  # e.g. {"shape.clarify": "auto"} for Panel toggles
 
+        if hasattr(self.bot, 'get_special_instructions_settings'):
+            si_settings = self.bot.get_special_instructions_settings()
+            if si_settings:
+                result['special_instructions'] = si_settings
+
         if hasattr(self.bot, '_scope') and self.bot._scope:
             import time
             # Reload scope from file to ensure we have the latest persisted state

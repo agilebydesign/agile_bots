@@ -1,10 +1,4 @@
-/**
- * Bot Panel Controller
- * 
- * Manages webview panel lifecycle and coordinates data fetching,
- * parsing, and rendering using the new domain-oriented BotView.
- * Implements singleton pattern.
- */
+
 
 const vscode = require("vscode");
 const path = require("path");
@@ -17,7 +11,7 @@ const { escapeForHtml, Logger } = require("./utils");
 
 class BotPanel {
   constructor(panel, workspaceRoot, extensionUri) {
-    // ===== PERFORMANCE: Start constructor timing =====
+
     const perfConstructorStart = performance.now();
     try {
       this._log = Logger.log;
@@ -32,6 +26,16 @@ class BotPanel {
           });
         }
       };
+      /** Report error to both log and display - never swallow. */
+      this._reportError = (err, context = '') => {
+        const msg = err?.message || String(err);
+        const stack = err?.stack || '';
+        const full = context ? `[${context}] ${msg}` : msg;
+        this._log(`[BotPanel] ERROR: ${full}`);
+        if (stack) this._log(`[BotPanel] Stack: ${stack}`);
+        console.error('[BotPanel]', full, stack);
+        vscode.window.showErrorMessage(full);
+      };
       
       this._log("[BotPanel] Constructor invoked");
       this._log(`[PERF] Constructor start`);
@@ -41,14 +45,14 @@ class BotPanel {
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};
-      this._currentStoryMapView = 'Hierarchy'; // 'Hierarchy', 'Increment', or 'Files'
+      this._currentStoryMapView = 'Hierarchy';
       
       // Initialize branding with repo root
       // TO-DO: This is where workspace is being used as the repo workspace, and not user workspace
       branding.setRepoRoot(workspaceRoot);
       this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
-      // Read panel version from package.json
+
       const perfVersionStart = performance.now();
       console.log("[BotPanel] Reading panel version");
       this._panelVersion = this._readPanelVersion();
@@ -56,15 +60,15 @@ class BotPanel {
       console.log(`[BotPanel] Panel version: ${this._panelVersion}`);
       this._log(`[PERF] Read panel version: ${(perfVersionEnd - perfVersionStart).toFixed(2)}ms`);
       
-      // Determine bot directory (from env var or default to story_bot)
+
       let botDirectory = process.env.BOT_DIRECTORY || path.join(workspaceRoot, 'bots', 'story_bot');
-      // Ensure bot directory is absolute
+
       if (!path.isAbsolute(botDirectory)) {
         botDirectory = path.join(workspaceRoot, botDirectory);
       }
       console.log(`[BotPanel] Bot directory: ${botDirectory}`);
       
-      // Create shared PanelView instance for CLI operations
+
       const perfPanelViewStart = performance.now();
       console.log("[BotPanel] Creating shared PanelView instance");
       this._sharedCLI = new PanelView(botDirectory);
@@ -72,14 +76,14 @@ class BotPanel {
       console.log("[BotPanel] Shared PanelView instance created successfully");
       this._log(`[PERF] PanelView creation: ${(perfPanelViewEnd - perfPanelViewStart).toFixed(2)}ms`);
       
-      // Initialize BotView (uses shared CLI)
+
       this._botView = null;
       
-      // Set initial loading HTML
+
       console.log("[BotPanel] Setting initial loading HTML");
       this._panel.webview.html = this._getWebviewContent('<div style="padding: 20px;">Loading bot panel...</div>');
       
-      // Update content asynchronously (can't await in constructor)
+
       console.log("[BotPanel] Calling _update()");
       this._update().catch(err => {
         console.error(`[BotPanel] ERROR in async _update: ${err.message}`);
@@ -87,7 +91,7 @@ class BotPanel {
         vscode.window.showErrorMessage(`Bot Panel Error: ${err.message}`);
       });
       
-      // ===== PERFORMANCE: End constructor timing =====
+
       const perfConstructorEnd = performance.now();
       const constructorDuration = (perfConstructorEnd - perfConstructorStart).toFixed(2);
       console.log("[BotPanel] Constructor completed successfully");
@@ -99,15 +103,15 @@ class BotPanel {
       throw error;
     }
 
-    // Listen for when the panel is disposed
+
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Note: We don't refresh when the panel becomes visible - once loaded, the webview content persists
-    // This preserves user state (scroll position, expanded nodes, etc.) when switching tabs
-    // The panel only refreshes when explicitly requested (refresh button, certain operations)
+
+
+
     this._panel.onDidChangeViewState(
       (e) => {
-        // Reset flag after a short delay to allow file opening to complete
+
         if (this._isOpeningFile) {
           setTimeout(() => { this._isOpeningFile = false; }, 500);
         }
@@ -116,7 +120,7 @@ class BotPanel {
       this._disposables
     );
 
-    // Handle messages from the webview
+
     this._log('[BotPanel] Registering onDidReceiveMessage handler');
     this._panel.webview.onDidReceiveMessage(
       (message) => {
@@ -124,13 +128,11 @@ class BotPanel {
         this._log('[BotPanel] Received message from webview: ' + message.command + ' ' + JSON.stringify(message));
         switch (message.command) {
           case "hidePanel":
-            // Close/dispose the panel - user can reopen via command
+
             this._log('[BotPanel] Closing panel');
             this._panel.dispose();
             return;
           case "refresh":
-            // Delete the enriched cache to force regeneration of test links
-            const fs = require('fs');
             const cachePath = path.join(this._workspaceRoot, 'docs', 'stories', '.story-graph-enriched-cache.json');
             try {
               if (fs.existsSync(cachePath)) {
@@ -138,21 +140,21 @@ class BotPanel {
                 this._log('[BotPanel] Deleted enriched cache file');
               }
             } catch (err) {
-              this._log(`[BotPanel] Warning: Could not delete cache: ${err.message}`);
+              this._reportError(err, 'Could not delete cache');
             }
-            // Clear the story graph cache in the Bot instance to force reload
+
             (async () => {
               try {
                 this._log('[BotPanel] Clearing story graph cache...');
                 await this._botView.execute('reload_story_graph --format json');
                 this._log('[BotPanel] Story graph cache cleared');
               } catch (err) {
-                this._log(`[BotPanel] Warning: Could not clear story graph cache: ${err.message}`);
+                this._reportError(err, 'Could not clear story graph cache');
               }
-              // Proceed with refresh after clearing cache
+
               try {
                 await this._update();
-                // After refresh, re-expand the current action's section
+
                 const botData = this._botView?.botData;
                 const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
                 if (currentAction) {
@@ -164,53 +166,68 @@ class BotPanel {
                         actionName: currentAction
                       });
                     } catch (postErr) {
-                      this._log(`[BotPanel] Error sending expandInstructionsSection after refresh: ${postErr.message}`);
+                      this._reportError(postErr, 'expandInstructionsSection after refresh');
                     }
                   }, 200);
                 }
               } catch (err) {
-                console.error(`[BotPanel] Refresh error: ${err.message}`);
+                this._reportError(err, 'Refresh');
               }
             })();
             return;
           case "toggleIncrementView":
-            // Legacy support for toggle (now handled by switchViewMode)
+
             this._log('[BotPanel] toggleIncrementView: switching to ' + message.currentView);
             this._currentStoryMapView = message.currentView;
-            // Refresh the panel to show the new view
+
             (async () => {
               try {
                 await this._update();
               } catch (err) {
-                console.error(`[BotPanel] Toggle view error: ${err.message}`);
+                this._reportError(err, 'Toggle view');
               }
             })();
             return;
           case "switchViewMode":
-            // Switch between Hierarchy, Increment, and Files views
+
             this._log('[BotPanel] switchViewMode: switching to ' + message.viewMode);
             this._currentStoryMapView = message.viewMode;
-            // Refresh the panel to show the new view
+
             (async () => {
               try {
                 await this._update();
               } catch (err) {
-                console.error(`[BotPanel] Switch view error: ${err.message}`);
+                this._reportError(err, 'Switch view');
               }
             })();
             return;
           case "logToFile":
             if (message.message) {
-              const fs = require('fs');
               const logPath = path.join(this._workspaceRoot, 'panel_clicks.log');
               const timestamp = new Date().toISOString();
               fs.appendFileSync(logPath, `[${timestamp}] ${message.message}\n`);
             }
             return;
+          case "logScopeDebug":
+            if (message.message) {
+              const logDir = path.join(this._workspaceRoot, 'logs');
+              try { fs.mkdirSync(logDir, { recursive: true }); } catch (e) { console.error('[BotPanel] Could not create log dir:', e?.message); vscode.window.showErrorMessage(`Could not create log dir: ${e?.message}`); }
+              const scopeLogPath = path.join(logDir, 'scope_debug.log');
+              const timestamp = new Date().toISOString();
+              fs.appendFileSync(scopeLogPath, `[${timestamp}] [PANEL] ${message.message}\n`);
+            }
+            return;
+          case "showScopeError":
+            if (message.message) {
+              const errMsg = message.message;
+              this._log(`[BotPanel] Scope error from webview: ${errMsg}`);
+              vscode.window.showErrorMessage(errMsg);
+            }
+            return;
           case "copyNodeToClipboard":
             (() => {
               const nodePath = message.nodePath;
-              const action = message.action; // 'name' or 'json'
+              const action = message.action;
               if (!nodePath || !action) return;
               const method = action === 'json' ? 'copy_json' : 'copy_name';
               const command = nodePath + '.' + method;
@@ -221,7 +238,7 @@ class BotPanel {
                 if (action === 'json') {
                   text = (typeof result === 'string' ? result : JSON.stringify(result, null, 2));
                 } else {
-                  // Copy name: result should be string; extract from object if backend returns wrong shape
+
                   if (typeof result === 'string') {
                     text = result;
                   } else if (result && typeof result === 'object') {
@@ -255,6 +272,33 @@ class BotPanel {
               }
             })();
             return;
+          case "copyIncrementStoriesJson":
+            (() => {
+              const incName = message.incName;
+              if (!incName) return;
+              const command = 'story_graph.copy_increment_stories_json name:"' + incName + '"';
+              const doCopy = async () => {
+                const response = await this._botView.execute(command);
+                const result = response && (response.result !== undefined ? response.result : response);
+                const arr = Array.isArray(result) ? result : (result && result.result ? result.result : []);
+                const text = JSON.stringify(arr, null, 2);
+                await vscode.env.clipboard.writeText(text);
+                vscode.window.showInformationMessage('Increment stories JSON copied to clipboard');
+              };
+              vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: 'Injecting increment stories to clipboard...',
+                cancellable: false
+              }, async () => {
+                try {
+                  await doCopy();
+                } catch (err) {
+                  this._log(`[BotPanel] copyIncrementStoriesJson failed: ${err.message}`);
+                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
+                }
+              });
+            })();
+            return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
               vscode.window.showInformationMessage(message.label || 'Copied to clipboard');
@@ -280,7 +324,7 @@ class BotPanel {
                 }
               }
               
-              // Normalize file path; handle file:// URIs and encoded characters
+
               let absolutePath;
               if (cleanPath.startsWith('file://')) {
                 absolutePath = vscode.Uri.parse(cleanPath).fsPath;
@@ -292,49 +336,47 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // Check if path is a directory
-              const fs = require('fs');
               if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isDirectory()) {
-                // Reveal directory in VS Code file explorer
+
                 vscode.commands.executeCommand('revealInExplorer', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to reveal folder: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to reveal folder: ${message.filePath}`);
                 });
               } else {
                 const fileExtension = cleanPath.split('.').pop().toLowerCase();
                 const binaryOrSpecialExtensions = ['drawio', 'png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'];
-                // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
                 const useVscodeOpenExtensions = ['json'];
                 
-                // Check file size - use vscode.open for large files (>10MB) to avoid VS Code text editor limit
-                const MAX_TEXT_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+                const MAX_TEXT_FILE_SIZE = 10 * 1024 * 1024;
                 let fileSize = 0;
                 try {
                   if (fs.existsSync(absolutePath)) {
                     fileSize = fs.statSync(absolutePath).size;
                   }
                 } catch (e) {
-                  // Ignore errors, proceed with default handling
+                  this._reportError(e, 'Could not stat file for open');
                 }
                 
                 if (binaryOrSpecialExtensions.includes(fileExtension)) {
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (useVscodeOpenExtensions.includes(fileExtension)) {
-                  // Use vscode.open for JSON to avoid showTextDocument bugs
+
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (fileSize > MAX_TEXT_FILE_SIZE) {
-                  // Large file - use vscode.open to avoid text editor memory limit
+
                   this._log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (fileExtension === 'md') {
-                  // Open markdown files in preview mode
+
                   vscode.commands.executeCommand('markdown.showPreview', fileUri).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open markdown preview: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open markdown preview: ${message.filePath}`);
                   });
                 } else {
                 const openOptions = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
@@ -342,7 +384,7 @@ class BotPanel {
                 if (lineNumber && !symbolName) {
                   openOptions.selection = new vscode.Range(lineNumber - 1, 0, lineNumber - 1, 0);
                   vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 } else if (symbolName) {
                   vscode.workspace.openTextDocument(fileUri).then(
@@ -370,12 +412,12 @@ class BotPanel {
                       vscode.window.showTextDocument(doc, openOptions);
                     },
                     (error) => {
-                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                      this._reportError(error, `Failed to open file: ${message.filePath}`);
                     }
                   );
                 } else {
                   vscode.window.showTextDocument(fileUri, openOptions).catch((error) => {
-                    vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                    this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
                 }
                 }
@@ -402,14 +444,13 @@ class BotPanel {
                   const decoded = decodeURIComponent(rawPath);
                   absolutePath = path.isAbsolute(decoded) ? decoded : path.join(this._workspaceRoot, decoded);
                 }
-                const fs = require('fs');
                 if (!fs.existsSync(absolutePath) || fs.statSync(absolutePath).isDirectory()) continue;
                 const fileExtension = rawPath.split('.').pop().toLowerCase();
                 const uri = lineNumber
                   ? vscode.Uri.file(absolutePath).with({ fragment: `L${lineNumber}` })
                   : vscode.Uri.file(absolutePath);
                 vscode.commands.executeCommand('vscode.open', uri).catch((err) => {
-                  this._log(`[BotPanel] openFiles failed for ${pathStr}: ${err.message}`);
+                  this._reportError(err, `openFiles failed for ${pathStr}`);
                 });
               }
             }
@@ -442,15 +483,15 @@ class BotPanel {
               };
               const targetColumn = columnMap[viewColumn] || vscode.ViewColumn.One;
               
-              // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json') {
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else {
                 vscode.window.showTextDocument(fileUri, { viewColumn: targetColumn, preserveFocus: false }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               }
             }
@@ -458,7 +499,7 @@ class BotPanel {
           case "openFileWithState":
             this._log('[BotPanel] openFileWithState message received');
             if (message.filePath) {
-              // Open file and apply state (collapse/expand)
+
               const rawPath = message.filePath;
               const cleanPath = rawPath.split('#')[0];
               let absolutePath;
@@ -472,14 +513,13 @@ class BotPanel {
               }
               const fileUri = vscode.Uri.file(absolutePath);
               
-              // Use vscode.open for JSON files (not openTextDocument) to avoid extension sync / text editor limits
+
               const fileExtension = cleanPath.split('.').pop().toLowerCase();
               if (fileExtension === 'json' && message.state && message.state.selectedNode) {
-                // JSON with selectedNode: read via fs, find line, open with vscode.open + fragment
+
                 const node = message.state.selectedNode;
                 let startLine = 0;
                 try {
-                  const fs = require('fs');
                   const text = fs.readFileSync(absolutePath, 'utf8');
                   const lines = text.split('\n');
                   const escapedName = node.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -503,17 +543,17 @@ class BotPanel {
                     }
                   }
                 } catch (e) {
-                  this._log(`[BotPanel] Could not search for node: ${e.message}`);
+                  this._reportError(e, 'Could not search for node');
                 }
                 const uriWithFragment = vscode.Uri.file(absolutePath).with({ fragment: `L${startLine + 1}` });
                 vscode.commands.executeCommand('vscode.open', uriWithFragment).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
                 this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
               } else if (fileExtension === 'json') {
-                // JSON files without selectedNode - just open
+
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else if (message.state && message.state.lineNumber) {
                 const options = {
@@ -524,10 +564,10 @@ class BotPanel {
                 vscode.window.showTextDocument(fileUri, options).then(() => {
                   this._log(`[BotPanel] File opened with state: lineNumber=${message.state.lineNumber}`);
                 }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               } else if (message.state && message.state.selectedNode) {
-                // Need to search document for node - use openTextDocument
+
                 vscode.workspace.openTextDocument(fileUri).then(
                   (doc) => {
                     const node = message.state.selectedNode;
@@ -548,7 +588,7 @@ class BotPanel {
                     let options = { viewColumn: vscode.ViewColumn.One, preserveFocus: false };
                     
                     if (nameLineIndex >= 0) {
-                      // Find the opening brace of this object (search backwards)
+
                       let startLine = nameLineIndex;
                       for (let i = nameLineIndex - 1; i >= 0; i--) {
                         const line = lines[i].trim();
@@ -561,7 +601,7 @@ class BotPanel {
                         }
                       }
                       
-                      // Find the matching closing brace (count braces forward)
+
                       let braceCount = 0;
                       let endLine = nameLineIndex;
                       let started = false;
@@ -583,7 +623,7 @@ class BotPanel {
                         if (started && braceCount === 0) break;
                       }
                       
-                      // Select from start of opening brace line to end of closing brace line
+
                       const endLineLength = lines[endLine] ? lines[endLine].length : 0;
                       options.selection = new vscode.Range(startLine, 0, endLine, endLineLength);
                     }
@@ -593,16 +633,16 @@ class BotPanel {
                     });
                   },
                   (error) => {
-                    // Fallback: open file without positioning
-                    vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch(() => {
-                      vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+
+                    vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((err) => {
+                      this._reportError(err, `Failed to open file: ${message.filePath}`);
                     });
                   }
                 );
               } else {
-                // No state - just open the file directly
+
                 vscode.window.showTextDocument(fileUri, { viewColumn: vscode.ViewColumn.One, preserveFocus: false }).catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to open file: ${message.filePath}\n${error.message}`);
+                  this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
               }
             }
@@ -611,7 +651,7 @@ class BotPanel {
           case "openTestFiles":
           case "openCodeFiles":
           case "openAllRelatedFiles":
-            // These commands need to query story graph data, so delegate to bot
+
             this._log(`[BotPanel] ${message.command} message received for node: ${message.nodeName}`);
             this._handleOpenRelatedFiles(message);
             return;
@@ -647,7 +687,7 @@ class BotPanel {
               return;
             }
             
-            // Execute scope include_level command to update bot and persist to scope.json
+
             const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
             this._botView.execute(scopeIncludeCmd)
               .then(() => {
@@ -674,8 +714,13 @@ class BotPanel {
             
             if (message.filter && message.filter.trim()) {
               const filterValue = message.filter.trim();
-              // If in Files mode, prefix filter with "file:"
-              const prefixedFilter = this._currentStoryMapView === 'Files' ? `file:${filterValue}` : filterValue;
+
+              let prefixedFilter = filterValue;
+              if (this._currentStoryMapView === 'Files') {
+                prefixedFilter = `file:${filterValue}`;
+              } else if (this._currentStoryMapView === 'Increment') {
+                prefixedFilter = `increment ${filterValue}`;
+              }
               const scopeCmd = `scope "${prefixedFilter}"`;
               this._log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
               
@@ -693,10 +738,10 @@ class BotPanel {
                   this._log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
-                  // Don't re-throw - show error but don't crash panel
+
                 });
             } else {
-              // Empty filter = clear filter
+
               this._log('[BotPanel] Clearing scope filter');
               
               this._botView.execute('scope all')
@@ -710,7 +755,7 @@ class BotPanel {
                   this._log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
-                  // Don't re-throw - show error but don't crash panel
+
                 });
             }
             return;
@@ -731,12 +776,12 @@ class BotPanel {
               if (folders && folders.length > 0) {
                 const folderPath = folders[0].fsPath;
                 this._log('[BotPanel] User selected folder: ' + folderPath);
-                // Update the workspace input in the webview
+
                 this._panel.webview.postMessage({
                   command: 'setWorkspacePath',
                   path: folderPath
                 });
-                // Trigger workspace update
+
                 this._botView?.handleEvent('updateWorkspace', { workspacePath: folderPath })
                   .then((result) => {
                     if (WorkspaceManager.updateWorkspace(message, this._botView, this)) {
@@ -755,7 +800,7 @@ class BotPanel {
               this._botView?.headerView?.handleEvent('switchBot', { botName: message.botName })
                 .then(() => this._update())
                 .catch((error) => {
-                  vscode.window.showErrorMessage(`Failed to switch bot: ${error.message}`);
+                  this._reportError(error, 'Failed to switch bot');
                 });
             }
             return;
@@ -764,13 +809,13 @@ class BotPanel {
               this._log(`[BotPanel] getBehaviorRules -> ${message.behaviorName}`);
               this._log(`[getBehaviorRules] STARTED for behavior: ${message.behaviorName}`);
               
-              // Execute submitrules CLI command to submit rules to chat
+
               this._botView?.execute(`submitrules:${message.behaviorName}`)
                 .then((result) => {
                   this._log('[BotPanel] Rules submitted:', result);
                   this._log(`[getBehaviorRules] Result received: ${JSON.stringify(result, null, 2)}`);
                   
-                  // Handle dictionary response from Python
+
                   if (result && typeof result === 'object') {
                     this._log(`[getBehaviorRules] Result is object with status: ${result.status}`);
                     if (result.status === 'success') {
@@ -782,7 +827,7 @@ class BotPanel {
                       this._log(`[getBehaviorRules] ERROR status - showing error: ${errorMsg}`);
                       vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
                     } else {
-                      // Legacy format: check output field
+
                       const outputStr = typeof result.output === 'string' ? result.output : '';
                       this._log(`[getBehaviorRules] Legacy format - output: ${outputStr}`);
                       if (outputStr.includes('submitted')) {
@@ -799,7 +844,7 @@ class BotPanel {
                     vscode.window.showWarningMessage('Submit completed with unknown result');
                   }
                   
-                  // Refresh panel to show current position
+
                   this._log(`[getBehaviorRules] About to refresh panel`);
                   return this._update();
                 })
@@ -825,6 +870,72 @@ class BotPanel {
                 });
             }
             return;
+          case "setExecutionMode":
+            if (message.behaviorName && message.actionName && message.mode) {
+              const cmd = `${message.behaviorName}.${message.actionName}.set_execution ${message.mode}`;
+              this._log(`[BotPanel] setExecutionMode -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setExecutionMode success: ${cmd}`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setExecutionMode ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set execution mode: ${error.message}`);
+                });
+            }
+            return;
+          case "setBehaviorExecuteMode":
+            if (message.behaviorName && message.mode) {
+              const cmd = `${message.behaviorName}.set_execution ${message.mode}`;
+              this._log(`[BotPanel] setBehaviorExecuteMode -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setBehaviorExecuteMode success: ${cmd}`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setBehaviorExecuteMode ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set behavior execution mode: ${error.message}`);
+                });
+            }
+            return;
+          case "setBehaviorSpecialInstructions":
+            if (message.behaviorName !== undefined) {
+              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
+              const cmd = `${message.behaviorName}.set_special_instructions "${escaped}"`;
+              this._log(`[BotPanel] setBehaviorSpecialInstructions -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setBehaviorSpecialInstructions success`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setBehaviorSpecialInstructions ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
+                });
+            }
+            return;
+          case "setActionSpecialInstructions":
+            if (message.behaviorName && message.actionName !== undefined) {
+              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
+              const cmd = `${message.behaviorName}.${message.actionName}.special_instructions "${escaped}"`;
+              this._log(`[BotPanel] setActionSpecialInstructions -> ${cmd}`);
+              this._botView?.execute(cmd)
+                .then((result) => {
+                  this._log(`[BotPanel] setActionSpecialInstructions success`);
+                  if (this._botView) this._botView.botData = null;
+                  return this._update();
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] setActionSpecialInstructions ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
+                });
+            }
+            return;
           case "renameNode":
             this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
             this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Received renameNode message`, {
@@ -833,7 +944,7 @@ class BotPanel {
               timestamp: new Date().toISOString()
             });
             if (message.nodePath && message.currentName) {
-              // Prompt for new name
+
               this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Prompting user for new name`);
               vscode.window.showInputBox({
                 prompt: `Rename "${message.currentName}"`,
@@ -846,14 +957,14 @@ class BotPanel {
                   changed: newName && newName !== message.currentName
                 });
                 if (newName && newName !== message.currentName) {
-                  // Strip any surrounding quotes from the input first (user shouldn't need to quote the name)
+
                   const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
-                  // Escape quotes and backslashes in the new name
+
                   const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
                   const command = `${message.nodePath}.rename name:"${escapedName}"`;
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Built rename command: ${command}`);
                   
-                  // Send optimistic update message to webview
+
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Sending optimistic update to webview`);
                   this._panel.webview.postMessage({
                     command: 'optimisticRename',
@@ -862,8 +973,6 @@ class BotPanel {
                     newName: trimmedName
                   });
                   
-                  // Log to file
-                  const fs = require('fs');
                   const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
                   const timestamp = new Date().toISOString();
                   const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
@@ -874,14 +983,14 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
                   }
                   
-                  // Execute backend command with optimistic flag
+
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Executing rename command via backend (optimistic)...`);
                   this._botView?.execute(command)
                     .then((result) => {
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [SUCCESS] Backend rename executed successfully`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
                       
-                      // Log result to file
+
                       const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
                       try {
                         fs.appendFileSync(logPath, resultLog);
@@ -889,14 +998,14 @@ class BotPanel {
                         this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                       }
                       
-                      // Send saveCompleted message for optimistic update handling
+
                       this._panel.webview.postMessage({
                         command: 'saveCompleted',
                         success: true,
                         result: result
                       });
                       
-                      // Don't refresh - optimistic update already handled in webview
+
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Optimistic update - skipping panel refresh`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION COMPLETE ==========`);
                     })
@@ -905,14 +1014,14 @@ class BotPanel {
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Error: ${error.message}`);
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Stack: ${error.stack}`);
                       
-                      // Send error message to webview for SaveQueue rollback
+
                       this._panel.webview.postMessage({
                         command: 'saveCompleted',
                         success: false,
                         error: error.message
                       });
                       
-                      // Log error to file
+
                       const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
                       try {
                         fs.appendFileSync(logPath, errorLog);
@@ -922,7 +1031,7 @@ class BotPanel {
                       
                       vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
                       
-                      // Always refresh on error to show accurate backend state
+
                       this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Refreshing panel after error...`);
                       this._update().catch(err => {
                         this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
@@ -938,8 +1047,8 @@ class BotPanel {
               this._log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
               this._log(`[BotPanel] commandText: ${message.commandText}`);
               
-              // Detect operation types
-              // Create operations can be: .create_epic, .create_story, .create (for sub-epics), create child, create epic
+
+
               const isCreateOp = message.commandText.includes('.create_') || 
                                  message.commandText.includes('.create ') || 
                                  message.commandText.match(/\.create(?:$| name:)/) ||
@@ -950,14 +1059,18 @@ class BotPanel {
               const isRenameOp = message.commandText.includes('.rename');
               const isStoryGraphOp = isCreateOp || isDeleteOp || isMoveOp || isRenameOp;
               
-              // ALL story-changing operations use optimistic updates and skip refresh
-              // This preserves the optimistic DOM updates made in the frontend
-              // No need to check optimistic flag - story-changing ops always skip refresh
+
+
+
               
-              // Special debug for submit commands
+
               const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
                 message.commandText.includes('submit_instructions') ||
                 message.commandText.includes('submit_current_instructions');
+              if (isSubmitOp) {
+                this._log(`[SUBMIT_DEBUG] executeCommand: submit op received, commandText=${message.commandText?.substring(0, 80)}`);
+                console.log('[SUBMIT_DEBUG] executeCommand: submit op received');
+              }
               if (message.commandText.includes('submit_required_behavior_instructions')) {
                 this._log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
                 this._log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
@@ -970,8 +1083,6 @@ class BotPanel {
                 isDeleteOp
               });
               
-              // Log to file for create/delete/rename operations
-              const fs = require('fs');
               const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
               const timestamp = new Date().toISOString();
               const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RECEIVED COMMAND: ${message.commandText}\n`;
@@ -1002,7 +1113,7 @@ class BotPanel {
                   }
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Timestamp: ${new Date().toISOString()}`);
                   
-                  // Log result to file
+
                   const resultLog = `[${timestamp}] SUCCESS RESULT: ${JSON.stringify(result, null, 2)}\n`;
                   try {
                     fs.appendFileSync(logPath, resultLog);
@@ -1010,11 +1121,11 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
                   }
                   
-                  // Check if this is submit_required_behavior_instructions - show submit result
-                  const isSubmitInstructions = message.commandText.includes('submit_required_behavior_instructions');
-                  if (isSubmitInstructions && result) {
-                    this._log(`[BotPanel] Submit result from CLI: ${JSON.stringify(result).substring(0, 500)}`);
-                    // Show success/error message from CLI submit
+
+                  if (isSubmitOp && result) {
+                    this._log(`[SUBMIT_DEBUG] executeCommand submit path: result status=${result?.status} clipboard_status=${result?.clipboard_status}`);
+                    console.log('[SUBMIT_DEBUG] executeCommand submit path: result status=', result?.status, 'clipboard_status=', result?.clipboard_status);
+
                     if (result.status === 'success') {
                       const msg = result.message || 'Instructions submitted to chat!';
                       vscode.window.showInformationMessage(msg);
@@ -1022,12 +1133,12 @@ class BotPanel {
                       const errorMsg = result.message || result.error || 'Failed to submit instructions';
                       vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                     }
-                    // Don't refresh panel after submit - it's a read-only operation that doesn't change the story graph
+
                     this._log(`[BotPanel] Submit completed - skipping panel refresh (no story graph changes)`);
                     return Promise.resolve();
                   }
                   
-                  // Log timestamp for when panel made a change (for behavior cache invalidation)
+
                   const timestampFile = path.join(this._workspaceRoot, 'docs', 'stories', '.story-graph-panel-edit-time');
                   try {
                     fs.writeFileSync(timestampFile, Date.now().toString());
@@ -1036,7 +1147,7 @@ class BotPanel {
                     this._log(`[BotPanel] Failed to write timestamp file: ${err.message}`);
                   }
                   
-                  // Notify webview of successful save
+
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
                     this._log(`[BotPanel] Sending saveCompleted(success=true) to webview`);
                     this._panel.webview.postMessage({
@@ -1047,29 +1158,29 @@ class BotPanel {
                     this._log(`[BotPanel] Message sent to webview`);
                   }
                   
-                  // Increment commands always need a full refresh to show updated data
+
                   if (isIncrementCmd) {
                     this._log(`[INCREMENT] Refreshing panel after increment command`);
                     return this._update();
                   }
                   
-                  // CRITICAL: Always skip refresh for story-changing operations
-                  // All story-changing operations use optimistic updates in the frontend
-                  // Refreshing would remove those optimistic updates, so we never refresh
+
+
+
                   if (isStoryGraphOp) {
                     this._log(`[BotPanel] Story-changing operation - skipping panel refresh`);
                     this._log(`[BotPanel] Operation type: create=${isCreateOp}, move=${isMoveOp}, delete=${isDeleteOp}, rename=${isRenameOp}`);
                     this._log(`[BotPanel] Panel will NOT refresh - optimistic updates remain visible`);
                     return Promise.resolve();
                   } else {
-                    // Check if this is a scope command - needs refresh to show filtered view
+
                     const isScopeCommand = message.commandText.startsWith('scope ');
                     if (isScopeCommand) {
                       this._log(`[BotPanel] Scope command detected - refreshing panel to show filtered view...`);
                       return this._update();
                     }
                     
-                    // Non-story operations (like submit) don't need refresh
+
                     this._log(`[BotPanel] Non-story operation - skipping refresh`);
                     return Promise.resolve();
                   }
@@ -1086,7 +1197,7 @@ class BotPanel {
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Stack: ${error.stack}`);
                   this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Timestamp: ${new Date().toISOString()}`);
                   
-                  // Log error to file
+
                   const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
                   try {
                     fs.appendFileSync(logPath, errorLog);
@@ -1096,7 +1207,7 @@ class BotPanel {
                   
                   vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
                   
-                  // Notify webview of save error
+
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
                     this._log(`[BotPanel] Sending saveCompleted(success=false) to webview`);
                     this._panel.webview.postMessage({
@@ -1107,8 +1218,8 @@ class BotPanel {
                     this._log(`[BotPanel] Error message sent to webview`);
                   }
                   
-                  // Always refresh on error to show accurate backend state
-                  // (rollback should have already happened in SaveQueue)
+
+
                   if (!isOptimistic) {
                     this._log(`[BotPanel] Refreshing panel after error...`);
                     this._update().catch(err => {
@@ -1139,14 +1250,14 @@ class BotPanel {
               const cmd = `${message.behaviorName}`;
               this._botView?.execute(cmd)
                 .then((result) => {
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();
@@ -1170,24 +1281,24 @@ class BotPanel {
                   if (result?.instructions) {
                     this._log(`[BotPanel] result.instructions keys: ${Object.keys(result.instructions).join(', ')}`);
                   }
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                       this._log(`[BotPanel] Copied instructions into botData`);
                     } else {
                       this._log(`[BotPanel] WARNING: No instructions in result to copy!`);
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   } else {
                     this._log(`[BotPanel] WARNING: No result.bot - not caching!`);
                   }
                   return this._updateWithCachedData().then(() => {
-                    // After panel update, expand the instructions section for this action
-                    // Use setTimeout to ensure DOM is ready after webview.html is set
+
+
                     setTimeout(() => {
                       try {
                         this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
@@ -1215,14 +1326,14 @@ class BotPanel {
               this._botView?.execute(command)
                 .then((result) => {
                   this._log(`[BotPanel] navigateAndExecute success: ${command} | result keys: ${Object.keys(result || {})}`);
-                  // Cache the navigation result to avoid redundant CLI calls
+
                   if (result?.bot) {
                     this._botView.botData = result.bot;
-                    // Copy instructions into botData so InstructionsSection can find them
+
                     if (result.instructions) {
                       this._botView.botData.instructions = result.instructions;
                     }
-                    // Also cache full response for InstructionsSection
+
                     PanelView._lastResponse = result;
                   }
                   return this._updateWithCachedData();
@@ -1236,7 +1347,7 @@ class BotPanel {
             return;
           case "toggleSection":
             if (message.sectionId) {
-              // Expansion state is handled client-side via JavaScript
+
             }
             return;
           case "sectionExpansion":
@@ -1247,28 +1358,36 @@ class BotPanel {
             return;
           case "toggleCollapse":
             if (message.elementId) {
-              // Expansion state is handled client-side via JavaScript
+
             }
             return;
           case "sendToChat":
-            this._log('sendToChat - calling bot submit command');
-            
-            // Call the bot's submit command (Python handles everything)
-            this._botView?.execute('submit')
+            this._log('[SUBMIT_DEBUG] 1. sendToChat received');
+            console.log('[SUBMIT_DEBUG] 1. sendToChat received');
+            if (!this._botView) {
+              const err = new Error('_botView is null - panel not properly initialized');
+              console.error('[BotPanel]', err.message, err.stack);
+              vscode.window.showErrorMessage(`Submit failed: ${err.message}`);
+              throw err;
+            }
+            this._log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
+            console.log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
+            this._botView.execute('submit')
               .then((output) => {
-                this._log('Bot submit command output:', output);
+                this._log(`[SUBMIT_DEBUG] 3. execute resolved, status=${output?.status} clipboard_status=${output?.clipboard_status} instructions_length=${output?.instructions_length}`);
+                console.log('[SUBMIT_DEBUG] 3. execute resolved, status:', output?.status, 'clipboard_status:', output?.clipboard_status, 'instructions_length:', output?.instructions_length);
                 
-                // Handle dictionary response from Python
+
                 if (output && typeof output === 'object' && output.status) {
                   if (output.status === 'success') {
                     const msg = output.message || 'Instructions submitted to chat!';
                     vscode.window.showInformationMessage(msg);
                   } else {
-                    const errorMsg = output.message || 'Unknown error';
+                    const errorMsg = output.message || output.error || 'Unknown error';
                     vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                   }
                 }
-                // Handle string response (legacy/CLI format)
+
                 else {
                   const outputStr = typeof output === 'string' ? output : JSON.stringify(output || '');
                   
@@ -1287,7 +1406,8 @@ class BotPanel {
                 }
               })
               .catch((error) => {
-                this._log('Submit command failed:', error);
+                this._log(`[SUBMIT_DEBUG] 4. execute REJECTED: ${error?.message}`);
+                console.error('[SUBMIT_DEBUG] 4. execute REJECTED:', error?.message, error?.stack);
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
             return;
@@ -1326,7 +1446,7 @@ class BotPanel {
           case "saveStrategyDecision":
             if (message.criteriaKey && message.selectedOption) {
               this._log(`[BotPanel] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
-              // Build decisions object with just this one decision
+
               const decisions = {};
               decisions[message.criteriaKey] = message.selectedOption;
               const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
@@ -1345,7 +1465,7 @@ class BotPanel {
           case "saveStrategyMultiDecision":
             if (message.criteriaKey && message.selectedOptions) {
               this._log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
-              // Build decisions object with array of selected options
+
               const multiDecisions = {};
               multiDecisions[message.criteriaKey] = message.selectedOptions;
               const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
@@ -1362,6 +1482,30 @@ class BotPanel {
             }
             return;
           case "renderDiagram": {
+            if (!this._findDiagramPathToOpen) {
+              this._findDiagramPathToOpen = (result, fallbackPath, scope) => {
+                if (result?.results && Array.isArray(result.results)) {
+                  const executed = result.results.find(r => r.status === 'executed' && r.path);
+                  if (executed) return executed.path;
+                  const anyWithPath = result.results.find(r => r.path);
+                  if (anyWithPath) return anyWithPath.path;
+                }
+                if (result?.path) return result.path;
+                if (fallbackPath) {
+                  let openPath = fallbackPath;
+                  if (scope) {
+                    const sanitized = scope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+                    if (openPath.includes('{scope}')) openPath = openPath.replace('{scope}', sanitized);
+                    else if (openPath.includes('-all.drawio')) openPath = openPath.replace('-all.drawio', `-${sanitized}.drawio`);
+                    else if (openPath.endsWith('.drawio')) openPath = openPath.replace('.drawio', `-${sanitized}.drawio`);
+                  } else if (openPath.includes('{scope}')) {
+                    openPath = openPath.replace('{scope}', 'all');
+                  }
+                  return openPath;
+                }
+                return null;
+              };
+            }
             const behaviorName = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
             if (!behaviorName) {
               vscode.window.showErrorMessage('No current behavior set');
@@ -1379,31 +1523,24 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(renderCmd);
+                this._log(`[BotPanel] renderDiagram result keys: ${result ? Object.keys(result).join(', ') : 'null'}`);
+                this._log(`[BotPanel] renderDiagram result.status: ${result?.status}, result.results: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
-                  vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
-                  // Open the rendered diagram file (use vscode.open so DrawIO editor opens, not XML)
-                  if (message.path) {
+                  const diagramPath = this._findDiagramPathToOpen(result, message.path, diagramScope);
+                  this._log(`[BotPanel] renderDiagram resolved path: ${diagramPath || '(none)'}`);
+                  if (diagramPath) {
                     try {
-                      // Resolve scoped filename using the same logic
-                      // the Python backend applies.
-                      let openPath = message.path;
-                      if (diagramScope) {
-                        const sanitized = diagramScope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
-                        if (openPath.includes('{scope}')) {
-                          openPath = openPath.replace('{scope}', sanitized);
-                        } else if (openPath.includes('-all.drawio')) {
-                          openPath = openPath.replace('-all.drawio', `-${sanitized}.drawio`);
-                        } else if (openPath.endsWith('.drawio')) {
-                          openPath = openPath.replace('.drawio', `-${sanitized}.drawio`);
-                        }
-                      } else if (openPath.includes('{scope}')) {
-                        openPath = openPath.replace('{scope}', 'all');
-                      }
-                      const diagramUri = vscode.Uri.file(openPath);
+                      const diagramUri = vscode.Uri.file(diagramPath);
+                      this._log(`[BotPanel] renderDiagram opening: ${diagramPath}`);
                       await vscode.commands.executeCommand('vscode.open', diagramUri);
+                      vscode.window.showInformationMessage(result.message || 'Diagram rendered and opened');
                     } catch (openErr) {
                       this._log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
+                      vscode.window.showErrorMessage(`Diagram rendered but failed to open: ${openErr.message}`);
                     }
+                  } else {
+                    this._log(`[BotPanel] renderDiagram: no path found in result to open`);
+                    vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
                   }
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
@@ -1492,8 +1629,22 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(reportCmd);
+                this._log(`[BotPanel] generateDiagramReport result: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
-                  vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                  const reportPath = (result.results || []).find(r => r.status === 'success' && r.report_path)?.report_path || result.report_path;
+                  if (reportPath) {
+                    try {
+                      const reportUri = vscode.Uri.file(reportPath);
+                      this._log(`[BotPanel] generateDiagramReport opening: ${reportPath}`);
+                      await vscode.commands.executeCommand('vscode.open', reportUri);
+                      vscode.window.showInformationMessage(result.message || 'Report generated and opened');
+                    } catch (openErr) {
+                      this._log(`[BotPanel] generateDiagramReport open file error: ${openErr.message}`);
+                      vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                    }
+                  } else {
+                    vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                  }
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to generate report');
                 }
@@ -1527,7 +1678,7 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to update story graph');
                 }
-                // Clear cached data so panel reloads fresh story map
+
                 if (this._botView) {
                   this._botView.botData = null;
                 }
@@ -1570,7 +1721,7 @@ class BotPanel {
       const column = vscode.ViewColumn.Two;
       console.log(`[BotPanel] >>> Column set: ${column}`);
 
-      // If we already have a panel, show it
+
       if (BotPanel.currentPanel) {
         console.log("[BotPanel] >>> Reusing existing panel");
         BotPanel.currentPanel._panel.reveal(column);
@@ -1578,7 +1729,7 @@ class BotPanel {
       }
 
       console.log("[BotPanel] >>> Creating new webview panel");
-      // Otherwise, create a new panel
+
       const panel = vscode.window.createWebviewPanel(
         BotPanel.viewType,
         "Bot Panel",
@@ -1604,27 +1755,19 @@ class BotPanel {
     }
   }
 
-  /**
-   * Create a BotPanel instance for use in a sidebar WebviewView.
-   * Unlike createOrShow, this doesn't create a new WebviewPanel - it uses an existing WebviewView.
-   * 
-   * @param {vscode.WebviewView} webviewView - The sidebar webview view
-   * @param {string} workspaceRoot - Workspace root path
-   * @param {vscode.Uri} extensionUri - Extension URI for resources
-   * @returns {BotPanel} The BotPanel instance
-   */
+
   static createForSidebar(webviewView, workspaceRoot, extensionUri) {
     console.log("[BotPanel] Creating for sidebar view");
     
-    // Create a wrapper object that mimics WebviewPanel interface
+
     const panelWrapper = {
       webview: webviewView.webview,
       onDidDispose: webviewView.onDidDispose.bind(webviewView),
-      // WebviewView doesn't have these, so provide no-ops that return disposables
+
       onDidChangeViewState: (callback, thisArg, disposables) => {
-        // WebviewView has onDidChangeVisibility instead
+
         return webviewView.onDidChangeVisibility(() => {
-          // Create a fake event object
+
           callback({ webviewView: webviewView });
         }, thisArg, disposables);
       },
@@ -1632,10 +1775,10 @@ class BotPanel {
       dispose: () => {}
     };
     
-    // Create new BotPanel instance using the wrapper
+
     const botPanel = new BotPanel(panelWrapper, workspaceRoot, extensionUri);
     
-    // Don't set as currentPanel - sidebar and editor panels can coexist
+
     console.log("[BotPanel] Sidebar instance created successfully");
     
     return botPanel;
@@ -1643,7 +1786,7 @@ class BotPanel {
 
   _readPanelVersion() {
     try {
-      // Try multiple locations for package.json
+
       const possiblePaths = [
         path.join(__dirname, "package.json"),
         path.join(__dirname, "..", "package.json"),
@@ -1683,7 +1826,7 @@ class BotPanel {
         return;
       }
       
-      // Verify story graph is available (but don't fail if it's not in the expected format)
+
       try {
         const storyGraph = await this._botView.execute('story_graph');
         this._log(`[BotPanel] Story graph check result: ${JSON.stringify(storyGraph)}`);
@@ -1691,18 +1834,16 @@ class BotPanel {
         this._log(`[BotPanel] Story graph check failed (continuing anyway): ${error.message}`);
       }
       
-      const fs = require('fs');
-      const path = require('path');
       const workspaceRoot = this._workspaceRoot;
       
-      // Helper to resolve file path
+
       const resolvePath = (filePath) => {
         if (!filePath) return null;
         if (path.isAbsolute(filePath)) return filePath;
         return path.join(workspaceRoot, filePath);
       };
       
-      // Helper to open file in column
+
       const openInColumn = async (filePath, column, options = {}) => {
         const absolutePath = resolvePath(filePath);
         if (!absolutePath || !fs.existsSync(absolutePath)) {
@@ -1711,7 +1852,7 @@ class BotPanel {
         }
         const fileUri = vscode.Uri.file(absolutePath);
         
-        // Use vscode.open for JSON files to avoid VS Code's 15MB text editor bug
+
         const fileExtension = filePath.split('.').pop().toLowerCase();
         if (fileExtension === 'json') {
           await vscode.commands.executeCommand('vscode.open', fileUri);
@@ -1719,7 +1860,7 @@ class BotPanel {
         }
         
         const doc = await vscode.workspace.openTextDocument(fileUri);
-        // Open as a new tab (preview: false) without taking focus (preserveFocus: true)
+
         const openOptions = { 
           viewColumn: column, 
           preview: false,
@@ -1730,19 +1871,19 @@ class BotPanel {
       };
       
       if (command === 'openStoryFiles') {
-        // Open story markdown files
+
         if (singleFileLink) {
-          // Single story - open normally
+
           await openInColumn(singleFileLink, vscode.ViewColumn.One);
         } else {
-          // Query for all story files under node
+
           this._log(`[BotPanel] Opening story files for ${nodeType} "${nodeName}"`);
           
-          // Use the openStoryFile domain API to get all story files
+
           try {
             const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openStoryFile()`);
             if (result && result.files && Array.isArray(result.files)) {
-              // Open files normally (not in separate panes)
+
               for (const filePath of result.files) {
                 await openInColumn(filePath, vscode.ViewColumn.One);
               }
@@ -1750,12 +1891,12 @@ class BotPanel {
             }
           } catch (error) {
             this._log(`[BotPanel] Error getting story files: ${error.message}`);
-            // Fallback: try to discover files from story graph structure
-            // TODO: Implement story file discovery from story graph
+
+
           }
         }
       } else if (command === 'openTestFiles') {
-        // Open test files - use vscode.open (not openTextDocument) to avoid extension sync issues
+
         this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
         
         try {
@@ -1769,7 +1910,7 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open test files: ${error.message}`);
         }
       } else if (command === 'openCodeFiles') {
-        // Trace imports in test files to find and open code files
+
         this._log(`[BotPanel] Opening code files traced from tests for ${nodeType} "${nodeName}"`);
         
         try {
@@ -1804,7 +1945,7 @@ class BotPanel {
           vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
         }
       } else if (command === 'openAllRelatedFiles') {
-        // Use internal helper methods
+
         const graphPath = storyGraphPath || path.join(workspaceRoot, 'docs/story/story-graph.json');
         const testFiles = message.testFiles || [];
         const storyFiles = message.storyFiles || [];
@@ -1812,11 +1953,11 @@ class BotPanel {
         
         this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
         
-        // 1. Open story graph with node selected
+
         await this._openGraphWithNodeSelected(graphPath, selectedNode);
         
         if (nodeType === 'sub-epic' || nodeType === 'epic') {
-          // For sub-epics/epics: open exploration doc (sub-epic's own file link) + all child story files
+
           if (singleFileLink) {
             this._log(`[BotPanel] Opening exploration file for sub-epic "${nodeName}": ${singleFileLink}`);
             await this._openStoryFile(singleFileLink);
@@ -1826,18 +1967,18 @@ class BotPanel {
             await this._openStoryFile(storyFilePath);
           }
         } else {
-          // 2. Open single story file
+
           if (singleFileLink) {
             await this._openStoryFile(singleFileLink);
           }
         }
         
-        // 3. Open test files
+
         if (testFiles.length > 0) {
           await this._openTestFiles(testFiles);
         }
         
-        // 3.5. Open code files traced from imports in test files
+
         try {
           const codeResult = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openCode()`);
           if (codeResult && codeResult.files && Array.isArray(codeResult.files)) {
@@ -1868,7 +2009,7 @@ class BotPanel {
           this._log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
         }
         
-        // 4. Activate the story graph tab as the last step (use vscode.open for JSON, not openTextDocument)
+
         const graphAbsPath = path.isAbsolute(graphPath) ? graphPath : path.join(workspaceRoot, graphPath);
         try {
           await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(graphAbsPath));
@@ -1882,26 +2023,19 @@ class BotPanel {
     }
   }
 
-  /**
-   * Open story graph JSON file with a specific node selected and scrolled into view.
-   * @param {string} graphPath - Path to story-graph.json
-   * @param {object} selectedNode - Node to select (with name, type, path properties)
-   */
+
   async _openGraphWithNodeSelected(graphPath, selectedNode) {
-    const fs = require('fs');
-    const path = require('path');
-    
     const absolutePath = path.isAbsolute(graphPath) 
       ? graphPath 
       : path.join(this._workspaceRoot, graphPath);
     
-    // Use vscode.open for JSON (not openTextDocument) to avoid extension sync / text editor limits
+
     if (!selectedNode || !selectedNode.name) {
       await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(absolutePath));
       return;
     }
     
-    // Read file via fs to find node line - avoids openTextDocument which fails for large JSON
+
     let startLine = 0;
     try {
       const text = fs.readFileSync(absolutePath, 'utf8');
@@ -1936,13 +2070,8 @@ class BotPanel {
     this._log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
   }
 
-  /**
-   * Open a story markdown file.
-   * @param {string} filePath - Path to the story .md file
-   */
+
   async _openStoryFile(filePath) {
-    const fs = require('fs');
-    const path = require('path');
     
     if (!filePath) return;
     
@@ -1966,13 +2095,8 @@ class BotPanel {
     this._log(`[BotPanel] Story file opened: ${filePath}`);
   }
 
-  /**
-   * Open test files in a split editor.
-   * @param {string[]} testFiles - Array of test file paths
-   */
+
   async _openTestFiles(testFiles) {
-    const fs = require('fs');
-    const path = require('path');
     
     for (const testFilePath of testFiles) {
       try {
@@ -2008,17 +2132,17 @@ class BotPanel {
   dispose() {
     BotPanel.currentPanel = undefined;
 
-    // Clean up BotView
+
       this._botView = null;
 
-    // Clean up shared CLI
+
     console.log("[BotPanel] Cleaning up shared PanelView CLI");
     if (this._sharedCLI) {
       this._sharedCLI.cleanup();
       this._sharedCLI = null;
     }
 
-    // Clean up resources
+
     this._panel.dispose();
 
     while (this._disposables.length) {
@@ -2029,11 +2153,7 @@ class BotPanel {
     }
   }
 
-  /**
-   * Update panel using already-cached data from navigation.
-   * Skips the refresh() call since botData is already populated.
-   * This significantly improves performance for navigation clicks.
-   */
+
   async _updateWithCachedData() {
     return vscode.window.withProgress({
       location: vscode.ProgressLocation.Notification,
@@ -2047,7 +2167,7 @@ class BotPanel {
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
       
-      // Initialize BotView if needed (uses shared CLI)
+
       if (!this._botView) {
         const perfBotViewStart = performance.now();
         this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
@@ -2055,16 +2175,16 @@ class BotPanel {
         this._log(`[PERF] BotView creation: ${(perfBotViewEnd - perfBotViewStart).toFixed(2)}ms`);
       }
       
-      // Skip refresh - data already cached from navigation command
+
       this._log('[BotPanel] Skipping refresh() - using cached botData from navigation');
       
-      // Pass view state to story map (preserve expansion across updates)
+
       if (this._botView.storyMapView) {
         this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
         this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
       }
       
-      // Render HTML using cached data
+
       const perfRenderStart = performance.now();
       const botData = this._botView.botData;
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
@@ -2076,7 +2196,7 @@ class BotPanel {
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
       
-      // Clear cached response after rendering
+
       PanelView._lastResponse = null;
       
       const perfUpdateEnd = performance.now();
@@ -2086,21 +2206,19 @@ class BotPanel {
     } catch (err) {
       console.error(`[BotPanel] ERROR in _updateWithCachedData: ${err.message}`);
       this._log(`[BotPanel] ERROR in _updateWithCachedData, falling back to full _update: ${err.message}`);
-      // Fall back to full update on error
+
       return this._update();
     }
     });
   }
 
-  /**
-   * Public refresh method - can be called from external code (e.g., sidebar provider)
-   */
+
   async refresh() {
     return this._update();
   }
 
   _setupDiagramFileWatchers(botData) {
-    // Disabled – file watchers were overwriting user edits to .drawio files
+
     if (this._diagramWatchers) {
       this._diagramWatchers.forEach(function(w) { w.dispose(); });
     }
@@ -2114,7 +2232,7 @@ class BotPanel {
       title: 'Reloading panel...',
       cancellable: false
     }, async () => {
-    // ===== PERFORMANCE: Start overall timing =====
+
     const perfUpdateStart = performance.now();
     try {
       this._log('[BotPanel] _update() START');
@@ -2122,9 +2240,9 @@ class BotPanel {
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
       
-      // Initialize BotView if needed (uses shared CLI)
+
       if (!this._botView) {
-        // ===== PERFORMANCE: BotView creation =====
+
         const perfBotViewStart = performance.now();
         console.log("[BotPanel] Creating BotView");
         this._log('[BotPanel] Creating BotView');
@@ -2143,14 +2261,14 @@ class BotPanel {
         }
       }
       
-      // Pass current story map view state to the view
+
       if (this._botView.storyMapView) {
         this._botView.storyMapView.currentViewMode = this._currentStoryMapView || 'Hierarchy';
         this._botView.storyMapView.scopeSectionExpanded = this._expansionState['scope-content'] !== false;
       }
       
-      // CRITICAL: Refresh data BEFORE rendering to show latest changes
-      // ===== PERFORMANCE: Data refresh =====
+
+
       const perfRefreshStart = performance.now();
       console.log("[BotPanel] Refreshing bot data...");
       this._log('[BotPanel] Calling _botView.refresh() to fetch latest data');
@@ -2160,11 +2278,11 @@ class BotPanel {
       this._log(`[BotPanel] Data refreshed successfully in ${refreshDuration}ms`);
       this._log(`[PERF] Data refresh: ${refreshDuration}ms`);
       
-      // ===== PERFORMANCE: HTML rendering =====
+
       const perfRenderStart = performance.now();
       console.log("[BotPanel] Rendering HTML");
       this._log('[BotPanel] _botView.render() starting');
-      // Render HTML using BotView (async now)
+
       const botData = this._botView.botData || await this._botView.execute('status');
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
       const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
@@ -2173,10 +2291,10 @@ class BotPanel {
       const renderDuration = (perfRenderEnd - perfRenderStart).toFixed(2);
       this._log(`[PERF] HTML rendering: ${renderDuration}ms`)
       
-      // ===== PERFORMANCE: HTML update =====
+
       const perfHtmlUpdateStart = performance.now();
       
-      // Log HTML update details
+
       const htmlPreview = html.substring(0, 500).replace(/\s+/g, ' ');
       this._log(`[BotPanel] Setting webview HTML (length: ${html.length}, preview: ${htmlPreview}...)`);
       this._log(`[BotPanel] Current HTML length: ${this._lastHtmlLength || 0}, New HTML length: ${html.length}`);
@@ -2197,9 +2315,9 @@ class BotPanel {
       this._log('[BotPanel] Webview HTML property set');
       this._log(`[PERF] HTML update (set webview.html): ${htmlUpdateDuration}ms`);
       
-      // Give webview time to load
+
       setTimeout(() => {
-        // Show refreshing status (will auto-hide after 1 second)
+
         this._panel.webview.postMessage({
           command: 'refreshStatus',
           state: 'refreshing',
@@ -2208,7 +2326,7 @@ class BotPanel {
         this._log('[BotPanel] Sent refreshStatus refreshing message to webview');
       }, 100);
       
-      // ===== PERFORMANCE: Log total duration =====
+
       const perfUpdateEnd = performance.now();
       const totalDuration = (perfUpdateEnd - perfUpdateStart).toFixed(2);
       console.log("[BotPanel] _update() completed successfully");
@@ -2222,13 +2340,13 @@ class BotPanel {
       console.error(`[BotPanel] ERROR stack: ${err.stack}`);
       this._log(`[BotPanel] ERROR in _update: ${err.message} | Stack: ${err.stack}`);
       
-      // Show error in VSCode notification
+
       const errorMsg = err.isCliError 
         ? `CLI Error: ${err.message}` 
         : `Bot Panel Update Error: ${err.message}`;
       vscode.window.showErrorMessage(errorMsg);
       
-      // Display error in panel with retry button
+
       const errorType = err.errorType || err.constructor.name;
       const command = err.command ? `Command: ${escapeForHtml(err.command)}` : '';
       
@@ -2277,7 +2395,7 @@ class BotPanel {
     const textColor = branding.getTextColor();
     const textColorFaded = branding.getTextColorFaded();
     const fontWeight = branding.getFontWeight();
-    // Convert hex to RGB for rgba() usage
+
     const hexToRgb = (hex) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
       return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 140, 0';
@@ -2352,7 +2470,7 @@ function getNonce() {
 	return text;
 }
 
-// Static properties (assigned after class definition for compatibility)
+
 BotPanel.currentPanel = undefined;
 BotPanel.viewType = "agilebot.botPanel";
 

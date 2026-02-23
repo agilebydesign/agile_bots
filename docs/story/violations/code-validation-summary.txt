@@ -1,0 +1,14 @@
+=== CODE VALIDATION (scope: Add Special Instructions) ===
+
+Rule chain_dependencies_properly.json: 2 file-by-file, 0 cross-file violations
+Rule enforce_encapsulation.json: 25 file-by-file, 0 cross-file violations
+Rule favor_code_representation.json: 1 file-by-file, 0 cross-file violations
+Rule keep_classes_small_with_single_responsibility.json: 2 file-by-file, 0 cross-file violations
+Rule place_imports_at_top.json: 5 file-by-file, 0 cross-file violations
+Rule simplify_control_flow.json: 3 file-by-file, 0 cross-file violations
+Rule stop_writing_useless_comments.json: 47 file-by-file, 0 cross-file violations
+Rule use_clear_function_parameters.json: 1 file-by-file, 0 cross-file violations
+Rule use_domain_language.json: 1 file-by-file, 0 cross-file violations
+Rule use_resource_oriented_design.json: 11 file-by-file, 0 cross-file violations
+
+Total: 10 rule(s) with violations

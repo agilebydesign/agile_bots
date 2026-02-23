@@ -1,0 +1,3 @@
+=== SCENARIOS VALIDATION (scope: Render Diagram Selected Node) ===
+
+No violations found.

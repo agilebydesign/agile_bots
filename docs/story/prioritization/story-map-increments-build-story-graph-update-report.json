@@ -1,0 +1,106 @@
+{
+  "matched_count": 2,
+  "increment_changes": [
+    {
+      "name": "Base Bot",
+      "added": [
+        "Build Story Graph"
+      ]
+    },
+    {
+      "name": "CLI",
+      "added": [
+        "Build Story Graph Using CLI",
+        "Get Build Instructions Through CLI"
+      ]
+    },
+    {
+      "name": "Panel",
+      "added": [
+        "Display Build Instructions Panel"
+      ]
+    },
+    {
+      "name": "Render Diagrams",
+      "added": [
+        "Build Story Graph Using API"
+      ]
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "added": [
+        "Build Story Graph Through Queue"
+      ]
+    }
+  ],
+  "increment_moves": [
+    {
+      "story": "Build Story Graph",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Build Story Graph Through Queue",
+      "from": "(unassigned)",
+      "to": "Queue Behavior Action Workflow"
+    },
+    {
+      "story": "Build Story Graph Using API",
+      "from": "(unassigned)",
+      "to": "Render Diagrams"
+    },
+    {
+      "story": "Build Story Graph Using CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Display Build Instructions Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Get Build Instructions Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    }
+  ],
+  "increment_order": [
+    {
+      "name": "Base Bot",
+      "priority": 1
+    },
+    {
+      "name": "CLI",
+      "priority": 2
+    },
+    {
+      "name": "Panel",
+      "priority": 3
+    },
+    {
+      "name": "Story Map Scoping",
+      "priority": 4
+    },
+    {
+      "name": "Render Diagrams",
+      "priority": 5
+    },
+    {
+      "name": "Increments On Panel",
+      "priority": 6
+    },
+    {
+      "name": "Behavior Action Ux Improvements",
+      "priority": 7
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "priority": 8
+    },
+    {
+      "name": "Trace and Edit",
+      "priority": 9
+    }
+  ]
+}
