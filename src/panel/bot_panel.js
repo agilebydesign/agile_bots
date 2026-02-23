@@ -3261,6 +3261,12 @@ class BotPanel {
             menu.id = 'story-node-copy-menu';
             menu.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;background:var(--vscode-dropdown-background);border:1px solid var(--vscode-dropdown-border);border-radius:4px;padding:4px 0;z-index:10001;min-width:160px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
             items.forEach(function(item) {
+                if (item.separator) {
+                    var hr = document.createElement('div');
+                    hr.style.cssText = 'height:1px;background:var(--vscode-dropdown-border);margin:4px 0;';
+                    menu.appendChild(hr);
+                    return;
+                }
                 const div = document.createElement('div');
                 div.textContent = item.label;
                 div.style.cssText = 'padding:6px 12px;cursor:pointer;font-size:12px;';
@@ -3289,12 +3295,29 @@ class BotPanel {
             if (target && target.classList.contains('story-node')) {
                 const nodePath = target.getAttribute('data-path');
                 if (nodePath) {
+                    var scope = window.diagramScope || '';
                     _showCopyMenu(e, [
                         { label: 'Copy node name', action: function() {
                             vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'name' });
                         }},
                         { label: 'Copy full JSON', action: function() {
                             vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'json' });
+                        }},
+                        { separator: true },
+                        { label: 'Render diagram', action: function() {
+                            vscode.postMessage({ command: 'renderDiagram', scope: scope });
+                        }},
+                        { label: 'Save layout', action: function() {
+                            vscode.postMessage({ command: 'saveDiagramLayout', scope: scope });
+                        }},
+                        { label: 'Clear layout', action: function() {
+                            vscode.postMessage({ command: 'clearDiagramLayout', scope: scope });
+                        }},
+                        { label: 'Generate report', action: function() {
+                            vscode.postMessage({ command: 'generateDiagramReport', scope: scope });
+                        }},
+                        { label: 'Update graph', action: function() {
+                            vscode.postMessage({ command: 'updateFromDiagram', scope: scope });
                         }}
                     ]);
                     return;
