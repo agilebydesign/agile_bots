@@ -62,3 +62,6 @@ then map to an archtitecture pattern
 --> wrap logic in CLI that supports bot piped and TTY mode
 
 --> then create architecture efforts, stories, scenarios, tests, and codes 
+
+
+--> 

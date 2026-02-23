@@ -18,10 +18,10 @@
   "story_bot.tests.build": "combine_next",
   "story_bot.code.build": "combine_next",
   "story_bot.tests.validate": "combine_next",
-  "story_bot._behavior.shape": "skip",
+  "story_bot._behavior.shape": "manual",
   "story_bot._behavior.scenarios": "combine_with_next",
   "story_bot._behavior.tests": "combine_with_next",
   "story_bot._behavior.code": "manual",
-  "story_bot._behavior.prioritization": "skip",
+  "story_bot._behavior.prioritization": "manual",
   "story_bot._behavior.exploration": "skip"
 }

@@ -1,9 +1,9 @@
 {
   "type": "story",
   "value": [
-    "Render Diagram Selected Node"
+    "Perform Action"
   ],
   "exclude": [],
   "skiprule": [],
-  "include_level": "code"
+  "include_level": "acceptance"
 }

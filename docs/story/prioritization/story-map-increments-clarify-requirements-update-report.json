@@ -1,0 +1,113 @@
+{
+  "matched_count": 2,
+  "increment_changes": [
+    {
+      "name": "Base Bot",
+      "added": [
+        "Clarify Requirements"
+      ]
+    },
+    {
+      "name": "CLI",
+      "added": [
+        "Clarify Requirements Using CLI",
+        "Display Clarification Data Through CLI",
+        "Get Clarify Instructions Through CLI"
+      ]
+    },
+    {
+      "name": "Panel",
+      "added": [
+        "Display Clarify Instructions Panel"
+      ]
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "added": [
+        "Associate Guard rail with scope",
+        "Clarify in Queue",
+        "Display clarification answers in Queue"
+      ]
+    }
+  ],
+  "increment_moves": [
+    {
+      "story": "Associate Guard rail with scope",
+      "from": "(unassigned)",
+      "to": "Queue Behavior Action Workflow"
+    },
+    {
+      "story": "Clarify Requirements",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Clarify Requirements Using CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Clarify in Queue",
+      "from": "(unassigned)",
+      "to": "Queue Behavior Action Workflow"
+    },
+    {
+      "story": "Display Clarification Data Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Display Clarify Instructions Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Display clarification answers in Queue",
+      "from": "(unassigned)",
+      "to": "Queue Behavior Action Workflow"
+    },
+    {
+      "story": "Get Clarify Instructions Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    }
+  ],
+  "increment_order": [
+    {
+      "name": "Base Bot",
+      "priority": 1
+    },
+    {
+      "name": "CLI",
+      "priority": 2
+    },
+    {
+      "name": "Panel",
+      "priority": 3
+    },
+    {
+      "name": "Story Map Scoping",
+      "priority": 4
+    },
+    {
+      "name": "Render Diagrams",
+      "priority": 5
+    },
+    {
+      "name": "Increments On Panel",
+      "priority": 6
+    },
+    {
+      "name": "Behavior Action Ux Improvements",
+      "priority": 7
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "priority": 8
+    },
+    {
+      "name": "Trace and Edit",
+      "priority": 9
+    }
+  ]
+}
