@@ -212,50 +212,10 @@ class StoryMapView extends PanelView {
                     </button>
                 </div>
                 
-                <!-- Separator between Create/Delete and Diagram groups -->
-                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
-                
-                <!-- Diagram action buttons: Render, Save layout, Clear layout, Generate report, Update graph -->
-                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 2px;">
-                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram for current behavior">
-                        <img src="${renderDiagramIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Render Diagram" />
-                    </button>
-                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Save diagram layout for current behavior">
-                        <img src="${saveLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Save Layout" />
-                    </button>
-                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear diagram layout for current behavior">
-                        <img src="${clearLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Clear Layout" />
-                    </button>
-                    <button id="btn-generate-report" class="generate-report-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'generateDiagramReport', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Generate update report from diagram">
-                        <img src="${generateReportIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Generate Report" />
-                    </button>
-                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Update graph from diagram for current behavior">
-                        <img src="${updateGraphIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Update Graph" />
-                    </button>
                 </div>
                 
-                <!-- Separator between Scope and Related Files groups -->
-                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
-                </div>
-                
-                <!-- Right side: Related Files and Submit button group -->
+                <!-- Right side: Submit button group -->
                 <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
-                    <button id="btn-open-graph" 
-                            onclick="event.stopPropagation(); handleOpenGraph();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 52px; height: 52px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open story graph with selected node expanded">
-                        <img src="${jsonIconPath}" style="width: 48px; height: 48px; object-fit: contain; display: block;" alt="Graph" />
-                    </button>
-                    <button id="btn-open-all" 
-                            onclick="event.stopPropagation(); handleOpenAll();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open all related files in split editors">
-                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
-                    </button>
                     <button id="btn-submit" 
                             onclick="event.stopPropagation(); handleSubmit();" 
                             style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 

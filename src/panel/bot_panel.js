@@ -4971,8 +4971,8 @@ class BotPanel {
             const btnDelete = document.getElementById('btn-delete');
             const btnScopeTo = document.getElementById('btn-scope-to');
             const btnSubmit = document.getElementById('btn-submit');
-            const btnOpenGraph = document.getElementById('btn-open-graph');
-            const btnOpenAll = document.getElementById('btn-open-all');
+            const btnOpenGraph = document.getElementById('btn-open-graph') || document.getElementById('ws-btn-open-graph');
+            const btnOpenAll = document.getElementById('btn-open-all') || document.getElementById('ws-btn-open-all');
             
 
             if (btnCreateEpic) btnCreateEpic.style.display = 'none';

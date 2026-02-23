@@ -1,6 +1,6 @@
 /**
- * Panel tests: diagram action bar in story map view.
- * Tests rendering, button layout, visibility when node selected.
+ * Panel tests: diagram action bar in workspace section view.
+ * Tests rendering, button layout, workspace section structure.
  * Routes through CLI. Uses generic fixtures (EpicA, SubEpicB).
  */
 
@@ -19,9 +19,8 @@ const assert = require('assert');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const { JSDOM } = require('jsdom');
 const PanelView = require('../../../src/panel/panel_view');
-const StoryMapView = require('../../../src/panel/story_map_view');
+const WorkspaceSectionView = require('../../../src/panel/workspace_section_view');
 
 const repoRoot = path.join(__dirname, '../../..');
 const productionBotPath = path.join(repoRoot, 'bots', 'story_bot');
@@ -67,55 +66,57 @@ after(() => {
 });
 
 test('TestDiagramActionBarPanel', { concurrency: false }, async (t) => {
-    await t.test('panel_shows_diagram_buttons_when_hierarchy_view_renders', async () => {
+    await t.test('workspace_section_shows_diagram_buttons', async () => {
         await cli.execute('scope "EpicA"');
-        const view = new StoryMapView(cli);
+        const botData = await cli.execute('status');
+        const view = new WorkspaceSectionView(cli);
+        view.parentView = { botData };
         const html = await view.render();
 
-        assert.ok(html.includes('diagram-action-buttons-group'), 'Panel should have diagram action buttons group');
-        assert.ok(html.includes('alt="Render Diagram"'), 'Panel should show Render Diagram icon button');
-        assert.ok(html.includes('alt="Save Layout"'), 'Panel should show Save Layout icon button');
-        assert.ok(html.includes('alt="Clear Layout"'), 'Panel should show Clear Layout icon button');
-        assert.ok(html.includes('alt="Generate Report"'), 'Panel should show Generate Report icon button');
-        assert.ok(html.includes('alt="Update Graph"'), 'Panel should show Update Graph icon button');
+        assert.ok(html.includes('ws-diagram-buttons'), 'Workspace section should have diagram buttons container');
+        assert.ok(html.includes('alt="Render Diagram"'), 'Should show Render Diagram icon button');
+        assert.ok(html.includes('alt="Save Layout"'), 'Should show Save Layout icon button');
+        assert.ok(html.includes('alt="Clear Layout"'), 'Should show Clear Layout icon button');
+        assert.ok(html.includes('alt="Generate Report"'), 'Should show Generate Report icon button');
+        assert.ok(html.includes('alt="Update Graph"'), 'Should show Update Graph icon button');
         assert.ok(html.includes('renderDiagram'), 'Render button should post renderDiagram command');
         assert.ok(html.includes('saveDiagramLayout'), 'Save button should post saveDiagramLayout command');
         assert.ok(html.includes('clearDiagramLayout'), 'Clear button should post clearDiagramLayout command');
         assert.ok(html.includes('generateDiagramReport'), 'Generate Report button should post generateDiagramReport command');
         assert.ok(html.includes('updateFromDiagram'), 'Update button should post updateFromDiagram command');
-        assert.ok(html.includes('render_diagram.png'), 'Render button should use render_diagram icon');
-        assert.ok(html.includes('save_layout.png'), 'Save button should use save_layout icon');
-        assert.ok(html.includes('clear_layout.png'), 'Clear button should use clear_layout icon');
-        assert.ok(html.includes('generate_report.png'), 'Generate Report button should use generate_report icon');
-        assert.ok(html.includes('update_graph.png'), 'Update button should use update_graph icon');
     });
 
-    await t.test('diagram_buttons_use_scope_from_selected_node', async () => {
+    await t.test('workspace_section_has_diagrams_and_build_subsections', async () => {
         await cli.execute('scope "EpicA"');
-        const view = new StoryMapView(cli);
+        const botData = await cli.execute('status');
+        const view = new WorkspaceSectionView(cli);
+        view.parentView = { botData };
+        const html = await view.render();
+
+        assert.ok(html.includes('Diagrams'), 'Workspace section should have Diagrams subsection');
+        assert.ok(html.includes('Build'), 'Workspace section should have Build subsection');
+        assert.ok(html.includes('Workspace'), 'Should have Workspace section header');
+    });
+
+    await t.test('workspace_section_has_open_graph_and_open_all_buttons', async () => {
+        await cli.execute('scope "EpicA"');
+        const botData = await cli.execute('status');
+        const view = new WorkspaceSectionView(cli);
+        view.parentView = { botData };
+        const html = await view.render();
+
+        assert.ok(html.includes('ws-btn-open-graph'), 'Build subsection should have Open Graph button');
+        assert.ok(html.includes('ws-btn-open-all'), 'Build subsection should have Open All button');
+        assert.ok(html.includes('alt="Graph"'), 'Open Graph button should have Graph alt text');
+        assert.ok(html.includes('alt="All"'), 'Open All button should have All alt text');
+    });
+
+    await t.test('diagram_buttons_use_scope', async () => {
+        await cli.execute('scope "EpicA"');
+        const botData = await cli.execute('status');
+        const view = new WorkspaceSectionView(cli);
+        view.parentView = { botData };
         const html = await view.render();
         assert.ok(html.includes('window.diagramScope'), 'Diagram buttons should use window.diagramScope for scope');
-    });
-
-    await t.test('diagram_buttons_shown_when_non_root_node_selected', async () => {
-        await cli.execute('scope "EpicA"');
-        const view = new StoryMapView(cli);
-        const html = await view.render();
-        const dom = new JSDOM(html);
-        const document = dom.window.document;
-        const win = dom.window;
-
-        const diagramGroup = document.getElementById('diagram-action-buttons-group');
-        assert.ok(diagramGroup, 'Diagram action buttons group must exist in DOM');
-
-        win.selectedNode = { type: 'root', name: null };
-        diagramGroup.style.display = (win.selectedNode.type !== 'root') ? 'flex' : 'none';
-        assert.strictEqual(diagramGroup.style.display, 'none', 'Diagram buttons hidden when root selected');
-
-        win.selectedNode = { type: 'story', name: 'SubEpicB' };
-        diagramGroup.style.display = (win.selectedNode.type !== 'root') ? 'flex' : 'none';
-        assert.strictEqual(diagramGroup.style.display, 'flex', 'Diagram buttons shown when story node selected');
-
-        dom.window.close();
     });
 });
