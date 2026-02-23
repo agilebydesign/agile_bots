@@ -1,0 +1,150 @@
+{
+  "matched_count": 3,
+  "increment_changes": [
+    {
+      "name": "Base Bot",
+      "added": [
+        "Inject Context Into Instructions",
+        "Save Clarification Answers",
+        "Save Clarification Evidence",
+        "Save File Isolation",
+        "Save Multiple Guardrails Together",
+        "Save Strategy Decisions",
+        "Submit Scope Instructions"
+      ]
+    },
+    {
+      "name": "CLI",
+      "added": [
+        "Get Action Instructions Through CLI",
+        "Handle Operation Errors and Validation in CLI",
+        "Save Guardrails Through CLI",
+        "Submit Instructions Through CLI"
+      ]
+    },
+    {
+      "name": "Panel",
+      "added": [
+        "Display Base Instructions Panel",
+        "Display Raw Format Instructions In Panel",
+        "Save Guardrails Through Panel",
+        "Submit Instructions To AI Agent Panel"
+      ]
+    }
+  ],
+  "increment_moves": [
+    {
+      "story": "Display Base Instructions Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Display Raw Format Instructions In Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Get Action Instructions Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Handle Operation Errors and Validation in CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Inject Context Into Instructions",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Save Clarification Answers",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Save Clarification Evidence",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Save File Isolation",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Save Guardrails Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Save Guardrails Through Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Save Multiple Guardrails Together",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Save Strategy Decisions",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    },
+    {
+      "story": "Submit Instructions Through CLI",
+      "from": "(unassigned)",
+      "to": "CLI"
+    },
+    {
+      "story": "Submit Instructions To AI Agent Panel",
+      "from": "(unassigned)",
+      "to": "Panel"
+    },
+    {
+      "story": "Submit Scope Instructions",
+      "from": "(unassigned)",
+      "to": "Base Bot"
+    }
+  ],
+  "increment_order": [
+    {
+      "name": "Base Bot",
+      "priority": 1
+    },
+    {
+      "name": "CLI",
+      "priority": 2
+    },
+    {
+      "name": "Panel",
+      "priority": 3
+    },
+    {
+      "name": "Story Map Scoping",
+      "priority": 4
+    },
+    {
+      "name": "Render Diagrams",
+      "priority": 5
+    },
+    {
+      "name": "Increments On Panel",
+      "priority": 6
+    },
+    {
+      "name": "Behavior Action Ux Improvements",
+      "priority": 7
+    },
+    {
+      "name": "Queue Behavior Action Workflow",
+      "priority": 8
+    },
+    {
+      "name": "Trace and Edit",
+      "priority": 9
+    }
+  ]
+}

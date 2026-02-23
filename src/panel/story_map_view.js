@@ -159,6 +159,7 @@ class StoryMapView extends PanelView {
         const deleteIconPath = getIcon('delete.png');
         const deleteChildrenIconPath = getIcon('delete_children.png');
         const scopeToIconPath = getIcon('bullseye.png');
+        const scopeMapIconPath = getIcon('scope_map.png');
         const submitShapeIconPath = getIcon('submit_subepic.png');
         const submitExploreIconPath = getIcon('submit_story.png');
         const submitScenarioIconPath = getIcon('submit_ac.png');
@@ -245,13 +246,6 @@ class StoryMapView extends PanelView {
             </div>
         `;
         
-        const linksHtml = scopeData.graphLinks && scopeData.graphLinks.length > 0
-            ? scopeData.graphLinks.map(link =>
-                `<span onclick="openFile('${this.escapeForJs(link.url)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${this.escapeHtml(link.text).toLowerCase()}</span>`
-            ).join('')
-            : '';
-        
-        const permanentLinksHtml = '';
         
         // ===== PERFORMANCE: Content rendering =====
         const perfContentStart = performance.now();
@@ -2593,12 +2587,9 @@ class StoryMapView extends PanelView {
             ">
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
+                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
-                </div>
-                <div onclick="event.stopPropagation();" style="display: flex; align-items: center; gap: 8px;">
-                    ${linksHtml}
-                    ${permanentLinksHtml}
                 </div>
             </div>
             <div id="scope-content" class="collapsible-content" style="${isIncrementView ? `overflow: visible; display: ${scopeSectionExpanded ? 'block' : 'none'};` : `max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};`}">

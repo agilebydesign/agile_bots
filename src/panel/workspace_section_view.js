@@ -38,10 +38,14 @@ class WorkspaceSectionView extends PanelView {
         const testTubeIconPath = getIcon('test_tube.png');
 
         const graphLinks = botData?.scope?.graphLinks || [];
-        const drawioLinks = graphLinks.filter(l => l.url && l.url.endsWith('.drawio'));
+        const allDrawioLinks = graphLinks.filter(l => l.url && l.url.endsWith('.drawio'));
+        // Filter to current behavior (path contains /behavior/ or \behavior\) - restore behavior-scoped display
+        const drawioLinks = currentBehavior
+            ? allDrawioLinks.filter(l => (l.url || '').includes('/' + currentBehavior + '/') || (l.url || '').includes('\\' + currentBehavior + '\\'))
+            : allDrawioLinks;
         const drawioPath = drawioLinks.length > 0 ? escapeForJs(drawioLinks[0].url) : '';
 
-        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath);
+        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, currentBehavior, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath);
         const buildHtml = this._renderBuildSubsection(instructionsData, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath);
 
         if (!diagramsHtml && !buildHtml) return '';
@@ -68,12 +72,11 @@ class WorkspaceSectionView extends PanelView {
     </div>`;
     }
 
-    _renderDiagramsSubsection(instructions, botData, drawioLinks, renderIcon, saveIcon, clearIcon, reportIcon, updateIcon, drawioPath) {
+    _renderDiagramsSubsection(instructions, botData, currentBehavior, drawioLinks, renderIcon, saveIcon, clearIcon, reportIcon, updateIcon, drawioPath) {
         let content = '';
 
         // Diagram action buttons
-        content += `
-            <div id="ws-diagram-buttons" style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
+        content += `<div id="ws-diagram-buttons" style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
                 <button class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram">
                     <img src="${renderIcon}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="Render Diagram" />
                 </button>
@@ -102,11 +105,13 @@ class WorkspaceSectionView extends PanelView {
             content += diagramView.renderSection();
         }
 
-        // Render output links (from scope if files exist, or from instructions after render)
-        const outputPathsFromScope = (instructions.render_output_paths || []).length > 0
-            ? instructions.render_output_paths
-            : (botData?.scope?.renderOutputLinks || []).filter(l => l.exists).map(l => l.url);
-        const outputPaths = outputPathsFromScope;
+        // Render output links: instructions (behavior-scoped) or scope filtered by current behavior
+        const outputPathsFromInstructions = instructions.render_output_paths || [];
+        const outputPaths = outputPathsFromInstructions.length > 0
+            ? outputPathsFromInstructions
+            : (botData?.scope?.renderOutputLinks || [])
+                .filter(l => l.exists && (!currentBehavior || (l.url || '').includes('/' + currentBehavior + '/') || (l.url || '').includes('\\' + currentBehavior + '\\')))
+                .map(l => l.url);
         if (outputPaths.length > 0) {
             content += '<div style="margin-top: 3px;">';
             outputPaths.forEach((outputPath, idx) => {
@@ -135,7 +140,7 @@ class WorkspaceSectionView extends PanelView {
 
         return `
         <div class="collapsible-section expanded" style="margin-bottom: 4px;">
-            <div class="collapsible-header" onclick="toggleSection('ws-diagrams-content')" style="cursor: pointer; padding: 2px 4px; display: flex; align-items: center; user-select: none;">
+            <div class="collapsible-header" onclick="toggleSection('ws-diagrams-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
                 <span class="expand-icon">▸</span>
                 <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Render</span>
             </div>
@@ -151,8 +156,7 @@ class WorkspaceSectionView extends PanelView {
         let content = '';
 
         // Build section: Document, Test tube, All files, Open Story Graph (compact, minimal padding)
-        content += `
-            <div style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
+        content += `<div style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
                 <button id="ws-btn-open-file" onclick="event.stopPropagation(); handleOpenFile();" style="background: transparent; border: none; padding: 0; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open file or folder for selected node">
                     <img src="${documentIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="File" />
                 </button>
@@ -201,7 +205,7 @@ class WorkspaceSectionView extends PanelView {
 
         return `
         <div class="collapsible-section expanded" style="margin-bottom: 4px;">
-            <div class="collapsible-header" onclick="toggleSection('ws-build-content')" style="cursor: pointer; padding: 2px 4px; display: flex; align-items: center; user-select: none;">
+            <div class="collapsible-header" onclick="toggleSection('ws-build-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
                 <span class="expand-icon">▸</span>
                 <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Build</span>
             </div>

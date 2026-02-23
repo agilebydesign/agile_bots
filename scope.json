@@ -1,8 +1,6 @@
 {
-  "type": "story",
-  "value": [
-    "Perform Action"
-  ],
+  "type": "showAll",
+  "value": [],
   "exclude": [],
   "skiprule": [],
   "include_level": "acceptance"

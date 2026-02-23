@@ -1,0 +1,28 @@
+{
+  "epics": [
+    {
+      "name": "Invoke Bot",
+      "sequential_order": 1.0,
+      "sub_epics": [
+        {
+          "name": "Prepare Common Instructions For Behavior, Action, and Scope",
+          "sequential_order": 1.0,
+          "sub_epics": [],
+          "story_groups": [
+            {
+              "type": "and",
+              "connector": null,
+              "stories": [
+                {
+                  "name": "Add special instructon",
+                  "sequential_order": 1.0,
+                  "story_type": "user"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
