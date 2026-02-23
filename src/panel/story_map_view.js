@@ -292,15 +292,7 @@ class StoryMapView extends PanelView {
             ).join('')
             : '';
         
-        // Always show story-graph.json and story-map.md links
-        const workspaceDir = botData.workspace_directory || '';
-        const storyGraphPath = workspaceDir ? `${workspaceDir}/docs/story/story-graph.json` : '';
-        const storyMapPath = workspaceDir ? `${workspaceDir}/docs/story/story-map/story-map.md` : '';
-        
-        const permanentLinksHtml = `
-            <span onclick="openFile('${this.escapeForJs(storyGraphPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
-            <span onclick="openFile('${this.escapeForJs(storyMapPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
-        `;
+        const permanentLinksHtml = '';
         
         // ===== PERFORMANCE: Content rendering =====
         const perfContentStart = performance.now();
