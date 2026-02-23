@@ -254,15 +254,15 @@ test('TestScopeView', { concurrency: false }, async (t) => {
         const view = new StoryMapView(cli);
         const html = await view.render();
         
-        assert.ok(html.includes('name="includeLevel"'), 'Should have includeLevel radio group');
-        assert.ok(html.includes('value="stories"'), 'Should have stories option');
-        assert.ok(html.includes('value="domain_concepts"'), 'Should have domain_concepts option');
-        assert.ok(html.includes('value="acceptance"'), 'Should have acceptance option');
-        assert.ok(html.includes('value="scenarios"'), 'Should have scenarios option');
-        assert.ok(html.includes('value="examples"'), 'Should have examples option');
-        assert.ok(html.includes('value="tests"'), 'Should have tests option');
-        assert.ok(html.includes('value="code"'), 'Should have code option');
-        assert.ok(html.includes('updateIncludeLevel'), 'Should have updateIncludeLevel handler');
+        assert.ok(html.includes('include-level-controls'), 'Should have include level controls');
+        assert.ok(html.includes('switchIncludeLevel'), 'Should have switchIncludeLevel handler');
+        assert.ok(html.includes("switchIncludeLevel('stories')"), 'Should have stories option');
+        assert.ok(html.includes("switchIncludeLevel('domain_concepts')"), 'Should have domain_concepts option');
+        assert.ok(html.includes("switchIncludeLevel('acceptance')"), 'Should have acceptance option');
+        assert.ok(html.includes("switchIncludeLevel('scenarios')"), 'Should have scenarios option');
+        assert.ok(html.includes("switchIncludeLevel('examples')"), 'Should have examples option');
+        assert.ok(html.includes("switchIncludeLevel('tests')"), 'Should have tests option');
+        assert.ok(html.includes("switchIncludeLevel('code')"), 'Should have code option');
     });
     
     await t.test('test_scope_include_level_persists_after_cli_set', async () => {
@@ -277,10 +277,9 @@ test('TestScopeView', { concurrency: false }, async (t) => {
         const view = new StoryMapView(cli);
         const html = await view.render();
         
-        // When includeLevel is 'code', the template outputs: value="code" checked
-        assert.ok(html.includes('value="code"'), 'Should have code option');
-        assert.ok(html.includes('value="code" checked') || html.includes('value="code"  checked'),
-            'Code option should be checked when include_level is code');
+        // When includeLevel is 'code', the code button has full opacity (selected)
+        assert.ok(html.includes("switchIncludeLevel('code')"), 'Should have code option');
+        assert.ok(html.includes("btn-include-code"), 'Should have code include button');
         
         // Reset for other tests
         await cli.execute('scope include_level=examples');

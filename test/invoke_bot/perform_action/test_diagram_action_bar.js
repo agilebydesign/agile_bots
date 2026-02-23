@@ -93,7 +93,7 @@ test('TestDiagramActionBarPanel', { concurrency: false }, async (t) => {
         view.parentView = { botData };
         const html = await view.render();
 
-        assert.ok(html.includes('Diagrams'), 'Workspace section should have Diagrams subsection');
+        assert.ok(html.includes('Render'), 'Workspace section should have Render subsection');
         assert.ok(html.includes('Build'), 'Workspace section should have Build subsection');
         assert.ok(html.includes('Workspace'), 'Should have Workspace section header');
     });
@@ -107,7 +107,7 @@ test('TestDiagramActionBarPanel', { concurrency: false }, async (t) => {
 
         assert.ok(html.includes('ws-btn-open-graph'), 'Build subsection should have Open Graph button');
         assert.ok(html.includes('ws-btn-open-all'), 'Build subsection should have Open All button');
-        assert.ok(html.includes('alt="Graph"'), 'Open Graph button should have Graph alt text');
+        assert.ok(html.includes('alt="Story Graph"'), 'Open Graph button should have Story Graph alt text');
         assert.ok(html.includes('alt="All"'), 'Open All button should have All alt text');
     });
 

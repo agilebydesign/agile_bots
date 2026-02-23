@@ -297,6 +297,7 @@ class BehaviorsView extends PanelView {
         const { atActionLevel = false, currentBehavior = null } = navContext;
         const isCurrentBehavior = behavior.name === currentBehavior;
         const isCurrent = (behavior.isCurrent || behavior.is_current || false) && !(atActionLevel && isCurrentBehavior);
+        const showActiveClass = isCurrentBehavior || isCurrent;
         const isCompleted = behavior.isCompleted || behavior.is_completed || false;
         const behaviorMarker = isCurrent 
             ? (tickIconPath ? `<img src="${tickIconPath}" alt="Current" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;" />` : '')
@@ -314,13 +315,13 @@ class BehaviorsView extends PanelView {
 
 
         const hasExpansionState = this.expansionState && (behaviorId in this.expansionState);
-        const behaviorExpanded = hasExpansionState ? this.expansionState[behaviorId] : (isCurrent || isCompleted);
+        const behaviorExpanded = hasExpansionState ? this.expansionState[behaviorId] : (isCurrent || isCompleted || isCurrentBehavior);
         const behaviorIconSrc = behaviorExpanded ? subtractIconPath : plusIconPath;
         const behaviorIconAlt = behaviorExpanded ? 'Collapse' : 'Expand';
         const behaviorIconClass = behaviorExpanded ? 'expanded' : '';
         const behaviorDisplay = behaviorExpanded ? 'block' : 'none';
         
-        const behaviorActiveClass = isCurrent ? ' active' : '';
+        const behaviorActiveClass = showActiveClass ? ' active' : '';
         const behaviorExecutionKey = `_behavior.${behaviorNameRaw}`;
         const behaviorCurrentMode = executionSettings[behaviorExecutionKey] || 'manual';
         const isSkipBehavior = behaviorCurrentMode === 'skip';
