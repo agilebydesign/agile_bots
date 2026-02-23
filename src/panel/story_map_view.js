@@ -165,6 +165,11 @@ class StoryMapView extends PanelView {
         const submitScenarioIconPath = getIcon('submit_ac.png');
         const submitTestIconPath = getIcon('submit_tests.png');
         const submitCodeIconPath = getIcon('submit_code.png');
+        const renderDiagramIconPath = getIcon('render_diagram.png');
+        const saveLayoutIconPath = getIcon('save_layout.png');
+        const clearLayoutIconPath = getIcon('clear_layout.png');
+        const generateReportIconPath = getIcon('generate_report.png');
+        const updateGraphIconPath = getIcon('update_graph.png');
         const refreshIconPath = getIcon('refresh.png');
         const injectStoriesIconPath = getIcon('inject_stories.png');
         const injectDomainIconPath = getIcon('inject_domain.png');
@@ -176,6 +181,9 @@ class StoryMapView extends PanelView {
         log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
         log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
+        
+        const drawioLink = (scopeData.graphLinks || []).find(l => l.url && l.url.endsWith('.drawio'));
+        const drawioPath = drawioLink ? this.escapeForJs(drawioLink.url) : '';
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `
@@ -215,11 +223,22 @@ class StoryMapView extends PanelView {
                 </div>
                 
                 <!-- Diagram action buttons: Render, Save layout, Clear layout, Update graph -->
-                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 4px;">
-                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Render diagram for selected node">Render diagram</button>
-                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Save layout to DrawIO file">Save layout</button>
-                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Clear layout">Clear layout</button>
-                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="padding: 2px 6px; font-size: 11px; cursor: pointer; background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: 1px solid var(--vscode-button-border); border-radius: 3px;" title="Update story graph from diagram">Update graph</button>
+                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 2px;">
+                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram for current behavior">
+                        <img src="${renderDiagramIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Render Diagram" />
+                    </button>
+                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Save diagram layout for current behavior">
+                        <img src="${saveLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Save Layout" />
+                    </button>
+                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear diagram layout for current behavior">
+                        <img src="${clearLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Clear Layout" />
+                    </button>
+                    <button id="btn-generate-report" class="generate-report-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'generateDiagramReport', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Generate update report from diagram">
+                        <img src="${generateReportIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Generate Report" />
+                    </button>
+                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Update graph from diagram for current behavior">
+                        <img src="${updateGraphIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Update Graph" />
+                    </button>
                 </div>
                 
                 <!-- Separator between Scope and Related Files groups -->

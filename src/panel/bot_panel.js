@@ -1500,6 +1500,30 @@ class BotPanel {
             }
             return;
           case "renderDiagram": {
+            if (!this._findDiagramPathToOpen) {
+              this._findDiagramPathToOpen = (result, fallbackPath, scope) => {
+                if (result?.results && Array.isArray(result.results)) {
+                  const executed = result.results.find(r => r.status === 'executed' && r.path);
+                  if (executed) return executed.path;
+                  const anyWithPath = result.results.find(r => r.path);
+                  if (anyWithPath) return anyWithPath.path;
+                }
+                if (result?.path) return result.path;
+                if (fallbackPath) {
+                  let openPath = fallbackPath;
+                  if (scope) {
+                    const sanitized = scope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+                    if (openPath.includes('{scope}')) openPath = openPath.replace('{scope}', sanitized);
+                    else if (openPath.includes('-all.drawio')) openPath = openPath.replace('-all.drawio', `-${sanitized}.drawio`);
+                    else if (openPath.endsWith('.drawio')) openPath = openPath.replace('.drawio', `-${sanitized}.drawio`);
+                  } else if (openPath.includes('{scope}')) {
+                    openPath = openPath.replace('{scope}', 'all');
+                  }
+                  return openPath;
+                }
+                return null;
+              };
+            }
             const behaviorName = this._botView?.botData?.behaviors?.current_behavior || this._botView?.botData?.current_behavior;
             if (!behaviorName) {
               vscode.window.showErrorMessage('No current behavior set');
@@ -1517,31 +1541,24 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(renderCmd);
+                this._log(`[BotPanel] renderDiagram result keys: ${result ? Object.keys(result).join(', ') : 'null'}`);
+                this._log(`[BotPanel] renderDiagram result.status: ${result?.status}, result.results: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
-                  vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
-
-                  if (message.path) {
+                  const diagramPath = this._findDiagramPathToOpen(result, message.path, diagramScope);
+                  this._log(`[BotPanel] renderDiagram resolved path: ${diagramPath || '(none)'}`);
+                  if (diagramPath) {
                     try {
-
-
-                      let openPath = message.path;
-                      if (diagramScope) {
-                        const sanitized = diagramScope.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
-                        if (openPath.includes('{scope}')) {
-                          openPath = openPath.replace('{scope}', sanitized);
-                        } else if (openPath.includes('-all.drawio')) {
-                          openPath = openPath.replace('-all.drawio', `-${sanitized}.drawio`);
-                        } else if (openPath.endsWith('.drawio')) {
-                          openPath = openPath.replace('.drawio', `-${sanitized}.drawio`);
-                        }
-                      } else if (openPath.includes('{scope}')) {
-                        openPath = openPath.replace('{scope}', 'all');
-                      }
-                      const diagramUri = vscode.Uri.file(openPath);
+                      const diagramUri = vscode.Uri.file(diagramPath);
+                      this._log(`[BotPanel] renderDiagram opening: ${diagramPath}`);
                       await vscode.commands.executeCommand('vscode.open', diagramUri);
+                      vscode.window.showInformationMessage(result.message || 'Diagram rendered and opened');
                     } catch (openErr) {
                       this._log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
+                      vscode.window.showErrorMessage(`Diagram rendered but failed to open: ${openErr.message}`);
                     }
+                  } else {
+                    this._log(`[BotPanel] renderDiagram: no path found in result to open`);
+                    vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
                   }
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
@@ -1630,8 +1647,22 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(reportCmd);
+                this._log(`[BotPanel] generateDiagramReport result: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
-                  vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                  const reportPath = (result.results || []).find(r => r.status === 'success' && r.report_path)?.report_path || result.report_path;
+                  if (reportPath) {
+                    try {
+                      const reportUri = vscode.Uri.file(reportPath);
+                      this._log(`[BotPanel] generateDiagramReport opening: ${reportPath}`);
+                      await vscode.commands.executeCommand('vscode.open', reportUri);
+                      vscode.window.showInformationMessage(result.message || 'Report generated and opened');
+                    } catch (openErr) {
+                      this._log(`[BotPanel] generateDiagramReport open file error: ${openErr.message}`);
+                      vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                    }
+                  } else {
+                    vscode.window.showInformationMessage(result.message || 'Report generated successfully');
+                  }
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to generate report');
                 }
@@ -4987,25 +5018,26 @@ class BotPanel {
                 ? window.selectedNode.name : '';
             window.diagramScope = dScope;
             
+            var bhv = window.currentBehavior || 'shape';
             var renderBtns = document.querySelectorAll('.render-button');
             for (var ri = 0; ri < renderBtns.length; ri++) {
-                renderBtns[ri].textContent = dScope ? 'Render Diagram for "' + dScope + '"' : 'Render Diagram';
+                renderBtns[ri].title = dScope ? 'Render ' + bhv + ' diagram for "' + dScope + '"' : 'Render ' + bhv + ' diagram';
             }
             var saveBtns = document.querySelectorAll('.save-layout-button');
             for (var si = 0; si < saveBtns.length; si++) {
-                saveBtns[si].textContent = dScope ? 'Save Layout for "' + dScope + '"' : 'Save Layout';
+                saveBtns[si].title = dScope ? 'Save ' + bhv + ' diagram layout for "' + dScope + '"' : 'Save ' + bhv + ' diagram layout';
             }
             var clearBtns = document.querySelectorAll('.clear-layout-button');
             for (var ci = 0; ci < clearBtns.length; ci++) {
-                clearBtns[ci].textContent = dScope ? 'Clear Layout for "' + dScope + '"' : 'Clear Layout';
+                clearBtns[ci].title = dScope ? 'Clear ' + bhv + ' diagram layout for "' + dScope + '"' : 'Clear ' + bhv + ' diagram layout';
             }
             var reportBtns = document.querySelectorAll('.generate-report-button');
             for (var gi = 0; gi < reportBtns.length; gi++) {
-                reportBtns[gi].textContent = dScope ? 'Generate Report for "' + dScope + '"' : 'Generate Report';
+                reportBtns[gi].title = dScope ? 'Generate ' + bhv + ' report for "' + dScope + '"' : 'Generate ' + bhv + ' report';
             }
             var updateBtns = document.querySelectorAll('.update-button');
             for (var ui = 0; ui < updateBtns.length; ui++) {
-                updateBtns[ui].textContent = dScope ? 'Update Graph for "' + dScope + '"' : 'Update Graph';
+                updateBtns[ui].title = dScope ? 'Update graph from ' + bhv + ' diagram for "' + dScope + '"' : 'Update graph from ' + bhv + ' diagram';
             }
             
 
