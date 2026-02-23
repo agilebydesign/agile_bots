@@ -11,6 +11,7 @@ const BotHeaderView = require('./bot_header_view');
 const BehaviorsView = require('./behaviors_view');
 const StoryMapView = require('./story_map_view');
 const InstructionsSection = require('./instructions_view');
+const WorkspaceSectionView = require('./workspace_section_view');
 const fs = require('fs');
 const path = require('path');
 const { Logger } = require('./utils');
@@ -39,6 +40,7 @@ class BotView extends PanelView {
         this.headerView = new BotHeaderView(botPathOrCli, this.panelVersion, webview, extensionUri, this);
         this.behaviorsView = new BehaviorsView(botPathOrCli, webview, extensionUri, this);
         this.storyMapView = new StoryMapView(botPathOrCli, webview, extensionUri, this);
+        this.workspaceSection = new WorkspaceSectionView(botPathOrCli, webview, extensionUri, this);
         this.instructionsSection = new InstructionsSection(botPathOrCli, webview, extensionUri, this);
     }
     
@@ -98,6 +100,12 @@ class BotView extends PanelView {
         const perfStoryMapEnd = performance.now();
         log(`[BotView] [PERF] Story map render: ${(perfStoryMapEnd - perfStoryMapStart).toFixed(2)}ms`);
         
+        // Workspace (Diagrams + Build)
+        const perfWorkspaceStart = performance.now();
+        const workspace = await this.workspaceSection.render();
+        const perfWorkspaceEnd = performance.now();
+        log(`[BotView] [PERF] Workspace render: ${(perfWorkspaceEnd - perfWorkspaceStart).toFixed(2)}ms`);
+        
         // Instructions
         const perfInstructionsStart = performance.now();
         const instructions = await this.instructionsSection.render();
@@ -111,6 +119,7 @@ class BotView extends PanelView {
                 ${header}
                 ${behaviors}
                 ${storyMap}
+                ${workspace}
                 ${instructions}
             </div>
         `;

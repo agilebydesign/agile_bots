@@ -1,6 +1,6 @@
 /* ============================================================
     THEME SYSTEM - All styling variables in one place
-    Branding: {{branding.getBranding()} ({{brandColor})
+    Branding: {{branding.getBranding()}} ({{brandColor}})
     ============================================================ */
 
 :root {
@@ -16,7 +16,7 @@
     --input-bg: {{inputBg}};
     --input-bg-focus: {{inputBgFocus}};
     --input-border: {{inputBorder}};
-    --input-border-focus: var(--accent-color);
+    --input-border-focus: var(--accent-color);            
     --input-padding: 6px;
     --input-border-radius: 6px;
     --input-border-width: 1px;
@@ -25,19 +25,19 @@
     --input-header-border-width-focus: 2px;
     --input-transition: border-color 150ms ease, background-color 150ms ease;
     
-    /* Borders */
+
     --border-width: 1px;
     --border-radius: 0;
     --border-radius-sm: 0;
     --active-border-width: 2px;
     
-    /* Spacing */
+
     --space-xs: 2px;
     --space-sm: 4px;
     --space-md: 6px;
     --space-lg: 8px;
     
-    /* Typography */
+
     --font-size-base: 13px;
     --font-size-sm: 12px;
     --font-size-xs: 11px;
@@ -58,7 +58,7 @@ body {
     font-weight: var(--font-weight-normal);
 }
 
-/* Prevent images from scaling with panel width */
+
 img {
     flex-shrink: 0;
     min-width: 0;
@@ -70,9 +70,7 @@ img {
     gap: 0;
 }
 
-/* ============================================================
-    CARDS & SECTIONS
-    ============================================================ */
+
 
 .card-primary {
     margin-bottom: var(--space-lg);
@@ -117,9 +115,7 @@ img {
     border-top: var(--border-width) solid var(--divider-color);
 }
 
-/* ============================================================
-    HIERARCHY & COLLAPSIBLE ITEMS
-    ============================================================ */
+
 
 .behavior-item, .action-item, .operation-item {
     margin: var(--space-xs) 0;
@@ -176,9 +172,42 @@ img {
     background-color: transparent;
 }
 
-/* ============================================================
-    STORY TREE NODE INTERACTION
-    ============================================================ */
+.execution-toggle-btn {
+    padding: 0;
+    font-size: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+    background: #000;
+    color: var(--text-color-faded);
+    cursor: pointer;
+    opacity: 0.5;
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 80ms ease, color 80ms ease, border-color 80ms ease, opacity 80ms ease;
+}
+.execution-toggle-container { display: inline-flex; align-items: center; overflow: visible; }
+.execution-toggle-collapsed { display: inline-flex; align-items: center; justify-content: center; transition: opacity 0.2s ease, max-width 0.25s ease; overflow: hidden; }
+.execution-toggle-container:not(.expanded) .execution-toggle-collapsed { opacity: 1; max-width: 40px; }
+.execution-toggle-container.expanded .execution-toggle-collapsed { opacity: 0; max-width: 0; min-width: 0; padding: 0; margin: 0; border: none; pointer-events: none; }
+.execution-toggle-expanded { display: inline-flex; gap: 4px; align-items: center; min-width: 0; overflow: hidden; transition: max-width 0.28s ease, opacity 0.22s ease; }
+.execution-toggle-container:not(.expanded) .execution-toggle-expanded { max-width: 0; opacity: 0; padding: 0; margin: 0; pointer-events: none; }
+.execution-toggle-container.expanded .execution-toggle-expanded { max-width: 380px; opacity: 1; }
+.execution-toggle-collapse-btn { background: transparent; border: none; padding: 2px; cursor: pointer; opacity: 0.6; }
+.execution-toggle-collapse-btn:hover { opacity: 1; }
+.execution-toggle-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-color);
+}
+.execution-toggle-btn.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-color);
+    opacity: 1;
+}
+
+
 
 .story-node {
     padding: 2px 4px;
@@ -187,11 +216,11 @@ img {
 }
 
 .story-node:hover {
-    background-color: rgba({{brandColorRgb}}, 0.15); /* Faded brand color on hover */
+    background-color: rgba({{brandColorRgb}}, 0.15);
 }
 
 .story-node.selected {
-    background-color: rgba({{brandColorRgb}}, 0.35); /* Distinct brand color when selected */
+    background-color: rgba({{brandColorRgb}}, 0.35);
 }
 
 .increment-column-container.selected {
@@ -217,7 +246,7 @@ img {
 .collapsible-section.expanded .expand-icon {
     transform: rotate(90deg);
 }
-/* Ensure nested subsections have smaller icons */
+
 .collapsible-content .collapsible-section .expand-icon {
     font-size: 20px;
 }
@@ -257,9 +286,7 @@ img {
     border: none;
 }
 
-/* ============================================================
-    INPUTS & INTERACTIVE ELEMENTS
-    ============================================================ */
+
 
 .input-container {
     border: var(--input-border-width) solid var(--accent-color);
@@ -363,7 +390,7 @@ img {
     animation: spin 1s linear infinite;
 }
 
-/* Save status indicator styles - matches input container design */
+
 .save-status {
     display: flex;
     align-items: center;
@@ -371,7 +398,7 @@ img {
     padding: 6px 12px;
     border: var(--input-border-width) solid var(--accent-color);
     border-radius: var(--input-border-radius);
-    background-color: rgba(255, 140, 0, 0.1); /* Dark black with orange tint */
+    background-color: rgba(255, 140, 0, 0.1);
     color: var(--text-color);
     font-size: var(--font-size-sm);
     transition: opacity 0.3s, background-color 150ms ease;
@@ -380,7 +407,7 @@ img {
 
 .save-status.saving,
 .save-status.refreshing {
-    background-color: rgba(255, 140, 0, 0.15); /* Slightly brighter when active */
+    background-color: rgba(255, 140, 0, 0.15);
     border-color: var(--accent-color);
 }
 
@@ -459,7 +486,7 @@ button:active {
     transform: scale(0.98);
 }
 
-/* Ensure button images maintain fixed size */
+
 button img {
     flex-shrink: 0;
     display: block;

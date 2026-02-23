@@ -1545,6 +1545,8 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to render diagram');
                 }
+                if (this._botView) this._botView.botData = null;
+                await this._update();
               } catch (error) {
                 this._log(`[BotPanel] renderDiagram ERROR: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to render diagram: ${error.message}`);
@@ -1576,6 +1578,7 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to save layout');
                 }
+                await this._update();
               } catch (error) {
                 this._log('[BotPanel] saveDiagramLayout ERROR: ' + error.message);
                 vscode.window.showErrorMessage('Failed to save layout: ' + error.message);
@@ -1605,6 +1608,7 @@ class BotPanel {
                 } else {
                   vscode.window.showErrorMessage(result?.message || 'Failed to clear layout');
                 }
+                await this._update();
               } catch (error) {
                 this._log('[BotPanel] clearDiagramLayout ERROR: ' + error.message);
                 vscode.window.showErrorMessage('Failed to clear layout: ' + error.message);

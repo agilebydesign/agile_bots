@@ -94,7 +94,6 @@ class StoryMapView extends PanelView {
         const perfIconsStart = performance.now();
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         
-        const scopeMapIconPath = getIcon('scope_map.png');
         const clearIconPath = getIcon('close.png');
         const showAllIconPath = getIcon('show_all.png');
         const jsonIconPath = getIcon('json.png');
@@ -115,6 +114,7 @@ class StoryMapView extends PanelView {
         const deleteIconPath = getIcon('delete.png');
         const deleteChildrenIconPath = getIcon('delete_children.png');
         const scopeToIconPath = getIcon('bullseye.png');
+        const scopeMapIconPath = getIcon('scope_map.png');
         const submitShapeIconPath = getIcon('submit_subepic.png');
         const submitExploreIconPath = getIcon('submit_story.png');
         const submitScenarioIconPath = getIcon('submit_ac.png');
@@ -167,57 +167,10 @@ class StoryMapView extends PanelView {
                     </button>
                 </div>
                 
-                <!-- Separator between Create/Delete and Scope/Submit groups -->
-                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
-                
-                <!-- Scope buttons group with space for additional scope buttons -->
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
-                        <img src="${scopeToIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Scope To" />
-                    </button>
                 </div>
                 
-                <!-- Diagram action buttons: Render, Save layout, Clear layout, Update graph -->
-                <div id="diagram-action-buttons-group" style="display: none; align-items: center; gap: 2px;">
-                    <button id="btn-render-diagram" class="render-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'renderDiagram', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Render diagram for current behavior">
-                        <img src="${renderDiagramIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Render Diagram" />
-                    </button>
-                    <button id="btn-save-layout" class="save-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'saveDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Save diagram layout for current behavior">
-                        <img src="${saveLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Save Layout" />
-                    </button>
-                    <button id="btn-clear-layout" class="clear-layout-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'clearDiagramLayout', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear diagram layout for current behavior">
-                        <img src="${clearLayoutIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Clear Layout" />
-                    </button>
-                    <button id="btn-generate-report" class="generate-report-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'generateDiagramReport', scope: (window.diagramScope || ''), path: '${drawioPath}' })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Generate update report from diagram">
-                        <img src="${generateReportIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Generate Report" />
-                    </button>
-                    <button id="btn-update-graph" class="update-button" onclick="event.stopPropagation(); vscode.postMessage({ command: 'updateFromDiagram', scope: (window.diagramScope || '') })" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Update graph from diagram for current behavior">
-                        <img src="${updateGraphIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Update Graph" />
-                    </button>
-                </div>
-                
-                <!-- Separator between Scope and Related Files groups -->
-                <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 8px;"></div>
-                </div>
-                
-                <!-- Right side: Related Files and Submit button group -->
+                <!-- Right side: Submit button group -->
                 <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
-                    <button id="btn-open-graph" 
-                            onclick="event.stopPropagation(); handleOpenGraph();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 52px; height: 52px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open story graph with selected node expanded">
-                        <img src="${jsonIconPath}" style="width: 48px; height: 48px; object-fit: contain; display: block;" alt="Graph" />
-                    </button>
-                    <button id="btn-open-all" 
-                            onclick="event.stopPropagation(); handleOpenAll();" 
-                            style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px; flex-shrink: 0;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title="Open all related files in split editors">
-                        <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
-                    </button>
                     <button id="btn-submit" 
                             onclick="event.stopPropagation(); handleSubmit();" 
                             style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
@@ -248,21 +201,6 @@ class StoryMapView extends PanelView {
             </div>
         `;
         
-        const linksHtml = scopeData.graphLinks && scopeData.graphLinks.length > 0
-            ? scopeData.graphLinks.map(link =>
-                `<span onclick="openFile('${escapeForJs(link.url)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;">${escapeForHtml(link.text).toLowerCase()}</span>`
-            ).join('')
-            : '';
-        
-        // Always show story-graph.json and story-map.md links
-        const workspaceDir = botData.workspace_directory || '';
-        const storyGraphPath = workspaceDir ? `${workspaceDir}/docs/story/story-graph.json` : '';
-        const storyMapPath = workspaceDir ? `${workspaceDir}/docs/story/story-map/story-map.md` : '';
-        
-        const permanentLinksHtml = `
-            <span onclick="openFile('${escapeForJs(storyGraphPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 12px; font-size: 12px; cursor: pointer;" title="Open story-graph.json">story graph</span>
-            <span onclick="openFile('${escapeForJs(storyMapPath)}')" style="color: var(--text-color-faded); text-decoration: underline; margin-left: 6px; font-size: 12px; cursor: pointer;" title="Open story-map.md">story map</span>
-        `;
         
         // ===== PERFORMANCE: Content rendering =====
         const perfContentStart = performance.now();
@@ -2604,57 +2542,9 @@ class StoryMapView extends PanelView {
             ">
                 <div style="display: flex; align-items: center; flex: 1;">
                     <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope Icon" />` : ''}
+                    ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
-                    ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 12px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Show all scope (scope showall)">
-                        <img src="${showAllIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Show All" />
-                    </button>` : ''}
-                    ${clearIconPath ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 6px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Clear scope filter (show all)">
-                        <img src="${clearIconPath}" style="width: 24px; height: 24px; object-fit: contain;" alt="Clear Filter" />
-                    </button>` : `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 6px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Clear scope filter (show all)">
-                        ✕
-                    </button>`}
-                </div>
-                <div onclick="event.stopPropagation();" style="display: flex; align-items: center; gap: 8px;">
-                    ${linksHtml}
-                    ${permanentLinksHtml}
                 </div>
             </div>
             <div id="scope-content" class="collapsible-content" style="${isIncrementView ? `overflow: visible; display: ${scopeSectionExpanded ? 'block' : 'none'};` : `max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};`}">
@@ -2725,12 +2615,21 @@ class StoryMapView extends PanelView {
                                 </button>
                             </div>
                         </div>
-                        <div style="border-top: 1px solid var(--accent-color); padding-top: 6px;">
-                        <input type="text" id="scopeFilterInput" style="padding: 4px 8px;"
+                        <div style="border-top: 1px solid var(--accent-color); padding-top: 6px; display: flex; align-items: center; gap: 4px;">
+                        <input type="text" id="scopeFilterInput" style="padding: 4px 8px; flex: 1;"
                                value="${filterValue}" 
                                placeholder="Epic or Story name"
                                onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
+                        <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
+                            <img src="${scopeToIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Scope To" />
+                        </button>
+                        <button onclick="event.stopPropagation(); showAllScope();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Show all scope">
+                            <img src="${showAllIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Show All" />
+                        </button>
+                        <button onclick="event.stopPropagation(); clearScopeFilter();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear scope filter">
+                            <img src="${clearIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Clear Filter" />
+                        </button>
                         </div>
                         <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 1px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
                         <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
@@ -2798,28 +2697,21 @@ ${clientScript}    </script>`;
             const epicId = `epic-${epicIndex}`;
             const epicIcon = epicIconPath ? `<img src="${epicIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Epic" />` : '';
             
-            // Find document and test links for epic
+            // Find document and test links for epic (data attrs for toolbar File/Test buttons)
             const epicDocLink = epic.links && epic.links.find(l => l.icon === 'document');
             const epicTestLink = epic.links && epic.links.find(l => l.icon === 'test_tube');
+            const epicTestFilesJson = epicTestLink ? this.escapeHtml(JSON.stringify([epicTestLink.url])) : '';
             
             // Check if epic has children
             const epicHasChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
             
-            // Make epic name a hyperlink if document exists, clickable to select, double-click to edit
-            // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-            const epicPath = escapeForHtml(`story_graph."${epic.name}"`);
+            // Epic name: plain text, clickable to select, double-click to edit (File/Test via toolbar)
+            const epicPath = this.escapeHtml(`story_graph."${epic.name}"`);
             const epicBehavior = epic.behavior_needed || '';
-            const epicNameHtml = epicDocLink
-                ? `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" data-file-link="${escapeForHtml(epicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(epic.name)}</span>`
-                : `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}" style="cursor: pointer;">${escapeForHtml(epic.name)}</span>`;
+            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${this.escapeHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
             
-            // Render test tube icon for epic test link
-            const epicTestIcon = (epicTestLink && testTubeIconPath)
-                ? ` <span onclick="openFile('${escapeForJs(epicTestLink.url)}')" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                : '';
-            
-            // Epic nodes - no inline action buttons (all actions are in the toolbar)
-            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}${epicTestIcon}</div>`;
+            // Epic nodes - no inline links (File/Test via toolbar buttons)
+            let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}</div>`;
             
             html += `<div id="${epicId}" class="collapsible-content" style="display: none;">`;
             // Helper function to recursively render a sub-epic (can be nested any number of levels)
@@ -2827,9 +2719,11 @@ ${clientScript}    </script>`;
                 const subEpicId = `${parentPath}-${subEpicIndex}`;
                 const subEpicIcon = gearIconPath ? `<img src="${gearIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Sub-Epic" />` : '';
                 
-                // Find document and test links
+                // Find document and test links (data attrs for toolbar File/Test buttons)
                 const subEpicDocLink = subEpic.links && subEpic.links.find(l => l.icon === 'document');
                 const subEpicTestLink = subEpic.links && subEpic.links.find(l => l.icon === 'test_tube');
+                const subEpicTestFiles = subEpic.test_files?.length > 0 ? subEpic.test_files : (subEpicTestLink ? [subEpicTestLink.url] : []);
+                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(subEpicTestFiles)) : '';
                 
                 // Build the full path to this SubEpic
                 // For first-level: story_graph."Epic"."SubEpic"
@@ -2845,24 +2739,14 @@ ${clientScript}    </script>`;
                 const hasNoChildren = !hasStories && !hasNestedSubEpics;
                 const subEpicHasChildren = hasStories || hasNestedSubEpics;
                 
-                // Make sub-epic name a hyperlink if document exists, clickable to select, double-click to edit
+                // Sub-epic name: plain text, clickable to select (File/Test via toolbar)
                 const subEpicBehavior = subEpic.behavior_needed || '';
                 const subEpicBehaviors = subEpic.behaviors_needed ? JSON.stringify(subEpic.behaviors_needed) : `["${subEpicBehavior}"]`;
-                const subEpicNameHtml = subEpicDocLink
-                    ? `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" data-file-link="${escapeForHtml(subEpicDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`
-                    : `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}" style="cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`;
+                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${this.escapeHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
                 
-                // Only render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick HTML parse errors)
-                const subEpicTestIcon = testTubeIconPath && (subEpic.test_files?.length > 0 || subEpicTestLink)
-                    ? (subEpic.test_files && subEpic.test_files.length > 0
-                        ? ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(subEpic.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`
-                        : ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([subEpicTestLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`)
-                    : '';
+                const marginLeft = 7 + (depth * 7);
                 
-                // No inline action buttons (all actions are in the toolbar)
-                const marginLeft = 7 + (depth * 7); // Increase margin for nested sub-epics
-                
-                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}${subEpicTestIcon}</div>`;
+                html += `<div style="margin-left: ${marginLeft}px; margin-top: 4px; font-size: 12px;"><span id="${subEpicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${subEpicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${subEpicIcon}${subEpicNameHtml}</div>`;
                 
                 html += `<div id="${subEpicId}" class="collapsible-content" style="display: none;">`;
                 
@@ -2900,29 +2784,16 @@ ${clientScript}    </script>`;
                                     html += `<span style="display: inline-block; min-width: 9px;"><img src="${emptyIconPath}" style="width: 9px; height: 9px; vertical-align: middle;" alt="" /></span> `;
                                 }
                                 
-                                // Find story doc link (if exists)
+                                // Find story doc and test links (data attrs for toolbar File/Test buttons)
                                 const storyDocLink = story.links && story.links.find(l => l.text === 'story');
+                                const storyTestLink = story.links && story.links.find(l => l.icon === 'test_tube');
+                                const storyTestFiles = story.test_files?.length > 0 ? story.test_files : (storyTestLink ? [storyTestLink.url] : []);
+                                const storyTestFilesJson = storyTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(storyTestFiles)) : '';
                                 
-                                // Story name with double-click to edit, clickable to select
+                                // Story name: plain text, clickable to select (File/Test via toolbar)
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
-                                if (storyDocLink) {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" data-file-link="${escapeForHtml(storyDocLink.url)}" style="text-decoration: underline; cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
-                                } else {
-                                    html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}" style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
-                                }
-                                
-                                // Render test tube icon: open all matching test files when test_files set, else single link (data attr avoids JSON-in-onclick parse errors)
-                                if (testTubeIconPath && (story.test_files?.length > 0 || (story.links && story.links.find(l => l.icon === 'test_tube')))) {
-                                    if (story.test_files && story.test_files.length > 0) {
-                                        html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(story.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                    } else {
-                                        const testLink = story.links.find(l => l.icon === 'test_tube');
-                                        if (testLink) {
-                                            html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([testLink.url]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                        }
-                                    }
-                                }
+                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${this.escapeHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
                                 
                                 // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
@@ -2941,25 +2812,12 @@ ${clientScript}    </script>`;
                                         // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
                                         const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
                                         
-                                        // Link scenario name to story file with scenario anchor
-                                        // Make scenarios draggable and renameable like other nodes
+                                        // Scenario: plain text, clickable to select (File/Test via toolbar)
                                         const scenarioBehavior = scenario.behavior_needed || '';
-                                        if (storyDocLink) {
-                                            const scenarioLink = `${storyDocLink.url}#${scenarioAnchor}`;
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" data-file-link="${escapeForHtml(scenarioLink)}" style="text-decoration: underline; cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
-                                        } else {
-                                            // No story doc link - just display scenario name with drag/rename support
-                                            html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}" style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
-                                        }
-                                        
-                                        // Render test tube icon: open all matching test files when test_files set, else single test_file (data attr avoids JSON-in-onclick parse errors)
-                                        if (testTubeIconPath && (scenario.test_files?.length > 0 || scenario.test_file)) {
-                                            if (scenario.test_files && scenario.test_files.length > 0) {
-                                                html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify(scenario.test_files))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                            } else {
-                                                html += ` <span class="test-files-link" data-test-files="${escapeForHtml(JSON.stringify([scenario.test_file]))}" onclick="openFilesFromEl(this)" style="cursor: pointer;"><img src="${testTubeIconPath}" style="width: 20px; height: 20px; vertical-align: middle;" alt="Test" /></span>`;
-                                            }
-                                        }
+                                        const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
+                                        const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
+                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(scenarioTestFiles)) : '';
+                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${this.escapeHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
                                         
                                         html += '</div>';
                                     });

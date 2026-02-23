@@ -1,0 +1,38 @@
+{
+  "EPIC|Invoke Bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 970.0,
+    "height": 60.0
+  },
+  "invoke-bot": {
+    "x": 20.0,
+    "y": 120.0,
+    "width": 970.0,
+    "height": 60.0
+  },
+  "SUB_EPIC|Prepare Common Instructions For Behavior, Action, and Scope": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 960.0,
+    "height": 60.0
+  },
+  "invoke-bot/prepare-common-instructions-for-behavior,-action,-and-scope": {
+    "x": 25.0,
+    "y": 195.0,
+    "width": 960.0,
+    "height": 60.0
+  },
+  "STORY|Invoke Bot|Prepare Common Instructions For Behavior, Action, and Scope|Add special instructon": {
+    "x": 930.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  },
+  "invoke-bot/prepare-common-instructions-for-behavior,-action,-and-scope/add-special-instructon": {
+    "x": 930.0,
+    "y": 345.0,
+    "width": 50.0,
+    "height": 50.0
+  }
+}
