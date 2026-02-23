@@ -2645,50 +2645,6 @@ class StoryMapView extends PanelView {
                     ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope Icon" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
                     <div style="flex: 1;"></div>
-                    ${showAllIconPath ? `<button onclick="event.stopPropagation(); showAllScope();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 12px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Show all scope (scope showall)">
-                        <img src="${showAllIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Show All" />
-                    </button>` : ''}
-                    ${clearIconPath ? `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 6px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Clear scope filter (show all)">
-                        <img src="${clearIconPath}" style="width: 24px; height: 24px; object-fit: contain;" alt="Clear Filter" />
-                    </button>` : `<button onclick="event.stopPropagation(); clearScopeFilter();" style="
-                        background: transparent;
-                        border: none;
-                        padding: 4px 8px;
-                        margin-left: 6px;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        transition: opacity 0.15s ease;
-                    " 
-                    onmouseover="this.style.opacity='0.7'" 
-                    onmouseout="this.style.opacity='1'"
-                    title="Clear scope filter (show all)">
-                        ✕
-                    </button>`}
                 </div>
                 <div onclick="event.stopPropagation();" style="display: flex; align-items: center; gap: 8px;">
                     ${linksHtml}
@@ -2771,6 +2727,12 @@ class StoryMapView extends PanelView {
                                onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
                         <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
                             <img src="${scopeToIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Scope To" />
+                        </button>
+                        <button onclick="event.stopPropagation(); showAllScope();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Show all scope">
+                            <img src="${showAllIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Show All" />
+                        </button>
+                        <button onclick="event.stopPropagation(); clearScopeFilter();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear scope filter">
+                            <img src="${clearIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Clear Filter" />
                         </button>
                         </div>
                         <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 1px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
