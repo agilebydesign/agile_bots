@@ -1626,20 +1626,6 @@ function updateNodePositions(container) {
     });
 }
 
-function updateWorkspace(workspacePath) {
-    console.log('[WebView] updateWorkspace called with:', workspacePath);
-    vscode.postMessage({
-        command: 'updateWorkspace',
-        workspacePath: workspacePath
-    });
-}
-
-function browseWorkspace() {
-    console.log('[WebView] browseWorkspace called');
-    vscode.postMessage({
-        command: 'browseWorkspace'
-    });
-}
 
 window.switchBot = function(botName) {
     console.log('[WebView] switchBot called with:', botName);
@@ -3071,11 +3057,7 @@ window.addEventListener('message', event => {
     }
     
     if (message.command === 'setWorkspacePath') {
-        console.log('[WebView] Received setWorkspacePath message:', message.path);
-        const input = document.getElementById('workspacePathInput');
-        if (input) {
-            input.value = message.path;
-        }
+        setWorkspacePath(message.path);
         return;
     }
     

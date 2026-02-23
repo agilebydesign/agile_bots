@@ -47,6 +47,7 @@ function truncatePath(pathStr, maxLength) {
 class Logger {
     static logFilePath = "";
     static debugLogEnabled = "";
+    static logFolder = "";
 
     constructor() {}
 
@@ -59,15 +60,25 @@ class Logger {
         if (typeof configLogFolder === 'undefined' || configLogFolder === "") {
             configLogFolder = path.join(defaultLogFolder);
         }
+        Logger.logFolder = configLogFolder;
         Logger.logFilePath = path.join(configLogFolder, 'panel-debug.log');   
 
         if (typeof process.env.PWD !== 'undefined') {
             // overwite with debug config
-            Logger.logFilePath = path.join(process.env.PWD, 'logs', 'panel-debug.log');
+            Logger.logFolder = path.join(process.env.PWD, 'logs');
+            Logger.logFilePath = path.join(Logger.logFolder, 'panel-debug.log');
         }
 
         Logger.debugLogEnabled = vscode.workspace.getConfiguration('agileBotsPanel').get('enableDebugLog', false) 
-    }    
+    }
+    
+    /**
+     * Get the folder where debug logs are being stored. Can be set by user in settings or overridden by Node environment variable
+     * @param {boolean} enableLogging 
+     */
+    static getLogFolder() {
+        return Logger.logFolder;
+    }
 
     /**
      * Set this to true to enable logging and overwrite VS Code setting - "Agile Bots Panel: Enable Debug Log". 
@@ -92,6 +103,35 @@ class Logger {
             // Silently ignore file write errors (permissions, disk full, etc.)
         }
         console.log(msg);
+    }
+
+    /**
+     * Logs message to panel_clicks.log with timestamp. 
+     * Used for logging user interactions in the panel.
+     * @param {string} msg 
+     */
+    static logPanelClicks(msg) {
+        let logPath = path.join(Logger.logFolder, 'panel_clicks.log');
+        let timestamp = new Date().toISOString();
+        fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
+    }
+
+    /**
+     * Logs messages to scope_debug.log with timestamp. 
+     * Used for logging detailed information about scope changes and updates for debugging.
+     * @param {string} msg 
+     */
+    static logScopeDebug(msg) {
+        let logDir = path.join(Logger.logFolder);
+        try { 
+            let scopeLogPath = path.join(logDir, 'scope_debug.log');
+            let timestamp = new Date().toISOString();
+            fs.appendFileSync(scopeLogPath, `[${timestamp}] [PANEL] ${msg}\n`); 
+        } 
+        catch (e) { 
+            console.error(`[Logger] Could not write to scope_debug.log at path ${scopeLogPath}:`, e?.message); 
+            vscode.window.showErrorMessage(`Could not create log dir: ${e?.message}`); 
+        }
     }
 
     /**

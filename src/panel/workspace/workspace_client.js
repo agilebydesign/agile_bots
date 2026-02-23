@@ -12,3 +12,11 @@ function browseWorkspace() {
         command: 'browseWorkspace'
     });
 }
+
+function setWorkspacePath(path) {
+    console.log('[WebView] Received setWorkspacePath message:', path);
+    const input = document.getElementById('workspacePathInput');
+    if (input) {
+        input.value = path;
+    }
+}

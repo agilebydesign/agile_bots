@@ -10,7 +10,7 @@ const branding = require("./branding");
 const { escapeForHtml, Logger } = require("./utils");
 
 class BotPanel {
-  constructor(panel, workspaceRoot, extensionUri) {
+  constructor(panel, repoRoot, extensionUri) {
 
     const perfConstructorStart = performance.now();
     try {
@@ -39,9 +39,10 @@ class BotPanel {
       
       this._log("[BotPanel] Constructor invoked");
       this._log(`[PERF] Constructor start`);
-      console.log(`[BotPanel] Constructor called - workspaceRoot: ${workspaceRoot}`);
+      console.log(`[BotPanel] Constructor called - repoRoot: ${repoRoot}`);
       this._panel = panel;
-      this._workspaceRoot = workspaceRoot;      
+      
+      this._repoRoot = repoRoot; // root folder of the repository, we assume it's the first folder in the user's VS Code Workspace
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};
@@ -49,7 +50,7 @@ class BotPanel {
       
       // Initialize branding with repo root
       // TO-DO: This is where workspace is being used as the repo workspace, and not user workspace
-      branding.setRepoRoot(workspaceRoot);
+      branding.setRepoRoot(this._repoRoot);
       this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
 
@@ -61,10 +62,10 @@ class BotPanel {
       this._log(`[PERF] Read panel version: ${(perfVersionEnd - perfVersionStart).toFixed(2)}ms`);
       
 
-      let botDirectory = process.env.BOT_DIRECTORY || path.join(workspaceRoot, 'bots', 'story_bot');
+      let botDirectory = process.env.BOT_DIRECTORY || path.join(this._repoRoot, 'bots', 'story_bot');
 
       if (!path.isAbsolute(botDirectory)) {
-        botDirectory = path.join(workspaceRoot, botDirectory);
+        botDirectory = path.join(this._repoRoot, botDirectory);
       }
       console.log(`[BotPanel] Bot directory: ${botDirectory}`);
       
@@ -156,6 +157,10 @@ class BotPanel {
                 await this._update();
 
                 const botData = this._botView?.botData;
+
+                // The User's ACE Workspace (not the VS Code workspace)
+                this._workspaceRoot = botData.workspace_directory;
+
                 const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
                 if (currentAction) {
                   setTimeout(() => {
@@ -203,18 +208,12 @@ class BotPanel {
             return;
           case "logToFile":
             if (message.message) {
-              const logPath = path.join(this._workspaceRoot, 'panel_clicks.log');
-              const timestamp = new Date().toISOString();
-              fs.appendFileSync(logPath, `[${timestamp}] ${message.message}\n`);
+              Logger.logPanelClicks(message.message);
             }
             return;
           case "logScopeDebug":
             if (message.message) {
-              const logDir = path.join(this._workspaceRoot, 'logs');
-              try { fs.mkdirSync(logDir, { recursive: true }); } catch (e) { console.error('[BotPanel] Could not create log dir:', e?.message); vscode.window.showErrorMessage(`Could not create log dir: ${e?.message}`); }
-              const scopeLogPath = path.join(logDir, 'scope_debug.log');
-              const timestamp = new Date().toISOString();
-              fs.appendFileSync(scopeLogPath, `[${timestamp}] [PANEL] ${message.message}\n`);
+              Logger.logScopeDebug(message.message);
             }
             return;
           case "showScopeError":
@@ -322,8 +321,7 @@ class BotPanel {
                 } else {
                   symbolName = fragment;
                 }
-              }
-              
+              }              
 
               let absolutePath;
               if (cleanPath.startsWith('file://')) {
@@ -761,39 +759,15 @@ class BotPanel {
             return;
           case "updateWorkspace":
             this._log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
-            if (WorkspaceManager.updateWorkspace(message, this._botView, this)) {
+            if (WorkspaceManager.updateWorkspace(message, this)) {
               return this._update();
             }
             return;
           case "browseWorkspace":
             this._log('[BotPanel] Received browseWorkspace message');
-            vscode.window.showOpenDialog({
-              canSelectFiles: false,
-              canSelectFolders: true,
-              canSelectMany: false,
-              openLabel: 'Select Workspace Folder'
-            }).then((folders) => {
-              if (folders && folders.length > 0) {
-                const folderPath = folders[0].fsPath;
-                this._log('[BotPanel] User selected folder: ' + folderPath);
-
-                this._panel.webview.postMessage({
-                  command: 'setWorkspacePath',
-                  path: folderPath
-                });
-
-                this._botView?.handleEvent('updateWorkspace', { workspacePath: folderPath })
-                  .then((result) => {
-                    if (WorkspaceManager.updateWorkspace(message, this._botView, this)) {
-                      return this._update();
-                    }
-                  })
-                  .catch((error) => {
-                    this._log('[BotPanel] ERROR browseWorkspace: ' + error.message);
-                    vscode.window.showErrorMessage(`Failed to update workspace: ${error.message}`);
-                  });
-              }
-            });
+            if (WorkspaceManager.browseWorkspace(this)) {
+              return this._update();
+            }            
             return;
           case "switchBot":
             if (message.botName) {
@@ -1717,8 +1691,8 @@ class BotPanel {
     );
   }
 
-  static createOrShow(workspaceRoot, extensionUri) {
-    console.log(`[BotPanel] >>> ENTERING createOrShow - workspaceRoot: ${workspaceRoot}`);
+  static createOrShow(repoRoot, extensionUri) {
+    console.log(`[BotPanel] >>> ENTERING createOrShow - repoRoot: ${repoRoot}`);
     console.log(`[BotPanel] >>> extensionUri: ${extensionUri}`);
     
     try {
@@ -1749,7 +1723,7 @@ class BotPanel {
       console.log("[BotPanel] >>> Webview panel created");
 
       console.log("[BotPanel] >>> Instantiating BotPanel class");
-      BotPanel.currentPanel = new BotPanel(panel, workspaceRoot, extensionUri);
+      BotPanel.currentPanel = new BotPanel(panel, repoRoot, extensionUri);
       console.log("[BotPanel] >>> BotPanel instance created successfully");
     } catch (error) {
       console.error(`[BotPanel] >>> EXCEPTION in createOrShow: ${error.message}`);
@@ -1760,7 +1734,7 @@ class BotPanel {
   }
 
 
-  static createForSidebar(webviewView, workspaceRoot, extensionUri) {
+  static createForSidebar(webviewView, repoRoot, extensionUri) {
     console.log("[BotPanel] Creating for sidebar view");
     
 
@@ -1780,7 +1754,7 @@ class BotPanel {
     };
     
 
-    const botPanel = new BotPanel(panelWrapper, workspaceRoot, extensionUri);
+    const botPanel = new BotPanel(panelWrapper, repoRoot, extensionUri);
     
 
     console.log("[BotPanel] Sidebar instance created successfully");
