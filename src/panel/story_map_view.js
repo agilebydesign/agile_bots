@@ -15,18 +15,7 @@ const StoryGraphAsyncSaveController = require('./story_graph/async_save_controll
 const branding = require('./branding');
 const fs = require('fs');
 const path = require('path');
-
-// Simple file logger - uses same path as bot_panel (workspace root)
-function log(msg) {
-    const timestamp = new Date().toISOString();
-    try {
-        const logFile = PanelView.getPanelLogPath ? PanelView.getPanelLogPath() : path.join(process.cwd(), 'panel-debug.log');
-        fs.appendFileSync(logFile, `${timestamp} ${msg}\n`);
-    } catch (e) {
-        // Ignore
-    }
-    console.log(msg);
-}
+const { escapeForHtml, escapeForJs, Logger } = require('./utils');
 
 class StoryMapView extends PanelView {
     /**
@@ -63,39 +52,6 @@ class StoryMapView extends PanelView {
     }
     
     /**
-     * Escape HTML entities.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeHtml(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
-    }
-    
-    /**
-     * Escape for JavaScript string.
-     * 
-     * @param {string} text - Text to escape
-     * @returns {string} Escaped text
-     */
-    escapeForJs(text) {
-        if (typeof text !== 'string') {
-            text = String(text);
-        }
-        return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
-    }
-    
-    /**
      * Create scenario anchor ID from scenario name (matches synchronizer format).
      * 
      * @param {string} scenarioName - Scenario name
@@ -123,17 +79,16 @@ class StoryMapView extends PanelView {
     async render() {
         // ===== PERFORMANCE: Start story map rendering =====
         const perfRenderStart = performance.now();
-        log('[StoryMapView] [PERF] render() START');
+        Logger.log('[StoryMapView] [PERF] render() START');
         
         // Use cached botData from parent if available, otherwise fetch it
         const perfStatusStart = performance.now();
         const botData = this.parentView?.botData || await this.execute('status');
         const perfStatusEnd = performance.now();
         const dataSource = this.parentView?.botData ? 'cached' : 'fetched';
-        log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
-        // PanelView returns { bot: {...} }; BotView returns bot object directly. Support both.
-        const scopeData = (botData.bot?.scope || botData.scope) || { type: 'all', filter: '', content: null, graphLinks: [], includeLevel: 'examples' };
+        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
         const perfIconsStart = performance.now();
@@ -178,10 +133,10 @@ class StoryMapView extends PanelView {
         const injectExamplesIconPath = getIcon('inject_examples.png');
         const injectTestsIconPath = getIcon('inject_tests.png');
         const injectCodeIconPath = getIcon('inject_code.png');
-        log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
-        log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
-        
+        Logger.log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
+
         const drawioLink = (scopeData.graphLinks || []).find(l => l.url && l.url.endsWith('.drawio'));
         const drawioPath = drawioLink ? this.escapeForJs(drawioLink.url) : '';
         
@@ -256,10 +211,10 @@ class StoryMapView extends PanelView {
         const actualViewMode = this.currentViewMode || 'Hierarchy';
         const isFilesView = actualViewMode === 'Files';
         const isIncrementView = actualViewMode === 'Increment';
-        log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
+        Logger.log(`[StoryMapView] Rendering view mode: ${actualViewMode} (scopeType: ${scopeData.type})`);
         
         if (isIncrementView) {
-            // Render increment columns view with shared toolbar so buttons exist in DOM
+            // Render increment columns view (read-only)
             contentHtml = this.renderIncrementView(botData, documentIconPath);
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
@@ -281,12 +236,12 @@ class StoryMapView extends PanelView {
             const perfTreeStart = performance.now();
             const treeHtml = this.renderStoryTree(epics, gearIconPath, epicIconPath, pageIconPath, testTubeIconPath, documentIconPath, plusIconPath, subtractIconPath, emptyIconPath);
             const perfTreeEnd = performance.now();
-            log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
+            Logger.log(`[StoryMapView] [PERF] renderStoryTree (${epics.length} epics): ${(perfTreeEnd - perfTreeStart).toFixed(2)}ms`);
             
             const perfRootNodeStart = performance.now();
             const rootNode = this.renderRootNode(treeHtml, plusIconPath, subtractIconPath);
             const perfRootNodeEnd = performance.now();
-            log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
+            Logger.log(`[StoryMapView] [PERF] renderRootNode: ${(perfRootNodeEnd - perfRootNodeStart).toFixed(2)}ms`);
             
             contentHtml = actionButtonsHtml + rootNode;
             contentSummary = `${epics.length} epic${epics.length !== 1 ? 's' : ''}`;
@@ -295,9 +250,9 @@ class StoryMapView extends PanelView {
             contentSummary = 'all files';
         }
         const perfContentEnd = performance.now();
-        log(`[StoryMapView] [PERF] Content rendering: ${(perfContentEnd - perfContentStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] Content rendering: ${(perfContentEnd - perfContentStart).toFixed(2)}ms`);
         
-        const filterValue = this.escapeHtml(scopeData.filter || '');
+        const filterValue = escapeForHtml(scopeData.filter || '');
         const hasFilter = filterValue.length > 0;
         
         // ===== PERFORMANCE: Final HTML assembly =====
@@ -2695,12 +2650,12 @@ class StoryMapView extends PanelView {
     <script>
 ${clientScript}    </script>`;
         const perfAssemblyEnd = performance.now();
-        log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
+        Logger.log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
         
         // ===== PERFORMANCE: Log total render time =====
         const perfRenderEnd = performance.now();
         const totalRenderTime = (perfRenderEnd - perfRenderStart).toFixed(2);
-        log(`[StoryMapView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
+        Logger.log(`[StoryMapView] [PERF] TOTAL render() duration: ${totalRenderTime}ms`);
         
         return result;
     }
@@ -2751,9 +2706,9 @@ ${clientScript}    </script>`;
             const epicHasChildren = (epic.sub_epics && epic.sub_epics.length > 0) || (epic.story_groups && epic.story_groups.some(sg => sg.stories && sg.stories.length > 0));
             
             // Epic name: plain text, clickable to select, double-click to edit (File/Test via toolbar)
-            const epicPath = this.escapeHtml(`story_graph."${epic.name}"`);
+            const epicPath = escapeForHtml(`story_graph."${epic.name}"`);
             const epicBehavior = epic.behavior_needed || '';
-            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${this.escapeHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${this.escapeHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(epic.name)}</span>`;
+            const epicNameHtml = `<span class="story-node" draggable="true" data-node-type="epic" data-node-name="${escapeForHtml(epic.name)}" data-behavior-needed="${epicBehavior}" data-has-children="${epicHasChildren}" data-position="${epicIndex}" data-path="${epicPath}"${epicDocLink ? ` data-file-link="${escapeForHtml(epicDocLink.url)}"` : ''}${epicTestFilesJson ? ` data-test-files="${epicTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(epic.name)}</span>`;
             
             // Epic nodes - no inline links (File/Test via toolbar buttons)
             let html = `<div style="margin-top: 8px; font-size: 12px;"><span id="${epicId}-icon" onclick="event.stopPropagation(); toggleCollapse('${epicId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> ${epicIcon}${epicNameHtml}</div>`;
@@ -2768,14 +2723,14 @@ ${clientScript}    </script>`;
                 const subEpicDocLink = subEpic.links && subEpic.links.find(l => l.icon === 'document');
                 const subEpicTestLink = subEpic.links && subEpic.links.find(l => l.icon === 'test_tube');
                 const subEpicTestFiles = subEpic.test_files?.length > 0 ? subEpic.test_files : (subEpicTestLink ? [subEpicTestLink.url] : []);
-                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(subEpicTestFiles)) : '';
+                const subEpicTestFilesJson = subEpicTestFiles.length > 0 ? escapeForHtml(JSON.stringify(subEpicTestFiles)) : '';
                 
                 // Build the full path to this SubEpic
                 // For first-level: story_graph."Epic"."SubEpic"
                 // For nested: story_graph."Epic"."ParentSubEpic"."NestedSubEpic"
                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
                 const baseStoryGraphPath = parentStoryGraphPath || `story_graph."${epic.name}"`;
-                const subEpicPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"`);
+                const subEpicPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"`);
                 
                 // Determine which buttons to show for SubEpic based on children
                 const nestedSubEpics = subEpic.sub_epics || [];
@@ -2787,7 +2742,7 @@ ${clientScript}    </script>`;
                 // Sub-epic name: plain text, clickable to select (File/Test via toolbar)
                 const subEpicBehavior = subEpic.behavior_needed || '';
                 const subEpicBehaviors = subEpic.behaviors_needed ? JSON.stringify(subEpic.behaviors_needed) : `["${subEpicBehavior}"]`;
-                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${this.escapeHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${this.escapeHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(subEpic.name)}</span>`;
+                const subEpicNameHtml = `<span class="story-node" draggable="true" data-node-type="sub-epic" data-node-name="${escapeForHtml(subEpic.name)}" data-behavior-needed="${subEpicBehavior}" data-behaviors-needed='${subEpicBehaviors}' data-has-children="${subEpicHasChildren}" data-has-stories="${hasStories}" data-has-nested-sub-epics="${hasNestedSubEpics}" data-position="${subEpicIndex}" data-path="${subEpicPath}"${subEpicDocLink ? ` data-file-link="${escapeForHtml(subEpicDocLink.url)}"` : ''}${subEpicTestFilesJson ? ` data-test-files="${subEpicTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(subEpic.name)}</span>`;
                 
                 const marginLeft = 7 + (depth * 7);
                 
@@ -2798,7 +2753,7 @@ ${clientScript}    </script>`;
                 // Render nested sub_epics if they exist (recursive)
                 // Pass the current sub-epic's full path as the parent for nested children
                 if (nestedSubEpics.length > 0) {
-                    const currentSubEpicStoryGraphPath = `${baseStoryGraphPath}."${subEpic.name}"`;
+                    const currentSubEpicStoryGraphPath = `${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"`;
                     nestedSubEpics.forEach((nested, nestedIndex) => {
                         renderSubEpic(nested, nestedIndex, subEpicId, depth + 1, currentSubEpicStoryGraphPath);
                     });
@@ -2817,7 +2772,7 @@ ${clientScript}    </script>`;
                                 
                                 // Build story path for edit mode - use full parent chain for nested sub-epics
                                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                const storyPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"`);
+                                const storyPath = escapeForHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"`);
                                 
                                 html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
                                 
@@ -2833,12 +2788,12 @@ ${clientScript}    </script>`;
                                 const storyDocLink = story.links && story.links.find(l => l.text === 'story');
                                 const storyTestLink = story.links && story.links.find(l => l.icon === 'test_tube');
                                 const storyTestFiles = story.test_files?.length > 0 ? story.test_files : (storyTestLink ? [storyTestLink.url] : []);
-                                const storyTestFilesJson = storyTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(storyTestFiles)) : '';
+                                const storyTestFilesJson = storyTestFiles.length > 0 ? escapeForHtml(JSON.stringify(storyTestFiles)) : '';
                                 
                                 // Story name: plain text, clickable to select (File/Test via toolbar)
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
-                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${this.escapeHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${this.escapeHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${this.escapeHtml(story.name)}</span>`;
+                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${escapeForHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
                                 
                                 // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
@@ -2855,14 +2810,14 @@ ${clientScript}    </script>`;
                                         // Create scenario anchor ID from scenario name (matches synchronizer format)
                                         const scenarioAnchor = this.createScenarioAnchor(scenario.name);
                                         // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                        const scenarioPath = this.escapeHtml(`${baseStoryGraphPath}."${subEpic.name}"."${story.name}"."${scenario.name}"`);
+                                        const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"."${escapeForHtml(story.name)}"."${escapeForHtml(scenario.name)}"`);
                                         
                                         // Scenario: plain text, clickable to select (File/Test via toolbar)
                                         const scenarioBehavior = scenario.behavior_needed || '';
                                         const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
                                         const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
-                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? this.escapeHtml(JSON.stringify(scenarioTestFiles)) : '';
-                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${this.escapeHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${this.escapeHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${this.escapeHtml(scenario.name)}</span>`;
+                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? escapeForHtml(JSON.stringify(scenarioTestFiles)) : '';
+                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${escapeForHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
                                         
                                         html += '</div>';
                                     });
@@ -2926,7 +2881,7 @@ ${clientScript}    </script>`;
             : '';
 
         const filterHint = filterText
-            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${this.escapeHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
+            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
             : '';
 
         let html = `
@@ -2945,7 +2900,7 @@ ${clientScript}    </script>`;
                     ${unallocatedStories.length === 0
                         ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(none)</div>`
                         : unallocatedStories.map(name => {
-                            const esc = this.escapeHtml(name);
+                            const esc = escapeForHtml(name);
                             return `<div class="story-node" draggable="true" data-node-type="story" data-node-name="${esc}" data-path="story_graph.unallocated.${esc}" data-inc-source="" data-position="0" style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px; cursor: grab;">
                                 ${storyIcon}<span style="flex: 1; word-wrap: break-word; pointer-events: none;">${esc}</span>
                             </div>`;
@@ -2958,7 +2913,7 @@ ${clientScript}    </script>`;
 
         for (const increment of displayIncrements) {
             const incName = increment.name;
-            const escapedName = this.escapeHtml(incName);
+            const escapedName = escapeForHtml(incName);
             const jsName = incName.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
             const stories = increment.stories || [];
             const sortedStories = [...stories].sort((a, b) =>
@@ -2967,7 +2922,7 @@ ${clientScript}    </script>`;
             const behaviorNeeded = increment.behavior_needed || 'shape';
 
             html += `
-                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${this.escapeHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
+                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${escapeForHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
                     <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
                         <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
                         <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>
@@ -2987,7 +2942,7 @@ ${clientScript}    </script>`;
                             ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(no stories)</div>`
                             : sortedStories.map((story, si) => {
                                 const storyName = typeof story === 'string' ? story : (story.name || '');
-                                const escapedStoryName = this.escapeHtml(storyName);
+                                const escapedStoryName = escapeForHtml(storyName);
                                 return `
                                     <div class="story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}" style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px; cursor: grab;">
                                         ${storyIcon}
@@ -3033,7 +2988,7 @@ ${clientScript}    </script>`;
      */
     renderFileList(files) {
         return '<div style="margin-top: 5px;">' + files.map(file => 
-            `<div style="margin-left: 5px; font-family: monospace; font-size: 12px; margin-top: 2px;">- ${this.escapeHtml(file.path)}</div>`
+            `<div style="margin-left: 5px; font-family: monospace; font-size: 12px; margin-top: 2px;">- ${escapeForHtml(file.path)}</div>`
         ).join('') + '</div>';
     }
     
@@ -3058,4 +3013,3 @@ ${clientScript}    </script>`;
 }
 
 module.exports = StoryMapView;
-
