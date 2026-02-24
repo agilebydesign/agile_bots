@@ -621,6 +621,37 @@ def then_cli_reports_failed(result):
 
 def then_cli_reports_failed_for_special_instructions(result):
     assert result is not None
+
+
+# ============================================================================
+# STORY: Submit Instructions From Workspace
+# ============================================================================
+
+class TestSubmitInstructionsFromWorkspace:
+    """
+    Story: Submit Instructions From Workspace
+    
+    When User has {Behavior} selected and instructions visible,
+    submit sends {Behavior} instructions to AI agent.
+    """
+
+    def test_workspace_submit_button_sends_instructions(self, tmp_path):
+        """
+        SCENARIO: User submits {Behavior} instructions to AI agent
+        GIVEN: {Behavior} "shape" is selected in workspace
+        AND: {InstructionsSection} displays shape instructions
+        WHEN: User triggers submit from workspace
+        THEN: System sends {Behavior} shape instructions to AI agent
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        helper.bot.behaviors.current.actions.navigate_to('clarify')
+        instructions = when_user_submits_instructions_in_panel(helper)
+        assert instructions is not None
+        content = str(instructions) if instructions else ""
+        if hasattr(instructions, "display_content"):
+            content = "\n".join(instructions.display_content)
+        assert 'shape' in content.lower() or 'clarify' in content.lower()
     if isinstance(result, dict):
         assert result.get("status") == "error", f"Expected error status, got {result}"
     else:

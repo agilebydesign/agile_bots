@@ -420,6 +420,22 @@ class TestBehaviorsView {
     }
 }
 
+// Story: Select Workspace Behavior - workspace section renders behavior buttons
+class TestSelectWorkspaceBehavior {
+    async testWorkspaceSectionRendersBehaviorButtons() {
+        const WorkspaceSectionView = require('../../../src/panel/workspace_section_view');
+        const statusResponse = await helper._cli.execute('status');
+        const botData = statusResponse.bot || statusResponse;
+        const view = new WorkspaceSectionView(helper._cli);
+        view.parentView = { botData };
+        const html = await view.render();
+        assert.ok(html.includes('navigateToBehavior') || html.includes('data-behavior-name'),
+            'Workspace section should have behavior selection buttons');
+        assert.ok(html.includes('shape') || (botData.behaviors?.names && botData.behaviors.names.length > 0),
+            'Workspace should show at least one behavior');
+    }
+}
+
 class TestDisplayBehaviorHierarchy {
     
     async testSingleBehaviorWithFiveActions() {
@@ -803,6 +819,13 @@ test('TestExecuteBehaviorActionPanel', { concurrency: false, timeout: 60000 }, a
 
     await t.test('test_behavior_has_navigate_to_behavior_handler', async () => {
         await suite.test_behavior_has_navigate_to_behavior_handler();
+    });
+});
+
+test('TestSelectWorkspaceBehavior', { concurrency: false, timeout: 60000 }, async (t) => {
+    const suite = new TestSelectWorkspaceBehavior();
+    await t.test('testWorkspaceSectionRendersBehaviorButtons', async () => {
+        await suite.testWorkspaceSectionRendersBehaviorButtons();
     });
 });
 

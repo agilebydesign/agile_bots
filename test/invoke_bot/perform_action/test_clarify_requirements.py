@@ -250,6 +250,32 @@ class TestClarifyRequirementsUsingCLI:
 
 
 # ============================================================================
+# STORY: Display Clarification In Workspace
+# ============================================================================
+
+class TestDisplayClarificationInWorkspace:
+    """
+    Story: Display Clarification In Workspace
+    
+    When {Behavior} is selected in workspace, {ClarifyInstructionsSection}
+    displays {KeyQuestions} and {ClarifyDataSubSection} shows editable answers.
+    """
+
+    def test_clarify_returns_key_questions_for_workspace_display(self, tmp_path):
+        """
+        SCENARIO: Workspace shows ClarifyInstructionsSection with key questions
+        GIVEN: {Behavior} "shape" is selected
+        WHEN: clarify action executes
+        THEN: Instructions contain key questions for workspace display
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        action = helper.bot.behaviors.current.actions.find_by_name('clarify')
+        instructions = action.do_execute()
+        helper.clarify.assert_clarify_context_instructions(instructions)
+
+
+# ============================================================================
 # STORY: Validate Rules
 # Maps to: TestValidateRules in test_perform_action.py
 # ============================================================================

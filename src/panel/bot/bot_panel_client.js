@@ -81,7 +81,7 @@ document.addEventListener('click', function(e) {
 
 
     const storyNode = target.closest && target.closest('.story-node');
-    if (storyNode) {
+    if (storyNode && !storyNode.getAttribute('data-inc-source')) {
         console.log('═══════════════════════════════════════════════════════');
         console.log('[WebView] STORY NODE CLICKED');
         const nodeType = storyNode.getAttribute('data-node-type');
@@ -322,7 +322,7 @@ document.addEventListener('contextmenu', function(e) {
         while (t && !t.classList.contains('story-node')) t = t.parentElement;
         return t;
     })();
-    if (target && target.classList.contains('story-node')) {
+    if (target && target.classList.contains('story-node') && !target.getAttribute('data-inc-source')) {
         const nodePath = target.getAttribute('data-path');
         if (nodePath) {
             var scope = window.diagramScope || '';
@@ -1593,6 +1593,11 @@ function sendInstructionsToChat(event) {
     console.log('[SUBMIT_DEBUG] WebView: sendInstructionsToChat triggered');
 
     if (window.selectedNode && window.selectedNode.name) {
+        if (window.selectedNode.type === 'increment') {
+            console.log('[SUBMIT_DEBUG] WebView: increment selected, taking handleSubmitCurrent path');
+            handleSubmitCurrent();
+            return;
+        }
         const nodePath = resolveNodePath(window.selectedNode);
         if (nodePath) {
             console.log('[SUBMIT_DEBUG] WebView: taking handleSubmitCurrent path (story map node selected)');
@@ -2833,14 +2838,14 @@ window.submitWorkspaceBehaviorInstructions = function() {
     }
     const action = window.currentAction || 'build';
     if (window.selectedNode && window.selectedNode.name) {
+        if (window.selectedNode.type === 'increment') {
+            const commandText = 'story_graph.submit_increment_instructions name:"' + window.selectedNode.name + '" behavior:"' + behavior + '" action:"' + action + '"';
+            vscode.postMessage({ command: 'executeCommand', commandText: commandText });
+            return;
+        }
         const nodePath = resolveNodePath(window.selectedNode);
         if (nodePath) {
-            let commandText;
-            if (window.selectedNode.type === 'increment') {
-                commandText = 'story_graph.submit_increment_instructions name:"' + window.selectedNode.name + '" behavior:"' + behavior + '" action:"' + action + '"';
-            } else {
-                commandText = nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"';
-            }
+            const commandText = nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"';
             vscode.postMessage({ command: 'executeCommand', commandText: commandText });
             return;
         }

@@ -687,6 +687,55 @@ class TestManageBehaviorsUsingCLI:
 
 
 # ============================================================================
+# STORY: Select Workspace Behavior
+# Domain: Behavior selection updates current; InstructionsSection reflects selection
+# ============================================================================
+
+class TestSelectWorkspaceBehavior:
+    """
+    Story: Select Workspace Behavior
+    
+    Domain: When User selects {Behavior}, current behavior updates and
+    {InstructionsSection} displays behavior-specific content.
+    """
+
+    def test_selecting_behavior_updates_current_and_instructions_reflect_it(self, tmp_path):
+        """
+        SCENARIO: User selects behavior and sees instructions update
+        GIVEN: {Behavior} registry has shape and prioritization
+        WHEN: User selects {Behavior} "shape"
+        THEN: {InstructionsSection} displays shape behavior instructions
+        AND: Instructions show clarify, strategy, build actions
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+
+        assert helper.bot.behaviors.current.name == 'shape'
+        current = helper.bot.behaviors.current
+        current.actions.load_state()
+        assert current.actions.current is not None
+        action_names = current.actions.names
+        assert 'clarify' in action_names
+        assert 'strategy' in action_names
+        assert 'build' in action_names
+
+    def test_behavior_selection_persists_across_state_refresh(self, tmp_path):
+        """
+        SCENARIO: Panel remembers selection across section toggles
+        GIVEN: User has selected {Behavior} "shape"
+        WHEN: State is refreshed (simulating section toggle)
+        THEN: {Behavior} "shape" remains selected
+        """
+        helper = BotTestHelper(tmp_path)
+        helper.bot.behaviors.navigate_to('shape')
+        assert helper.bot.behaviors.current.name == 'shape'
+
+        helper.state.set_state('shape', 'clarify')
+        state = helper.state.get_state()
+        assert state.get('current_behavior') == 'shape'
+
+
+# ============================================================================
 # STORY: Manage Behavior Action State
 # Maps to: TestManageBehaviorActionState in test_navigate_and_execute_behaviors.py (5 tests)
 # ============================================================================

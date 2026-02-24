@@ -1,4 +1,3666 @@
-"""
+**Combined instructions:** The following combines multiple actions. Perform them one after another.
+
+## Scope
+
+**Story Scope:** "Submit Instructions From Workspace"
+
+Please only work on the following scope.
+
+Scope Filter: ""Submit Instructions From Workspace""
+
+Scope:
+
+{
+  "path": "C:\\dev\\agile_bots\\docs\\story\\story-graph.json",
+  "has_epics": true,
+  "has_increments": true,
+  "has_domain_concepts": true,
+  "epic_count": 1,
+  "content": {
+    "epics": [
+      {
+        "name": "Invoke Bot",
+        "sub_epics": [
+          {
+            "name": "Navigate Behavior Actions",
+            "sub_epics": [
+              {
+                "name": "Perform Behavior Action In Bot Workflow",
+                "sub_epics": [],
+                "story_groups": [
+                  {
+                    "name": null,
+                    "stories": [
+                      {
+                        "name": "Submit Instructions From Workspace",
+                        "acceptance_criteria": [
+                          {
+                            "name": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                            "text": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                            "sequential_order": 0.0
+                          },
+                          {
+                            "name": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                            "text": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                            "sequential_order": 1.0
+                          }
+                        ],
+                        "scenarios": [
+                          {
+                            "name": "User submits {Behavior} instructions to AI agent",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {Behavior} \"shape\" is selected in workspace",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "And {InstructionsSection} displays shape instructions",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "When User triggers submit from workspace",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "Then System sends {Behavior} shape instructions to AI agent",
+                                "sequential_order": 4.0
+                              },
+                              {
+                                "text": "And Submit button is visible and enabled",
+                                "sequential_order": 5.0
+                              }
+                            ],
+                            "examples": null
+                          },
+                          {
+                            "name": "Submit disabled when no behavior selected",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given no {Behavior} is selected in workspace",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "When User views workspace section",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "Then Submit shows scope error or is disabled",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "And User cannot submit empty instructions",
+                                "sequential_order": 4.0
+                              }
+                            ],
+                            "examples": null
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "domain_concepts": [
+                  {
+                    "name": "Base Action",
+                    "responsibilities": [
+                      {
+                        "name": "Inject Instructions",
+                        "collaborators": [
+                          "Behavior"
+                        ]
+                      },
+                      {
+                        "name": "Load Relevant Content + Inject Into Instructions",
+                        "collaborators": [
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Save content changes",
+                        "collaborators": [
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Get save file",
+                        "collaborators": [
+                          "Path"
+                        ]
+                      },
+                      {
+                        "name": "Execution gates on save file watch",
+                        "collaborators": [
+                          "SaveFileWatcher",
+                          "Debounce",
+                          "Next Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "SaveFileWatcher",
+                    "responsibilities": [
+                      {
+                        "name": "Watch save file for writes",
+                        "collaborators": [
+                          "Path",
+                          "File System"
+                        ]
+                      },
+                      {
+                        "name": "Report when file stable past debounce",
+                        "collaborators": [
+                          "Path",
+                          "Debounce",
+                          "Boolean"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "ActionStateManager",
+                    "responsibilities": [
+                      {
+                        "name": "Get state file path",
+                        "collaborators": [
+                          "Path"
+                        ]
+                      },
+                      {
+                        "name": "Load or create state",
+                        "collaborators": [
+                          "State File",
+                          "Dict"
+                        ]
+                      },
+                      {
+                        "name": "Save state",
+                        "collaborators": [
+                          "Action",
+                          "State File"
+                        ]
+                      },
+                      {
+                        "name": "Load state",
+                        "collaborators": [
+                          "Actions List",
+                          "Current Index"
+                        ]
+                      },
+                      {
+                        "name": "Find action index",
+                        "collaborators": [
+                          "Actions List",
+                          "Action Name",
+                          "Integer"
+                        ]
+                      },
+                      {
+                        "name": "Filter completed actions",
+                        "collaborators": [
+                          "Completed Actions",
+                          "Target Index",
+                          "Actions List",
+                          "List"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "TTYAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to TTY",
+                        "collaborators": [
+                          "Action",
+                          "String"
+                        ]
+                      },
+                      {
+                        "name": "Format action line",
+                        "collaborators": [
+                          "Action Name",
+                          "Marker",
+                          "Indent"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "TTYProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "JSONAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to JSON dict",
+                        "collaborators": [
+                          "Action",
+                          "Dict"
+                        ]
+                      },
+                      {
+                        "name": "Include action metadata",
+                        "collaborators": [
+                          "Name",
+                          "Description",
+                          "Status"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "JSONProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "MarkdownAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to Markdown",
+                        "collaborators": [
+                          "Action",
+                          "String"
+                        ]
+                      },
+                      {
+                        "name": "Format action documentation",
+                        "collaborators": [
+                          "Action Name",
+                          "Description",
+                          "Subsection"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "MarkdownProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  }
+                ]
+              }
+            ],
+            "story_groups": []
+          }
+        ],
+        "domain_concepts": []
+      }
+    ],
+    "increments": []
+  }
+}
+
+---
+
+# Behavior: scenarios
+
+## Behavior Instructions - scenarios
+
+The purpose of this behavior is to write detailed plain-english scenarios (given/when/then) that specify exact behavior for each story
+
+Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story
+
+## Action Instructions - build
+
+The purpose of this action is to build story graph from content area and render using story graph renderer
+
+Follow agile_bot/bots/story_bot/behaviors/scenarios/content/story_graph/instructions.json
+specification_scenarios: build scenarios using domain language
+Use proper domain terminology in scenario steps - refer to domain concepts and entities
+Add/update scenarios and scenario_outlines ONLY in main epics section (single source of truth), NOT in increments section
+
+**STORY GRAPH UPDATE STRATEGY (use when story-graph.json already exists):**
+
+When updating an existing story graph, do NOT read and rewrite the entire story-graph.json manually.
+Choose one of these approaches in order of preference:
+
+1. **API approach (preferred for targeted changes):**
+   Use the StoryMap node API via CLI dot-notation to make surgical changes.
+   - Navigate: story_map.filter_by_name name:"Story Name" to read only the relevant subtree
+   - Create:  story_map."Epic"."SubEpic"."Story".create_scenario name:"Scenario Name"
+   - Create:  story_map."Epic"."SubEpic"."Story".create_acceptance_criteria name:"WHEN condition THEN outcome"
+   - Rename:  story_map."Epic"."SubEpic"."Story".rename name:"New Name"
+   - Move:    story_map."Epic"."SubEpic"."Story".move_to target:"Other SubEpic"
+   - Reorder: story_map."Epic"."SubEpic"."Story".move_to at_position:2
+   - Delete:  story_map."Epic"."SubEpic"."Story"."Old Scenario".delete
+   Each call auto-saves the full graph safely through in-memory tree serialization.
+
+2. **Bulk approach (for sweeping changes across many stories):**
+   Build a temporary StoryMap with just your changes using the same create API (without bot context),
+   then use generate_merge_report() to compare against the original, and merge_story_graphs() to apply.
+   The merge preserves all original data (acceptance_criteria, scenarios, steps, metadata) you did not change.
+
+3. **Manual JSON edit (last resort only):**
+   Only if the API and bulk approaches cannot handle the situation.
+   Use filter_by_name to read a scoped subtree rather than the full file.
+   Write changes back through the StoryMap.save() method, as opposed to by editing story-graph.json directly.
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- `C:/dev/agile_bots/docs/story/story-graph.json` - the story graph and related  knowledge built so far
+- `C:/dev/agile_bots/docs/story/strategy.json` - strategy decisions made
+- `C:/dev/agile_bots/docs/story/clarification.json` - clarification answers
+- `C:/dev/agile_bots/test/` and `C:/dev/agile_bots/src/` - existing code and tests
+- any folder named `context/` anywhere in `C:/dev/agile_bots/` - additional context files
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+@build-instructions.txt
+
+**BUILD PROCESS:**
+
+**1. Load Context**
+Load clarification.json, planning.json, and source material from context sources (listed above).
+
+**2. Load Build Configs**
+From `c:\dev\agile_bots\bots\story_bot/behaviors/scenarios/content/`, each folder contains:
+- `build_*.json` - Config (name, path, template, output)
+- `instructions.json` - Build instructions
+- `template-file.json` - Output schema/structure
+
+**3. Execute Build**
+1. Load config, instructions, and template (injected as 'story_graph_template')
+2. Check if output file exists - read it FIRST
+3. Follow instructions.json - match template structure exactly (check '_explanation' section)
+4. Apply context from Step 1
+5. If file exists: ADD/EXTEND only, never overwrite/delete
+6. Validate against template schema
+7. Write to `C:\dev\agile_bots/{config.path}/{config.output}`
+- Read existing files before changes - preserve all content
+- Match template structure exactly - don't invent schemas
+- Trace all knowledge to clarification/planning data
+- Process builds sequentially - validate each
+
+**4. SOURCE TRACEABILITY**
+Knowledge artifacts should include source references when available:
+- `context_source` field on epics, sub_epics, story_groups, stories, and domain concepts
+- Format: `{"file": "filename.pdf", "page": "12", "section": "3.2.1 Payment Flow"}`
+- For multiple sources: use array of source objects
+- If source is chat/conversation: `{"type": "chat", "description": "User clarification on approval workflow"}`
+- If source is code: `{"file": "path/to/file.py", "lines": "45-67", "function": "process_payment"}`
+- Prefer tracing knowledge to a source when possible
+- When source is unclear, mark as `{"type": "inferred", "basis": "description of inference basis"}`
+Follow agile_bot/bots/story_bot/behaviors/scenarios/content/story_graph/instructions.json
+specification_scenarios: build scenarios using domain language
+Use proper domain terminology in scenario steps - refer to domain concepts and entities
+Add/update scenarios and scenario_outlines ONLY in main epics section (single source of truth), NOT in increments section
+
+**STORY GRAPH UPDATE STRATEGY (use when story-graph.json already exists):**
+
+When updating an existing story graph, do NOT read and rewrite the entire story-graph.json manually.
+Choose one of these approaches in order of preference:
+
+1. **API approach (preferred for targeted changes):**
+   Use the StoryMap node API via CLI dot-notation to make surgical changes.
+   - Navigate: story_map.filter_by_name name:"Story Name" to read only the relevant subtree
+   - Create:  story_map."Epic"."SubEpic"."Story".create_scenario name:"Scenario Name"
+   - Create:  story_map."Epic"."SubEpic"."Story".create_acceptance_criteria name:"WHEN condition THEN outcome"
+   - Rename:  story_map."Epic"."SubEpic"."Story".rename name:"New Name"
+   - Move:    story_map."Epic"."SubEpic"."Story".move_to target:"Other SubEpic"
+   - Reorder: story_map."Epic"."SubEpic"."Story".move_to at_position:2
+   - Delete:  story_map."Epic"."SubEpic"."Story"."Old Scenario".delete
+   Each call auto-saves the full graph safely through in-memory tree serialization.
+
+2. **Bulk approach (for sweeping changes across many stories):**
+   Build a temporary StoryMap with just your changes using the same create API (without bot context),
+   then use generate_merge_report() to compare against the original, and merge_story_graphs() to apply.
+   The merge preserves all original data (acceptance_criteria, scenarios, steps, metadata) you did not change.
+
+3. **Manual JSON edit (last resort only):**
+   Only if the API and bulk approaches cannot handle the situation.
+   Use filter_by_name to read a scoped subtree rather than the full file.
+   Write changes back through the StoryMap.save() method, as opposed to by editing story-graph.json directly.
+
+When building or adding to the story graph follow these rules,
+Rules to follow:
+
+- **scenario_language_matches_domain**: Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+  DO: Use domain language in scenario steps - reference domain concepts by name.
+  DON'T: Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+- **example_tables_use_domain_language**: Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+  DO: Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+  DON'T: Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+- **given_describes_state_not_actions**: Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+  DO: Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+  DON'T: Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+- **background_vs_scenario_setup**: Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+  DO: Use Background for shared context with {Concept} references to example tables.
+  DON'T: Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+- **scenarios_cover_all_cases**: Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+  DO: Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+  DON'T: Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+- **use_scenario_outline_when_needed**: Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+  DO: Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+  DON'T: Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+- **write_concrete_scenarios**: Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+  DO: Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+  DON'T: Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+- **scenarios_on_story_docs**: Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+  DO: Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+  DON'T: Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+- **map_table_columns_to_scenario_parameters**: Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+  DO: Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+  DON'T: Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+### Key Questions
+
+- What system and user actions initiate this story's flow?
+- What is the intended system response after each user action?
+- What preconditions or data states are required before this story can begin?
+- What are the success criteria for the story (from a domain and user perspective)?
+- What are the expected alternate flows, error paths, and edge cases?
+- Are there any mandatory sequencing constraints within or across stories?
+- What domain rules, calculations, or business policies does this story validate?
+- Is the story testable independently (including setup and teardown conditions)?
+- What external systems or services does this story need to interact with?
+- What requests, responses, or contracts are involved in those system interactions?
+- Are there system integration points that require validation or simulation?
+- How do we handle failures, timeouts, or retries for those system calls?
+- What data variations (e.g., boundary conditions, common examples) are required for test coverage?
+- What are the input values needed to test each scenario?
+- What are the expected output values for each input?
+- Are there formulas or calculations that need multiple data points to validate?
+- Are there domain entities with named values that should be tested?
+- What are the boundary conditions (min, max, edge cases) for each data point?
+
+### Evidence
+
+Acceptance criteria from Exploration stage (Domain AC at feature level, Behavioral AC at story level), High fidelity UX flows, Cross-functional walkthrough outputs, Integration contracts or API mocks, Behavior diagrams (state, sequence)
+
+### Decisions
+
+**Your Decisions:**
+
+**examples_representation:**
+  Verification Data Table
+
+**scenario_outline:**
+  Scenario Outline with Examples
+
+**scenario_coverage:**
+  - Happy Path
+  - Edge Cases
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- One story is specified at a time
+- Acceptance criteria must be testable, unambiguous, and executable
+- Gherkin syntax or structured language (Given/When/Then) is preferred
+- Scenarios are written in plain English. When using Scenario Outline, variables are clearly marked and defined in Examples tables with actual test data.
+- Examples tables when used must include ALL variables used in scenario steps
+- Examples tables when used must have exact values for both input AND output variables
+- Every variable when used in scenario steps must have a corresponding column in Examples table
+- Examples tables when used must have actual test data, not placeholders
+- Output/expected result variables must be included in Examples tables when used
+- scnarios follow this pattern
+- bulk of business logic tests done against the domain layer objects directly
+- minimal happy path testing done with separate tgests that go theoiugh CLI
+- JS nodetest for panel test focus on rendering and button layout
+
+---
+## Next action: validate
+**Next:** Perform the following action. Fix any errors found in the Violation.
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Scenario Language Matches Domain | `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json` | `scanners.scenarios.scenario_language_scanner.ScenarioLanguageScanner` |
+| Example Tables Use Domain Language | `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json` | `scanners.scenarios.example_table_scanner.ExampleTableScanner` |
+| Given Describes State Not Actions | `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json` | `scanners.scenarios.given_state_not_actions_scanner.GivenStateNotActionsScanner` |
+| Background Vs Scenario Setup | `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json` | `scanners.scenarios.background_common_setup_scanner.BackgroundCommonSetupScanner` |
+| Scenarios Cover All Cases | `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json` | `scanners.scenarios.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner` |
+| Use Scenario Outline When Needed | `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json` | `scanners.scenarios.scenario_outline_scanner.ScenarioOutlineScanner` |
+| Write Concrete Scenarios | `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json` | `scanners.scenarios.parameterized_scenarios_scanner.ParameterizedScenariosScanner` |
+| Scenarios On Story Docs | `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json` | `scanners.scenarios.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner` |
+| Map Table Columns To Scenario Parameters | `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json` | `scanners.table_column_parameter_scanner.TableColumnParameterScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** all epics, sub-epics, stories, and domain concepts in the story graph
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Scenario Language Matches Domain (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json`
+**Description:** Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+**DO:** Use domain language in scenario steps - reference domain concepts by name.
+**DON'T:** Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+### Rule: Example Tables Use Domain Language (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json`
+**Description:** Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+**DO:** Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+**DON'T:** Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+### Rule: Given Describes State Not Actions (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json`
+**Description:** Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+**DO:** Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+**DON'T:** Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+### Rule: Background Vs Scenario Setup (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json`
+**Description:** Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+**DO:** Use Background for shared context with {Concept} references to example tables.
+**DON'T:** Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+### Rule: Scenarios Cover All Cases (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json`
+**Description:** Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+**DO:** Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+**DON'T:** Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+### Rule: Use Scenario Outline When Needed (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json`
+**Description:** Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+**DO:** Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+**DON'T:** Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+### Rule: Write Concrete Scenarios (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json`
+**Description:** Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+**DO:** Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+**DON'T:** Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+### Rule: Scenarios On Story Docs (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json`
+**Description:** Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+**DO:** Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+**DON'T:** Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+### Rule: Map Table Columns To Scenario Parameters (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json`
+**Description:** Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+**DO:** Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+**DON'T:** Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect all epics, sub-epics, stories, and domain concepts in the story graph for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+## Next action: render
+**Next:** Perform the following action.
+
+## Action Instructions - render
+
+The purpose of this action is to render output documents and artifacts from story graph using templates and synchronizers
+
+specification_scenarios: render story documents with scenarios
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+Please follow the instructions below in order to manually render output documents using templates
+
+All render configurations are automatically loaded and injected below. Process ALL configs - do not skip any.
+
+
+
+**Final Steps:**
+- Process ALL configs above - do not skip any
+- Priority order: synchronizer > template
+- Verify each output file exists after execution
+- If execution fails, report the error and continue with other outputs
+- After completing all renders, pause and wait for human confirmation before proceeding to next behavior
+
+**Creating New Render Outputs:**
+If you need to create code to render a new output format:
+1. Create a new synchronizer file in {workspace}/synchronizers/ (create folder if it doesn't exist)
+2. Follow this signature pattern: output_file = synchronizer.render(story_graph_file)
+3. The synchronizer should read the story-graph.json and produce the desired output file
+4. Add the new synchronizer to the behavior's render config to include it in future renders
+specification_scenarios: render story documents with scenarios
+IMPORTANT: After completing all template-based rendering, you MUST execute the synchronizer-based render specs by running: scenarios.render.renderAll
+This will render the following outputs: render_story_scenarios
+
+---
+## Next action: tests.build
+**Next:** Perform the following action.
+
+## Action Instructions - build
+
+The purpose of this action is to build story graph from content area and render using story graph renderer
+
+write test files (.py, .js, etc.) with executable test code based on the scenarios you have made within the story-graph.json file
+After writing test files, update story-graph.json with further test_file, test_class, and test_method mapping changes you have made
+| Field | Level | Format | Example |
+|-------|-------|--------|---------|
+| test_file | sub_epic | "test/<domain|CLI|panel>/test_<sub_epic>.py" | "test/domain/test_edit_story_graph.py" |
+| test_class | story | "Test<StoryName>" | "TestCreatesChildStoryNode" |
+| test_method | scenario | "test_<scenario_name>" | "test_user_creates_child_under_epic" |
+
+Hierarchy: epic → sub_epic(test_file) → story_group → story(test_class) → scenario(test_method)
+
+Rules:
+- One test_file per sub_epic (all stories share it)
+- One test_class per story (only if story has scenarios)
+- One test_method per scenario
+- Read story-graph.json first, preserve existing fields
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+@build-instructions.txt
+
+**BUILD PROCESS:**
+
+**1. Load Context**
+Load clarification.json, planning.json, and source material from context sources (listed above).
+
+**2. Load Build Configs**
+From `c:\dev\agile_bots\bots\story_bot/behaviors/tests/content/`, each folder contains:
+- `build_*.json` - Config (name, path, template, output)
+- `instructions.json` - Build instructions
+- `template-file.json` - Output schema/structure
+
+**3. Execute Build**
+1. Load config, instructions, and template (injected as 'story_graph_template')
+2. Check if output file exists - read it FIRST
+3. Follow instructions.json - match template structure exactly (check '_explanation' section)
+4. Apply context from Step 1
+5. If file exists: ADD/EXTEND only, never overwrite/delete
+6. Validate against template schema
+7. Write to `C:\dev\agile_bots/{config.path}/{config.output}`
+- Read existing files before changes - preserve all content
+- Match template structure exactly - don't invent schemas
+- Trace all knowledge to clarification/planning data
+- Process builds sequentially - validate each
+
+**4. SOURCE TRACEABILITY**
+Knowledge artifacts should include source references when available:
+- `context_source` field on epics, sub_epics, story_groups, stories, and domain concepts
+- Format: `{"file": "filename.pdf", "page": "12", "section": "3.2.1 Payment Flow"}`
+- For multiple sources: use array of source objects
+- If source is chat/conversation: `{"type": "chat", "description": "User clarification on approval workflow"}`
+- If source is code: `{"file": "path/to/file.py", "lines": "45-67", "function": "process_payment"}`
+- Prefer tracing knowledge to a source when possible
+- When source is unclear, mark as `{"type": "inferred", "basis": "description of inference basis"}`
+write test files (.py, .js, etc.) with executable test code based on the scenarios you have made within the story-graph.json file
+After writing test files, update story-graph.json with further test_file, test_class, and test_method mapping changes you have made
+| Field | Level | Format | Example |
+|-------|-------|--------|---------|
+| test_file | sub_epic | "test/<domain|CLI|panel>/test_<sub_epic>.py" | "test/domain/test_edit_story_graph.py" |
+| test_class | story | "Test<StoryName>" | "TestCreatesChildStoryNode" |
+| test_method | scenario | "test_<scenario_name>" | "test_user_creates_child_under_epic" |
+
+Hierarchy: epic → sub_epic(test_file) → story_group → story(test_class) → scenario(test_method)
+
+Rules:
+- One test_file per sub_epic (all stories share it)
+- One test_class per story (only if story has scenarios)
+- One test_method per scenario
+- Read story-graph.json first, preserve existing fields
+
+When building or adding to the story graph follow these rules,
+Rules to follow:
+
+- **use_class_based_organization**: CRITICAL STRUCTURAL RULE: Test structure matches story graph hierarchy. File = sub-epic (test_<sub_epic>.py), Class = story (Test<ExactStoryName>), Method = scenario (test_<scenario_snake_case>). Getting this wrong creates files in wrong locations requiring deletion/recreation. BEFORE writing any test code, identify the parent sub-epic that contains the story.
+  DO: Map story hierarchy to test structure exactly. CRITICAL: File name comes from SUB-EPIC, not story.
+  DON'T: Don't use generic/abbreviated names or wrong hierarchy level for file naming. Don't create files in wrong locations.
+
+- **use_domain_language**: Use Ubiquitous Language (DDD): Same vocabulary in domain model, stories, scenarios, AND code. Class names = domain entities/nouns. Method names = domain responsibilities/verbs. Test names read like plain English stories. Example: test_agent_loads_configuration_when_file_exists (not test_agt_init_sets_vars)
+  DO: Use domain language for classes, methods, and test names. Example: class GatherContextAction, def inject_guardrails(), test_agent_loads_config_when_file_exists
+  DON'T: Don't use generic technical terms or implementation-specific names. Example: class StdioHandler (wrong), def execute_with_guardrails (wrong), test_agt_init_sets_vars (wrong)
+
+- **consistent_vocabulary**: Use ONE word per concept across entire codebase. Pick consistent vocabulary: create (not build/make/construct), verify (not check/assert/validate), load (not fetch/get/retrieve). Use intention-revealing names that describe behavior. Example: create_agent(), verify_initialized(), load_config() - same verbs everywhere
+  DO: Use same word for same concept everywhere. Example: create_agent(), create_config(), create_workspace() - all use 'create'
+  DON'T: Don't mix synonyms for same concept. Example: create_agent() + build_config() + make_workspace() (wrong - pick one verb)
+
+- **domain_oriented_test_inheritance**: Scaling extension of helper_extraction_and_reuse, object_oriented_test_helpers, and standard_test_data_sets. At small scale, a single test class covering multiple domain objects is fine. As domain objects develop distinct behavior, break out into domain-specific test classes. Use abstract base classes for common operations. Share parameter data and fixtures only when there is obvious shared logic across sub-epics. Place shared base files at the appropriate hierarchy level.
+  DO: At small scale keep together. As you scale, use abstract bases, share fixtures only with explicit need, and place shared files at the right hierarchy level.
+  DON'T: When scaling, do not copy assertion logic, do not create shared files preemptively, and do not group tests by operation or technology.
+
+- **no_defensive_code_in_tests**: Tests must NEVER contain guard clauses, defensive conditionals, or fallback paths. We control test setup - if it's wrong, the test MUST fail immediately. Guard clauses hide problems. Tests should assume positive outcomes. Example: Just call the code directly, don't wrap in if-checks
+  DO: Assume correct setup - let test fail if wrong. Example: behavior = Behavior(name='shape') then assert behavior.name == 'shape'
+  DON'T: Don't add if-checks, type guards, or fallback handling in tests. Example: if behavior_file.exists(): (wrong - test should fail if it doesn't)
+
+- **production_code_clean_functions**: Production code functions should do ONE thing, be under 20 lines, and have one level of abstraction. No hidden side effects. Name reveals complete behavior. Extract multiple concerns into separate functions. Example: load_config(), validate_config(), apply_config() - each does one thing
+  DO: Single responsibility, small focused functions. Example: initialize_from_config() calls validate_exists(), load_config(), validate_structure(), apply_config()
+  DON'T: Don't make functions that do multiple unrelated things or are too long. Example: 50-line function that loads, validates, and applies config
+
+- **bug_fix_test_first**: When production code breaks, follow test-first workflow: write failing test, verify failure, fix code, verify success. Never fix bugs without a failing test first. Example: test_mcp_tool_initializes_bot() fails -> fix initialization -> test passes
+  DO: Follow RED-GREEN-PRODUCTION workflow. Example: Write test reproducing bug -> Run test (RED) -> Fix minimal code -> Run test (GREEN) -> Run full suite
+  DON'T: Don't fix bugs directly without failing test first. Example: Editing production code without test -> deploying -> hoping it works (wrong)
+
+- **call_production_code_directly**: Call production code directly in tests. Let tests fail naturally if code doesn't exist. Don't comment out calls, mock business logic, or fake state. Only mock external boundaries. Example: agent = Agent(); agent.initialize() (not agent = Mock())
+  DO: Call production code directly, let it fail naturally. Example: agent = Agent(workspace); agent.initialize(config); assert agent.is_initialized
+  DON'T: Don't mock class under test, comment out calls, or fake state. Example: agent = Mock(spec=Agent) (wrong); agent._initialized = True (wrong)
+
+- **cover_all_behavior_paths**: Cover all behavior paths: normal (happy path), edge cases, and failure scenarios. Each distinct behavior needs its own focused test. Tests must be independent. Example: test_loads_valid_config(), test_loads_empty_config(), test_raises_error_when_file_missing()
+  DO: Test normal, edge, and failure paths separately. Example: test_loads_valid_config() (happy), test_loads_empty_config() (edge), test_raises_when_missing() (failure)
+  DON'T: Don't test only happy path or combine multiple behaviors in one test. Example: Single test for both success and failure (wrong)
+
+- **mock_only_boundaries**: Mock ONLY at architectural boundaries: external APIs, network, uncontrollable services. Don't mock internal business logic, classes under test, or file operations (use temp files). Example: patch('requests.get') (OK); patch('agent.validate') (wrong)
+  DO: Mock only external dependencies you can't control. Example: with patch('requests.get') as mock: (external API - OK to mock)
+  DON'T: Don't mock internal logic, class under test, or file I/O. Example: with patch('agent.validate_config') (wrong - test the logic!)
+
+- **create_parameterized_tests_for_scenarios**: If scenarios have Examples tables, create parameterized tests using @pytest.mark.parametrize. Each row becomes a test case. Don't write single tests that only test one example. Example: @pytest.mark.parametrize('input,expected', [(1, 2), (3, 4)])
+  DO: Create parameterized tests from Examples tables. Example: @pytest.mark.parametrize('paths,count', [(['p1','p2'], 2), (['p3'], 1)])
+  DON'T: Don't hardcode single example or duplicate test methods. Example: def test_with_value_1(): (wrong); def test_with_value_2(): (wrong - use parametrize)
+
+- **define_fixtures_in_test_file**: Define fixtures in the test file, not separate conftest.py. Truly reusable fixtures (file ops, location helpers) go in base conftest.py. Example: @pytest.fixture def workspace_root(tmp_path): return tmp_path / 'workspace'
+  DO: Define fixtures in same test file. Example: @pytest.fixture def config_file(tmp_path): ... (in test_agent.py)
+  DON'T: Don't create separate conftest.py for agent-specific fixtures. Don't create shared files without explicit need.
+
+- **design_api_through_failing_tests**: Write tests against the REAL expected API BEFORE implementing code. Tests MUST fail initially. Set up real test data and call real API. Failure reveals complete API design. Example: project = Project(path=path); project.initialize() (doesn't exist yet -> fails -> drives implementation)
+  DO: Write test against real expected API that fails initially. Example: project = Project(path); project.initialize(); assert project.is_ready (fails until implemented)
+  DON'T: Don't use placeholders, dummy values, or skip the failing step. Example: project = 'TODO' (wrong); assuming test passes first (wrong)
+
+- **test_observable_behavior**: Test observable behavior, not implementation details. Verify public API and visible state changes. Don't assert on private methods or internal flags. Example: assert agent.config_path.exists() (observable); not assert agent._internal_flag (private)
+  DO: Test observable outcomes through public API. Example: assert agent.config_path == expected; assert agent.is_initialized (public properties)
+  DON'T: Don't test private state or implementation details. Example: assert agent._initialized (wrong); assert agent._config_cache (wrong)
+
+- **helper_extraction_and_reuse**: Extract duplicate test setup to reusable helper functions. Keep test bodies focused on specific behavior. Example: create_agent_with_config(), create_config_file(), verify_agent_initialized() - reusable across tests
+  DO: Extract duplicate setup to reusable helpers. Example: create_agent_with_config(name, workspace, config) returns initialized Agent
+  DON'T: Don't duplicate setup code across tests. Example: Same 10 lines of setup in every test method (wrong - extract to helper)
+
+- **match_specification_scenarios**: Tests must match specification scenarios exactly. Test names, steps, and assertions verify exactly what the scenario states. Use exact variable names and terminology from specification. Example: agent_name='story_bot' (from spec), not name='bot'
+  DO: Test matches specification exactly. Example: GIVEN config exists, WHEN Agent(agent_name='story_bot'), THEN config_path == agents/base/agent.json
+  DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
+
+- **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bot.bots... import X
+  DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
+
+- **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
+  DO: Use shared helper objects to create full test fixtures and assert against complete domain objects, not fragments.
+  DON'T: Do not spread test setup across many primitive parameters or cherry-pick single values from partial objects.
+
+- **production_code_explicit_dependencies**: Production code: make dependencies explicit through constructor injection. Pass all external dependencies as constructor parameters. No hidden global state. Tests easily inject test doubles. Example: Agent(config_loader=loader, domain_graph=graph)
+  DO: Inject all dependencies through constructor. Example: def __init__(self, config_loader, domain_graph): self._loader = config_loader
+  DON'T: Don't access globals, singletons, or create dependencies internally. Example: self._loader = ConfigLoader() (wrong - creates internally)
+
+- **self_documenting_tests**: Tests are self-documenting through code structure. Don't add verbose comments explaining failures. Imports, calls, and assertions show the API design. Let code speak for itself. Example: generator = MCPServerGenerator(bot_name, config_path); server = generator.generate_server()
+  DO: Let code structure document the test. Example: generator = MCPServerGenerator(name, config); file = generator.generate() - API is clear
+  DON'T: Don't add verbose comments explaining obvious things. Example: # This will fail because API doesn't exist yet (unnecessary)
+
+- **standard_test_data_sets**: Use standard, named test data sets across tests instead of recreating ad-hoc values. Example: STANDARD_STATE = {...}; helper.set_state(...); assert helper.get_state() == STANDARD_STATE.
+  DO: Define canonical data once (helper constants/factories) and reuse it so every test exercises the full domain object.
+  DON'T: Do not create new ad-hoc values per test or assert only one field from a complex object.
+
+- **assert_full_results**: Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.
+  DO: Compare entire objects/dicts/dataclasses against standard data fixtures.
+  DON'T: Do not assert single fields or lengths when validating complex results.
+
+- **use_ascii_only**: All test code must use ASCII-only characters. No Unicode symbols, emojis, or special characters. Use plain ASCII alternatives. Example: print('[PASS] Success') not print('[checkmark] Success')
+  DO: Use ASCII-only characters. Example: print('[PASS] Agent initialized'); print('[ERROR] Config not found')
+  DON'T: Don't use Unicode or emojis. Example: print('[checkmark] Done') (wrong); print('[green_check] OK') (wrong)
+
+- **pytest_bdd_orchestrator_pattern**: Use pytest with orchestrator pattern for story-based tests. NO FEATURE FILES. Test classes contain orchestrator methods (under 20 lines) showing Given-When-Then flow by calling helper functions. Example: def test_agent_loads_config(): given_config_exists(); agent = when_agent_initialized(); then_agent_is_configured(agent)
+  DO: Orchestrator pattern: test shows flow, delegates to helpers. Example: # Given; create_config_file(); # When; agent.initialize(); # Then; assert agent.is_initialized
+  DON'T: Don't use feature files or inline complex setup. Example: @given('config exists') def step(): ... (wrong - use pytest directly)
+
+- **use_exact_variable_names**: Use exact variable names from specification scenarios. When spec mentions agent_name, workspace_root, config_path - use those exact names in tests and production code. Example: agent_name = 'story_bot' (from spec), not name = 'story_bot'
+  DO: Use exact names from specification in tests and production. Example: agent_name, workspace_root, config_path - all from spec
+  DON'T: Don't use different names than specification. Example: name = 'bot' when spec says agent_name (wrong)
+
+- **use_given_when_then_helpers**: Use reusable helper functions instead of inline code blocks of 4+ lines. Optimize for reusability, not exact step names. Place helpers at correct scope: story-level in class, sub-epic in module, epic in separate file. Example: given_config_exists(), when_agent_initialized(), then_agent_is_configured()
+  DO: Use Given/When/Then helper functions for setup, action, assertion. Example: given_bot_config_exists(); bot = when_bot_instantiated(); then_bot_uses_correct_directories(bot)
+  DON'T: Don't use inline operations of 4+ lines. Example: config_dir = ...; config_dir.mkdir(); config_file = ...; config_file.write_text() (wrong - extract to helper)
+
+---
+## Next action: tests.validate
+**Next:** Perform the following action. Fix any errors found in the Violation.
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_tests: validate test code and domain language usage
+Validate that test code uses proper domain terminology (class names = domain entities, method names = domain responsibilities)
+Validate that all test files, classes, and methods are properly mapped to story-graph.json
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Use Class Based Organization | `story_bot/behaviors/tests/rules/use_class_based_organization.json` | `scanners.code.python.class_based_organization_scanner.ClassBasedOrganizationScanner` |
+| Use Domain Language | `story_bot/behaviors/tests/rules/use_domain_language.json` | `scanners.code.python.domain_language_code_scanner.DomainLanguageCodeScanner` |
+| Consistent Vocabulary | `story_bot/behaviors/tests/rules/consistent_vocabulary.json` | `scanners.code.python.consistent_vocabulary_scanner.ConsistentVocabularyScanner` |
+| Domain Oriented Test Inheritance | `story_bot/behaviors/tests/rules/domain_oriented_test_inheritance.json` | `scanners.code.python.duplicate_assertion_scanner.DuplicateAssertionScanner` |
+| No Defensive Code In Tests | `story_bot/behaviors/tests/rules/no_defensive_code_in_tests.json` | `scanners.code.python.excessive_guards_scanner.ExcessiveGuardsScanner` |
+| Production Code Clean Functions | `story_bot/behaviors/tests/rules/production_code_clean_functions.json` | `scanners.code.python.function_size_scanner.FunctionSizeScanner` |
+| Bug Fix Test First | `story_bot/behaviors/tests/rules/bug_fix_test_first.json` | `scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner` |
+| Call Production Code Directly | `story_bot/behaviors/tests/rules/call_production_code_directly.json` | `scanners.code.python.real_implementations_scanner.RealImplementationsScanner` |
+| Cover All Behavior Paths | `story_bot/behaviors/tests/rules/cover_all_behavior_paths.json` | `scanners.code.python.cover_all_paths_scanner.CoverAllPathsScanner` |
+| Mock Only Boundaries | `story_bot/behaviors/tests/rules/mock_only_boundaries.json` | `scanners.code.python.mock_boundaries_scanner.MockBoundariesScanner` |
+| Create Parameterized Tests For Scenarios | `story_bot/behaviors/tests/rules/create_parameterized_tests_for_scenarios.json` | `scanners.parameterized_tests_scanner.ParameterizedTestsScanner` |
+| Define Fixtures In Test File | `story_bot/behaviors/tests/rules/define_fixtures_in_test_file.json` | `scanners.code.python.fixture_placement_scanner.FixturePlacementScanner` |
+| Design Api Through Failing Tests | `story_bot/behaviors/tests/rules/design_api_through_failing_tests.json` | `scanners.failing_test_api_scanner.FailingTestApiScanner` |
+| Test Observable Behavior | `story_bot/behaviors/tests/rules/test_observable_behavior.json` | `scanners.code.python.observable_behavior_scanner.ObservableBehaviorScanner` |
+| Helper Extraction And Reuse | `story_bot/behaviors/tests/rules/helper_extraction_and_reuse.json` | `scanners.helper_extraction_scanner.HelperExtractionScanner` |
+| Match Specification Scenarios | `story_bot/behaviors/tests/rules/match_specification_scenarios.json` | `scanners.specification_match_scanner.SpecificationMatchScanner` |
+| Place Imports At Top | `story_bot/behaviors/tests/rules/place_imports_at_top.json` | `scanners.code.python.import_placement_scanner.ImportPlacementScanner` |
+| Object Oriented Test Helpers | `story_bot/behaviors/tests/rules/object_oriented_test_helpers.json` | `scanners.code.python.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner` |
+| Production Code Explicit Dependencies | `story_bot/behaviors/tests/rules/production_code_explicit_dependencies.json` | `scanners.code.python.explicit_dependencies_scanner.ExplicitDependenciesScanner` |
+| Self Documenting Tests | `story_bot/behaviors/tests/rules/self_documenting_tests.json` | `scanners.code.python.intention_revealing_names_scanner.IntentionRevealingNamesScanner` |
+| Standard Test Data Sets | `story_bot/behaviors/tests/rules/standard_test_data_sets.json` | `scanners.code.python.standard_data_reuse_scanner.StandardDataReuseScanner` |
+| Assert Full Results | `story_bot/behaviors/tests/rules/assert_full_results.json` | `scanners.code.python.full_result_assertions_scanner.FullResultAssertionsScanner` |
+| Use Ascii Only | `story_bot/behaviors/tests/rules/use_ascii_only.json` | `scanners.code.python.ascii_only_scanner.AsciiOnlyScanner` |
+| Pytest Bdd Orchestrator Pattern | `story_bot/behaviors/tests/rules/pytest_bdd_orchestrator_pattern.json` | `scanners.orchestrator_pattern_scanner.OrchestratorPatternScanner` |
+| Use Exact Variable Names | `story_bot/behaviors/tests/rules/use_exact_variable_names.json` | `scanners.code.python.exact_variable_names_scanner.ExactVariableNamesScanner` |
+| Use Given When Then Helpers | `story_bot/behaviors/tests/rules/use_given_when_then_helpers.json` | `scanners.code.python.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** all epics, sub-epics, stories, and domain concepts in the story graph
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Use Class Based Organization (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_class_based_organization.json`
+**Description:** CRITICAL STRUCTURAL RULE: Test structure matches story graph hierarchy. File = sub-epic (test_<sub_epic>.py), Class = story (Test<ExactStoryName>), Method = scenario (test_<scenario_snake_case>). Getting this wrong creates files in wrong locations requiring deletion/recreation. BEFORE writing any test code, identify the parent sub-epic that contains the story.
+**DO:** Map story hierarchy to test structure exactly. CRITICAL: File name comes from SUB-EPIC, not story.
+**DON'T:** Don't use generic/abbreviated names or wrong hierarchy level for file naming. Don't create files in wrong locations.
+
+### Rule: Use Domain Language (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_domain_language.json`
+**Description:** Use Ubiquitous Language (DDD): Same vocabulary in domain model, stories, scenarios, AND code. Class names = domain entities/nouns. Method names = domain responsibilities/verbs. Test names read like plain English stories. Example: test_agent_loads_configuration_when_file_exists (not test_agt_init_sets_vars)
+**DO:** Use domain language for classes, methods, and test names. Example: class GatherContextAction, def inject_guardrails(), test_agent_loads_config_when_file_exists
+**DON'T:** Don't use generic technical terms or implementation-specific names. Example: class StdioHandler (wrong), def execute_with_guardrails (wrong), test_agt_init_sets_vars (wrong)
+
+### Rule: Consistent Vocabulary (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/consistent_vocabulary.json`
+**Description:** Use ONE word per concept across entire codebase. Pick consistent vocabulary: create (not build/make/construct), verify (not check/assert/validate), load (not fetch/get/retrieve). Use intention-revealing names that describe behavior. Example: create_agent(), verify_initialized(), load_config() - same verbs everywhere
+**DO:** Use same word for same concept everywhere. Example: create_agent(), create_config(), create_workspace() - all use 'create'
+**DON'T:** Don't mix synonyms for same concept. Example: create_agent() + build_config() + make_workspace() (wrong - pick one verb)
+
+### Rule: Domain Oriented Test Inheritance (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/domain_oriented_test_inheritance.json`
+**Description:** Scaling extension of helper_extraction_and_reuse, object_oriented_test_helpers, and standard_test_data_sets. At small scale, a single test class covering multiple domain objects is fine. As domain objects develop distinct behavior, break out into domain-specific test classes. Use abstract base classes for common operations. Share parameter data and fixtures only when there is obvious shared logic across sub-epics. Place shared base files at the appropriate hierarchy level.
+**DO:** At small scale keep together. As you scale, use abstract bases, share fixtures only with explicit need, and place shared files at the right hierarchy level.
+**DON'T:** When scaling, do not copy assertion logic, do not create shared files preemptively, and do not group tests by operation or technology.
+
+### Rule: No Defensive Code In Tests (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/no_defensive_code_in_tests.json`
+**Description:** Tests must NEVER contain guard clauses, defensive conditionals, or fallback paths. We control test setup - if it's wrong, the test MUST fail immediately. Guard clauses hide problems. Tests should assume positive outcomes. Example: Just call the code directly, don't wrap in if-checks
+**DO:** Assume correct setup - let test fail if wrong. Example: behavior = Behavior(name='shape') then assert behavior.name == 'shape'
+**DON'T:** Don't add if-checks, type guards, or fallback handling in tests. Example: if behavior_file.exists(): (wrong - test should fail if it doesn't)
+
+### Rule: Production Code Clean Functions (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/production_code_clean_functions.json`
+**Description:** Production code functions should do ONE thing, be under 20 lines, and have one level of abstraction. No hidden side effects. Name reveals complete behavior. Extract multiple concerns into separate functions. Example: load_config(), validate_config(), apply_config() - each does one thing
+**DO:** Single responsibility, small focused functions. Example: initialize_from_config() calls validate_exists(), load_config(), validate_structure(), apply_config()
+**DON'T:** Don't make functions that do multiple unrelated things or are too long. Example: 50-line function that loads, validates, and applies config
+
+### Rule: Bug Fix Test First (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/bug_fix_test_first.json`
+**Description:** When production code breaks, follow test-first workflow: write failing test, verify failure, fix code, verify success. Never fix bugs without a failing test first. Example: test_mcp_tool_initializes_bot() fails -> fix initialization -> test passes
+**DO:** Follow RED-GREEN-PRODUCTION workflow. Example: Write test reproducing bug -> Run test (RED) -> Fix minimal code -> Run test (GREEN) -> Run full suite
+**DON'T:** Don't fix bugs directly without failing test first. Example: Editing production code without test -> deploying -> hoping it works (wrong)
+
+### Rule: Call Production Code Directly (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/call_production_code_directly.json`
+**Description:** Call production code directly in tests. Let tests fail naturally if code doesn't exist. Don't comment out calls, mock business logic, or fake state. Only mock external boundaries. Example: agent = Agent(); agent.initialize() (not agent = Mock())
+**DO:** Call production code directly, let it fail naturally. Example: agent = Agent(workspace); agent.initialize(config); assert agent.is_initialized
+**DON'T:** Don't mock class under test, comment out calls, or fake state. Example: agent = Mock(spec=Agent) (wrong); agent._initialized = True (wrong)
+
+### Rule: Cover All Behavior Paths (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/cover_all_behavior_paths.json`
+**Description:** Cover all behavior paths: normal (happy path), edge cases, and failure scenarios. Each distinct behavior needs its own focused test. Tests must be independent. Example: test_loads_valid_config(), test_loads_empty_config(), test_raises_error_when_file_missing()
+**DO:** Test normal, edge, and failure paths separately. Example: test_loads_valid_config() (happy), test_loads_empty_config() (edge), test_raises_when_missing() (failure)
+**DON'T:** Don't test only happy path or combine multiple behaviors in one test. Example: Single test for both success and failure (wrong)
+
+### Rule: Mock Only Boundaries (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/mock_only_boundaries.json`
+**Description:** Mock ONLY at architectural boundaries: external APIs, network, uncontrollable services. Don't mock internal business logic, classes under test, or file operations (use temp files). Example: patch('requests.get') (OK); patch('agent.validate') (wrong)
+**DO:** Mock only external dependencies you can't control. Example: with patch('requests.get') as mock: (external API - OK to mock)
+**DON'T:** Don't mock internal logic, class under test, or file I/O. Example: with patch('agent.validate_config') (wrong - test the logic!)
+
+### Rule: Create Parameterized Tests For Scenarios (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/create_parameterized_tests_for_scenarios.json`
+**Description:** If scenarios have Examples tables, create parameterized tests using @pytest.mark.parametrize. Each row becomes a test case. Don't write single tests that only test one example. Example: @pytest.mark.parametrize('input,expected', [(1, 2), (3, 4)])
+**DO:** Create parameterized tests from Examples tables. Example: @pytest.mark.parametrize('paths,count', [(['p1','p2'], 2), (['p3'], 1)])
+**DON'T:** Don't hardcode single example or duplicate test methods. Example: def test_with_value_1(): (wrong); def test_with_value_2(): (wrong - use parametrize)
+
+### Rule: Define Fixtures In Test File (Priority 10) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/define_fixtures_in_test_file.json`
+**Description:** Define fixtures in the test file, not separate conftest.py. Truly reusable fixtures (file ops, location helpers) go in base conftest.py. Example: @pytest.fixture def workspace_root(tmp_path): return tmp_path / 'workspace'
+**DO:** Define fixtures in same test file. Example: @pytest.fixture def config_file(tmp_path): ... (in test_agent.py)
+**DON'T:** Don't create separate conftest.py for agent-specific fixtures. Don't create shared files without explicit need.
+
+### Rule: Design Api Through Failing Tests (Priority 11) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/design_api_through_failing_tests.json`
+**Description:** Write tests against the REAL expected API BEFORE implementing code. Tests MUST fail initially. Set up real test data and call real API. Failure reveals complete API design. Example: project = Project(path=path); project.initialize() (doesn't exist yet -> fails -> drives implementation)
+**DO:** Write test against real expected API that fails initially. Example: project = Project(path); project.initialize(); assert project.is_ready (fails until implemented)
+**DON'T:** Don't use placeholders, dummy values, or skip the failing step. Example: project = 'TODO' (wrong); assuming test passes first (wrong)
+
+### Rule: Test Observable Behavior (Priority 12) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/test_observable_behavior.json`
+**Description:** Test observable behavior, not implementation details. Verify public API and visible state changes. Don't assert on private methods or internal flags. Example: assert agent.config_path.exists() (observable); not assert agent._internal_flag (private)
+**DO:** Test observable outcomes through public API. Example: assert agent.config_path == expected; assert agent.is_initialized (public properties)
+**DON'T:** Don't test private state or implementation details. Example: assert agent._initialized (wrong); assert agent._config_cache (wrong)
+
+### Rule: Helper Extraction And Reuse (Priority 13) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/helper_extraction_and_reuse.json`
+**Description:** Extract duplicate test setup to reusable helper functions. Keep test bodies focused on specific behavior. Example: create_agent_with_config(), create_config_file(), verify_agent_initialized() - reusable across tests
+**DO:** Extract duplicate setup to reusable helpers. Example: create_agent_with_config(name, workspace, config) returns initialized Agent
+**DON'T:** Don't duplicate setup code across tests. Example: Same 10 lines of setup in every test method (wrong - extract to helper)
+
+### Rule: Match Specification Scenarios (Priority 14) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/match_specification_scenarios.json`
+**Description:** Tests must match specification scenarios exactly. Test names, steps, and assertions verify exactly what the scenario states. Use exact variable names and terminology from specification. Example: agent_name='story_bot' (from spec), not name='bot'
+**DO:** Test matches specification exactly. Example: GIVEN config exists, WHEN Agent(agent_name='story_bot'), THEN config_path == agents/base/agent.json
+**DON'T:** Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
+
+### Rule: Place Imports At Top (Priority 15) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/place_imports_at_top.json`
+**Description:** Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
+**DO:** All imports at top, grouped by type. Example: import json; import pytest; from agile_bot.bots... import X
+**DON'T:** Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
+
+### Rule: Object Oriented Test Helpers (Priority 16) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/object_oriented_test_helpers.json`
+**Description:** Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
+**DO:** Use shared helper objects to create full test fixtures and assert against complete domain objects, not fragments.
+**DON'T:** Do not spread test setup across many primitive parameters or cherry-pick single values from partial objects.
+
+### Rule: Production Code Explicit Dependencies (Priority 16) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/production_code_explicit_dependencies.json`
+**Description:** Production code: make dependencies explicit through constructor injection. Pass all external dependencies as constructor parameters. No hidden global state. Tests easily inject test doubles. Example: Agent(config_loader=loader, domain_graph=graph)
+**DO:** Inject all dependencies through constructor. Example: def __init__(self, config_loader, domain_graph): self._loader = config_loader
+**DON'T:** Don't access globals, singletons, or create dependencies internally. Example: self._loader = ConfigLoader() (wrong - creates internally)
+
+### Rule: Self Documenting Tests (Priority 17) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/self_documenting_tests.json`
+**Description:** Tests are self-documenting through code structure. Don't add verbose comments explaining failures. Imports, calls, and assertions show the API design. Let code speak for itself. Example: generator = MCPServerGenerator(bot_name, config_path); server = generator.generate_server()
+**DO:** Let code structure document the test. Example: generator = MCPServerGenerator(name, config); file = generator.generate() - API is clear
+**DON'T:** Don't add verbose comments explaining obvious things. Example: # This will fail because API doesn't exist yet (unnecessary)
+
+### Rule: Standard Test Data Sets (Priority 17) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/standard_test_data_sets.json`
+**Description:** Use standard, named test data sets across tests instead of recreating ad-hoc values. Example: STANDARD_STATE = {...}; helper.set_state(...); assert helper.get_state() == STANDARD_STATE.
+**DO:** Define canonical data once (helper constants/factories) and reuse it so every test exercises the full domain object.
+**DON'T:** Do not create new ad-hoc values per test or assert only one field from a complex object.
+
+### Rule: Assert Full Results (Priority 18) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/assert_full_results.json`
+**Description:** Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.
+**DO:** Compare entire objects/dicts/dataclasses against standard data fixtures.
+**DON'T:** Do not assert single fields or lengths when validating complex results.
+
+### Rule: Use Ascii Only (Priority 18) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_ascii_only.json`
+**Description:** All test code must use ASCII-only characters. No Unicode symbols, emojis, or special characters. Use plain ASCII alternatives. Example: print('[PASS] Success') not print('[checkmark] Success')
+**DO:** Use ASCII-only characters. Example: print('[PASS] Agent initialized'); print('[ERROR] Config not found')
+**DON'T:** Don't use Unicode or emojis. Example: print('[checkmark] Done') (wrong); print('[green_check] OK') (wrong)
+
+### Rule: Pytest Bdd Orchestrator Pattern (Priority 19) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/pytest_bdd_orchestrator_pattern.json`
+**Description:** Use pytest with orchestrator pattern for story-based tests. NO FEATURE FILES. Test classes contain orchestrator methods (under 20 lines) showing Given-When-Then flow by calling helper functions. Example: def test_agent_loads_config(): given_config_exists(); agent = when_agent_initialized(); then_agent_is_configured(agent)
+**DO:** Orchestrator pattern: test shows flow, delegates to helpers. Example: # Given; create_config_file(); # When; agent.initialize(); # Then; assert agent.is_initialized
+**DON'T:** Don't use feature files or inline complex setup. Example: @given('config exists') def step(): ... (wrong - use pytest directly)
+
+### Rule: Use Exact Variable Names (Priority 21) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_exact_variable_names.json`
+**Description:** Use exact variable names from specification scenarios. When spec mentions agent_name, workspace_root, config_path - use those exact names in tests and production code. Example: agent_name = 'story_bot' (from spec), not name = 'story_bot'
+**DO:** Use exact names from specification in tests and production. Example: agent_name, workspace_root, config_path - all from spec
+**DON'T:** Don't use different names than specification. Example: name = 'bot' when spec says agent_name (wrong)
+
+### Rule: Use Given When Then Helpers (Priority 22) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_given_when_then_helpers.json`
+**Description:** Use reusable helper functions instead of inline code blocks of 4+ lines. Optimize for reusability, not exact step names. Place helpers at correct scope: story-level in class, sub-epic in module, epic in separate file. Example: given_config_exists(), when_agent_initialized(), then_agent_is_configured()
+**DO:** Use Given/When/Then helper functions for setup, action, assertion. Example: given_bot_config_exists(); bot = when_bot_instantiated(); then_bot_uses_correct_directories(bot)
+**DON'T:** Don't use inline operations of 4+ lines. Example: config_dir = ...; config_dir.mkdir(); config_file = ...; config_file.write_text() (wrong - extract to helper)
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect all epics, sub-epics, stories, and domain concepts in the story graph for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_tests: validate test code and domain language usage
+Validate that test code uses proper domain terminology (class names = domain entities, method names = domain responsibilities)
+Validate that all test files, classes, and methods are properly mapped to story-graph.json**Combined instructions:** The following combines multiple actions. Perform them one after another.
+
+## Scope
+
+**Story Scope:** "Render Diagram In Workspace"
+
+Please only work on the following scope.
+
+Scope Filter: ""Render Diagram In Workspace""
+
+Scope:
+
+{
+  "path": "C:\\dev\\agile_bots\\docs\\story\\story-graph.json",
+  "has_epics": true,
+  "has_increments": true,
+  "has_domain_concepts": true,
+  "epic_count": 1,
+  "content": {
+    "epics": [
+      {
+        "name": "Invoke Bot",
+        "sub_epics": [
+          {
+            "name": "Perform Action",
+            "sub_epics": [
+              {
+                "name": "Render Content",
+                "sub_epics": [],
+                "story_groups": [
+                  {
+                    "name": null,
+                    "stories": [
+                      {
+                        "name": "Render Diagram In Workspace",
+                        "acceptance_criteria": [
+                          {
+                            "name": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                            "text": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                            "sequential_order": 0.0
+                          },
+                          {
+                            "name": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                            "text": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                            "sequential_order": 1.0
+                          }
+                        ],
+                        "scenarios": [
+                          {
+                            "name": "Workspace displays {DrawIOElement} diagram for scope",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {Behavior} \"shape\" is selected",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "And scope has diagram output",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "When workspace section renders",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "Then {DrawIOElement} diagram links are displayed",
+                                "sequential_order": 4.0
+                              },
+                              {
+                                "text": "And User can open diagram in editor",
+                                "sequential_order": 5.0
+                              }
+                            ],
+                            "examples": null
+                          },
+                          {
+                            "name": "Large diagram has scroll or zoom",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {DrawIOElement} diagram exceeds viewport",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "When User views diagram in workspace",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "Then Panel provides scroll or zoom",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "And Diagram remains readable",
+                                "sequential_order": 4.0
+                              }
+                            ],
+                            "examples": null
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "domain_concepts": [
+                  {
+                    "name": "RenderOutputAction",
+                    "responsibilities": [
+                      {
+                        "name": "Inject render output instructions",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Render Spec",
+                          "Renderer"
+                        ]
+                      },
+                      {
+                        "name": "Inject templates",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Render Spec",
+                          "Template"
+                        ]
+                      },
+                      {
+                        "name": "Inject transformers",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Transformer"
+                        ]
+                      },
+                      {
+                        "name": "Load + inject structured content",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Knowledge Graph"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "TTYRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to TTY",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "TTY String"
+                        ]
+                      },
+                      {
+                        "name": "Format render status",
+                        "collaborators": [
+                          "Render Spec",
+                          "TTY String"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "TTYProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "JSONRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to JSON",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "JSON String"
+                        ]
+                      },
+                      {
+                        "name": "Include render spec",
+                        "collaborators": [
+                          "Render Spec",
+                          "Templates",
+                          "JSON"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "JSONProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "MarkdownRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to Markdown",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "Markdown String"
+                        ]
+                      },
+                      {
+                        "name": "Format render documentation",
+                        "collaborators": [
+                          "Render Spec",
+                          "Templates",
+                          "Markdown"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "MarkdownProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Renderer",
+                    "responsibilities": [
+                      {
+                        "name": "Render complex output",
+                        "collaborators": [
+                          "Template",
+                          "Knowledge Graph",
+                          "Transformer"
+                        ]
+                      },
+                      {
+                        "name": "Render outputs using components in context",
+                        "collaborators": [
+                          "AI Chat",
+                          "Template",
+                          "Content"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Template",
+                    "responsibilities": [
+                      {
+                        "name": "Define output structure",
+                        "collaborators": [
+                          "Placeholder"
+                        ]
+                      },
+                      {
+                        "name": "Transform content",
+                        "collaborators": [
+                          "Transformer",
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Load template",
+                        "collaborators": [
+                          "Behavior",
+                          "Content"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Content",
+                    "responsibilities": [
+                      {
+                        "name": "Render outputs",
+                        "collaborators": [
+                          "Template",
+                          "Renderer",
+                          "Render Spec"
+                        ]
+                      },
+                      {
+                        "name": "Synchronize formats",
+                        "collaborators": [
+                          "Synchronizer",
+                          "Extractor",
+                          "Synchronizer Spec"
+                        ]
+                      },
+                      {
+                        "name": "Save knowledge graph",
+                        "collaborators": [
+                          "Knowledge Graph"
+                        ]
+                      },
+                      {
+                        "name": "Load rendered content",
+                        "collaborators": [
+                          "na"
+                        ]
+                      },
+                      {
+                        "name": "Present rendered content",
+                        "collaborators": [
+                          "na"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "RenderInstructionsSection",
+                    "responsibilities": [
+                      {
+                        "name": "Wraps render subsection",
+                        "collaborators": [
+                          "RenderDataSubSection"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "InstructionsSection",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "RenderDataSubSection",
+                    "responsibilities": [
+                      {
+                        "name": "Wraps render JSON",
+                        "collaborators": [
+                          "Render JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays render spec",
+                        "collaborators": [
+                          "Object",
+                          "RenderSpec JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays templates",
+                        "collaborators": [
+                          "List",
+                          "Template JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays render instructions",
+                        "collaborators": [
+                          "String",
+                          "RenderInstructions JSON"
+                        ]
+                      },
+                      {
+                        "name": "Opens template file",
+                        "collaborators": [
+                          "CLI",
+                          "Path JSON"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "SubSectionView",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  }
+                ]
+              }
+            ],
+            "story_groups": []
+          }
+        ],
+        "domain_concepts": []
+      }
+    ],
+    "increments": []
+  }
+}
+
+---
+
+# Behavior: scenarios
+
+## Behavior Instructions - scenarios
+
+The purpose of this behavior is to write detailed plain-english scenarios (given/when/then) that specify exact behavior for each story
+
+Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story
+
+## Action Instructions - build
+
+The purpose of this action is to build story graph from content area and render using story graph renderer
+
+Follow agile_bot/bots/story_bot/behaviors/scenarios/content/story_graph/instructions.json
+specification_scenarios: build scenarios using domain language
+Use proper domain terminology in scenario steps - refer to domain concepts and entities
+Add/update scenarios and scenario_outlines ONLY in main epics section (single source of truth), NOT in increments section
+
+**STORY GRAPH UPDATE STRATEGY (use when story-graph.json already exists):**
+
+When updating an existing story graph, do NOT read and rewrite the entire story-graph.json manually.
+Choose one of these approaches in order of preference:
+
+1. **API approach (preferred for targeted changes):**
+   Use the StoryMap node API via CLI dot-notation to make surgical changes.
+   - Navigate: story_map.filter_by_name name:"Story Name" to read only the relevant subtree
+   - Create:  story_map."Epic"."SubEpic"."Story".create_scenario name:"Scenario Name"
+   - Create:  story_map."Epic"."SubEpic"."Story".create_acceptance_criteria name:"WHEN condition THEN outcome"
+   - Rename:  story_map."Epic"."SubEpic"."Story".rename name:"New Name"
+   - Move:    story_map."Epic"."SubEpic"."Story".move_to target:"Other SubEpic"
+   - Reorder: story_map."Epic"."SubEpic"."Story".move_to at_position:2
+   - Delete:  story_map."Epic"."SubEpic"."Story"."Old Scenario".delete
+   Each call auto-saves the full graph safely through in-memory tree serialization.
+
+2. **Bulk approach (for sweeping changes across many stories):**
+   Build a temporary StoryMap with just your changes using the same create API (without bot context),
+   then use generate_merge_report() to compare against the original, and merge_story_graphs() to apply.
+   The merge preserves all original data (acceptance_criteria, scenarios, steps, metadata) you did not change.
+
+3. **Manual JSON edit (last resort only):**
+   Only if the API and bulk approaches cannot handle the situation.
+   Use filter_by_name to read a scoped subtree rather than the full file.
+   Write changes back through the StoryMap.save() method, as opposed to by editing story-graph.json directly.
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- `C:/dev/agile_bots/docs/story/story-graph.json` - the story graph and related  knowledge built so far
+- `C:/dev/agile_bots/docs/story/strategy.json` - strategy decisions made
+- `C:/dev/agile_bots/docs/story/clarification.json` - clarification answers
+- `C:/dev/agile_bots/test/` and `C:/dev/agile_bots/src/` - existing code and tests
+- any folder named `context/` anywhere in `C:/dev/agile_bots/` - additional context files
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+@build-instructions.txt
+
+**BUILD PROCESS:**
+
+**1. Load Context**
+Load clarification.json, planning.json, and source material from context sources (listed above).
+
+**2. Load Build Configs**
+From `c:\dev\agile_bots\bots\story_bot/behaviors/scenarios/content/`, each folder contains:
+- `build_*.json` - Config (name, path, template, output)
+- `instructions.json` - Build instructions
+- `template-file.json` - Output schema/structure
+
+**3. Execute Build**
+1. Load config, instructions, and template (injected as 'story_graph_template')
+2. Check if output file exists - read it FIRST
+3. Follow instructions.json - match template structure exactly (check '_explanation' section)
+4. Apply context from Step 1
+5. If file exists: ADD/EXTEND only, never overwrite/delete
+6. Validate against template schema
+7. Write to `C:\dev\agile_bots/{config.path}/{config.output}`
+- Read existing files before changes - preserve all content
+- Match template structure exactly - don't invent schemas
+- Trace all knowledge to clarification/planning data
+- Process builds sequentially - validate each
+
+**4. SOURCE TRACEABILITY**
+Knowledge artifacts should include source references when available:
+- `context_source` field on epics, sub_epics, story_groups, stories, and domain concepts
+- Format: `{"file": "filename.pdf", "page": "12", "section": "3.2.1 Payment Flow"}`
+- For multiple sources: use array of source objects
+- If source is chat/conversation: `{"type": "chat", "description": "User clarification on approval workflow"}`
+- If source is code: `{"file": "path/to/file.py", "lines": "45-67", "function": "process_payment"}`
+- Prefer tracing knowledge to a source when possible
+- When source is unclear, mark as `{"type": "inferred", "basis": "description of inference basis"}`
+Follow agile_bot/bots/story_bot/behaviors/scenarios/content/story_graph/instructions.json
+specification_scenarios: build scenarios using domain language
+Use proper domain terminology in scenario steps - refer to domain concepts and entities
+Add/update scenarios and scenario_outlines ONLY in main epics section (single source of truth), NOT in increments section
+
+**STORY GRAPH UPDATE STRATEGY (use when story-graph.json already exists):**
+
+When updating an existing story graph, do NOT read and rewrite the entire story-graph.json manually.
+Choose one of these approaches in order of preference:
+
+1. **API approach (preferred for targeted changes):**
+   Use the StoryMap node API via CLI dot-notation to make surgical changes.
+   - Navigate: story_map.filter_by_name name:"Story Name" to read only the relevant subtree
+   - Create:  story_map."Epic"."SubEpic"."Story".create_scenario name:"Scenario Name"
+   - Create:  story_map."Epic"."SubEpic"."Story".create_acceptance_criteria name:"WHEN condition THEN outcome"
+   - Rename:  story_map."Epic"."SubEpic"."Story".rename name:"New Name"
+   - Move:    story_map."Epic"."SubEpic"."Story".move_to target:"Other SubEpic"
+   - Reorder: story_map."Epic"."SubEpic"."Story".move_to at_position:2
+   - Delete:  story_map."Epic"."SubEpic"."Story"."Old Scenario".delete
+   Each call auto-saves the full graph safely through in-memory tree serialization.
+
+2. **Bulk approach (for sweeping changes across many stories):**
+   Build a temporary StoryMap with just your changes using the same create API (without bot context),
+   then use generate_merge_report() to compare against the original, and merge_story_graphs() to apply.
+   The merge preserves all original data (acceptance_criteria, scenarios, steps, metadata) you did not change.
+
+3. **Manual JSON edit (last resort only):**
+   Only if the API and bulk approaches cannot handle the situation.
+   Use filter_by_name to read a scoped subtree rather than the full file.
+   Write changes back through the StoryMap.save() method, as opposed to by editing story-graph.json directly.
+
+When building or adding to the story graph follow these rules,
+Rules to follow:
+
+- **scenario_language_matches_domain**: Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+  DO: Use domain language in scenario steps - reference domain concepts by name.
+  DON'T: Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+- **example_tables_use_domain_language**: Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+  DO: Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+  DON'T: Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+- **given_describes_state_not_actions**: Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+  DO: Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+  DON'T: Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+- **background_vs_scenario_setup**: Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+  DO: Use Background for shared context with {Concept} references to example tables.
+  DON'T: Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+- **scenarios_cover_all_cases**: Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+  DO: Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+  DON'T: Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+- **use_scenario_outline_when_needed**: Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+  DO: Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+  DON'T: Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+- **write_concrete_scenarios**: Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+  DO: Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+  DON'T: Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+- **scenarios_on_story_docs**: Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+  DO: Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+  DON'T: Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+- **map_table_columns_to_scenario_parameters**: Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+  DO: Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+  DON'T: Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+### Key Questions
+
+- What system and user actions initiate this story's flow?
+- What is the intended system response after each user action?
+- What preconditions or data states are required before this story can begin?
+- What are the success criteria for the story (from a domain and user perspective)?
+- What are the expected alternate flows, error paths, and edge cases?
+- Are there any mandatory sequencing constraints within or across stories?
+- What domain rules, calculations, or business policies does this story validate?
+- Is the story testable independently (including setup and teardown conditions)?
+- What external systems or services does this story need to interact with?
+- What requests, responses, or contracts are involved in those system interactions?
+- Are there system integration points that require validation or simulation?
+- How do we handle failures, timeouts, or retries for those system calls?
+- What data variations (e.g., boundary conditions, common examples) are required for test coverage?
+- What are the input values needed to test each scenario?
+- What are the expected output values for each input?
+- Are there formulas or calculations that need multiple data points to validate?
+- Are there domain entities with named values that should be tested?
+- What are the boundary conditions (min, max, edge cases) for each data point?
+
+### Evidence
+
+Acceptance criteria from Exploration stage (Domain AC at feature level, Behavioral AC at story level), High fidelity UX flows, Cross-functional walkthrough outputs, Integration contracts or API mocks, Behavior diagrams (state, sequence)
+
+### Decisions
+
+**Your Decisions:**
+
+**examples_representation:**
+  Verification Data Table
+
+**scenario_outline:**
+  Scenario Outline with Examples
+
+**scenario_coverage:**
+  - Happy Path
+  - Edge Cases
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- One story is specified at a time
+- Acceptance criteria must be testable, unambiguous, and executable
+- Gherkin syntax or structured language (Given/When/Then) is preferred
+- Scenarios are written in plain English. When using Scenario Outline, variables are clearly marked and defined in Examples tables with actual test data.
+- Examples tables when used must include ALL variables used in scenario steps
+- Examples tables when used must have exact values for both input AND output variables
+- Every variable when used in scenario steps must have a corresponding column in Examples table
+- Examples tables when used must have actual test data, not placeholders
+- Output/expected result variables must be included in Examples tables when used
+- scnarios follow this pattern
+- bulk of business logic tests done against the domain layer objects directly
+- minimal happy path testing done with separate tgests that go theoiugh CLI
+- JS nodetest for panel test focus on rendering and button layout
+
+---
+## Next action: validate
+**Next:** Perform the following action. Fix any errors found in the Violation.
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Scenario Language Matches Domain | `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json` | `scanners.scenarios.scenario_language_scanner.ScenarioLanguageScanner` |
+| Example Tables Use Domain Language | `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json` | `scanners.scenarios.example_table_scanner.ExampleTableScanner` |
+| Given Describes State Not Actions | `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json` | `scanners.scenarios.given_state_not_actions_scanner.GivenStateNotActionsScanner` |
+| Background Vs Scenario Setup | `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json` | `scanners.scenarios.background_common_setup_scanner.BackgroundCommonSetupScanner` |
+| Scenarios Cover All Cases | `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json` | `scanners.scenarios.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner` |
+| Use Scenario Outline When Needed | `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json` | `scanners.scenarios.scenario_outline_scanner.ScenarioOutlineScanner` |
+| Write Concrete Scenarios | `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json` | `scanners.scenarios.parameterized_scenarios_scanner.ParameterizedScenariosScanner` |
+| Scenarios On Story Docs | `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json` | `scanners.scenarios.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner` |
+| Map Table Columns To Scenario Parameters | `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json` | `scanners.table_column_parameter_scanner.TableColumnParameterScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** all epics, sub-epics, stories, and domain concepts in the story graph
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Scenario Language Matches Domain (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json`
+**Description:** Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+**DO:** Use domain language in scenario steps - reference domain concepts by name.
+**DON'T:** Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+### Rule: Example Tables Use Domain Language (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json`
+**Description:** Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+**DO:** Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+**DON'T:** Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+### Rule: Given Describes State Not Actions (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json`
+**Description:** Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+**DO:** Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+**DON'T:** Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+### Rule: Background Vs Scenario Setup (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json`
+**Description:** Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+**DO:** Use Background for shared context with {Concept} references to example tables.
+**DON'T:** Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+### Rule: Scenarios Cover All Cases (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json`
+**Description:** Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+**DO:** Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+**DON'T:** Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+### Rule: Use Scenario Outline When Needed (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json`
+**Description:** Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+**DO:** Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+**DON'T:** Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+### Rule: Write Concrete Scenarios (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json`
+**Description:** Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+**DO:** Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+**DON'T:** Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+### Rule: Scenarios On Story Docs (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json`
+**Description:** Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+**DO:** Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+**DON'T:** Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+### Rule: Map Table Columns To Scenario Parameters (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json`
+**Description:** Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+**DO:** Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+**DON'T:** Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect all epics, sub-epics, stories, and domain concepts in the story graph for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+## Next action: render
+**Next:** Perform the following action.
+
+## Action Instructions - render
+
+The purpose of this action is to render output documents and artifacts from story graph using templates and synchronizers
+
+specification_scenarios: render story documents with scenarios
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+Please follow the instructions below in order to manually render output documents using templates
+
+All render configurations are automatically loaded and injected below. Process ALL configs - do not skip any.
+
+
+
+**Final Steps:**
+- Process ALL configs above - do not skip any
+- Priority order: synchronizer > template
+- Verify each output file exists after execution
+- If execution fails, report the error and continue with other outputs
+- After completing all renders, pause and wait for human confirmation before proceeding to next behavior
+
+**Creating New Render Outputs:**
+If you need to create code to render a new output format:
+1. Create a new synchronizer file in {workspace}/synchronizers/ (create folder if it doesn't exist)
+2. Follow this signature pattern: output_file = synchronizer.render(story_graph_file)
+3. The synchronizer should read the story-graph.json and produce the desired output file
+4. Add the new synchronizer to the behavior's render config to include it in future renders
+specification_scenarios: render story documents with scenarios
+IMPORTANT: After completing all template-based rendering, you MUST execute the synchronizer-based render specs by running: scenarios.render.renderAll
+This will render the following outputs: render_story_scenarios
+
+---
+## Next action: tests.build
+**Next:** Perform the following action.
+
+## Action Instructions - build
+
+The purpose of this action is to build story graph from content area and render using story graph renderer
+
+write test files (.py, .js, etc.) with executable test code based on the scenarios you have made within the story-graph.json file
+After writing test files, update story-graph.json with further test_file, test_class, and test_method mapping changes you have made
+| Field | Level | Format | Example |
+|-------|-------|--------|---------|
+| test_file | sub_epic | "test/<domain|CLI|panel>/test_<sub_epic>.py" | "test/domain/test_edit_story_graph.py" |
+| test_class | story | "Test<StoryName>" | "TestCreatesChildStoryNode" |
+| test_method | scenario | "test_<scenario_name>" | "test_user_creates_child_under_epic" |
+
+Hierarchy: epic → sub_epic(test_file) → story_group → story(test_class) → scenario(test_method)
+
+Rules:
+- One test_file per sub_epic (all stories share it)
+- One test_class per story (only if story has scenarios)
+- One test_method per scenario
+- Read story-graph.json first, preserve existing fields
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+@build-instructions.txt
+
+**BUILD PROCESS:**
+
+**1. Load Context**
+Load clarification.json, planning.json, and source material from context sources (listed above).
+
+**2. Load Build Configs**
+From `c:\dev\agile_bots\bots\story_bot/behaviors/tests/content/`, each folder contains:
+- `build_*.json` - Config (name, path, template, output)
+- `instructions.json` - Build instructions
+- `template-file.json` - Output schema/structure
+
+**3. Execute Build**
+1. Load config, instructions, and template (injected as 'story_graph_template')
+2. Check if output file exists - read it FIRST
+3. Follow instructions.json - match template structure exactly (check '_explanation' section)
+4. Apply context from Step 1
+5. If file exists: ADD/EXTEND only, never overwrite/delete
+6. Validate against template schema
+7. Write to `C:\dev\agile_bots/{config.path}/{config.output}`
+- Read existing files before changes - preserve all content
+- Match template structure exactly - don't invent schemas
+- Trace all knowledge to clarification/planning data
+- Process builds sequentially - validate each
+
+**4. SOURCE TRACEABILITY**
+Knowledge artifacts should include source references when available:
+- `context_source` field on epics, sub_epics, story_groups, stories, and domain concepts
+- Format: `{"file": "filename.pdf", "page": "12", "section": "3.2.1 Payment Flow"}`
+- For multiple sources: use array of source objects
+- If source is chat/conversation: `{"type": "chat", "description": "User clarification on approval workflow"}`
+- If source is code: `{"file": "path/to/file.py", "lines": "45-67", "function": "process_payment"}`
+- Prefer tracing knowledge to a source when possible
+- When source is unclear, mark as `{"type": "inferred", "basis": "description of inference basis"}`
+write test files (.py, .js, etc.) with executable test code based on the scenarios you have made within the story-graph.json file
+After writing test files, update story-graph.json with further test_file, test_class, and test_method mapping changes you have made
+| Field | Level | Format | Example |
+|-------|-------|--------|---------|
+| test_file | sub_epic | "test/<domain|CLI|panel>/test_<sub_epic>.py" | "test/domain/test_edit_story_graph.py" |
+| test_class | story | "Test<StoryName>" | "TestCreatesChildStoryNode" |
+| test_method | scenario | "test_<scenario_name>" | "test_user_creates_child_under_epic" |
+
+Hierarchy: epic → sub_epic(test_file) → story_group → story(test_class) → scenario(test_method)
+
+Rules:
+- One test_file per sub_epic (all stories share it)
+- One test_class per story (only if story has scenarios)
+- One test_method per scenario
+- Read story-graph.json first, preserve existing fields
+
+When building or adding to the story graph follow these rules,
+Rules to follow:
+
+- **use_class_based_organization**: CRITICAL STRUCTURAL RULE: Test structure matches story graph hierarchy. File = sub-epic (test_<sub_epic>.py), Class = story (Test<ExactStoryName>), Method = scenario (test_<scenario_snake_case>). Getting this wrong creates files in wrong locations requiring deletion/recreation. BEFORE writing any test code, identify the parent sub-epic that contains the story.
+  DO: Map story hierarchy to test structure exactly. CRITICAL: File name comes from SUB-EPIC, not story.
+  DON'T: Don't use generic/abbreviated names or wrong hierarchy level for file naming. Don't create files in wrong locations.
+
+- **use_domain_language**: Use Ubiquitous Language (DDD): Same vocabulary in domain model, stories, scenarios, AND code. Class names = domain entities/nouns. Method names = domain responsibilities/verbs. Test names read like plain English stories. Example: test_agent_loads_configuration_when_file_exists (not test_agt_init_sets_vars)
+  DO: Use domain language for classes, methods, and test names. Example: class GatherContextAction, def inject_guardrails(), test_agent_loads_config_when_file_exists
+  DON'T: Don't use generic technical terms or implementation-specific names. Example: class StdioHandler (wrong), def execute_with_guardrails (wrong), test_agt_init_sets_vars (wrong)
+
+- **consistent_vocabulary**: Use ONE word per concept across entire codebase. Pick consistent vocabulary: create (not build/make/construct), verify (not check/assert/validate), load (not fetch/get/retrieve). Use intention-revealing names that describe behavior. Example: create_agent(), verify_initialized(), load_config() - same verbs everywhere
+  DO: Use same word for same concept everywhere. Example: create_agent(), create_config(), create_workspace() - all use 'create'
+  DON'T: Don't mix synonyms for same concept. Example: create_agent() + build_config() + make_workspace() (wrong - pick one verb)
+
+- **domain_oriented_test_inheritance**: Scaling extension of helper_extraction_and_reuse, object_oriented_test_helpers, and standard_test_data_sets. At small scale, a single test class covering multiple domain objects is fine. As domain objects develop distinct behavior, break out into domain-specific test classes. Use abstract base classes for common operations. Share parameter data and fixtures only when there is obvious shared logic across sub-epics. Place shared base files at the appropriate hierarchy level.
+  DO: At small scale keep together. As you scale, use abstract bases, share fixtures only with explicit need, and place shared files at the right hierarchy level.
+  DON'T: When scaling, do not copy assertion logic, do not create shared files preemptively, and do not group tests by operation or technology.
+
+- **no_defensive_code_in_tests**: Tests must NEVER contain guard clauses, defensive conditionals, or fallback paths. We control test setup - if it's wrong, the test MUST fail immediately. Guard clauses hide problems. Tests should assume positive outcomes. Example: Just call the code directly, don't wrap in if-checks
+  DO: Assume correct setup - let test fail if wrong. Example: behavior = Behavior(name='shape') then assert behavior.name == 'shape'
+  DON'T: Don't add if-checks, type guards, or fallback handling in tests. Example: if behavior_file.exists(): (wrong - test should fail if it doesn't)
+
+- **production_code_clean_functions**: Production code functions should do ONE thing, be under 20 lines, and have one level of abstraction. No hidden side effects. Name reveals complete behavior. Extract multiple concerns into separate functions. Example: load_config(), validate_config(), apply_config() - each does one thing
+  DO: Single responsibility, small focused functions. Example: initialize_from_config() calls validate_exists(), load_config(), validate_structure(), apply_config()
+  DON'T: Don't make functions that do multiple unrelated things or are too long. Example: 50-line function that loads, validates, and applies config
+
+- **bug_fix_test_first**: When production code breaks, follow test-first workflow: write failing test, verify failure, fix code, verify success. Never fix bugs without a failing test first. Example: test_mcp_tool_initializes_bot() fails -> fix initialization -> test passes
+  DO: Follow RED-GREEN-PRODUCTION workflow. Example: Write test reproducing bug -> Run test (RED) -> Fix minimal code -> Run test (GREEN) -> Run full suite
+  DON'T: Don't fix bugs directly without failing test first. Example: Editing production code without test -> deploying -> hoping it works (wrong)
+
+- **call_production_code_directly**: Call production code directly in tests. Let tests fail naturally if code doesn't exist. Don't comment out calls, mock business logic, or fake state. Only mock external boundaries. Example: agent = Agent(); agent.initialize() (not agent = Mock())
+  DO: Call production code directly, let it fail naturally. Example: agent = Agent(workspace); agent.initialize(config); assert agent.is_initialized
+  DON'T: Don't mock class under test, comment out calls, or fake state. Example: agent = Mock(spec=Agent) (wrong); agent._initialized = True (wrong)
+
+- **cover_all_behavior_paths**: Cover all behavior paths: normal (happy path), edge cases, and failure scenarios. Each distinct behavior needs its own focused test. Tests must be independent. Example: test_loads_valid_config(), test_loads_empty_config(), test_raises_error_when_file_missing()
+  DO: Test normal, edge, and failure paths separately. Example: test_loads_valid_config() (happy), test_loads_empty_config() (edge), test_raises_when_missing() (failure)
+  DON'T: Don't test only happy path or combine multiple behaviors in one test. Example: Single test for both success and failure (wrong)
+
+- **mock_only_boundaries**: Mock ONLY at architectural boundaries: external APIs, network, uncontrollable services. Don't mock internal business logic, classes under test, or file operations (use temp files). Example: patch('requests.get') (OK); patch('agent.validate') (wrong)
+  DO: Mock only external dependencies you can't control. Example: with patch('requests.get') as mock: (external API - OK to mock)
+  DON'T: Don't mock internal logic, class under test, or file I/O. Example: with patch('agent.validate_config') (wrong - test the logic!)
+
+- **create_parameterized_tests_for_scenarios**: If scenarios have Examples tables, create parameterized tests using @pytest.mark.parametrize. Each row becomes a test case. Don't write single tests that only test one example. Example: @pytest.mark.parametrize('input,expected', [(1, 2), (3, 4)])
+  DO: Create parameterized tests from Examples tables. Example: @pytest.mark.parametrize('paths,count', [(['p1','p2'], 2), (['p3'], 1)])
+  DON'T: Don't hardcode single example or duplicate test methods. Example: def test_with_value_1(): (wrong); def test_with_value_2(): (wrong - use parametrize)
+
+- **define_fixtures_in_test_file**: Define fixtures in the test file, not separate conftest.py. Truly reusable fixtures (file ops, location helpers) go in base conftest.py. Example: @pytest.fixture def workspace_root(tmp_path): return tmp_path / 'workspace'
+  DO: Define fixtures in same test file. Example: @pytest.fixture def config_file(tmp_path): ... (in test_agent.py)
+  DON'T: Don't create separate conftest.py for agent-specific fixtures. Don't create shared files without explicit need.
+
+- **design_api_through_failing_tests**: Write tests against the REAL expected API BEFORE implementing code. Tests MUST fail initially. Set up real test data and call real API. Failure reveals complete API design. Example: project = Project(path=path); project.initialize() (doesn't exist yet -> fails -> drives implementation)
+  DO: Write test against real expected API that fails initially. Example: project = Project(path); project.initialize(); assert project.is_ready (fails until implemented)
+  DON'T: Don't use placeholders, dummy values, or skip the failing step. Example: project = 'TODO' (wrong); assuming test passes first (wrong)
+
+- **test_observable_behavior**: Test observable behavior, not implementation details. Verify public API and visible state changes. Don't assert on private methods or internal flags. Example: assert agent.config_path.exists() (observable); not assert agent._internal_flag (private)
+  DO: Test observable outcomes through public API. Example: assert agent.config_path == expected; assert agent.is_initialized (public properties)
+  DON'T: Don't test private state or implementation details. Example: assert agent._initialized (wrong); assert agent._config_cache (wrong)
+
+- **helper_extraction_and_reuse**: Extract duplicate test setup to reusable helper functions. Keep test bodies focused on specific behavior. Example: create_agent_with_config(), create_config_file(), verify_agent_initialized() - reusable across tests
+  DO: Extract duplicate setup to reusable helpers. Example: create_agent_with_config(name, workspace, config) returns initialized Agent
+  DON'T: Don't duplicate setup code across tests. Example: Same 10 lines of setup in every test method (wrong - extract to helper)
+
+- **match_specification_scenarios**: Tests must match specification scenarios exactly. Test names, steps, and assertions verify exactly what the scenario states. Use exact variable names and terminology from specification. Example: agent_name='story_bot' (from spec), not name='bot'
+  DO: Test matches specification exactly. Example: GIVEN config exists, WHEN Agent(agent_name='story_bot'), THEN config_path == agents/base/agent.json
+  DON'T: Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
+
+- **place_imports_at_top**: Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
+  DO: All imports at top, grouped by type. Example: import json; import pytest; from agile_bot.bots... import X
+  DON'T: Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
+
+- **object_oriented_test_helpers**: Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
+  DO: Use shared helper objects to create full test fixtures and assert against complete domain objects, not fragments.
+  DON'T: Do not spread test setup across many primitive parameters or cherry-pick single values from partial objects.
+
+- **production_code_explicit_dependencies**: Production code: make dependencies explicit through constructor injection. Pass all external dependencies as constructor parameters. No hidden global state. Tests easily inject test doubles. Example: Agent(config_loader=loader, domain_graph=graph)
+  DO: Inject all dependencies through constructor. Example: def __init__(self, config_loader, domain_graph): self._loader = config_loader
+  DON'T: Don't access globals, singletons, or create dependencies internally. Example: self._loader = ConfigLoader() (wrong - creates internally)
+
+- **self_documenting_tests**: Tests are self-documenting through code structure. Don't add verbose comments explaining failures. Imports, calls, and assertions show the API design. Let code speak for itself. Example: generator = MCPServerGenerator(bot_name, config_path); server = generator.generate_server()
+  DO: Let code structure document the test. Example: generator = MCPServerGenerator(name, config); file = generator.generate() - API is clear
+  DON'T: Don't add verbose comments explaining obvious things. Example: # This will fail because API doesn't exist yet (unnecessary)
+
+- **standard_test_data_sets**: Use standard, named test data sets across tests instead of recreating ad-hoc values. Example: STANDARD_STATE = {...}; helper.set_state(...); assert helper.get_state() == STANDARD_STATE.
+  DO: Define canonical data once (helper constants/factories) and reuse it so every test exercises the full domain object.
+  DON'T: Do not create new ad-hoc values per test or assert only one field from a complex object.
+
+- **assert_full_results**: Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.
+  DO: Compare entire objects/dicts/dataclasses against standard data fixtures.
+  DON'T: Do not assert single fields or lengths when validating complex results.
+
+- **use_ascii_only**: All test code must use ASCII-only characters. No Unicode symbols, emojis, or special characters. Use plain ASCII alternatives. Example: print('[PASS] Success') not print('[checkmark] Success')
+  DO: Use ASCII-only characters. Example: print('[PASS] Agent initialized'); print('[ERROR] Config not found')
+  DON'T: Don't use Unicode or emojis. Example: print('[checkmark] Done') (wrong); print('[green_check] OK') (wrong)
+
+- **pytest_bdd_orchestrator_pattern**: Use pytest with orchestrator pattern for story-based tests. NO FEATURE FILES. Test classes contain orchestrator methods (under 20 lines) showing Given-When-Then flow by calling helper functions. Example: def test_agent_loads_config(): given_config_exists(); agent = when_agent_initialized(); then_agent_is_configured(agent)
+  DO: Orchestrator pattern: test shows flow, delegates to helpers. Example: # Given; create_config_file(); # When; agent.initialize(); # Then; assert agent.is_initialized
+  DON'T: Don't use feature files or inline complex setup. Example: @given('config exists') def step(): ... (wrong - use pytest directly)
+
+- **use_exact_variable_names**: Use exact variable names from specification scenarios. When spec mentions agent_name, workspace_root, config_path - use those exact names in tests and production code. Example: agent_name = 'story_bot' (from spec), not name = 'story_bot'
+  DO: Use exact names from specification in tests and production. Example: agent_name, workspace_root, config_path - all from spec
+  DON'T: Don't use different names than specification. Example: name = 'bot' when spec says agent_name (wrong)
+
+- **use_given_when_then_helpers**: Use reusable helper functions instead of inline code blocks of 4+ lines. Optimize for reusability, not exact step names. Place helpers at correct scope: story-level in class, sub-epic in module, epic in separate file. Example: given_config_exists(), when_agent_initialized(), then_agent_is_configured()
+  DO: Use Given/When/Then helper functions for setup, action, assertion. Example: given_bot_config_exists(); bot = when_bot_instantiated(); then_bot_uses_correct_directories(bot)
+  DON'T: Don't use inline operations of 4+ lines. Example: config_dir = ...; config_dir.mkdir(); config_file = ...; config_file.write_text() (wrong - extract to helper)
+
+---
+## Next action: tests.validate
+**Next:** Perform the following action. Fix any errors found in the Violation.
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_tests: validate test code and domain language usage
+Validate that test code uses proper domain terminology (class names = domain entities, method names = domain responsibilities)
+Validate that all test files, classes, and methods are properly mapped to story-graph.json
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Use Class Based Organization | `story_bot/behaviors/tests/rules/use_class_based_organization.json` | `scanners.code.python.class_based_organization_scanner.ClassBasedOrganizationScanner` |
+| Use Domain Language | `story_bot/behaviors/tests/rules/use_domain_language.json` | `scanners.code.python.domain_language_code_scanner.DomainLanguageCodeScanner` |
+| Consistent Vocabulary | `story_bot/behaviors/tests/rules/consistent_vocabulary.json` | `scanners.code.python.consistent_vocabulary_scanner.ConsistentVocabularyScanner` |
+| Domain Oriented Test Inheritance | `story_bot/behaviors/tests/rules/domain_oriented_test_inheritance.json` | `scanners.code.python.duplicate_assertion_scanner.DuplicateAssertionScanner` |
+| No Defensive Code In Tests | `story_bot/behaviors/tests/rules/no_defensive_code_in_tests.json` | `scanners.code.python.excessive_guards_scanner.ExcessiveGuardsScanner` |
+| Production Code Clean Functions | `story_bot/behaviors/tests/rules/production_code_clean_functions.json` | `scanners.code.python.function_size_scanner.FunctionSizeScanner` |
+| Bug Fix Test First | `story_bot/behaviors/tests/rules/bug_fix_test_first.json` | `scanners.bug_fix_test_first_scanner.BugFixTestFirstScanner` |
+| Call Production Code Directly | `story_bot/behaviors/tests/rules/call_production_code_directly.json` | `scanners.code.python.real_implementations_scanner.RealImplementationsScanner` |
+| Cover All Behavior Paths | `story_bot/behaviors/tests/rules/cover_all_behavior_paths.json` | `scanners.code.python.cover_all_paths_scanner.CoverAllPathsScanner` |
+| Mock Only Boundaries | `story_bot/behaviors/tests/rules/mock_only_boundaries.json` | `scanners.code.python.mock_boundaries_scanner.MockBoundariesScanner` |
+| Create Parameterized Tests For Scenarios | `story_bot/behaviors/tests/rules/create_parameterized_tests_for_scenarios.json` | `scanners.parameterized_tests_scanner.ParameterizedTestsScanner` |
+| Define Fixtures In Test File | `story_bot/behaviors/tests/rules/define_fixtures_in_test_file.json` | `scanners.code.python.fixture_placement_scanner.FixturePlacementScanner` |
+| Design Api Through Failing Tests | `story_bot/behaviors/tests/rules/design_api_through_failing_tests.json` | `scanners.failing_test_api_scanner.FailingTestApiScanner` |
+| Test Observable Behavior | `story_bot/behaviors/tests/rules/test_observable_behavior.json` | `scanners.code.python.observable_behavior_scanner.ObservableBehaviorScanner` |
+| Helper Extraction And Reuse | `story_bot/behaviors/tests/rules/helper_extraction_and_reuse.json` | `scanners.helper_extraction_scanner.HelperExtractionScanner` |
+| Match Specification Scenarios | `story_bot/behaviors/tests/rules/match_specification_scenarios.json` | `scanners.specification_match_scanner.SpecificationMatchScanner` |
+| Place Imports At Top | `story_bot/behaviors/tests/rules/place_imports_at_top.json` | `scanners.code.python.import_placement_scanner.ImportPlacementScanner` |
+| Object Oriented Test Helpers | `story_bot/behaviors/tests/rules/object_oriented_test_helpers.json` | `scanners.code.python.object_oriented_helpers_scanner.ObjectOrientedHelpersScanner` |
+| Production Code Explicit Dependencies | `story_bot/behaviors/tests/rules/production_code_explicit_dependencies.json` | `scanners.code.python.explicit_dependencies_scanner.ExplicitDependenciesScanner` |
+| Self Documenting Tests | `story_bot/behaviors/tests/rules/self_documenting_tests.json` | `scanners.code.python.intention_revealing_names_scanner.IntentionRevealingNamesScanner` |
+| Standard Test Data Sets | `story_bot/behaviors/tests/rules/standard_test_data_sets.json` | `scanners.code.python.standard_data_reuse_scanner.StandardDataReuseScanner` |
+| Assert Full Results | `story_bot/behaviors/tests/rules/assert_full_results.json` | `scanners.code.python.full_result_assertions_scanner.FullResultAssertionsScanner` |
+| Use Ascii Only | `story_bot/behaviors/tests/rules/use_ascii_only.json` | `scanners.code.python.ascii_only_scanner.AsciiOnlyScanner` |
+| Pytest Bdd Orchestrator Pattern | `story_bot/behaviors/tests/rules/pytest_bdd_orchestrator_pattern.json` | `scanners.orchestrator_pattern_scanner.OrchestratorPatternScanner` |
+| Use Exact Variable Names | `story_bot/behaviors/tests/rules/use_exact_variable_names.json` | `scanners.code.python.exact_variable_names_scanner.ExactVariableNamesScanner` |
+| Use Given When Then Helpers | `story_bot/behaviors/tests/rules/use_given_when_then_helpers.json` | `scanners.code.python.given_when_then_helpers_scanner.GivenWhenThenHelpersScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** all epics, sub-epics, stories, and domain concepts in the story graph
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Use Class Based Organization (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_class_based_organization.json`
+**Description:** CRITICAL STRUCTURAL RULE: Test structure matches story graph hierarchy. File = sub-epic (test_<sub_epic>.py), Class = story (Test<ExactStoryName>), Method = scenario (test_<scenario_snake_case>). Getting this wrong creates files in wrong locations requiring deletion/recreation. BEFORE writing any test code, identify the parent sub-epic that contains the story.
+**DO:** Map story hierarchy to test structure exactly. CRITICAL: File name comes from SUB-EPIC, not story.
+**DON'T:** Don't use generic/abbreviated names or wrong hierarchy level for file naming. Don't create files in wrong locations.
+
+### Rule: Use Domain Language (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_domain_language.json`
+**Description:** Use Ubiquitous Language (DDD): Same vocabulary in domain model, stories, scenarios, AND code. Class names = domain entities/nouns. Method names = domain responsibilities/verbs. Test names read like plain English stories. Example: test_agent_loads_configuration_when_file_exists (not test_agt_init_sets_vars)
+**DO:** Use domain language for classes, methods, and test names. Example: class GatherContextAction, def inject_guardrails(), test_agent_loads_config_when_file_exists
+**DON'T:** Don't use generic technical terms or implementation-specific names. Example: class StdioHandler (wrong), def execute_with_guardrails (wrong), test_agt_init_sets_vars (wrong)
+
+### Rule: Consistent Vocabulary (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/consistent_vocabulary.json`
+**Description:** Use ONE word per concept across entire codebase. Pick consistent vocabulary: create (not build/make/construct), verify (not check/assert/validate), load (not fetch/get/retrieve). Use intention-revealing names that describe behavior. Example: create_agent(), verify_initialized(), load_config() - same verbs everywhere
+**DO:** Use same word for same concept everywhere. Example: create_agent(), create_config(), create_workspace() - all use 'create'
+**DON'T:** Don't mix synonyms for same concept. Example: create_agent() + build_config() + make_workspace() (wrong - pick one verb)
+
+### Rule: Domain Oriented Test Inheritance (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/domain_oriented_test_inheritance.json`
+**Description:** Scaling extension of helper_extraction_and_reuse, object_oriented_test_helpers, and standard_test_data_sets. At small scale, a single test class covering multiple domain objects is fine. As domain objects develop distinct behavior, break out into domain-specific test classes. Use abstract base classes for common operations. Share parameter data and fixtures only when there is obvious shared logic across sub-epics. Place shared base files at the appropriate hierarchy level.
+**DO:** At small scale keep together. As you scale, use abstract bases, share fixtures only with explicit need, and place shared files at the right hierarchy level.
+**DON'T:** When scaling, do not copy assertion logic, do not create shared files preemptively, and do not group tests by operation or technology.
+
+### Rule: No Defensive Code In Tests (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/no_defensive_code_in_tests.json`
+**Description:** Tests must NEVER contain guard clauses, defensive conditionals, or fallback paths. We control test setup - if it's wrong, the test MUST fail immediately. Guard clauses hide problems. Tests should assume positive outcomes. Example: Just call the code directly, don't wrap in if-checks
+**DO:** Assume correct setup - let test fail if wrong. Example: behavior = Behavior(name='shape') then assert behavior.name == 'shape'
+**DON'T:** Don't add if-checks, type guards, or fallback handling in tests. Example: if behavior_file.exists(): (wrong - test should fail if it doesn't)
+
+### Rule: Production Code Clean Functions (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/production_code_clean_functions.json`
+**Description:** Production code functions should do ONE thing, be under 20 lines, and have one level of abstraction. No hidden side effects. Name reveals complete behavior. Extract multiple concerns into separate functions. Example: load_config(), validate_config(), apply_config() - each does one thing
+**DO:** Single responsibility, small focused functions. Example: initialize_from_config() calls validate_exists(), load_config(), validate_structure(), apply_config()
+**DON'T:** Don't make functions that do multiple unrelated things or are too long. Example: 50-line function that loads, validates, and applies config
+
+### Rule: Bug Fix Test First (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/bug_fix_test_first.json`
+**Description:** When production code breaks, follow test-first workflow: write failing test, verify failure, fix code, verify success. Never fix bugs without a failing test first. Example: test_mcp_tool_initializes_bot() fails -> fix initialization -> test passes
+**DO:** Follow RED-GREEN-PRODUCTION workflow. Example: Write test reproducing bug -> Run test (RED) -> Fix minimal code -> Run test (GREEN) -> Run full suite
+**DON'T:** Don't fix bugs directly without failing test first. Example: Editing production code without test -> deploying -> hoping it works (wrong)
+
+### Rule: Call Production Code Directly (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/call_production_code_directly.json`
+**Description:** Call production code directly in tests. Let tests fail naturally if code doesn't exist. Don't comment out calls, mock business logic, or fake state. Only mock external boundaries. Example: agent = Agent(); agent.initialize() (not agent = Mock())
+**DO:** Call production code directly, let it fail naturally. Example: agent = Agent(workspace); agent.initialize(config); assert agent.is_initialized
+**DON'T:** Don't mock class under test, comment out calls, or fake state. Example: agent = Mock(spec=Agent) (wrong); agent._initialized = True (wrong)
+
+### Rule: Cover All Behavior Paths (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/cover_all_behavior_paths.json`
+**Description:** Cover all behavior paths: normal (happy path), edge cases, and failure scenarios. Each distinct behavior needs its own focused test. Tests must be independent. Example: test_loads_valid_config(), test_loads_empty_config(), test_raises_error_when_file_missing()
+**DO:** Test normal, edge, and failure paths separately. Example: test_loads_valid_config() (happy), test_loads_empty_config() (edge), test_raises_when_missing() (failure)
+**DON'T:** Don't test only happy path or combine multiple behaviors in one test. Example: Single test for both success and failure (wrong)
+
+### Rule: Mock Only Boundaries (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/mock_only_boundaries.json`
+**Description:** Mock ONLY at architectural boundaries: external APIs, network, uncontrollable services. Don't mock internal business logic, classes under test, or file operations (use temp files). Example: patch('requests.get') (OK); patch('agent.validate') (wrong)
+**DO:** Mock only external dependencies you can't control. Example: with patch('requests.get') as mock: (external API - OK to mock)
+**DON'T:** Don't mock internal logic, class under test, or file I/O. Example: with patch('agent.validate_config') (wrong - test the logic!)
+
+### Rule: Create Parameterized Tests For Scenarios (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/create_parameterized_tests_for_scenarios.json`
+**Description:** If scenarios have Examples tables, create parameterized tests using @pytest.mark.parametrize. Each row becomes a test case. Don't write single tests that only test one example. Example: @pytest.mark.parametrize('input,expected', [(1, 2), (3, 4)])
+**DO:** Create parameterized tests from Examples tables. Example: @pytest.mark.parametrize('paths,count', [(['p1','p2'], 2), (['p3'], 1)])
+**DON'T:** Don't hardcode single example or duplicate test methods. Example: def test_with_value_1(): (wrong); def test_with_value_2(): (wrong - use parametrize)
+
+### Rule: Define Fixtures In Test File (Priority 10) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/define_fixtures_in_test_file.json`
+**Description:** Define fixtures in the test file, not separate conftest.py. Truly reusable fixtures (file ops, location helpers) go in base conftest.py. Example: @pytest.fixture def workspace_root(tmp_path): return tmp_path / 'workspace'
+**DO:** Define fixtures in same test file. Example: @pytest.fixture def config_file(tmp_path): ... (in test_agent.py)
+**DON'T:** Don't create separate conftest.py for agent-specific fixtures. Don't create shared files without explicit need.
+
+### Rule: Design Api Through Failing Tests (Priority 11) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/design_api_through_failing_tests.json`
+**Description:** Write tests against the REAL expected API BEFORE implementing code. Tests MUST fail initially. Set up real test data and call real API. Failure reveals complete API design. Example: project = Project(path=path); project.initialize() (doesn't exist yet -> fails -> drives implementation)
+**DO:** Write test against real expected API that fails initially. Example: project = Project(path); project.initialize(); assert project.is_ready (fails until implemented)
+**DON'T:** Don't use placeholders, dummy values, or skip the failing step. Example: project = 'TODO' (wrong); assuming test passes first (wrong)
+
+### Rule: Test Observable Behavior (Priority 12) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/test_observable_behavior.json`
+**Description:** Test observable behavior, not implementation details. Verify public API and visible state changes. Don't assert on private methods or internal flags. Example: assert agent.config_path.exists() (observable); not assert agent._internal_flag (private)
+**DO:** Test observable outcomes through public API. Example: assert agent.config_path == expected; assert agent.is_initialized (public properties)
+**DON'T:** Don't test private state or implementation details. Example: assert agent._initialized (wrong); assert agent._config_cache (wrong)
+
+### Rule: Helper Extraction And Reuse (Priority 13) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/helper_extraction_and_reuse.json`
+**Description:** Extract duplicate test setup to reusable helper functions. Keep test bodies focused on specific behavior. Example: create_agent_with_config(), create_config_file(), verify_agent_initialized() - reusable across tests
+**DO:** Extract duplicate setup to reusable helpers. Example: create_agent_with_config(name, workspace, config) returns initialized Agent
+**DON'T:** Don't duplicate setup code across tests. Example: Same 10 lines of setup in every test method (wrong - extract to helper)
+
+### Rule: Match Specification Scenarios (Priority 14) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/match_specification_scenarios.json`
+**Description:** Tests must match specification scenarios exactly. Test names, steps, and assertions verify exactly what the scenario states. Use exact variable names and terminology from specification. Example: agent_name='story_bot' (from spec), not name='bot'
+**DO:** Test matches specification exactly. Example: GIVEN config exists, WHEN Agent(agent_name='story_bot'), THEN config_path == agents/base/agent.json
+**DON'T:** Don't use different terminology or assert things not in specification. Example: assert agent._internal_flag (not in spec - wrong)
+
+### Rule: Place Imports At Top (Priority 15) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/place_imports_at_top.json`
+**Description:** Place all imports at top of test file, after docstrings, before code. Group: stdlib, third-party, then local. Example: import json; import pytest; from mymodule import MyClass
+**DO:** All imports at top, grouped by type. Example: import json; import pytest; from agile_bot.bots... import X
+**DON'T:** Don't place imports inside functions or after code. Example: def test(): from pathlib import Path (wrong - import inside function)
+
+### Rule: Object Oriented Test Helpers (Priority 16) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/object_oriented_test_helpers.json`
+**Description:** Consolidate tests around object-oriented helpers/factories (e.g., BotTestHelper test hopper) that build complete domain objects with standard data. Example: helper = BotTestHelper(tmp_path); helper.set_state('shape','clarify'); helper.assert_at_behavior_action('shape','clarify'). Avoid scattering many primitive parameters across parametrize blocks or inline setups.
+**DO:** Use shared helper objects to create full test fixtures and assert against complete domain objects, not fragments.
+**DON'T:** Do not spread test setup across many primitive parameters or cherry-pick single values from partial objects.
+
+### Rule: Production Code Explicit Dependencies (Priority 16) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/production_code_explicit_dependencies.json`
+**Description:** Production code: make dependencies explicit through constructor injection. Pass all external dependencies as constructor parameters. No hidden global state. Tests easily inject test doubles. Example: Agent(config_loader=loader, domain_graph=graph)
+**DO:** Inject all dependencies through constructor. Example: def __init__(self, config_loader, domain_graph): self._loader = config_loader
+**DON'T:** Don't access globals, singletons, or create dependencies internally. Example: self._loader = ConfigLoader() (wrong - creates internally)
+
+### Rule: Self Documenting Tests (Priority 17) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/self_documenting_tests.json`
+**Description:** Tests are self-documenting through code structure. Don't add verbose comments explaining failures. Imports, calls, and assertions show the API design. Let code speak for itself. Example: generator = MCPServerGenerator(bot_name, config_path); server = generator.generate_server()
+**DO:** Let code structure document the test. Example: generator = MCPServerGenerator(name, config); file = generator.generate() - API is clear
+**DON'T:** Don't add verbose comments explaining obvious things. Example: # This will fail because API doesn't exist yet (unnecessary)
+
+### Rule: Standard Test Data Sets (Priority 17) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/standard_test_data_sets.json`
+**Description:** Use standard, named test data sets across tests instead of recreating ad-hoc values. Example: STANDARD_STATE = {...}; helper.set_state(...); assert helper.get_state() == STANDARD_STATE.
+**DO:** Define canonical data once (helper constants/factories) and reuse it so every test exercises the full domain object.
+**DON'T:** Do not create new ad-hoc values per test or assert only one field from a complex object.
+
+### Rule: Assert Full Results (Priority 18) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/assert_full_results.json`
+**Description:** Assert full domain results (state/log/graph objects), not single cherry-picked fields. Example: assert helper.get_state() == STANDARD_STATE, not assert helper.get_state()['current'] == 'shape.clarify'.
+**DO:** Compare entire objects/dicts/dataclasses against standard data fixtures.
+**DON'T:** Do not assert single fields or lengths when validating complex results.
+
+### Rule: Use Ascii Only (Priority 18) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_ascii_only.json`
+**Description:** All test code must use ASCII-only characters. No Unicode symbols, emojis, or special characters. Use plain ASCII alternatives. Example: print('[PASS] Success') not print('[checkmark] Success')
+**DO:** Use ASCII-only characters. Example: print('[PASS] Agent initialized'); print('[ERROR] Config not found')
+**DON'T:** Don't use Unicode or emojis. Example: print('[checkmark] Done') (wrong); print('[green_check] OK') (wrong)
+
+### Rule: Pytest Bdd Orchestrator Pattern (Priority 19) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/pytest_bdd_orchestrator_pattern.json`
+**Description:** Use pytest with orchestrator pattern for story-based tests. NO FEATURE FILES. Test classes contain orchestrator methods (under 20 lines) showing Given-When-Then flow by calling helper functions. Example: def test_agent_loads_config(): given_config_exists(); agent = when_agent_initialized(); then_agent_is_configured(agent)
+**DO:** Orchestrator pattern: test shows flow, delegates to helpers. Example: # Given; create_config_file(); # When; agent.initialize(); # Then; assert agent.is_initialized
+**DON'T:** Don't use feature files or inline complex setup. Example: @given('config exists') def step(): ... (wrong - use pytest directly)
+
+### Rule: Use Exact Variable Names (Priority 21) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_exact_variable_names.json`
+**Description:** Use exact variable names from specification scenarios. When spec mentions agent_name, workspace_root, config_path - use those exact names in tests and production code. Example: agent_name = 'story_bot' (from spec), not name = 'story_bot'
+**DO:** Use exact names from specification in tests and production. Example: agent_name, workspace_root, config_path - all from spec
+**DON'T:** Don't use different names than specification. Example: name = 'bot' when spec says agent_name (wrong)
+
+### Rule: Use Given When Then Helpers (Priority 22) [Scanner]
+**File:** `story_bot/behaviors/tests/rules/use_given_when_then_helpers.json`
+**Description:** Use reusable helper functions instead of inline code blocks of 4+ lines. Optimize for reusability, not exact step names. Place helpers at correct scope: story-level in class, sub-epic in module, epic in separate file. Example: given_config_exists(), when_agent_initialized(), then_agent_is_configured()
+**DO:** Use Given/When/Then helper functions for setup, action, assertion. Example: given_bot_config_exists(); bot = when_bot_instantiated(); then_bot_uses_correct_directories(bot)
+**DON'T:** Don't use inline operations of 4+ lines. Example: config_dir = ...; config_dir.mkdir(); config_file = ...; config_file.write_text() (wrong - extract to helper)
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect all epics, sub-epics, stories, and domain concepts in the story graph for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_tests: validate test code and domain language usage
+Validate that test code uses proper domain terminology (class names = domain entities, method names = domain responsibilities)
+Validate that all test files, classes, and methods are properly mapped to story-graph.json**Combined instructions:** The following combines multiple actions. Perform them one after another.
+
+## Scope
+
+**Story Scope:** "Submit Instructions From Workspace"
+
+Please only work on the following scope.
+
+Scope Filter: ""Submit Instructions From Workspace""
+
+Scope:
+
+{
+  "path": "C:\\dev\\agile_bots\\docs\\story\\story-graph.json",
+  "has_epics": true,
+  "has_increments": true,
+  "has_domain_concepts": true,
+  "epic_count": 1,
+  "content": {
+    "epics": [
+      {
+        "name": "Invoke Bot",
+        "sub_epics": [
+          {
+            "name": "Navigate Behavior Actions",
+            "sub_epics": [
+              {
+                "name": "Perform Behavior Action In Bot Workflow",
+                "sub_epics": [],
+                "story_groups": [
+                  {
+                    "name": null,
+                    "stories": [
+                      {
+                        "name": "Submit Instructions From Workspace",
+                        "acceptance_criteria": [
+                          {
+                            "name": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                            "text": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                            "sequential_order": 0.0
+                          },
+                          {
+                            "name": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                            "text": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                            "sequential_order": 1.0
+                          }
+                        ],
+                        "scenarios": [
+                          {
+                            "name": "User submits {Behavior} instructions to AI agent",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {Behavior} \"shape\" is selected in workspace",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "And {InstructionsSection} displays shape instructions",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "When User triggers submit from workspace",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "Then System sends {Behavior} shape instructions to AI agent",
+                                "sequential_order": 4.0
+                              },
+                              {
+                                "text": "And Submit button is visible and enabled",
+                                "sequential_order": 5.0
+                              }
+                            ],
+                            "examples": null
+                          },
+                          {
+                            "name": "Submit disabled when no behavior selected",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given no {Behavior} is selected in workspace",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "When User views workspace section",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "Then Submit shows scope error or is disabled",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "And User cannot submit empty instructions",
+                                "sequential_order": 4.0
+                              }
+                            ],
+                            "examples": null
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "domain_concepts": [
+                  {
+                    "name": "Base Action",
+                    "responsibilities": [
+                      {
+                        "name": "Inject Instructions",
+                        "collaborators": [
+                          "Behavior"
+                        ]
+                      },
+                      {
+                        "name": "Load Relevant Content + Inject Into Instructions",
+                        "collaborators": [
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Save content changes",
+                        "collaborators": [
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Get save file",
+                        "collaborators": [
+                          "Path"
+                        ]
+                      },
+                      {
+                        "name": "Execution gates on save file watch",
+                        "collaborators": [
+                          "SaveFileWatcher",
+                          "Debounce",
+                          "Next Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "SaveFileWatcher",
+                    "responsibilities": [
+                      {
+                        "name": "Watch save file for writes",
+                        "collaborators": [
+                          "Path",
+                          "File System"
+                        ]
+                      },
+                      {
+                        "name": "Report when file stable past debounce",
+                        "collaborators": [
+                          "Path",
+                          "Debounce",
+                          "Boolean"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "ActionStateManager",
+                    "responsibilities": [
+                      {
+                        "name": "Get state file path",
+                        "collaborators": [
+                          "Path"
+                        ]
+                      },
+                      {
+                        "name": "Load or create state",
+                        "collaborators": [
+                          "State File",
+                          "Dict"
+                        ]
+                      },
+                      {
+                        "name": "Save state",
+                        "collaborators": [
+                          "Action",
+                          "State File"
+                        ]
+                      },
+                      {
+                        "name": "Load state",
+                        "collaborators": [
+                          "Actions List",
+                          "Current Index"
+                        ]
+                      },
+                      {
+                        "name": "Find action index",
+                        "collaborators": [
+                          "Actions List",
+                          "Action Name",
+                          "Integer"
+                        ]
+                      },
+                      {
+                        "name": "Filter completed actions",
+                        "collaborators": [
+                          "Completed Actions",
+                          "Target Index",
+                          "Actions List",
+                          "List"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "TTYAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to TTY",
+                        "collaborators": [
+                          "Action",
+                          "String"
+                        ]
+                      },
+                      {
+                        "name": "Format action line",
+                        "collaborators": [
+                          "Action Name",
+                          "Marker",
+                          "Indent"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "TTYProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "JSONAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to JSON dict",
+                        "collaborators": [
+                          "Action",
+                          "Dict"
+                        ]
+                      },
+                      {
+                        "name": "Include action metadata",
+                        "collaborators": [
+                          "Name",
+                          "Description",
+                          "Status"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "JSONProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "MarkdownAction",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize action to Markdown",
+                        "collaborators": [
+                          "Action",
+                          "String"
+                        ]
+                      },
+                      {
+                        "name": "Format action documentation",
+                        "collaborators": [
+                          "Action Name",
+                          "Description",
+                          "Subsection"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "Action"
+                        ]
+                      }
+                    ],
+                    "module": "actions",
+                    "inherits_from": "MarkdownProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  }
+                ]
+              }
+            ],
+            "story_groups": []
+          }
+        ],
+        "domain_concepts": []
+      }
+    ],
+    "increments": []
+  }
+}
+
+---
+
+# Behavior: scenarios
+
+## Behavior Instructions - scenarios
+
+The purpose of this behavior is to write detailed plain-english scenarios (given/when/then) that specify exact behavior for each story
+
+Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- `C:/dev/agile_bots/docs/story/story-graph.json` - the story graph and related  knowledge built so far
+- `C:/dev/agile_bots/docs/story/strategy.json` - strategy decisions made
+- `C:/dev/agile_bots/docs/story/clarification.json` - clarification answers
+- `C:/dev/agile_bots/test/` and `C:/dev/agile_bots/src/` - existing code and tests
+- any folder named `context/` anywhere in `C:/dev/agile_bots/` - additional context files
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Scenario Language Matches Domain | `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json` | `scanners.scenarios.scenario_language_scanner.ScenarioLanguageScanner` |
+| Example Tables Use Domain Language | `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json` | `scanners.scenarios.example_table_scanner.ExampleTableScanner` |
+| Given Describes State Not Actions | `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json` | `scanners.scenarios.given_state_not_actions_scanner.GivenStateNotActionsScanner` |
+| Background Vs Scenario Setup | `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json` | `scanners.scenarios.background_common_setup_scanner.BackgroundCommonSetupScanner` |
+| Scenarios Cover All Cases | `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json` | `scanners.scenarios.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner` |
+| Use Scenario Outline When Needed | `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json` | `scanners.scenarios.scenario_outline_scanner.ScenarioOutlineScanner` |
+| Write Concrete Scenarios | `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json` | `scanners.scenarios.parameterized_scenarios_scanner.ParameterizedScenariosScanner` |
+| Scenarios On Story Docs | `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json` | `scanners.scenarios.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner` |
+| Map Table Columns To Scenario Parameters | `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json` | `scanners.table_column_parameter_scanner.TableColumnParameterScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** story/stories: "Submit Instructions From Workspace"
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Scenario Language Matches Domain (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json`
+**Description:** Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+**DO:** Use domain language in scenario steps - reference domain concepts by name.
+**DON'T:** Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+### Rule: Example Tables Use Domain Language (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json`
+**Description:** Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+**DO:** Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+**DON'T:** Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+### Rule: Given Describes State Not Actions (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json`
+**Description:** Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+**DO:** Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+**DON'T:** Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+### Rule: Background Vs Scenario Setup (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json`
+**Description:** Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+**DO:** Use Background for shared context with {Concept} references to example tables.
+**DON'T:** Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+### Rule: Scenarios Cover All Cases (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json`
+**Description:** Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+**DO:** Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+**DON'T:** Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+### Rule: Use Scenario Outline When Needed (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json`
+**Description:** Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+**DO:** Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+**DON'T:** Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+### Rule: Write Concrete Scenarios (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json`
+**Description:** Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+**DO:** Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+**DON'T:** Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+### Rule: Scenarios On Story Docs (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json`
+**Description:** Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+**DO:** Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+**DON'T:** Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+### Rule: Map Table Columns To Scenario Parameters (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json`
+**Description:** Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+**DO:** Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+**DON'T:** Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect story/stories: "Submit Instructions From Workspace" for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+### Key Questions
+
+- What system and user actions initiate this story's flow?
+- What is the intended system response after each user action?
+- What preconditions or data states are required before this story can begin?
+- What are the success criteria for the story (from a domain and user perspective)?
+- What are the expected alternate flows, error paths, and edge cases?
+- Are there any mandatory sequencing constraints within or across stories?
+- What domain rules, calculations, or business policies does this story validate?
+- Is the story testable independently (including setup and teardown conditions)?
+- What external systems or services does this story need to interact with?
+- What requests, responses, or contracts are involved in those system interactions?
+- Are there system integration points that require validation or simulation?
+- How do we handle failures, timeouts, or retries for those system calls?
+- What data variations (e.g., boundary conditions, common examples) are required for test coverage?
+- What are the input values needed to test each scenario?
+- What are the expected output values for each input?
+- Are there formulas or calculations that need multiple data points to validate?
+- Are there domain entities with named values that should be tested?
+- What are the boundary conditions (min, max, edge cases) for each data point?
+
+### Evidence
+
+Acceptance criteria from Exploration stage (Domain AC at feature level, Behavioral AC at story level), High fidelity UX flows, Cross-functional walkthrough outputs, Integration contracts or API mocks, Behavior diagrams (state, sequence)
+
+### Decisions
+
+**Your Decisions:**
+
+**examples_representation:**
+  Verification Data Table
+
+**scenario_outline:**
+  Scenario Outline with Examples
+
+**scenario_coverage:**
+  - Happy Path
+  - Edge Cases
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- One story is specified at a time
+- Acceptance criteria must be testable, unambiguous, and executable
+- Gherkin syntax or structured language (Given/When/Then) is preferred
+- Scenarios are written in plain English. When using Scenario Outline, variables are clearly marked and defined in Examples tables with actual test data.
+- Examples tables when used must include ALL variables used in scenario steps
+- Examples tables when used must have exact values for both input AND output variables
+- Every variable when used in scenario steps must have a corresponding column in Examples table
+- Examples tables when used must have actual test data, not placeholders
+- Output/expected result variables must be included in Examples tables when used
+- scnarios follow this pattern
+- bulk of business logic tests done against the domain layer objects directly
+- minimal happy path testing done with separate tgests that go theoiugh CLI
+- JS nodetest for panel test focus on rendering and button layout
+
+---
+## Next action: render
+**Next:** Perform the following action.
+
+## Action Instructions - render
+
+The purpose of this action is to render output documents and artifacts from story graph using templates and synchronizers
+
+specification_scenarios: render story documents with scenarios
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+Please follow the instructions below in order to manually render output documents using templates
+
+All render configurations are automatically loaded and injected below. Process ALL configs - do not skip any.
+
+
+
+**Final Steps:**
+- Process ALL configs above - do not skip any
+- Priority order: synchronizer > template
+- Verify each output file exists after execution
+- If execution fails, report the error and continue with other outputs
+- After completing all renders, pause and wait for human confirmation before proceeding to next behavior
+
+**Creating New Render Outputs:**
+If you need to create code to render a new output format:
+1. Create a new synchronizer file in {workspace}/synchronizers/ (create folder if it doesn't exist)
+2. Follow this signature pattern: output_file = synchronizer.render(story_graph_file)
+3. The synchronizer should read the story-graph.json and produce the desired output file
+4. Add the new synchronizer to the behavior's render config to include it in future renders
+specification_scenarios: render story documents with scenarios
+IMPORTANT: After completing all template-based rendering, you MUST execute the synchronizer-based render specs by running: scenarios.render.renderAll
+This will render the following outputs: render_story_scenarios**Combined instructions:** The following combines multiple actions. Perform them one after another.
+
+## Scope
+
+**Story Scope:** "Render Diagram In Workspace"
+
+Please only work on the following scope.
+
+Scope Filter: ""Render Diagram In Workspace""
+
+Scope:
+
+{
+  "path": "C:\\dev\\agile_bots\\docs\\story\\story-graph.json",
+  "has_epics": true,
+  "has_increments": true,
+  "has_domain_concepts": true,
+  "epic_count": 1,
+  "content": {
+    "epics": [
+      {
+        "name": "Invoke Bot",
+        "sub_epics": [
+          {
+            "name": "Perform Action",
+            "sub_epics": [
+              {
+                "name": "Render Content",
+                "sub_epics": [],
+                "story_groups": [
+                  {
+                    "name": null,
+                    "stories": [
+                      {
+                        "name": "Render Diagram In Workspace",
+                        "acceptance_criteria": [
+                          {
+                            "name": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                            "text": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                            "sequential_order": 0.0
+                          },
+                          {
+                            "name": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                            "text": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                            "sequential_order": 1.0
+                          }
+                        ],
+                        "scenarios": [
+                          {
+                            "name": "Workspace displays {DrawIOElement} diagram for scope",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {Behavior} \"shape\" is selected",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "And scope has diagram output",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "When workspace section renders",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "Then {DrawIOElement} diagram links are displayed",
+                                "sequential_order": 4.0
+                              },
+                              {
+                                "text": "And User can open diagram in editor",
+                                "sequential_order": 5.0
+                              }
+                            ],
+                            "examples": null
+                          },
+                          {
+                            "name": "Large diagram has scroll or zoom",
+                            "background": [],
+                            "steps": [
+                              {
+                                "text": "Given {DrawIOElement} diagram exceeds viewport",
+                                "sequential_order": 1.0
+                              },
+                              {
+                                "text": "When User views diagram in workspace",
+                                "sequential_order": 2.0
+                              },
+                              {
+                                "text": "Then Panel provides scroll or zoom",
+                                "sequential_order": 3.0
+                              },
+                              {
+                                "text": "And Diagram remains readable",
+                                "sequential_order": 4.0
+                              }
+                            ],
+                            "examples": null
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "domain_concepts": [
+                  {
+                    "name": "RenderOutputAction",
+                    "responsibilities": [
+                      {
+                        "name": "Inject render output instructions",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Render Spec",
+                          "Renderer"
+                        ]
+                      },
+                      {
+                        "name": "Inject templates",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Render Spec",
+                          "Template"
+                        ]
+                      },
+                      {
+                        "name": "Inject transformers",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Transformer"
+                        ]
+                      },
+                      {
+                        "name": "Load + inject structured content",
+                        "collaborators": [
+                          "Behavior",
+                          "Content",
+                          "Knowledge Graph"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "TTYRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to TTY",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "TTY String"
+                        ]
+                      },
+                      {
+                        "name": "Format render status",
+                        "collaborators": [
+                          "Render Spec",
+                          "TTY String"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "TTYProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "JSONRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to JSON",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "JSON String"
+                        ]
+                      },
+                      {
+                        "name": "Include render spec",
+                        "collaborators": [
+                          "Render Spec",
+                          "Templates",
+                          "JSON"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "JSONProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "MarkdownRenderOutput",
+                    "responsibilities": [
+                      {
+                        "name": "Serialize render action to Markdown",
+                        "collaborators": [
+                          "RenderOutputAction",
+                          "Markdown String"
+                        ]
+                      },
+                      {
+                        "name": "Format render documentation",
+                        "collaborators": [
+                          "Render Spec",
+                          "Templates",
+                          "Markdown"
+                        ]
+                      },
+                      {
+                        "name": "Wraps domain action",
+                        "collaborators": [
+                          "RenderOutputAction"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "MarkdownProgressAdapter",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Renderer",
+                    "responsibilities": [
+                      {
+                        "name": "Render complex output",
+                        "collaborators": [
+                          "Template",
+                          "Knowledge Graph",
+                          "Transformer"
+                        ]
+                      },
+                      {
+                        "name": "Render outputs using components in context",
+                        "collaborators": [
+                          "AI Chat",
+                          "Template",
+                          "Content"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Template",
+                    "responsibilities": [
+                      {
+                        "name": "Define output structure",
+                        "collaborators": [
+                          "Placeholder"
+                        ]
+                      },
+                      {
+                        "name": "Transform content",
+                        "collaborators": [
+                          "Transformer",
+                          "Content"
+                        ]
+                      },
+                      {
+                        "name": "Load template",
+                        "collaborators": [
+                          "Behavior",
+                          "Content"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "Content",
+                    "responsibilities": [
+                      {
+                        "name": "Render outputs",
+                        "collaborators": [
+                          "Template",
+                          "Renderer",
+                          "Render Spec"
+                        ]
+                      },
+                      {
+                        "name": "Synchronize formats",
+                        "collaborators": [
+                          "Synchronizer",
+                          "Extractor",
+                          "Synchronizer Spec"
+                        ]
+                      },
+                      {
+                        "name": "Save knowledge graph",
+                        "collaborators": [
+                          "Knowledge Graph"
+                        ]
+                      },
+                      {
+                        "name": "Load rendered content",
+                        "collaborators": [
+                          "na"
+                        ]
+                      },
+                      {
+                        "name": "Present rendered content",
+                        "collaborators": [
+                          "na"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "RenderInstructionsSection",
+                    "responsibilities": [
+                      {
+                        "name": "Wraps render subsection",
+                        "collaborators": [
+                          "RenderDataSubSection"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "InstructionsSection",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  },
+                  {
+                    "name": "RenderDataSubSection",
+                    "responsibilities": [
+                      {
+                        "name": "Wraps render JSON",
+                        "collaborators": [
+                          "Render JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays render spec",
+                        "collaborators": [
+                          "Object",
+                          "RenderSpec JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays templates",
+                        "collaborators": [
+                          "List",
+                          "Template JSON"
+                        ]
+                      },
+                      {
+                        "name": "Displays render instructions",
+                        "collaborators": [
+                          "String",
+                          "RenderInstructions JSON"
+                        ]
+                      },
+                      {
+                        "name": "Opens template file",
+                        "collaborators": [
+                          "CLI",
+                          "Path JSON"
+                        ]
+                      }
+                    ],
+                    "module": "actions.render",
+                    "inherits_from": "SubSectionView",
+                    "_source_path": "Invoke Bot.Invoke Bot Directly"
+                  }
+                ]
+              }
+            ],
+            "story_groups": []
+          }
+        ],
+        "domain_concepts": []
+      }
+    ],
+    "increments": []
+  }
+}
+
+---
+
+# Behavior: scenarios
+
+## Behavior Instructions - scenarios
+
+The purpose of this behavior is to write detailed plain-english scenarios (given/when/then) that specify exact behavior for each story
+
+Write detailed plain-English scenarios (Given/When/Then) that specify exact behavior for each story
+
+## Action Instructions - validate
+
+The purpose of this action is to validate story graph and/or artifacts against behavior-specific rules, checking for violations and compliance
+
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+---
+
+**Look for context in the following locations:**
+- in this message and chat history
+- `C:/dev/agile_bots/docs/story/story-graph.json` - the story graph and related  knowledge built so far
+- `C:/dev/agile_bots/docs/story/strategy.json` - strategy decisions made
+- `C:/dev/agile_bots/docs/story/clarification.json` - clarification answers
+- `C:/dev/agile_bots/test/` and `C:/dev/agile_bots/src/` - existing code and tests
+- any folder named `context/` anywhere in `C:/dev/agile_bots/` - additional context files
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+## Step 1: Run Scanners Then Review Violations
+
+**Scanners you must run (with params below). Do not assume pre-run results.**
+
+| Rule | Rule file | Scanner module |
+|------|-----------|----------------|
+| Scenario Language Matches Domain | `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json` | `scanners.scenarios.scenario_language_scanner.ScenarioLanguageScanner` |
+| Example Tables Use Domain Language | `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json` | `scanners.scenarios.example_table_scanner.ExampleTableScanner` |
+| Given Describes State Not Actions | `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json` | `scanners.scenarios.given_state_not_actions_scanner.GivenStateNotActionsScanner` |
+| Background Vs Scenario Setup | `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json` | `scanners.scenarios.background_common_setup_scanner.BackgroundCommonSetupScanner` |
+| Scenarios Cover All Cases | `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json` | `scanners.scenarios.scenarios_cover_all_cases_scanner.ScenariosCoverAllCasesScanner` |
+| Use Scenario Outline When Needed | `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json` | `scanners.scenarios.scenario_outline_scanner.ScenarioOutlineScanner` |
+| Write Concrete Scenarios | `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json` | `scanners.scenarios.parameterized_scenarios_scanner.ParameterizedScenariosScanner` |
+| Scenarios On Story Docs | `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json` | `scanners.scenarios.scenarios_on_story_docs_scanner.ScenariosOnStoryDocsScanner` |
+| Map Table Columns To Scenario Parameters | `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json` | `scanners.table_column_parameter_scanner.TableColumnParameterScanner` |
+
+**Params to pass when running scanners:**
+- **Scope:** story/stories: "Render Diagram In Workspace"
+- **Workspace:** `C:\dev\agile_bots`
+- **Story graph path:** `docs/story/story-graph.json` (or behavior-specific path)
+
+Run each scanner with the above scope and workspace; then report violations and fix the story graph as needed.
+
+Run each scanner with the params above, then review the violations they report as follows:
+1. For each violation message, locate the corresponding element in the story graph.
+2. Open the relevant rule file and read all DO and DON'T examples thoroughly.
+3. Decide if the violation is **Valid** (truly a rule breach per examples) or a **False Positive** (explain why if so).
+4. Determine the **Root Cause** (e.g., 'incorrect concept naming', 'missing actor', etc.).
+5. Assign a **Theme** grouping based on the type of issue (e.g., 'noun-only naming', 'incomplete acceptance criteria').
+6. Extract an **Example** from the actual code/content showing the problem.
+7. Suggest a clear, concrete **Fix** with a code example informed by DO examples in the rule.
+
+## Step 2: Manual Rule Review
+
+**Rules to validate against (read each file for full DO/DON'T examples):**
+
+### Rule: Scenario Language Matches Domain (Priority 1) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenario_language_matches_domain.json`
+**Description:** Scenario language MUST use domain concept terminology. Given/When/Then steps should reference domain entities and concepts, not UI elements or technical implementation details.
+**DO:** Use domain language in scenario steps - reference domain concepts by name.
+**DON'T:** Don't use UI element names, technical implementation terms, or generic words instead of domain concepts.
+
+### Rule: Example Tables Use Domain Language (Priority 2) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/example_tables_use_domain_language.json`
+**Description:** Example tables MUST be grounded in scenario steps AND use domain-rich language. Table columns = nouns from Given/When/Then steps. Use domain terminology, not UI elements. Omit ID columns used purely for linking tables - relationships are expressed via collaboration field and table ordering. Concrete values with domain context, not generic JSON or placeholders. Use source entity data, not aggregated/calculated values - this is the stage where you figure out the real examples.
+**DO:** Ground tables in scenario nouns, use domain terminology, connect tables using domain responsibility sentences. Omit implementation IDs. Show source entities, not derived counts.
+**DON'T:** Don't use UI elements, flat lookup tables, generic JSON, abstract descriptions, invented terminology, or aggregated/calculated values.
+
+### Rule: Given Describes State Not Actions (Priority 3) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/given_describes_state_not_actions.json`
+**Description:** Given statements describe STATE/PRECONDITIONS, not actions or functionality. Given = what exists before test. When = first action. Then = expected behavior. Example: Given user is logged in (state), not Given user logs in (action).
+**DO:** Given describes state/preconditions only. Example: 'Given user is logged in' (state), 'Given character sheet exists' (precondition)
+**DON'T:** Don't describe actions, UI navigation, or functionality in Given. Example: 'Given user logs in' (action - wrong), 'Given User is on PaymentDetails step' (navigation - wrong)
+
+### Rule: Background Vs Scenario Setup (Priority 4) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/background_vs_scenario_setup.json`
+**Description:** Background = shared setup for 3+ scenarios (Given/And only, no When/Then). Background steps MUST use {Concept} notation to reference domain objects. Use {Concept.property} when a specific attribute is important. Don't repeat Background in Steps.
+**DO:** Use Background for shared context with {Concept} references to example tables.
+**DON'T:** Don't use hardcoded values or column names in Background - use {Concept} notation. Don't include When/Then.
+
+### Rule: Scenarios Cover All Cases (Priority 5) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_cover_all_cases.json`
+**Description:** Scenarios must cover happy path, edge cases, and error cases based on acceptance criteria. Example: Valid input → success; Boundary value → validates; Invalid input → error message.
+**DO:** Cover all case types: happy path, edge cases, error cases. Example: User enters valid data → success; User enters boundary → validates; User enters invalid → error
+**DON'T:** Don't skip case types. Example: Only happy path scenarios (missing edge and error cases)
+
+### Rule: Use Scenario Outline When Needed (Priority 6) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/use_scenario_outline_when_needed.json`
+**Description:** Use Scenario Outline with Examples when story warrants concrete data: formulas need validation, domain has named entities, parameter variations exist. Example: Calculate ability modifier with Examples table Rank 10→0, Rank 12→+1, Rank 14→+2.
+**DO:** Scenario Outline for formulas, domain entities, or data variations. Example: Scenario Outline: Calculate modifier with Examples table showing input→output pairs
+**DON'T:** Don't use Scenario Outline for simple behaviors. Example: Scenario Outline: User clicks button (too simple - use regular scenario)
+
+### Rule: Write Concrete Scenarios (Priority 7) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/write_concrete_scenarios.json`
+**Description:** Parameterize domain concepts in scenarios using {Concept} notation for objects and {Concept.property} for specific attributes. Every {parameter} in Background/Steps MUST have corresponding example table. Use object references, not column names directly.
+**DO:** Use {Concept} for object references, {Concept.property} for specific attributes. Connect to example tables.
+**DON'T:** Don't hardcode values without examples, don't use non-domain placeholders, don't skip base data dependencies.
+
+### Rule: Scenarios On Story Docs (Priority 8) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/scenarios_on_story_docs.json`
+**Description:** Scenarios must be in story-graph.json (in scenarios or scenario_outlines fields), NOT in separate markdown files. NEVER create feature specification documents. Example: story-graph.json epics[].stories[].scenarios[], not docs/story/scenarios.md.
+**DO:** Add scenarios to story-graph.json. Example: story-graph.json epics[].stories[].scenarios[] array
+**DON'T:** Dont create separate scenario files or feature specifications. Example: docs/story/Epic/Feature/Feature Specification.md (wrong)
+
+### Rule: Map Table Columns To Scenario Parameters (Priority 9) [Scanner]
+**File:** `story_bot/behaviors/scenarios/rules/map_table_columns_to_scenario_parameters.json`
+**Description:** Map example tables to {Concept} references bidirectionally. Every example table maps to a {Concept} in Background/Steps. Use {Concept} for object references and {Concept.property} for specific attributes. Keep tables minimal and domain-focused.
+**DO:** Bidirectional mapping: Example table name ↔ {Concept} reference in steps.
+**DON'T:** Don't use <column_name> notation - use {Concept} or {Concept.property}. Don't have orphaned tables or references.
+
+
+Scanner tools don't cover or catch every rule violation. Do a second pass:
+1. Carefully read each rule file, fully reviewing DO and DON'T sections, and every provided example.
+2. Inspect story/stories: "Render Diagram In Workspace" for compliance.
+3. Compare the properties and content of each element against the rule's requirements.
+4. Document any violations the scanner could not find.
+5. For each violation, extract an **Example** showing the problem and provide a **Fix** with code example.
+
+## Violations Found
+
+Record ALL findings (scanner + manual) using this readable format. Group by theme for narrow IDE chat panels:
+
+### [Theme Name] (X violations)
+
+**1. [Rule Name]**
+- Location: `path.to.element`
+- Status: Valid / False Positive
+- Source: Scanner / Manual / Both
+- Problem: `"actual problematic text"`
+- Fix: `"corrected text"`
+- Root Cause: Brief explanation
+
+**2. [Rule Name]**
+- Location: `path.to.element`
+- ...
+
+---
+
+### [Next Theme] (Y violations)
+...
+
+Use this list format instead of tables - tables are unreadable in narrow IDE side chat panels.
+
+## Step 3: Summarize Findings & Recommendations
+
+Provide a concise summary:
+- Report how many **scanner violations** were valid vs false positives.
+- Enumerate any **additional manual findings** not caught by scanners.
+- Group all violations by recurring theme or pattern.
+- Split violations into **Priority Fixes** (must resolve before continuing) and **Optional Improvements**.
+
+Present your summary and await user confirmation before automatically applying or proposing corrections.
+specification_scenarios: validate scenario structure and domain language usage
+Validate that scenarios use proper domain terminology and reference domain concepts correctly
+
+### Key Questions
+
+- What system and user actions initiate this story's flow?
+- What is the intended system response after each user action?
+- What preconditions or data states are required before this story can begin?
+- What are the success criteria for the story (from a domain and user perspective)?
+- What are the expected alternate flows, error paths, and edge cases?
+- Are there any mandatory sequencing constraints within or across stories?
+- What domain rules, calculations, or business policies does this story validate?
+- Is the story testable independently (including setup and teardown conditions)?
+- What external systems or services does this story need to interact with?
+- What requests, responses, or contracts are involved in those system interactions?
+- Are there system integration points that require validation or simulation?
+- How do we handle failures, timeouts, or retries for those system calls?
+- What data variations (e.g., boundary conditions, common examples) are required for test coverage?
+- What are the input values needed to test each scenario?
+- What are the expected output values for each input?
+- Are there formulas or calculations that need multiple data points to validate?
+- Are there domain entities with named values that should be tested?
+- What are the boundary conditions (min, max, edge cases) for each data point?
+
+### Evidence
+
+Acceptance criteria from Exploration stage (Domain AC at feature level, Behavioral AC at story level), High fidelity UX flows, Cross-functional walkthrough outputs, Integration contracts or API mocks, Behavior diagrams (state, sequence)
+
+### Decisions
+
+**Your Decisions:**
+
+**examples_representation:**
+  Verification Data Table
+
+**scenario_outline:**
+  Scenario Outline with Examples
+
+**scenario_coverage:**
+  - Happy Path
+  - Edge Cases
+
+
+### Assumptions
+
+**Your Assumptions:**
+
+- One story is specified at a time
+- Acceptance criteria must be testable, unambiguous, and executable
+- Gherkin syntax or structured language (Given/When/Then) is preferred
+- Scenarios are written in plain English. When using Scenario Outline, variables are clearly marked and defined in Examples tables with actual test data.
+- Examples tables when used must include ALL variables used in scenario steps
+- Examples tables when used must have exact values for both input AND output variables
+- Every variable when used in scenario steps must have a corresponding column in Examples table
+- Examples tables when used must have actual test data, not placeholders
+- Output/expected result variables must be included in Examples tables when used
+- scnarios follow this pattern
+- bulk of business logic tests done against the domain layer objects directly
+- minimal happy path testing done with separate tgests that go theoiugh CLI
+- JS nodetest for panel test focus on rendering and button layout
+
+---
+## Next action: render
+**Next:** Perform the following action.
+
+## Action Instructions - render
+
+The purpose of this action is to render output documents and artifacts from story graph using templates and synchronizers
+
+specification_scenarios: render story documents with scenarios
+
+---
+
+
+IMPORTANT: Follow these action instructions specifically. Frame the behavior instructions above within the context of this action.
+
+Please follow the instructions below in order to manually render output documents using templates
+
+All render configurations are automatically loaded and injected below. Process ALL configs - do not skip any.
+
+
+
+**Final Steps:**
+- Process ALL configs above - do not skip any
+- Priority order: synchronizer > template
+- Verify each output file exists after execution
+- If execution fails, report the error and continue with other outputs
+- After completing all renders, pause and wait for human confirmation before proceeding to next behavior
+
+**Creating New Render Outputs:**
+If you need to create code to render a new output format:
+1. Create a new synchronizer file in {workspace}/synchronizers/ (create folder if it doesn't exist)
+2. Follow this signature pattern: output_file = synchronizer.render(story_graph_file)
+3. The synchronizer should read the story-graph.json and produce the desired output file
+4. Add the new synchronizer to the behavior's render config to include it in future renders
+specification_scenarios: render story documents with scenarios
+IMPORTANT: After completing all template-based rendering, you MUST execute the synchronizer-based render specs by running: scenarios.render.renderAll
+This will render the following outputs: render_story_scenarios"""
 Test Submit Scoped Action
 
 SubEpic: Submit Scoped Action
