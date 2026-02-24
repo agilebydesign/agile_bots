@@ -1244,6 +1244,46 @@ class BotPanel {
                 });
             }
             return;
+          case "submitWorkspaceBehaviorInstructions":
+            if (message.behavior && this._botView) {
+              const behaviorName = message.behavior;
+              this._botView.execute(behaviorName)
+                .then((result) => {
+                  if (result?.bot) {
+                    this._botView.botData = result.bot;
+                    if (result.instructions) {
+                      this._botView.botData.instructions = result.instructions;
+                    }
+                    PanelView._lastResponse = result;
+                  }
+                  return this._updateWithCachedData();
+                })
+                .then(() => this._botView.execute('submit'))
+                .then((output) => {
+                  if (output && typeof output === 'object' && output.status) {
+                    if (output.status === 'success') {
+                      vscode.window.showInformationMessage(output.message || 'Instructions submitted to chat!');
+                    } else {
+                      vscode.window.showErrorMessage(`Submit failed: ${output.message || output.error || 'Unknown error'}`);
+                    }
+                  } else {
+                    const outputStr = typeof output === 'string' ? output : JSON.stringify(output || '');
+                    if (outputStr && (outputStr.includes('SUCCESS:') || outputStr.includes('submitted to Cursor chat successfully'))) {
+                      vscode.window.showInformationMessage('Instructions submitted to chat!');
+                    } else if (outputStr && (outputStr.includes('ERROR:') || outputStr.includes('FAILED:'))) {
+                      const errorMatch = outputStr.match(/ERROR:|FAILED:\s*(.+)/);
+                      vscode.window.showErrorMessage(`Submit failed: ${errorMatch ? errorMatch[1] : 'Unknown error'}`);
+                    } else {
+                      vscode.window.showWarningMessage('Submit completed with unknown result');
+                    }
+                  }
+                })
+                .catch((error) => {
+                  this._log(`[BotPanel] submitWorkspaceBehaviorInstructions ERROR: ${error.message}`);
+                  vscode.window.showErrorMessage(`Submit failed: ${error.message}`);
+                });
+            }
+            return;
           case "navigateToAction":
             if (message.behaviorName && message.actionName) {
               const cmd = `${message.behaviorName}.${message.actionName}`;
@@ -1677,11 +1717,11 @@ class BotPanel {
               this._botView?.execute(cmd)
                 .then(() => {
                   this._log(`[BotPanel] saveStrategyAssumptions success`);
-                  vscode.window.showInformationMessage('Strategy assumptions saved successfully');
+                  vscode.window.showInformationMessage('Additional strategies saved successfully');
                 })
                 .catch((error) => {
                   this._log(`[BotPanel] saveStrategyAssumptions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy assumptions: ${error.message}`);
+                  vscode.window.showErrorMessage(`Failed to save additional strategies: ${error.message}`);
                 });
             }
             return;

@@ -2206,6 +2206,13 @@ window.updateContextualButtons = function() {
     var dScope = (window.selectedNode.type !== 'root' && window.selectedNode.name)
         ? window.selectedNode.name : '';
     window.diagramScope = dScope;
+
+    var wsSubmitBtn = document.getElementById('ws-submit-btn');
+    if (wsSubmitBtn) {
+        var bhv = (window.currentBehavior || '').charAt(0).toUpperCase() + (window.currentBehavior || '').slice(1);
+        var scope = (window.selectedNode.type !== 'root' && window.selectedNode.name) ? window.selectedNode.name : 'all';
+        wsSubmitBtn.title = 'Submit ' + bhv + ' for ' + scope;
+    }
     
     var bhv = window.currentBehavior || 'shape';
     var renderBtns = document.querySelectorAll('.render-button');
@@ -2812,6 +2819,28 @@ window.handleSubmitCurrent = function() {
     console.log('[WebView] ========== COMMAND SENT ==========');
 };
 
+window.submitWorkspaceBehaviorInstructions = function() {
+    const behavior = window.currentBehavior || null;
+    if (!behavior) {
+        vscode.postMessage({ command: 'showScopeError', message: 'Select a behavior in Workspace first (click a behavior button).' });
+        return;
+    }
+    const action = window.currentAction || 'build';
+    if (window.selectedNode && window.selectedNode.name) {
+        const nodePath = resolveNodePath(window.selectedNode);
+        if (nodePath) {
+            let commandText;
+            if (window.selectedNode.type === 'increment') {
+                commandText = 'story_graph.submit_increment_instructions name:"' + window.selectedNode.name + '" behavior:"' + behavior + '" action:"' + action + '"';
+            } else {
+                commandText = nodePath + '.submit_instructions behavior:"' + behavior + '" action:"' + action + '"';
+            }
+            vscode.postMessage({ command: 'executeCommand', commandText: commandText });
+            return;
+        }
+    }
+    vscode.postMessage({ command: 'submitWorkspaceBehaviorInstructions', behavior: behavior });
+};
 
 function getSelectedNodeFileLink() {
     if (!window.selectedNode || !window.selectedNode.name) return null;

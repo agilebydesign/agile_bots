@@ -64,6 +64,7 @@ class WorkspaceSectionView extends PanelView {
         const jsonIconPath = getIcon('json.png');
         const filesIconPath = getIcon('files.png');
         const gearIconPath = getIcon('gear.png');
+        const submitIconPath = getIcon('submit.png');
         const documentIconPath = getIcon('document.png');
         const testTubeIconPath = getIcon('test_tube.png');
 
@@ -124,6 +125,9 @@ class WorkspaceSectionView extends PanelView {
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
                 </div>
                 ${behaviorButtonsHtml ? `<div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">${behaviorButtonsHtml}</div>` : ''}
+                <button id="ws-submit-btn" onclick="event.stopPropagation(); if(window.submitWorkspaceBehaviorInstructions) window.submitWorkspaceBehaviorInstructions()" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px; margin-left: 4px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Submit ${escapeForHtml((currentBehavior || '').charAt(0).toUpperCase() + (currentBehavior || '').slice(1))} for all">
+                    <img src="${submitIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="Submit" />
+                </button>
             </div>
             <div id="workspace-content" class="collapsible-content" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: block;">
                 ${clarifyHtml}
