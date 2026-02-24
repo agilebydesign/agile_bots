@@ -989,8 +989,10 @@ window.hidePanel = function() {
     vscode.postMessage({ command: 'hidePanel' });
 };
 
-const WS_SECTION_IDS = ['workspace-content', 'ws-clarify-content', 'ws-strategy-content', 'ws-build-content', 'ws-build-rules-content', 'ws-diagrams-content'];
+const WS_SECTION_IDS = ['workspace-content', 'ws-clarify-content', 'ws-clarify-questions-content', 'ws-strategy-content', 'ws-build-content', 'ws-build-rules-content', 'ws-diagrams-content'];
 const WS_STORAGE_KEY = 'agileBots_workspaceCollapse';
+const WS_QA_COLLAPSE_KEY = 'agileBots_clarifyQACollapse';
+const WS_TEXTAREA_COLLAPSE_KEY = 'agileBots_textareaCollapse';
 
 window.saveWorkspaceCollapseState = function(behavior) {
     if (!behavior || typeof localStorage === 'undefined') return;
@@ -1002,8 +1004,11 @@ window.saveWorkspaceCollapseState = function(behavior) {
             state[id] = section && section.classList.contains('expanded');
         }
     });
+    document.querySelectorAll('[id^="ws-strategy-decision-"]').forEach(el => {
+        const section = el.closest('.collapsible-section');
+        if (section) state[el.id] = section.classList.contains('expanded');
+    });
     try {
-        const key = WS_STORAGE_KEY + '_' + behavior;
         const all = JSON.parse(localStorage.getItem(WS_STORAGE_KEY) || '{}');
         all[behavior] = state;
         localStorage.setItem(WS_STORAGE_KEY, JSON.stringify(all));
@@ -1015,23 +1020,108 @@ window.restoreWorkspaceCollapseState = function(behavior) {
     try {
         const all = JSON.parse(localStorage.getItem(WS_STORAGE_KEY) || '{}');
         const state = all[behavior];
+        if (state) {
+            Object.keys(state).forEach(id => {
+                const content = document.getElementById(id);
+                if (!content) return;
+                const section = content.closest('.collapsible-section');
+                if (!section) return;
+                const expanded = state[id];
+                if (expanded) {
+                    const isWorkspaceContent = id === 'workspace-content';
+                    content.style.maxHeight = isWorkspaceContent ? '400px' : '2000px';
+                    content.style.overflow = isWorkspaceContent ? 'auto' : 'visible';
+                    content.style.overflowX = isWorkspaceContent ? 'hidden' : '';
+                    content.style.display = 'block';
+                    section.classList.add('expanded');
+                } else {
+                    content.style.maxHeight = '0px';
+                    content.style.overflow = 'hidden';
+                    content.style.display = 'none';
+                    section.classList.remove('expanded');
+                }
+            });
+        }
+        if (window.restoreClarifyQACollapseState) {
+            window.restoreClarifyQACollapseState(behavior);
+        }
+        if (window.restoreTextareaCollapseState) {
+            window.restoreTextareaCollapseState(behavior);
+        }
+    } catch (e) {}
+};
+
+window.saveTextareaCollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    try {
+        const state = {};
+        ['ws-clarify-evidence', 'ws-strategy-assumptions'].forEach(id => {
+            const ta = document.getElementById(id);
+            if (ta) state[id] = ta.getAttribute('data-collapsed') === 'true';
+        });
+        const all = JSON.parse(localStorage.getItem(WS_TEXTAREA_COLLAPSE_KEY) || '{}');
+        all[behavior] = state;
+        localStorage.setItem(WS_TEXTAREA_COLLAPSE_KEY, JSON.stringify(all));
+    } catch (e) {}
+};
+
+window.restoreTextareaCollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    try {
+        const all = JSON.parse(localStorage.getItem(WS_TEXTAREA_COLLAPSE_KEY) || '{}');
+        const state = all[behavior];
         if (!state) return;
         Object.keys(state).forEach(id => {
-            const content = document.getElementById(id);
-            if (!content) return;
-            const section = content.closest('.collapsible-section');
-            if (!section) return;
-            const expanded = state[id];
-            if (expanded) {
-                content.style.maxHeight = '2000px';
-                content.style.overflow = 'visible';
-                content.style.display = 'block';
-                section.classList.add('expanded');
-            } else {
-                content.style.maxHeight = '0px';
-                content.style.overflow = 'hidden';
-                content.style.display = 'none';
-                section.classList.remove('expanded');
+            if (!state[id]) return;
+            const textarea = document.getElementById(id);
+            const toggleBtn = document.getElementById(id + '-toggle');
+            if (textarea) {
+                textarea.style.display = 'none';
+                textarea.style.overflow = 'hidden';
+                textarea.setAttribute('data-collapsed', 'true');
+                if (toggleBtn) toggleBtn.textContent = '▼';
+            }
+        });
+    } catch (e) {}
+};
+
+window.saveClarifyQACollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    try {
+        const state = {};
+        const textareas = document.querySelectorAll('[id^="ws-clarify-answer-"]');
+        textareas.forEach((ta) => {
+            const id = ta.id;
+            const match = id.match(/ws-clarify-answer-(\d+)/);
+            if (match) {
+                const idx = parseInt(match[1], 10);
+                state[idx] = ta.getAttribute('data-collapsed') === 'true';
+            }
+        });
+        const all = JSON.parse(localStorage.getItem(WS_QA_COLLAPSE_KEY) || '{}');
+        all[behavior] = state;
+        localStorage.setItem(WS_QA_COLLAPSE_KEY, JSON.stringify(all));
+    } catch (e) {}
+};
+
+window.restoreClarifyQACollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    try {
+        const all = JSON.parse(localStorage.getItem(WS_QA_COLLAPSE_KEY) || '{}');
+        const state = all[behavior];
+        if (!state) return;
+        Object.keys(state).forEach(idxStr => {
+            const idx = parseInt(idxStr, 10);
+            const collapsed = state[idx];
+            if (!collapsed) return;
+            const textarea = document.getElementById('ws-clarify-answer-' + idx);
+            const toggleBtn = document.getElementById('ws-qa-toggle-' + idx);
+            if (textarea) {
+                textarea.style.display = 'none';
+                textarea.style.height = '';
+                textarea.style.overflow = 'hidden';
+                textarea.setAttribute('data-collapsed', 'true');
+                if (toggleBtn) toggleBtn.textContent = '▼';
             }
         });
     } catch (e) {}
@@ -1054,12 +1144,13 @@ window.toggleSection = function(sectionId) {
             content.style.overflow = 'hidden';
             content.style.display = 'none';
         } else {
-
-            content.style.maxHeight = '2000px';
-            content.style.overflow = 'visible';
+            const isWorkspaceContent = sectionId === 'workspace-content';
+            content.style.maxHeight = isWorkspaceContent ? '400px' : '2000px';
+            content.style.overflow = isWorkspaceContent ? 'auto' : 'visible';
+            content.style.overflowX = isWorkspaceContent ? 'hidden' : '';
             content.style.display = 'block';
 
-            if (content.querySelector('[id^="clarify-answer-"]')) {
+            if (content.querySelector('[id*="clarify-answer-"]')) {
                 setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
             }
         }
@@ -1138,7 +1229,7 @@ window.expandInstructionsSection = function(actionName) {
                 section.classList.add('expanded');
                 
 
-                if (sectionName === 'Clarify' && content.querySelector('[id^="clarify-answer-"]')) {
+                if (sectionName === 'Clarify' && content.querySelector('[id*="clarify-answer-"]')) {
                     setTimeout(() => { if (window.expandClarifyBoxes) window.expandClarifyBoxes(); }, 50);
                 }
                 
@@ -1356,7 +1447,7 @@ window.openFilesFromEl = function(el, event) {
 
 
 window.expandClarifyBoxes = function() {
-    const textareas = document.querySelectorAll('[id^="clarify-answer-"]');
+    const textareas = document.querySelectorAll('[id*="clarify-answer-"]');
     textareas.forEach((ta) => {
         if (ta.getAttribute('data-collapsed') === 'false') {
             ta.style.overflow = 'hidden';
@@ -2944,16 +3035,16 @@ document.addEventListener('keydown', function(e) {
 });
 
 
-window.toggleQAExpand = function(idx) {
-    const textarea = document.getElementById('clarify-answer-' + idx);
-    const toggleBtn = document.getElementById('qa-toggle-' + idx);
+window.toggleQAExpand = function(idx, prefix) {
+    const p = prefix || '';
+    const textarea = document.getElementById(p + 'clarify-answer-' + idx);
+    const toggleBtn = document.getElementById(p + 'qa-toggle-' + idx);
     if (!textarea) return;
     
     const isCollapsed = textarea.getAttribute('data-collapsed') === 'true';
-    const defaultHeight = 60;
     
     if (isCollapsed) {
-
+        textarea.style.display = '';
         textarea.style.height = 'auto';
         const fullHeight = textarea.scrollHeight;
         textarea.style.height = fullHeight + 'px';
@@ -2961,11 +3052,37 @@ window.toggleQAExpand = function(idx) {
         textarea.setAttribute('data-collapsed', 'false');
         if (toggleBtn) toggleBtn.textContent = '▲';
     } else {
-
-        textarea.style.height = defaultHeight + 'px';
+        textarea.style.display = 'none';
+        textarea.style.height = '';
         textarea.style.overflow = 'hidden';
         textarea.setAttribute('data-collapsed', 'true');
         if (toggleBtn) toggleBtn.textContent = '▼';
+    }
+    if (p === 'ws-' && window.currentBehavior && window.saveClarifyQACollapseState) {
+        window.saveClarifyQACollapseState(window.currentBehavior);
+    }
+};
+
+window.toggleTextareaExpand = function(textareaId) {
+    const textarea = document.getElementById(textareaId);
+    const toggleBtn = document.getElementById(textareaId + '-toggle');
+    if (!textarea) return;
+    
+    const isCollapsed = textarea.getAttribute('data-collapsed') === 'true';
+    
+    if (isCollapsed) {
+        textarea.style.display = '';
+        textarea.style.overflow = 'visible';
+        textarea.setAttribute('data-collapsed', 'false');
+        if (toggleBtn) toggleBtn.textContent = '▲';
+    } else {
+        textarea.style.display = 'none';
+        textarea.style.overflow = 'hidden';
+        textarea.setAttribute('data-collapsed', 'true');
+        if (toggleBtn) toggleBtn.textContent = '▼';
+    }
+    if (window.currentBehavior && window.saveTextareaCollapseState) {
+        window.saveTextareaCollapseState(window.currentBehavior);
     }
 };
 
@@ -2973,7 +3090,7 @@ window.toggleQAExpand = function(idx) {
 window.saveClarifyAnswers = function() {
     console.log('[WebView] saveClarifyAnswers triggered');
     const answers = {};
-    const answerElements = document.querySelectorAll('[id^="clarify-answer-"]');
+    const answerElements = document.querySelectorAll('[id*="clarify-answer-"]');
     
     answerElements.forEach((textarea) => {
         const question = textarea.getAttribute('data-question');
@@ -2994,13 +3111,13 @@ window.saveClarifyAnswers = function() {
 
 window.saveClarifyEvidence = function() {
     console.log('[WebView] saveClarifyEvidence triggered');
-    const evidenceTextarea = document.getElementById('clarify-evidence');
+    const evidenceTextarea = document.getElementById('ws-clarify-evidence') || document.getElementById('clarify-evidence');
     if (evidenceTextarea) {
         const evidenceText = evidenceTextarea.value?.trim();
         if (evidenceText) {
 
             const evidenceProvided = {};
-            evidenceText.split('\\n').forEach(line => {
+            evidenceText.split(/\n/).forEach(line => {
                 const colonIdx = line.indexOf(':');
                 if (colonIdx > 0) {
                     const key = line.substring(0, colonIdx).trim();
@@ -3056,11 +3173,11 @@ window.saveStrategyMultiDecision = function(criteriaKey, inputName) {
 
 window.saveStrategyAssumptions = function() {
     console.log('[WebView] saveStrategyAssumptions triggered');
-    const assumptionsTextarea = document.getElementById('strategy-assumptions');
+    const assumptionsTextarea = document.getElementById('ws-strategy-assumptions') || document.getElementById('strategy-assumptions');
     if (assumptionsTextarea) {
         const assumptionsText = assumptionsTextarea.value?.trim();
         if (assumptionsText) {
-            const assumptions = assumptionsText.split('\\n').filter(a => a.trim());
+            const assumptions = assumptionsText.split(/\n/).filter(a => a.trim());
             console.log('[WebView] Saving strategy assumptions:', assumptions);
             vscode.postMessage({
                 command: 'saveStrategyAssumptions',

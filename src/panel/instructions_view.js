@@ -597,44 +597,34 @@ class InstructionsSection extends PanelView {
             .trim();
     }
     
-    _formatClarifyInstructions(value) {
-        // Format clarify-specific instructions - Q&A and evidence
+    _formatClarifyInstructions(value, idPrefix) {
+        const p = idPrefix || '';
         if (typeof value !== 'object' || !value) {
             return escapeForHtml(String(value));
         }
         
-        let html = '';
+        let questionsHtml = '';
         let questions = [];
-        let evidence = [];
         
-        // Determine source of questions and answers
         if (value.clarification_data && Array.isArray(value.clarification_data) && value.clarification_data.length > 0) {
-            // Use clarification.json if present
             questions = value.clarification_data;
         } else if (value.guardrails && value.guardrails.required_context && Array.isArray(value.guardrails.required_context.key_questions)) {
-            // Use guardrails questions if clarification.json not present
             questions = value.guardrails.required_context.key_questions.map(q => ({
                 question: q,
                 answer: ''
             }));
         }
 
-        // Get required evidence and provided evidence from evidence object
         let requiredEvidence = [];
         let providedEvidence = {};
-        
         if (value.evidence && typeof value.evidence === 'object') {
-            // Evidence object should have 'required' and 'provided' keys
             requiredEvidence = value.evidence.required || [];
             providedEvidence = value.evidence.provided || {};
         }
-        
-        // Fallback to guardrails if no evidence structure
         if (requiredEvidence.length === 0 && value.guardrails && value.guardrails.required_context && Array.isArray(value.guardrails.required_context.evidence)) {
             requiredEvidence = value.guardrails.required_context.evidence;
         }
 
-        // Render Q&A Section - questions with editable answer textboxes
         if (questions.length > 0) {
             questions.forEach((item, idx) => {
                 let questionText = typeof item === 'string' ? item : item.question;
@@ -644,52 +634,53 @@ class InstructionsSection extends PanelView {
 
                 if (questionText) {
                     const hasAnswer = answerText && answerText.trim().length > 0;
-                    const isLongAnswer = hasAnswer && answerText.length > 100;
-                    // Always show full answer without scrolling: estimate height from line count (~22px per line)
                     const lineCount = (answerText.match(/\n/g) || []).length + 1;
                     const expandedHeightPx = Math.min(500, Math.max(60, lineCount * 22));
                     const heightStyle = hasAnswer ? `${expandedHeightPx}px` : 'auto';
                     const overflowStyle = 'visible';
-                    html += `<div class="input-container qa-container" style="margin-top: ${idx > 0 ? '12px' : '0'}; position: relative;">`;
-                    html += `<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;">`;
-                    html += `<span style="flex: 1; padding-right: 8px;">${escapeForHtml(questionText)}</span>`;
-                    html += `<button onclick="toggleQAExpand(${idx})" id="qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button>`;
-                    html += `</div>`;
-                    html += `<textarea id="clarify-answer-${idx}" data-question="${escapeForHtml(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${heightStyle}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${overflowStyle};" data-collapsed="false">${escapeForHtml(answerText)}</textarea>`;
-                    html += `</div>`;
+                    questionsHtml += `<div class="input-container qa-container" style="margin-top: ${idx > 0 ? '12px' : '0'}; position: relative;">`;
+                    questionsHtml += `<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;">`;
+                    questionsHtml += `<span style="flex: 1; padding-right: 8px;">${escapeForHtml(questionText)}</span>`;
+                    questionsHtml += `<button onclick="toggleQAExpand(${idx}, '${p}')" id="${p}qa-toggle-${idx}" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button>`;
+                    questionsHtml += `</div>`;
+                    questionsHtml += `<textarea id="${p}clarify-answer-${idx}" data-question="${escapeForHtml(questionText)}" onblur="saveClarifyAnswers()" style="width: 100%; height: ${heightStyle}; min-height: 40px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base); overflow: ${overflowStyle};" data-collapsed="false">${escapeForHtml(answerText)}</textarea>`;
+                    questionsHtml += `</div>`;
                 }
             });
         }
         
-        // Render Evidence Section - Required evidence as list + editable "Evidence Provided" box
+        let evidenceHtml = '';
         if (requiredEvidence.length > 0 || Object.keys(providedEvidence).length > 0) {
-            html += '<div style="margin-top: 16px;">';
-            html += '<div class="input-header">Evidence</div>';
-            
-            // Show required evidence as bullet list
             if (requiredEvidence.length > 0) {
-                html += '<div style="margin-top: 8px;">';
                 requiredEvidence.forEach(item => {
-                    html += `<div style="margin-bottom: 4px;">• ${escapeForHtml(repairUtf8Mojibake(String(item)))}</div>`;
+                    evidenceHtml += `<div style="margin-bottom: 4px;">• ${escapeForHtml(repairUtf8Mojibake(String(item)))}</div>`;
                 });
-                html += '</div>';
             }
-            
-            // Show editable "Evidence Provided" textarea
-            html += '<div style="margin-top: 12px;">';
-            html += '<div class="input-header" style="font-size: 13px; margin-bottom: 4px;">Evidence Provided</div>';
-            
-            // Convert providedEvidence object to text for textarea
             let providedText = '';
             if (Object.keys(providedEvidence).length > 0) {
                 providedText = Object.entries(providedEvidence)
                     .map(([key, val]) => `${repairUtf8Mojibake(key)}: ${repairUtf8Mojibake(String(val))}`)
                     .join('\n');
             }
+            evidenceHtml += `<div style="margin-top: 12px;" class="input-container qa-container"><div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px; font-size: 13px;">Evidence Provided</span><button onclick="toggleTextareaExpand('${p}clarify-evidence')" id="${p}clarify-evidence-toggle" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button></div>`;
+            evidenceHtml += `<textarea id="${p}clarify-evidence" data-collapsed="false" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea></div>`;
+        }
 
-            html += `<textarea id="clarify-evidence" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea>`;
-            html += '</div>';
-            html += '</div>';
+        let html = '';
+        if (questionsHtml) {
+            const qId = p + 'clarify-questions-content';
+            html += `<div class="collapsible-section expanded" style="margin-bottom: 4px;">
+                <div class="collapsible-header" onclick="toggleSection('${qId}')" style="cursor: pointer; padding: 2px 0; display: flex; align-items: center; user-select: none;">
+                    <span class="expand-icon">▸</span>
+                    <span style="font-weight: 600; font-size: 13px;">Questions</span>
+                </div>
+                <div id="${qId}" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                    <div style="padding-left: 4px;">${questionsHtml}</div>
+                </div>
+            </div>`;
+        }
+        if (evidenceHtml) {
+            html += `<div style="margin-bottom: 4px;">${evidenceHtml}</div>`;
         }
 
         if (html === '' && (!value.clarification_data || value.clarification_data.length === 0)) {
@@ -699,20 +690,21 @@ class InstructionsSection extends PanelView {
         return html;
     }
     
-    _formatStrategyInstructions(value) {
+    _formatStrategyInstructions(value, idPrefix) {
         // Format strategy-specific instructions - decision criteria and assumptions
         if (typeof value !== 'object' || !value) {
             return escapeForHtml(String(value));
         }
 
+        const p = idPrefix || '';
         console.log('[DEBUG] Strategy Instructions value:', JSON.stringify(value, null, 2));
         
-        let html = '';
+        let decisionsHtml = '';
         const strategyCriteriaObj = value.strategy_criteria || {};
         const decisionsMade = value.decisions_made || {};
         const assumptionsMade = value.assumptions_made || [];
 
-        // Render Decision Criteria - radio buttons with saved decisions highlighted
+        // Render Decision Criteria - each decision (question + options) is individually collapsible
         // strategyCriteriaObj format: { 'key1': {question: '...', options: [...]}, ... }
         // decisionsMade format: { 'key1': 'selected option text', ... }
         const criteriaKeys = Object.keys(strategyCriteriaObj);
@@ -720,11 +712,9 @@ class InstructionsSection extends PanelView {
             criteriaKeys.forEach((criteriaKey, criteriaIdx) => {
                 const criteria = strategyCriteriaObj[criteriaKey];
                 if (typeof criteria === 'object' && criteria !== null) {
-                    html += '<div style="margin-bottom: 16px;">';
-                    
-                    // Render the question as header
                     const question = criteria.question || criteriaKey;
-                    html += `<div class="input-header">${escapeForHtml(question)}</div>`;
+                    const decisionId = p + 'strategy-decision-' + criteriaIdx;
+                    let choicesHtml = '';
                     
                     // Get the saved decision for this criteria
                     const savedDecision = decisionsMade[criteriaKey];
@@ -732,55 +722,59 @@ class InstructionsSection extends PanelView {
                     // All strategy choices use checkboxes (multi-select)
                     const options = criteria.options || [];
                     if (options.length > 0) {
-                        html += '<div style="margin-top: 8px;">';
-                        
-                        // savedDecision can be a string (legacy) or array
                         const savedSelections = Array.isArray(savedDecision) 
                             ? savedDecision 
                             : (savedDecision ? [savedDecision] : []);
                         
                         options.forEach((option, optionIdx) => {
                             const inputName = `decision-criteria-${criteriaIdx}`;
-                            
-                            // Extract option text (could be string or object with 'name' field)
                             let optionText = '';
                             if (typeof option === 'string') {
                                 optionText = option;
                             } else if (typeof option === 'object' && option !== null) {
                                 optionText = option.name || option.id || JSON.stringify(option);
                             }
-                            
-                            // Check if this option is in the saved selections
                             const isSelected = savedSelections.includes(optionText);
-                            
-                            // Escape for use in onclick attribute
                             const escapedCriteriaKey = escapeForHtml(criteriaKey).replace(/'/g, "\\'");
                             
-                            html += `<div style="margin-bottom: 8px;">`;
-                            html += `<label style="display: flex; align-items: flex-start; cursor: pointer;">`;
-                            html += `<input type="checkbox" name="${inputName}" value="${optionIdx}" ${isSelected ? 'checked' : ''} onchange="saveStrategyMultiDecision('${escapedCriteriaKey}', '${inputName}')" style="margin-right: 8px; margin-top: 4px; cursor: pointer;" />`;
-                            html += `<span style="flex: 1; ${isSelected ? 'font-weight: 600; color: var(--vscode-textLink-foreground);' : ''}">${escapeForHtml(optionText)}</span>`;
-                            html += `</label>`;
-                            html += `</div>`;
+                            choicesHtml += `<div style="margin-bottom: 8px;">`;
+                            choicesHtml += `<label style="display: flex; align-items: flex-start; cursor: pointer;">`;
+                            choicesHtml += `<input type="checkbox" name="${inputName}" value="${optionIdx}" ${isSelected ? 'checked' : ''} onchange="saveStrategyMultiDecision('${escapedCriteriaKey}', '${inputName}')" style="margin-right: 8px; margin-top: 4px; cursor: pointer;" />`;
+                            choicesHtml += `<span style="flex: 1; ${isSelected ? 'font-weight: 600; color: var(--vscode-textLink-foreground);' : ''}">${escapeForHtml(optionText)}</span>`;
+                            choicesHtml += `</label>`;
+                            choicesHtml += `</div>`;
                         });
-                        html += '</div>';
                     }
                     
-                    html += '</div>';
+                    decisionsHtml += `<div class="collapsible-section expanded" style="margin-bottom: 4px;">
+                        <div class="collapsible-header" onclick="toggleSection('${decisionId}')" style="cursor: pointer; padding: 2px 0; display: flex; align-items: center; user-select: none;">
+                            <span class="expand-icon">▸</span>
+                            <span style="font-weight: 600; font-size: 13px;">${escapeForHtml(question)}</span>
+                        </div>
+                        <div id="${decisionId}" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                            <div style="padding-left: 4px; margin-top: 8px;">${choicesHtml}</div>
+                        </div>
+                    </div>`;
                 }
             });
         }
 
-        // Render Assumptions - always show as editable textarea with saved values pre-filled
-        html += '<div class="input-container" style="margin-top: 6px;">';
-        html += '<div class="input-header">Assumptions</div>';
-
-        // Pre-fill textarea with saved assumptions (one per line) or empty
+        // Assumptions - textarea with collapse button (like Clarify Q&A)
+        let assumptionsHtml = '<div class="input-container qa-container" style="margin-top: 6px;">';
+        assumptionsHtml += '<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px;">Assumptions</span>';
+        assumptionsHtml += `<button onclick="toggleTextareaExpand('${p}strategy-assumptions')" id="${p}strategy-assumptions-toggle" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button></div>`;
         const assumptionsText = assumptionsMade.length > 0
             ? assumptionsMade.join('\n')
             : '';
-        html += `<textarea id="strategy-assumptions" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(assumptionsText)}</textarea>`;
-        html += '</div>';
+        assumptionsHtml += `<textarea id="${p}strategy-assumptions" data-collapsed="false" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(assumptionsText)}</textarea>`;
+        assumptionsHtml += '</div>';
+
+        // Build final HTML - Decisions shown directly (each is collapsible), Assumptions inline with collapsible textarea
+        let html = '';
+        if (decisionsHtml) {
+            html += `<div style="margin-bottom: 8px;">${decisionsHtml}</div>`;
+        }
+        html += assumptionsHtml;
 
         return html;
     }

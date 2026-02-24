@@ -99,7 +99,7 @@ class WorkspaceSectionView extends PanelView {
                 ${gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Workspace" />` : ''}
                 <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
             </div>
-            <div id="workspace-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+            <div id="workspace-content" class="collapsible-content" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: block;">
                 ${clarifyHtml}
                 ${strategyHtml}
                 ${buildHtml}
