@@ -26,6 +26,25 @@ function escapeForJs(text) {
         .replace(/\r/g, '\\r');
 }
 
+/**
+ * Repair UTF-8 mojibake: text that was UTF-8 bytes misinterpreted as Latin-1 and re-saved.
+ * E.g. "Ã¢â€"Â¼" -> "¼". Only applies when each char has code point <= 255 (one byte per char).
+ */
+function repairUtf8Mojibake(text) {
+    if (text === null || text === undefined || typeof text !== 'string') return text;
+    if (!/[^\x00-\x7f]/.test(text)) return text;
+    try {
+        for (let i = 0; i < text.length; i++) {
+            if (text.charCodeAt(i) > 255) return text;
+        }
+        const bytes = new Uint8Array([].map.call(text, c => c.charCodeAt(0)));
+        const repaired = new TextDecoder('utf-8').decode(bytes);
+        return repaired.includes('\ufffd') ? text : repaired;
+    } catch (e) {
+        return text;
+    }
+}
+
 // ── Path utilities ────────────────────────────────────────────────────────────
 
 function truncatePath(pathStr, maxLength) {
@@ -162,6 +181,7 @@ class Logger {
 module.exports = {
     escapeForHtml,
     escapeForJs,
+    repairUtf8Mojibake,
     truncatePath,
     Logger
 };

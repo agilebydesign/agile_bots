@@ -5,6 +5,7 @@
 const PanelView = require('./panel_view');
 const branding = require('./branding');
 const DiagramSectionView = require('./diagram_section_view');
+const InstructionsSection = require('./instructions_view');
 const { escapeForHtml, escapeForJs, log } = require('./utils');
 
 class WorkspaceSectionView extends PanelView {
@@ -73,10 +74,13 @@ class WorkspaceSectionView extends PanelView {
             : allDrawioLinks;
         const drawioPath = drawioLinks.length > 0 ? escapeForJs(drawioLinks[0].url) : '';
 
-        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, currentBehavior, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath);
+        const getIconMore = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
+        const clarifyHtml = this._renderClarifySubsection(instructionsData, currentBehavior, getIconMore);
+        const strategyHtml = this._renderStrategySubsection(instructionsData, currentBehavior, getIconMore);
         const buildHtml = this._renderBuildSubsection(instructionsData, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath);
+        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, currentBehavior, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath);
 
-        if (!diagramsHtml && !buildHtml) return '';
+        if (!diagramsHtml && !buildHtml && !clarifyHtml && !strategyHtml) return '';
 
         return `
     <div class="section card-primary" style="margin-top: 8px;">
@@ -93,6 +97,8 @@ class WorkspaceSectionView extends PanelView {
                 <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
             </div>
             <div id="workspace-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                ${clarifyHtml}
+                ${strategyHtml}
                 ${buildHtml}
                 ${diagramsHtml}
             </div>
@@ -239,6 +245,90 @@ class WorkspaceSectionView extends PanelView {
                 <div style="padding: 0 4px 2px 4px;">
                     ${content}
                 </div>
+            </div>
+        </div>`;
+    }
+
+    _renderClarifySubsection(instructions, currentBehavior, getIcon) {
+        const botPathOrCli = this._cli || this._botPath || this.parentView?._cli || this.parentView?._botPath;
+        const instrView = new InstructionsSection(botPathOrCli, this.webview, this.extensionUri, this.parentView);
+        const rawClarification = instructions.clarification;
+        const savedClarification = (rawClarification && currentBehavior && rawClarification[currentBehavior] && !rawClarification.key_questions)
+            ? rawClarification[currentBehavior]
+            : rawClarification;
+        const hasSavedAnswers = savedClarification &&
+            savedClarification.key_questions &&
+            savedClarification.key_questions.answers &&
+            Object.keys(savedClarification.key_questions.answers).length > 0;
+
+        let clarificationDataArray = [];
+        if (hasSavedAnswers) {
+            clarificationDataArray = Object.keys(savedClarification.key_questions.answers).map(question => ({
+                question,
+                answer: savedClarification.key_questions.answers[question]
+            }));
+        }
+        if (clarificationDataArray.length === 0 && instructions.guardrails?.required_context?.key_questions) {
+            clarificationDataArray = instructions.guardrails.required_context.key_questions.map(q => ({ question: q, answer: '' }));
+        }
+        const evidenceData = savedClarification?.evidence || {
+            required: instructions.guardrails?.required_context?.evidence || [],
+            provided: {}
+        };
+        const clarifyData = {
+            clarification_data: clarificationDataArray,
+            evidence: evidenceData,
+            guardrails: instructions.guardrails || instructions.clarify_instructions?.guardrails
+        };
+        const content = instrView._formatClarifyInstructions(clarifyData, 'ws-');
+        const iconPath = getIcon ? getIcon('light_bulb_head.png') : null;
+
+        return `
+        <div class="collapsible-section expanded" style="margin-bottom: 4px;">
+            <div class="collapsible-header" onclick="toggleSection('ws-clarify-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
+                <span class="expand-icon">▸</span>
+                ${iconPath ? `<img src="${iconPath}" style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="Clarify" />` : ''}
+                <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Clarify</span>
+            </div>
+            <div id="ws-clarify-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                <div style="padding: 0 4px 2px 4px;">${content}</div>
+            </div>
+        </div>`;
+    }
+
+    _renderStrategySubsection(instructions, currentBehavior, getIcon) {
+        const botPathOrCli = this._cli || this._botPath || this.parentView?._cli || this.parentView?._botPath;
+        const instrView = new InstructionsSection(botPathOrCli, this.webview, this.extensionUri, this.parentView);
+        const rawStrategy = instructions.strategy;
+        const savedStrategy = (rawStrategy && currentBehavior && rawStrategy[currentBehavior] && !rawStrategy.strategy_criteria)
+            ? rawStrategy[currentBehavior]
+            : rawStrategy;
+        const isRawFormat = savedStrategy && (savedStrategy.decisions !== undefined || savedStrategy.assumptions !== undefined);
+        let strategyCriteriaData = savedStrategy?.strategy_criteria?.criteria || {};
+        let decisionsMade = isRawFormat ? (savedStrategy.decisions || {}) : (savedStrategy?.strategy_criteria?.decisions_made || {});
+        let assumptionsMade = isRawFormat ? (savedStrategy.assumptions || []) : (savedStrategy?.assumptions?.assumptions_made || []);
+        if (Object.keys(strategyCriteriaData).length === 0) {
+            const fallbackData = instructions.strategy_criteria || instructions.guardrails?.decision_criteria || {};
+            strategyCriteriaData = fallbackData.criteria || fallbackData;
+        }
+        const strategyData = {
+            strategy_criteria: strategyCriteriaData,
+            decisions_made: decisionsMade,
+            assumptions_made: assumptionsMade,
+            action_instructions: instructions.action_instructions
+        };
+        const content = instrView._formatStrategyInstructions(strategyData, 'ws-');
+        const iconPath = getIcon ? getIcon('lightbulb.png') : null;
+
+        return `
+        <div class="collapsible-section expanded" style="margin-bottom: 4px;">
+            <div class="collapsible-header" onclick="toggleSection('ws-strategy-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
+                <span class="expand-icon">▸</span>
+                ${iconPath ? `<img src="${iconPath}" style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="Strategy" />` : ''}
+                <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Strategy</span>
+            </div>
+            <div id="ws-strategy-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                <div style="padding: 0 4px 2px 4px;">${content}</div>
             </div>
         </div>`;
     }

@@ -10,7 +10,7 @@ const PanelView = require('./panel_view');
 const branding = require('./branding');
 const vscode = require('vscode');
 const path = require('path');
-const { escapeForHtml, escapeForJs, Logger } = require('./utils');
+const { escapeForHtml, escapeForJs, repairUtf8Mojibake, Logger } = require('./utils');
 
 class InstructionsSection extends PanelView {
     /**
@@ -637,9 +637,11 @@ class InstructionsSection extends PanelView {
         // Render Q&A Section - questions with editable answer textboxes
         if (questions.length > 0) {
             questions.forEach((item, idx) => {
-                const questionText = typeof item === 'string' ? item : item.question;
-                const answerText = typeof item === 'object' ? (item.answer || '') : '';
-                
+                let questionText = typeof item === 'string' ? item : item.question;
+                let answerText = typeof item === 'object' ? (item.answer || '') : '';
+                questionText = repairUtf8Mojibake(questionText);
+                answerText = repairUtf8Mojibake(answerText);
+
                 if (questionText) {
                     const hasAnswer = answerText && answerText.trim().length > 0;
                     const isLongAnswer = hasAnswer && answerText.length > 100;
@@ -668,7 +670,7 @@ class InstructionsSection extends PanelView {
             if (requiredEvidence.length > 0) {
                 html += '<div style="margin-top: 8px;">';
                 requiredEvidence.forEach(item => {
-                    html += `<div style="margin-bottom: 4px;">• ${escapeForHtml(String(item))}</div>`;
+                    html += `<div style="margin-bottom: 4px;">• ${escapeForHtml(repairUtf8Mojibake(String(item)))}</div>`;
                 });
                 html += '</div>';
             }
@@ -681,10 +683,10 @@ class InstructionsSection extends PanelView {
             let providedText = '';
             if (Object.keys(providedEvidence).length > 0) {
                 providedText = Object.entries(providedEvidence)
-                    .map(([key, val]) => `${key}: ${val}`)
+                    .map(([key, val]) => `${repairUtf8Mojibake(key)}: ${repairUtf8Mojibake(String(val))}`)
                     .join('\n');
             }
-            
+
             html += `<textarea id="clarify-evidence" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea>`;
             html += '</div>';
             html += '</div>';
