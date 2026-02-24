@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 100);
         }
+
+        if (window.currentBehavior && window.restoreWorkspaceCollapseState) {
+            setTimeout(() => window.restoreWorkspaceCollapseState(window.currentBehavior), 50);
+        }
         
 
         setTimeout(() => {
@@ -985,6 +989,54 @@ window.hidePanel = function() {
     vscode.postMessage({ command: 'hidePanel' });
 };
 
+const WS_SECTION_IDS = ['workspace-content', 'ws-clarify-content', 'ws-strategy-content', 'ws-build-content', 'ws-build-rules-content', 'ws-diagrams-content'];
+const WS_STORAGE_KEY = 'agileBots_workspaceCollapse';
+
+window.saveWorkspaceCollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    const state = {};
+    WS_SECTION_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            const section = el.closest('.collapsible-section');
+            state[id] = section && section.classList.contains('expanded');
+        }
+    });
+    try {
+        const key = WS_STORAGE_KEY + '_' + behavior;
+        const all = JSON.parse(localStorage.getItem(WS_STORAGE_KEY) || '{}');
+        all[behavior] = state;
+        localStorage.setItem(WS_STORAGE_KEY, JSON.stringify(all));
+    } catch (e) {}
+};
+
+window.restoreWorkspaceCollapseState = function(behavior) {
+    if (!behavior || typeof localStorage === 'undefined') return;
+    try {
+        const all = JSON.parse(localStorage.getItem(WS_STORAGE_KEY) || '{}');
+        const state = all[behavior];
+        if (!state) return;
+        Object.keys(state).forEach(id => {
+            const content = document.getElementById(id);
+            if (!content) return;
+            const section = content.closest('.collapsible-section');
+            if (!section) return;
+            const expanded = state[id];
+            if (expanded) {
+                content.style.maxHeight = '2000px';
+                content.style.overflow = 'visible';
+                content.style.display = 'block';
+                section.classList.add('expanded');
+            } else {
+                content.style.maxHeight = '0px';
+                content.style.overflow = 'hidden';
+                content.style.display = 'none';
+                section.classList.remove('expanded');
+            }
+        });
+    } catch (e) {}
+};
+
 window.toggleSection = function(sectionId) {
     console.log('[toggleSection] Called with sectionId:', sectionId);
     const content = document.getElementById(sectionId);
@@ -1027,6 +1079,9 @@ window.toggleSection = function(sectionId) {
             }
         }
 
+        if (WS_SECTION_IDS.indexOf(sectionId) >= 0 && window.currentBehavior && window.saveWorkspaceCollapseState) {
+            window.saveWorkspaceCollapseState(window.currentBehavior);
+        }
         if (sectionId === 'scope-content' && typeof vscode !== 'undefined') {
             vscode.postMessage({ command: 'sectionExpansion', sectionId: sectionId, expanded: !isExpanded });
         }
