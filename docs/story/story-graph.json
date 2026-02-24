@@ -13256,6 +13256,58 @@
                       "behavior": null
                     },
                     {
+                      "name": "Select Workspace Behavior",
+                      "sequential_order": 6.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestSelectWorkspaceBehavior",
+                      "scenarios": [
+                        {
+                          "name": "User selects behavior and sees instructions update",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build"
+                        },
+                        {
+                          "name": "Panel remembers selection across section toggles",
+                          "sequential_order": 1.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": "test_behavior_selection_persists_across_state_refresh",
+                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected"
+                        },
+                        {
+                          "name": "Default behavior shown when none selected",
+                          "sequential_order": 2.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd no {Behavior} selected yet\nWhen User opens workspace section\nThen {InstructionsSection} displays default or last-selected {Behavior}\nAnd {InstructionsSection} does not show empty content"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User opens panel AND workspace section is visible\nTHEN Panel displays behavior dropdown with available behaviors AND User can select a behavior from dropdown AND Selected behavior becomes active scope for instructions",
+                          "text": "WHEN User opens panel AND workspace section is visible\nTHEN Panel displays behavior dropdown with available behaviors AND User can select a behavior from dropdown AND Selected behavior becomes active scope for instructions",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN User selects behavior from dropdown\nTHEN Panel updates instructions section to show behavior-specific content AND Panel persists selection for session",
+                          "text": "WHEN User selects behavior from dropdown\nTHEN Panel updates instructions section to show behavior-specific content AND Panel persists selection for session",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN No behavior selected\nTHEN Panel shows default or last-selected behavior AND Panel does not show empty instructions",
+                          "text": "WHEN No behavior selected\nTHEN Panel shows default or last-selected behavior AND Panel does not show empty instructions",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
                       "name": "Navigate Sequentially Using CLI",
                       "sequential_order": 7.0,
                       "connector": null,
@@ -14529,6 +14581,45 @@
                           "name": "WHEN User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\" THEN CLI stores that instruction for shape.clarify AND CLI includes it in next prompt",
                           "text": "WHEN User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\" THEN CLI stores that instruction for shape.clarify AND CLI includes it in next prompt",
                           "sequential_order": 4.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Submit Instructions From Workspace",
+                      "sequential_order": 15.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestSubmitInstructionsFromWorkspace",
+                      "scenarios": [
+                        {
+                          "name": "User submits {Behavior} instructions to AI agent",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_workspace_submit_button_sends_instructions",
+                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {InstructionsSection} displays shape instructions\nWhen User triggers submit from workspace\nThen System sends {Behavior} shape instructions to AI agent\nAnd Submit button is visible and enabled"
+                        },
+                        {
+                          "name": "Submit disabled when no behavior selected",
+                          "sequential_order": 1.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given no {Behavior} is selected in workspace\nWhen User views workspace section\nThen Submit shows scope error or is disabled\nAnd User cannot submit empty instructions"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                          "text": "WHEN User has instructions visible in workspace section\nTHEN Panel displays Submit button AND User can trigger submit to send instructions to AI agent",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                          "text": "WHEN No {Behavior} selected\nTHEN System shows scope error or disables submit",
+                          "sequential_order": 1.0
                         }
                       ],
                       "behavior": null
@@ -16352,6 +16443,58 @@
                       "behavior": null
                     },
                     {
+                      "name": "Display Clarification In Workspace",
+                      "sequential_order": 6.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestDisplayClarificationInWorkspace",
+                      "scenarios": [
+                        {
+                          "name": "Workspace shows ClarifyInstructionsSection with key questions",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_clarify_returns_key_questions_for_workspace_display",
+                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {GatherContextAction} defines {KeyQuestions} for shape\nWhen workspace section renders\nThen {ClarifyInstructionsSection} displays {KeyQuestions} in workspace\nAnd {ClarifyDataSubSection} shows editable answer fields"
+                        },
+                        {
+                          "name": "User edits answer and saves via CLI",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given {ClarifyInstructionsSection} displays {KeyQuestions} in workspace\nWhen User edits answer in {ClarifyDataSubSection}\nThen System saves answer via CLI\nAnd answer persists in clarification.json"
+                        },
+                        {
+                          "name": "Saved answers display when workspace reopens",
+                          "sequential_order": 2.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given {KeyQuestions} answers exist in clarification.json for shape\nWhen User opens workspace section with {Behavior} \"shape\" selected\nThen {ClarifyInstructionsSection} displays saved answers in workspace\nAnd {ClarifyDataSubSection} shows answers in textareas"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Workspace section is visible AND {Behavior} is selected AND current action is clarify\nTHEN {ClarifyInstructionsSection} displays {KeyQuestions} in workspace AND {ClarifyDataSubSection} shows editable answer fields",
+                          "text": "WHEN Workspace section is visible AND {Behavior} is selected AND current action is clarify\nTHEN {ClarifyInstructionsSection} displays {KeyQuestions} in workspace AND {ClarifyDataSubSection} shows editable answer fields",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN User edits answer in {ClarifyDataSubSection}\nTHEN System saves answer via CLI AND answer persists",
+                          "text": "WHEN User edits answer in {ClarifyDataSubSection}\nTHEN System saves answer via CLI AND answer persists",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN saved {KeyQuestions} answers exist\nTHEN {ClarifyInstructionsSection} displays saved answers in workspace",
+                          "text": "WHEN saved {KeyQuestions} answers exist\nTHEN {ClarifyInstructionsSection} displays saved answers in workspace",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
                       "name": "Display clarification answers in Queue",
                       "sequential_order": 6.0,
                       "connector": null,
@@ -17752,6 +17895,45 @@
                           "name": "WHEN User runs build or validate from CLI (no Panel) THEN the same CLI flow runs AND for build CLI subscribes to story-graph AND for validate CLI watches validation status (periodic) and validation report (at end) AND CLI runs the action AND CLI reports BuildInProcess or ValidationInProcess AND when save of output is detected and debounce passes CLI starts render AND CLI reports RenderInProcess AND when done CLI reports completion or failed AND CLI reports to the terminal so the flow works without Panel",
                           "text": "WHEN User runs build or validate from CLI (no Panel) THEN the same CLI flow runs AND for build CLI subscribes to story-graph AND for validate CLI watches validation status (periodic) and validation report (at end) AND CLI runs the action AND CLI reports BuildInProcess or ValidationInProcess AND when save of output is detected and debounce passes CLI starts render AND CLI reports RenderInProcess AND when done CLI reports completion or failed AND CLI reports to the terminal so the flow works without Panel",
                           "sequential_order": 3.0
+                        }
+                      ],
+                      "behavior": null
+                    },
+                    {
+                      "name": "Render Diagram In Workspace",
+                      "sequential_order": 8.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRenderDiagramInWorkspace",
+                      "scenarios": [
+                        {
+                          "name": "Workspace displays {DrawIOElement} diagram for scope",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_workspace_section_renders_diagram_buttons",
+                          "steps": "Given {Behavior} \"shape\" is selected\nAnd scope has diagram output\nWhen workspace section renders\nThen {DrawIOElement} diagram links are displayed\nAnd User can open diagram in editor"
+                        },
+                        {
+                          "name": "Large diagram has scroll or zoom",
+                          "sequential_order": 1.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given {DrawIOElement} diagram exceeds viewport\nWhen User views diagram in workspace\nThen Panel provides scroll or zoom\nAnd Diagram remains readable"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                          "text": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                          "text": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                          "sequential_order": 1.0
                         }
                       ],
                       "behavior": null
@@ -23528,8 +23710,18 @@
       ]
     },
     {
-      "name": "Story Map Scoping",
+      "name": "Workspace Features",
       "priority": 4,
+      "stories": [
+        "Select Workspace Behavior",
+        "Submit Instructions From Workspace",
+        "Display Clarification In Workspace",
+        "Render Diagram In Workspace"
+      ]
+    },
+    {
+      "name": "Story Map Scoping",
+      "priority": 5,
       "stories": [
         "Automatically Refresh Story Graph Changes  CLI",
         "Automatically Refresh Story Graph Changes Panel",
@@ -23560,7 +23752,7 @@
     },
     {
       "name": "Render Diagrams",
-      "priority": 5,
+      "priority": 6,
       "stories": [
         "Create Rule Files From Bot Behavior",
         "Build Story Graph Using API",
@@ -23581,7 +23773,7 @@
     },
     {
       "name": "Increments On Panel",
-      "priority": 6,
+      "priority": 7,
       "stories": [
         "Remove Increment",
         "Rename Increment",

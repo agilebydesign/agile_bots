@@ -184,9 +184,9 @@ class TestSaveStrategyDecisions:
         saved_data = json.loads(strategy_file.read_text())
         
         assert 'shape' in saved_data
-        # Actual format: behavior_data['assumptions'] = [...]
-        assert 'assumptions' in saved_data['shape']
-        assert saved_data['shape']['assumptions'] == test_assumptions
+        # Actual format: behavior_data['additional_strategies'] = [...]
+        assert 'additional_strategies' in saved_data['shape']
+        assert saved_data['shape']['additional_strategies'] == test_assumptions
 
 
 class TestSaveMultipleGuardrails:
@@ -218,9 +218,9 @@ class TestSaveMultipleGuardrails:
         # Verify strategy
         strategy_file = tmp_path / 'workspace' / 'docs' / 'story' / 'strategy.json'
         strategy_data = json.loads(strategy_file.read_text())
-        # Actual format: behavior_data['decisions'] and behavior_data['assumptions']
+        # Actual format: behavior_data['decisions'] and behavior_data['additional_strategies']
         assert strategy_data['shape']['decisions']['Approach'] == "Agile"
-        assert strategy_data['shape']['assumptions'] == ["Team has agile experience"]
+        assert strategy_data['shape']['additional_strategies'] == ["Team has agile experience"]
     
     def test_save_preserves_data_across_behaviors(self, tmp_path):
         """

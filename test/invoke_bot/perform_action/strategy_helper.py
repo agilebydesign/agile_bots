@@ -187,7 +187,8 @@ class StrategyTestHelper(BaseHelper):
                     f"Expected decision '{key}' = '{value}', got '{behavior_data['decisions'].get(key)}'"
         
         if expected_assumptions:
-            # Actual format: behavior_data['assumptions'] = [...]
-            assert 'assumptions' in behavior_data, "Behavior should have 'assumptions'"
-            assert behavior_data['assumptions'] == expected_assumptions, \
-                f"Expected assumptions = {expected_assumptions}, got {behavior_data['assumptions']}"
+            # Actual format: behavior_data uses 'additional_strategies' (or legacy 'assumptions')
+            saved_assumptions = behavior_data.get('additional_strategies') or behavior_data.get('assumptions', [])
+            assert saved_assumptions, "Behavior should have 'additional_strategies' or 'assumptions'"
+            assert saved_assumptions == expected_assumptions, \
+                f"Expected assumptions = {expected_assumptions}, got {saved_assumptions}"

@@ -628,8 +628,11 @@ class Bot:
                     'status': 'error',
                     'message': f'Behavior {behavior_name} has no actions'
                 }
-            first_action = self._first_non_skip_action(behavior_name) or behavior.actions.names[0]
-            action = behavior.actions.find_by_name(first_action)
+            # Use current action from state when available (load_state runs on first actions access)
+            action = behavior.actions.forward_to_current()
+            if action is None:
+                first_action = self._first_non_skip_action(behavior_name) or behavior.actions.names[0]
+                action = behavior.actions.find_by_name(first_action)
         if not action:
             return {
                 'status': 'error',
