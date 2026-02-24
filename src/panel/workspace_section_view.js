@@ -36,10 +36,11 @@ class WorkspaceSectionView extends PanelView {
                     executor(`${currentBehavior}.rules`)
                 ]);
                 instructionsData = { ...instructionsData };
-                if (clarResp?.result !== undefined) {
-                    instructionsData.clarification = clarResp.result && typeof clarResp.result === 'object'
-                        ? { [currentBehavior]: clarResp.result }
-                        : {};
+                const emptyClarification = { key_questions: { answers: {} }, evidence: { required: [], provided: {} } };
+                if (clarResp?.result !== undefined && clarResp.result && typeof clarResp.result === 'object') {
+                    instructionsData.clarification = { [currentBehavior]: clarResp.result };
+                } else {
+                    instructionsData.clarification = { [currentBehavior]: emptyClarification };
                 }
                 if (stratResp?.result !== undefined) {
                     instructionsData.strategy = stratResp.result && typeof stratResp.result === 'object'
@@ -75,10 +76,12 @@ class WorkspaceSectionView extends PanelView {
         const drawioPath = drawioLinks.length > 0 ? escapeForJs(drawioLinks[0].url) : '';
 
         const getIconMore = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
+        const buildDiagramIconPath = getIcon('build_diagram.png');
+        const renderSectionIconPath = getIcon('render_section.png');
         const clarifyHtml = this._renderClarifySubsection(instructionsData, currentBehavior, getIconMore);
         const strategyHtml = this._renderStrategySubsection(instructionsData, currentBehavior, getIconMore);
-        const buildHtml = this._renderBuildSubsection(instructionsData, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath);
-        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, currentBehavior, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath);
+        const buildHtml = this._renderBuildSubsection(instructionsData, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath, buildDiagramIconPath);
+        const diagramsHtml = this._renderDiagramsSubsection(instructionsData, botData, currentBehavior, drawioLinks, renderDiagramIconPath, saveLayoutIconPath, clearLayoutIconPath, generateReportIconPath, updateGraphIconPath, drawioPath, renderSectionIconPath);
 
         if (!diagramsHtml && !buildHtml && !clarifyHtml && !strategyHtml) return '';
 
@@ -106,7 +109,7 @@ class WorkspaceSectionView extends PanelView {
     </div>`;
     }
 
-    _renderDiagramsSubsection(instructions, botData, currentBehavior, drawioLinks, renderIcon, saveIcon, clearIcon, reportIcon, updateIcon, drawioPath) {
+    _renderDiagramsSubsection(instructions, botData, currentBehavior, drawioLinks, renderIcon, saveIcon, clearIcon, reportIcon, updateIcon, drawioPath, renderSectionIconPath) {
         let content = '';
 
         // Diagram action buttons
@@ -160,6 +163,7 @@ class WorkspaceSectionView extends PanelView {
         <div class="collapsible-section expanded" style="margin-bottom: 4px;">
             <div class="collapsible-header" onclick="toggleSection('ws-diagrams-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
                 <span class="expand-icon">▸</span>
+                ${renderSectionIconPath ? `<img src="${renderSectionIconPath}" style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="Render" />` : ''}
                 <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Render</span>
             </div>
             <div id="ws-diagrams-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
@@ -170,7 +174,7 @@ class WorkspaceSectionView extends PanelView {
         </div>`;
     }
 
-    _renderBuildSubsection(instructions, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath) {
+    _renderBuildSubsection(instructions, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath, buildDiagramIconPath) {
         let content = '';
 
         // Build section: Document, Test tube, All files, Open Story Graph (compact like Render buttons)
@@ -239,6 +243,7 @@ class WorkspaceSectionView extends PanelView {
         <div class="collapsible-section expanded" style="margin-bottom: 4px;">
             <div class="collapsible-header" onclick="toggleSection('ws-build-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
                 <span class="expand-icon">▸</span>
+                ${buildDiagramIconPath ? `<img src="${buildDiagramIconPath}" style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="Build" />` : ''}
                 <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">Build</span>
             </div>
             <div id="ws-build-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">

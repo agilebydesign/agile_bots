@@ -691,7 +691,11 @@ class InstructionsSection extends PanelView {
             html += '</div>';
             html += '</div>';
         }
-        
+
+        if (html === '' && (!value.clarification_data || value.clarification_data.length === 0)) {
+            html = '<div style="color: var(--text-color-faded); font-style: italic; font-size: 12px;">No clarification questions yet.</div>';
+        }
+
         return html;
     }
     

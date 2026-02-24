@@ -103,10 +103,38 @@ class Behavior:
 
     @property
     def clarifications(self) -> Dict[str, Any]:
-        """Return clarification data for this behavior from clarification.json. Empty dict if file/domain doesn't exist."""
+        """Return clarification data for this behavior from clarification.json. When empty, seed with guardrails key_questions and empty answers."""
         from actions.clarify.requirements_clarifications import RequirementsClarifications
+        from actions.clarify.required_context import RequiredContext
         data = RequirementsClarifications.load_all(self.bot_paths)
-        return data.get(self.name, {})
+        result = data.get(self.name, {}) or {}
+        if not isinstance(result, dict):
+            result = {}
+        answers = {}
+        if result.get('key_questions') and isinstance(result['key_questions'], dict):
+            answers = result['key_questions'].get('answers') or {}
+        if not isinstance(answers, dict):
+            answers = {}
+        try:
+            required_context = RequiredContext(self.behavior_directory)
+            questions = getattr(required_context.key_questions, 'questions', []) or []
+            for q in questions:
+                if q not in answers:
+                    answers[q] = ''
+        except (FileNotFoundError, Exception):
+            pass
+        result = {**result, 'key_questions': {'answers': answers}}
+        if 'evidence' not in result:
+            result = {**result, 'evidence': {'required': [], 'provided': {}}}
+        elif not isinstance(result.get('evidence'), dict):
+            result = {**result, 'evidence': {'required': [], 'provided': {}}}
+        if not result.get('evidence', {}).get('required'):
+            try:
+                required_context = RequiredContext(self.behavior_directory)
+                result['evidence']['required'] = getattr(required_context.evidence, 'evidence_list', []) or []
+            except (FileNotFoundError, Exception):
+                pass
+        return result
 
     @property
     def strategies(self) -> Dict[str, Any]:
