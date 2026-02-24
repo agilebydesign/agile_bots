@@ -1,4 +1,4 @@
-﻿
+﻿    
 from cli.adapters import TTYAdapter
 from instructions.instructions import Instructions
 
