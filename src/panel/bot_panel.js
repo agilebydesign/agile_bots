@@ -43,6 +43,7 @@ class BotPanel {
       this._panel = panel;
       
       this._repoRoot = repoRoot; // root folder of the repository, we assume it's the first folder in the user's VS Code Workspace
+      this._workspaceRoot = repoRoot; // fallback until refresh provides bot workspace_directory
       this._extensionUri = extensionUri;
       this._disposables = [];
       this._expansionState = {};

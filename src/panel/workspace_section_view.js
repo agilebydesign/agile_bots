@@ -123,7 +123,7 @@ class WorkspaceSectionView extends PanelView {
                     ${gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Workspace" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
                 </div>
-                ${behaviorButtonsHtml ? `<div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">${behaviorButtonsHtml}</div>` : ''}
+                ${behaviorButtonsHtml ? `<div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">${behaviorButtonsHtml}</div>` : ''}
             </div>
             <div id="workspace-content" class="collapsible-content" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: block;">
                 ${clarifyHtml}
