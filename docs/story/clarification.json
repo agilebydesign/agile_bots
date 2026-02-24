@@ -9,14 +9,6 @@
         "Filter": "Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations."
       }
     },
-    "evidence": {
-      "required": [
-        "Requirements doc",
-        "User interviews",
-        "Product roadmap"
-      ],
-      "provided": {}
-    },
     "context": []
   },
   "work_with_story_map_panel_writeups": {
@@ -27,17 +19,6 @@
         "What format should the writeups follow?": "Looking at the existing user-guide.md structure, each section uses: Headers (##, ###), Brief description of feature purpose, Step-by-step instructions where applicable, Screenshots references (images), Tables for acceptance criteria or feature summaries.",
         "What information is available in the scope for each panel story?": "Each panel story in the scope contains: Story name, Acceptance criteria (WHEN/THEN statements), Scenarios with Given/When/Then steps, Test classes and test methods (where defined), Domain concepts (for Edit Story Map sub-epic).",
         "Where should this documentation be added?": "Section 17 'The Story Graph' in user-guide.md appears to be the appropriate location, as it already covers navigating and editing the story graph. The panel stories would expand this section with detailed feature documentation."
-      }
-    },
-    "evidence": {
-      "required": [
-        "story-graph.json scope data",
-        "existing user-guide.md structure",
-        "acceptance criteria from panel stories"
-      ],
-      "provided": {
-        "story_graph_scope": "Provided in user request - complete scope JSON for Work With Story Map",
-        "user_guide": "c:\\dev\\agile_bots\\docs\\manual\\user-guide.md"
       }
     },
     "context": [
@@ -91,31 +72,12 @@
     "key_questions": {
       "answers": {
         "What test framework should be used (pytest-bdd, pytest, etc.)?": "TWO test frameworks: (1) Python: pytest (standard pytest, NOT pytest-bdd) for domain/CLI tests. Evidence from pyproject.toml shows pytest>=7.0.0. (2) JavaScript: Node.js built-in test runner (node --test) for panel tests. Evidence from src/panel/package.json shows scripts: 'node --test ../../test/panel/test_*.js' with jsdom>=27.4.0 for DOM testing.",
-        "Should tests use real implementations or mocks (e2e vs unit tests)?": "Real implementations (unit/integration tests). From strategy.json: 'bulk of business logic tests done against the domain layer objects directly' and 'Should tests use real implementations by default' and 'Only mock when explicitly asked for e2e tests or for uncontrollable external dependencies'. T",
+        "Should tests use real implementations or mocks (e2e vs unit tests)?": "Real implementations (unit/integration tests). From strategy.json: 'bulk of business logic tests done against the domain layer objects directly' and 'Should tests use real implementations by default' and 'Only mock when explicitly asked for e2e tests or for uncontrollable external dependencies'.",
         "What fixtures or helpers are needed for test setup?": "EXTEND EXISTING HELPER PATTERN: test/helpers/ has shared helpers (base_helper.py, bot_test_helper.py, file_helper.py, state_helper.py) and test/invoke_bot/edit_story_map/ has local story_helper.py. For DrawIOStoryMap tests, create test/invoke_bot/perform_action/drawio_story_map_helper.py extending BaseHelper with methods like: create_drawio_xml(), create_layout_data(), load_drawio_story_map(), assert_render_output(), assert_update_report(). Use existing BotTestHelper(tmp_path) pattern with helper.bot, helper.workspace properties. See test/invoke_bot/perform_action/render_helper.py for similar render action helpers.",
-        "Are there any specific test data requirements beyond what's in Examples tables?": "Test DrawIO XML files and StoryMap JSON files. The scenarios test rendering (StoryMap -> DrawIO) and extraction (DrawIO -> StoryMap) workflows. We'll need: sample story-graph.json files with known structure (1 epic, 1-2 sub-epics, 2-3 stories), sample DrawIO XML files with known nodes/positions for extraction tests, layout data JSON files for re-render tests, UpdateReport JSON structures for merge tests. The Examples tables provide the logical test data (epic counts, story types, styles), but we need concrete XML/JSON file fixtures.\n\nDO THIS IN  TEMP WOEKSPACE FOLDER DO NOT OVWEWRITE BOT WORKSPACE DATA!",
+        "Are there any specific test data requirements beyond what's in Examples tables?": "Test DrawIO XML files and StoryMap JSON files. The scenarios test rendering (StoryMap -> DrawIO) and extraction (DrawIO -> StoryMap) workflows. We'll need: sample story-graph.json files with known structure (1 epic, 1-2 sub-epics, 2-3 stories), sample DrawIO XML files with known nodes/positions for extraction tests, layout data JSON files for re-render tests, UpdateReport JSON structures for merge tests. The Examples tables provide the logical test data (epic counts, story types, styles), but we need concrete XML/JSON file fixtures.\n\nDO THIS IN  TEMP WORKSPACE FOLDER DO NOT OVERWRITE BOT WORKSPACE DATA!",
         "What is the expected test file structure and location?": "ALL tests follow the same hierarchy convention - file named after SUB-EPIC, placed in the epic path: (1) Python domain tests: test/invoke_bot/perform_action/test_render_drawio_diagrams.py with classes TestRenderStoryMap, TestUpdateGraphFromStoryMap, etc. (one class per story, one method per scenario). (2) Node panel tests: test/invoke_bot/perform_action/test_render_drawio_diagrams.js with describe('TestRenderActionDiagramSection') for the 'Render action diagram section' story - tests panel rendering of Diagram section with links, staleness indicators, Refresh/Generate report buttons, and report file display.",
         "Are there any existing test patterns or conventions to follow?": "YES - FOLLOW EXISTING PATTERNS: (1) Test structure: test/invoke_bot/perform_action/test_render_drawio_diagrams.py with class TestRenderStoryMap, TestUpdateGraphFromStoryMap, etc. (2) Helper pattern: Create test/invoke_bot/perform_action/drawio_story_map_helper.py extending BaseHelper(parent) with helper methods. (3) Test setup: Use BotTestHelper(tmp_path) as entry point, access via helper.bot, helper.workspace. (4) See test/invoke_bot/perform_action/test_render_content.py for similar render action test pattern. (5) Node JS tests: SAME location as Python - test/invoke_bot/perform_action/test_render_drawio_diagrams.js (named after sub-epic, NOT story). (6) Strategy: domain layer unit tests (bulk), minimal CLI happy path tests, separate JS panel UI tests (rendering and button layout).",
         "What Node tests are needed for the Render action diagram section story?": "Node tests in test/invoke_bot/perform_action/test_render_drawio_diagrams.js (named after sub-epic, same folder as .py file) should test: (1) Diagram section displays with links to DrawIO file and UpdateReport file when they exist, (2) Stale diagram indicator and Refresh button appear when DrawIO file modified after last sync, (3) Pending changes indicator and Generate report button appear when diagram save time newer than last refresh time, (4) Report file link opens file in editor and Update button is shown after report generated, (5) Missing diagram file shows appropriate indicator with no Refresh/Generate report buttons, (6) After clicking Update button the story graph is updated from diagram. Use jsdom to test DOM rendering, button presence/absence, link targets, visual indicators (stale/pending classes or text), and button click handlers."
-      }
-    },
-    "evidence": {
-      "required": [
-        "Feature files (.feature) from specification_examples stage",
-        "Examples tables with test data",
-        "Structured.json with scenarios and examples",
-        "Existing test code or test patterns",
-        "Test framework documentation"
-      ],
-      "provided": {
-        "story_graph_json": "C:/dev/agile_bots/docs/story/story-graph.json - acceptance criteria and scenarios",
-        "domain_walkthrough": "C:/dev/agile_bots/docs/crc/walkthrough/drawio-story-map-walkthrough-realizations.md - object flows and walkthroughs",
-        "domain_concepts": "C:/dev/agile_bots/docs/crc/domain/synchronized-graph-domain-concepts.json - CRC cards for new classes",
-        "pytest_ini": "C:/dev/agile_bots/pytest.ini",
-        "pyproject_toml": "C:/dev/agile_bots/pyproject.toml",
-        "panel_package_json": "C:/dev/agile_bots/src/panel/package.json",
-        "old_synchronizers_for_reference_only": "src/synchronizers/story_io/ - OLD code to be REPLACED (reference for algorithms only)",
-        "strategy_json": "C:/dev/agile_bots/docs/story/strategy.json"
       }
     },
     "context": [
@@ -141,5 +103,13 @@
       "For DrawIOStoryMap tests: Create drawio_story_map_helper.py in test/invoke_bot/perform_action/ following render_helper.py pattern",
       "Test file location: test/invoke_bot/perform_action/test_render_drawio_diagrams.py (matches sub-epic name)"
     ]
+  },
+  "prioritization": {
+    "key_questions": {
+      "answers": {
+        "Which areas of the story map carry the most business or delivery risk?": "test"
+      }
+    },
+    "context": []
   }
 }

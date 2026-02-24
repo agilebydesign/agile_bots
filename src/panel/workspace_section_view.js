@@ -85,6 +85,28 @@ class WorkspaceSectionView extends PanelView {
 
         if (!diagramsHtml && !buildHtml && !clarifyHtml && !strategyHtml) return '';
 
+        const behaviorNames = botData?.behaviors?.names || botData?.behavior_names || (botData?.behaviors?.all_behaviors || []).map(b => (typeof b === 'string' ? b : b?.name)).filter(Boolean) || [];
+        const behaviorIconMap = { shape: 'shape_icon.png', code: 'code_icon.png', prioritization: 'prioritization.png', scenarios: 'inject_scenarios.png', tests: 'test_tube.png', exploration: 'exploration_icon.png' };
+        const behaviorButtonsHtml = behaviorNames.length > 0 ? behaviorNames.map(name => {
+            const isActive = name === currentBehavior;
+            const iconFile = behaviorIconMap[name];
+            const iconPath = iconFile ? getIcon(iconFile) : null;
+            const escapedName = (name || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+            const label = name.charAt(0).toUpperCase() + name.slice(1);
+            const content = iconPath ? `<img src="${iconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="" />` : `<span style="font-size: 11px; color: ${isActive ? 'var(--accent-color)' : 'var(--text-color-faded)'};">${escapeForHtml(label)}</span>`;
+            return `<button onclick="event.stopPropagation(); if(window.navigateToBehavior) window.navigateToBehavior('${escapedName}')" title="${escapeForHtml(label)}" style="
+                background: ${isActive ? 'rgba(255, 140, 0, 0.25)' : 'transparent'};
+                border: 1px solid ${isActive ? 'var(--accent-color)' : 'var(--input-border)'};
+                border-radius: 4px;
+                padding: 4px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.15s ease;
+            " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${content}</button>`;
+        }).join('') : '';
+
         return `
     <div class="section card-primary" style="margin-top: 8px;">
         <div class="collapsible-section expanded">
@@ -93,11 +115,15 @@ class WorkspaceSectionView extends PanelView {
                 padding: 2px 4px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 user-select: none;
             ">
-                <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                ${gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Workspace" />` : ''}
-                <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
+                <div style="display: flex; align-items: center;">
+                    <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
+                    ${gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Workspace" />` : ''}
+                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
+                </div>
+                ${behaviorButtonsHtml ? `<div style="display: flex; align-items: center; gap: 4px; flex-wrap: wrap;">${behaviorButtonsHtml}</div>` : ''}
             </div>
             <div id="workspace-content" class="collapsible-content" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: block;">
                 ${clarifyHtml}
@@ -276,10 +302,7 @@ class WorkspaceSectionView extends PanelView {
         if (clarificationDataArray.length === 0 && instructions.guardrails?.required_context?.key_questions) {
             clarificationDataArray = instructions.guardrails.required_context.key_questions.map(q => ({ question: q, answer: '' }));
         }
-        const evidenceData = savedClarification?.evidence || {
-            required: instructions.guardrails?.required_context?.evidence || [],
-            provided: {}
-        };
+        const evidenceData = savedClarification?.evidence || { required: [], provided: {} };
         const clarifyData = {
             clarification_data: clarificationDataArray,
             evidence: evidenceData,

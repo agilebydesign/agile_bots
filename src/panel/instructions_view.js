@@ -257,19 +257,7 @@ class InstructionsSection extends PanelView {
                 }));
             }
             
-            // Get evidence - pass full evidence object with both required and provided
-            let evidenceData = {};
-            if (savedClarification && savedClarification.evidence) {
-                // Use saved evidence structure (has both required and provided)
-                evidenceData = savedClarification.evidence;
-            } else {
-                // Create structure from guardrails only (no provided yet)
-                evidenceData = {
-                    required: instructions.guardrails?.required_context?.evidence || [],
-                    provided: {}
-                };
-            }
-            
+            let evidenceData = { required: [], provided: savedClarification?.evidence?.provided || {} };
             restructured.clarify_instructions = {
                 clarification_data: clarificationDataArray,
                 evidence: evidenceData,
@@ -615,14 +603,9 @@ class InstructionsSection extends PanelView {
             }));
         }
 
-        let requiredEvidence = [];
         let providedEvidence = {};
         if (value.evidence && typeof value.evidence === 'object') {
-            requiredEvidence = value.evidence.required || [];
             providedEvidence = value.evidence.provided || {};
-        }
-        if (requiredEvidence.length === 0 && value.guardrails && value.guardrails.required_context && Array.isArray(value.guardrails.required_context.evidence)) {
-            requiredEvidence = value.guardrails.required_context.evidence;
         }
 
         if (questions.length > 0) {
@@ -648,26 +631,18 @@ class InstructionsSection extends PanelView {
                 }
             });
         }
-        
-        let evidenceHtml = '';
-        if (requiredEvidence.length > 0 || Object.keys(providedEvidence).length > 0) {
-            if (requiredEvidence.length > 0) {
-                requiredEvidence.forEach(item => {
-                    evidenceHtml += `<div style="margin-bottom: 4px;">• ${escapeForHtml(repairUtf8Mojibake(String(item)))}</div>`;
-                });
-            }
-            let providedText = '';
-            if (Object.keys(providedEvidence).length > 0) {
-                providedText = Object.entries(providedEvidence)
-                    .map(([key, val]) => `${repairUtf8Mojibake(key)}: ${repairUtf8Mojibake(String(val))}`)
-                    .join('\n');
-            }
-            evidenceHtml += `<div style="margin-top: 12px;" class="input-container qa-container"><div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px; font-size: 13px;">Evidence Provided</span><button onclick="toggleTextareaExpand('${p}clarify-evidence')" id="${p}clarify-evidence-toggle" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button></div>`;
-            evidenceHtml += `<textarea id="${p}clarify-evidence" data-collapsed="false" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter evidence sources provided (e.g., Requirements doc: project-spec.md)" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea></div>`;
+
+        let additionalHtml = '';
+        if (questions.length > 0) {
+            let providedText = Object.entries(providedEvidence)
+                .map(([key, val]) => `${repairUtf8Mojibake(key)}: ${repairUtf8Mojibake(String(val))}`)
+                .join('\n');
+            additionalHtml = `<div style="margin-top: 12px;" class="input-container qa-container"><div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px; font-size: 13px;">Additional Clarification</span><button onclick="toggleTextareaExpand('${p}clarify-evidence')" id="${p}clarify-evidence-toggle" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button></div>`;
+            additionalHtml += `<textarea id="${p}clarify-evidence" data-collapsed="false" onblur="saveClarifyEvidence()" oninput="autoResizeTextarea(this)" placeholder="Enter additional context or notes" style="width: 100%; min-height: 60px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(providedText)}</textarea></div>`;
         }
 
         let html = '';
-        if (questionsHtml) {
+        if (questionsHtml || additionalHtml) {
             const qId = p + 'clarify-questions-content';
             html += `<div class="collapsible-section expanded" style="margin-bottom: 4px;">
                 <div class="collapsible-header" onclick="toggleSection('${qId}')" style="cursor: pointer; padding: 2px 0; display: flex; align-items: center; user-select: none;">
@@ -676,13 +651,10 @@ class InstructionsSection extends PanelView {
                 </div>
                 <div id="${qId}" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
                     <div style="padding-left: 4px;">${questionsHtml}</div>
+                    ${additionalHtml ? `<div style="padding-left: 4px; margin-top: 4px;">${additionalHtml}</div>` : ''}
                 </div>
             </div>`;
         }
-        if (evidenceHtml) {
-            html += `<div style="margin-bottom: 4px;">${evidenceHtml}</div>`;
-        }
-
         if (html === '' && (!value.clarification_data || value.clarification_data.length === 0)) {
             html = '<div style="color: var(--text-color-faded); font-style: italic; font-size: 12px;">No clarification questions yet.</div>';
         }
