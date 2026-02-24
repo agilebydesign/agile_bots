@@ -63,6 +63,15 @@ class CLISession:
         return None
     
     def _handle_submit(self, verb: str, args: str) -> CLICommandResponse:
+        # Support "submit shape strategy" to submit specific action (panel-selected action)
+        args_stripped = (args or '').strip()
+        if args_stripped and '.' not in args_stripped:
+            parts = args_stripped.split(maxsplit=1)
+            if len(parts) == 2:
+                behavior_name, action_name = parts[0], parts[1]
+                if hasattr(self.bot, behavior_name):
+                    result = self.bot.submit_action(behavior_name, action_name)
+                    return self._format_submit_response(result, "Instructions copied to clipboard!")
         result = self.bot.submit_current_action()
         return self._format_submit_response(result, "Instructions copied to clipboard!")
     

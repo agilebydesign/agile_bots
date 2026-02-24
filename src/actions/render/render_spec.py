@@ -98,11 +98,16 @@ class RenderSpec:
 
     def _resolve_input_path(self) -> Path:
         workspace_dir = self._bot_paths.workspace_directory
-        # Use centralized path as default fallback
+        # Use input_path if specified (canonical story-graph location); else path (output dir)
         default_path = str(self._bot_paths.story_graph_paths.docs_root)
-        config_path = self._config_data.get('path', default_path)
+        input_path_config = self._config_data.get('input_path')
+        if input_path_config is not None:
+            # Explicit input path: read from canonical location (e.g. docs/story)
+            input_dir = Path(input_path_config)
+        else:
+            input_dir = Path(self._config_data.get('path', default_path))
         input_file = self._config_data.get('input', 'story-graph.json')
-        input_path = workspace_dir / config_path / input_file
+        input_path = workspace_dir / input_dir / input_file
         if not input_path.exists():
             # Fall back to story graph location
             input_path = self._bot_paths.story_graph_paths.story_graph_path

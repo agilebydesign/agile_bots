@@ -2,14 +2,51 @@
   "shape": {
     "key_questions": {
       "answers": {
-        "What is the scope of this work?": "Generate Bot Tools (from Increment: User Manually Drops Config In to AI Chat). This story creates the foundational MCP bot tool that routes AI chat requests to bot behaviors and actions, enabling all subsequent MCP-based interactions.",
-        "Who are the target users?": "The Three primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.",
-        "What is the first priority action?": "Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.",
+        "What is the scope of this work?": "Show All (entire story graph). Full agile bot system.",
+        "Who are the target users?": "(1) AI Agents - MCP; (2) Developers - CLI and panel; (3) Bot System.",
+        "What is the first priority action?": "Building the agile bot system: bot infrastructure, MCP, CLI, panel, story mapping, CRC modeling, scope filtering, validation, activity tracking.",
         "Workspace": "THREE primary user groups: (1) AI Agents - interact via MCP tools to execute bot behaviors and access knowledge graphs, (2) Developers - use CLI and panel interfaces to navigate workflows, manage scope, and execute actions, (3) Bot System - internal behaviors that orchestrate workflows, track state, and coordinate between actions.",
-        "Filter": "Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations."
+        "Filter": "Building the comprehensive agile bot system that enables AI agents and developers to manage software development workflows. The system includes: (1) Bot infrastructure with behavior-based workflows (clarify, strategy, build, validate, render actions), (2) MCP server integration for AI tool invocation, (3) Multiple interface options (CLI, VS Code panel), (4) Knowledge graph management for story mapping and CRC modeling, (5) Scope filtering and navigation capabilities, (6) Automated validation with rule scanners, and (7) Activity tracking across all operations.",
+        "Who are the distinct types of users (e.g., operational users, power users, compliance consumers, content creators, producers)?": "(1) AI Agents - interact via MCP tools; (2) Developers - use CLI and panel; (3) Bot System - internal orchestration.",
+        "What are the key goals, behaviors, or decisions each group is trying to accomplish using this capability?": "AI Agents: Execute clarify, strategy, build, validate, render via MCP. Developers: Navigate story graph, filter scope, edit story map, run actions. Bot System: Load behaviors/actions, persist state, track activity.",
+        "Who are the primary users or stakeholder groups impacted?": "AI Agents (MCP), Developers (CLI, panel), Bot System.",
+        "What is the first thing users will try to do with this new capability or system?": "Load a bot and execute a behavior action (e.g., clarify, build, validate), or navigate the story graph and set scope.",
+        "What problems, inefficiencies, or workarounds is this request trying to eliminate?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "Where are users currently struggling, getting stuck, or experiencing delays in the process we are aiming to improve?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What are the key drivers for customer value or business value that this capability addresses?": "AI-assisted software development workflows; story mapping and CRC modeling; behavior-based action execution; scope-driven context for AI agents; validation with rules.",
+        "What specific customer or business outcomes are we trying to achieve?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What is the user journey from start to finish for the primary use case?": "(1) Initialize bot (load behaviors, actions, workspace) -> (2) Set scope (story node or increment) -> (3) Execute behavior action (clarify, strategy, build, validate, render) -> (4) View/apply results.",
+        "What are the key stages or steps in the user journey?": "(1) Initialize bot and load workspace; (2) Navigate story graph and set scope; (3) Select behavior and action; (4) Execute action; (5) View results.",
+        "Where in the user journey are users experiencing frustration, friction, or unhappiness?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What moments of delight or value should users experience during their journey?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What are the critical pain points that prevent users from achieving their goals?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What other systems, data sources, or tools does this capability need to interact with in order to deliver value?": "VS Code (panel, workspace); MCP protocol (AI chat); story-graph.json, strategy.json, clarification.json; DrawIO files; rule files; context files.",
+        "What are the key behaviors or integration points that define how these systems support or depend on one another?": "Bot loads from workspace; CLI/panel submit scope and action to domain; MCP tools invoke bot behaviors; domain reads/writes story-graph, strategy, clarification; render syncs DrawIO with story graph.",
+        "What is the business domain we are modeling?": "Agile bot system - behavior-based workflows for story mapping, CRC modeling, clarification, strategy, build, validate, render.",
+        "What are the core business concepts and their relationships?": "Bot, Behavior, Action, StoryMap, Epic, SubEpic, Story, Increment, Scope, Instructions, Guardrails. Bot has Behaviors; Behavior has Actions; StoryMap has Epics; Epic has SubEpics/Stories; Increment groups Stories.",
+        "What are the distinct sub-domains or business capabilities?": "Bot infrastructure (MCP, CLI, panel); Story map (hierarchy, scope, increments); Behavior actions (clarify, strategy, build, validate, render); Diagram sync (DrawIO, UpdateReport); Rules and guardrails.",
+        "What are the boundaries between different parts of the domain?": "Domain vs CLI; Domain vs Panel; MCP vs Bot; Story graph vs DrawIO.",
+        "What domain events occur in this business domain?": "Bot loaded, Scope set, Action executed, Story graph updated, Diagram rendered, Clarification/Strategy saved, Validation run.",
+        "What are the key business rules and constraints?": "One user interaction followed by one system response; Domain has business logic, CLI minimal; Panel routes to CLI; Tests use real implementations.",
+        "What domain language do business experts use to describe this domain?": "Bot, behavior, action, story map, epic, sub-epic, story, increment, scope, clarify, strategy, build, validate, render, guardrails, acceptance criteria, scenario."
       }
     },
-    "context": []
+    "context": [
+      "Scope: Show All (entire story graph)",
+      "Epics: Build Agile Bots, Invoke Bot",
+      "10 increments"
+    ],
+    "evidence": {
+      "required": [
+        "Requirements doc",
+        "User interviews",
+        "Product roadmap"
+      ],
+      "provided": {
+        "story_graph": "docs/story/story-graph.json",
+        "strategy": "docs/story/strategy.json"
+      }
+    }
   },
   "work_with_story_map_panel_writeups": {
     "key_questions": {
@@ -111,5 +148,54 @@
       }
     },
     "context": []
+  },
+  "domain": {
+    "key_questions": {
+      "answers": {
+        "Who are the distinct types of users (e.g., operational users, power users, compliance consumers, content creators, producers)?": "(1) AI Agents - interact via MCP tools; (2) Developers - use CLI and panel; (3) Bot System - internal orchestration.",
+        "What are the key goals, behaviors, or decisions each group is trying to accomplish using this capability?": "AI Agents: Execute clarify, strategy, build, validate, render via MCP. Developers: Navigate story graph, filter scope, edit story map, run actions. Bot System: Load behaviors/actions, persist state, track activity.",
+        "Who are the primary users or stakeholder groups impacted?": "AI Agents (MCP), Developers (CLI, panel), Bot System.",
+        "What is the first thing users will try to do with this new capability or system?": "Load a bot and execute a behavior action (e.g., clarify, build, validate), or navigate the story graph and set scope.",
+        "What problems, inefficiencies, or workarounds is this request trying to eliminate?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "Where are users currently struggling, getting stuck, or experiencing delays in the process we are aiming to improve?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What are the key drivers for customer value or business value that this capability addresses?": "AI-assisted software development workflows; story mapping and CRC modeling; behavior-based action execution; scope-driven context for AI agents; validation with rules.",
+        "What specific customer or business outcomes are we trying to achieve?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What is the user journey from start to finish for the primary use case?": "(1) Initialize bot (load behaviors, actions, workspace) -> (2) Set scope (story node or increment) -> (3) Execute behavior action (clarify, strategy, build, validate, render) -> (4) View/apply results.",
+        "What are the key stages or steps in the user journey?": "(1) Initialize bot and load workspace; (2) Navigate story graph and set scope; (3) Select behavior and action; (4) Execute action; (5) View results.",
+        "Where in the user journey are users experiencing frustration, friction, or unhappiness?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What moments of delight or value should users experience during their journey?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What are the critical pain points that prevent users from achieving their goals?": "[!] NOT ENOUGH INFORMATION - REQUIRES USER INPUT.",
+        "What other systems, data sources, or tools does this capability need to interact with in order to deliver value?": "VS Code (panel, workspace); MCP protocol (AI chat); story-graph.json, strategy.json, clarification.json; DrawIO files; rule files; context files.",
+        "What are the key behaviors or integration points that define how these systems support or depend on one another?": "Bot loads from workspace; CLI/panel submit scope and action to domain; MCP tools invoke bot behaviors; domain reads/writes story-graph, strategy, clarification; render syncs DrawIO with story graph.",
+        "What is the business domain we are modeling?": "Agile bot system - behavior-based workflows for story mapping, CRC modeling, clarification, strategy, build, validate, render.",
+        "What are the core business concepts and their relationships?": "Bot, Behavior, Action, StoryMap, Epic, SubEpic, Story, Increment, Scope, Instructions, Guardrails. Bot has Behaviors; Behavior has Actions; StoryMap has Epics; Epic has SubEpics/Stories; Increment groups Stories.",
+        "What are the distinct sub-domains or business capabilities?": "Bot infrastructure (MCP, CLI, panel); Story map (hierarchy, scope, increments); Behavior actions (clarify, strategy, build, validate, render); Diagram sync (DrawIO, UpdateReport); Rules and guardrails.",
+        "What are the boundaries between different parts of the domain?": "Domain vs CLI; Domain vs Panel; MCP vs Bot; Story graph vs DrawIO.",
+        "What domain events occur in this business domain?": "Bot loaded, Scope set, Action executed, Story graph updated, Diagram rendered, Clarification/Strategy saved, Validation run.",
+        "What are the key business rules and constraints?": "One user interaction followed by one system response; Domain has business logic, CLI minimal; Panel routes to CLI; Tests use real implementations.",
+        "What domain language do business experts use to describe this domain?": "Bot, behavior, action, story map, epic, sub-epic, story, increment, scope, clarify, strategy, build, validate, render, guardrails, acceptance criteria, scenario.",
+        "What is the scope of this work?": "Show All (entire story graph). Full agile bot system.",
+        "Who are the target users?": "(1) AI Agents - MCP; (2) Developers - CLI and panel; (3) Bot System.",
+        "What is the first priority action?": "Building the agile bot system: bot infrastructure, MCP, CLI, panel, story mapping, CRC modeling, scope filtering, validation, activity tracking."
+      }
+    },
+    "evidence": {
+      "required": [
+        "Business model canvas",
+        "Journey maps",
+        "User research",
+        "Domain expert interviews"
+      ],
+      "provided": {
+        "story_graph": "docs/story/story-graph.json",
+        "strategy": "docs/story/strategy.json",
+        "crc_domain": "docs/crc/domain/",
+        "crc_walkthrough": "docs/crc/walkthrough/"
+      }
+    },
+    "context": [
+      "CRC modeling for agile bot domain",
+      "Concepts from story graph"
+    ]
   }
 }

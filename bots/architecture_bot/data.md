@@ -28,7 +28,7 @@ Information Exchange: Handling data translation across boundaries.
 Transaction Management: Ensuring ACID transactions. 
 Clemson University, South Carolina
 Clemson University, South Carolina
- +4
+ +4 
 Value of Defining Mechanisms
 Reduced Complexity: Standardizing how common problems are solved.
 Consistency: Promoting a uniform set of services across the system.

@@ -1385,9 +1385,12 @@ class BotPanel {
               vscode.window.showErrorMessage(`Submit failed: ${err.message}`);
               throw err;
             }
-            this._log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
-            console.log('[SUBMIT_DEBUG] 2. Calling _botView.execute("submit")');
-            this._botView.execute('submit')
+            const currentBehavior = this._botView.botData?.behaviors?.current_behavior || this._botView.botData?.current_behavior;
+            const currentAction = this._botView.botData?.behaviors?.current_action || this._botView.botData?.current_action;
+            const submitCmd = (currentBehavior && currentAction) ? `submit ${currentBehavior} ${currentAction}` : 'submit';
+            this._log(`[SUBMIT_DEBUG] 2. Calling _botView.execute("${submitCmd}") - panel selection: ${currentBehavior}.${currentAction}`);
+            console.log('[SUBMIT_DEBUG] 2. Calling _botView.execute("' + submitCmd + '")');
+            this._botView.execute(submitCmd)
               .then((output) => {
                 this._log(`[SUBMIT_DEBUG] 3. execute resolved, status=${output?.status} clipboard_status=${output?.clipboard_status} instructions_length=${output?.instructions_length}`);
                 console.log('[SUBMIT_DEBUG] 3. execute resolved, status:', output?.status, 'clipboard_status:', output?.clipboard_status, 'instructions_length:', output?.instructions_length);

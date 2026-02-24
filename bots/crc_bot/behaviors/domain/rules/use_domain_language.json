@@ -1,133 +1,165 @@
 {
-    "priority":  2,
-    "description":  "Use domain-specific language rooted in core business concepts. Avoid generic terms, technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains). Name concepts and responsibilities using the ubiquitous language of the business domain.",
-    "do":  {
-               "description":  "Use concrete domain language with specific behaviors and actions",
-               "guidance":  [
-                                {
-                                    "description":  "Name concepts after what they represent in the domain, not technical patterns",
-                                    "example":  [
-                                                    "Portfolio",
-                                                    "    Get holdings: Holding",
-                                                    "    Calculates total value with market prices: Money, Holding, MarketPrice",
-                                                    "    Evaluates risk score: RiskScore, RiskModel, Holding, MarketData",
-                                                    "",
-                                                    "RebalanceRecommendation",
-                                                    "    Generates trades to achieve target allocation: Trade, Portfolio, TargetAllocation",
-                                                    "    Compares current allocation to target: AllocationDifference, Portfolio, TargetAllocation",
-                                                    "",
-                                                    "(Concrete business concepts: Portfolio, Holding, Trade, not PortfolioManager, HoldingService)"
-                                                ]
-                                },
-                                {
-                                    "description":  "Use domain verbs for responsibilities, not generic technical verbs",
-                                    "example":  [
-                                                    "Order",
-                                                    "    Get line items: LineItem",
-                                                    "    Calculates subtotal from items: Money, LineItem",
-                                                    "    Calculates shipping cost based on address: Money, ShippingAddress, ShippingMethod",
-                                                    "",
-                                                    "Payment",
-                                                    "    Authorizes transaction with gateway: AuthorizationCode, PaymentGateway",
-                                                    "    Retrieves transaction status: TransactionStatus, PaymentGateway",
-                                                    "",
-                                                    "(Business-meaningful verbs: calculates, authorizes, retrieves - not generic process, handle, manage)"
-                                                ]
-                                },
-                                {
-                                    "description":  "Transform capability language into action language showing what happens and when",
-                                    "example":  [
-                                                    "Instead of \u0027Exposes portfolio data\u0027:",
-                                                    "",
-                                                    "Portfolio",
-                                                    "    Get holdings: Holding",
-                                                    "    Calculates total value across holdings: Money, Holding, MarketPrice",
-                                                    "    Finds by account identifier: Portfolio, AccountId",
-                                                    "",
-                                                    "(Specific actions with clear intent, not generic \u0027exposes\u0027)"
-                                                ]
-                                },
-                                {
-                                    "description":  "Use domain-specific collaborator types that have business meaning",
-                                    "example":  [
-                                                    "Order",
-                                                    "    Get line items: LineItem",
-                                                    "    Calculates subtotal from items: Money, LineItem",
-                                                    "    Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod",
-                                                    "",
-                                                    "Payment",
-                                                    "    Authorizes with payment gateway: AuthorizationCode, PaymentGateway",
-                                                    "    Retrieves transaction status: TransactionStatus, PaymentGateway",
-                                                    "",
-                                                    "(Collaborators: Money, ShippingAddress, AuthorizationCode have domain meaning)"
-                                                ]
-                                }
-                            ]
-           },
-    "dont":  {
-                 "description":  "Don\u0027t use generic terms, technical patterns, or capability verbs",
-                 "guidance":  [
-                                  {
-                                      "description":  "Don\u0027t name concepts with suffixes like Manager, Service, Handler, Factory",
-                                      "example":  [
-                                                      "PortfolioManager (WRONG: xxxer abstraction)",
-                                                      "    Manages portfolio: Portfolio",
-                                                      "    Handles holdings: Holding",
-                                                      "",
-                                                      "HoldingService (WRONG: not a domain concept)",
-                                                      "    Services holdings: Holding",
-                                                      "    Processes updates: Update",
-                                                      "",
-                                                      "(Should be: Portfolio with clear responsibilities, not Manager/Service)"
-                                                  ]
-                                  },
-                                  {
-                                      "description":  "Don\u0027t use generic verbs like process, handle, manage when domain verbs exist",
-                                      "example":  [
-                                                      "Order",
-                                                      "    Processes items: Item (WRONG: generic verb)",
-                                                      "    Handles payment: Payment (WRONG: generic verb)",
-                                                      "    Manages shipping: Shipping (WRONG: generic verb)",
-                                                      "",
-                                                      "(Should be: Get line items: LineItem, Authorizes payment: Payment, Calculates shipping: Money, ShippingMethod)"
-                                                  ]
-                                  },
-                                  {
-                                      "description":  "Don\u0027t use capability verbs like Exposes, Provides, Contains, Represents",
-                                      "example":  [
-                                                      "Portfolio",
-                                                      "    Exposes holdings: Holding (WRONG: capability)",
-                                                      "    Provides valuation: Money (WRONG: capability)",
-                                                      "    Contains risk data: RiskData (WRONG: capability)",
-                                                      "",
-                                                      "(Should be: Get holdings, Calculates total value: Money, Evaluates risk score: RiskScore - specific actions)"
-                                                  ]
-                                  },
-                                  {
-                                      "description":  "Don\u0027t use generic terms like Data, Config, Parameter, Result without domain context",
-                                      "example":  [
-                                                      "RebalanceRecommendation",
-                                                      "    Get result: ResultData (WRONG: generic)",
-                                                      "    Get calculation: CalculationResult (WRONG: generic)",
-                                                      "",
-                                                      "Portfolio",
-                                                      "    Get data: PortfolioData (WRONG: generic suffix)",
-                                                      "    Get config: Configuration (WRONG: generic)",
-                                                      "",
-                                                      "(Should be: Generates trades: Trade, Get holdings: Holding)"
-                                                  ]
-                                  },
-                                  {
-                                      "description":  "Don\u0027t describe system structure instead of behavior",
-                                      "example":  [
-                                                      "PaymentSystem",
-                                                      "    Contains payment gateway: PaymentGateway (WRONG: structure)",
-                                                      "    Has authorization logic: Authorization (WRONG: structure)",
-                                                      "",
-                                                      "(Should be: Payment - Get authorization: AuthorizationCode, PaymentGateway)"
-                                                  ]
-                                  }
-                              ]
-             },
-    "scanner":  "scanners.domain_language_scanner.DomainLanguageScanner"
+  "priority": 2,
+  "description": "Use domain-specific language rooted in core business concepts. Responsibilities must form meaningful domain sentences. Mine vocabulary from stories, acceptance criteria, and domain discussions. Avoid generic terms (Hold, Get), technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains).",
+  "do": {
+    "description": "Use concrete domain language that creates meaningful sentences",
+    "guidance": [
+      {
+        "description": "Create responsibilities that form domain sentences with specific meaning. Extract vocabulary from stories and discussions.",
+        "example": [
+          "Campaign",
+          "    Is identified by code:",
+          "    Defines voucher capacity (max count):",
+          "    Starts valid at date:",
+          "    Expires at date (or never):",
+          "    Is valid at date: Boolean, Date",
+          "    Defines discount (amount or percent):",
+          "    Generates vouchers: Voucher",
+          "",
+          "Voucher",
+          "    Is identified by code:",
+          "    Defines redemption limit (redemptions allowed):",
+          "    Inherits metadata from campaign: Campaign",
+          "    Applies discount amount to order: Campaign",
+          "    Is exhausted when fully redeemed: Boolean",
+          "",
+          "(Each responsibility reads as a domain sentence: 'Campaign is valid at date', 'Voucher is exhausted when fully redeemed')"
+        ]
+      },
+      {
+        "description": "Mine domain language from stories: size → defines voucher capacity; time frame → starts valid at, expires at, is valid at; code → is identified by code; validity → is valid at date",
+        "example": [
+          "Instead of 'Hold size and auto-increase':",
+          "    Defines voucher capacity (max count):",
+          "    Allows generation when exhausted (auto-increase):",
+          "",
+          "Instead of 'Hold time frame and validity':",
+          "    Starts valid at date:",
+          "    Expires at date (or never):",
+          "    Is valid at date: Boolean, Date",
+          "",
+          "Instead of 'Hold code':",
+          "    Is identified by code:",
+          "",
+          "Instead of 'Expose discount amount':",
+          "    Applies discount amount to order: Campaign"
+        ]
+      },
+      {
+        "description": "Name concepts after what they represent in the domain, not technical patterns",
+        "example": [
+          "Portfolio",
+          "    Reports holdings: Holding",
+          "    Calculates total value with market prices: Money, Holding, MarketPrice",
+          "    Evaluates risk score: RiskScore, RiskModel, Holding, MarketData",
+          "",
+          "Order",
+          "    Lists line items: LineItem",
+          "    Calculates subtotal from items: Money, LineItem",
+          "    Calculates shipping cost based on address: Money, ShippingAddress, ShippingMethod",
+          "",
+          "(Concrete business concepts and domain verbs, not PortfolioManager or generic Get)"
+        ]
+      },
+      {
+        "description": "Use domain-specific collaborator types that have business meaning",
+        "example": [
+          "Order",
+          "    Calculates subtotal from items: Money, LineItem",
+          "    Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod",
+          "",
+          "Payment",
+          "    Authorizes with payment gateway: AuthorizationCode, PaymentGateway",
+          "    Retrieves transaction status: TransactionStatus, PaymentGateway",
+          "",
+          "(Collaborators: Money, ShippingAddress, AuthorizationCode have domain meaning)"
+        ]
+      },
+      {
+        "description": "Reference domain objects as collaborators, not as raw parameters in a list. When a concept (Customer, Campaign, etc.) participates in a responsibility, list it as a collaborator.",
+        "example": [
+          "Redemption",
+          "    Records voucher code, customer identity, amount, timestamp: Voucher, Customer (CORRECT: Customer is collaborator)",
+          "",
+          "Redemption",
+          "    Records voucher code, customer, amount, timestamp: Voucher (WRONG: 'customer' is raw - flattened into parameter list)",
+          "",
+          "(Domain objects belong in collaborators, not as raw words in the responsibility text)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't use Hold or Get as default - they are fallbacks that signal failure to find domain language",
+    "guidance": [
+      {
+        "description": "Don't use Hold or Get. These are fallbacks when you cannot find actual domain language - and that is a sign of failure. Mine the domain first.",
+        "example": [
+          "Campaign",
+          "    Hold campaign definition: (WRONG: vague)",
+          "    Hold size and auto-increase: (WRONG: vague)",
+          "    Hold time frame and validity: (WRONG: vague)",
+          "",
+          "(Should be: Defines voucher capacity, Starts valid at date, Is valid at date - domain sentences)"
+        ]
+      },
+      {
+        "description": "Don't use Get as a substitute for Hold - it is equally vague. Find the actual responsibility.",
+        "example": [
+          "Voucher",
+          "    Get code: (WRONG: what does 'get' mean in domain terms?)",
+          "    Get redemption limit: (WRONG: vague)",
+          "",
+          "(Should be: Is identified by code, Defines redemption limit - domain-specific)"
+        ]
+      },
+      {
+        "description": "Don't name concepts with suffixes like Manager, Service, Handler, Factory",
+        "example": [
+          "PortfolioManager (WRONG: xxxer abstraction)",
+          "    Manages portfolio: Portfolio",
+          "",
+          "(Should be: Portfolio with clear domain responsibilities)"
+        ]
+      },
+      {
+        "description": "Don't use capability verbs like Exposes, Provides, Contains, Represents",
+        "example": [
+          "Portfolio",
+          "    Exposes holdings: Holding (WRONG: capability)",
+          "    Provides valuation: Money (WRONG: capability)",
+          "",
+          "(Should be: Reports holdings, Calculates total value - specific domain actions)"
+        ]
+      },
+      {
+        "description": "Don't use generic terms like Data, Config, Parameter, Result without domain context",
+        "example": [
+          "RebalanceRecommendation",
+          "    Get result: ResultData (WRONG: generic)",
+          "",
+          "(Should be: Generates trades: Trade - domain action)"
+        ]
+      },
+      {
+        "description": "Don't describe system structure instead of behavior",
+        "example": [
+          "PaymentSystem",
+          "    Contains payment gateway: PaymentGateway (WRONG: structure)",
+          "",
+          "(Should be: Payment - Authorizes with payment gateway: AuthorizationCode, PaymentGateway)"
+        ]
+      },
+      {
+        "description": "Don't use raw parameters for domain concepts. When Customer, Campaign, or another domain object participates, add it as a collaborator - don't flatten it into a parameter list.",
+        "example": [
+          "Redemption",
+          "    Records voucher code, customer, amount, timestamp: Voucher (WRONG: customer is raw parameter)",
+          "",
+          "(Should be: Records voucher code, customer identity, amount, timestamp: Voucher, Customer - Customer as collaborator)"
+        ]
+      }
+    ]
+  },
+  "scanner": "scanners.domain_language_scanner.DomainLanguageScanner"
 }
