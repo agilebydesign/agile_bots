@@ -65,6 +65,7 @@ class WorkspaceSectionView extends PanelView {
         const filesIconPath = getIcon('files.png');
         const gearIconPath = getIcon('gear.png');
         const submitIconPath = getIcon('submit.png');
+        const subtractIconPath = getIcon('subtract.png');
         const documentIconPath = getIcon('document.png');
         const testTubeIconPath = getIcon('test_tube.png');
 
@@ -88,25 +89,20 @@ class WorkspaceSectionView extends PanelView {
 
         const behaviorNames = botData?.behaviors?.names || botData?.behavior_names || (botData?.behaviors?.all_behaviors || []).map(b => (typeof b === 'string' ? b : b?.name)).filter(Boolean) || [];
         const behaviorIconMap = { shape: 'shape_icon.png', code: 'code_icon.png', prioritization: 'prioritization.png', scenarios: 'inject_scenarios.png', tests: 'test_tube.png', exploration: 'exploration_icon.png' };
-        const behaviorButtonsHtml = behaviorNames.length > 0 ? behaviorNames.map(name => {
+        const wsBehaviorExecToggleId = 'ws-behavior-exec-toggle';
+        const currentBehaviorIcon = (currentBehavior && behaviorIconMap[currentBehavior] ? getIcon(behaviorIconMap[currentBehavior]) : null) || (behaviorNames[0] && behaviorIconMap[behaviorNames[0]] ? getIcon(behaviorIconMap[behaviorNames[0]]) : null);
+        const currentBehaviorLabel = (currentBehavior || behaviorNames[0] || '').charAt(0).toUpperCase() + (currentBehavior || behaviorNames[0] || '').slice(1);
+        const behaviorCollapsedBtn = currentBehaviorIcon ? `<button class="execution-toggle-btn active execution-toggle-collapsed" data-action="toggleExecutionToggle" data-target="${wsBehaviorExecToggleId}" title="${escapeForHtml(currentBehaviorLabel)}"><img src="${currentBehaviorIcon}" alt="${escapeForHtml(currentBehaviorLabel)}" style="width: 20px; height: 20px; object-fit: contain; display: block;" /></button>` : '';
+        const behaviorExpandedButtons = behaviorNames.length > 0 ? behaviorNames.map(name => {
             const isActive = name === currentBehavior;
             const iconFile = behaviorIconMap[name];
             const iconPath = iconFile ? getIcon(iconFile) : null;
-            const escapedName = (name || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
             const label = name.charAt(0).toUpperCase() + name.slice(1);
             const content = iconPath ? `<img src="${iconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="" />` : `<span style="font-size: 11px; color: ${isActive ? 'var(--accent-color)' : 'var(--text-color-faded)'};">${escapeForHtml(label)}</span>`;
-            return `<button onclick="event.stopPropagation(); if(window.navigateToBehavior) window.navigateToBehavior('${escapedName}')" title="${escapeForHtml(label)}" style="
-                background: ${isActive ? 'rgba(255, 140, 0, 0.25)' : 'transparent'};
-                border: 1px solid ${isActive ? 'var(--accent-color)' : 'var(--input-border)'};
-                border-radius: 4px;
-                padding: 4px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.15s ease;
-            " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">${content}</button>`;
+            return `<button class="execution-toggle-btn${isActive ? ' active' : ''}" data-action="navigateToBehavior" data-behavior-name="${escapeForHtml(name)}" title="${escapeForHtml(label)}">${content}</button>`;
         }).join('') : '';
+        const behaviorExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${behaviorExpandedButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${wsBehaviorExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
+        const behaviorToggleGroupHtml = behaviorNames.length > 0 ? `<span class="execution-toggle-container" id="${wsBehaviorExecToggleId}" style="flex-shrink: 0;" onclick="event.stopPropagation();">${behaviorExpandedGroup}${behaviorCollapsedBtn}</span>` : '';
 
         return `
     <div class="section card-primary" style="margin-top: 8px;">
@@ -124,10 +120,12 @@ class WorkspaceSectionView extends PanelView {
                     ${gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Workspace" />` : ''}
                     <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Workspace</span>
                 </div>
-                ${behaviorButtonsHtml ? `<div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">${behaviorButtonsHtml}</div>` : ''}
-                <button id="ws-submit-btn" onclick="event.stopPropagation(); if(window.submitWorkspaceBehaviorInstructions) window.submitWorkspaceBehaviorInstructions()" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px; margin-left: 4px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Submit ${escapeForHtml((currentBehavior || '').charAt(0).toUpperCase() + (currentBehavior || '').slice(1))} for all">
+                <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;">
+                ${behaviorToggleGroupHtml || ''}
+                <button id="ws-submit-btn" onclick="event.stopPropagation(); if(window.submitWorkspaceBehaviorInstructions) window.submitWorkspaceBehaviorInstructions()" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Submit ${escapeForHtml((currentBehavior || '').charAt(0).toUpperCase() + (currentBehavior || '').slice(1))} for all">
                     <img src="${submitIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="Submit" />
                 </button>
+                </div>
             </div>
             <div id="workspace-content" class="collapsible-content" style="max-height: 400px; overflow-y: auto; overflow-x: hidden; display: block;">
                 ${clarifyHtml}

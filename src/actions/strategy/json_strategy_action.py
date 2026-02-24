@@ -79,7 +79,7 @@ class JSONStrategyAction(JSONAdapter):
             
             behavior_data = saved_data.get(self.action.behavior.name, {}) if saved_data else {}
             saved_decisions = behavior_data.get('decisions', {})
-            saved_assumptions = behavior_data.get('assumptions', [])
+            saved_assumptions = behavior_data.get('additional_strategies') or behavior_data.get('assumptions', [])
             
             with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
                 f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H3,H4','location':'json_strategy_action.py:93','message':'extracted behavior data','data':{'behavior_data':behavior_data,'saved_decisions':saved_decisions,'saved_assumptions':saved_assumptions},'timestamp':int(time.time()*1000)})+'\n')

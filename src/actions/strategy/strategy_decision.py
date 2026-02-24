@@ -27,7 +27,7 @@ class StrategyDecision(JsonPersistent):
         
         behavior_data = existing_data.get(self.behavior_name, {})
         existing_decisions = behavior_data.get('decisions', {})
-        existing_assumptions = behavior_data.get('assumptions', [])
+        existing_assumptions = behavior_data.get('additional_strategies') or behavior_data.get('assumptions', [])
         
         merged_decisions = {**existing_decisions, **self.decisions_made}
         
@@ -35,7 +35,7 @@ class StrategyDecision(JsonPersistent):
         
         new_data = {
             'decisions': merged_decisions,
-            'assumptions': merged_assumptions
+            'additional_strategies': merged_assumptions
         }
         merged_data = self.merge(existing_data, new_data, self.behavior_name)
         super().save(merged_data)

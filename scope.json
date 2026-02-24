@@ -3,5 +3,5 @@
   "value": [],
   "exclude": [],
   "skiprule": [],
-  "include_level": "acceptance"
+  "include_level": "stories"
 }

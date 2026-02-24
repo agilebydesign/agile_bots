@@ -2,14 +2,19 @@
   "shape": {
     "decisions": {
       "flow_scope_and_granularity": [
-        "Intra-system level - Focus on interactions within a single system, Useful for Solutions with significant backend or service flows."
+        "End-to-end user-system behavior - One user interaction followed by one system response"
       ],
       "drill_down_approach": "Dig deep on behavioral complexity",
       "depth_of_shaping": "Decompose -> Discover all stories listed",
-      "drill_down_limits": "Approximate story limit: 10-15 stories",
-      "structure_exploration_depth": "Behavioral"
+      "drill_down_limits": [
+        "Approximate feature limit: No limit"
+      ],
+      "structure_exploration_depth": [
+        "Structure -> Explore structural AC only (data, relationships, constraints)",
+        "Behavioral -> Explore business and behavioral AC (user interactions, workflows, outcomes)"
+      ]
     },
-    "assumptions": [
+    "additional_strategies": [
       "this is an assumption"
     ]
   },
@@ -19,7 +24,7 @@
       "parent_child_management": "Explicit Collection Class",
       "ui_domain_interaction": "Application Service Layer"
     },
-    "assumptions": []
+    "additional_strategies": []
   },
   "scenarios": {
     "decisions": {
@@ -30,7 +35,7 @@
         "Edge Cases"
       ]
     },
-    "assumptions": [
+    "additional_strategies": [
       "One story is specified at a time",
       "Acceptance criteria must be testable, unambiguous, and executable",
       "Gherkin syntax or structured language (Given/When/Then) is preferred",
@@ -72,7 +77,7 @@
       ],
       "risk_assessment": "HIGH: DrawIOStoryMap (central, doesn't exist), DrawIOStoryNode hierarchy (unified API missing), Recursive report/update (currently flat). MEDIUM: UpdateReport (dict\u2192class), DrawIOStoryNodeSerializer (split across renderer/synchronizer). LOW: LayoutData (dict wrapper), render layout rules (proven), behavior-to-diagram mapping (config)."
     },
-    "assumptions": [
+    "additional_strategies": [
       "validate the use of  diff story map / story node extension using consosutient model"
     ]
   },
@@ -86,7 +91,7 @@
       "helper_structure": "Feature helpers extend BaseHelper(parent), in test/invoke_bot/<subepic>/",
       "test_data_fixtures": "Fixtures in test/invoke_bot/<subepic>/fixtures/ as needed"
     },
-    "assumptions": [
+    "additional_strategies": [
       "Tests call domain model classes",
       "Domain model sources guide implementation: walkthrough realizations (object flows), CRC cards (responsibilities), acceptance criteria (behavior)",
       "Tests use tmp_path workspace for all file operations - no writes to production",
@@ -101,7 +106,7 @@
   },
   "code": {
     "decisions": {},
-    "assumptions": [
+    "additional_strategies": [
       "Domain has the most business logic",
       "CLI has minimum logic - wraps parameters from STDIO into domain and wraps results back",
       "Main objects have format-specific extensions",

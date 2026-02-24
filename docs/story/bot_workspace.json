@@ -11,6 +11,7 @@
     "_behavior.scenarios": "combine_with_next"
   },
   "special_instructions": {
-    "shape": ""
+    "shape": "",
+    "prioritization": ""
   }
 }

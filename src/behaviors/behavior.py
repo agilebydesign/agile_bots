@@ -153,7 +153,7 @@ class Behavior:
                 'decisions_made': saved.get('decisions', {})
             }
             result['assumptions'] = {
-                'assumptions_made': saved.get('assumptions', [])
+                'assumptions_made': saved.get('additional_strategies') or saved.get('assumptions', [])
             }
         except (FileNotFoundError, Exception):
             result = {

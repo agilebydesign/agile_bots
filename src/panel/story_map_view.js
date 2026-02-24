@@ -2522,10 +2522,39 @@ class StoryMapView extends PanelView {
             '                    }\n' +
             '                }\n' +
             '                if (typeof updateIncludeLevel === \'function\') updateIncludeLevel(level);\n' +
+            '                var injectContainer = document.getElementById(\'inject-level-exec-toggle\');\n' +
+            '                if (injectContainer && injectContainer.classList.contains(\'execution-toggle-container\') && injectContainer.classList.contains(\'expanded\')) {\n' +
+            '                    injectContainer.classList.remove(\'expanded\');\n' +
+            '                    if (window.getCollapseState && sessionStorage) {\n' +
+            '                        sessionStorage.setItem(\'collapseState\', JSON.stringify(window.getCollapseState()));\n' +
+            '                    }\n' +
+            '                }\n' +
             '            };\n' +
             '        })();\n';
         
         const scopeSectionExpanded = this.scopeSectionExpanded !== false;
+        const injectLevels = [
+            { level: 'stories', icon: injectStoriesIconPath, title: 'Include up to stories' },
+            { level: 'domain_concepts', icon: injectDomainIconPath, title: 'Include up to domain concepts' },
+            { level: 'acceptance', icon: injectCriteriaIconPath, title: 'Include up to acceptance criteria' },
+            { level: 'scenarios', icon: injectScenariosIconPath, title: 'Include up to scenarios' },
+            { level: 'examples', icon: injectExamplesIconPath, title: 'Include up to examples' },
+            { level: 'tests', icon: injectTestsIconPath, title: 'Include up to tests' },
+            { level: 'code', icon: injectCodeIconPath, title: 'Include up to code' }
+        ];
+        const currentInjectLevel = scopeData.includeLevel || 'examples';
+        const currentInjectObj = injectLevels.find(l => l.level === currentInjectLevel) || injectLevels.find(l => l.level === 'examples');
+        const injectExecToggleId = 'inject-level-exec-toggle';
+        const injectCollapsedBtn = currentInjectObj && currentInjectObj.icon ? `<button class="execution-toggle-btn active execution-toggle-collapsed" data-action="toggleExecutionToggle" data-target="${injectExecToggleId}" title="${currentInjectObj.title}"><img src="${currentInjectObj.icon}" alt="${currentInjectObj.title}" style="width: 22px; height: 22px; object-fit: contain; display: block;" /></button>` : '';
+        const levelToId = { stories: 'stories', domain_concepts: 'domain', acceptance: 'acceptance', scenarios: 'scenarios', examples: 'examples', tests: 'tests', code: 'code' };
+        const injectExpandedButtons = injectLevels.map(l => {
+            const isActive = currentInjectLevel === l.level;
+            const imgStyle = l.icon ? `width: ${l.level === 'domain_concepts' ? '28' : '26'}px; height: ${l.level === 'domain_concepts' ? '28' : '26'}px; object-fit: contain; opacity: ${isActive ? '1' : '0.5'};` : '';
+            const content = l.icon ? `<img src="${l.icon}" style="${imgStyle}" alt="${l.level}" />` : l.level;
+            return `<button id="btn-include-${levelToId[l.level]}" onclick="event.stopPropagation(); switchIncludeLevel('${l.level}');" class="execution-toggle-btn${isActive ? ' active' : ''}" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="${l.title}">${content}</button>`;
+        }).join('');
+        const injectExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 1px; align-items: center;" onclick="event.stopPropagation();">${injectExpandedButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${injectExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
+        const injectToggleGroupHtml = `<span class="execution-toggle-container" id="${injectExecToggleId}" style="flex-shrink: 0;" onclick="event.stopPropagation();">${injectCollapsedBtn}${injectExpandedGroup}</span>`;
         const result = `
     <div class="section scope-section card-primary">
         <div class="collapsible-section ${scopeSectionExpanded ? 'expanded' : ''}">
@@ -2631,15 +2660,9 @@ class StoryMapView extends PanelView {
                             <img src="${clearIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Clear Filter" />
                         </button>
                         </div>
-                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 1px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
+                        <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
                         <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
-                        <button id="btn-include-stories" onclick="event.stopPropagation(); switchIncludeLevel('stories');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to stories">${injectStoriesIconPath ? `<img src="${injectStoriesIconPath}" style="width: 20px; height: 20px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'stories') ? '1' : '0.5'};" alt="stories" />` : 'stories'}</button>
-                        <button id="btn-include-domain" onclick="event.stopPropagation(); switchIncludeLevel('domain_concepts');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to domain concepts">${injectDomainIconPath ? `<img src="${injectDomainIconPath}" style="width: 28px; height: 28px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'domain_concepts') ? '1' : '0.5'};" alt="domain" />` : 'domain'}</button>
-                        <button id="btn-include-acceptance" onclick="event.stopPropagation(); switchIncludeLevel('acceptance');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to acceptance criteria">${injectCriteriaIconPath ? `<img src="${injectCriteriaIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'acceptance') ? '1' : '0.5'};" alt="criteria" />` : 'criteria'}</button>
-                        <button id="btn-include-scenarios" onclick="event.stopPropagation(); switchIncludeLevel('scenarios');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to scenarios">${injectScenariosIconPath ? `<img src="${injectScenariosIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'scenarios') ? '1' : '0.5'};" alt="scenarios" />` : 'scenarios'}</button>
-                        <button id="btn-include-examples" onclick="event.stopPropagation(); switchIncludeLevel('examples');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to examples">${injectExamplesIconPath ? `<img src="${injectExamplesIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(!scopeData.includeLevel || scopeData.includeLevel === 'examples') ? '1' : '0.5'};" alt="examples" />` : 'examples'}</button>
-                        <button id="btn-include-tests" onclick="event.stopPropagation(); switchIncludeLevel('tests');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to tests">${injectTestsIconPath ? `<img src="${injectTestsIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'tests') ? '1' : '0.5'};" alt="tests" />` : 'tests'}</button>
-                        <button id="btn-include-code" onclick="event.stopPropagation(); switchIncludeLevel('code');" style="display: flex; align-items: center; justify-content: center; padding: 0 1px; line-height: 1; cursor: pointer; border: none; background: transparent; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Include up to code">${injectCodeIconPath ? `<img src="${injectCodeIconPath}" style="width: 26px; height: 26px; object-fit: contain; opacity: ${(scopeData.includeLevel === 'code') ? '1' : '0.5'};" alt="code" />` : 'code'}</button>
+                        ${injectToggleGroupHtml}
                         </div>
                     </div>
                     ${contentHtml}

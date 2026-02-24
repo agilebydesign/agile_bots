@@ -733,12 +733,12 @@ class InstructionsSection extends PanelView {
 
         // Assumptions - textarea with collapse button (like Clarify Q&A)
         let assumptionsHtml = '<div class="input-container qa-container" style="margin-top: 6px;">';
-        assumptionsHtml += '<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px;">Assumptions</span>';
+        assumptionsHtml += '<div class="input-header" style="display: flex; justify-content: space-between; align-items: flex-start;"><span style="flex: 1; padding-right: 8px;">Additional Strategies</span>';
         assumptionsHtml += `<button onclick="toggleTextareaExpand('${p}strategy-assumptions')" id="${p}strategy-assumptions-toggle" title="Expand/Collapse" style="background: transparent; border: 1px solid var(--input-border); border-radius: 3px; padding: 2px 6px; cursor: pointer; color: var(--text-color-faded); font-size: 10px; flex-shrink: 0;">▲</button></div>`;
         const assumptionsText = assumptionsMade.length > 0
             ? assumptionsMade.join('\n')
             : '';
-        assumptionsHtml += `<textarea id="${p}strategy-assumptions" data-collapsed="false" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter assumptions (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(assumptionsText)}</textarea>`;
+        assumptionsHtml += `<textarea id="${p}strategy-assumptions" data-collapsed="false" onblur="saveStrategyAssumptions()" oninput="autoResizeTextarea(this)" placeholder="Enter additional strategies (one per line)" style="width: 100%; min-height: 80px; padding: var(--input-padding); background-color: var(--input-bg); border: none; color: var(--vscode-foreground); resize: vertical; font-family: inherit; font-size: var(--font-size-base);">${escapeForHtml(assumptionsText)}</textarea>`;
         assumptionsHtml += '</div>';
 
         // Build final HTML - Decisions shown directly (each is collapsible), Assumptions inline with collapsible textarea

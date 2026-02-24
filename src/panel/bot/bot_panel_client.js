@@ -157,6 +157,12 @@ document.addEventListener('click', function(e) {
             const isSkip = actionElement.getAttribute('data-skip') === 'true';
             if (behaviorName && window.navigateToBehavior && !isSkip) {
                 window.navigateToBehavior(behaviorName);
+                const wsContainer = actionElement.closest('#ws-behavior-exec-toggle');
+                if (wsContainer && wsContainer.classList.contains('execution-toggle-container') && wsContainer.classList.contains('expanded')) {
+                    wsContainer.classList.remove('expanded');
+                    const currentState = window.getCollapseState();
+                    sessionStorage.setItem('collapseState', JSON.stringify(currentState));
+                }
                 e.stopPropagation();
                 e.preventDefault();
             }

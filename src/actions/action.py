@@ -519,7 +519,7 @@ class Action:
             if saved_decisions:
                 combined_strategy_criteria['decisions_made'] = saved_decisions
             
-            saved_assumptions = saved_behavior_data.get('assumptions', [])
+            saved_assumptions = saved_behavior_data.get('additional_strategies') or saved_behavior_data.get('assumptions', [])
             if saved_assumptions:
                 combined_assumptions['assumptions_made'] = saved_assumptions
             
