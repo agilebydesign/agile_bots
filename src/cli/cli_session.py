@@ -175,7 +175,9 @@ class CLISession:
         # so we get combined instructions (current+next when auto) and execution mode handling.
         is_set_execution = len(verb_parts) == 3 and verb_parts[2] == 'set_execution'
         is_get_execution = len(verb_parts) == 3 and verb_parts[2] == 'get_execution'
-        is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0])
+        # Domain getters (rules, clarifications, strategies) go to domain navigator, not behavior action
+        is_domain_getter = len(verb_parts) == 2 and verb_parts[1] in ('rules', 'clarifications', 'strategies')
+        is_behavior_action = len(verb_parts) == 2 and hasattr(self.bot, verb_parts[0]) and not is_domain_getter
         
         if (is_story_graph_command or
                 ('.' in verb and hasattr(self.bot, verb.split('.')[0]) and not has_dash_params

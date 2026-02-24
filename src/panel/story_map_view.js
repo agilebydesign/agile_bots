@@ -138,7 +138,7 @@ class StoryMapView extends PanelView {
         Logger.log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
 
         const drawioLink = (scopeData.graphLinks || []).find(l => l.url && l.url.endsWith('.drawio'));
-        const drawioPath = drawioLink ? this.escapeForJs(drawioLink.url) : '';
+        const drawioPath = drawioLink ? escapeForJs(drawioLink.url) : '';
         
         // Create contextual action buttons toolbar
         const actionButtonsHtml = `

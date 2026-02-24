@@ -102,6 +102,39 @@ class Behavior:
         return self._rules
 
     @property
+    def clarifications(self) -> Dict[str, Any]:
+        """Return clarification data for this behavior from clarification.json. Empty dict if file/domain doesn't exist."""
+        from actions.clarify.requirements_clarifications import RequirementsClarifications
+        data = RequirementsClarifications.load_all(self.bot_paths)
+        return data.get(self.name, {})
+
+    @property
+    def strategies(self) -> Dict[str, Any]:
+        """Return strategy data for this behavior: strategy.json merged with criteria template from guardrails."""
+        from actions.strategy.strategy_decision import StrategyDecision
+        from actions.strategy.strategy import Strategy
+        saved = StrategyDecision.load_all(self.bot_paths).get(self.name, {})
+        result = {}
+        try:
+            strategy_obj = Strategy(self.behavior_directory)
+            criteria_dict = {}
+            for key, criteria in strategy_obj.strategy_criterias.strategy_criterias.items():
+                criteria_dict[key] = criteria.to_dict()
+            result['strategy_criteria'] = {
+                'criteria': criteria_dict,
+                'decisions_made': saved.get('decisions', {})
+            }
+            result['assumptions'] = {
+                'assumptions_made': saved.get('assumptions', [])
+            }
+        except (FileNotFoundError, Exception):
+            result = {
+                'strategy_criteria': {'criteria': {}, 'decisions_made': {}},
+                'assumptions': {'assumptions_made': []}
+            }
+        return result
+
+    @property
     def actions(self):
         if self._actions is None:
             from actions.actions import Actions
@@ -132,8 +165,8 @@ class Behavior:
         Dynamically resolve action names as attributes.
         This allows DomainNavigator to access actions like: behavior.build, behavior.clarify, etc.
         """
-        # Avoid infinite recursion by checking if _actions exists
-        if name.startswith('_') or name in ('_actions', 'actions'):
+        # Avoid infinite recursion - exclude known properties and actions
+        if name.startswith('_') or name in ('_actions', 'actions', 'clarifications', 'strategies', 'rules'):
             raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
         
         # Try to find the action by name

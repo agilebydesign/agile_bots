@@ -349,6 +349,11 @@ class DomainNavigator:
         if hasattr(obj, 'story_graph') and isinstance(getattr(obj, 'story_graph'), dict):
             return {'status': 'success', 'result': obj.story_graph}
         
+        # Rules: return list of {rule_file, rule_file_path} for panel/CLI
+        if type(obj).__name__ == 'Rules':
+            rules_list = [{'rule_file': r.rule_file, 'rule_file_path': str(r.rule_file_path)} for r in obj]
+            return {'status': 'success', 'result': rules_list}
+        
         if isinstance(obj, (str, int, float, bool, list, dict)):
             return {'status': 'success', 'result': obj}
         

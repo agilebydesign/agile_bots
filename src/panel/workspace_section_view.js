@@ -20,10 +20,38 @@ class WorkspaceSectionView extends PanelView {
         if (!botData) return '';
 
         const lastResponse = PanelView._lastResponse || {};
-        const instructionsData = lastResponse.instructions || botData?.instructions || {};
+        let instructionsData = lastResponse.instructions || botData?.instructions || {};
         const currentAction = lastResponse.bot?.current_action || lastResponse.current_action ||
             botData?.current_action || botData?.behaviors?.current_action || '';
         const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || '';
+
+        // Fetch clarifications, strategies, rules via CLI (shape.clarifications, shape.strategies, shape.rules)
+        const executor = this.parentView?.execute?.bind(this.parentView) || this.execute?.bind(this);
+        if (currentBehavior && executor) {
+            try {
+                const [clarResp, stratResp, rulesResp] = await Promise.all([
+                    executor(`${currentBehavior}.clarifications`),
+                    executor(`${currentBehavior}.strategies`),
+                    executor(`${currentBehavior}.rules`)
+                ]);
+                instructionsData = { ...instructionsData };
+                if (clarResp?.result !== undefined) {
+                    instructionsData.clarification = clarResp.result && typeof clarResp.result === 'object'
+                        ? { [currentBehavior]: clarResp.result }
+                        : {};
+                }
+                if (stratResp?.result !== undefined) {
+                    instructionsData.strategy = stratResp.result && typeof stratResp.result === 'object'
+                        ? { [currentBehavior]: stratResp.result }
+                        : {};
+                }
+                if (rulesResp?.result && Array.isArray(rulesResp.result)) {
+                    instructionsData.rules = rulesResp.result;
+                }
+            } catch (e) {
+                log('[WorkspaceSectionView] CLI fetch for clarifications/strategies/rules failed: ' + (e?.message || e));
+            }
+        }
 
         const getIcon = (name) => branding.getImageUri(this.webview, this.extensionUri, name);
         const renderDiagramIconPath = getIcon('render_diagram.png');
@@ -122,22 +150,6 @@ class WorkspaceSectionView extends PanelView {
             content += '</div>';
         }
 
-        // Rules links
-        const rules = instructions.rules || [];
-        if (rules.length > 0) {
-            content += '<div style="margin-top: 3px;">';
-            rules.forEach((rule, idx) => {
-                const rulePath = typeof rule === 'string' ? rule : rule.rule_file || '';
-                if (rulePath) {
-                    content += `<div style="margin-top: 2px; font-size: 12px;" title="${escapeForHtml(rulePath)}">`;
-                    content += `<span style="color: var(--text-color-faded);">Rule:</span> `;
-                    content += this._renderFileLink(rulePath);
-                    content += '</div>';
-                }
-            });
-            content += '</div>';
-        }
-
         return `
         <div class="collapsible-section expanded" style="margin-bottom: 4px;">
             <div class="collapsible-header" onclick="toggleSection('ws-diagrams-content')" style="cursor: pointer; padding: 0 4px 0 4px; display: flex; align-items: center; user-select: none;">
@@ -155,43 +167,57 @@ class WorkspaceSectionView extends PanelView {
     _renderBuildSubsection(instructions, currentAction, botData, jsonIconPath, filesIconPath, documentIconPath, testTubeIconPath) {
         let content = '';
 
-        // Build section: Document, Test tube, All files, Open Story Graph (compact, minimal padding)
-        content += `<div style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
-                <button id="ws-btn-open-file" onclick="event.stopPropagation(); handleOpenFile();" style="background: transparent; border: none; padding: 0; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open file or folder for selected node">
+        // Build section: Document, Test tube, All files, Open Story Graph (compact like Render buttons)
+        content += `<div id="ws-build-buttons" style="display: flex; align-items: center; gap: 2px; margin-bottom: 2px;">
+                <button id="ws-btn-open-file" onclick="event.stopPropagation(); handleOpenFile();" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open file or folder for selected node">
                     <img src="${documentIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="File" />
                 </button>
-                <button id="ws-btn-open-test" onclick="event.stopPropagation(); handleOpenTest();" style="background: transparent; border: none; padding: 0; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open test for selected node">
+                <button id="ws-btn-open-test" onclick="event.stopPropagation(); handleOpenTest();" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open test for selected node">
                     <img src="${testTubeIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="Test" />
                 </button>
-                <button id="ws-btn-open-all" onclick="event.stopPropagation(); handleOpenAll();" style="background: transparent; border: none; padding: 0; cursor: pointer; transition: opacity 0.15s ease; width: 28px; height: 28px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open all related files in split editors">
+                <button id="ws-btn-open-all" onclick="event.stopPropagation(); handleOpenAll();" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open all related files in split editors">
                     <img src="${filesIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="All" />
                 </button>
-                <button id="ws-btn-open-graph" onclick="event.stopPropagation(); handleOpenGraph();" style="background: transparent; border: none; padding: 0; cursor: pointer; transition: opacity 0.15s ease; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open story graph with selected node expanded">
-                    <img src="${jsonIconPath}" style="width: 52px; height: 52px; object-fit: contain; display: block;" alt="Story Graph" />
+                <button id="ws-btn-open-graph" onclick="event.stopPropagation(); handleOpenGraph();" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 40px; min-height: 40px; display: flex; align-items: center; justify-content: center;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Open story graph with selected node expanded">
+                    <img src="${jsonIconPath}" style="width: 36px; height: 36px; object-fit: contain; display: block;" alt="Story Graph" />
                 </button>
             </div>`;
 
-        // Build content (schema + rules) - shown when build action
+        // Rules - shown below Build buttons when available (regardless of action), collapsible
+        const buildRules = instructions.rules || instructions.build_instructions?.rules || [];
+        if (buildRules.length > 0) {
+            let rulesLinksHtml = '';
+            buildRules.forEach(rule => {
+                const rulePath = typeof rule === 'string' ? rule : (rule.rule_file_path || rule.rule_file || '');
+                if (rulePath) {
+                    rulesLinksHtml += `<div style="margin-top: 2px; font-size: 12px;" title="${escapeForHtml(rulePath)}">`;
+                    rulesLinksHtml += this._renderFileLink(rulePath);
+                    rulesLinksHtml += '</div>';
+                }
+            });
+            content += `
+        <div class="collapsible-section expanded" style="margin-top: 4px; margin-bottom: 2px;">
+            <div class="collapsible-header" onclick="toggleSection('ws-build-rules-content')" style="cursor: pointer; padding: 2px 0; display: flex; align-items: center; user-select: none;">
+                <span class="expand-icon">▸</span>
+                <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 13px;">Rules</span>
+            </div>
+            <div id="ws-build-rules-content" class="collapsible-content" style="max-height: none; overflow: visible; display: block;">
+                <div style="padding-left: 14px;">
+                    ${rulesLinksHtml}
+                </div>
+            </div>
+        </div>`;
+        }
+
+        // Build content (schema) - shown when build action
         const hasBuildData = instructions.schema || instructions.story_graph_template || instructions.story_graph_config || instructions.build_instructions;
         if (hasBuildData && currentAction === 'build') {
             let schemaData = instructions.schema || instructions.build_instructions?.schema || {};
             if (instructions.story_graph_template) schemaData = { ...schemaData, ...instructions.story_graph_template };
             if (instructions.story_graph_config) schemaData = { ...schemaData, ...instructions.story_graph_config };
-            const buildRules = instructions.rules || instructions.build_instructions?.rules || [];
 
             if (Object.keys(schemaData).length > 0) {
                 content += `<div style="margin-top: 2px; font-size: 12px; color: var(--text-color-faded);">Story Graph schema loaded</div>`;
-            }
-            if (buildRules.length > 0) {
-                buildRules.forEach(rule => {
-                    const rulePath = typeof rule === 'string' ? rule : rule.rule_file || '';
-                    if (rulePath) {
-                        content += `<div style="margin-top: 2px; font-size: 12px;" title="${escapeForHtml(rulePath)}">`;
-                        content += `<span style="color: var(--text-color-faded);">Build Rule:</span> `;
-                        content += this._renderFileLink(rulePath);
-                        content += '</div>';
-                    }
-                });
             }
         }
 

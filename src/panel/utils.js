@@ -111,9 +111,17 @@ class Logger {
      * @param {string} msg 
      */
     static logPanelClicks(msg) {
-        let logPath = path.join(Logger.logFolder, 'panel_clicks.log');
-        let timestamp = new Date().toISOString();
-        fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
+        try {
+            const logDir = Logger.logFolder;
+            if (logDir) {
+                fs.mkdirSync(logDir, { recursive: true });
+                const logPath = path.join(logDir, 'panel_clicks.log');
+                const timestamp = new Date().toISOString();
+                fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
+            }
+        } catch (e) {
+            // Silently ignore (dir creation failed, permissions, etc.)
+        }
     }
 
     /**
