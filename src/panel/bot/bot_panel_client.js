@@ -1170,7 +1170,8 @@ window.toggleSection = function(sectionId) {
             }
         }
 
-        if (WS_SECTION_IDS.indexOf(sectionId) >= 0 && window.currentBehavior && window.saveWorkspaceCollapseState) {
+        const isWorkspaceSection = WS_SECTION_IDS.indexOf(sectionId) >= 0 || (sectionId && sectionId.startsWith('ws-strategy-decision-'));
+        if (isWorkspaceSection && window.currentBehavior && window.saveWorkspaceCollapseState) {
             window.saveWorkspaceCollapseState(window.currentBehavior);
         }
         if (sectionId === 'scope-content' && typeof vscode !== 'undefined') {
