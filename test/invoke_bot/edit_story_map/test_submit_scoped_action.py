@@ -1,4 +1,4 @@
-﻿"""
+"""
 Test Submit Scoped Action
 
 SubEpic: Submit Scoped Action

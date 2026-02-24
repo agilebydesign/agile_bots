@@ -1338,7 +1338,7 @@
             },
             {
               "name": "Render Bot Interface",
-              "sequential_order": 2.0,
+              "sequential_order": 1.0,
               "behavior": null,
               "domain_concepts": [
                 {
@@ -2537,7 +2537,7 @@
             },
             {
               "name": "Load Bot",
-              "sequential_order": 4.0,
+              "sequential_order": 2.0,
               "behavior": null,
               "domain_concepts": [],
               "sub_epics": [],
@@ -8696,14 +8696,99 @@
               "sequential_order": 3.0,
               "behavior": null,
               "domain_concepts": [
-                {"name": "StoryMapView", "responsibilities": [{"name": "Shows diagram action buttons", "collaborators": ["RenderDiagram", "SaveLayout", "ClearLayout", "UpdateGraph"]}]},
-                {"name": "RenderDiagram", "responsibilities": [{"name": "Renders diagram for scope", "collaborators": ["StoryNode", "StoryMap"]}]},
-                {"name": "SaveLayout", "responsibilities": [{"name": "Persists layout to DrawIO", "collaborators": ["DrawIO"]}]},
-                {"name": "ClearLayout", "responsibilities": [{"name": "Clears diagram layout", "collaborators": ["DrawIO"]}]},
-                {"name": "UpdateGraph", "responsibilities": [{"name": "Applies changes to story graph", "collaborators": ["UpdateReport", "StoryMap"]}]},
-                {"name": "DrawIO", "responsibilities": [{"name": "Persists layout", "collaborators": ["File"]}]},
-                {"name": "UpdateReport", "responsibilities": [{"name": "Reports changes", "collaborators": ["StoryMap"]}]},
-                {"name": "render_diagram", "responsibilities": [{"name": "CLI command to render diagram for scope", "collaborators": ["RenderDiagram"]}]}
+                {
+                  "name": "StoryMapView",
+                  "responsibilities": [
+                    {
+                      "name": "Shows diagram action buttons",
+                      "collaborators": [
+                        "RenderDiagram",
+                        "SaveLayout",
+                        "ClearLayout",
+                        "UpdateGraph"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "RenderDiagram",
+                  "responsibilities": [
+                    {
+                      "name": "Renders diagram for scope",
+                      "collaborators": [
+                        "StoryNode",
+                        "StoryMap"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "SaveLayout",
+                  "responsibilities": [
+                    {
+                      "name": "Persists layout to DrawIO",
+                      "collaborators": [
+                        "DrawIO"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "ClearLayout",
+                  "responsibilities": [
+                    {
+                      "name": "Clears diagram layout",
+                      "collaborators": [
+                        "DrawIO"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "UpdateGraph",
+                  "responsibilities": [
+                    {
+                      "name": "Applies changes to story graph",
+                      "collaborators": [
+                        "UpdateReport",
+                        "StoryMap"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "DrawIO",
+                  "responsibilities": [
+                    {
+                      "name": "Persists layout",
+                      "collaborators": [
+                        "File"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "UpdateReport",
+                  "responsibilities": [
+                    {
+                      "name": "Reports changes",
+                      "collaborators": [
+                        "StoryMap"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "render_diagram",
+                  "responsibilities": [
+                    {
+                      "name": "CLI command to render diagram for scope",
+                      "collaborators": [
+                        "RenderDiagram"
+                      ]
+                    }
+                  ]
+                }
               ],
               "test_file": "invoke_bot/edit_story_map/test_submit_scoped_action.py",
               "sub_epics": [],
@@ -13151,109 +13236,57 @@
                       "behavior": null
                     },
                     {
-                      "name": "Navigate To Behavior Action And Execute Using CLI",
+                      "name": "Select Workspace Behavior",
                       "sequential_order": 6.0,
                       "connector": null,
                       "story_type": "user",
-                      "users": [
-                        "User"
-                      ],
-                      "test_class": "TestNavigateToBehaviorActionAndExecuteUsingCLI",
+                      "users": [],
+                      "test_class": "TestSelectWorkspaceBehavior",
                       "scenarios": [
                         {
-                          "name": "Cli execute behavior with action parameter",
+                          "name": "User selects behavior and sees instructions update",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build"
+                        },
+                        {
+                          "name": "Panel remembers selection across section toggles",
                           "sequential_order": 1.0,
-                          "type": "happy_path",
+                          "type": "edge_case",
                           "background": [],
-                          "test_method": "test_cli_execute_behavior_with_action_parameter",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_execute_behavior_with_action_parameter",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 703
-                          }
+                          "test_method": "test_behavior_selection_persists_across_state_refresh",
+                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected"
                         },
                         {
-                          "name": "Cli execute behavior without action uses current",
+                          "name": "Default behavior shown when none selected",
                           "sequential_order": 2.0,
-                          "type": "happy_path",
+                          "type": "edge_case",
                           "background": [],
-                          "test_method": "test_cli_execute_behavior_without_action_uses_current",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_execute_behavior_without_action_uses_current",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 716
-                          }
-                        },
-                        {
-                          "name": "Cli execute behavior with no state starts at first",
-                          "sequential_order": 3.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_execute_behavior_with_no_state_starts_at_first",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_execute_behavior_with_no_state_starts_at_first",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 729
-                          }
-                        },
-                        {
-                          "name": "Cli workflow order determines next action",
-                          "sequential_order": 4.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_workflow_order_determines_next_action",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_workflow_order_determines_next_action",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 743
-                          }
-                        },
-                        {
-                          "name": "Cli starts at first action when no completed",
-                          "sequential_order": 5.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_starts_at_first_action_when_no_completed",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_starts_at_first_action_when_no_completed",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 757
-                          }
-                        },
-                        {
-                          "name": "Cli falls back to completed actions list",
-                          "sequential_order": 6.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_falls_back_to_completed_actions_list",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_falls_back_to_completed_actions_list",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 770
-                          }
-                        },
-                        {
-                          "name": "Cli different behaviors have different workflows",
-                          "sequential_order": 7.0,
-                          "type": "happy_path",
-                          "background": [],
-                          "test_method": "test_cli_different_behaviors_have_different_workflows",
-                          "steps": "",
-                          "test": {
-                            "method": "test_cli_different_behaviors_have_different_workflows",
-                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 789
-                          }
+                          "test_method": null,
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd no {Behavior} selected yet\nWhen User opens workspace section\nThen {InstructionsSection} displays default or last-selected {Behavior}\nAnd {InstructionsSection} does not show empty content"
                         }
                       ],
-                      "acceptance_criteria": [],
-                      "behavior": null
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN User opens panel AND workspace section is visible\nTHEN Panel displays behavior dropdown with available behaviors AND User can select a behavior from dropdown AND Selected behavior becomes active scope for instructions",
+                          "text": "WHEN User opens panel AND workspace section is visible\nTHEN Panel displays behavior dropdown with available behaviors AND User can select a behavior from dropdown AND Selected behavior becomes active scope for instructions",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN User selects behavior from dropdown\nTHEN Panel updates instructions section to show behavior-specific content AND Panel persists selection for session",
+                          "text": "WHEN User selects behavior from dropdown\nTHEN Panel updates instructions section to show behavior-specific content AND Panel persists selection for session",
+                          "sequential_order": 1.0
+                        },
+                        {
+                          "name": "WHEN No behavior selected\nTHEN Panel shows default or last-selected behavior AND Panel does not show empty instructions",
+                          "text": "WHEN No behavior selected\nTHEN Panel shows default or last-selected behavior AND Panel does not show empty instructions",
+                          "sequential_order": 2.0
+                        }
+                      ],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Navigate Behavior Actions\\Navigate Behavior And Actions\\📄 Select Workspace Behavior.md"
                     },
                     {
                       "name": "Select Workspace Behavior",
@@ -13419,6 +13452,112 @@
                             "method": "test_cli_pos_command_shows_current_position",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
                             "line": 925
+                          }
+                        }
+                      ],
+                      "acceptance_criteria": [],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Navigate Behavior Actions\\Navigate Behavior And Actions\\📄 Navigate Sequentially Using CLI.md"
+                    },
+                    {
+                      "name": "Navigate To Behavior Action And Execute Using CLI",
+                      "sequential_order": 8.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [
+                        "User"
+                      ],
+                      "test_class": "TestNavigateToBehaviorActionAndExecuteUsingCLI",
+                      "scenarios": [
+                        {
+                          "name": "Cli execute behavior with action parameter",
+                          "sequential_order": 1.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_execute_behavior_with_action_parameter",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_execute_behavior_with_action_parameter",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 703
+                          }
+                        },
+                        {
+                          "name": "Cli execute behavior without action uses current",
+                          "sequential_order": 2.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_execute_behavior_without_action_uses_current",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_execute_behavior_without_action_uses_current",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 716
+                          }
+                        },
+                        {
+                          "name": "Cli execute behavior with no state starts at first",
+                          "sequential_order": 3.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_execute_behavior_with_no_state_starts_at_first",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_execute_behavior_with_no_state_starts_at_first",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 729
+                          }
+                        },
+                        {
+                          "name": "Cli workflow order determines next action",
+                          "sequential_order": 4.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_workflow_order_determines_next_action",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_workflow_order_determines_next_action",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 743
+                          }
+                        },
+                        {
+                          "name": "Cli starts at first action when no completed",
+                          "sequential_order": 5.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_starts_at_first_action_when_no_completed",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_starts_at_first_action_when_no_completed",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 757
+                          }
+                        },
+                        {
+                          "name": "Cli falls back to completed actions list",
+                          "sequential_order": 6.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_falls_back_to_completed_actions_list",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_falls_back_to_completed_actions_list",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 770
+                          }
+                        },
+                        {
+                          "name": "Cli different behaviors have different workflows",
+                          "sequential_order": 7.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_cli_different_behaviors_have_different_workflows",
+                          "steps": "",
+                          "test": {
+                            "method": "test_cli_different_behaviors_have_different_workflows",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 789
                           }
                         }
                       ],
@@ -14029,7 +14168,7 @@
                           "test": {
                             "method": "test_activity_logged_to_workspace_area_not_bot_area",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 155
+                            "line": 156
                           }
                         },
                         {
@@ -14042,7 +14181,7 @@
                           "test": {
                             "method": "test_activity_log_contains_correct_entry",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 183
+                            "line": 184
                           }
                         }
                       ],
@@ -14125,7 +14264,7 @@
                           "test": {
                             "method": "test_complete_workflow_progresses_through_single_behavior",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 65
+                            "line": 66
                           }
                         },
                         {
@@ -14138,7 +14277,7 @@
                           "test": {
                             "method": "test_complete_workflow_progresses_across_multiple_behaviors",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 110
+                            "line": 111
                           }
                         }
                       ],
@@ -14206,7 +14345,7 @@
                           "test": {
                             "method": "test_cli_complete_workflow_through_single_behavior",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 217
+                            "line": 218
                           }
                         },
                         {
@@ -14219,7 +14358,7 @@
                           "test": {
                             "method": "test_cli_complete_workflow_across_multiple_behaviors",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 238
+                            "line": 239
                           }
                         }
                       ],
@@ -14449,7 +14588,7 @@
                     },
                     {
                       "name": "Configure Behavior Execute",
-                      "sequential_order": 12.5,
+                      "sequential_order": 13.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -14506,7 +14645,7 @@
                     },
                     {
                       "name": "Add Special Instructions",
-                      "sequential_order": 12.6,
+                      "sequential_order": 14.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -14518,7 +14657,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_panel_stores_behavior_level_special_instructions",
-                          "steps": "Given Panel displays shape Behavior with no special instructions stored\nWhen User enters \"focus on edge cases\" in Panel behavior-level Special Instructions for shape\nThen Panel stores \"focus on edge cases\" for shape Behavior"
+                          "steps": "Given Panel displays shape Behavior with no special instructions stored\nWhen User enters \"focus on edge cases\" in Panel behavior-level Special Instructions for shape\nThen Panel stores \"focus on edge cases\" for shape Behavior",
+                          "test": {
+                            "method": "test_panel_stores_behavior_level_special_instructions",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 636
+                          }
                         },
                         {
                           "name": "Panel stores action-level special instructions",
@@ -14526,7 +14670,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_panel_stores_action_level_special_instructions",
-                          "steps": "Given Panel displays shape Behavior with clarify Action and no special instructions stored for that Action\nWhen User enters \"emphasize validation\" in Panel action-level Special Instructions for shape and clarify\nThen Panel stores \"emphasize validation\" for shape Behavior and clarify Action"
+                          "steps": "Given Panel displays shape Behavior with clarify Action and no special instructions stored for that Action\nWhen User enters \"emphasize validation\" in Panel action-level Special Instructions for shape and clarify\nThen Panel stores \"emphasize validation\" for shape Behavior and clarify Action",
+                          "test": {
+                            "method": "test_panel_stores_action_level_special_instructions",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 643
+                          }
                         },
                         {
                           "name": "Panel injects special instructions on Submit",
@@ -14534,7 +14683,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_panel_injects_special_instructions_on_submit",
-                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has action-level special instructions \"emphasize validation\" for shape and clarify\nWhen User submits instructions in Panel\nThen Panel injects behavior-level and action-level special instructions into Instructions"
+                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has action-level special instructions \"emphasize validation\" for shape and clarify\nWhen User submits instructions in Panel\nThen Panel injects behavior-level and action-level special instructions into Instructions",
+                          "test": {
+                            "method": "test_panel_injects_special_instructions_on_submit",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 651
+                          }
                         },
                         {
                           "name": "CLI stores and includes special instructions in next prompt",
@@ -14542,7 +14696,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_cli_stores_and_includes_special_instructions_in_next_prompt",
-                          "steps": "Given CLI is at shape.clarify\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI stores that instruction for shape.clarify\nAnd CLI includes it in next prompt"
+                          "steps": "Given CLI is at shape.clarify\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI stores that instruction for shape.clarify\nAnd CLI includes it in next prompt",
+                          "test": {
+                            "method": "test_cli_stores_and_includes_special_instructions_in_next_prompt",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 660
+                          }
                         },
                         {
                           "name": "Panel injects only behavior-level instructions when no action-level set",
@@ -14550,7 +14709,12 @@
                           "type": "edge_case",
                           "background": [],
                           "test_method": "test_panel_injects_only_behavior_level_instructions_when_no_action_level_set",
-                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has no action-level special instructions for shape\nWhen User submits instructions in Panel\nThen Panel injects behavior-level special instructions into Instructions"
+                          "steps": "Given Panel has behavior-level special instructions \"focus on edge cases\" for shape\nAnd Panel has no action-level special instructions for shape\nWhen User submits instructions in Panel\nThen Panel injects behavior-level special instructions into Instructions",
+                          "test": {
+                            "method": "test_panel_injects_only_behavior_level_instructions_when_no_action_level_set",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 668
+                          }
                         },
                         {
                           "name": "CLI reports failed when special_instructions command fails",
@@ -14558,7 +14722,12 @@
                           "type": "error_case",
                           "background": [],
                           "test_method": "test_cli_reports_failed_when_special_instructions_command_fails",
-                          "steps": "Given CLI is at shape.clarify\nAnd Bot or workspace is misconfigured\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI reports failed to Terminal"
+                          "steps": "Given CLI is at shape.clarify\nAnd Bot or workspace is misconfigured\nWhen User runs cli.behaviors.shape.clarify.special_instructions \"focus on edge cases\"\nThen CLI reports failed to Terminal",
+                          "test": {
+                            "method": "test_cli_reports_failed_when_special_instructions_command_fails",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 677
+                          }
                         }
                       ],
                       "acceptance_criteria": [
@@ -14622,11 +14791,12 @@
                           "sequential_order": 1.0
                         }
                       ],
-                      "behavior": null
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Navigate Behavior Actions\\Perform Behavior Action In Bot Workflow\\📄 Submit Instructions From Workspace.md"
                     },
                     {
                       "name": "Skip Behavior and Action Queie",
-                      "sequential_order": 13.0,
+                      "sequential_order": 16.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -14637,7 +14807,7 @@
                     },
                     {
                       "name": "Save  / Load Queue Consolidation",
-                      "sequential_order": 14.0,
+                      "sequential_order": 17.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -16492,22 +16662,24 @@
                           "sequential_order": 2.0
                         }
                       ],
-                      "behavior": null
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Perform Action\\Clarify Requirements\\📄 Display Clarification In Workspace.md"
                     },
                     {
-                      "name": "Display clarification answers in Queue",
-                      "sequential_order": 6.0,
+                      "name": "Associate Guard rail with scope",
+                      "sequential_order": 7.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
                       "test_class": null,
                       "scenarios": [],
                       "acceptance_criteria": [],
-                      "behavior": null
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Perform Action\\Clarify Requirements\\📄 Associate Guard rail with scope.md"
                     },
                     {
-                      "name": "Associate Guard rail with scope",
-                      "sequential_order": 7.0,
+                      "name": "Display clarification answers in Queue",
+                      "sequential_order": 8.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -17825,7 +17997,7 @@
                     },
                     {
                       "name": "Display Render Instructions Panel",
-                      "sequential_order": 6.0,
+                      "sequential_order": 5.0,
                       "connector": "and",
                       "story_type": "user",
                       "users": [
@@ -17874,7 +18046,7 @@
                     },
                     {
                       "name": "Render as Part of Build and Validate Actions",
-                      "sequential_order": 7.0,
+                      "sequential_order": 6.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -17940,7 +18112,7 @@
                     },
                     {
                       "name": "Report and Update InQ",
-                      "sequential_order": 8.0,
+                      "sequential_order": 7.0,
                       "connector": null,
                       "story_type": "user",
                       "users": [],
@@ -17948,6 +18120,46 @@
                       "scenarios": [],
                       "acceptance_criteria": [],
                       "behavior": null
+                    },
+                    {
+                      "name": "Render Diagram In Workspace",
+                      "sequential_order": 8.0,
+                      "connector": null,
+                      "story_type": "user",
+                      "users": [],
+                      "test_class": "TestRenderDiagramInWorkspace",
+                      "scenarios": [
+                        {
+                          "name": "Workspace displays {DrawIOElement} diagram for scope",
+                          "sequential_order": 0.0,
+                          "type": "happy_path",
+                          "background": [],
+                          "test_method": "test_workspace_section_renders_diagram_buttons",
+                          "steps": "Given {Behavior} \"shape\" is selected\nAnd scope has diagram output\nWhen workspace section renders\nThen {DrawIOElement} diagram links are displayed\nAnd User can open diagram in editor"
+                        },
+                        {
+                          "name": "Large diagram has scroll or zoom",
+                          "sequential_order": 1.0,
+                          "type": "edge_case",
+                          "background": [],
+                          "test_method": null,
+                          "steps": "Given {DrawIOElement} diagram exceeds viewport\nWhen User views diagram in workspace\nThen Panel provides scroll or zoom\nAnd Diagram remains readable"
+                        }
+                      ],
+                      "acceptance_criteria": [
+                        {
+                          "name": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                          "text": "WHEN Diagram is large\nTHEN Panel provides scroll or zoom AND Diagram remains readable",
+                          "sequential_order": 0.0
+                        },
+                        {
+                          "name": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                          "text": "WHEN User clicks diagram link\nTHEN System opens diagram file in editor",
+                          "sequential_order": 1.0
+                        }
+                      ],
+                      "behavior": null,
+                      "file_link": "C:\\dev\\agile_bots\\docs\\story\\scenarios\\Invoke Bot\\Perform Action\\Render Content\\📄 Render Diagram In Workspace.md"
                     },
                     {
                       "name": "Display Rules in Queue",
@@ -23788,7 +24000,7 @@
     },
     {
       "name": "Behavior Action Ux Improvements",
-      "priority": 7,
+      "priority": 8,
       "stories": [
         "Configure Action Execution",
         "Configure Behavior Execute",
@@ -23799,7 +24011,7 @@
     },
     {
       "name": "Queue Behavior Action Workflow",
-      "priority": 8,
+      "priority": 9,
       "stories": [
         "Add Context Files",
         "Associate Guard rail with scope",
@@ -23835,7 +24047,7 @@
     },
     {
       "name": "Trace and Edit",
-      "priority": 9,
+      "priority": 10,
       "stories": [
         "Add / Remove Examples",
         "Display Code Trace",

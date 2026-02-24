@@ -120,3 +120,16 @@ test('TestDiagramActionBarPanel', { concurrency: false }, async (t) => {
         assert.ok(html.includes('window.diagramScope'), 'Diagram buttons should use window.diagramScope for scope');
     });
 });
+
+// Story: Render Diagram In Workspace
+test('TestRenderDiagramInWorkspace', { concurrency: false }, async (t) => {
+    await t.test('test_workspace_section_renders_diagram_buttons', async () => {
+        await cli.execute('scope "EpicA"');
+        const botData = await cli.execute('status');
+        const view = new WorkspaceSectionView(cli);
+        view.parentView = { botData };
+        const html = await view.render();
+        assert.ok(html.includes('ws-diagram-buttons'), 'Workspace should have diagram buttons');
+        assert.ok(html.includes('Render') || html.includes('renderDiagram'), 'Workspace should show diagram render option');
+    });
+});
