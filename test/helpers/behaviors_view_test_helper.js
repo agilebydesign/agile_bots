@@ -5,6 +5,7 @@
  */
 
 const assert = require('node:assert');
+const path = require('path');
 const { parseHTML, HTMLAssertions } = require('./html_assertions');
 
 class BehaviorsViewTestHelper {
@@ -23,7 +24,8 @@ class BehaviorsViewTestHelper {
         
         // Create view with parentView, like production: new BehaviorsView(botPathOrCli, webview, extensionUri, this)
         const BehaviorsView = require('../../src/panel/behaviors_view');
-        this._view = new BehaviorsView(this._cli, null, null, this._parentView);
+        this.workspaceDir = workspaceDir;
+        this._view = new BehaviorsView(this._cli, null, this.createMockExtensionUri(), this._parentView);
     }
     
     /**
@@ -71,6 +73,17 @@ class BehaviorsViewTestHelper {
      */
     createBehaviorsView() {
         return this._view;
+    }
+
+    /**
+     * Create mock extension URI
+     * @returns {Object} - Mock URI object
+     */
+    createMockExtensionUri() {
+        return {
+            fsPath: path.join(this.workspaceDir, 'src', 'panel'),
+            toString: () => `file://${this.workspaceDir}`
+        };
     }
     
     // ========================================================================

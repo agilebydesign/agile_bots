@@ -134,7 +134,7 @@ class BotHeaderView extends PanelView {
         const productName = branding.getProductName();
         const titleStyle = branding.getTitleStyle();
 
-        const htmlPath = vscode.Uri.joinPath(this.extensionUri, 'workspace', 'workspace.html');
+        const htmlPath = vscode.Uri.joinPath(this.extensionUri, 'workspace', 'workspace_section.html');
         let htmlComponentString = fs.readFileSync(htmlPath.fsPath, 'utf-8');   
                 
         return htmlComponentString.replace(/\${safeBotName}/g, safeBotName)

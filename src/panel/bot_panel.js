@@ -6,6 +6,7 @@ const fs = require("fs");
 const BotView = require("./bot_view");
 const PanelView = require("./panel_view");
 const WorkspaceManager = require("./workspace/workspace_manager");
+const BehaviorsManager = require("./behaviors/behaviors_manager");
 const branding = require("./branding");
 const { escapeForHtml, Logger } = require("./utils");
 
@@ -759,153 +760,59 @@ class BotPanel {
             return;
           case "updateWorkspace":
             this._log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
-            if (WorkspaceManager.updateWorkspace(message, this)) {
-              return this._update();
-            }
-            return;
+            WorkspaceManager.updateWorkspace(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
           case "browseWorkspace":
             this._log('[BotPanel] Received browseWorkspace message');
-            if (WorkspaceManager.browseAndUpdateWorkspace(this)) {
-              return this._update();
-            }            
+            WorkspaceManager.browseAndUpdateWorkspace(this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "switchBot":
             this._log('[BotPanel] Received switchBot message');
-            if (WorkspaceManager.switchBot(message, this)) {
-              return this._update();
-            } 
+            WorkspaceManager.switchBot(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "getBehaviorRules":
-            if (message.behaviorName) {
-              this._log(`[BotPanel] getBehaviorRules -> ${message.behaviorName}`);
-              this._log(`[getBehaviorRules] STARTED for behavior: ${message.behaviorName}`);
-              
-
-              this._botView?.execute(`submitrules:${message.behaviorName}`)
-                .then((result) => {
-                  this._log('[BotPanel] Rules submitted:', result);
-                  this._log(`[getBehaviorRules] Result received: ${JSON.stringify(result, null, 2)}`);
-                  
-
-                  if (result && typeof result === 'object') {
-                    this._log(`[getBehaviorRules] Result is object with status: ${result.status}`);
-                    if (result.status === 'success') {
-                      const msg = result.message || `${message.behaviorName} rules submitted to chat!`;
-                      this._log(`[getBehaviorRules] SUCCESS - showing message: ${msg}`);
-                      vscode.window.showInformationMessage(msg);
-                    } else if (result.status === 'error') {
-                      const errorMsg = result.message || 'Unknown error';
-                      this._log(`[getBehaviorRules] ERROR status - showing error: ${errorMsg}`);
-                      vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
-                    } else {
-
-                      const outputStr = typeof result.output === 'string' ? result.output : '';
-                      this._log(`[getBehaviorRules] Legacy format - output: ${outputStr}`);
-                      if (outputStr.includes('submitted')) {
-                        this._log(`[getBehaviorRules] Output includes 'submitted' - SUCCESS`);
-                        vscode.window.showInformationMessage(`${message.behaviorName} rules submitted to chat!`);
-                      } else {
-                        const errorMsg = result.message || outputStr || 'Unknown error';
-                        this._log(`[getBehaviorRules] Output does NOT include 'submitted' - ERROR: ${errorMsg}`);
-                        vscode.window.showErrorMessage(`Failed to submit rules: ${errorMsg}`);
-                      }
-                    }
-                  } else {
-                    this._log(`[getBehaviorRules] Result is NOT an object - type: ${typeof result}, value: ${result}`);
-                    vscode.window.showWarningMessage('Submit completed with unknown result');
-                  }
-                  
-
-                  this._log(`[getBehaviorRules] About to refresh panel`);
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] ERROR getting behavior rules: ${error.message}`);
-                  this._log(`[getBehaviorRules] CATCH BLOCK - Error: ${error.message}, Stack: ${error.stack}`);
-                  vscode.window.showErrorMessage(`Failed to get rules: ${error.message}`);
-                });
-            }
+            BehaviorsManager.getBehaviorRules(message, this)
+              .then(() => {
+                return this._update();
+              });
             return;
           case "executeNavigationCommand":
-            if (message.commandText) {
-              this._log(`[BotPanel] executeNavigationCommand -> ${message.commandText}`);
-              this._botView?.execute(message.commandText)
-                .then((result) => {
-                  this._log(`[BotPanel] executeNavigationCommand success: ${message.commandText} | result keys: ${Object.keys(result || {})}`);
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] executeNavigationCommand ERROR: ${error.message}`);
-                  this._log(`[BotPanel] executeNavigationCommand STACK: ${error.stack}`);
-                  vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
-                });
-            }
+            BehaviorsManager.executeNavigationCommand(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "setExecutionMode":
-            if (message.behaviorName && message.actionName && message.mode) {
-              const cmd = `${message.behaviorName}.${message.actionName}.set_execution ${message.mode}`;
-              this._log(`[BotPanel] setExecutionMode -> ${cmd}`);
-              this._botView?.execute(cmd)
-                .then((result) => {
-                  this._log(`[BotPanel] setExecutionMode success: ${cmd}`);
-                  if (this._botView) this._botView.botData = null;
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] setExecutionMode ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to set execution mode: ${error.message}`);
-                });
-            }
+            BehaviorsManager.setExecutionMode(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "setBehaviorExecuteMode":
-            if (message.behaviorName && message.mode) {
-              const cmd = `${message.behaviorName}.set_execution ${message.mode}`;
-              this._log(`[BotPanel] setBehaviorExecuteMode -> ${cmd}`);
-              this._botView?.execute(cmd)
-                .then((result) => {
-                  this._log(`[BotPanel] setBehaviorExecuteMode success: ${cmd}`);
-                  if (this._botView) this._botView.botData = null;
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] setBehaviorExecuteMode ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to set behavior execution mode: ${error.message}`);
-                });
-            }
+            BehaviorsManager.setBehaviorExecuteMode(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "setBehaviorSpecialInstructions":
-            if (message.behaviorName !== undefined) {
-              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
-              const cmd = `${message.behaviorName}.set_special_instructions "${escaped}"`;
-              this._log(`[BotPanel] setBehaviorSpecialInstructions -> ${cmd}`);
-              this._botView?.execute(cmd)
-                .then((result) => {
-                  this._log(`[BotPanel] setBehaviorSpecialInstructions success`);
-                  if (this._botView) this._botView.botData = null;
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] setBehaviorSpecialInstructions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
-                });
-            }
+            BehaviorsManager.setBehaviorSpecialInstructions(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "setActionSpecialInstructions":
-            if (message.behaviorName && message.actionName !== undefined) {
-              const escaped = (message.instructionText || '').replace(/"/g, '\\"');
-              const cmd = `${message.behaviorName}.${message.actionName}.special_instructions "${escaped}"`;
-              this._log(`[BotPanel] setActionSpecialInstructions -> ${cmd}`);
-              this._botView?.execute(cmd)
-                .then((result) => {
-                  this._log(`[BotPanel] setActionSpecialInstructions success`);
-                  if (this._botView) this._botView.botData = null;
-                  return this._update();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] setActionSpecialInstructions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to set special instructions: ${error.message}`);
-                });
-            }
+            BehaviorsManager.setActionSpecialInstructions(message, this)
+              .then((result) => {
+                if (result) return this._update();
+              });
             return;
           case "renameNode":
             this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
@@ -1217,144 +1124,29 @@ class BotPanel {
             }
             return;
           case "navigateToBehavior":
-            if (message.behaviorName) {
-              const cmd = `${message.behaviorName}`;
-              this._botView?.execute(cmd)
-                .then((result) => {
-
-                  if (result?.bot) {
-                    this._botView.botData = result.bot;
-
-                    if (result.instructions) {
-                      this._botView.botData.instructions = result.instructions;
-                    }
-
-                    PanelView._lastResponse = result;
-                  }
-                  return this._updateWithCachedData();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] navigateToBehavior ERROR: ${error.message}`);
-                  this._log(`[BotPanel] navigateToBehavior STACK: ${error.stack}`);
-                  vscode.window.showErrorMessage(`Failed to navigate to behavior: ${error.message}`);
-                });
-            }
+            BehaviorsManager.navigateToBehavior(message, this)
+              .then((result) => {
+                if (result) return this._updateWithCachedData();
+              });
             return;
           case "submitWorkspaceBehaviorInstructions":
-            if (message.behavior && this._botView) {
-              const behaviorName = message.behavior;
-              this._botView.execute(behaviorName)
-                .then((result) => {
-                  if (result?.bot) {
-                    this._botView.botData = result.bot;
-                    if (result.instructions) {
-                      this._botView.botData.instructions = result.instructions;
-                    }
-                    PanelView._lastResponse = result;
-                  }
-                  return this._updateWithCachedData();
-                })
-                .then(() => this._botView.execute('submit'))
-                .then((output) => {
-                  if (output && typeof output === 'object' && output.status) {
-                    if (output.status === 'success') {
-                      vscode.window.showInformationMessage(output.message || 'Instructions submitted to chat!');
-                    } else {
-                      vscode.window.showErrorMessage(`Submit failed: ${output.message || output.error || 'Unknown error'}`);
-                    }
-                  } else {
-                    const outputStr = typeof output === 'string' ? output : JSON.stringify(output || '');
-                    if (outputStr && (outputStr.includes('SUCCESS:') || outputStr.includes('submitted to Cursor chat successfully'))) {
-                      vscode.window.showInformationMessage('Instructions submitted to chat!');
-                    } else if (outputStr && (outputStr.includes('ERROR:') || outputStr.includes('FAILED:'))) {
-                      const errorMatch = outputStr.match(/ERROR:|FAILED:\s*(.+)/);
-                      vscode.window.showErrorMessage(`Submit failed: ${errorMatch ? errorMatch[1] : 'Unknown error'}`);
-                    } else {
-                      vscode.window.showWarningMessage('Submit completed with unknown result');
-                    }
-                  }
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] submitWorkspaceBehaviorInstructions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Submit failed: ${error.message}`);
-                });
-            }
+            BehaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
+              .then((result) => {
+                if (result) return this._updateWithCachedData();
+                return this._updateWithCachedData();
+              });
             return;
           case "navigateToAction":
-            if (message.behaviorName && message.actionName) {
-              const cmd = `${message.behaviorName}.${message.actionName}`;
-              this._log(`[BotPanel] navigateToAction: ${cmd}`);
-              this._botView?.execute(cmd)
-                .then((result) => {
-                  this._log(`[BotPanel] navigateToAction result keys: ${Object.keys(result || {}).join(', ')}`);
-                  this._log(`[BotPanel] result.bot? ${!!result?.bot}`);
-                  this._log(`[BotPanel] result.instructions? ${!!result?.instructions}`);
-                  if (result?.instructions) {
-                    this._log(`[BotPanel] result.instructions keys: ${Object.keys(result.instructions).join(', ')}`);
-                  }
-
-                  if (result?.bot) {
-                    this._botView.botData = result.bot;
-
-                    if (result.instructions) {
-                      this._botView.botData.instructions = result.instructions;
-                      this._log(`[BotPanel] Copied instructions into botData`);
-                    } else {
-                      this._log(`[BotPanel] WARNING: No instructions in result to copy!`);
-                    }
-
-                    PanelView._lastResponse = result;
-                  } else {
-                    this._log(`[BotPanel] WARNING: No result.bot - not caching!`);
-                  }
-                  return this._updateWithCachedData().then(() => {
-
-
-                    setTimeout(() => {
-                      try {
-                        this._log(`[BotPanel] Sending expandInstructionsSection for: ${message.actionName}`);
-                        this._panel.webview.postMessage({
-                          command: 'expandInstructionsSection',
-                          actionName: message.actionName
-                        });
-                      } catch (postErr) {
-                        this._log(`[BotPanel] Error sending expandInstructionsSection: ${postErr.message}`);
-                      }
-                    }, 200);
-                  });
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] navigateToAction ERROR: ${error.message}`);
-                  this._log(`[BotPanel] navigateToAction STACK: ${error.stack}`);
-                  vscode.window.showErrorMessage(`Failed to navigate to action: ${error.message}`);
-                });
-            }
+            BehaviorsManager.navigateToAction(message, this)
+              .then((result) => {
+                if (result) return this._updateWithCachedData();
+              });
             return;
           case "navigateAndExecute":
-            if (message.behaviorName && message.actionName && message.operationName) {
-              const command = `${message.behaviorName}.${message.actionName}.${message.operationName}`;
-              this._log(`[BotPanel] navigateAndExecute -> ${command}`);
-              this._botView?.execute(command)
-                .then((result) => {
-                  this._log(`[BotPanel] navigateAndExecute success: ${command} | result keys: ${Object.keys(result || {})}`);
-
-                  if (result?.bot) {
-                    this._botView.botData = result.bot;
-
-                    if (result.instructions) {
-                      this._botView.botData.instructions = result.instructions;
-                    }
-
-                    PanelView._lastResponse = result;
-                  }
-                  return this._updateWithCachedData();
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] navigateAndExecute ERROR: ${error.message}`);
-                  this._log(`[BotPanel] navigateAndExecute STACK: ${error.stack}`);
-                  vscode.window.showErrorMessage(`Failed to execute operation: ${error.message}`);
-                });
-            }
+            BehaviorsManager.navigateAndExecute(message, this)
+              .then((result) => {
+                if (result) return this._updateWithCachedData();
+              });
             return;
           case "toggleSection":
             if (message.sectionId) {
@@ -2402,10 +2194,14 @@ class BotPanel {
     // Local path to main script run in the webview
 		const botPanelClientPath = vscode.Uri.joinPath(this._extensionUri, 'bot', 'bot_panel_client.js');
     const workspaceClientPath = vscode.Uri.joinPath(this._extensionUri, 'workspace', 'workspace_client.js');
+    const behaviorsClientPath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors_client.js');
+    const behaviorsStylePath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors.css');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
     const workspaceClientUri = webview.asWebviewUri(workspaceClientPath);
+    const behaviorsClientUri = webview.asWebviewUri(behaviorsClientPath);
+    const behaviorsStyleUri = webview.asWebviewUri(behaviorsStylePath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2468,12 +2264,14 @@ class BotPanel {
           <style nonce="${nonce}">
             ${contentStyle}  
           </style>
+          <link rel="stylesheet" href="${behaviorsStyleUri}">
           ${currentBehaviorScript}
       </head>
       <body>
           ${contentHtml}    
           <script nonce="${nonce}" src="${botPanelClientUri}"></script>
           <script nonce="${nonce}" src="${workspaceClientUri}"></script>
+          <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
       </body>
       </html>`;
   }
