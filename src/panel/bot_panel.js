@@ -49,8 +49,7 @@ class BotPanel {
       this._expansionState = {};
       this._currentStoryMapView = 'Hierarchy';
       
-      // Initialize branding with repo root
-      // TO-DO: This is where workspace is being used as the repo workspace, and not user workspace
+      // Initialize branding with repo root      
       branding.setRepoRoot(this._repoRoot);
       this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
@@ -766,18 +765,15 @@ class BotPanel {
             return;
           case "browseWorkspace":
             this._log('[BotPanel] Received browseWorkspace message');
-            if (WorkspaceManager.browseWorkspace(this)) {
+            if (WorkspaceManager.browseAndUpdateWorkspace(this)) {
               return this._update();
             }            
             return;
           case "switchBot":
-            if (message.botName) {
-              this._botView?.headerView?.handleEvent('switchBot', { botName: message.botName })
-                .then(() => this._update())
-                .catch((error) => {
-                  this._reportError(error, 'Failed to switch bot');
-                });
-            }
+            this._log('[BotPanel] Received switchBot message');
+            if (WorkspaceManager.switchBot(message, this)) {
+              return this._update();
+            } 
             return;
           case "getBehaviorRules":
             if (message.behaviorName) {

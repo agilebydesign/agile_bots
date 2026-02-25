@@ -652,10 +652,6 @@ class TestSubmitInstructionsFromWorkspace:
         if hasattr(instructions, "display_content"):
             content = "\n".join(instructions.display_content)
         assert 'shape' in content.lower() or 'clarify' in content.lower()
-    if isinstance(result, dict):
-        assert result.get("status") == "error", f"Expected error status, got {result}"
-    else:
-        assert "error" in str(result).lower() or "failed" in str(result).lower()
 
 
 # ============================================================================

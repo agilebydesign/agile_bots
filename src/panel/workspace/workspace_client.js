@@ -1,3 +1,4 @@
+// Client-side functions for workspace management, called from workspace.html and bot_panel's webView content
 function updateWorkspace(workspacePath) {
     console.log('[WebView] updateWorkspace called with:', workspacePath);
     vscode.postMessage({
@@ -19,4 +20,11 @@ function setWorkspacePath(path) {
     if (input) {
         input.value = path;
     }
+}
+
+function getWorkspaceDir() {
+    if (window.botData && window.botData.workspace_directory) {
+        return window.botData.workspace_directory;
+    }    
+    return '';
 }
