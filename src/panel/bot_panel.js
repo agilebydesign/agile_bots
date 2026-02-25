@@ -780,8 +780,8 @@ class BotPanel {
             return;
           case "getBehaviorRules":
             BehaviorsManager.getBehaviorRules(message, this)
-              .then(() => {
-                return this._update();
+              .then((result) => {
+                if (result) return this._update();
               });
             return;
           case "executeNavigationCommand":
