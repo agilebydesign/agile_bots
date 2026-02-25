@@ -1,8 +1,9 @@
 
-
 const PanelView = require('./panel_view');
 const branding = require('./branding');
 const { escapeForHtml, escapeForJs } = require('./utils');
+const vscode = require('vscode');
+const fs = require('fs');
 
 class BehaviorsView extends PanelView {
 
@@ -103,191 +104,72 @@ class BehaviorsView extends PanelView {
             promptContentStr = '';
         }
 
-        return `
-    <div class="section card-primary">
-        <div class="collapsible-section expanded">
-            <div class="collapsible-header" style="
-                cursor: pointer;
-                padding: 4px 5px;
-                background-color: transparent;
-                border-left: none;
-                border-radius: 2px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                user-select: none;
-            ">
-                <div style="display: flex; align-items: center;" onclick="toggleSection('behaviors-content')">
-                    <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${valueStreamIconPath ? `<img src="${valueStreamIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` : (feedbackIconPath ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` : ''))}
-                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Value Stream</span>
-                </div>
-                <button id="submit-to-chat-btn" onclick="sendInstructionsToChat(event)" style="
-                    background: rgba(255, 140, 0, 0.15);
-                    border: none;
-                    border-radius: 8px;
-                    padding: 6px;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.15s ease;
-                    width: 40px;
-                    height: 40px;
-                " 
-                onmouseover="this.style.backgroundColor='rgba(255, 140, 0, 0.3)'" 
-                onmouseout="this.style.backgroundColor='rgba(255, 140, 0, 0.15)'"
-                title="Submit instructions to chat">
-                    ${submitIconPath ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : '📤'}
-                </button>
-                <script>
-                    window._promptContent = ${JSON.stringify(promptContentStr)};
-                </script>
-            </div>
-            <div id="behaviors-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
-                <div class="card-secondary" style="padding: 5px;">
-                    ${behaviorsHtml}
-                    <div style="margin-top: 8px; padding-top: 5px; border-top: none; display: flex; gap: 4px; flex-wrap: wrap;">
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="back" title="Back - Go to previous action" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${leftIconPath ? `<img src="${leftIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Back" />` : ''}</button>
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="current" title="Current - Show current action details" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${pointerIconPath ? `<img src="${pointerIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Current" />` : ''}</button>
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="next" title="Next - Advance to next action" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${rightIconPath ? `<img src="${rightIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Next" />` : ''}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
+        // Build icon HTML
+        const valueStreamIcon = valueStreamIconPath 
+            ? `<img src="${valueStreamIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` 
+            : (feedbackIconPath 
+                ? `<img src="${feedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` 
+                : (gearIconPath 
+                    ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` 
+                    : ''));
+        const submitIcon = submitIconPath 
+            ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` 
+            : '📤';
+        const leftIcon = leftIconPath 
+            ? `<img src="${leftIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Back" />` 
+            : '';
+        const pointerIcon = pointerIconPath 
+            ? `<img src="${pointerIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Current" />` 
+            : '';
+        const rightIcon = rightIconPath 
+            ? `<img src="${rightIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Next" />` 
+            : '';
+
+        // Load HTML template
+        const htmlPath = vscode.Uri.joinPath(this.extensionUri, 'behaviors', 'behaviors_section.html');
+        let htmlTemplate = fs.readFileSync(htmlPath.fsPath, 'utf-8');
+
+        return htmlTemplate
+            .replace(/\${valueStreamIcon}/g, valueStreamIcon)
+            .replace(/\${submitIcon}/g, submitIcon)
+            .replace(/\${promptContentJson}/g, JSON.stringify(promptContentStr))
+            .replace(/\${behaviorsHtml}/g, behaviorsHtml)
+            .replace(/\${leftIcon}/g, leftIcon)
+            .replace(/\${pointerIcon}/g, pointerIcon)
+            .replace(/\${rightIcon}/g, rightIcon);
     }
     
 
     renderEmpty(valueStreamOrFeedbackIconPath, gearIconPath, leftIconPath, pointerIconPath, rightIconPath, submitIconPath) {
-        return `
-    <div class="section card-primary">
-        <div class="collapsible-section expanded">
-            <div class="collapsible-header" style="
-                cursor: pointer;
-                padding: 4px 5px;
-                background-color: transparent;
-                border-left: none;
-                border-radius: 2px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                user-select: none;
-            ">
-                <div style="display: flex; align-items: center;" onclick="toggleSection('behaviors-content')">
-                    <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                    ${valueStreamOrFeedbackIconPath ? `<img src="${valueStreamOrFeedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` : (gearIconPath ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` : '')}
-                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Value Stream</span>
-                </div>
-                <button onclick="sendInstructionsToChat(event)" style="
-                    background: rgba(255, 140, 0, 0.15);
-                    border: none;
-                    border-radius: 8px;
-                    padding: 6px;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.15s ease;
-                    width: 40px;
-                    height: 40px;
-                " 
-                onmouseover="this.style.backgroundColor='rgba(255, 140, 0, 0.3)'" 
-                onmouseout="this.style.backgroundColor='rgba(255, 140, 0, 0.15)'"
-                title="Submit instructions to chat">
-                    ${submitIconPath ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : '📤'}
-                </button>
-            </div>
-            <div id="behaviors-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
-                <div class="card-secondary" style="padding: 5px;">
-                    <div class="empty-state">No behaviors available</div>
-                    <div style="margin-top: 8px; padding-top: 5px; border-top: none; display: flex; gap: 4px; flex-wrap: wrap;">
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="back" title="Back - Go to previous action" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${leftIconPath ? `<img src="${leftIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Back" />` : ''}</button>
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="current" title="Current - Show current action details" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${pointerIconPath ? `<img src="${pointerIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Current" />` : ''}</button>
-                        <button class="nav-command-button" data-action="executeNavigationCommand" data-command="next" title="Next - Advance to next action" style="
-                            background-color: var(--vscode-button-secondaryBackground);
-                            color: var(--vscode-button-secondaryForeground);
-                            border: none;
-                            padding: 4px 6px;
-                            cursor: pointer;
-                            border-radius: 2px;
-                            font-size: 16px;
-                            font-family: inherit;
-                            line-height: 1;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">${rightIconPath ? `<img src="${rightIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Next" />` : ''}</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
+        // Build icon HTML
+        const valueStreamIcon = valueStreamOrFeedbackIconPath 
+            ? `<img src="${valueStreamOrFeedbackIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` 
+            : (gearIconPath 
+                ? `<img src="${gearIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Value Stream" />` 
+                : '');
+        const submitIcon = submitIconPath 
+            ? `<img src="${submitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` 
+            : '📤';
+        const leftIcon = leftIconPath 
+            ? `<img src="${leftIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Back" />` 
+            : '';
+        const pointerIcon = pointerIconPath 
+            ? `<img src="${pointerIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Current" />` 
+            : '';
+        const rightIcon = rightIconPath 
+            ? `<img src="${rightIconPath}" style="width: 20px; height: 20px; object-fit: contain;" alt="Next" />` 
+            : '';
+
+        // Load HTML template
+        const htmlPath = vscode.Uri.joinPath(this.extensionUri, 'behaviors', 'behaviors_empty.html');
+        let htmlTemplate = fs.readFileSync(htmlPath.fsPath, 'utf-8');
+
+        return htmlTemplate
+            .replace(/\${valueStreamIcon}/g, valueStreamIcon)
+            .replace(/\${submitIcon}/g, submitIcon)
+            .replace(/\${leftIcon}/g, leftIcon)
+            .replace(/\${pointerIcon}/g, pointerIcon)
+            .replace(/\${rightIcon}/g, rightIcon);
     }
     
 
