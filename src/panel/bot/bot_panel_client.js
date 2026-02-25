@@ -77,8 +77,6 @@ document.addEventListener('click', function(e) {
         command: 'logToFile',
         message: '[WebView] CLICK: ' + JSON.stringify(targetInfo)
     });
-    
-
 
     const storyNode = target.closest && target.closest('.story-node');
     if (storyNode && !storyNode.getAttribute('data-inc-source')) {
@@ -129,13 +127,10 @@ document.addEventListener('click', function(e) {
             window.selectNode(nodeType, nodeName, options);
         }
         
-
         e.stopPropagation();
         console.log('═══════════════════════════════════════════════════════');
     }
     
-
-
     let actionElement = target;
     let action = actionElement.getAttribute('data-action');
     let searchDepth = 0;
@@ -259,9 +254,6 @@ document.addEventListener('click', function(e) {
 
 document.addEventListener('dblclick', function(e) {
     const target = e.target;
-    
-
-
     if (target.classList.contains('story-node') && target.getAttribute('data-inc-source') === null) {
         const nodePath = target.getAttribute('data-path');
         const nodeName = target.getAttribute('data-node-name');
@@ -2874,17 +2866,6 @@ function getSelectedNodeTestFiles() {
 }
 
 
-function getWorkspaceDir() {
-
-    if (window.botData && window.botData.workspace_directory) {
-        return window.botData.workspace_directory;
-    }
-
-    const storyGraphPath = 'docs/story/story-graph.json';
-    return '';
-}
-
-
 function openFileInColumn(filePath, viewColumn) {
     vscode.postMessage({
         command: 'openFileInColumn',
@@ -2922,7 +2903,7 @@ window.handleOpenGraph = function() {
         return;
     }
     
-    const workspaceDir = getWorkspaceDir();
+    const workspaceDir = getWorkspaceDir(); // from workspace_client.js
     const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
     
     console.log('[WebView] Opening story graph:', storyGraphPath);
@@ -2973,7 +2954,7 @@ window.handleOpenAll = function() {
     }
     
     const fileLink = getSelectedNodeFileLink();
-    const workspaceDir = getWorkspaceDir();
+    const workspaceDir = getWorkspaceDir(); // from workspace_client.js
     const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
     
 
@@ -3270,7 +3251,7 @@ window.addEventListener('message', event => {
     }
     
     if (message.command === 'setWorkspacePath') {
-        setWorkspacePath(message.path);
+        setWorkspacePath(message.path); // workspace_client.js
         return;
     }
     
@@ -3375,7 +3356,6 @@ window.addEventListener('message', event => {
 
     }
     
-
     if (message.command === 'revertRename') {
         console.log('[WebView] Revert rename command received but not needed');
     }
