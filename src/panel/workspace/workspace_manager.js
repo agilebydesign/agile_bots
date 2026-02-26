@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 const { Logger } = require("../utils");
-const BotPanel = require("../bot_panel");
+const BotPanel = require("../bot/bot_panel");
 
 /**
  * WorkspaceManager handles routing of workspace-related messages from the webview client to the appropriate views

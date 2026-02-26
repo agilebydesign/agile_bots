@@ -6,8 +6,8 @@
  */
 
 const vscode = require("vscode");
-const BotPanel = require("./bot_panel.js");
-const BotPanelSidebarProvider = require("./bot_panel_sidebar.js");
+const BotPanel = require("./bot/bot_panel.js");
+const BotPanelSidebarProvider = require("./bot/bot_panel_sidebar.js");
 const { Logger } = require("./utils");
 const path = require("path");
 

@@ -1,7 +1,7 @@
 
-const PanelView = require('./panel_view');
-const branding = require('./branding');
-const { escapeForHtml, escapeForJs } = require('./utils');
+const PanelView = require('../panel_view');
+const branding = require('../branding');
+const { escapeForHtml, escapeForJs } = require('../utils');
 const vscode = require('vscode');
 const fs = require('fs');
 

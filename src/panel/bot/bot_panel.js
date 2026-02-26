@@ -4,11 +4,11 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const BotView = require("./bot_view");
-const PanelView = require("./panel_view");
-const WorkspaceManager = require("./workspace/workspace_manager");
-const BehaviorsManager = require("./behaviors/behaviors_manager");
-const branding = require("./branding");
-const { escapeForHtml, Logger } = require("./utils");
+const PanelView = require("../panel_view");
+const WorkspaceManager = require("../workspace/workspace_manager");
+const BehaviorsManager = require("../behaviors/behaviors_manager");
+const branding = require("../branding");
+const { escapeForHtml, Logger } = require("../utils");
 
 class BotPanel {
   constructor(panel, repoRoot, extensionUri) {
@@ -2228,7 +2228,7 @@ class BotPanel {
 
     // replace branding placeholders in css file
     // contentStyles(brandColor, brandColorRgb, bgColor, bgColorRgb, textColor, textColorRgb, textColorFaded, fontWeight, isLightBg)}  
-    const stylesPath = vscode.Uri.joinPath(this._extensionUri, 'styles', 'theme.css');
+    const stylesPath = vscode.Uri.joinPath(this._extensionUri, 'bot', 'bot_panel.css');
     let contentStyle = fs.readFileSync(stylesPath.fsPath, 'utf-8');    
     
     contentStyle = contentStyle.replace(/{{brandColor}}/g, brandColor)
