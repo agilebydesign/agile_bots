@@ -1,0 +1,84 @@
+{
+  "priority": 4,
+  "description": "Map domain concept collaborators bidirectionally. When concept A has a collaborator B (non-primitive), concept B should have a corresponding responsibility that references A, describing the same relationship from B's perspective. Primitives (String, Number, Boolean, Date, Integer) are exceptions—they do not require bidirectional mapping.",
+  "scanner": "scanners.bidirectional_collaborator_scanner.BidirectionalCollaboratorScanner",
+  "do": {
+    "description": "Describe the same relationship from both collaborators' perspectives",
+    "guidance": [
+      {
+        "description": "When A references B as collaborator, B should reference A—mapped perspectives of the same relationship",
+        "example": [
+          "Campaign",
+          "    Generates vouchers: Voucher, VoucherCodeGenerator",
+          "",
+          "Voucher",
+          "    Generated for a campaign: Campaign",
+          "",
+          "(Campaign generates Voucher → Voucher is generated for Campaign. Same relationship, both perspectives.)"
+        ]
+      },
+      {
+        "description": "Use responsibility names that describe the relationship from each concept's viewpoint",
+        "example": [
+          "Order",
+          "    Contains line items: LineItem",
+          "",
+          "LineItem",
+          "    Belongs to order: Order",
+          "",
+          "Portfolio",
+          "    Holds holdings: Holding",
+          "",
+          "Holding",
+          "    Held in portfolio: Portfolio",
+          "",
+          "(Each side describes the relationship from its own perspective.)"
+        ]
+      }
+    ]
+  },
+  "dont": {
+    "description": "Don't leave collaborator relationships one-way or use mismatched collaborators",
+    "guidance": [
+      {
+        "description": "Don't have one-way collaborator—if A references B, B should reference A (unless B is primitive)",
+        "example": [
+          "Campaign",
+          "    Generates vouchers: Voucher, VoucherCodeGenerator",
+          "",
+          "Voucher",
+          "    (WRONG: no responsibility referencing Campaign—relationship is one-way)",
+          "",
+          "(Voucher should have a responsibility like 'Generated for a campaign: Campaign')"
+        ]
+      },
+      {
+        "description": "Don't use mismatched collaborators—the bidirectional pair must describe the SAME relationship",
+        "example": [
+          "Campaign",
+          "    Generates vouchers: Voucher, VoucherCodeGenerator",
+          "",
+          "Voucher",
+          "    Inherits metadata from campaign: Campaign",
+          "",
+          "(WRONG: 'Inherits metadata' describes a different aspect of the relationship than 'Generates vouchers'. They are not the same bidirectional pair.)",
+          "",
+          "CORRECT:",
+          "Voucher",
+          "    Generated for a campaign: Campaign",
+          "",
+          "(This maps to Campaign's 'Generates vouchers'—same relationship, both perspectives.)"
+        ]
+      },
+      {
+        "description": "Don't require bidirectional mapping for primitive collaborators",
+        "example": [
+          "Voucher",
+          "    Is identified by code: String",
+          "",
+          "(String is primitive—no need for 'String' to reference Voucher. Primitives are exceptions.)"
+        ]
+      }
+    ]
+  }
+}

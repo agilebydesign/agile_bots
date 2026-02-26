@@ -51,24 +51,6 @@
                                                 ]
                                 },
                                 {
-                                    "description":  "Name responsibilities based on their nature: use noun phrases for property access, verb phrases for behaviors that perform actions.",
-                                    "example":  [
-                                                    "Order (resource)",
-                                                    "    Get order id: OrderId (property access - noun phrase)",
-                                                    "    Get line items: LineItem (property access - noun phrase)",
-                                                    "    Calculates total with taxes: Money, TaxRate (behavior/action - verb phrase)",
-                                                    "    Validates inventory availability: LineItem, InventoryService (behavior/action - verb phrase)",
-                                                    "",
-                                                    "HeadlessSession (resource)",
-                                                    "    Get configuration: HeadlessConfig (property access - noun phrase)",
-                                                    "    Get execution context: ExecutionContext (property access - noun phrase)",
-                                                    "    Prepares instructions with directive: Instructions (behavior/action - verb phrase)",
-                                                    "    Executes via Cursor API: CursorHeadlessAPI (behavior/action - verb phrase)",
-                                                    "",
-                                                    "(Property access = noun phrases starting with Get/Find. Behaviors = verb phrases describing actions)"
-                                                ]
-                                },
-                                {
                                     "description":  "Use collaborators for complex resources with behavior/state. Use simple types for properties without sufficient complexity. Only create separate resource concepts when warranted.",
                                     "example":  [
                                                     "Order (resource)",
@@ -139,6 +121,32 @@
                                                       "    Validates holding allocation limits: Boolean, Symbol, AllocationRule (WRONG: belongs to Holding)",
                                                       "",
                                                       "(Should be: LineItem calculates its own price, Holding calculates its own market value)"
+                                                  ]
+                                  },
+                                  {
+                                      "description":  "Don\u0027t hold responsibilities that belong to a collaborator\u2014when many responsibilities reference the same collaborator or noun, that\u0027s a smell. Move those responsibilities to the collaborator and keep a link instead.",
+                                      "example":  [
+                                                      "Voucher (WRONG: many redemption-related responsibilities)",
+                                                      "    Defines redemption limit (redemptions allowed): Integer",
+                                                      "    Tracks redemption count: Integer",
+                                                      "    Is exhausted when fully redeemed: Boolean",
+                                                      "    Is locked for redemption: Lock",
+                                                      "    Is redeemed in: Redemption",
+                                                      "",
+                                                      "(Smell: \u0027redemption\u0027 appears in many responsibilities\u2014Voucher is holding too much. Move limit, count, exhaustion to Redemptions.)",
+                                                      "",
+                                                      "Voucher (CORRECT: link to Redemptions for redemption state)",
+                                                      "    Is identified by code: String",
+                                                      "    Inherits metadata from campaign: Campaign",
+                                                      "    Applies discount amount to order: Campaign",
+                                                      "    isRedeemed: Redemptions, Lock",
+                                                      "",
+                                                      "Redemptions (owns redemption data and behavior)",
+                                                      "    has Maximum Redemptions: Number",
+                                                      "    has Redemptions: Date Collection",
+                                                      "    redeems A Voucher: Voucher",
+                                                      "    redeemed by A Customer: Customer",
+                                                      "    Is exhausted: Boolean"
                                                   ]
                                   },
                                   {

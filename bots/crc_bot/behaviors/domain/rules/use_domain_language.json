@@ -1,24 +1,47 @@
 {
   "priority": 2,
-  "description": "Use domain-specific language rooted in core business concepts. Responsibilities must form meaningful domain sentences. Mine vocabulary from stories, acceptance criteria, and domain discussions. Avoid generic terms (Hold, Get), technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains).",
+  "description": "Use domain-specific language rooted in core business concepts. Responsibilities must form meaningful domain sentences. Mine vocabulary from stories, acceptance criteria, and domain discussions. Avoid generic terms (Hold, Get, Has), technical patterns (Manager, Service, Handler, Factory), and capability verbs (Exposes, Provides, Contains). Never leave collaborators empty—use a primitive type when no domain collaborator applies. Prefer domain concepts over primitive soup when multiple primitives form a cohesive concept.",
   "do": {
     "description": "Use concrete domain language that creates meaningful sentences",
     "guidance": [
       {
-        "description": "Create responsibilities that form domain sentences with specific meaning. Extract vocabulary from stories and discussions.",
+        "description": "Define all collaborators for every responsibility. Use a primitive type (String, Number, Boolean, Date, Integer) when no domain collaborator can be used. Never leave collaborators empty.",
         "example": [
           "Campaign",
-          "    Is identified by code:",
-          "    Defines voucher capacity (max count):",
-          "    Starts valid at date:",
-          "    Expires at date (or never):",
+          "    Is identified by code: String",
+          "    Defines voucher capacity (max count): Number",
+          "    Allows generation when exhausted (auto-increase): Boolean",
+          "    Starts valid at date: Date",
+          "    Expires at date (or never): Date or null",
           "    Is valid at date: Boolean, Date",
-          "    Defines discount (amount or percent):",
+          "    Defines discount (amount or percent): String, Number",
           "    Generates vouchers: Voucher",
           "",
           "Voucher",
-          "    Is identified by code:",
-          "    Defines redemption limit (redemptions allowed):",
+          "    Is identified by code: String",
+          "    Defines redemption limit (redemptions allowed): Number",
+          "    Inherits metadata from campaign: Campaign",
+          "    Applies discount amount to order: Campaign",
+          "    Is exhausted when fully redeemed: Boolean",
+          "",
+          "(Every responsibility has at least one collaborator—domain object or primitive)"
+        ]
+      },
+      {
+        "description": "Create responsibilities that form domain sentences with specific meaning. Extract vocabulary from stories and discussions.",
+        "example": [
+          "Campaign",
+          "    Is identified by code: String",
+          "    Defines voucher capacity (max count): Number",
+          "    Starts valid at date: Date",
+          "    Expires at date (or never): Date or null",
+          "    Is valid at date: Boolean, Date",
+          "    Defines discount (amount or percent): String, Number",
+          "    Generates vouchers: Voucher",
+          "",
+          "Voucher",
+          "    Is identified by code: String",
+          "    Defines redemption limit (redemptions allowed): Number",
           "    Inherits metadata from campaign: Campaign",
           "    Applies discount amount to order: Campaign",
           "    Is exhausted when fully redeemed: Boolean",
@@ -30,16 +53,16 @@
         "description": "Mine domain language from stories: size → defines voucher capacity; time frame → starts valid at, expires at, is valid at; code → is identified by code; validity → is valid at date",
         "example": [
           "Instead of 'Hold size and auto-increase':",
-          "    Defines voucher capacity (max count):",
-          "    Allows generation when exhausted (auto-increase):",
+          "    Defines voucher capacity (max count): Number",
+          "    Allows generation when exhausted (auto-increase): Boolean",
           "",
           "Instead of 'Hold time frame and validity':",
-          "    Starts valid at date:",
-          "    Expires at date (or never):",
+          "    Starts valid at date: Date",
+          "    Expires at date (or never): Date or null",
           "    Is valid at date: Boolean, Date",
           "",
           "Instead of 'Hold code':",
-          "    Is identified by code:",
+          "    Is identified by code: String",
           "",
           "Instead of 'Expose discount amount':",
           "    Applies discount amount to order: Campaign"
@@ -76,6 +99,34 @@
         ]
       },
       {
+        "description": "Think of whole behaviors over data. Prefer collaborators with other domain classes, not tons of primitives. When multiple primitives describe a cohesive concept, create a domain concept instead.",
+        "example": [
+          "Campaign",
+          "    Runs for a period: Period",
+          "    Defines discount (amount or percent): Discount",
+          "    Is applicable to: CampaignMetaDataCollection",
+          "    Generates vouchers: Voucher, VoucherCodeGenerator",
+          "",
+          "VoucherCodeGenerator",
+          "    Generates code: String",
+          "    Generates using prefix: String",
+          "    Generates using suffix: String",
+          "",
+          "Period",
+          "    Starts on: Date",
+          "    Ends on: Date",
+          "",
+          "Discount",
+          "    Value: Number",
+          "    Percentage: Number",
+          "",
+          "CampaignMetaDataCollection",
+          "    Entries key: String, value: String",
+          "",
+          "(Domain concepts as collaborators—Period, Discount, CampaignMetaDataCollection—instead of primitive soup)"
+        ]
+      },
+      {
         "description": "Reference domain objects as collaborators, not as raw parameters in a list. When a concept (Customer, Campaign, etc.) participates in a responsibility, list it as a collaborator.",
         "example": [
           "Redemption",
@@ -90,8 +141,45 @@
     ]
   },
   "dont": {
-    "description": "Don't use Hold or Get as default - they are fallbacks that signal failure to find domain language",
+    "description": "Don't use Hold, Get, or Has as default—they are fallbacks that signal failure to find domain language. Don't leave collaborators empty. Avoid primitive soup (scattering primitives instead of domain concepts).",
     "guidance": [
+      {
+        "description": "Don't leave collaborators empty. Use a primitive (String, Number, Boolean, Date, Integer) when no domain collaborator applies.",
+        "example": [
+          "Campaign (WRONG: empty collaborators)",
+          "    Is identified by code:",
+          "    Defines voucher capacity (max count):",
+          "    Allows generation when exhausted (auto-increase):",
+          "",
+          "Campaign (CORRECT: primitives when no domain collaborator)",
+          "    Is identified by code: String",
+          "    Defines voucher capacity (max count): Number",
+          "    Allows generation when exhausted (auto-increase): Boolean",
+          "",
+          "(Every responsibility must have at least one collaborator)"
+        ]
+      },
+      {
+        "description": "Don't use primitives that make up a concept—avoid primitive soup. Don't use Has, Get, Hold. Prefer domain concepts as collaborators over scattering String, Number, Boolean, Date across responsibilities.",
+        "example": [
+          "Campaign (WRONG: primitive soup, Has, empty collaborators)",
+          "    Starts valid at date:",
+          "    Expires at date (or never):",
+          "    Is valid at date: Boolean, Date",
+          "    Defines discount (amount or percent):",
+          "    Has metadata (key-value):",
+          "    Has voucher code generation parameters: VoucherCodeGenerationParameters",
+          "    Generated voucher codes:",
+          "",
+          "Campaign (CORRECT: domain concepts as collaborators)",
+          "    Runs for a period: Period",
+          "    Defines discount (amount or percent): Discount",
+          "    Is applicable to: CampaignMetaDataCollection",
+          "    Generates vouchers: Voucher, VoucherCodeGenerator",
+          "",
+          "(Think whole behaviors—Period, Discount, CampaignMetaDataCollection—not tons of primitives)"
+        ]
+      },
       {
         "description": "Don't use Hold or Get. These are fallbacks when you cannot find actual domain language - and that is a sign of failure. Mine the domain first.",
         "example": [

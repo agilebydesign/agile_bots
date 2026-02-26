@@ -264,6 +264,31 @@ class Action:
     def track_activity_on_start(self):
         state = ActionState(self.behavior.bot_name, self.behavior.name, self.action_name)
         self.tracker.track_start(state)
+        self._track_rules_snapshot(state)
+
+    def _track_rules_snapshot(self, state: ActionState):
+        try:
+            rules_dir = self.bot_dir / 'behaviors' / self.behavior.name / 'rules'
+            if not rules_dir.exists():
+                return
+            import json as _json
+            rules_summary = []
+            for rule_file in sorted(rules_dir.glob('*.json')):
+                try:
+                    with open(rule_file, 'r', encoding='utf-8') as f:
+                        content = _json.load(f)
+                    rules_summary.append({
+                        'file': rule_file.name,
+                        'description': content.get('description', ''),
+                        'priority': content.get('priority', 999),
+                        'scanner': content.get('scanner', None),
+                    })
+                except Exception:
+                    rules_summary.append({'file': rule_file.name, 'error': 'failed to read'})
+            if rules_summary:
+                self.tracker.track_rules_used(state, rules_summary)
+        except Exception:
+            pass
 
     def track_activity_on_completion(self, outputs: dict=None, duration: int=None):
         state = ActionState(self.behavior.bot_name, self.behavior.name, self.action_name, outputs=outputs, duration=duration)

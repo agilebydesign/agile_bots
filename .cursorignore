@@ -3,3 +3,7 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Assets (junction to OneDrive) - don't index
+Assets/
+**/converted/**

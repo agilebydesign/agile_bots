@@ -523,7 +523,7 @@ class Scope:
     
     @staticmethod
     def clear_from_bot(workspace_directory: Path) -> None:
-        state_file = workspace_directory / 'behavior_action_state.json'
+        state_file = workspace_directory / 'logs' / 'behavior_action_state.json'
         
         if not state_file.exists():
             return

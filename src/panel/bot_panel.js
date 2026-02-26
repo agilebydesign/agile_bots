@@ -948,11 +948,12 @@ class BotPanel {
                     newName: trimmedName
                   });
                   
-                  const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
+                  const logPath = path.join(this._workspaceRoot, 'logs', 'story_graph_operations.log');
                   const timestamp = new Date().toISOString();
                   const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
                   
                   try {
+                    fs.mkdirSync(path.join(this._workspaceRoot, 'logs'), { recursive: true });
                     fs.appendFileSync(logPath, logEntry);
                   } catch (err) {
                     this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
@@ -1058,11 +1059,12 @@ class BotPanel {
                 isDeleteOp
               });
               
-              const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
+              const logPath = path.join(this._workspaceRoot, 'logs', 'story_graph_operations.log');
               const timestamp = new Date().toISOString();
               const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RECEIVED COMMAND: ${message.commandText}\n`;
               
               try {
+                fs.mkdirSync(path.join(this._workspaceRoot, 'logs'), { recursive: true });
                 fs.appendFileSync(logPath, logEntry);
               } catch (err) {
                 this._log(`[BotPanel] Failed to write to log file: ${err.message}`);

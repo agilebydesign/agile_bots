@@ -88,7 +88,17 @@ class WorkspaceSectionView extends PanelView {
         if (!diagramsHtml && !buildHtml && !clarifyHtml && !strategyHtml) return '';
 
         const behaviorNames = botData?.behaviors?.names || botData?.behavior_names || (botData?.behaviors?.all_behaviors || []).map(b => (typeof b === 'string' ? b : b?.name)).filter(Boolean) || [];
-        const behaviorIconMap = { shape: 'shape_icon.png', code: 'code_icon.png', prioritization: 'prioritization.png', scenarios: 'inject_scenarios.png', tests: 'test_tube.png', exploration: 'exploration_icon.png' };
+        const behaviorIconMap = {
+            shape: 'shape_icon.png',
+            code: 'code_icon.png',
+            prioritization: 'prioritization.png',
+            scenarios: 'inject_scenarios.png',
+            tests: 'test_tube.png',
+            exploration: 'exploration_icon.png',
+            domain: 'domain_icon.png',
+            design: 'design_icon.png',
+            walkthrough: 'walkthrough_icon.png'
+        };
         const wsBehaviorExecToggleId = 'ws-behavior-exec-toggle';
         const currentBehaviorIcon = (currentBehavior && behaviorIconMap[currentBehavior] ? getIcon(behaviorIconMap[currentBehavior]) : null) || (behaviorNames[0] && behaviorIconMap[behaviorNames[0]] ? getIcon(behaviorIconMap[behaviorNames[0]]) : null);
         const currentBehaviorLabel = (currentBehavior || behaviorNames[0] || '').charAt(0).toUpperCase() + (currentBehavior || behaviorNames[0] || '').slice(1);
