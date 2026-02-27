@@ -192,9 +192,11 @@ class PanelView {
                             if (jsonData.status && (jsonData.behavior || jsonData.instructions_length !== undefined)) {
                                 console.log('[SUBMIT_DEBUG] PanelView: received submit response, status=', jsonData.status, 'clipboard_status=', jsonData.clipboard_status, 'instructions_length=', jsonData.instructions_length);
                             }
-                            // Check if response indicates an error from CLI
-                            if (jsonData.status === 'error' && jsonData.error) {
-                                console.error('[PanelView] CLI returned error:', jsonData.error);
+                            // Check if response indicates an error from CLI                            
+                            // CLI returns an error JSON like so: {"status":"error","message":"Unknown command 'bt'","command":"bt"}
+                            if (jsonData.status === 'error') {
+                                let errorMessage = typeof jsonData.message !== 'undefined' ? jsonData.message : 'Unknown error from CLI';
+                                console.error('[PanelView] CLI returned error:', errorMessage);
                                 // Resolve with the error object so it can be handled gracefully
                                 this._pendingResolve(jsonData);
                             } else {

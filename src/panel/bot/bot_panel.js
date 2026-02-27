@@ -7,6 +7,7 @@ const BotView = require("./bot_view");
 const PanelView = require("../panel_view");
 const WorkspaceManager = require("../workspace/workspace_manager");
 const BehaviorsManager = require("../behaviors/behaviors_manager");
+const StoryGraphManager = require("../story_graph/story_graph_manager");
 const branding = require("../branding");
 const { escapeForHtml, Logger } = require("../utils");
 
@@ -182,30 +183,16 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-
-            this._log('[BotPanel] toggleIncrementView: switching to ' + message.currentView);
-            this._currentStoryMapView = message.currentView;
-
-            (async () => {
-              try {
-                await this._update();
-              } catch (err) {
-                this._reportError(err, 'Toggle view');
-              }
-            })();
+            StoryGraphManager.toggleIncrementView(message, this)
+              .then((result) => {
+                  if (result) return this._update();
+              });
             return;
           case "switchViewMode":
-
-            this._log('[BotPanel] switchViewMode: switching to ' + message.viewMode);
-            this._currentStoryMapView = message.viewMode;
-
-            (async () => {
-              try {
-                await this._update();
-              } catch (err) {
-                this._reportError(err, 'Switch view');
-              }
-            })();
+            StoryGraphManager.switchViewMode(message, this)
+              .then((result) => {
+                  if (result) return this._update();
+              });
             return;
           case "logToFile":
             if (message.message) {
@@ -225,79 +212,10 @@ class BotPanel {
             }
             return;
           case "copyNodeToClipboard":
-            (() => {
-              const nodePath = message.nodePath;
-              const action = message.action;
-              if (!nodePath || !action) return;
-              const method = action === 'json' ? 'copy_json' : 'copy_name';
-              const command = nodePath + '.' + method;
-              const doCopy = async () => {
-                const response = await this._botView.execute(command);
-                const result = response && (response.result !== undefined ? response.result : response);
-                let text;
-                if (action === 'json') {
-                  text = (typeof result === 'string' ? result : JSON.stringify(result, null, 2));
-                } else {
-
-                  if (typeof result === 'string') {
-                    text = result;
-                  } else if (result && typeof result === 'object') {
-                    text = result.result ?? result.node_name ?? result.message ?? result.name ?? '';
-                    text = String(text);
-                  } else {
-                    text = String(result != null ? result : '');
-                  }
-                }
-                await vscode.env.clipboard.writeText(text);
-                vscode.window.showInformationMessage(action === 'json' ? 'Node JSON copied to clipboard' : 'Node name copied to clipboard');
-              };
-              if (action === 'json') {
-                vscode.window.withProgress({
-                  location: vscode.ProgressLocation.Notification,
-                  title: 'Injecting scope to clipboard...',
-                  cancellable: false
-                }, async () => {
-                  try {
-                    await doCopy();
-                  } catch (err) {
-                    this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
-                    vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                  }
-                });
-              } else {
-                doCopy().catch((err) => {
-                  this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
-                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                });
-              }
-            })();
+            StoryGraphManager.copyNodeToClipboard(message, this);
             return;
           case "copyIncrementStoriesJson":
-            (() => {
-              const incName = message.incName;
-              if (!incName) return;
-              const command = 'story_graph.copy_increment_stories_json name:"' + incName + '"';
-              const doCopy = async () => {
-                const response = await this._botView.execute(command);
-                const result = response && (response.result !== undefined ? response.result : response);
-                const arr = Array.isArray(result) ? result : (result && result.result ? result.result : []);
-                const text = JSON.stringify(arr, null, 2);
-                await vscode.env.clipboard.writeText(text);
-                vscode.window.showInformationMessage('Increment stories JSON copied to clipboard');
-              };
-              vscode.window.withProgress({
-                location: vscode.ProgressLocation.Notification,
-                title: 'Injecting increment stories to clipboard...',
-                cancellable: false
-              }, async () => {
-                try {
-                  await doCopy();
-                } catch (err) {
-                  this._log(`[BotPanel] copyIncrementStoriesJson failed: ${err.message}`);
-                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                }
-              });
-            })();
+            StoryGraphManager.copyIncrementStoriesJson(message, this);
             return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
@@ -684,8 +602,7 @@ class BotPanel {
               this._log('[BotPanel] ERROR: ' + errorMsg);
               this._displayError(errorMsg);
               return;
-            }
-            
+            }            
 
             const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
             this._botView.execute(scopeIncludeCmd)
@@ -764,6 +681,7 @@ class BotPanel {
               .then((result) => {
                 if (result) return this._update();
               });
+            return;
           case "browseWorkspace":
             this._log('[BotPanel] Received browseWorkspace message');
             WorkspaceManager.browseAndUpdateWorkspace(this)
@@ -815,109 +733,7 @@ class BotPanel {
               });
             return;
           case "renameNode":
-            this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
-            this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Received renameNode message`, {
-              nodePath: message.nodePath,
-              currentName: message.currentName,
-              timestamp: new Date().toISOString()
-            });
-            if (message.nodePath && message.currentName) {
-
-              this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Prompting user for new name`);
-              vscode.window.showInputBox({
-                prompt: `Rename "${message.currentName}"`,
-                value: message.currentName,
-                placeHolder: 'Enter new name'
-              }).then((newName) => {
-                this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] User provided new name`, {
-                  newName: newName,
-                  currentName: message.currentName,
-                  changed: newName && newName !== message.currentName
-                });
-                if (newName && newName !== message.currentName) {
-
-                  const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
-
-                  const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-                  const command = `${message.nodePath}.rename name:"${escapedName}"`;
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Built rename command: ${command}`);
-                  
-
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Sending optimistic update to webview`);
-                  this._panel.webview.postMessage({
-                    command: 'optimisticRename',
-                    nodePath: message.nodePath,
-                    oldName: message.currentName,
-                    newName: trimmedName
-                  });
-                  
-                  const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
-                  const timestamp = new Date().toISOString();
-                  const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
-                  
-                  try {
-                    fs.appendFileSync(logPath, logEntry);
-                  } catch (err) {
-                    this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
-                  }
-                  
-
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Executing rename command via backend (optimistic)...`);
-                  this._botView?.execute(command)
-                    .then((result) => {
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [SUCCESS] Backend rename executed successfully`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
-                      
-
-                      const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
-                      try {
-                        fs.appendFileSync(logPath, resultLog);
-                      } catch (err) {
-                        this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
-                      }
-                      
-
-                      this._panel.webview.postMessage({
-                        command: 'saveCompleted',
-                        success: true,
-                        result: result
-                      });
-                      
-
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Optimistic update - skipping panel refresh`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION COMPLETE ==========`);
-                    })
-                    .catch((error) => {
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Rename failed`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Error: ${error.message}`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Stack: ${error.stack}`);
-                      
-
-                      this._panel.webview.postMessage({
-                        command: 'saveCompleted',
-                        success: false,
-                        error: error.message
-                      });
-                      
-
-                      const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
-                      try {
-                        fs.appendFileSync(logPath, errorLog);
-                      } catch (err) {
-                        this._log(`[BotPanel] Failed to write error to log file: ${err.message}`);
-                      }
-                      
-                      vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
-                      
-
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Refreshing panel after error...`);
-                      this._update().catch(err => {
-                        this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
-                      });
-                    });
-                }
-              });
-            }
+            StoryGraphManager.renameNode(message, this)
             return;
           case "executeCommand":
             if (message.commandText) {
@@ -2196,12 +2012,14 @@ class BotPanel {
     const workspaceClientPath = vscode.Uri.joinPath(this._extensionUri, 'workspace', 'workspace_client.js');
     const behaviorsClientPath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors_client.js');
     const behaviorsStylePath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors.css');
+    const storyGraphClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph_client.js');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
     const workspaceClientUri = webview.asWebviewUri(workspaceClientPath);
     const behaviorsClientUri = webview.asWebviewUri(behaviorsClientPath);
     const behaviorsStyleUri = webview.asWebviewUri(behaviorsStylePath);
+    const storyGraphClientUri = webview.asWebviewUri(storyGraphClientPath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2272,6 +2090,7 @@ class BotPanel {
           <script nonce="${nonce}" src="${botPanelClientUri}"></script>
           <script nonce="${nonce}" src="${workspaceClientUri}"></script>
           <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
+          <script nonce="${nonce}" src="${storyGraphClientUri}"></script>
       </body>
       </html>`;
   }
