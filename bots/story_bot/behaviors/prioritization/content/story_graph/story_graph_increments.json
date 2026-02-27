@@ -10,11 +10,13 @@
       "name": "Epic Name",
       "sequential_order": null,
       "behavior": "scenarios",
+      "notes": "",
       "sub_epics": [
         {
           "name": "Sub Epic Name",
           "sequential_order": 0.0,
           "behavior": "code",
+          "notes": "",
           "sub_epics": [],
           "story_groups": [
             {
@@ -29,7 +31,8 @@
                   "sequential_order": 0.0,
                   "connector": "and",
                   "story_type": "user",
-                  "behavior": "code"
+                  "behavior": "code",
+                  "notes": ""
                 }
               ]
             }

@@ -12,11 +12,13 @@
       "name": "",
       "sequential_order": 1,
       "estimated_stories": null,
+      "notes": "",
       "sub_epics": [
         {
           "name": "",
           "sequential_order": 1,
           "estimated_stories": null,
+          "notes": "",
           "sub_epics": [],
           "story_groups": [
             {
@@ -32,6 +34,7 @@
                   "story_type": "user",
                   "optional": false,
                   "priority": 1,
+                  "notes": "",
                   "context_source": {"file": "source.pdf", "page": "10", "section": "3.1 Feature Flow"},
                   "Steps": null,
                   "acceptance_criteria": [
@@ -53,6 +56,7 @@
                   "story_type": "user",
                   "optional": false,
                   "priority": 1,
+                  "notes": "",
                   "context_source": {"file": "source.pdf", "page": "12", "section": "3.2 Alternate Flow"},
                   "Steps": null,
                   "acceptance_criteria": [
@@ -81,6 +85,7 @@
                   "story_type": "user",
                   "optional": false,
                   "priority": 1,
+                  "notes": "",
                   "Steps": null,
                   "acceptance_criteria": [
                     "WHEN [condition]\nTHEN [outcome]",
