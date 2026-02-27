@@ -255,11 +255,7 @@ class BotView extends PanelView {
             case 'executeBehavior':
                 return await this.behaviorsView.handleEvent('execute', eventData);
             case 'updateScope':
-                return await this.storyMapView.handleEvent('updateFilter', eventData);
-            case 'updateWorkspace':
-                return await this.headerView.handleEvent('updateWorkspace', eventData);
-            case 'switchBot':
-                return await this.headerView.handleEvent('switchBot', eventData);
+                return await this.storyMapView.handleEvent('updateFilter', eventData);            
             default:
                 throw new Error(`Unknown event type: ${eventType}`);
         }

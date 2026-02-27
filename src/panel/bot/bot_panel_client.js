@@ -77,8 +77,6 @@ document.addEventListener('click', function(e) {
         command: 'logToFile',
         message: '[WebView] CLICK: ' + JSON.stringify(targetInfo)
     });
-    
-
 
     const storyNode = target.closest && target.closest('.story-node');
     if (storyNode && !storyNode.getAttribute('data-inc-source')) {
@@ -129,13 +127,10 @@ document.addEventListener('click', function(e) {
             window.selectNode(nodeType, nodeName, options);
         }
         
-
         e.stopPropagation();
         console.log('═══════════════════════════════════════════════════════');
     }
     
-
-
     let actionElement = target;
     let action = actionElement.getAttribute('data-action');
     let searchDepth = 0;
@@ -259,9 +254,6 @@ document.addEventListener('click', function(e) {
 
 document.addEventListener('dblclick', function(e) {
     const target = e.target;
-    
-
-
     if (target.classList.contains('story-node') && target.getAttribute('data-inc-source') === null) {
         const nodePath = target.getAttribute('data-path');
         const nodeName = target.getAttribute('data-node-name');
@@ -1518,98 +1510,6 @@ window.showAllScope = function() {
     });
 };
 
-window.executeNavigationCommand = function(command) {
-    console.log('[WebView] executeNavigationCommand click ->', command);
-    vscode.postMessage({
-        command: 'executeNavigationCommand',
-        commandText: command
-    });
-};
-
-window.navigateToBehavior = function(behaviorName) {
-    vscode.postMessage({
-        command: 'navigateToBehavior',
-        behaviorName: behaviorName
-    });
-};
-
-window.navigateToAction = function(behaviorName, actionName) {
-    vscode.postMessage({
-        command: 'navigateToAction',
-        behaviorName: behaviorName,
-        actionName: actionName
-    });
-};
-
-window.navigateAndExecute = function(behaviorName, actionName, operationName) {
-    console.log('[WebView] navigateAndExecute click ->', behaviorName, actionName, operationName);
-    vscode.postMessage({
-        command: 'navigateAndExecute',
-        behaviorName: behaviorName,
-        actionName: actionName,
-        operationName: operationName
-    });
-};
-
-window.setBehaviorSpecialInstructions = function(textareaEl) {
-    if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
-    const behaviorName = textareaEl.getAttribute('data-behavior-name');
-    const instructionText = (textareaEl.value || '').trim();
-    if (behaviorName !== null) {
-        vscode.postMessage({
-            command: 'setBehaviorSpecialInstructions',
-            behaviorName: behaviorName,
-            instructionText: instructionText
-        });
-    }
-};
-
-window.setActionSpecialInstructions = function(textareaEl) {
-    if (!textareaEl || textareaEl.tagName !== 'TEXTAREA') return;
-    const behaviorName = textareaEl.getAttribute('data-behavior-name');
-    const actionName = textareaEl.getAttribute('data-action-name');
-    const instructionText = (textareaEl.value || '').trim();
-    if (behaviorName !== null && actionName !== null) {
-        vscode.postMessage({
-            command: 'setActionSpecialInstructions',
-            behaviorName: behaviorName,
-            actionName: actionName,
-            instructionText: instructionText
-        });
-    }
-};
-
-function submitToChat() {
-    console.log('[SUBMIT_DEBUG] WebView: submitToChat() posting sendToChat');
-    vscode.postMessage({
-        command: 'sendToChat'
-    });
-}
-
-function sendInstructionsToChat(event) {
-    if (event) {
-        event.stopPropagation();
-    }
-    console.log('[SUBMIT_DEBUG] WebView: sendInstructionsToChat triggered');
-
-    if (window.selectedNode && window.selectedNode.name) {
-        if (window.selectedNode.type === 'increment') {
-            console.log('[SUBMIT_DEBUG] WebView: increment selected, taking handleSubmitCurrent path');
-            handleSubmitCurrent();
-            return;
-        }
-        const nodePath = resolveNodePath(window.selectedNode);
-        if (nodePath) {
-            console.log('[SUBMIT_DEBUG] WebView: taking handleSubmitCurrent path (story map node selected)');
-            handleSubmitCurrent();
-            return;
-        }
-    }
-
-    console.log('[SUBMIT_DEBUG] WebView: taking submitToChat path (behaviors submit)');
-    submitToChat();
-}
-
 function refreshStatus() {
     vscode.postMessage({
         command: 'refresh'
@@ -1790,18 +1690,6 @@ window.switchBot = function(botName) {
     vscode.postMessage({
         command: 'switchBot',
         botName: botName
-    });
-};
-
-window.getBehaviorRules = function(behaviorName) {
-    console.log('[WebView] getBehaviorRules called with:', behaviorName);
-    vscode.postMessage({
-        command: 'logToFile',
-        message: '[WebView] getBehaviorRules BUTTON CLICKED for: ' + behaviorName
-    });
-    vscode.postMessage({
-        command: 'getBehaviorRules',
-        behaviorName: behaviorName
     });
 };
 
@@ -2874,17 +2762,6 @@ function getSelectedNodeTestFiles() {
 }
 
 
-function getWorkspaceDir() {
-
-    if (window.botData && window.botData.workspace_directory) {
-        return window.botData.workspace_directory;
-    }
-
-    const storyGraphPath = 'docs/story/story-graph.json';
-    return '';
-}
-
-
 function openFileInColumn(filePath, viewColumn) {
     vscode.postMessage({
         command: 'openFileInColumn',
@@ -2922,7 +2799,7 @@ window.handleOpenGraph = function() {
         return;
     }
     
-    const workspaceDir = getWorkspaceDir();
+    const workspaceDir = getWorkspaceDir(); // from workspace_client.js
     const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
     
     console.log('[WebView] Opening story graph:', storyGraphPath);
@@ -2973,7 +2850,7 @@ window.handleOpenAll = function() {
     }
     
     const fileLink = getSelectedNodeFileLink();
-    const workspaceDir = getWorkspaceDir();
+    const workspaceDir = getWorkspaceDir(); // from workspace_client.js
     const storyGraphPath = workspaceDir ? workspaceDir + '/docs/story/story-graph.json' : 'docs/story/story-graph.json';
     
 
@@ -3270,7 +3147,7 @@ window.addEventListener('message', event => {
     }
     
     if (message.command === 'setWorkspacePath') {
-        setWorkspacePath(message.path);
+        setWorkspacePath(message.path); // workspace_client.js
         return;
     }
     
@@ -3375,7 +3252,6 @@ window.addEventListener('message', event => {
 
     }
     
-
     if (message.command === 'revertRename') {
         console.log('[WebView] Revert rename command received but not needed');
     }

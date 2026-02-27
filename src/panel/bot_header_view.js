@@ -8,6 +8,7 @@
 
 const PanelView = require('./panel_view');
 const branding = require('./branding');
+const fs = require('fs');
 const { escapeForHtml, truncatePath, Logger } = require('./utils');
 
 class BotHeaderView extends PanelView {
@@ -107,12 +108,15 @@ class BotHeaderView extends PanelView {
             }).join('\n                ');
         }
         
-        // Get the proper webview URIs for images using branding utility
-        const imagePath = branding.getImageUri(this.webview, this.extensionUri, 'company_icon.png');
-        const refreshIconPath = branding.getImageUri(this.webview, this.extensionUri, 'refresh.png');
+        // Get the proper webview URIs for images using branding utility        
+        const imagePath = `<img src="${branding.getImageUri(this.webview, this.extensionUri, 'company_icon.png')}" class="main-header-icon" alt="Company Icon" onerror="console.error('Failed to load icon:', this.src); this.style.border='1px solid red';" />`;        
+        const refreshIconPath = `<img src="${branding.getImageUri(this.webview, this.extensionUri, 'refresh.png')}" style="width: 36px; height: 36px; object-fit: contain; filter: saturate(1.3) brightness(0.95) hue-rotate(-5deg);" alt="Refresh" />`;
+        
         const storyIconPath = branding.getImageUri(this.webview, this.extensionUri, 'story.png');
         const crcIconPath = branding.getImageUri(this.webview, this.extensionUri, 'crc.png');
-        const folderBrowseIconPath = branding.getImageUri(this.webview, this.extensionUri, 'folder_browse.png');
+
+        let folderBrowseIconPath = branding.getImageUri(this.webview, this.extensionUri, 'folder_browse.png');
+        folderBrowseIconPath = folderBrowseIconPath ? `<img src="${folderBrowseIconPath}" alt="Browse" style="width: 36px; height: 36px;" />` : '📁';        
         
         console.log('[BotHeaderView] Branding:', branding.getBranding());
         console.log('[BotHeaderView] Company icon URI:', imagePath);
@@ -121,106 +125,34 @@ class BotHeaderView extends PanelView {
             ? `<span style="font-size: 14px; opacity: 0.7; margin-left: 6px;">v${escapeForHtml(this.panelVersion)}</span>`
             : '';
         
+        const botIconPath = this.currentBot === 'story_bot' && storyIconPath
+                    ? `<img src="${storyIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Story Bot Icon" />`
+                    : this.currentBot === 'crc_bot' && crcIconPath
+                    ? `<img src="${crcIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="CRC Bot Icon" />`
+                    : '';
+        
         const productName = branding.getProductName();
         const titleStyle = branding.getTitleStyle();
-        
-        return `
-        <div class="section card-primary" style="border-top: none; padding-top: 0;">
-            <div class="main-header">
-                ${imagePath ? `<img src="${imagePath}" class="main-header-icon" alt="Company Icon" onerror="console.error('Failed to load icon:', this.src); this.style.border='1px solid red';" />` : ''}
-                <span class="main-header-title" ${titleStyle}>${productName} ${versionHtml}</span>
-                <button class="main-header-refresh" onclick="refreshStatus()" title="Refresh">
-                    ${refreshIconPath ? `<img src="${refreshIconPath}" style="width: 36px; height: 36px; object-fit: contain; filter: saturate(1.3) brightness(0.95) hue-rotate(-5deg);" alt="Refresh" />` : ''}
-                </button>
-            </div>
-            <div class="collapsible-section expanded">
-                <div class="collapsible-header" onclick="toggleSection('header-content')" style="
-                    cursor: pointer;
-                    padding: 4px 5px;
-                    background-color: transparent;
-                    border-left: none;
-                    border-radius: 2px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    user-select: none;
-                ">
-                    <div style="display: flex; align-items: center;">
-                        <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                        ${this.currentBot === 'story_bot' && storyIconPath
-                            ? `<img src="${storyIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="Story Bot Icon" />`
-                            : this.currentBot === 'crc_bot' && crcIconPath
-                            ? `<img src="${crcIconPath}" style="margin-right: 8px; width: 36px; height: 36px; object-fit: contain;" alt="CRC Bot Icon" />`
-                            : ''}
-                        <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">${safeBotName}</span>
-                    </div>
-                    <div class="bot-links" onclick="event.stopPropagation();" style="gap: 6px;">
-                        ${botLinksHtml}
-                    </div>
-                </div>
-                <div id="header-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
-                    <div class="card-secondary" style="padding: 1px 5px 2px 5px;">
-                        <div class="input-container" style="margin-top: 0;">
-                            <div class="input-header">Workspace</div>
-                            <div style="display: flex; gap: 4px; align-items: center;">
-                                <input type="text" id="workspacePathInput" 
-                                    value="${safeWorkspaceDir}" 
-                                    placeholder="Path to workspace"
-                                    style="flex: 1;"
-                                    onchange="updateWorkspace(this.value)"
-                                    onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
-                                    title="${safeWorkspaceDir}" />
-                                <button onclick="browseWorkspace()" title="Browse for folder" style="padding: 0; min-width: auto; display: flex; align-items: center; background: transparent; border: none;">${folderBrowseIconPath ? `<img src="${folderBrowseIconPath}" alt="Browse" style="width: 36px; height: 36px;" />` : '📁'}</button>
-                            </div>
-                        </div>
-                        <div class="info-display" style="margin-top: 4px;" title="${safeBotDir}">
-                            <span class="label">Bot Path:</span>
-                            <span class="value">${displayBotDir}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
+
+        const htmlPath = vscode.Uri.joinPath(this.extensionUri, 'workspace', 'workspace_section.html');
+        let htmlComponentString = fs.readFileSync(htmlPath.fsPath, 'utf-8');   
+                
+        return htmlComponentString.replace(/\${safeBotName}/g, safeBotName)
+            .replace(/\${displayBotDir}/g, displayBotDir)
+            .replace(/\${displayWorkspaceDir}/g, displayWorkspaceDir)
+            .replace(/\${botIconPath}/g, botIconPath)
+            .replace(/\${productName}/g, productName)
+            .replace(/\${titleStyle}/g, titleStyle)
+            .replace(/\${imagePath}/g, imagePath)
+            .replace(/\${refreshIconPath}/g, refreshIconPath)
+            .replace(/\${folderBrowseIconPath}/g, folderBrowseIconPath)
+            .replace(/\${versionHtml}/g, versionHtml)
+            .replace(/\${botLinksHtml}/g, botLinksHtml)
+            .replace(/\${safeBotDir}/g, safeBotDir)
+            .replace(/\${safeWorkspaceDir}/g, safeWorkspaceDir);
+            
     }
     
-    /**
-     * Handle events. TO-DO: Make specific event handlers instead of one big handler with if statements?
-     * 
-     * @param {string} eventType - Event type
-     * @param {Object} eventData - Event data
-     * @returns {Promise<Object>} Result
-     */
-    async handleEvent(eventType, eventData) {
-        if (eventType === 'switchBot') {
-            // Execute CLI command to switch bot
-            const botName = eventData.botName;
-            Logger.log(`[BotHeaderView] Switching bot to: ${botName}`);
-            
-            try {
-                const result = await this.execute(`bot ${botName}`);
-                Logger.log(`[BotHeaderView] Bot switch result: ${JSON.stringify(result)}`);
-                return result;
-            } catch (error) {
-                Logger.log(`[BotHeaderView] ERROR switching bot: ${error.message}`);
-                throw error;
-            }
-        }
-        if (eventType === 'updateWorkspace') {
-            // Execute CLI command to change workspace
-            const workspacePath = eventData.workspacePath;
-            Logger.log(`[BotHeaderView] Executing workspace command: workspace ${workspacePath}`);
-            
-            try {
-                const result = await this.execute(`workspace ${workspacePath}`);
-                Logger.log(`[BotHeaderView] Workspace command result: ${JSON.stringify(result)}`);
-                return result;
-            } catch (error) {
-                Logger.log(`[BotHeaderView] ERROR executing workspace command: ${error.message}`);
-                throw error;
-            }
-        }
-        throw new Error(`Unknown event type: ${eventType}`);
-    }
 }
 
 module.exports = BotHeaderView;

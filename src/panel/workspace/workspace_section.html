@@ -1,0 +1,54 @@
+
+<!--HTML Component for the workspace & bot selection header -->
+<div class="section card-primary" style="border-top: none; padding-top: 0;">
+    <div class="main-header">
+            ${imagePath}
+        <span class="main-header-title" ${titleStyle}>${productName} ${versionHtml}</span>
+        <button class="main-header-refresh" onclick="refreshStatus()" title="Refresh">
+            ${refreshIconPath}
+        </button>
+    </div>
+    <div class="collapsible-section expanded">
+        <div class="collapsible-header" onclick="toggleSection('header-content')" style="
+            cursor: pointer;
+            padding: 4px 5px;
+            background-color: transparent;
+            border-left: none;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        ">
+            <div style="display: flex; align-items: center;">
+                <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
+                    ${botIconPath}
+                <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">${safeBotName}</span>
+            </div>
+            <div class="bot-links" onclick="event.stopPropagation();" style="gap: 6px;">
+                ${botLinksHtml}
+            </div>
+        </div>
+        <div id="header-content" class="collapsible-content" style="max-height: 2000px; overflow: hidden; transition: max-height 0.3s ease;">
+            <div class="card-secondary" style="padding: 1px 5px 2px 5px;">
+                <div class="input-container" style="margin-top: 0;">
+                    <div class="input-header">Workspace</div>
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <input type="text" id="workspacePathInput" 
+                            value="${safeWorkspaceDir}" 
+                            placeholder="Path to workspace"
+                            style="flex: 1;"
+                            onchange="updateWorkspace(this.value)"
+                            onkeydown="if(event.key === 'Enter') { event.preventDefault(); updateWorkspace(this.value); }"
+                            title="${safeWorkspaceDir}" />
+                        <button onclick="browseWorkspace()" title="Browse for folder" style="padding: 0; min-width: auto; display: flex; align-items: center; background: transparent; border: none;">${folderBrowseIconPath}</button>
+                    </div>
+                </div>
+                <div class="info-display" style="margin-top: 4px;" title="${safeBotDir}">
+                    <span class="label">Bot Path:</span>
+                    <span class="value">${displayBotDir}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

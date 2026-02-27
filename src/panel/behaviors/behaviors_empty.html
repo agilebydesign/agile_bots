@@ -1,0 +1,31 @@
+<!-- HTML Component for the Value Stream empty state -->
+<div class="section card-primary">
+    <div class="collapsible-section expanded">
+        <div class="collapsible-header behaviors-section-header">
+            <div class="behaviors-title-group" onclick="toggleSection('behaviors-content')">
+                <span class="expand-icon">▸</span>
+                ${valueStreamIcon}
+                <span class="behaviors-title">Value Stream</span>
+            </div>
+            <button class="behaviors-submit-btn" onclick="sendInstructionsToChat(event)" title="Submit instructions to chat">
+                ${submitIcon}
+            </button>
+        </div>
+        <div id="behaviors-content" class="collapsible-content behaviors-content">
+            <div class="card-secondary behaviors-inner">
+                <div class="empty-state">No behaviors available</div>
+                <div class="behaviors-nav-buttons">
+                    <button class="nav-command-button" data-action="executeNavigationCommand" data-command="back" title="Back - Go to previous action">
+                        ${leftIcon}
+                    </button>
+                    <button class="nav-command-button" data-action="executeNavigationCommand" data-command="current" title="Current - Show current action details">
+                        ${pointerIcon}
+                    </button>
+                    <button class="nav-command-button" data-action="executeNavigationCommand" data-command="next" title="Next - Advance to next action">
+                        ${rightIcon}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
