@@ -1,1 +1,10 @@
-{"version":1,"skills":{}}
+{
+  "version": 1,
+  "skills": {
+    "content-memory": {
+      "source": "agilebydesign/agilebydesign-skills",
+      "sourceType": "github",
+      "computedHash": "22c6d48932ed3710430a10aac560598fbd332b06f057278dd51a2497ec5a4145"
+    }
+  }
+}

@@ -2738,6 +2738,14 @@ window.submitWorkspaceBehaviorInstructions = function() {
             return;
         }
     }
+    // When behavior is expanded and an action is selected: submit action only (sendToChat).
+    // When behavior is collapsed: submit entire behavior.
+    const wsToggle = document.getElementById('ws-behavior-exec-toggle');
+    const isBehaviorExpanded = wsToggle && wsToggle.classList.contains('execution-toggle-container') && wsToggle.classList.contains('expanded');
+    if (isBehaviorExpanded && action) {
+        vscode.postMessage({ command: 'sendToChat' });
+        return;
+    }
     vscode.postMessage({ command: 'submitWorkspaceBehaviorInstructions', behavior: behavior });
 };
 

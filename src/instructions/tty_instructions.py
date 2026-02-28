@@ -1,4 +1,4 @@
-﻿    
+    
 from cli.adapters import TTYAdapter
 from instructions.instructions import Instructions
 
@@ -158,6 +158,11 @@ class TTYInstructions(TTYAdapter):
                             output_lines.append(f"{self.add_bold(f'{criteria_key}:')} {question}")
                         else:
                             output_lines.append(self.add_bold(f"{criteria_key}:"))
+                        note = criteria_data.get('note', '')
+                        if note:
+                            output_lines.append(note)
+                        else:
+                            output_lines.append("Select one option.")
                         
                         selected_value = saved_decisions.get(criteria_key) if saved_decisions else None
                         

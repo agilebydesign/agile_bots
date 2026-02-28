@@ -744,6 +744,51 @@ class Bot:
                 'message': f'Error executing {behavior_name}.{action.action_name}: {str(e)}'
             }
     
+    def _append_remaining_actions_when_behavior_manual(
+        self,
+        behavior,
+        behavior_name: str,
+        current_action_name: str,
+        instructions,
+        include_scope: bool = False,
+    ) -> Optional[str]:
+        """When behavior is manual, append all remaining actions (manual + combine_next) so the agent
+        goes through the full workflow. Returns last appended action name, or None if nothing appended."""
+        if self.get_behavior_execute(behavior_name) != 'manual':
+            return None
+        action_names = behavior.action_names
+        try:
+            idx = action_names.index(current_action_name)
+        except ValueError:
+            return None
+        last_appended: Optional[str] = None
+        first_append = True
+        while idx + 1 < len(action_names):
+            next_action_name = action_names[idx + 1]
+            if self.get_execution_mode(behavior_name, next_action_name) == 'skip':
+                idx += 1
+                continue
+            next_action = behavior.actions.find_by_name(next_action_name)
+            if not next_action:
+                break
+            if first_append:
+                instructions._display_content.insert(0, '')
+                instructions._display_content.insert(0, '**Workflow:** Perform the following actions in sequence.')
+                first_append = False
+            next_instructions = next_action.get_instructions(None, include_scope=False)
+            next_intro = '**Next:** Perform the following action.'
+            if next_action_name == 'validate':
+                next_intro += ' Fix any errors found in the Violation.'
+            instructions.add_display('', '---', f'## Next action: {next_action_name}', next_intro, '')
+            from instructions.markdown_instructions import MarkdownInstructions
+            action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
+            action_only_lines = action_only_md.serialize().split('\n')
+            for line in action_only_lines:
+                instructions.add_display(line)
+            last_appended = next_action_name
+            idx += 1
+        return last_appended
+
     def _append_next_action_instructions_if_combine_next(
         self,
         behavior,
@@ -1330,6 +1375,11 @@ class Bot:
             current_behavior, current_behavior.name, current_action_name, action, instructions,
             context=None, include_scope=True
         )
+        if last_appended is None and not at_action_level:
+            last_appended = self._append_remaining_actions_when_behavior_manual(
+                current_behavior, current_behavior.name, current_action_name, instructions,
+                include_scope=True
+            )
         if not at_action_level:
             self._append_next_behavior_instructions_if_combine_with_next(
                 current_behavior, instructions, first_append=(last_appended is None)
