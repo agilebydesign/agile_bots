@@ -6,12 +6,17 @@ from scanners.violation import Violation
 from .vocabulary_helper import VocabularyHelper
 
 class ResourceOrientedDesignScanner(DomainScanner):
-    
+    """Domain resource nouns that are standard terms, not agent nouns (e.g. Voucher = coupon, not 'one who vouches')."""
+    DOMAIN_RESOURCE_EXCEPTIONS = frozenset({'voucher'})
+
     def scan_domain_concept(self, node: DomainConceptNode) -> List[Dict[str, Any]]:
         violations = []
-        
+
+        if node.name.lower() in self.DOMAIN_RESOURCE_EXCEPTIONS:
+            return violations
+
         is_agent, base_verb, suffix = VocabularyHelper.is_agent_noun(node.name)
-        
+
         if is_agent:
             suggested_name = node.name[:-len(suffix)]
             if not suggested_name:
@@ -27,9 +32,5 @@ class ResourceOrientedDesignScanner(DomainScanner):
                 ).to_dict()
             )
         
-        return violations
-
-        return violations
-
         return violations
 

@@ -147,120 +147,96 @@ class StoryGraphManager {
      * @returns {boolean} false - handles own async flow with optimistic updates
      */
     static async renameNode(message, botPanel) {
-        if (!message.nodePath || !message.currentName) {
-            return false;
-        }
-
-        Logger.log(`[StoryGraphManager] ========== RENAME OPERATION RECEIVED ==========`);
-        Logger.log(`[StoryGraphManager] [RENAME] Received renameNode message`, {
+        Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
+        Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Received renameNode message`, {
             nodePath: message.nodePath,
             currentName: message.currentName,
             timestamp: new Date().toISOString()
         });
+        if (message.nodePath && message.currentName) {
 
-        Logger.log(`[StoryGraphManager] [RENAME] Prompting user for new name`);
-        
-        const newName = await vscode.window.showInputBox({
+            Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Prompting user for new name`);
+            vscode.window.showInputBox({
             prompt: `Rename "${message.currentName}"`,
             value: message.currentName,
             placeHolder: 'Enter new name'
-        });
-
-        Logger.log(`[StoryGraphManager] [RENAME] User provided new name`, {
-            newName: newName,
-            currentName: message.currentName,
-            changed: newName && newName !== message.currentName
-        });
-
-        if (!newName || newName === message.currentName) {
-            return false;
-        }
-
-        const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
-        const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-        const command = `${message.nodePath}.rename name:"${escapedName}"`;
-        
-        Logger.log(`[StoryGraphManager] [RENAME] Built rename command: ${command}`);
-
-        // Send optimistic update to webview
-        Logger.log(`[StoryGraphManager] [RENAME] Sending optimistic update to webview`);
-        botPanel._panel.webview.postMessage({
-            command: 'optimisticRename',
-            nodePath: message.nodePath,
-            oldName: message.currentName,
-            newName: trimmedName
-        });
-
-        const logPath = path.join(botPanel._workspaceRoot, 'story_graph_operations.log');
-        const timestamp = new Date().toISOString();
-        const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
-
-        try {
-            fs.appendFileSync(logPath, logEntry);
-        } catch (err) {
-            Logger.log(`[StoryGraphManager] Failed to write to log file: ${err.message}`);
-        }
-
-        // Execute rename command
-        Logger.log(`[StoryGraphManager] [RENAME] Executing rename command via backend (optimistic)...`);
-        
-        try {
-            const result = await botPanel._botView?.execute(command);
-            
-            Logger.log(`[StoryGraphManager] [RENAME] [SUCCESS] Backend rename executed successfully`);
-            Logger.log(`[StoryGraphManager] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
-
-            const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
-            try {
-                fs.appendFileSync(logPath, resultLog);
-            } catch (err) {
-                Logger.log(`[StoryGraphManager] Failed to write result to log file: ${err.message}`);
-            }
-
-            // Notify webview of success
-            botPanel._panel.webview.postMessage({
-                command: 'saveCompleted',
-                success: true,
-                result: result
+            }).then((newName) => {
+            Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] User provided new name`, {
+                newName: newName,
+                currentName: message.currentName,
+                changed: newName && newName !== message.currentName
             });
+            if (newName && newName !== message.currentName) {
 
-            Logger.log(`[StoryGraphManager] [RENAME] Optimistic update - skipping panel refresh`);
-            Logger.log(`[StoryGraphManager] ========== RENAME OPERATION COMPLETE ==========`);
-            
-            return false; // Don't trigger update - optimistic updates handled
-            
-        } catch (error) {
-            Logger.log(`[StoryGraphManager] [RENAME] [ERROR] Rename failed`);
-            Logger.log(`[StoryGraphManager] [RENAME] [ERROR] Error: ${error.message}`);
-            Logger.log(`[StoryGraphManager] [RENAME] [ERROR] Stack: ${error.stack}`);
+                const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
 
-            // Notify webview of failure (triggers rollback)
-            botPanel._panel.webview.postMessage({
-                command: 'saveCompleted',
-                success: false,
-                error: error.message
+                const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+                const command = `${message.nodePath}.rename name:"${escapedName}"`;
+                Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Built rename command: ${command}`);
+                
+
+                Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Sending optimistic update to webview`);
+                botPanel._panel.webview.postMessage({
+                    command: 'optimisticRename',
+                    nodePath: message.nodePath,
+                    oldName: message.currentName,
+                    newName: trimmedName
+                });
+                                
+                const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
+                
+                Logger.logStoryGraphOperations(logEntry);
+                
+
+                Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Executing rename command via backend (optimistic)...`);
+                botPanel._botView?.execute(command)
+                .then((result) => {
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [SUCCESS] Backend rename executed successfully`);
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
+                    
+
+                    const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
+                    Logger.logStoryGraphOperations(resultLog);
+                    
+
+                    botPanel._panel.webview.postMessage({
+                        command: 'saveCompleted',
+                        success: true,
+                        result: result
+                    });
+                    
+
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Optimistic update - skipping panel refresh`);
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION COMPLETE ==========`);
+                })
+                .catch((error) => {
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Rename failed`);
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Error: ${error.message}`);
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Stack: ${error.stack}`);
+                    
+
+                    botPanel._panel.webview.postMessage({
+                        command: 'saveCompleted',
+                        success: false,
+                        error: error.message
+                    });
+                    
+
+                    const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
+                    Logger.logStoryGraphOperations(errorLog);
+                    
+                    vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);                    
+
+                    Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Refreshing panel after error...`);
+                    botPanel._update().catch(err => {
+                        Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
+                    });
+                });
+            }
             });
-
-            const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
-            try {
-                fs.appendFileSync(logPath, errorLog);
-            } catch (err) {
-                Logger.log(`[StoryGraphManager] Failed to write error to log file: ${err.message}`);
-            }
-
-            vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
-
-            // Refresh panel after error to restore correct state
-            Logger.log(`[StoryGraphManager] [RENAME] [ERROR] Refreshing panel after error...`);
-            try {
-                await botPanel._update();
-            } catch (err) {
-                Logger.log(`[StoryGraphManager] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
-            }
-
-            return false;
         }
     }
+ 
 }
 
 module.exports = StoryGraphManager;

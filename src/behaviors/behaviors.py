@@ -241,7 +241,7 @@ class Behaviors:
         if self.current is None or self.bot_paths is None:
             return
         workspace_dir = self.bot_paths.workspace_directory
-        state_file = workspace_dir / 'behavior_action_state.json'
+        state_file = workspace_dir / 'logs' / 'behavior_action_state.json'
         state_data = {}
         if state_file.exists():
             try:
@@ -310,7 +310,7 @@ class Behaviors:
             self._init_to_first_behavior()
             return
         workspace_dir = self.bot_paths.workspace_directory
-        state_file = workspace_dir / 'behavior_action_state.json'
+        state_file = workspace_dir / 'logs' / 'behavior_action_state.json'
         if not state_file.exists() or not self._behaviors:
             self._init_to_first_behavior()
             return
@@ -338,7 +338,7 @@ class Behaviors:
         if behavior_obj is None:
             raise ValueError(f"Behavior '{confirmed_behavior}' not found. Available behaviors: {', '.join(self.names)}.")
         workspace_dir = self.bot_paths.workspace_directory
-        state_file = workspace_dir / 'behavior_action_state.json'
+        state_file = workspace_dir / 'logs' / 'behavior_action_state.json'
         action_names = behavior_obj.actions.names
         first_action = action_names[0] if action_names else 'clarify'
         self.navigate_to(confirmed_behavior)

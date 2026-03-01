@@ -55,6 +55,7 @@
         "next_action": "validate",
         "instructions": [
           "write test files (.py, .js, etc.) with executable test code based on the scenarios you have made within the story-graph.json file",
+          "Each epic, sub_epic, and story has an optional notes field. When examining content and generating the story graph, place any knowledge that does not fit into <what we are building> (e.g., scenarios, acceptance criteria, detailed flows) into notes using plain English. This helps humans verify you are putting context in the right part of the story map before rendering it in detail in later stages.",
           "After writing test files, update story-graph.json with further test_file, test_class, and test_method mapping changes you have made",
           "| Field | Level | Format | Example |",
           "|-------|-------|--------|---------|",

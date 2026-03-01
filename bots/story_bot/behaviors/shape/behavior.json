@@ -32,6 +32,7 @@
         "instructions": [
           "shape: build story map structure",
           "Apply story shaping rules (context: 'when shaping stories') for story structure",
+          "Each epic, sub_epic, and story has an optional notes field. When examining content and generating the story graph, place any knowledge that does not fit into <what we are building> (e.g., scenarios, acceptance criteria, detailed flows) into notes using plain English. This helps humans verify you are putting context in the right part of the story map before rendering it in detail in later stages.",
           "",
           "**STORY GRAPH UPDATE STRATEGY (use when story-graph.json already exists):**",
           "",

@@ -11,7 +11,7 @@ class ActionStateManager:
 
     def get_state_file_path(self) -> Path:
         workspace_dir = self.behavior.bot_paths.workspace_directory
-        return workspace_dir / 'behavior_action_state.json'
+        return workspace_dir / 'logs' / 'behavior_action_state.json'
 
     def load_or_create_state(self, state_file: Path) -> dict:
         expected_behavior = f'{self.behavior.bot_name}.{self.behavior.name}'
@@ -50,7 +50,7 @@ class ActionStateManager:
         current_index_ref[0] = None
 
     def _load_state_data(self) -> Optional[dict]:
-        state_file = self.behavior.bot_paths.workspace_directory / 'behavior_action_state.json'
+        state_file = self.behavior.bot_paths.workspace_directory / 'logs' / 'behavior_action_state.json'
         if not state_file.exists():
             return None
         try:

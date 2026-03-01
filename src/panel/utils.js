@@ -109,7 +109,7 @@ class Logger {
 
     /**
      * Log message with timestamp to both console and debug file.
-     * Writes to panel-debug.log in the current working directory.
+     * Writes to panel-debug.log
      * 
      * @param {string} msg - Message to log
      */
@@ -144,8 +144,25 @@ class Logger {
     }
 
     /**
-     * Logs messages to scope_debug.log with timestamp. 
-     * Used for logging detailed information about scope changes and updates for debugging.
+     * Logs message to story_graph_operations.log with timestamp.      
+     * @param {string} msg 
+     */
+    static logStoryGraphOperations(msg) {
+        try {
+            const logDir = Logger.logFolder;
+            if (logDir) {
+                fs.mkdirSync(logDir, { recursive: true });
+                const logPath = path.join(logDir, 'story_graph_operations.log');
+                const timestamp = new Date().toISOString();
+                fs.appendFileSync(logPath, `[${timestamp}] ${msg}\n`);
+            }
+        } catch (e) {
+            // Silently ignore (dir creation failed, permissions, etc.)
+        }
+    }
+
+    /**
+     * Logs messages to scope_debug.log with timestamp.      
      * @param {string} msg 
      */
     static logScopeDebug(msg) {

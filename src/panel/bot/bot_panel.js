@@ -749,11 +749,6 @@ class BotPanel {
               const isMoveOp = message.commandText.includes('.move_to');
               const isRenameOp = message.commandText.includes('.rename');
               const isStoryGraphOp = isCreateOp || isDeleteOp || isMoveOp || isRenameOp;
-              
-
-
-
-              
 
               const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
                 message.commandText.includes('submit_instructions') ||
@@ -773,16 +768,10 @@ class BotPanel {
                 isCreateOp,
                 isDeleteOp
               });
-              
-              const logPath = path.join(this._workspaceRoot, 'story_graph_operations.log');
-              const timestamp = new Date().toISOString();
+                            
               const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RECEIVED COMMAND: ${message.commandText}\n`;
+              Logger.logStoryGraphOperations(logEntry);
               
-              try {
-                fs.appendFileSync(logPath, logEntry);
-              } catch (err) {
-                this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
-              }
               
               this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 5] Executing command via backend...`);
               const isIncrementCmd = message.commandText.includes('_increment') || message.commandText.includes('add_increment') || message.commandText.includes('rename_story_in');

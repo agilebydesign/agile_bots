@@ -1,11 +1,21 @@
 
 from abc import abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, TYPE_CHECKING
 from scanners.scanner import Scanner
 from scanners.story_map import StoryMap
 from scanners.domain_concept_node import DomainConceptNode
 
+if TYPE_CHECKING:
+    from scanners.resources.scan_context import ScanFilesContext
+
 class DomainScanner(Scanner):
+    
+    def scan_with_context(self, context: 'ScanFilesContext') -> List[Dict[str, Any]]:
+        """Delegate to scan() using story_graph from context."""
+        story_graph = getattr(context, 'story_graph', None) or getattr(context, 'full_story_graph')
+        if story_graph:
+            return self.scan(story_graph=story_graph)
+        return []
     
     def scan(
         self, 
@@ -25,8 +35,7 @@ class DomainScanner(Scanner):
             epic_violations = self._scan_domain_concepts(
                 epic.data.get('domain_concepts', []),
                 epic.epic_idx,
-                None,
-                self.rule
+                None
             )
             violations.extend(epic_violations)
             
@@ -35,8 +44,7 @@ class DomainScanner(Scanner):
                     sub_epic_violations = self._scan_domain_concepts(
                         node.data.get('domain_concepts', []),
                         epic.epic_idx,
-                        getattr(node, 'sub_epic_path', None),
-                        self.rule
+                        getattr(node, 'sub_epic_path', None)
                     )
                     violations.extend(sub_epic_violations)
         

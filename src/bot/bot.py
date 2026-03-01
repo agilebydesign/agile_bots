@@ -873,7 +873,7 @@ class Bot:
     def get_execution_mode(self, behavior_name: str, action_name: str) -> str:
 
 
-        path = self.workspace_directory / 'execution_settings.json'
+        path = self.workspace_directory / 'logs' / 'execution_settings.json'
         if not path.exists():
             return 'manual'
         try:
@@ -887,7 +887,7 @@ class Bot:
     def set_action_execution(self, behavior_name: str, action_name: str, mode: str) -> Dict[str, Any]:
 
 
-        path = self.workspace_directory / 'execution_settings.json'
+        path = self.workspace_directory / 'logs' / 'execution_settings.json'
         data = {}
         if path.exists():
             try:
@@ -904,7 +904,7 @@ class Bot:
         return f"{self.bot_name}._behavior.{behavior_name}"
 
     def get_behavior_execute(self, behavior_name: str) -> str:
-        path = self.workspace_directory / 'execution_settings.json'
+        path = self.workspace_directory / 'logs' / 'execution_settings.json'
         if not path.exists():
             return 'manual'
         try:
@@ -918,7 +918,7 @@ class Bot:
     def set_behavior_execute(self, behavior_name: str, mode: str) -> Dict[str, Any]:
         if mode not in ('combine_with_next', 'skip', 'manual'):
             raise ValueError(f"Invalid behavior execution mode: {mode}. Use combine_with_next, skip, or manual.")
-        path = self.workspace_directory / 'execution_settings.json'
+        path = self.workspace_directory / 'logs' / 'execution_settings.json'
         data = {}
         if path.exists():
             try:
@@ -934,7 +934,7 @@ class Bot:
     def get_execution_settings(self) -> Dict[str, str]:
 
 
-        path = self.workspace_directory / 'execution_settings.json'
+        path = self.workspace_directory / 'logs' / 'execution_settings.json'
         if not path.exists():
             return {}
         try:
@@ -1208,6 +1208,8 @@ class Bot:
         if not action_name:
             action_name = getattr(instructions, 'action_name', 'unknown')
         
+        self._track_submission(behavior_name, action_name, content_str)
+        
         return {
             'status': 'success',
             'message': f'Instructions submitted for {behavior_name}.{action_name}',
@@ -1220,6 +1222,16 @@ class Bot:
             'instructions': content_str
         }
     
+    def _track_submission(self, behavior_name: str, action_name: str, content: str) -> None:
+        try:
+            from actions.activity_tracker import ActivityTracker, ActionState
+            tracker = ActivityTracker(self.bot_paths, self.name)
+            state = ActionState(self.name, behavior_name, action_name)
+            tracker.track_generated(state, content, artifact='instructions')
+            tracker.track_submission(state, content)
+        except Exception:
+            pass
+
     def _first_non_skip_action(self, behavior_name: str) -> Optional[str]:
         """Return the first workflow action in the behavior that is not set to skip. Used when behavior is collapsed (behavior-level, not action-level). Excludes non-workflow actions (e.g. rules)."""
         behavior = self.behaviors.find_by_name(behavior_name)
