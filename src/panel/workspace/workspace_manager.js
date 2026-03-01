@@ -1,6 +1,6 @@
 const vscode = require("vscode");
 const { Logger } = require("../utils");
-const BotPanel = require("../bot_panel");
+const BotPanel = require("../bot/bot_panel");
 
 /**
  * WorkspaceManager handles routing of workspace-related messages from the webview client to the appropriate views
@@ -16,6 +16,22 @@ class WorkspaceManager {
         vscode.window.showErrorMessage(`Failed to ${operation}: ${error.message}`);
     }
 
+    static async executeCliCommand(command, botPanel, operationDescription) {
+        Logger.log(`[WorkspaceManager] Executing CLI command: ${command}`);
+        return botPanel._sharedCLI.execute(command)
+            .then((result) => {
+                if (result.status === 'error') {
+                    throw new Error(`CLI error: ${result.message}`);
+                }
+                Logger.log(`[WorkspaceManager] ${operationDescription} result: ` + JSON.stringify(result));
+                return true;
+            })
+            .catch((error) => {
+                WorkspaceManager.handleError(error, operationDescription);
+                return false;
+            });
+    }
+
      /**
      * 
      * @param {Webview.message} message 
@@ -28,22 +44,11 @@ class WorkspaceManager {
             return false;
         }
 
-        const botName = message.botName;
-
-        Logger.log(`[BotHeaderView] Executing bot command: bot ${botName}`);
-        await botPanel._sharedCLI.execute(`bot ${botName}`)
-        .then((result) => {
-            Logger.log('[WorkspaceManager] switchBot result: ' + JSON.stringify(result));            
-            return true;
-        })
-        .catch((error) => {
-            WorkspaceManager.handleError(error, 'switch bot');
-        });                    
-        return false;
+        const botName = message.botName;        
+        return WorkspaceManager.executeCliCommand(`bot ${botName}`, botPanel, 'switch bot');                           
     }
-    
+
     /**
-     * 
      * @param {Webview.message} message 
      * @param {BotPanel} botPanel 
      * @returns 
@@ -55,19 +60,8 @@ class WorkspaceManager {
             return false;
         }
 
-        const workspacePath = message.workspacePath;
-        Logger.log(`[BotHeaderView] Executing workspace command: workspace ${workspacePath}`);
-        
-        await botPanel._sharedCLI.execute(`workspace ${workspacePath}`)
-        .then((result) => {
-            Logger.log('[WorkspaceManager] updateWorkspace result: ' + JSON.stringify(result));
-            botPanel._workspaceRoot = message.workspacePath;
-            return true;
-        })
-        .catch((error) => {
-            WorkspaceManager.handleError(error, 'update workspace');
-        });                    
-        return false;
+        const workspacePath = message.workspacePath;        
+        return this.executeCliCommand(`workspace ${workspacePath}`, botPanel, 'update workspace');                           
     }
 
     /**
@@ -90,16 +84,13 @@ class WorkspaceManager {
                     command: 'setWorkspacePath',
                     path: folderPath
                 });
-                if (await WorkspaceManager.updateWorkspace({ workspacePath: folderPath }, botPanel)) {
-                    return true;
-                }
-                return false;            
+                return WorkspaceManager.updateWorkspace({ workspacePath: folderPath }, botPanel);
             }
         })            
         .catch((error) => {
             WorkspaceManager.handleError(error, 'browse/update workspace');
-        });;
-        return false;
+            return false;
+        });;        
     }   
 }
 

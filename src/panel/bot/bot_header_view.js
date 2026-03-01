@@ -6,10 +6,10 @@
  * Story: Open Panel, Display Session Status, Switch Bot
  */
 
-const PanelView = require('./panel_view');
-const branding = require('./branding');
+const PanelView = require('../panel_view');
+const branding = require('../branding');
 const fs = require('fs');
-const { escapeForHtml, truncatePath, Logger } = require('./utils');
+const { escapeForHtml, truncatePath, Logger } = require('../utils');
 
 class BotHeaderView extends PanelView {
     /**

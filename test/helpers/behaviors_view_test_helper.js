@@ -19,11 +19,11 @@ class BehaviorsViewTestHelper {
         
         // Create mock parentView like BotView does in production
         // BotView sets this.botData = await this.execute('status') where execute() unwraps {bot: {...}}
-        const BotView = require('../../src/panel/bot_view');
+        const BotView = require('../../src/panel/bot/bot_view');
         this._parentView = new BotView(this._cli);
         
         // Create view with parentView, like production: new BehaviorsView(botPathOrCli, webview, extensionUri, this)
-        const BehaviorsView = require('../../src/panel/behaviors_view');
+        const BehaviorsView = require('../../src/panel/behaviors/behaviors_view');
         this.workspaceDir = workspaceDir;
         this._view = new BehaviorsView(this._cli, null, this.createMockExtensionUri(), this._parentView);
     }

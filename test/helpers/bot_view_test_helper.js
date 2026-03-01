@@ -50,7 +50,7 @@ class BotViewTestHelper {
      * Create BotView instance - uses the helper's shared CLI
      */
     createBotView(webview = null, extensionUri = null) {
-        const BotView = require('../../src/panel/bot_view');
+        const BotView = require('../../src/panel/bot/bot_view');
         return new BotView(
             this._cli,  // Use helper's CLI instance
             null,       // panelVersion

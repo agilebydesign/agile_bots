@@ -6,15 +6,15 @@
  * Story: Open Panel, Display Session Status
  */
 
-const PanelView = require('./panel_view');
+const PanelView = require('../panel_view');
 const BotHeaderView = require('./bot_header_view');
-const BehaviorsView = require('./behaviors_view');
-const StoryMapView = require('./story_map_view');
-const InstructionsSection = require('./instructions_view');
-const WorkspaceSectionView = require('./workspace_section_view');
+const BehaviorsView = require('../behaviors/behaviors_view');
+const StoryMapView = require('../story_map_view');
+const InstructionsSection = require('../instructions_view');
+const WorkspaceSectionView = require('../workspace_section_view');
 const fs = require('fs');
 const path = require('path');
-const { Logger } = require('./utils');
+const { Logger } = require('../utils');
 
 function log(msg) {
     Logger.log(msg);
