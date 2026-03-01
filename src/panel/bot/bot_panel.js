@@ -190,10 +190,7 @@ class BotPanel {
             return;
           case "switchViewMode":
             StoryGraphManager.switchViewMode(message, this)
-              .then((result) => {
-                  if (result) return this._update();
-              });
-            return;
+              return this._update();            
           case "logToFile":
             if (message.message) {
               Logger.logPanelClicks(message.message);
@@ -2013,6 +2010,7 @@ class BotPanel {
     const behaviorsClientPath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors_client.js');
     const behaviorsStylePath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors.css');
     const storyGraphClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph_client.js');
+    const storyMapClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_map_client.js');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
@@ -2020,6 +2018,7 @@ class BotPanel {
     const behaviorsClientUri = webview.asWebviewUri(behaviorsClientPath);
     const behaviorsStyleUri = webview.asWebviewUri(behaviorsStylePath);
     const storyGraphClientUri = webview.asWebviewUri(storyGraphClientPath);
+    const storyMapClientUri = webview.asWebviewUri(storyMapClientPath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2091,6 +2090,7 @@ class BotPanel {
           <script nonce="${nonce}" src="${workspaceClientUri}"></script>
           <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
           <script nonce="${nonce}" src="${storyGraphClientUri}"></script>
+          <script nonce="${nonce}" src="${storyMapClientUri}"></script>
       </body>
       </html>`;
   }

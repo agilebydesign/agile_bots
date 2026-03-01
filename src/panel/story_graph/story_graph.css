@@ -1,0 +1,71 @@
+/* Story Graph styles - extracted from bot_panel.css */
+
+/* Story node base styles */
+.story-node {
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 150ms ease;
+}
+
+.story-node:hover {
+    background-color: rgba(var(--brand-color-rgb, 255, 140, 0), 0.15);
+}
+
+.story-node.selected {
+    background-color: rgba(var(--brand-color-rgb, 255, 140, 0), 0.35);
+}
+
+/* Increment column styles */
+.increment-column-container.selected {
+    background-color: rgba(var(--brand-color-rgb, 255, 140, 0), 0.2);
+    border-top: 2px solid var(--accent-color);
+}
+
+/* Save status indicator styles */
+.save-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: var(--input-border-width, 1px) solid var(--accent-color);
+    border-radius: var(--input-border-radius, 4px);
+    background-color: rgba(255, 140, 0, 0.1);
+    color: var(--text-color);
+    font-size: var(--font-size-sm, 12px);
+    transition: opacity 0.3s, background-color 150ms ease;
+    white-space: nowrap;
+}
+
+.save-status.saving,
+.save-status.refreshing {
+    background-color: rgba(255, 140, 0, 0.15);
+    border-color: var(--accent-color);
+}
+
+.save-status.success {
+    background-color: rgba(255, 140, 0, 0.1);
+    border-color: var(--accent-color);
+    color: #ff8c00;
+}
+
+.save-status.success #save-status-message {
+    color: #ff8c00;
+}
+
+.save-status.error {
+    background-color: rgba(255, 140, 0, 0.15);
+    border-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.save-status.error:hover {
+    background-color: rgba(255, 140, 0, 0.2);
+}
+
+.save-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    font-size: 16px;
+    line-height: 1;
+}
