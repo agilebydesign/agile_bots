@@ -190,9 +190,6 @@ class BehaviorsView extends PanelView {
         const behaviorNameRaw = behavior.name || '';
         const behaviorName = escapeForHtml(behaviorNameRaw);
         const behaviorNameJs = escapeForJs(behaviorNameRaw);
-        
-
-
 
         const hasExpansionState = this.expansionState && (behaviorId in this.expansionState);
         const behaviorExpanded = hasExpansionState ? this.expansionState[behaviorId] : (isCurrent || isCompleted || isCurrentBehavior);

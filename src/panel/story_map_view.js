@@ -10,6 +10,7 @@
  *   - Edit Story Graph In Panel
  */
 
+const vscode = require('vscode');
 const PanelView = require('./panel_view');
 const StoryGraphAsyncSaveController = require('./story_graph/async_save_controller.js');
 const branding = require('./branding');
@@ -140,66 +141,20 @@ class StoryMapView extends PanelView {
         const drawioLink = (scopeData.graphLinks || []).find(l => l.url && l.url.endsWith('.drawio'));
         const drawioPath = drawioLink ? escapeForJs(drawioLink.url) : '';
         
-        // Create contextual action buttons toolbar
-        const actionButtonsHtml = `
-            <div id="contextual-actions" style="display: flex; align-items: center; margin-left: 12px; margin-right: 12px; gap: 6px;">
-                <!-- Left side: Create, delete, scope, and submit buttons -->
-                <div style="display: flex; align-items: center; gap: 6px;">
-                <!-- Create and delete buttons with tight spacing -->
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <button id="btn-create-epic" onclick="event.stopPropagation(); createEpic();" style="display: block; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Epic">
-                        <img src="${addEpicIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Epic" />
-                    </button>
-                    <button id="btn-create-sub-epic" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Sub-Epic">
-                        <img src="${addSubEpicIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Sub-Epic" />
-                    </button>
-                    <button id="btn-create-story" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Story">
-                        <img src="${addStoryIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Story" />
-                    </button>
-                    <button id="btn-create-scenario" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Scenario">
-                        <img src="${addTestsIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Scenario" />
-                    </button>
-                    <button id="btn-create-acceptance-criteria" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Create Acceptance Criteria">
-                        <img src="${addAcceptanceCriteriaIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Create Acceptance Criteria" />
-                    </button>
-                    <button id="btn-delete" onclick="event.stopPropagation(); handleDelete();" style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Delete (including children)">
-                        <img src="${deleteIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Delete" />
-                    </button>
-                </div>
-                
-                </div>
-                
-                <!-- Right side: Submit button group -->
-                <div id="btn-related-files-group" style="display: flex; align-items: center; gap: 2px; margin-left: auto;">
-                    <button id="btn-submit" 
-                            onclick="event.stopPropagation(); handleSubmit();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title=""
-                            data-shape-icon="${submitShapeIconPath}"
-                            data-exploration-icon="${submitExploreIconPath}"
-                            data-scenarios-icon="${submitScenarioIconPath}"
-                            data-tests-icon="${submitTestIconPath}"
-                            data-code-icon="${submitCodeIconPath}">
-                        <img id="btn-submit-icon" src="${submitShapeIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit" />
-                    </button>
-                    <button id="btn-submit-alt" 
-                            onclick="event.stopPropagation(); handleSubmitAlt();" 
-                            style="display: none; background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" 
-                            onmouseover="this.style.opacity='0.7'" 
-                            onmouseout="this.style.opacity='1'" 
-                            title=""
-                            data-shape-icon="${submitShapeIconPath}"
-                            data-exploration-icon="${submitExploreIconPath}"
-                            data-scenarios-icon="${submitScenarioIconPath}"
-                            data-tests-icon="${submitTestIconPath}"
-                            data-code-icon="${submitCodeIconPath}">
-                        <img id="btn-submit-alt-icon" src="${submitScenarioIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block; flex-shrink: 0;" alt="Submit Alt" />
-                    </button>
-                </div>
-            </div>
-        `;
+        // Create contextual action buttons toolbar (load from template)
+        const actionButtonsHtmlPath = vscode.Uri.joinPath(this.extensionUri, 'story_graph', 'action_buttons.html');
+        const actionButtonsHtml = fs.readFileSync(actionButtonsHtmlPath.fsPath, 'utf-8')
+            .replace(/\${addEpicIconPath}/g, addEpicIconPath)
+            .replace(/\${addSubEpicIconPath}/g, addSubEpicIconPath)
+            .replace(/\${addStoryIconPath}/g, addStoryIconPath)
+            .replace(/\${addTestsIconPath}/g, addTestsIconPath)
+            .replace(/\${addAcceptanceCriteriaIconPath}/g, addAcceptanceCriteriaIconPath)
+            .replace(/\${deleteIconPath}/g, deleteIconPath)
+            .replace(/\${submitShapeIconPath}/g, submitShapeIconPath)
+            .replace(/\${submitExploreIconPath}/g, submitExploreIconPath)
+            .replace(/\${submitScenarioIconPath}/g, submitScenarioIconPath)
+            .replace(/\${submitTestIconPath}/g, submitTestIconPath)
+            .replace(/\${submitCodeIconPath}/g, submitCodeIconPath);
         
         
         // ===== PERFORMANCE: Content rendering =====
@@ -757,15 +712,6 @@ class StoryMapView extends PanelView {
         }
         throw new Error(`Unknown event type: ${eventType}`);
     }
-}
-
-function getNonce() {
-	let text = '';
-	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	for (let i = 0; i < 32; i++) {
-		text += possible.charAt(Math.floor(Math.random() * possible.length));
-	}
-	return text;
 }
 
 module.exports = StoryMapView;

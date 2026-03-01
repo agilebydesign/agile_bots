@@ -183,7 +183,7 @@ class StoryGraphManager {
                     newName: trimmedName
                 });
                                 
-                const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
+                const logEntry = `\n${'='.repeat(80)}\n[RENAME COMMAND: ${command}\n`;
                 
                 Logger.logStoryGraphOperations(logEntry);
                 
@@ -195,7 +195,7 @@ class StoryGraphManager {
                     Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
                     
 
-                    const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
+                    const resultLog = `[ RESULT: ${JSON.stringify(result, null, 2)}\n`;
                     Logger.logStoryGraphOperations(resultLog);
                     
 
@@ -222,7 +222,7 @@ class StoryGraphManager {
                     });
                     
 
-                    const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
+                    const errorLog = `[ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
                     Logger.logStoryGraphOperations(errorLog);
                     
                     vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);                    

@@ -1,0 +1,55 @@
+<!-- Action Buttons Toolbar - Contextual story graph actions -->
+<div id="contextual-actions" class="action-buttons-toolbar">
+    <!-- Left side: Create, delete, scope, and submit buttons -->
+    <div class="action-buttons-group">
+        <!-- Create and delete buttons with tight spacing -->
+        <div class="action-buttons-tight">
+            <button id="btn-create-epic" class="action-button" onclick="event.stopPropagation(); createEpic();" title="Create Epic">
+                <img src="${addEpicIconPath}" class="action-button-icon" alt="Create Epic" />
+            </button>
+            <button id="btn-create-sub-epic" class="action-button" onclick="event.stopPropagation(); handleContextualCreate('sub-epic');" style="display: none;" title="Create Sub-Epic">
+                <img src="${addSubEpicIconPath}" class="action-button-icon" alt="Create Sub-Epic" />
+            </button>
+            <button id="btn-create-story" class="action-button" onclick="event.stopPropagation(); handleContextualCreate('story');" style="display: none;" title="Create Story">
+                <img src="${addStoryIconPath}" class="action-button-icon" alt="Create Story" />
+            </button>
+            <button id="btn-create-scenario" class="action-button" onclick="event.stopPropagation(); handleContextualCreate('scenario');" style="display: none;" title="Create Scenario">
+                <img src="${addTestsIconPath}" class="action-button-icon" alt="Create Scenario" />
+            </button>
+            <button id="btn-create-acceptance-criteria" class="action-button" onclick="event.stopPropagation(); handleContextualCreate('acceptance-criteria');" style="display: none;" title="Create Acceptance Criteria">
+                <img src="${addAcceptanceCriteriaIconPath}" class="action-button-icon" alt="Create Acceptance Criteria" />
+            </button>
+            <button id="btn-delete" class="action-button" onclick="event.stopPropagation(); handleDelete();" style="display: none;" title="Delete (including children)">
+                <img src="${deleteIconPath}" class="action-button-icon" alt="Delete" />
+            </button>
+        </div>
+    </div>
+    
+    <!-- Right side: Submit button group -->
+    <div id="btn-related-files-group" class="action-buttons-submit-group">
+        <button id="btn-submit" 
+                class="action-button"
+                onclick="event.stopPropagation(); handleSubmit();" 
+                style="display: none;" 
+                title=""
+                data-shape-icon="${submitShapeIconPath}"
+                data-exploration-icon="${submitExploreIconPath}"
+                data-scenarios-icon="${submitScenarioIconPath}"
+                data-tests-icon="${submitTestIconPath}"
+                data-code-icon="${submitCodeIconPath}">
+            <img id="btn-submit-icon" src="${submitShapeIconPath}" class="action-button-icon" alt="Submit" />
+        </button>
+        <button id="btn-submit-alt" 
+                class="action-button"
+                onclick="event.stopPropagation(); handleSubmitAlt();" 
+                style="display: none;" 
+                title=""
+                data-shape-icon="${submitShapeIconPath}"
+                data-exploration-icon="${submitExploreIconPath}"
+                data-scenarios-icon="${submitScenarioIconPath}"
+                data-tests-icon="${submitTestIconPath}"
+                data-code-icon="${submitCodeIconPath}">
+            <img id="btn-submit-alt-icon" src="${submitScenarioIconPath}" class="action-button-icon" alt="Submit Alt" />
+        </button>
+    </div>
+</div>
