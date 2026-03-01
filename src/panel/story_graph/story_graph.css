@@ -119,3 +119,318 @@
     display: block;
     flex-shrink: 0;
 }
+
+/* Scope section styles */
+.scope-collapsible-header {
+    cursor: pointer;
+    padding: 4px 5px;
+    background-color: transparent;
+    border-left: none;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.scope-header-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.scope-expand-icon {
+    margin-right: 8px;
+    font-size: 28px;
+    transition: transform 0.15s;
+}
+
+.scope-icon {
+    margin-right: 8px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.scope-title {
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--accent-color);
+}
+
+.scope-header-spacer {
+    flex: 1;
+}
+
+.scope-card-secondary {
+    padding: 2px 4px;
+}
+
+.scope-input-container {
+    margin-bottom: 10px;
+    padding: 6px 8px;
+}
+
+.scope-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 28px;
+}
+
+.scope-filter-label {
+    margin-bottom: 0;
+    padding: 2px 6px 2px 0;
+    border-bottom: none;
+}
+
+.scope-view-modes {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.scope-view-button {
+    display: flex;
+    align-items: center;
+    padding: 2px 6px;
+    line-height: 1.2;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-color-faded);
+    border: none;
+    background: transparent;
+    transition: all 0.15s ease;
+}
+
+.scope-view-button:hover {
+    color: var(--text-color);
+}
+
+.scope-view-button.active {
+    color: var(--text-color, #fff);
+}
+
+.scope-filter-row {
+    border-top: 1px solid var(--accent-color);
+    padding-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.scope-filter-input {
+    padding: 4px 8px;
+    flex: 1;
+}
+
+.scope-filter-button {
+    background: transparent;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    min-width: 28px;
+    min-height: 28px;
+    flex-shrink: 0;
+}
+
+.scope-filter-button:hover {
+    opacity: 0.7;
+}
+
+.scope-filter-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    display: block;
+}
+
+.scope-inject-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    min-height: 28px;
+    border-top: 1px solid var(--accent-color);
+    padding-top: 6px;
+    margin-top: 6px;
+}
+
+.scope-inject-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color, #fff);
+    flex-shrink: 0;
+}
+
+/* Increment view styles */
+.increment-header {
+    padding: 8px 12px 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--text-color-faded, #444);
+}
+
+.increment-header-title {
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0.7;
+}
+
+.increment-filter-hint {
+    font-size: 11px;
+    color: var(--accent-color);
+    margin-left: 8px;
+}
+
+.increment-add-button {
+    font-size: 11px;
+    padding: 2px 8px;
+    cursor: pointer;
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    margin-left: auto;
+}
+
+.increment-columns-wrapper {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    height: 65vh;
+    min-height: 300px;
+}
+
+.unallocated-column {
+    min-width: 140px;
+    max-width: 160px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border-right: 1px solid var(--text-color-faded, #444);
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.unallocated-title {
+    font-size: 11px;
+    font-weight: 600;
+    opacity: 0.6;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.increment-empty-text {
+    font-size: 11px;
+    color: var(--text-color-faded);
+    font-style: italic;
+}
+
+.unallocated-hint {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-color-faded);
+    font-style: italic;
+}
+
+.increment-story-node {
+    display: flex;
+    align-items: flex-start;
+    font-size: 12px;
+    margin-bottom: 4px;
+    gap: 2px;
+    cursor: grab;
+}
+
+.increment-story-name {
+    flex: 1;
+    word-wrap: break-word;
+    min-width: 0;
+    pointer-events: none;
+}
+
+.increment-column-container {
+    min-width: 160px;
+    max-width: 200px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--text-color-faded, #444);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    cursor: pointer;
+    transition: min-width 0.2s, max-width 0.2s;
+}
+
+.increment-column-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--text-color-faded, #555);
+}
+
+.increment-collapse-button {
+    font-size: 9px;
+    padding: 1px 4px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-color-faded);
+    border: none;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.increment-drag-handle {
+    cursor: grab;
+    font-size: 11px;
+    color: var(--text-color-faded);
+    flex-shrink: 0;
+    padding: 0 2px;
+    user-select: none;
+}
+
+.increment-name {
+    flex: 1;
+    font-weight: 600;
+    font-size: 12px;
+    word-wrap: break-word;
+    outline: none;
+    cursor: text;
+    min-width: 0;
+}
+
+.increment-delete-button {
+    font-size: 10px;
+    padding: 1px 5px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-color-faded);
+    border: 1px solid var(--text-color-faded);
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.increment-stories-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.increment-story-remove {
+    font-size: 9px;
+    padding: 0 3px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-color-faded);
+    border: none;
+    flex-shrink: 0;
+    opacity: 0.5;
+    line-height: 1;
+    pointer-events: auto;
+}

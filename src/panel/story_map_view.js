@@ -236,121 +236,31 @@ class StoryMapView extends PanelView {
         }).join('');
         const injectExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 1px; align-items: center;" onclick="event.stopPropagation();">${injectExpandedButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${injectExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const injectToggleGroupHtml = `<span class="execution-toggle-container" id="${injectExecToggleId}" style="flex-shrink: 0;" onclick="event.stopPropagation();">${injectCollapsedBtn}${injectExpandedGroup}</span>`;
-        const result = `
-            <div class="section scope-section card-primary">
-                <div class="collapsible-section ${scopeSectionExpanded ? 'expanded' : ''}">
-                    <div class="collapsible-header" onclick="toggleSection('scope-content')" style="
-                        cursor: pointer;
-                        padding: 4px 5px;
-                        background-color: transparent;
-                        border-left: none;
-                        border-radius: 2px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        user-select: none;
-                    ">
-                        <div style="display: flex; align-items: center; flex: 1;">
-                            <span class="expand-icon" style="margin-right: 8px; font-size: 28px; transition: transform 0.15s;">▸</span>
-                            ${scopeMapIconPath ? `<img src="${scopeMapIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Scope" />` : ''}
-                            <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Scope</span>
-                            <div style="flex: 1;"></div>
-                        </div>
-                    </div>
-                    <div id="scope-content" class="collapsible-content" style="${isIncrementView ? `overflow: visible; display: ${scopeSectionExpanded ? 'block' : 'none'};` : `max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};`}">
-                        <div class="card-secondary" style="padding: 2px 4px;">
-                            <div class="input-container" style="margin-bottom: 10px; padding: 6px 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 28px;">
-                                    <div class="input-header" style="margin-bottom: 0; padding: 2px 6px 2px 0; border-bottom: none;">Filter</div>
-                                    <div style="display: flex; gap: 4px; align-items: center;">
-                                        <button 
-                                            id="btn-view-hierarchy"
-                                            onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
-                                            style="
-                                                display: flex;
-                                                align-items: center;
-                                                padding: 2px 6px;
-                                                line-height: 1.2;
-                                                cursor: pointer;
-                                                font-size: 12px;
-                                                color: ${actualViewMode === 'Hierarchy' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
-                                                border: none;
-                                                background: transparent;
-                                                transition: all 0.15s ease;
-                                            " 
-                                            onmouseover="if('${actualViewMode}' !== 'Hierarchy') this.style.color='var(--text-color)'" 
-                                            onmouseout="if('${actualViewMode}' !== 'Hierarchy') this.style.color='var(--text-color-faded)'"
-                                            title="View story map hierarchy">
-                                            hierarchy
-                                        </button>
-                                        <button 
-                                            id="btn-view-increment"
-                                            onclick="event.stopPropagation(); switchViewMode('Increment');" 
-                                            style="
-                                                display: flex;
-                                                align-items: center;
-                                                padding: 2px 6px;
-                                                line-height: 1.2;
-                                                cursor: pointer;
-                                                font-size: 12px;
-                                                color: ${actualViewMode === 'Increment' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
-                                                border: none;
-                                                background: transparent;
-                                                transition: all 0.15s ease;
-                                            " 
-                                            onmouseover="if('${actualViewMode}' !== 'Increment') this.style.color='var(--text-color)'" 
-                                            onmouseout="if('${actualViewMode}' !== 'Increment') this.style.color='var(--text-color-faded)'"
-                                            title="View by increments">
-                                            increments
-                                        </button>
-                                        <button 
-                                            id="btn-view-files"
-                                            onclick="event.stopPropagation(); switchViewMode('Files');" 
-                                            style="
-                                                display: flex;
-                                                align-items: center;
-                                                padding: 2px 6px;
-                                                line-height: 1.2;
-                                                cursor: pointer;
-                                                font-size: 12px;
-                                                color: ${actualViewMode === 'Files' ? 'var(--text-color, #fff)' : 'var(--text-color-faded)'};
-                                                border: none;
-                                                background: transparent;
-                                                transition: all 0.15s ease;
-                                            " 
-                                            onmouseover="if('${actualViewMode}' !== 'Files') this.style.color='var(--text-color)'" 
-                                            onmouseout="if('${actualViewMode}' !== 'Files') this.style.color='var(--text-color-faded)'"
-                                            title="View file list">
-                                            files
-                                        </button>
-                                    </div>
-                                </div>
-                                <div style="border-top: 1px solid var(--accent-color); padding-top: 6px; display: flex; align-items: center; gap: 4px;">
-                                <input type="text" id="scopeFilterInput" style="padding: 4px 8px; flex: 1;"
-                                    value="${filterValue}" 
-                                    placeholder="Epic or Story name"
-                                    onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
-                                    onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
-                                <button id="btn-scope-to" onclick="event.stopPropagation(); handleScopeTo();" style="display: none; background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Scope to selected node">
-                                    <img src="${scopeToIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Scope To" />
-                                </button>
-                                <button onclick="event.stopPropagation(); showAllScope();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Show all scope">
-                                    <img src="${showAllIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Show All" />
-                                </button>
-                                <button onclick="event.stopPropagation(); clearScopeFilter();" style="background: transparent; border: none; padding: 2px; cursor: pointer; transition: opacity 0.15s ease; min-width: 28px; min-height: 28px; flex-shrink: 0;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Clear scope filter">
-                                    <img src="${clearIconPath}" style="width: 22px; height: 22px; object-fit: contain; display: block;" alt="Clear Filter" />
-                                </button>
-                                </div>
-                                <div class="include-level-controls" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 28px; border-top: 1px solid var(--accent-color); padding-top: 6px; margin-top: 6px;">
-                                <span style="font-size: 12px; font-weight: 600; color: var(--text-color, #fff); flex-shrink: 0;">Inject</span>
-                                ${injectToggleGroupHtml}
-                                </div>
-                            </div>
-                            ${contentHtml}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+        
+        // Load scope section from template
+        const scopeSectionHtmlPath = vscode.Uri.joinPath(this.extensionUri, 'story_graph', 'scope_section.html');
+        const expandedClass = scopeSectionExpanded ? 'expanded' : '';
+        const scopeIconHtml = scopeMapIconPath ? `<img src="${scopeMapIconPath}" class="scope-icon" alt="Scope" />` : '';
+        const contentStyle = isIncrementView 
+            ? `overflow: visible; display: ${scopeSectionExpanded ? 'block' : 'none'};`
+            : `max-height: ${scopeSectionExpanded ? '2000px' : '0px'}; overflow: hidden; transition: max-height 0.3s ease; display: ${scopeSectionExpanded ? 'block' : 'none'};`;
+        const hierarchyActiveClass = actualViewMode === 'Hierarchy' ? 'active' : '';
+        const incrementActiveClass = actualViewMode === 'Increment' ? 'active' : '';
+        const filesActiveClass = actualViewMode === 'Files' ? 'active' : '';
+        
+        const result = fs.readFileSync(scopeSectionHtmlPath.fsPath, 'utf-8')
+            .replace(/\${expandedClass}/g, expandedClass)
+            .replace(/\${scopeIconHtml}/g, scopeIconHtml)
+            .replace(/\${contentStyle}/g, contentStyle)
+            .replace(/\${hierarchyActiveClass}/g, hierarchyActiveClass)
+            .replace(/\${incrementActiveClass}/g, incrementActiveClass)
+            .replace(/\${filesActiveClass}/g, filesActiveClass)
+            .replace(/\${filterValue}/g, filterValue)
+            .replace(/\${scopeToIconPath}/g, scopeToIconPath)
+            .replace(/\${showAllIconPath}/g, showAllIconPath)
+            .replace(/\${clearIconPath}/g, clearIconPath)
+            .replace(/\${injectToggleGroupHtml}/g, injectToggleGroupHtml)
+            .replace(/\${contentHtml}/g, contentHtml);
         const perfAssemblyEnd = performance.now();
         Logger.log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
         
@@ -552,6 +462,10 @@ class StoryMapView extends PanelView {
      * @returns {string} HTML string for increment columns
      */
     renderIncrementView(botData, documentIconPath) {
+        // Load increment column template
+        const incrementColumnTemplatePath = vscode.Uri.joinPath(this.extensionUri, 'story_graph', 'increment_column.html');
+        const incrementColumnTemplate = fs.readFileSync(incrementColumnTemplatePath.fsPath, 'utf-8');
+        
         // Always use the full increments list regardless of scope filter
         const allIncrements = botData?.scope?.content?.increments || botData?.increments || [];
 
@@ -583,32 +497,32 @@ class StoryMapView extends PanelView {
             : '';
 
         const filterHint = filterText
-            ? `<span style="font-size: 11px; color: var(--accent-color); margin-left: 8px;">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
+            ? `<span class="increment-filter-hint">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
             : '';
 
         let html = `
-            <div style="padding: 8px 12px 4px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--text-color-faded, #444);">
-                <span style="font-size: 12px; font-weight: 600; opacity: 0.7;">INCREMENTS</span>
+            <div class="increment-header">
+                <span class="increment-header-title">INCREMENTS</span>
                 ${filterHint}
-                <button onclick="addIncrement()" style="font-size: 11px; padding: 2px 8px; cursor: pointer; background: var(--accent-color); color: #fff; border: none; border-radius: 3px; margin-left: auto;">+ Add Increment</button>
+                <button class="increment-add-button" onclick="addIncrement()">+ Add Increment</button>
             </div>
-            <div class="increment-columns-wrapper" style="display: flex; gap: 0; overflow-x: auto; height: 65vh; min-height: 300px;">
+            <div class="increment-columns-wrapper">
         `;
 
         if (!filterText && (unallocatedStories.length > 0 || allIncrements.length === 0)) {
             html += `
-                <div class="unallocated-column" style="min-width: 140px; max-width: 160px; flex-shrink: 0; background: rgba(255,255,255,0.03); border-right: 1px solid var(--text-color-faded, #444); padding: 8px; overflow-y: auto;">
-                    <div style="font-size: 11px; font-weight: 600; opacity: 0.6; margin-bottom: 6px; text-transform: uppercase;">Unallocated</div>
+                <div class="unallocated-column">
+                    <div class="unallocated-title">Unallocated</div>
                     ${unallocatedStories.length === 0
-                        ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(none)</div>`
+                        ? `<div class="increment-empty-text">(none)</div>`
                         : unallocatedStories.map(name => {
                             const esc = escapeForHtml(name);
-                            return `<div class="story-node" draggable="true" data-node-type="story" data-node-name="${esc}" data-path="story_graph.unallocated.${esc}" data-inc-source="" data-position="0" style="display: flex; align-items: flex-start; font-size: 12px; margin-bottom: 4px; gap: 2px; cursor: grab;">
-                                ${storyIcon}<span style="flex: 1; word-wrap: break-word; pointer-events: none;">${esc}</span>
+                            return `<div class="story-node increment-story-node" draggable="true" data-node-type="story" data-node-name="${esc}" data-path="story_graph.unallocated.${esc}" data-inc-source="" data-position="0">
+                                ${storyIcon}<span class="increment-story-name">${esc}</span>
                             </div>`;
                         }).join('')
                     }
-                    ${allIncrements.length === 0 ? `<div style="margin-top: 12px; font-size: 11px; color: var(--text-color-faded); font-style: italic;">Add an increment to start assigning stories.</div>` : ''}
+                    ${allIncrements.length === 0 ? `<div class="unallocated-hint">Add an increment to start assigning stories.</div>` : ''}
                 </div>
             `;
         }
@@ -622,40 +536,24 @@ class StoryMapView extends PanelView {
                 (a.sequential_order || 0) - (b.sequential_order || 0)
             );
             const behaviorNeeded = increment.behavior_needed || 'shape';
+            const sortedStoryNames = sortedStories.length === 0
+                ? `<div class="increment-empty-text">(no stories)</div>`
+                : sortedStories.map((story, si) => {
+                    const storyName = typeof story === 'string' ? story : (story.name || '');
+                    const escapedStoryName = escapeForHtml(storyName);
+                    return `
+                        <div class="story-node increment-story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}">
+                            ${storyIcon}
+                            <span class="increment-story-name">${escapedStoryName}</span>
+                            <button class="increment-story-remove" data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" title="Remove story from increment">x</button>
+                        </div>`;
+                }).join('');
 
-            html += `
-                <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${escapeForHtml(behaviorNeeded)}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));" style="min-width: 160px; max-width: 200px; flex-shrink: 0; border-right: 1px solid var(--text-color-faded, #444); padding: 8px; display: flex; flex-direction: column; overflow-y: auto; cursor: pointer; transition: min-width 0.2s, max-width 0.2s;">
-                    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--text-color-faded, #555);">
-                        <button onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" style="font-size: 9px; padding: 1px 4px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; line-height: 1;" title="Collapse / expand">▼</button>
-                        <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" style="cursor: grab; font-size: 11px; color: var(--text-color-faded); flex-shrink: 0; padding: 0 2px; user-select: none;" title="Drag to reorder">⠿</span>
-                        <span
-                            contenteditable="true"
-                            data-increment-name="${escapedName}"
-                            onclick="event.stopPropagation();"
-                            onblur="renameIncrement(this, this.getAttribute('data-increment-name'))"
-                            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment-name');this.blur();}"
-                            style="flex: 1; font-weight: 600; font-size: 12px; word-wrap: break-word; outline: none; cursor: text; min-width: 0;"
-                            title="Click to rename"
-                        >${escapedName}</span>
-                        <button data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" style="font-size: 10px; padding: 1px 5px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: 1px solid var(--text-color-faded); border-radius: 3px; flex-shrink: 0;" title="Delete increment">x</button>
-                    </div>
-                    <div class="increment-stories-body" style="display: flex; flex-direction: column; gap: 4px; flex: 1;">
-                        ${sortedStories.length === 0
-                            ? `<div style="font-size: 11px; color: var(--text-color-faded); font-style: italic;">(no stories)</div>`
-                            : sortedStories.map((story, si) => {
-                                const storyName = typeof story === 'string' ? story : (story.name || '');
-                                const escapedStoryName = escapeForHtml(storyName);
-                                return `
-                                    <div class="story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}" style="display: flex; align-items: flex-start; font-size: 12px; gap: 2px; cursor: grab;">
-                                        ${storyIcon}
-                                        <span style="flex: 1; word-wrap: break-word; min-width: 0; pointer-events: none;">${escapedStoryName}</span>
-                                        <button data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" style="font-size: 9px; padding: 0 3px; cursor: pointer; background: transparent; color: var(--text-color-faded); border: none; flex-shrink: 0; opacity: 0.5; line-height: 1; pointer-events: auto;" title="Remove story from increment">x</button>
-                                    </div>`;
-                            }).join('')
-                        }
-                    </div>
-                </div>
-            `;
+            // Load increment column from template
+            html += incrementColumnTemplate
+                .replace(/\${escapedName}/g, escapedName)
+                .replace(/\${behaviorNeeded}/g, escapeForHtml(behaviorNeeded))
+                .replace(/\${sortedStoryNames}/g, sortedStoryNames);
         }
 
         html += '</div>';

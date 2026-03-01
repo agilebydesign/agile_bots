@@ -1,0 +1,20 @@
+<!-- Increment Column - Individual increment column container -->
+<div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${behaviorNeeded}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));">
+    <div class="increment-column-header">
+        <button class="increment-collapse-button" onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" title="Collapse / expand">▼</button>
+        <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" title="Drag to reorder">⠿</span>
+        <span
+            class="increment-name"
+            contenteditable="true"
+            data-increment-name="${escapedName}"
+            onclick="event.stopPropagation();"
+            onblur="renameIncrement(this, this.getAttribute('data-increment-name'))"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment-name');this.blur();}"
+            title="Click to rename"
+        >${escapedName}</span>
+        <button class="increment-delete-button" data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" title="Delete increment">x</button>
+    </div>
+    <div class="increment-stories-body">
+        ${sortedStoryNames}
+    </div>
+</div>
