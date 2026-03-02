@@ -1,0 +1,40 @@
+<div class="section card-primary">
+    <div class="collapsible-section expanded">
+        <div class="collapsible-header instr-collapsible-header">
+            <div class="instr-header-left" onclick="toggleSection('instructions-content')">
+                <span class="expand-icon">▸</span>
+                ${clipboardIcon}
+                <span class="instr-section-title">Instructions</span>
+            </div>
+            <button id="submit-to-chat-btn" class="instr-submit-button" 
+                onclick="sendInstructionsToChat(event)"
+                title="Submit instructions to chat">
+                ${submitIcon}
+            </button>
+            <script>
+                window._promptContent = ${promptContentJson};
+            </script>
+        </div>
+        <div id="instructions-content" class="collapsible-content instr-content-container">
+            <div class="card-secondary instr-card">
+                ${sections}
+                
+                <!-- Raw Instructions Subsection -->
+                <div class="instr-raw-section">
+                    <div class="collapsible-section">
+                        <div class="collapsible-header instr-raw-header" onclick="toggleSection('raw-instructions-content')">
+                            <span class="expand-icon">▸</span>
+                            ${rawIcon}
+                            <span class="instr-raw-title">Raw Instructions (Test)</span>
+                        </div>
+                        <div id="raw-instructions-content" class="collapsible-content" style="max-height: 0; overflow: hidden; display: none; transition: max-height 0.3s ease;">
+                            <div class="instr-raw-content">
+                                <pre class="instr-raw-pre">${rawInstructionsContent}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

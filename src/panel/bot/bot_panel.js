@@ -5,9 +5,10 @@ const path = require("path");
 const fs = require("fs");
 const BotView = require("./bot_view");
 const PanelView = require("../panel_view");
-const WorkspaceManager = require("../workspace/workspace_manager");
-const BehaviorsManager = require("../behaviors/behaviors_manager");
-const StoryGraphManager = require("../story_graph/story_graph_manager");
+const workspaceManager = require("../workspace/workspace_manager");
+const behaviorsManager = require("../behaviors/behaviors_manager");
+const storyGraphManager = require("../story_graph/story_graph_manager");
+const instructionsManager = require("../instructions/instructions_manager");
 const branding = require("../branding");
 const { escapeForHtml, Logger } = require("../utils");
 
@@ -182,13 +183,13 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-            StoryGraphManager.toggleIncrementView(message, this)
+            storyGraphManager.toggleIncrementView(message, this)
               .then((result) => {
                   if (result) return this._update();
               });
             return;
           case "switchViewMode":
-            StoryGraphManager.switchViewMode(message, this)
+            storyGraphManager.switchViewMode(message, this)
               return this._update();            
           case "logToFile":
             if (message.message) {
@@ -208,10 +209,10 @@ class BotPanel {
             }
             return;
           case "copyNodeToClipboard":
-            StoryGraphManager.copyNodeToClipboard(message, this);
+            storyGraphManager.copyNodeToClipboard(message, this);
             return;
           case "copyIncrementStoriesJson":
-            StoryGraphManager.copyIncrementStoriesJson(message, this);
+            storyGraphManager.copyIncrementStoriesJson(message, this);
             return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
@@ -673,63 +674,63 @@ class BotPanel {
             return;
           case "updateWorkspace":
             Logger.log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
-            WorkspaceManager.updateWorkspace(message, this)
+            workspaceManager.updateWorkspace(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "browseWorkspace":
             Logger.log('[BotPanel] Received browseWorkspace message');
-            WorkspaceManager.browseAndUpdateWorkspace(this)
+            workspaceManager.browseAndUpdateWorkspace(this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "switchBot":
             Logger.log('[BotPanel] Received switchBot message');
-            WorkspaceManager.switchBot(message, this)
+            workspaceManager.switchBot(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "getBehaviorRules":
-            BehaviorsManager.getBehaviorRules(message, this)
+            behaviorsManager.getBehaviorRules(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "executeNavigationCommand":
-            BehaviorsManager.executeNavigationCommand(message, this)
+            behaviorsManager.executeNavigationCommand(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setExecutionMode":
-            BehaviorsManager.setExecutionMode(message, this)
+            behaviorsManager.setExecutionMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorExecuteMode":
-            BehaviorsManager.setBehaviorExecuteMode(message, this)
+            behaviorsManager.setBehaviorExecuteMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorSpecialInstructions":
-            BehaviorsManager.setBehaviorSpecialInstructions(message, this)
+            behaviorsManager.setBehaviorSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setActionSpecialInstructions":
-            BehaviorsManager.setActionSpecialInstructions(message, this)
+            behaviorsManager.setActionSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "renameNode":
-            StoryGraphManager.renameNode(message, this)
+            storyGraphManager.renameNode(message, this)
             return;
           case "executeCommand":
             if (message.commandText) {
@@ -737,8 +738,6 @@ class BotPanel {
               Logger.log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
               Logger.log(`[BotPanel] commandText: ${message.commandText}`);
               
-
-
               const isCreateOp = message.commandText.includes('.create_') || 
                                  message.commandText.includes('.create ') || 
                                  message.commandText.match(/\.create(?:$| name:)/) ||
@@ -837,9 +836,6 @@ class BotPanel {
                     Logger.log(`[INCREMENT] Refreshing panel after increment command`);
                     return this._update();
                   }
-                  
-
-
 
                   if (isStoryGraphOp) {
                     Logger.log(`[BotPanel] Story-changing operation - skipping panel refresh`);
@@ -916,26 +912,26 @@ class BotPanel {
             }
             return;
           case "navigateToBehavior":
-            BehaviorsManager.navigateToBehavior(message, this)
+            behaviorsManager.navigateToBehavior(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "submitWorkspaceBehaviorInstructions":
-            BehaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
+            behaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
                 return this._updateWithCachedData();
               });
             return;
           case "navigateToAction":
-            BehaviorsManager.navigateToAction(message, this)
+            behaviorsManager.navigateToAction(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "navigateAndExecute":
-            BehaviorsManager.navigateAndExecute(message, this)
+            behaviorsManager.navigateAndExecute(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
@@ -1008,76 +1004,24 @@ class BotPanel {
                 console.error('[SUBMIT_DEBUG] 4. execute REJECTED:', error?.message, error?.stack);
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
-            return;
+            return;          
           case "saveClarifyAnswers":
-            if (message.answers) {
-              Logger.log(`[BotPanel] saveClarifyAnswers -> ${JSON.stringify(message.answers)}`);
-              const answersJson = JSON.stringify(message.answers).replace(/'/g, "\\'");
-              const cmd = `save --answers '${answersJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveClarifyAnswers success`);
-                  vscode.window.showInformationMessage('Answers saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveClarifyAnswers ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify answers: ${error.message}`);
-                });
-            }
+            instructionsManager.saveClarifyAnswers(message, this._botView);
+            return;
+          case "updateQuestionAnswer":
+            instructionsManager.updateQuestionAnswer(message, this._botView);
             return;
           case "saveClarifyEvidence":
-            if (message.evidence_provided) {
-              Logger.log(`[BotPanel] saveClarifyEvidence -> ${JSON.stringify(message.evidence_provided)}`);
-              const evidenceJson = JSON.stringify(message.evidence_provided).replace(/'/g, "\\'");
-              const cmd = `save --evidence_provided '${evidenceJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveClarifyEvidence success`);
-                  vscode.window.showInformationMessage('Evidence saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveClarifyEvidence ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify evidence: ${error.message}`);
-                });
-            }
+            instructionsManager.saveClarifyEvidence(message, this._botView);
             return;
           case "saveStrategyDecision":
-            if (message.criteriaKey && message.selectedOption) {
-              Logger.log(`[BotPanel] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
-
-              const decisions = {};
-              decisions[message.criteriaKey] = message.selectedOption;
-              const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
-              const cmd = `save --decisions '${decisionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyDecision success`);
-                  vscode.window.showInformationMessage('Strategy decision saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decision: ${error.message}`);
-                });
-            }
+            instructionsManager.saveStrategyDecision(message, this._botView);
             return;
           case "saveStrategyMultiDecision":
-            if (message.criteriaKey && message.selectedOptions) {
-              Logger.log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
-
-              const multiDecisions = {};
-              multiDecisions[message.criteriaKey] = message.selectedOptions;
-              const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
-              const multiCmd = `save --decisions '${multiDecisionsJson}'`;
-              this._botView?.execute(multiCmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyMultiDecision success`);
-                  vscode.window.showInformationMessage('Strategy decisions saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyMultiDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decisions: ${error.message}`);
-                });
-            }
+            instructionsManager.saveStrategyMultiDecision(message, this._botView);
+            return;
+          case "saveStrategyAssumptions":
+            instructionsManager.saveStrategyAssumptions(message, this._botView);
             return;
           case "renderDiagram": {
             if (!this._findDiagramPathToOpen) {
@@ -1293,20 +1237,7 @@ class BotPanel {
             return;
           }
           case "saveStrategyAssumptions":
-            if (message.assumptions) {
-              Logger.log(`[BotPanel] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
-              const assumptionsJson = JSON.stringify(message.assumptions).replace(/'/g, "\\'");
-              const cmd = `save --assumptions '${assumptionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyAssumptions success`);
-                  vscode.window.showInformationMessage('Additional strategies saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyAssumptions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save additional strategies: ${error.message}`);
-                });
-            }
+            instructionsManager.handleInstructionsMessage(message.command, message, this._botView);
             return;
         }
       },
@@ -1991,6 +1922,8 @@ class BotPanel {
     const storyGraphClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph_client.js');
     const storyMapClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_map_client.js');
     const storyGraphStylePath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph.css');
+    const instructionsStylePath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions.css');
+    const instructionsClientPath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions_client.js');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
@@ -2000,6 +1933,8 @@ class BotPanel {
     const storyGraphClientUri = webview.asWebviewUri(storyGraphClientPath);
     const storyMapClientUri = webview.asWebviewUri(storyMapClientPath);
     const storyGraphStyleUri = webview.asWebviewUri(storyGraphStylePath);
+    const instructionsStyleUri = webview.asWebviewUri(instructionsStylePath);
+    const instructionsClientUri = webview.asWebviewUri(instructionsClientPath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2064,6 +1999,7 @@ class BotPanel {
           </style>
           <link rel="stylesheet" href="${behaviorsStyleUri}">
           <link rel="stylesheet" href="${storyGraphStyleUri}">
+          <link rel="stylesheet" href="${instructionsStyleUri}">
           ${currentBehaviorScript}
       </head>
       <body>
@@ -2073,6 +2009,7 @@ class BotPanel {
           <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
           <script nonce="${nonce}" src="${storyGraphClientUri}"></script>
           <script nonce="${nonce}" src="${storyMapClientUri}"></script>
+          <script nonce="${nonce}" src="${instructionsClientUri}"></script>
       </body>
       </html>`;
   }

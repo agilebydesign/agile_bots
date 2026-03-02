@@ -31,7 +31,7 @@ Module.prototype.require = function(...args) {
     return originalRequire.apply(this, args);
 };
 
-const StoryMapView = require('../../../src/panel/story_map_view');
+const StoryMapView = require('../../../src/panel/story_graph/story_map_view');
 const { parseHTML } = require('../../helpers/html_assertions');
 
 // Setup test workspace

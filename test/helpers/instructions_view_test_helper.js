@@ -6,6 +6,7 @@
 
 const assert = require('node:assert');
 const { parseHTML, HTMLAssertions } = require('./html_assertions');
+const path = require('path');
 
 class InstructionsViewTestHelper {
     constructor(workspaceDir, botName = 'story_bot') {
@@ -17,8 +18,19 @@ class InstructionsViewTestHelper {
         this._cli = new PanelView(this.botPath);
         
         // Create view with injected CLI
-        const InstructionsView = require('../../src/panel/instructions_view');
-        this._view = new InstructionsView(this._cli);
+        const InstructionsView = require('../../src/panel/instructions/instructions_view');
+        this._view = new InstructionsView(this._cli, null, this.createMockExtensionUri(workspaceDir));
+    }
+
+    /**
+     * Create mock extension URI
+     * @returns {Object} - Mock URI object
+     */
+    createMockExtensionUri(workspaceDir) {
+        return {
+            fsPath: path.join(workspaceDir, 'src', 'panel'),
+            toString: () => `file://${workspaceDir}`
+        };
     }
     
     /**
@@ -35,14 +47,6 @@ class InstructionsViewTestHelper {
     // ========================================================================
     // FACTORY METHODS - Create test objects
     // ========================================================================
-    
-    /**
-     * Render instructions HTML
-     * @returns {Promise<string>} - Rendered HTML
-     */
-    async render_html() {
-        return await this._view.render();
-    }
     
     // ========================================================================
     // SETUP HELPERS - Create test data structures
@@ -157,7 +161,7 @@ class InstructionsViewTestHelper {
      * Render instructions view to HTML - uses REAL CLI
      * @returns {Promise<string>} - Rendered HTML
      */
-    async render_html() {
+    async render() {
         return await this._view.render();
     }
     
