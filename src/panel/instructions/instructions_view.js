@@ -6,12 +6,12 @@
  * Story: Display Base Instructions, Display Clarify Instructions, Display Strategy Instructions, etc.
  */
 
-const PanelView = require('./panel_view');
-const branding = require('./branding');
+const PanelView = require('../panel_view');
+const branding = require('../branding');
 const vscode = require('vscode');
 const path = require('path');
 const fs = require('fs');
-const { escapeForHtml, escapeForJs, repairUtf8Mojibake, Logger } = require('./utils');
+const { escapeForHtml, escapeForJs, repairUtf8Mojibake, Logger } = require('../utils');
 
 class InstructionsView extends PanelView {
     /**
@@ -882,7 +882,7 @@ class InstructionsView extends PanelView {
 
     _formatDiagramInstructions(value) {
         if (!value || !value.diagrams) return '';
-        const DiagramSectionView = require('./diagram_section_view');
+        const DiagramSectionView = require('../diagram_section_view');
         const view = new DiagramSectionView(value.diagrams);
         return view.renderSection();
     }

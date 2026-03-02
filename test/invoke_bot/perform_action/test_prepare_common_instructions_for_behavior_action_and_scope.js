@@ -25,7 +25,7 @@ const os = require('os');
 const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
 const BotPanel = require('../../../src/panel/bot/bot_panel');
-const InstructionsView = require('../../../src/panel/instructions_view');
+const InstructionsView = require('../../../src/panel/instructions/instructions_view');
 const { InstructionsViewTestHelper } = require('../../helpers');
 
 

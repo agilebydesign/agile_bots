@@ -11,12 +11,12 @@
  */
 
 const vscode = require('vscode');
-const PanelView = require('./panel_view');
-const StoryGraphAsyncSaveController = require('./story_graph/async_save_controller.js');
-const branding = require('./branding');
+const PanelView = require('../panel_view.js');
+const StoryGraphAsyncSaveController = require('./async_save_controller.js');
+const branding = require('../branding.js');
 const fs = require('fs');
 const path = require('path');
-const { escapeForHtml, escapeForJs, Logger } = require('./utils');
+const { escapeForHtml, escapeForJs, Logger } = require('../utils.js');
 
 class StoryMapView extends PanelView {
     /**

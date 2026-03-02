@@ -18,7 +18,7 @@ class InstructionsViewTestHelper {
         this._cli = new PanelView(this.botPath);
         
         // Create view with injected CLI
-        const InstructionsView = require('../../src/panel/instructions_view');
+        const InstructionsView = require('../../src/panel/instructions/instructions_view');
         this._view = new InstructionsView(this._cli, null, this.createMockExtensionUri(workspaceDir));
     }
 

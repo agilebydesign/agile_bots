@@ -5,10 +5,10 @@ const path = require("path");
 const fs = require("fs");
 const BotView = require("./bot_view");
 const PanelView = require("../panel_view");
-const WorkspaceManager = require("../workspace/workspace_manager");
-const BehaviorsManager = require("../behaviors/behaviors_manager");
-const StoryGraphManager = require("../story_graph/story_graph_manager");
-const InstructionsManager = require("../instructions/instructions_manager");
+const workspaceManager = require("../workspace/workspace_manager");
+const behaviorsManager = require("../behaviors/behaviors_manager");
+const storyGraphManager = require("../story_graph/story_graph_manager");
+const instructionsManager = require("../instructions/instructions_manager");
 const branding = require("../branding");
 const { escapeForHtml, Logger } = require("../utils");
 
@@ -183,13 +183,13 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-            StoryGraphManager.toggleIncrementView(message, this)
+            storyGraphManager.toggleIncrementView(message, this)
               .then((result) => {
                   if (result) return this._update();
               });
             return;
           case "switchViewMode":
-            StoryGraphManager.switchViewMode(message, this)
+            storyGraphManager.switchViewMode(message, this)
               return this._update();            
           case "logToFile":
             if (message.message) {
@@ -209,10 +209,10 @@ class BotPanel {
             }
             return;
           case "copyNodeToClipboard":
-            StoryGraphManager.copyNodeToClipboard(message, this);
+            storyGraphManager.copyNodeToClipboard(message, this);
             return;
           case "copyIncrementStoriesJson":
-            StoryGraphManager.copyIncrementStoriesJson(message, this);
+            storyGraphManager.copyIncrementStoriesJson(message, this);
             return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
@@ -674,63 +674,63 @@ class BotPanel {
             return;
           case "updateWorkspace":
             Logger.log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
-            WorkspaceManager.updateWorkspace(message, this)
+            workspaceManager.updateWorkspace(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "browseWorkspace":
             Logger.log('[BotPanel] Received browseWorkspace message');
-            WorkspaceManager.browseAndUpdateWorkspace(this)
+            workspaceManager.browseAndUpdateWorkspace(this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "switchBot":
             Logger.log('[BotPanel] Received switchBot message');
-            WorkspaceManager.switchBot(message, this)
+            workspaceManager.switchBot(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "getBehaviorRules":
-            BehaviorsManager.getBehaviorRules(message, this)
+            behaviorsManager.getBehaviorRules(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "executeNavigationCommand":
-            BehaviorsManager.executeNavigationCommand(message, this)
+            behaviorsManager.executeNavigationCommand(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setExecutionMode":
-            BehaviorsManager.setExecutionMode(message, this)
+            behaviorsManager.setExecutionMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorExecuteMode":
-            BehaviorsManager.setBehaviorExecuteMode(message, this)
+            behaviorsManager.setBehaviorExecuteMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorSpecialInstructions":
-            BehaviorsManager.setBehaviorSpecialInstructions(message, this)
+            behaviorsManager.setBehaviorSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setActionSpecialInstructions":
-            BehaviorsManager.setActionSpecialInstructions(message, this)
+            behaviorsManager.setActionSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "renameNode":
-            StoryGraphManager.renameNode(message, this)
+            storyGraphManager.renameNode(message, this)
             return;
           case "executeCommand":
             if (message.commandText) {
@@ -738,8 +738,6 @@ class BotPanel {
               Logger.log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
               Logger.log(`[BotPanel] commandText: ${message.commandText}`);
               
-
-
               const isCreateOp = message.commandText.includes('.create_') || 
                                  message.commandText.includes('.create ') || 
                                  message.commandText.match(/\.create(?:$| name:)/) ||
@@ -838,9 +836,6 @@ class BotPanel {
                     Logger.log(`[INCREMENT] Refreshing panel after increment command`);
                     return this._update();
                   }
-                  
-
-
 
                   if (isStoryGraphOp) {
                     Logger.log(`[BotPanel] Story-changing operation - skipping panel refresh`);
@@ -917,26 +912,26 @@ class BotPanel {
             }
             return;
           case "navigateToBehavior":
-            BehaviorsManager.navigateToBehavior(message, this)
+            behaviorsManager.navigateToBehavior(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "submitWorkspaceBehaviorInstructions":
-            BehaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
+            behaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
                 return this._updateWithCachedData();
               });
             return;
           case "navigateToAction":
-            BehaviorsManager.navigateToAction(message, this)
+            behaviorsManager.navigateToAction(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "navigateAndExecute":
-            BehaviorsManager.navigateAndExecute(message, this)
+            behaviorsManager.navigateAndExecute(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
@@ -1009,14 +1004,24 @@ class BotPanel {
                 console.error('[SUBMIT_DEBUG] 4. execute REJECTED:', error?.message, error?.stack);
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
-            return;
-          // Instructions-related handlers delegated to InstructionsManager
+            return;          
           case "saveClarifyAnswers":
+            instructionsManager.saveClarifyAnswers(message, this._botView);
+            return;
           case "updateQuestionAnswer":
+            instructionsManager.updateQuestionAnswer(message, this._botView);
+            return;
           case "saveClarifyEvidence":
+            instructionsManager.saveClarifyEvidence(message, this._botView);
+            return;
           case "saveStrategyDecision":
+            instructionsManager.saveStrategyDecision(message, this._botView);
+            return;
           case "saveStrategyMultiDecision":
-            InstructionsManager.handleInstructionsMessage(message.command, message, this._botView);
+            instructionsManager.saveStrategyMultiDecision(message, this._botView);
+            return;
+          case "saveStrategyAssumptions":
+            instructionsManager.saveStrategyAssumptions(message, this._botView);
             return;
           case "renderDiagram": {
             if (!this._findDiagramPathToOpen) {
@@ -1232,7 +1237,7 @@ class BotPanel {
             return;
           }
           case "saveStrategyAssumptions":
-            InstructionsManager.handleInstructionsMessage(message.command, message, this._botView);
+            instructionsManager.handleInstructionsMessage(message.command, message, this._botView);
             return;
         }
       },

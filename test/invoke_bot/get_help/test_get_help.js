@@ -17,7 +17,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
-const InstructionsSection = require('../../../src/panel/instructions_view');
+const InstructionsSection = require('../../../src/panel/instructions/instructions_view');
 
 // Setup - Use temp directory for test workspace to avoid modifying production data
 const repoRoot = path.join(__dirname, '../../..');

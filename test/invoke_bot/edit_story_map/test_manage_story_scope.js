@@ -24,7 +24,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
-const StoryMapView = require('../../../src/panel/story_map_view');
+const StoryMapView = require('../../../src/panel/story_graph/story_map_view');
 
 // Setup - Use temp directory for test data to avoid modifying production
 const repoRoot = path.join(__dirname, '../../..');

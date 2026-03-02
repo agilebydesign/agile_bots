@@ -8,175 +8,105 @@
 const vscode = require('vscode');
 const { Logger } = require('../utils');
 
-/**
- * Handle instructions-related messages from the webview.
- * 
- * @param {string} command - The message command
- * @param {Object} message - The full message object
- * @param {Object} botView - The BotView instance for executing commands
- * @returns {boolean} True if the message was handled, false otherwise
- */
-function handleInstructionsMessage(command, message, botView) {
-    switch (command) {
-        case "saveClarifyAnswers":
-            return handleSaveClarifyAnswers(message, botView);
-        
-        case "updateQuestionAnswer":
-            return handleUpdateQuestionAnswer(message, botView);
-        
-        case "saveClarifyEvidence":
-            return handleSaveClarifyEvidence(message, botView);
-        
-        case "saveStrategyDecision":
-            return handleSaveStrategyDecision(message, botView);
-        
-        case "saveStrategyMultiDecision":
-            return handleSaveStrategyMultiDecision(message, botView);
-        
-        case "saveStrategyAssumptions":
-            return handleSaveStrategyAssumptions(message, botView);
-        
-        default:
-            return false;
-    }
+
+async function executeCommand(botView, cmd, successMessage, errorMessage) {
+    return botView?.execute(cmd)
+        .then((result) => {
+            if (result.status === 'error') {
+                throw new Error(`Command error: ${result.message}`);
+            }
+            Logger.log(`[InstructionsManager] ${successMessage}`);
+            vscode.window.showInformationMessage(successMessage);
+        })
+        .catch((error) => {
+            Logger.log(`[InstructionsManager] ${errorMessage}: ${error.message}`);
+            vscode.window.showErrorMessage(`${errorMessage}: ${error.message}`);
+        });
 }
 
 /**
  * Save clarify answers (batch).
  */
-function handleSaveClarifyAnswers(message, botView) {
+async function saveClarifyAnswers(message, botView) {
     if (message.answers) {
         Logger.log(`[InstructionsManager] saveClarifyAnswers -> ${JSON.stringify(message.answers)}`);
         const answersJson = JSON.stringify(message.answers).replace(/'/g, "\\'");
         const cmd = `save --answers '${answersJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] saveClarifyAnswers success`);
-                vscode.window.showInformationMessage('Answers saved successfully');
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] saveClarifyAnswers ERROR: ${error.message}`);
-                vscode.window.showErrorMessage(`Failed to save clarify answers: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'Answers saved successfully', 'Failed to save clarify answers');
+    }    
 }
 
 /**
  * Update a single question answer.
  */
-function handleUpdateQuestionAnswer(message, botView) {
+async function updateQuestionAnswer(message, botView) {
     if (message.question && typeof message.answer !== 'undefined') {
         Logger.log(`[InstructionsManager] updateQuestionAnswer -> ${message.question}: ${message.answer}`);
         const answers = {};
         answers[message.question] = message.answer;
         const answersJson = JSON.stringify(answers).replace(/'/g, "\\'");
         const cmd = `save --answers '${answersJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] updateQuestionAnswer success`);
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] updateQuestionAnswer ERROR: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'updateQuestionAnswer success', 'updateQuestionAnswer ERROR');
+    }    
 }
 
 /**
  * Save clarify evidence.
  */
-function handleSaveClarifyEvidence(message, botView) {
+async function saveClarifyEvidence(message, botView) {
     if (message.evidence_provided) {
         Logger.log(`[InstructionsManager] saveClarifyEvidence -> ${JSON.stringify(message.evidence_provided)}`);
         const evidenceJson = JSON.stringify(message.evidence_provided).replace(/'/g, "\\'");
         const cmd = `save --evidence_provided '${evidenceJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] saveClarifyEvidence success`);
-                vscode.window.showInformationMessage('Evidence saved successfully');
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] saveClarifyEvidence ERROR: ${error.message}`);
-                vscode.window.showErrorMessage(`Failed to save clarify evidence: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'Evidence saved successfully', 'Failed to save clarify evidence');
+    }    
 }
 
 /**
  * Save a single strategy decision.
  */
-function handleSaveStrategyDecision(message, botView) {
+async function saveStrategyDecision(message, botView) {
     if (message.criteriaKey && message.selectedOption) {
         Logger.log(`[InstructionsManager] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
         const decisions = {};
         decisions[message.criteriaKey] = message.selectedOption;
         const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
         const cmd = `save --decisions '${decisionsJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] saveStrategyDecision success`);
-                vscode.window.showInformationMessage('Strategy decision saved successfully');
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] saveStrategyDecision ERROR: ${error.message}`);
-                vscode.window.showErrorMessage(`Failed to save strategy decision: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'Strategy decision saved successfully', 'Failed to save strategy decision');
+    }    
 }
 
 /**
  * Save multi-select strategy decisions.
  */
-function handleSaveStrategyMultiDecision(message, botView) {
+async function saveStrategyMultiDecision(message, botView) {
     if (message.criteriaKey && message.selectedOptions) {
         Logger.log(`[InstructionsManager] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
         const multiDecisions = {};
         multiDecisions[message.criteriaKey] = message.selectedOptions;
         const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
         const cmd = `save --decisions '${multiDecisionsJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] saveStrategyMultiDecision success`);
-                vscode.window.showInformationMessage('Strategy decisions saved successfully');
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] saveStrategyMultiDecision ERROR: ${error.message}`);
-                vscode.window.showErrorMessage(`Failed to save strategy decisions: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'Strategy decisions saved successfully', 'Failed to save strategy decisions');
+    }    
 }
 
 /**
  * Save strategy assumptions.
  */
-function handleSaveStrategyAssumptions(message, botView) {
+async function saveStrategyAssumptions(message, botView) {
     if (message.assumptions) {
         Logger.log(`[InstructionsManager] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
         const assumptionsJson = JSON.stringify(message.assumptions).replace(/'/g, "\\'");
         const cmd = `save --assumptions '${assumptionsJson}'`;
-        botView?.execute(cmd)
-            .then(() => {
-                Logger.log(`[InstructionsManager] saveStrategyAssumptions success`);
-                vscode.window.showInformationMessage('Additional strategies saved successfully');
-            })
-            .catch((error) => {
-                Logger.log(`[InstructionsManager] saveStrategyAssumptions ERROR: ${error.message}`);
-                vscode.window.showErrorMessage(`Failed to save additional strategies: ${error.message}`);
-            });
-    }
-    return true;
+        await executeCommand(botView, cmd, 'Additional strategies saved successfully', 'Failed to save additional strategies');
+    }    
 }
 
-module.exports = {
-    handleInstructionsMessage,
-    handleSaveClarifyAnswers,
-    handleUpdateQuestionAnswer,
-    handleSaveClarifyEvidence,
-    handleSaveStrategyDecision,
-    handleSaveStrategyMultiDecision,
-    handleSaveStrategyAssumptions
+module.exports = {    
+    saveClarifyAnswers,
+    updateQuestionAnswer,
+    saveClarifyEvidence,
+    saveStrategyDecision,
+    saveStrategyMultiDecision,
+    saveStrategyAssumptions
 };
