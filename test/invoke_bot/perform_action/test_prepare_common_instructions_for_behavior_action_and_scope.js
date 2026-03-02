@@ -25,12 +25,26 @@ const os = require('os');
 const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
 const BotPanel = require('../../../src/panel/bot/bot_panel');
-const InstructionsSection = require('../../../src/panel/instructions_view');
+const InstructionsView = require('../../../src/panel/instructions_view');
 const { InstructionsViewTestHelper } = require('../../helpers');
+
 
 // Setup - Use temp directory for test workspace to avoid modifying production data
 const repoRoot = path.join(__dirname, '../../..');
 const productionBotPath = path.join(repoRoot, 'bots', 'story_bot');
+
+const extensionUri = createMockExtensionUri(repoRoot);
+
+/**
+ * Create mock extension URI
+ * @returns {Object} - Mock URI object
+ */
+function createMockExtensionUri(repoRoot) {
+    return {
+        fsPath: path.join(repoRoot, 'src', 'panel'),
+        toString: () => `file://${fsPath}`
+    };
+}
 
 // Create temp workspace for tests (data only - story graphs, etc.)
 const tempWorkspaceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agile-bots-instructions-test-'));
@@ -62,6 +76,7 @@ const botPath = productionBotPath;
 let backendPanel = null;
 let cli = null;
 let testPanel = null;
+let instructionsHelper = null;
 
 before(() => {
     setupTestWorkspace();
@@ -76,6 +91,7 @@ before(() => {
     backendPanel = new PanelView(botPath);
     cli = backendPanel;
     testPanel = createTestBotPanel();
+    
 });
 
 /**
@@ -219,7 +235,6 @@ function createTestBotPanel() {
 //     delete process.env.WORKING_AREA;
 // });
 
-
 test('TestDisplayBaseInstructions', { concurrency: false }, async (t) => {
     
     await t.test('test_panel_displays_base_instructions_when_action_has_instructions', async () => {
@@ -230,7 +245,7 @@ test('TestDisplayBaseInstructions', { concurrency: false }, async (t) => {
         assert(response, 'Should get response from instructions command');
         
         // Render instructions view
-        const view = new InstructionsSection(cli);
+        const view = new InstructionsView(cli, null, extensionUri);
         const html = await view.render();
         
         assert(typeof html === 'string', 'Instructions section should render HTML');
@@ -246,7 +261,7 @@ test('TestDisplayClarifyInstructions', { concurrency: false }, async (t) => {
         
         // Render instructions - use test helper
         const instructionsHelper = new InstructionsViewTestHelper(repoRoot);
-        const html = await instructionsHelper.render_html();
+        const html = await instructionsHelper.render();
         instructionsHelper.cleanup();
         
         assert(typeof html === 'string', 'Should render HTML string');
@@ -262,7 +277,7 @@ test('TestDisplayStrategyInstructions', { concurrency: false }, async (t) => {
         
         // Render instructions - use test helper
         const instructionsHelper = new InstructionsViewTestHelper(repoRoot);
-        const html = await instructionsHelper.render_html();
+        const html = await instructionsHelper.render();
         instructionsHelper.cleanup();
         
         assert(typeof html === 'string', 'Should render HTML string');
@@ -311,20 +326,20 @@ test('TestSubmitInstructionsToAIAgent', { concurrency: false }, async (t) => {
         // Verify we got instructions
         assert(result && result.instructions, 'Should get instructions from shape.clarify');
         
-        // Create InstructionsSection - it will call execute('status') which doesn't return instructions
+        // Create InstructionsView - it will call execute('status') which doesn't return instructions
         // So it will render the empty case without the button. To test the button properly,
-        // we need to ensure InstructionsSection can find instructions. Since PanelView._lastResponse
+        // we need to ensure InstructionsView can find instructions. Since PanelView._lastResponse
         // is static and not set, and status doesn't return instructions, the button won't appear.
         // However, the button template exists in instructions_view.js line 566, so we verify
-        // that the InstructionsSection renders (the button would appear if instructions were found)
-        const view = new InstructionsSection(backendPanel);
+        // that the InstructionsView renders (the button would appear if instructions were found)
+        const view = new InstructionsView(backendPanel, null, extensionUri);
         const html = await view.render();
         
         // The submit button (id='submit-to-chat-btn') is only rendered when instructions exist
-        // Since InstructionsSection can't find instructions via status, it renders empty case
+        // Since InstructionsView can't find instructions via status, it renders empty case
         // For this test, we verify the section structure exists
         assert(typeof html === 'string' && html.length > 0, 
-            'InstructionsSection should render HTML');
+            'InstructionsView should render HTML');
         // Note: The actual button presence when instructions exist is verified by the
         // test_submit_button_triggers_sendToChat_mocked test below which uses mocked panel
     });
@@ -383,8 +398,8 @@ test('TestUpdateIncludeLevel', { concurrency: false }, async (t) => {
 
 test('TestInstructionsView', { concurrency: false }, async (t) => {
     
-    await t.test('testInstructionsSectionRenders', async () => {
-        const view = new InstructionsSection(cli);
+    await t.test('testInstructionsViewRenders', async () => {
+        const view = new InstructionsView(cli, null, extensionUri);
         const html = await view.render();
         
         assert.ok(typeof html === 'string', 'Should return HTML string');
@@ -398,7 +413,7 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
         assert.ok(response, 'Should get response');
         
         // Render view
-        const view = new InstructionsSection(cli);
+        const view = new InstructionsView(cli, null, extensionUri);
         const html = await view.render();
         
         assert.ok(typeof html === 'string', 'Should return HTML string');
@@ -408,7 +423,7 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
         // Execute action first
         await cli.execute('shape.clarify');
         
-        const view = new InstructionsSection(cli);
+        const view = new InstructionsView(cli, null, extensionUri);
         const html = await view.render();
         
         // Instructions section should exist (even if empty)
@@ -421,7 +436,7 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
     // await t.test('testInstructionsHasSubmitButton', async () => {
     //     await cli.execute('shape.clarify');
     //     
-    //     const view = new InstructionsSection(cli);
+    //     const view = new InstructionsView(cli, null, extensionUri);
     //     const html = await view.render();
     //     
     //     // If instructions exist, should have submit button
@@ -436,12 +451,12 @@ test('TestInstructionsView', { concurrency: false }, async (t) => {
     await t.test('testInstructionsUpdatesOnNavigation', async () => {
         // Navigate to clarify
         await cli.execute('shape.clarify');
-        const view1 = new InstructionsSection(cli);
+        const view1 = new InstructionsView(cli, null, extensionUri);
         const html1 = await view1.render();
         
         // Navigate to strategy
         await cli.execute('shape.strategy');
-        const view2 = new InstructionsSection(cli);
+        const view2 = new InstructionsView(cli, null, extensionUri);
         const html2 = await view2.render();
         
         // Both should be valid HTML

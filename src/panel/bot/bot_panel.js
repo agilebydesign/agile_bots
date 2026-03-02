@@ -8,6 +8,7 @@ const PanelView = require("../panel_view");
 const WorkspaceManager = require("../workspace/workspace_manager");
 const BehaviorsManager = require("../behaviors/behaviors_manager");
 const StoryGraphManager = require("../story_graph/story_graph_manager");
+const InstructionsManager = require("../instructions/instructions_manager");
 const branding = require("../branding");
 const { escapeForHtml, Logger } = require("../utils");
 
@@ -1009,75 +1010,13 @@ class BotPanel {
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
             return;
+          // Instructions-related handlers delegated to InstructionsManager
           case "saveClarifyAnswers":
-            if (message.answers) {
-              Logger.log(`[BotPanel] saveClarifyAnswers -> ${JSON.stringify(message.answers)}`);
-              const answersJson = JSON.stringify(message.answers).replace(/'/g, "\\'");
-              const cmd = `save --answers '${answersJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveClarifyAnswers success`);
-                  vscode.window.showInformationMessage('Answers saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveClarifyAnswers ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify answers: ${error.message}`);
-                });
-            }
-            return;
+          case "updateQuestionAnswer":
           case "saveClarifyEvidence":
-            if (message.evidence_provided) {
-              Logger.log(`[BotPanel] saveClarifyEvidence -> ${JSON.stringify(message.evidence_provided)}`);
-              const evidenceJson = JSON.stringify(message.evidence_provided).replace(/'/g, "\\'");
-              const cmd = `save --evidence_provided '${evidenceJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveClarifyEvidence success`);
-                  vscode.window.showInformationMessage('Evidence saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveClarifyEvidence ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify evidence: ${error.message}`);
-                });
-            }
-            return;
           case "saveStrategyDecision":
-            if (message.criteriaKey && message.selectedOption) {
-              Logger.log(`[BotPanel] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
-
-              const decisions = {};
-              decisions[message.criteriaKey] = message.selectedOption;
-              const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
-              const cmd = `save --decisions '${decisionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyDecision success`);
-                  vscode.window.showInformationMessage('Strategy decision saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decision: ${error.message}`);
-                });
-            }
-            return;
           case "saveStrategyMultiDecision":
-            if (message.criteriaKey && message.selectedOptions) {
-              Logger.log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
-
-              const multiDecisions = {};
-              multiDecisions[message.criteriaKey] = message.selectedOptions;
-              const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
-              const multiCmd = `save --decisions '${multiDecisionsJson}'`;
-              this._botView?.execute(multiCmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyMultiDecision success`);
-                  vscode.window.showInformationMessage('Strategy decisions saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyMultiDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decisions: ${error.message}`);
-                });
-            }
+            InstructionsManager.handleInstructionsMessage(message.command, message, this._botView);
             return;
           case "renderDiagram": {
             if (!this._findDiagramPathToOpen) {
@@ -1293,20 +1232,7 @@ class BotPanel {
             return;
           }
           case "saveStrategyAssumptions":
-            if (message.assumptions) {
-              Logger.log(`[BotPanel] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
-              const assumptionsJson = JSON.stringify(message.assumptions).replace(/'/g, "\\'");
-              const cmd = `save --assumptions '${assumptionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  Logger.log(`[BotPanel] saveStrategyAssumptions success`);
-                  vscode.window.showInformationMessage('Additional strategies saved successfully');
-                })
-                .catch((error) => {
-                  Logger.log(`[BotPanel] saveStrategyAssumptions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save additional strategies: ${error.message}`);
-                });
-            }
+            InstructionsManager.handleInstructionsMessage(message.command, message, this._botView);
             return;
         }
       },
@@ -1991,6 +1917,8 @@ class BotPanel {
     const storyGraphClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph_client.js');
     const storyMapClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_map_client.js');
     const storyGraphStylePath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph.css');
+    const instructionsStylePath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions.css');
+    const instructionsClientPath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions_client.js');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
@@ -2000,6 +1928,8 @@ class BotPanel {
     const storyGraphClientUri = webview.asWebviewUri(storyGraphClientPath);
     const storyMapClientUri = webview.asWebviewUri(storyMapClientPath);
     const storyGraphStyleUri = webview.asWebviewUri(storyGraphStylePath);
+    const instructionsStyleUri = webview.asWebviewUri(instructionsStylePath);
+    const instructionsClientUri = webview.asWebviewUri(instructionsClientPath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2064,6 +1994,7 @@ class BotPanel {
           </style>
           <link rel="stylesheet" href="${behaviorsStyleUri}">
           <link rel="stylesheet" href="${storyGraphStyleUri}">
+          <link rel="stylesheet" href="${instructionsStyleUri}">
           ${currentBehaviorScript}
       </head>
       <body>
@@ -2073,6 +2004,7 @@ class BotPanel {
           <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
           <script nonce="${nonce}" src="${storyGraphClientUri}"></script>
           <script nonce="${nonce}" src="${storyMapClientUri}"></script>
+          <script nonce="${nonce}" src="${instructionsClientUri}"></script>
       </body>
       </html>`;
   }
