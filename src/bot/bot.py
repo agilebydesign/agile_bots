@@ -849,16 +849,23 @@ class Bot:
         instructions,
         first_append: bool,
     ) -> None:
-        """When behavior has combine_with_next, append the next behavior's non-skip actions. Recurses if next also has combine_with_next."""
+        """When behavior has combine_with_next, append the next behavior's non-skip actions. Recurses if next also has combine_with_next.
+        When a subsequent behavior is 'skip', skip it and continue to check the behavior after it."""
+        if self.get_behavior_execute(current_behavior.name) != 'combine_with_next':
+            return  # Only proceed if current behavior has combine_with_next TODO: Addi is this ok
+        
         behavior = current_behavior
         while True:
-            if self.get_behavior_execute(behavior.name) != 'combine_with_next':
-                break
             next_behavior = self.behaviors.next_after(behavior)
             if not next_behavior:
                 break
+            
+            # Skip behaviors that are set to 'skip' and continue to the next one
             if self.get_behavior_execute(next_behavior.name) == 'skip':
-                break
+                behavior = next_behavior
+                continue
+            
+            # Append actions from non-skip behavior
             if first_append:
                 instructions._display_content.insert(0, '')
                 instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
@@ -878,6 +885,11 @@ class Bot:
                 action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
                 for line in action_only_md.serialize().split('\n'):
                     instructions.add_display(line)
+            
+            # Stop if next behavior doesn't have combine_with_next (we've completed the chain)
+            if self.get_behavior_execute(next_behavior.name) != 'combine_with_next':
+                break
+            
             behavior = next_behavior
 
     ACTION_IS_DONE_FILENAME = 'action_is_done.json'

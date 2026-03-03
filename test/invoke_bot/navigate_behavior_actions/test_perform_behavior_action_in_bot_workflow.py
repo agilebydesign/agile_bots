@@ -599,8 +599,8 @@ def when_user_runs_set_execute_combine_with_next(helper):
 
 
 def then_cli_invokes_bot_and_persists_behavior_execute(helper):
-    settings_path = helper.workspace / "execution_settings.json"
-    assert settings_path.exists(), "execution_settings.json should exist after set_behavior_execute"
+    settings_path = helper.workspace / "logs" / "execution_settings.json"
+    assert settings_path.exists(), "logs/execution_settings.json should exist after set_behavior_execute"
 
 
 def then_cli_reports_completion_or_failed(result):
