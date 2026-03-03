@@ -6,6 +6,7 @@ class StrategyCriteria:
         self.question = criteria_data.get('question', '')
         self.options = self._format_options(criteria_data.get('options', []))
         self.outcome = criteria_data.get('outcome', None)
+        self.note = criteria_data.get('note', '')
 
     def _format_options(self, options: List[Any]) -> List[Any]:
         formatted_options = []
@@ -46,9 +47,20 @@ class StrategyCriteria:
     def outcome(self, value: Optional[Any]):
         self._outcome = value
 
+    @property
+    def note(self) -> str:
+        return getattr(self, '_note', '')
+
+    @note.setter
+    def note(self, value: str):
+        self._note = value or ''
+
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        result = {
             'question': self.question,
             'options': self.options,
             'outcome': self.outcome
         }
+        if self.note:
+            result['note'] = self.note
+        return result

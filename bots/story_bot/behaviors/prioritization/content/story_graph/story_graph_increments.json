@@ -25,6 +25,7 @@
               "type": "and",
               "connector": "or",
               "behavior": "code",
+              "notes": "",
               "stories": [
                 {
                   "name": "Story Name",

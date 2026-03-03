@@ -343,10 +343,11 @@ class WorkspaceSectionView extends PanelView {
         const savedStrategy = (rawStrategy && currentBehavior && rawStrategy[currentBehavior] && !rawStrategy.strategy_criteria)
             ? rawStrategy[currentBehavior]
             : rawStrategy;
-        const isRawFormat = savedStrategy && (savedStrategy.decisions !== undefined || savedStrategy.assumptions !== undefined);
+        // Raw format = strategy.json: { decisions, assumptions|additional_strategies }; full format = behavior.strategies: { strategy_criteria, assumptions: { assumptions_made } }
+        const isRawFormat = savedStrategy && savedStrategy.decisions !== undefined && !savedStrategy.strategy_criteria;
         let strategyCriteriaData = savedStrategy?.strategy_criteria?.criteria || {};
         let decisionsMade = isRawFormat ? (savedStrategy.decisions || {}) : (savedStrategy?.strategy_criteria?.decisions_made || {});
-        let assumptionsMade = isRawFormat ? (savedStrategy.assumptions || []) : (savedStrategy?.assumptions?.assumptions_made || []);
+        let assumptionsMade = isRawFormat ? (savedStrategy.assumptions || savedStrategy.additional_strategies || []) : (savedStrategy?.assumptions?.assumptions_made || []);
         if (Object.keys(strategyCriteriaData).length === 0) {
             const fallbackData = instructions.strategy_criteria || instructions.guardrails?.decision_criteria || {};
             strategyCriteriaData = fallbackData.criteria || fallbackData;

@@ -22,6 +22,14 @@ class StrategyDecision(JsonPersistent):
         self.decisions_made = decisions_made or {}
         self.assumptions_made = assumptions_made or []
 
+    def _normalize_decision_value(self, value: Any) -> list:
+        """Ensure decision value is always a list (array). Single string -> [string]. Already list -> as-is."""
+        if value is None:
+            return []
+        if isinstance(value, list):
+            return value
+        return [value]
+
     def save(self):
         existing_data = self.load()
         
@@ -29,7 +37,8 @@ class StrategyDecision(JsonPersistent):
         existing_decisions = behavior_data.get('decisions', {})
         existing_assumptions = behavior_data.get('additional_strategies') or behavior_data.get('assumptions', [])
         
-        merged_decisions = {**existing_decisions, **self.decisions_made}
+        normalized = {k: self._normalize_decision_value(v) for k, v in self.decisions_made.items()}
+        merged_decisions = {**existing_decisions, **normalized}
         
         merged_assumptions = self.assumptions_made if self.assumptions_made else existing_assumptions
         

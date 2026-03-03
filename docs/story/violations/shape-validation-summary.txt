@@ -1,0 +1,10 @@
+=== SHAPE BEHAVIOR VALIDATION SUMMARY ===
+
+Rule verb_noun_format.json: 5 file-by-file, 0 cross-file violations
+Rule active_business_and_behavioral_language.json: 5 file-by-file, 0 cross-file violations
+Rule small_and_testable.json: 23 file-by-file, 0 cross-file violations
+Rule enumerate_all_stories_explicitly.json: 3 file-by-file, 0 cross-file violations
+Rule scale_story_map_by_domain.json: 22 file-by-file, 0 cross-file violations
+Rule rule_change_impact.json: 1 file-by-file, 0 cross-file violations
+
+Total: 6 rule(s) with violations

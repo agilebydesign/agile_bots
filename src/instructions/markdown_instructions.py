@@ -218,6 +218,11 @@ class MarkdownInstructions(MarkdownAdapter):
                         output_lines.append(f"**{criteria_key}:** {question}")
                     else:
                         output_lines.append(f"**{criteria_key}:**")
+                    note = criteria_data.get('note', '')
+                    if note:
+                        output_lines.append(f"*{note}*")
+                    else:
+                        output_lines.append("*Select one option.*")
                     output_lines.append("")
                     options = criteria_data.get('options', [])
                     if options:

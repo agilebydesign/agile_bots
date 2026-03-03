@@ -27,6 +27,7 @@
               "type": "and",
               "connector": "or",
               "behavior": "code",
+              "notes": "",
               "context_source": {"file": "source.pdf", "page": "8", "section": "2.1.3 User Workflows"},
               "stories": [
                 {
