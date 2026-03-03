@@ -5,7 +5,7 @@
 const PanelView = require('./panel_view');
 const branding = require('./branding');
 const DiagramSectionView = require('./diagram_section_view');
-const InstructionsSection = require('./instructions_view');
+const InstructionsSection = require('./instructions/instructions_view');
 const { escapeForHtml, escapeForJs, log } = require('./utils');
 
 class WorkspaceSectionView extends PanelView {

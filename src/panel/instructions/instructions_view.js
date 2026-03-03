@@ -6,13 +6,14 @@
  * Story: Display Base Instructions, Display Clarify Instructions, Display Strategy Instructions, etc.
  */
 
-const PanelView = require('./panel_view');
-const branding = require('./branding');
+const PanelView = require('../panel_view');
+const branding = require('../branding');
 const vscode = require('vscode');
 const path = require('path');
-const { escapeForHtml, escapeForJs, repairUtf8Mojibake, Logger } = require('./utils');
+const fs = require('fs');
+const { escapeForHtml, escapeForJs, repairUtf8Mojibake, Logger } = require('../utils');
 
-class InstructionsSection extends PanelView {
+class InstructionsView extends PanelView {
     /**
      * Instructions section view.
      * 
@@ -449,36 +450,20 @@ class InstructionsSection extends PanelView {
             
             // Determine icon display - use image if available
             const iconHtml = config.iconPath 
-                ? `<img src="${config.iconPath}" style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; vertical-align: middle;" alt="${config.name}" />`
+                ? `<img src="${config.iconPath}" class="instr-subsection-icon" alt="${config.name}" />`
                 : '';
             
-            return `
-        <div class="collapsible-section ${expandedClass}" style="margin-bottom: 8px;">
-          <div class="collapsible-header" onclick="toggleSection('${sectionId}')" style="
-            cursor: pointer;
-            padding: 4px 5px;
-            background-color: transparent;
-            border-left: none;
-            border-radius: 2px;
-            display: flex;
-            align-items: center;
-            user-select: none;
-          ">
-            <span class="expand-icon">▸</span>
-            ${iconHtml}
-            <span style="font-weight: 600; color: var(--vscode-foreground); font-size: 14px;">${config.name}</span>
-          </div>
-          <div id="${sectionId}" class="collapsible-content" style="
-            max-height: ${config.defaultExpanded ? 'none' : '0'};
-            overflow: ${config.defaultExpanded ? 'visible' : 'hidden'};
-            display: ${config.defaultExpanded ? 'block' : 'none'};
-            transition: max-height 0.3s ease;
-          ">
-            <div style="padding: 5px; background-color: transparent; margin-top: 2px;">
-              ${contentHtml}
-            </div>
-          </div>
-        </div>`;
+            // Load section template
+            const sectionTemplatePath = vscode.Uri.joinPath(this.extensionUri, 'instructions', 'instructions.html');
+            return fs.readFileSync(sectionTemplatePath.fsPath, 'utf-8')
+                .replace(/\${expandedClass}/g, expandedClass)
+                .replace(/\${sectionId}/g, sectionId)
+                .replace(/\${iconHtml}/g, iconHtml)
+                .replace(/\${sectionName}/g, config.name)
+                .replace(/\${maxHeight}/g, config.defaultExpanded ? 'none' : '0')
+                .replace(/\${overflow}/g, config.defaultExpanded ? 'visible' : 'hidden')
+                .replace(/\${display}/g, config.defaultExpanded ? 'block' : 'none')
+                .replace(/\${contentHtml}/g, contentHtml);
         }).join('');
 
         // Escape prompt content for safe embedding in HTML attribute
@@ -486,92 +471,30 @@ class InstructionsSection extends PanelView {
         const escapedPromptContent = promptContentStr.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '\\r');
         
         Logger.log(`[InstructionsSection] [PERF] render() DONE: ${(performance.now() - perfRenderStart).toFixed(0)}ms`);
-        return `
-    <div class="section card-primary">
-        <div class="collapsible-section expanded">
-            <div class="collapsible-header" style="
-                cursor: pointer;
-                padding: 4px 5px;
-                background-color: transparent;
-                border-left: none;
-                border-radius: 2px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                user-select: none;
-            ">
-                <div style="display: flex; align-items: center;" onclick="toggleSection('instructions-content')">
-                    <span class="expand-icon">▸</span>
-                    ${clipboardIconPath ? `<img src="${clipboardIconPath}" style="margin-right: 8px; width: 28px; height: 28px; object-fit: contain;" alt="Instructions Icon" />` : ''}
-                    <span style="font-weight: 600; font-size: 20px; color: var(--accent-color);">Instructions</span>
-                </div>
-                <button id="submit-to-chat-btn" onclick="sendInstructionsToChat(event)" style="
-                    background: rgba(255, 140, 0, 0.15);
-                    border: none;
-                    border-radius: 8px;
-                    padding: 6px;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    transition: all 0.15s ease;
-                    width: 48px;
-                    height: 48px;
-                " 
-                onmouseover="this.style.backgroundColor='rgba(255, 140, 0, 0.3)'" 
-                onmouseout="this.style.backgroundColor='rgba(255, 140, 0, 0.15)'"
-                title="Submit instructions to chat">
-                    ${botSubmitIconPath ? `<img src="${botSubmitIconPath}" style="width: 100%; height: 100%; object-fit: contain;" alt="Submit to Chat" />` : ''}
-                </button>
-                <script>
-                    window._promptContent = ${JSON.stringify(promptContentStr)};
-                </script>
-            </div>
-            <div id="instructions-content" class="collapsible-content" style="max-height: 600px; overflow-y: auto; overflow-x: hidden; transition: max-height 0.3s ease;">
-                <div class="card-secondary" style="padding: 5px 10px;">
-                    ${sections}
-                    
-                    <!-- Raw Instructions Subsection -->
-                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
-                        <div class="collapsible-section">
-                            <div class="collapsible-header" style="
-                                cursor: pointer;
-                                padding: 8px 0;
-                                display: flex;
-                                align-items: center;
-                                user-select: none;
-                            " onclick="toggleSection('raw-instructions-content')">
-                                <span class="expand-icon">▸</span>
-                                ${copyIconPath ? `<img src="${copyIconPath}" 
-                                     style="margin-right: 8px; width: 20px; height: 20px; object-fit: contain; opacity: 0.9;" 
-                                     alt="Raw" 
-                                     onerror="this.style.display='none';" />` : ''}
-                                <span style="font-weight: 600; font-size: 14px;">Raw Instructions (Test)</span>
-                            </div>
-                            <div id="raw-instructions-content" class="collapsible-content" style="max-height: 0; overflow: hidden; display: none; transition: max-height 0.3s ease;">
-                                <div style="padding: 5px 0; margin-top: 8px;">
-                                    <pre style="
-                                        white-space: pre-wrap;
-                                        word-wrap: break-word;
-                                        font-family: 'Courier New', monospace;
-                                        font-size: 11px;
-                                        line-height: 1.4;
-                                        color: rgba(255,255,255,0.8);
-                                        background: rgba(0,0,0,0.3);
-                                        padding: 6px;
-                                        border-radius: 4px;
-                                        margin: 0;
-                                        max-height: 400px;
-                                        overflow-y: auto;
-                                    ">${promptContentStr ? promptContentStr.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Click Submit button or run an instructions command to populate'}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`;
+        
+        // Build icon HTML for header
+        const clipboardIcon = clipboardIconPath 
+            ? `<img src="${clipboardIconPath}" class="instr-header-icon" alt="Instructions Icon" />` 
+            : '';
+        const submitIcon = botSubmitIconPath 
+            ? `<img src="${botSubmitIconPath}" class="instr-submit-icon" alt="Submit to Chat" />` 
+            : '';
+        const rawIcon = copyIconPath 
+            ? `<img src="${copyIconPath}" class="instr-raw-icon" alt="Raw" onerror="this.style.display='none';" />` 
+            : '';
+        const rawInstructionsContent = promptContentStr 
+            ? promptContentStr.replace(/</g, '&lt;').replace(/>/g, '&gt;') 
+            : 'Click Submit button or run an instructions command to populate';
+        
+        // Load header template
+        const headerTemplatePath = vscode.Uri.joinPath(this.extensionUri, 'instructions', 'instructions_header.html');
+        return fs.readFileSync(headerTemplatePath.fsPath, 'utf-8')
+            .replace(/\${clipboardIcon}/g, clipboardIcon)
+            .replace(/\${submitIcon}/g, submitIcon)
+            .replace(/\${promptContentJson}/g, JSON.stringify(promptContentStr))
+            .replace(/\${sections}/g, sections)
+            .replace(/\${rawIcon}/g, rawIcon)
+            .replace(/\${rawInstructionsContent}/g, rawInstructionsContent);
     }
     
     _formatPropertyName(key) {
@@ -959,7 +882,7 @@ class InstructionsSection extends PanelView {
 
     _formatDiagramInstructions(value) {
         if (!value || !value.diagrams) return '';
-        const DiagramSectionView = require('./diagram_section_view');
+        const DiagramSectionView = require('../diagram_section_view');
         const view = new DiagramSectionView(value.diagrams);
         return view.renderSection();
     }
@@ -1255,71 +1178,31 @@ class InstructionsSection extends PanelView {
             // Review status
             if (assumptions.review_status) {
                 html += `
-          <div style="
-            margin-bottom: 6px;
-            padding: 8px 0;
-            background-color: transparent;
-            border-radius: 0;
-            border-left: none;
-          ">
-            <span style="font-weight: 400; color: var(--vscode-foreground);">Review Status:</span>
-            <span style="margin-left: 8px; color: var(--vscode-foreground);">${escapeForHtml(assumptions.review_status)}</span>
-          </div>`;
+                <div class="instr-review-status">
+                    <span class="instr-review-status-label">Review Status:</span>
+                    <span class="instr-review-status-value">${escapeForHtml(assumptions.review_status)}</span>
+                </div>`;
             }
 
             // Individual assumptions
             if (assumptions.assumptions && Array.isArray(assumptions.assumptions)) {
+                // Load assumption item template
+                const assumptionTemplatePath = vscode.Uri.joinPath(this.extensionUri, 'instructions', 'strategy_assumption_item.html');
+                const assumptionTemplate = fs.readFileSync(assumptionTemplatePath.fsPath, 'utf-8');
+                
                 assumptions.assumptions.forEach((item, index) => {
                     const statusIcon = ''; // No emoji fallbacks - use images only
+                    const marginClass = index < assumptions.assumptions.length - 1 ? 'with-margin' : '';
+                    const justificationHtml = item.justification 
+                        ? `<div class="instr-assumption-justification">${escapeForHtml(item.justification)}</div>` 
+                        : '';
                     
-                    html += `
-            <div style="
-              margin-bottom: ${index < assumptions.assumptions.length - 1 ? '12px' : '0'};
-              padding: 8px 0;
-              background-color: transparent;
-              border-radius: 0;
-              border-left: none;
-            ">
-              <div style="
-                display: flex;
-                align-items: flex-start;
-                margin-bottom: 8px;
-              ">
-                <span style="
-                  font-weight: 600;
-                  color: var(--vscode-foreground);
-                  font-size: 12px;
-                  line-height: 1.4;
-                  flex: 1;
-                ">
-                  ${escapeForHtml(item.assumption)}
-                </span>
-                <span style="
-                  padding: 2px 8px;
-                  border-radius: 3px;
-                  font-size: 10px;
-                  font-weight: 400;
-                  color: var(--vscode-foreground);
-                  border: 1px solid rgba(255, 255, 255, 0.2);
-                ">
-                  ${statusIcon} ${escapeForHtml(item.status || 'UNKNOWN')}
-                </span>
-              </div>
-              ${item.justification ? `
-                <div style="
-                  color: var(--vscode-foreground);
-                  font-size: 11px;
-                  line-height: 1.5;
-                  padding-left: 0;
-                  white-space: pre-wrap;
-                  word-wrap: break-word;
-                  border-left: none;
-                  padding: 8px 0;
-                  margin-top: 8px;
-                ">
-                  ${escapeForHtml(item.justification)}
-                </div>` : ''}
-            </div>`;
+                    html += assumptionTemplate
+                        .replace(/\${marginClass}/g, marginClass)
+                        .replace(/\${assumptionText}/g, escapeForHtml(item.assumption))
+                        .replace(/\${statusIcon}/g, statusIcon)
+                        .replace(/\${statusText}/g, escapeForHtml(item.status || 'UNKNOWN'))
+                        .replace(/\${justificationHtml}/g, justificationHtml);
                 });
             }
         }
@@ -1328,4 +1211,4 @@ class InstructionsSection extends PanelView {
     }
 }
 
-module.exports = InstructionsSection;
+module.exports = InstructionsView;

@@ -1,0 +1,12 @@
+<div class="collapsible-section ${expandedClass} instr-subsection">
+    <div class="collapsible-header instr-subsection-header" onclick="toggleSection('${sectionId}')">
+        <span class="expand-icon">▸</span>
+        ${iconHtml}
+        <span class="instr-subsection-title">${sectionName}</span>
+    </div>
+    <div id="${sectionId}" class="collapsible-content" style="max-height: ${maxHeight}; overflow: ${overflow}; display: ${display}; transition: max-height 0.3s ease;">
+        <div class="instr-subsection-content">
+            ${contentHtml}
+        </div>
+    </div>
+</div>

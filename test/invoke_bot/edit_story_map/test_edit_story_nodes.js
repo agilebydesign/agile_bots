@@ -37,9 +37,9 @@ const { test, after, before } = require('node:test');
 const assert = require('assert');
 const path = require('path');
 const os = require('os');
-const BotPanel = require('../../../src/panel/bot_panel');
+const BotPanel = require('../../../src/panel/bot/bot_panel');
 const PanelView = require('../../../src/panel/panel_view');
-const StoryMapView = require('../../../src/panel/story_map_view');
+const StoryMapView = require('../../../src/panel/story_graph/story_map_view');
 const fs = require('fs');
 
 // Setup - Use temp directory for test workspace to avoid modifying production data

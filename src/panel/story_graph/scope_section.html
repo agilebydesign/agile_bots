@@ -1,0 +1,66 @@
+<!-- Scope Section - Story map filtering and view controls -->
+<div class="section scope-section card-primary">
+    <div class="collapsible-section ${expandedClass}">
+        <div class="collapsible-header scope-collapsible-header" onclick="toggleSection('scope-content')">
+            <div class="scope-header-content">
+                <span class="expand-icon scope-expand-icon">▸</span>
+                ${scopeIconHtml}
+                <span class="scope-title">Scope</span>
+                <div class="scope-header-spacer"></div>
+            </div>
+        </div>
+        <div id="scope-content" class="collapsible-content" style="${contentStyle}">
+            <div class="card-secondary scope-card-secondary">
+                <div class="input-container scope-input-container">
+                    <div class="scope-filter-header">
+                        <div class="input-header scope-filter-label">Filter</div>
+                        <div class="scope-view-modes">
+                            <button 
+                                id="btn-view-hierarchy"
+                                class="scope-view-button ${hierarchyActiveClass}"
+                                onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
+                                title="View story map hierarchy">
+                                hierarchy
+                            </button>
+                            <button 
+                                id="btn-view-increment"
+                                class="scope-view-button ${incrementActiveClass}"
+                                onclick="event.stopPropagation(); switchViewMode('Increment');" 
+                                title="View by increments">
+                                increments
+                            </button>
+                            <button 
+                                id="btn-view-files"
+                                class="scope-view-button ${filesActiveClass}"
+                                onclick="event.stopPropagation(); switchViewMode('Files');" 
+                                title="View file list">
+                                files
+                            </button>
+                        </div>
+                    </div>
+                    <div class="scope-filter-row">
+                        <input type="text" id="scopeFilterInput" class="scope-filter-input"
+                            value="${filterValue}" 
+                            placeholder="Epic or Story name"
+                            onchange="console.log('[ScopeInput] onchange fired with:', this.value); updateFilter(this.value)"
+                            onkeydown="console.log('[ScopeInput] Key pressed:', event.key, 'Value:', this.value); if(event.key === 'Enter') { event.preventDefault(); console.log('[ScopeInput] Enter key - calling updateFilter'); updateFilter(this.value); }" />
+                        <button id="btn-scope-to" class="scope-filter-button" onclick="event.stopPropagation(); handleScopeTo();" style="display: none;" title="Scope to selected node">
+                            <img src="${scopeToIconPath}" class="scope-filter-icon" alt="Scope To" />
+                        </button>
+                        <button class="scope-filter-button" onclick="event.stopPropagation(); showAllScope();" title="Show all scope">
+                            <img src="${showAllIconPath}" class="scope-filter-icon" alt="Show All" />
+                        </button>
+                        <button class="scope-filter-button" onclick="event.stopPropagation(); clearScopeFilter();" title="Clear scope filter">
+                            <img src="${clearIconPath}" class="scope-filter-icon" alt="Clear Filter" />
+                        </button>
+                    </div>
+                    <div class="include-level-controls scope-inject-row">
+                        <span class="scope-inject-label">Inject</span>
+                        ${injectToggleGroupHtml}
+                    </div>
+                </div>
+                ${contentHtml}
+            </div>
+        </div>
+    </div>
+</div>

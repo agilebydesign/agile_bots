@@ -4,21 +4,22 @@ const vscode = require("vscode");
 const path = require("path");
 const fs = require("fs");
 const BotView = require("./bot_view");
-const PanelView = require("./panel_view");
-const WorkspaceManager = require("./workspace/workspace_manager");
-const BehaviorsManager = require("./behaviors/behaviors_manager");
-const branding = require("./branding");
-const { escapeForHtml, Logger } = require("./utils");
+const PanelView = require("../panel_view");
+const workspaceManager = require("../workspace/workspace_manager");
+const behaviorsManager = require("../behaviors/behaviors_manager");
+const storyGraphManager = require("../story_graph/story_graph_manager");
+const instructionsManager = require("../instructions/instructions_manager");
+const branding = require("../branding");
+const { escapeForHtml, Logger } = require("../utils");
 
 class BotPanel {
   constructor(panel, repoRoot, extensionUri) {
 
     const perfConstructorStart = performance.now();
-    try {
-      this._log = Logger.log;
+    try {      
       
       this._displayError = (errorMsg) => {
-        this._log('[BotPanel] Displaying error in webview: ' + errorMsg);
+        Logger.log('[BotPanel] Displaying error in webview: ' + errorMsg);
         vscode.window.showErrorMessage('Bot Panel Error: ' + errorMsg);
         if (this._panel && this._panel.webview) {
           this._panel.webview.postMessage({
@@ -32,14 +33,14 @@ class BotPanel {
         const msg = err?.message || String(err);
         const stack = err?.stack || '';
         const full = context ? `[${context}] ${msg}` : msg;
-        this._log(`[BotPanel] ERROR: ${full}`);
-        if (stack) this._log(`[BotPanel] Stack: ${stack}`);
+        Logger.log(`[BotPanel] ERROR: ${full}`);
+        if (stack) Logger.log(`[BotPanel] Stack: ${stack}`);
         console.error('[BotPanel]', full, stack);
         vscode.window.showErrorMessage(full);
       };
       
-      this._log("[BotPanel] Constructor invoked");
-      this._log(`[PERF] Constructor start`);
+      Logger.log("[BotPanel] Constructor invoked");
+      Logger.log(`[PERF] Constructor start`);
       console.log(`[BotPanel] Constructor called - repoRoot: ${repoRoot}`);
       this._panel = panel;
       
@@ -52,7 +53,7 @@ class BotPanel {
       
       // Initialize branding with repo root      
       branding.setRepoRoot(this._repoRoot);
-      this._log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
+      Logger.log(`[BotPanel] Branding initialized: ${branding.getBranding()}`);
       
 
       const perfVersionStart = performance.now();
@@ -60,7 +61,7 @@ class BotPanel {
       this._panelVersion = this._readPanelVersion();
       const perfVersionEnd = performance.now();
       console.log(`[BotPanel] Panel version: ${this._panelVersion}`);
-      this._log(`[PERF] Read panel version: ${(perfVersionEnd - perfVersionStart).toFixed(2)}ms`);
+      Logger.log(`[PERF] Read panel version: ${(perfVersionEnd - perfVersionStart).toFixed(2)}ms`);
       
 
       let botDirectory = process.env.BOT_DIRECTORY || path.join(this._repoRoot, 'bots', 'story_bot');
@@ -76,7 +77,7 @@ class BotPanel {
       this._sharedCLI = new PanelView(botDirectory);
       const perfPanelViewEnd = performance.now();
       console.log("[BotPanel] Shared PanelView instance created successfully");
-      this._log(`[PERF] PanelView creation: ${(perfPanelViewEnd - perfPanelViewStart).toFixed(2)}ms`);
+      Logger.log(`[PERF] PanelView creation: ${(perfPanelViewEnd - perfPanelViewStart).toFixed(2)}ms`);
       
 
       this._botView = null;
@@ -97,7 +98,7 @@ class BotPanel {
       const perfConstructorEnd = performance.now();
       const constructorDuration = (perfConstructorEnd - perfConstructorStart).toFixed(2);
       console.log("[BotPanel] Constructor completed successfully");
-      this._log(`[PERF] TOTAL Constructor duration: ${constructorDuration}ms`);
+      Logger.log(`[PERF] TOTAL Constructor duration: ${constructorDuration}ms`);
     } catch (error) {
       console.error(`[BotPanel] ERROR in constructor: ${error.message}`);
       console.error(`[BotPanel] ERROR stack: ${error.stack}`);
@@ -123,15 +124,15 @@ class BotPanel {
     );
 
 
-    this._log('[BotPanel] Registering onDidReceiveMessage handler');
+    Logger.log('[BotPanel] Registering onDidReceiveMessage handler');
     this._panel.webview.onDidReceiveMessage(
       (message) => {
-        this._log('[BotPanel] *** MESSAGE HANDLER FIRED ***');
-        this._log('[BotPanel] Received message from webview: ' + message.command + ' ' + JSON.stringify(message));
+        Logger.log('[BotPanel] *** MESSAGE HANDLER FIRED ***');
+        Logger.log('[BotPanel] Received message from webview: ' + message.command + ' ' + JSON.stringify(message));
         switch (message.command) {
           case "hidePanel":
 
-            this._log('[BotPanel] Closing panel');
+            Logger.log('[BotPanel] Closing panel');
             this._panel.dispose();
             return;
           case "refresh":
@@ -139,7 +140,7 @@ class BotPanel {
             try {
               if (fs.existsSync(cachePath)) {
                 fs.unlinkSync(cachePath);
-                this._log('[BotPanel] Deleted enriched cache file');
+                Logger.log('[BotPanel] Deleted enriched cache file');
               }
             } catch (err) {
               this._reportError(err, 'Could not delete cache');
@@ -147,9 +148,9 @@ class BotPanel {
 
             (async () => {
               try {
-                this._log('[BotPanel] Clearing story graph cache...');
+                Logger.log('[BotPanel] Clearing story graph cache...');
                 await this._botView.execute('reload_story_graph --format json');
-                this._log('[BotPanel] Story graph cache cleared');
+                Logger.log('[BotPanel] Story graph cache cleared');
               } catch (err) {
                 this._reportError(err, 'Could not clear story graph cache');
               }
@@ -166,7 +167,7 @@ class BotPanel {
                 if (currentAction) {
                   setTimeout(() => {
                     try {
-                      this._log(`[BotPanel] Refresh: Re-expanding section for: ${currentAction}`);
+                      Logger.log(`[BotPanel] Refresh: Re-expanding section for: ${currentAction}`);
                       this._panel.webview.postMessage({
                         command: 'expandInstructionsSection',
                         actionName: currentAction
@@ -182,31 +183,14 @@ class BotPanel {
             })();
             return;
           case "toggleIncrementView":
-
-            this._log('[BotPanel] toggleIncrementView: switching to ' + message.currentView);
-            this._currentStoryMapView = message.currentView;
-
-            (async () => {
-              try {
-                await this._update();
-              } catch (err) {
-                this._reportError(err, 'Toggle view');
-              }
-            })();
+            storyGraphManager.toggleIncrementView(message, this)
+              .then((result) => {
+                  if (result) return this._update();
+              });
             return;
           case "switchViewMode":
-
-            this._log('[BotPanel] switchViewMode: switching to ' + message.viewMode);
-            this._currentStoryMapView = message.viewMode;
-
-            (async () => {
-              try {
-                await this._update();
-              } catch (err) {
-                this._reportError(err, 'Switch view');
-              }
-            })();
-            return;
+            storyGraphManager.switchViewMode(message, this)
+              return this._update();            
           case "logToFile":
             if (message.message) {
               Logger.logPanelClicks(message.message);
@@ -220,84 +204,15 @@ class BotPanel {
           case "showScopeError":
             if (message.message) {
               const errMsg = message.message;
-              this._log(`[BotPanel] Scope error from webview: ${errMsg}`);
+              Logger.log(`[BotPanel] Scope error from webview: ${errMsg}`);
               vscode.window.showErrorMessage(errMsg);
             }
             return;
           case "copyNodeToClipboard":
-            (() => {
-              const nodePath = message.nodePath;
-              const action = message.action;
-              if (!nodePath || !action) return;
-              const method = action === 'json' ? 'copy_json' : 'copy_name';
-              const command = nodePath + '.' + method;
-              const doCopy = async () => {
-                const response = await this._botView.execute(command);
-                const result = response && (response.result !== undefined ? response.result : response);
-                let text;
-                if (action === 'json') {
-                  text = (typeof result === 'string' ? result : JSON.stringify(result, null, 2));
-                } else {
-
-                  if (typeof result === 'string') {
-                    text = result;
-                  } else if (result && typeof result === 'object') {
-                    text = result.result ?? result.node_name ?? result.message ?? result.name ?? '';
-                    text = String(text);
-                  } else {
-                    text = String(result != null ? result : '');
-                  }
-                }
-                await vscode.env.clipboard.writeText(text);
-                vscode.window.showInformationMessage(action === 'json' ? 'Node JSON copied to clipboard' : 'Node name copied to clipboard');
-              };
-              if (action === 'json') {
-                vscode.window.withProgress({
-                  location: vscode.ProgressLocation.Notification,
-                  title: 'Injecting scope to clipboard...',
-                  cancellable: false
-                }, async () => {
-                  try {
-                    await doCopy();
-                  } catch (err) {
-                    this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
-                    vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                  }
-                });
-              } else {
-                doCopy().catch((err) => {
-                  this._log(`[BotPanel] copyNodeToClipboard failed: ${err.message}`);
-                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                });
-              }
-            })();
+            storyGraphManager.copyNodeToClipboard(message, this);
             return;
           case "copyIncrementStoriesJson":
-            (() => {
-              const incName = message.incName;
-              if (!incName) return;
-              const command = 'story_graph.copy_increment_stories_json name:"' + incName + '"';
-              const doCopy = async () => {
-                const response = await this._botView.execute(command);
-                const result = response && (response.result !== undefined ? response.result : response);
-                const arr = Array.isArray(result) ? result : (result && result.result ? result.result : []);
-                const text = JSON.stringify(arr, null, 2);
-                await vscode.env.clipboard.writeText(text);
-                vscode.window.showInformationMessage('Increment stories JSON copied to clipboard');
-              };
-              vscode.window.withProgress({
-                location: vscode.ProgressLocation.Notification,
-                title: 'Injecting increment stories to clipboard...',
-                cancellable: false
-              }, async () => {
-                try {
-                  await doCopy();
-                } catch (err) {
-                  this._log(`[BotPanel] copyIncrementStoriesJson failed: ${err.message}`);
-                  vscode.window.showErrorMessage(`Copy failed: ${err.message}`);
-                }
-              });
-            })();
+            storyGraphManager.copyIncrementStoriesJson(message, this);
             return;
           case "copyText":
             vscode.env.clipboard.writeText(message.text || '').then(() => {
@@ -305,7 +220,7 @@ class BotPanel {
             });
             return;
           case "openFile":
-            this._log('[BotPanel] openFile message received with filePath: ' + message.filePath);
+            Logger.log('[BotPanel] openFile message received with filePath: ' + message.filePath);
             if (message.filePath) {
               const rawPath = message.filePath;
               const cleanPath = rawPath.split('#')[0];
@@ -368,7 +283,7 @@ class BotPanel {
                   });
                 } else if (fileSize > MAX_TEXT_FILE_SIZE) {
 
-                  this._log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
+                  Logger.log(`[BotPanel] File exceeds ${MAX_TEXT_FILE_SIZE} bytes (${fileSize}), using vscode.open`);
                   vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
                     this._reportError(error, `Failed to open file: ${message.filePath}`);
                   });
@@ -424,7 +339,7 @@ class BotPanel {
             }
             return;
           case "openFiles":
-            this._log('[BotPanel] openFiles message received with ' + (message.filePaths && message.filePaths.length) + ' paths');
+            Logger.log('[BotPanel] openFiles message received with ' + (message.filePaths && message.filePaths.length) + ' paths');
             if (message.filePaths && Array.isArray(message.filePaths) && message.filePaths.length > 0) {
               for (const filePath of message.filePaths) {
                 if (!filePath) continue;
@@ -455,7 +370,7 @@ class BotPanel {
             }
             return;
           case "openFileInColumn":
-            this._log('[BotPanel] openFileInColumn message received');
+            Logger.log('[BotPanel] openFileInColumn message received');
             if (message.filePath) {
               const rawPath = message.filePath;
               const cleanPath = rawPath.split('#')[0];
@@ -496,7 +411,7 @@ class BotPanel {
             }
             return;
           case "openFileWithState":
-            this._log('[BotPanel] openFileWithState message received');
+            Logger.log('[BotPanel] openFileWithState message received');
             if (message.filePath) {
 
               const rawPath = message.filePath;
@@ -548,7 +463,7 @@ class BotPanel {
                 vscode.commands.executeCommand('vscode.open', uriWithFragment).catch((error) => {
                   this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
-                this._log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
+                Logger.log(`[BotPanel] JSON file opened with state: selectedNode=${node.name}`);
               } else if (fileExtension === 'json') {
 
                 vscode.commands.executeCommand('vscode.open', fileUri).catch((error) => {
@@ -561,7 +476,7 @@ class BotPanel {
                   preserveFocus: false
                 };
                 vscode.window.showTextDocument(fileUri, options).then(() => {
-                  this._log(`[BotPanel] File opened with state: lineNumber=${message.state.lineNumber}`);
+                  Logger.log(`[BotPanel] File opened with state: lineNumber=${message.state.lineNumber}`);
                 }).catch((error) => {
                   this._reportError(error, `Failed to open file: ${message.filePath}`);
                 });
@@ -628,7 +543,7 @@ class BotPanel {
                     }
                     
                     vscode.window.showTextDocument(doc, options).then(() => {
-                      this._log(`[BotPanel] File opened with state: selectedNode=${node.name}`);
+                      Logger.log(`[BotPanel] File opened with state: selectedNode=${node.name}`);
                     });
                   },
                   (error) => {
@@ -651,18 +566,18 @@ class BotPanel {
           case "openCodeFiles":
           case "openAllRelatedFiles":
 
-            this._log(`[BotPanel] ${message.command} message received for node: ${message.nodeName}`);
+            Logger.log(`[BotPanel] ${message.command} message received for node: ${message.nodeName}`);
             this._handleOpenRelatedFiles(message);
             return;
           case "clearScopeFilter":
             if (message.viewMode) {
               this._currentStoryMapView = message.viewMode;
-              this._log(`[BotPanel] clearScopeFilter: setting view to ${message.viewMode} before clearing`);
+              Logger.log(`[BotPanel] clearScopeFilter: setting view to ${message.viewMode} before clearing`);
             }
             this._botView?.execute('scope all')
               .then(() => this._update())
               .catch((error) => {
-                this._log(`[BotPanel] ERROR clearScopeFilter: ${error.message}`);
+                Logger.log(`[BotPanel] ERROR clearScopeFilter: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to clear scope: ${error.message}`);
                 this._displayError(`Failed to clear scope: ${error.message}`);
               });
@@ -671,42 +586,41 @@ class BotPanel {
             this._botView?.execute('scope showall')
               .then(() => this._update())
               .catch((error) => {
-                this._log(`[BotPanel] ERROR showAllScope: ${error.message}`);
+                Logger.log(`[BotPanel] ERROR showAllScope: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to show all: ${error.message}`);
                 this._displayError(`Failed to show all: ${error.message}`);
               });
             return;
           case "updateIncludeLevel":
-            this._log('[BotPanel] Received updateIncludeLevel: ' + message.includeLevel);
+            Logger.log('[BotPanel] Received updateIncludeLevel: ' + message.includeLevel);
             
             if (!this._botView) {
               const errorMsg = '_botView is null, cannot update include_level';
-              this._log('[BotPanel] ERROR: ' + errorMsg);
+              Logger.log('[BotPanel] ERROR: ' + errorMsg);
               this._displayError(errorMsg);
               return;
-            }
-            
+            }            
 
             const scopeIncludeCmd = `scope include_level=${message.includeLevel}`;
             this._botView.execute(scopeIncludeCmd)
               .then(() => {
-                this._log('[BotPanel] Include level updated: ' + message.includeLevel);
+                Logger.log('[BotPanel] Include level updated: ' + message.includeLevel);
                 return this._update();
               })
               .catch((err) => {
                 const errorMsg = 'Include level update failed: ' + err.message;
-                this._log('[BotPanel] ERROR: ' + errorMsg);
+                Logger.log('[BotPanel] ERROR: ' + errorMsg);
                 this._displayError(errorMsg);
               });
             return;
           
           case "updateFilter":
-            this._log('[BotPanel] Received updateFilter: ' + message.filter);
-            this._log('[BotPanel] _botView is: ' + this._botView);
+            Logger.log('[BotPanel] Received updateFilter: ' + message.filter);
+            Logger.log('[BotPanel] _botView is: ' + this._botView);
             
             if (!this._botView) {
               const errorMsg = '_botView is null, cannot execute scope command';
-              this._log('[BotPanel] ERROR: ' + errorMsg);
+              Logger.log('[BotPanel] ERROR: ' + errorMsg);
               this._displayError(errorMsg);
               return;
             }
@@ -721,37 +635,37 @@ class BotPanel {
                 prefixedFilter = `increment ${filterValue}`;
               }
               const scopeCmd = `scope "${prefixedFilter}"`;
-              this._log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
+              Logger.log('[BotPanel] Executing scope command: ' + scopeCmd + ' (view mode: ' + this._currentStoryMapView + ')');
               
               this._botView.execute(scopeCmd)
                 .then((result) => {
-                  this._log('[BotPanel] Scope filter applied, result: ' + JSON.stringify(result).substring(0, 200));
+                  Logger.log('[BotPanel] Scope filter applied, result: ' + JSON.stringify(result).substring(0, 200));
                   return this._update();
                 })
                 .then(() => {
-                  this._log('[BotPanel] Update completed after scope filter');
+                  Logger.log('[BotPanel] Update completed after scope filter');
                 })
                 .catch((err) => {
                   const errorMsg = 'Scope filter failed: ' + err.message;
-                  this._log('[BotPanel] ERROR: ' + errorMsg);
-                  this._log('[BotPanel] ERROR stack: ' + err.stack);
+                  Logger.log('[BotPanel] ERROR: ' + errorMsg);
+                  Logger.log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
 
                 });
             } else {
 
-              this._log('[BotPanel] Clearing scope filter');
+              Logger.log('[BotPanel] Clearing scope filter');
               
               this._botView.execute('scope all')
                 .then((result) => {
-                  this._log('[BotPanel] Scope cleared successfully');
+                  Logger.log('[BotPanel] Scope cleared successfully');
                   return this._update();
                 })
                 .catch((err) => {
                   const errorMsg = 'Clear scope failed: ' + err.message;
-                  this._log('[BotPanel] ERROR: ' + errorMsg);
-                  this._log('[BotPanel] ERROR stack: ' + err.stack);
+                  Logger.log('[BotPanel] ERROR: ' + errorMsg);
+                  Logger.log('[BotPanel] ERROR stack: ' + err.stack);
                   this._displayError(errorMsg);
                   vscode.window.showErrorMessage(errorMsg);
 
@@ -759,175 +673,71 @@ class BotPanel {
             }
             return;
           case "updateWorkspace":
-            this._log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
-            WorkspaceManager.updateWorkspace(message, this)
+            Logger.log('[BotPanel] Received updateWorkspace message: ' + message.workspacePath);
+            workspaceManager.updateWorkspace(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
+            return;
           case "browseWorkspace":
-            this._log('[BotPanel] Received browseWorkspace message');
-            WorkspaceManager.browseAndUpdateWorkspace(this)
+            Logger.log('[BotPanel] Received browseWorkspace message');
+            workspaceManager.browseAndUpdateWorkspace(this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "switchBot":
-            this._log('[BotPanel] Received switchBot message');
-            WorkspaceManager.switchBot(message, this)
+            Logger.log('[BotPanel] Received switchBot message');
+            workspaceManager.switchBot(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "getBehaviorRules":
-            BehaviorsManager.getBehaviorRules(message, this)
+            behaviorsManager.getBehaviorRules(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "executeNavigationCommand":
-            BehaviorsManager.executeNavigationCommand(message, this)
+            behaviorsManager.executeNavigationCommand(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setExecutionMode":
-            BehaviorsManager.setExecutionMode(message, this)
+            behaviorsManager.setExecutionMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorExecuteMode":
-            BehaviorsManager.setBehaviorExecuteMode(message, this)
+            behaviorsManager.setBehaviorExecuteMode(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setBehaviorSpecialInstructions":
-            BehaviorsManager.setBehaviorSpecialInstructions(message, this)
+            behaviorsManager.setBehaviorSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "setActionSpecialInstructions":
-            BehaviorsManager.setActionSpecialInstructions(message, this)
+            behaviorsManager.setActionSpecialInstructions(message, this)
               .then((result) => {
                 if (result) return this._update();
               });
             return;
           case "renameNode":
-            this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION RECEIVED ==========`);
-            this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Received renameNode message`, {
-              nodePath: message.nodePath,
-              currentName: message.currentName,
-              timestamp: new Date().toISOString()
-            });
-            if (message.nodePath && message.currentName) {
-
-              this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Prompting user for new name`);
-              vscode.window.showInputBox({
-                prompt: `Rename "${message.currentName}"`,
-                value: message.currentName,
-                placeHolder: 'Enter new name'
-              }).then((newName) => {
-                this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] User provided new name`, {
-                  newName: newName,
-                  currentName: message.currentName,
-                  changed: newName && newName !== message.currentName
-                });
-                if (newName && newName !== message.currentName) {
-
-                  const trimmedName = newName.trim().replace(/^"(.*)"$/, '$1');
-
-                  const escapedName = trimmedName.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-                  const command = `${message.nodePath}.rename name:"${escapedName}"`;
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Built rename command: ${command}`);
-                  
-
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Sending optimistic update to webview`);
-                  this._panel.webview.postMessage({
-                    command: 'optimisticRename',
-                    nodePath: message.nodePath,
-                    oldName: message.currentName,
-                    newName: trimmedName
-                  });
-                  
-                  const logPath = path.join(this._workspaceRoot, 'logs', 'story_graph_operations.log');
-                  const timestamp = new Date().toISOString();
-                  const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RENAME COMMAND: ${command}\n`;
-                  
-                  try {
-                    fs.mkdirSync(path.join(this._workspaceRoot, 'logs'), { recursive: true });
-                    fs.appendFileSync(logPath, logEntry);
-                  } catch (err) {
-                    this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
-                  }
-                  
-
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Executing rename command via backend (optimistic)...`);
-                  this._botView?.execute(command)
-                    .then((result) => {
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [SUCCESS] Backend rename executed successfully`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Result: ${JSON.stringify(result).substring(0, 500)}`);
-                      
-
-                      const resultLog = `[${timestamp}] RESULT: ${JSON.stringify(result, null, 2)}\n`;
-                      try {
-                        fs.appendFileSync(logPath, resultLog);
-                      } catch (err) {
-                        this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
-                      }
-                      
-
-                      this._panel.webview.postMessage({
-                        command: 'saveCompleted',
-                        success: true,
-                        result: result
-                      });
-                      
-
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] Optimistic update - skipping panel refresh`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== RENAME OPERATION COMPLETE ==========`);
-                    })
-                    .catch((error) => {
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Rename failed`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Error: ${error.message}`);
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Stack: ${error.stack}`);
-                      
-
-                      this._panel.webview.postMessage({
-                        command: 'saveCompleted',
-                        success: false,
-                        error: error.message
-                      });
-                      
-
-                      const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
-                      try {
-                        fs.appendFileSync(logPath, errorLog);
-                      } catch (err) {
-                        this._log(`[BotPanel] Failed to write error to log file: ${err.message}`);
-                      }
-                      
-                      vscode.window.showErrorMessage(`Failed to rename: ${error.message}`);
-                      
-
-                      this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Refreshing panel after error...`);
-                      this._update().catch(err => {
-                        this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [RENAME] [ERROR] Panel refresh failed: ${err.message}`);
-                      });
-                    });
-                }
-              });
-            }
+            storyGraphManager.renameNode(message, this)
             return;
           case "executeCommand":
             if (message.commandText) {
-              this._log(`\n${'='.repeat(80)}`);
-              this._log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
-              this._log(`[BotPanel] commandText: ${message.commandText}`);
+              Logger.log(`\n${'='.repeat(80)}`);
+              Logger.log(`[BotPanel] RECEIVED executeCommand MESSAGE`);
+              Logger.log(`[BotPanel] commandText: ${message.commandText}`);
               
-
-
               const isCreateOp = message.commandText.includes('.create_') || 
                                  message.commandText.includes('.create ') || 
                                  message.commandText.match(/\.create(?:$| name:)/) ||
@@ -937,73 +747,56 @@ class BotPanel {
               const isMoveOp = message.commandText.includes('.move_to');
               const isRenameOp = message.commandText.includes('.rename');
               const isStoryGraphOp = isCreateOp || isDeleteOp || isMoveOp || isRenameOp;
-              
-
-
-
-              
 
               const isSubmitOp = message.commandText.includes('submit_required_behavior_instructions') ||
                 message.commandText.includes('submit_instructions') ||
                 message.commandText.includes('submit_current_instructions');
               if (isSubmitOp) {
-                this._log(`[SUBMIT_DEBUG] executeCommand: submit op received, commandText=${message.commandText?.substring(0, 80)}`);
+                Logger.log(`[SUBMIT_DEBUG] executeCommand: submit op received, commandText=${message.commandText?.substring(0, 80)}`);
                 console.log('[SUBMIT_DEBUG] executeCommand: submit op received');
               }
               if (message.commandText.includes('submit_required_behavior_instructions')) {
-                this._log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
-                this._log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
+                Logger.log(`[BotPanel] *** SUBMIT COMMAND DETECTED ***`);
+                Logger.log(`[BotPanel] Command contains 'submit_required_behavior_instructions': YES`);
               }
               
-              this._log(`[BotPanel] Operation type detected`, {
+              Logger.log(`[BotPanel] Operation type detected`, {
                 isMoveOp,
                 isRenameOp,
                 isCreateOp,
                 isDeleteOp
               });
+                            
+              const logEntry = `\n${'='.repeat(80)}\n[RECEIVED COMMAND: ${message.commandText}\n`;
+              Logger.logStoryGraphOperations(logEntry);
               
-              const logPath = path.join(this._workspaceRoot, 'logs', 'story_graph_operations.log');
-              const timestamp = new Date().toISOString();
-              const logEntry = `\n${'='.repeat(80)}\n[${timestamp}] RECEIVED COMMAND: ${message.commandText}\n`;
               
-              try {
-                fs.mkdirSync(path.join(this._workspaceRoot, 'logs'), { recursive: true });
-                fs.appendFileSync(logPath, logEntry);
-              } catch (err) {
-                this._log(`[BotPanel] Failed to write to log file: ${err.message}`);
-              }
-              
-              this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 5] Executing command via backend...`);
+              Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 5] Executing command via backend...`);
               const isIncrementCmd = message.commandText.includes('_increment') || message.commandText.includes('add_increment') || message.commandText.includes('rename_story_in');
               if (isIncrementCmd) {
-                this._log(`[INCREMENT][CLI] Received increment command: ${message.commandText}`);
+                Logger.log(`[INCREMENT][CLI] Received increment command: ${message.commandText}`);
               }
               const runExecute = () => this._botView?.execute(message.commandText)
                 .then((result) => {
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] [SUCCESS] Backend command executed successfully`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Command: ${message.commandText}`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Result: ${JSON.stringify(result).substring(0, 500)}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] [SUCCESS] Backend command executed successfully`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Command: ${message.commandText}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Result: ${JSON.stringify(result).substring(0, 500)}`);
                   if (isIncrementCmd) {
-                    this._log(`[INCREMENT][CLI->UI] Result for "${message.commandText}": ${JSON.stringify(result)}`);
+                    Logger.log(`[INCREMENT][CLI->UI] Result for "${message.commandText}": ${JSON.stringify(result)}`);
                     this._panel.webview.postMessage({
                       command: 'incrementCommandResult',
                       commandText: message.commandText,
                       result: result
                     });
                   }
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Timestamp: ${new Date().toISOString()}`);
-                  
-
-                  const resultLog = `[${timestamp}] SUCCESS RESULT: ${JSON.stringify(result, null, 2)}\n`;
-                  try {
-                    fs.appendFileSync(logPath, resultLog);
-                  } catch (err) {
-                    this._log(`[BotPanel] Failed to write result to log file: ${err.message}`);
-                  }
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 6] Timestamp: ${new Date().toISOString()}`);          
+            
+                  const resultLog = `SUCCESS RESULT: ${JSON.stringify(result, null, 2)}\n`;
+                  Logger.log(resultLog);
                   
 
                   if (isSubmitOp && result) {
-                    this._log(`[SUBMIT_DEBUG] executeCommand submit path: result status=${result?.status} clipboard_status=${result?.clipboard_status}`);
+                    Logger.log(`[SUBMIT_DEBUG] executeCommand submit path: result status=${result?.status} clipboard_status=${result?.clipboard_status}`);
                     console.log('[SUBMIT_DEBUG] executeCommand submit path: result status=', result?.status, 'clipboard_status=', result?.clipboard_status);
 
                     if (result.status === 'success') {
@@ -1014,7 +807,7 @@ class BotPanel {
                       vscode.window.showErrorMessage(`Submit failed: ${errorMsg}`);
                     }
 
-                    this._log(`[BotPanel] Submit completed - skipping panel refresh (no story graph changes)`);
+                    Logger.log(`[BotPanel] Submit completed - skipping panel refresh (no story graph changes)`);
                     return Promise.resolve();
                   }
                   
@@ -1022,95 +815,88 @@ class BotPanel {
                   const timestampFile = path.join(this._workspaceRoot, 'docs', 'stories', '.story-graph-panel-edit-time');
                   try {
                     fs.writeFileSync(timestampFile, Date.now().toString());
-                    this._log(`[BotPanel] Logged panel edit timestamp: ${Date.now()}`);
+                    Logger.log(`[BotPanel] Logged panel edit timestamp: ${Date.now()}`);
                   } catch (err) {
-                    this._log(`[BotPanel] Failed to write timestamp file: ${err.message}`);
+                    Logger.log(`[BotPanel] Failed to write timestamp file: ${err.message}`);
                   }
                   
 
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
-                    this._log(`[BotPanel] Sending saveCompleted(success=true) to webview`);
+                    Logger.log(`[BotPanel] Sending saveCompleted(success=true) to webview`);
                     this._panel.webview.postMessage({
                       command: 'saveCompleted',
                       success: true,
                       result: result
                     });
-                    this._log(`[BotPanel] Message sent to webview`);
+                    Logger.log(`[BotPanel] Message sent to webview`);
                   }
                   
 
                   if (isIncrementCmd) {
-                    this._log(`[INCREMENT] Refreshing panel after increment command`);
+                    Logger.log(`[INCREMENT] Refreshing panel after increment command`);
                     return this._update();
                   }
-                  
-
-
 
                   if (isStoryGraphOp) {
-                    this._log(`[BotPanel] Story-changing operation - skipping panel refresh`);
-                    this._log(`[BotPanel] Operation type: create=${isCreateOp}, move=${isMoveOp}, delete=${isDeleteOp}, rename=${isRenameOp}`);
-                    this._log(`[BotPanel] Panel will NOT refresh - optimistic updates remain visible`);
+                    Logger.log(`[BotPanel] Story-changing operation - skipping panel refresh`);
+                    Logger.log(`[BotPanel] Operation type: create=${isCreateOp}, move=${isMoveOp}, delete=${isDeleteOp}, rename=${isRenameOp}`);
+                    Logger.log(`[BotPanel] Panel will NOT refresh - optimistic updates remain visible`);
                     return Promise.resolve();
                   } else {
 
                     const isScopeCommand = message.commandText.startsWith('scope ');
                     if (isScopeCommand) {
-                      this._log(`[BotPanel] Scope command detected - refreshing panel to show filtered view...`);
+                      Logger.log(`[BotPanel] Scope command detected - refreshing panel to show filtered view...`);
                       return this._update();
                     }
                     
 
-                    this._log(`[BotPanel] Non-story operation - skipping refresh`);
+                    Logger.log(`[BotPanel] Non-story operation - skipping refresh`);
                     return Promise.resolve();
                   }
                 })
                 .then(() => {
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 9] Panel refresh completed`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== COMMAND FLOW COMPLETE ==========`);
-                  this._log(`${'='.repeat(80)}\n`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [STEP 9] Panel refresh completed`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== COMMAND FLOW COMPLETE ==========`);
+                  Logger.log(`${'='.repeat(80)}\n`);
                 })
                 .catch((error) => {
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Command execution failed`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Command: ${message.commandText}`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Error: ${error.message}`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Stack: ${error.stack}`);
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Timestamp: ${new Date().toISOString()}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Command execution failed`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Command: ${message.commandText}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Error: ${error.message}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Stack: ${error.stack}`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] [ERROR] Timestamp: ${new Date().toISOString()}`);
                   
 
-                  const errorLog = `[${timestamp}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
-                  try {
-                    fs.appendFileSync(logPath, errorLog);
-                  } catch (err) {
-                    this._log(`[BotPanel] Failed to write error to log file: ${err.message}`);
-                  }
+                  const errorLog = `[ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
+                  Logger.log(errorLog);
                   
                   vscode.window.showErrorMessage(`Failed to execute ${message.commandText}: ${error.message}`);
                   
 
                   if (isMoveOp || isCreateOp || isDeleteOp || isRenameOp) {
-                    this._log(`[BotPanel] Sending saveCompleted(success=false) to webview`);
+                    Logger.log(`[BotPanel] Sending saveCompleted(success=false) to webview`);
                     this._panel.webview.postMessage({
                       command: 'saveCompleted',
                       success: false,
                       error: error.message
                     });
-                    this._log(`[BotPanel] Error message sent to webview`);
+                    Logger.log(`[BotPanel] Error message sent to webview`);
                   }
                   
 
 
                   if (!isOptimistic) {
-                    this._log(`[BotPanel] Refreshing panel after error...`);
+                    Logger.log(`[BotPanel] Refreshing panel after error...`);
                     this._update().catch(err => {
-                      this._log(`[BotPanel] ERROR in _update after failure: ${err.message}`);
+                      Logger.log(`[BotPanel] ERROR in _update after failure: ${err.message}`);
                     });
                   } else {
-                    this._log(`[BotPanel] Optimistic operation failed - skipping refresh (rollback handled by SaveQueue)`);
+                    Logger.log(`[BotPanel] Optimistic operation failed - skipping refresh (rollback handled by SaveQueue)`);
                   }
                   
-                  this._log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== COMMAND FLOW FAILED ==========`);
-                  this._log(`${'='.repeat(80)}\n`);
+                  Logger.log(`[ASYNC_SAVE] [EXTENSION_HOST] ========== COMMAND FLOW FAILED ==========`);
+                  Logger.log(`${'='.repeat(80)}\n`);
                 });
               if (isSubmitOp) {
                 vscode.window.withProgress({
@@ -1122,30 +908,30 @@ class BotPanel {
                 runExecute();
               }
             } else {
-              this._log(`[BotPanel] WARNING: executeCommand received with no commandText`);
+              Logger.log(`[BotPanel] WARNING: executeCommand received with no commandText`);
             }
             return;
           case "navigateToBehavior":
-            BehaviorsManager.navigateToBehavior(message, this)
+            behaviorsManager.navigateToBehavior(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "submitWorkspaceBehaviorInstructions":
-            BehaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
+            behaviorsManager.submitWorkspaceBehaviorInstructions(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
                 return this._updateWithCachedData();
               });
             return;
           case "navigateToAction":
-            BehaviorsManager.navigateToAction(message, this)
+            behaviorsManager.navigateToAction(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
             return;
           case "navigateAndExecute":
-            BehaviorsManager.navigateAndExecute(message, this)
+            behaviorsManager.navigateAndExecute(message, this)
               .then((result) => {
                 if (result) return this._updateWithCachedData();
               });
@@ -1158,7 +944,7 @@ class BotPanel {
           case "sectionExpansion":
             if (message.sectionId && typeof message.expanded === 'boolean') {
               this._expansionState[message.sectionId] = message.expanded;
-              this._log(`[BotPanel] sectionExpansion: ${message.sectionId} = ${message.expanded}`);
+              Logger.log(`[BotPanel] sectionExpansion: ${message.sectionId} = ${message.expanded}`);
             }
             return;
           case "toggleCollapse":
@@ -1167,7 +953,7 @@ class BotPanel {
             }
             return;
           case "sendToChat":
-            this._log('[SUBMIT_DEBUG] 1. sendToChat received');
+            Logger.log('[SUBMIT_DEBUG] 1. sendToChat received');
             console.log('[SUBMIT_DEBUG] 1. sendToChat received');
             if (!this._botView) {
               const err = new Error('_botView is null - panel not properly initialized');
@@ -1178,11 +964,11 @@ class BotPanel {
             const currentBehavior = this._botView.botData?.behaviors?.current_behavior || this._botView.botData?.current_behavior;
             const currentAction = this._botView.botData?.behaviors?.current_action || this._botView.botData?.current_action;
             const submitCmd = (currentBehavior && currentAction) ? `submit ${currentBehavior} ${currentAction}` : 'submit';
-            this._log(`[SUBMIT_DEBUG] 2. Calling _botView.execute("${submitCmd}") - panel selection: ${currentBehavior}.${currentAction}`);
+            Logger.log(`[SUBMIT_DEBUG] 2. Calling _botView.execute("${submitCmd}") - panel selection: ${currentBehavior}.${currentAction}`);
             console.log('[SUBMIT_DEBUG] 2. Calling _botView.execute("' + submitCmd + '")');
             this._botView.execute(submitCmd)
               .then((output) => {
-                this._log(`[SUBMIT_DEBUG] 3. execute resolved, status=${output?.status} clipboard_status=${output?.clipboard_status} instructions_length=${output?.instructions_length}`);
+                Logger.log(`[SUBMIT_DEBUG] 3. execute resolved, status=${output?.status} clipboard_status=${output?.clipboard_status} instructions_length=${output?.instructions_length}`);
                 console.log('[SUBMIT_DEBUG] 3. execute resolved, status:', output?.status, 'clipboard_status:', output?.clipboard_status, 'instructions_length:', output?.instructions_length);
                 
 
@@ -1209,85 +995,33 @@ class BotPanel {
                   }
                   else {
                     vscode.window.showWarningMessage('Submit completed with unknown result');
-                    this._log('[PANEL] Submit output:', output);
+                    Logger.log('[PANEL] Submit output:', output);
                   }
                 }
               })
               .catch((error) => {
-                this._log(`[SUBMIT_DEBUG] 4. execute REJECTED: ${error?.message}`);
+                Logger.log(`[SUBMIT_DEBUG] 4. execute REJECTED: ${error?.message}`);
                 console.error('[SUBMIT_DEBUG] 4. execute REJECTED:', error?.message, error?.stack);
                 vscode.window.showErrorMessage(`Submit command failed: ${error.message}`);
               });
-            return;
+            return;          
           case "saveClarifyAnswers":
-            if (message.answers) {
-              this._log(`[BotPanel] saveClarifyAnswers -> ${JSON.stringify(message.answers)}`);
-              const answersJson = JSON.stringify(message.answers).replace(/'/g, "\\'");
-              const cmd = `save --answers '${answersJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  this._log(`[BotPanel] saveClarifyAnswers success`);
-                  vscode.window.showInformationMessage('Answers saved successfully');
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] saveClarifyAnswers ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify answers: ${error.message}`);
-                });
-            }
+            instructionsManager.saveClarifyAnswers(message, this._botView);
+            return;
+          case "updateQuestionAnswer":
+            instructionsManager.updateQuestionAnswer(message, this._botView);
             return;
           case "saveClarifyEvidence":
-            if (message.evidence_provided) {
-              this._log(`[BotPanel] saveClarifyEvidence -> ${JSON.stringify(message.evidence_provided)}`);
-              const evidenceJson = JSON.stringify(message.evidence_provided).replace(/'/g, "\\'");
-              const cmd = `save --evidence_provided '${evidenceJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  this._log(`[BotPanel] saveClarifyEvidence success`);
-                  vscode.window.showInformationMessage('Evidence saved successfully');
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] saveClarifyEvidence ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save clarify evidence: ${error.message}`);
-                });
-            }
+            instructionsManager.saveClarifyEvidence(message, this._botView);
             return;
           case "saveStrategyDecision":
-            if (message.criteriaKey && message.selectedOption) {
-              this._log(`[BotPanel] saveStrategyDecision -> ${message.criteriaKey}: ${message.selectedOption}`);
-
-              const decisions = {};
-              decisions[message.criteriaKey] = message.selectedOption;
-              const decisionsJson = JSON.stringify(decisions).replace(/'/g, "\\'");
-              const cmd = `save --decisions '${decisionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  this._log(`[BotPanel] saveStrategyDecision success`);
-                  vscode.window.showInformationMessage('Strategy decision saved successfully');
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] saveStrategyDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decision: ${error.message}`);
-                });
-            }
+            instructionsManager.saveStrategyDecision(message, this._botView);
             return;
           case "saveStrategyMultiDecision":
-            if (message.criteriaKey && message.selectedOptions) {
-              this._log(`[BotPanel] saveStrategyMultiDecision -> ${message.criteriaKey}: ${JSON.stringify(message.selectedOptions)}`);
-
-              const multiDecisions = {};
-              multiDecisions[message.criteriaKey] = message.selectedOptions;
-              const multiDecisionsJson = JSON.stringify(multiDecisions).replace(/'/g, "\\'");
-              const multiCmd = `save --decisions '${multiDecisionsJson}'`;
-              this._botView?.execute(multiCmd)
-                .then(() => {
-                  this._log(`[BotPanel] saveStrategyMultiDecision success`);
-                  vscode.window.showInformationMessage('Strategy decisions saved successfully');
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] saveStrategyMultiDecision ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save strategy decisions: ${error.message}`);
-                });
-            }
+            instructionsManager.saveStrategyMultiDecision(message, this._botView);
+            return;
+          case "saveStrategyAssumptions":
+            instructionsManager.saveStrategyAssumptions(message, this._botView);
             return;
           case "renderDiagram": {
             if (!this._findDiagramPathToOpen) {
@@ -1322,7 +1056,7 @@ class BotPanel {
             const diagramScope = message.scope || '';
             const scopeParam = diagramScope ? ` scope:"${diagramScope}"` : '';
             const renderCmd = `${behaviorName}.render.renderDiagram${scopeParam}`;
-            this._log(`[BotPanel] renderDiagram -> ${renderCmd}`);
+            Logger.log(`[BotPanel] renderDiagram -> ${renderCmd}`);
             this._renderInProgress = true;
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
@@ -1331,23 +1065,23 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(renderCmd);
-                this._log(`[BotPanel] renderDiagram result keys: ${result ? Object.keys(result).join(', ') : 'null'}`);
-                this._log(`[BotPanel] renderDiagram result.status: ${result?.status}, result.results: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
+                Logger.log(`[BotPanel] renderDiagram result keys: ${result ? Object.keys(result).join(', ') : 'null'}`);
+                Logger.log(`[BotPanel] renderDiagram result.status: ${result?.status}, result.results: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
                   const diagramPath = this._findDiagramPathToOpen(result, message.path, diagramScope);
-                  this._log(`[BotPanel] renderDiagram resolved path: ${diagramPath || '(none)'}`);
+                  Logger.log(`[BotPanel] renderDiagram resolved path: ${diagramPath || '(none)'}`);
                   if (diagramPath) {
                     try {
                       const diagramUri = vscode.Uri.file(diagramPath);
-                      this._log(`[BotPanel] renderDiagram opening: ${diagramPath}`);
+                      Logger.log(`[BotPanel] renderDiagram opening: ${diagramPath}`);
                       await vscode.commands.executeCommand('vscode.open', diagramUri);
                       vscode.window.showInformationMessage(result.message || 'Diagram rendered and opened');
                     } catch (openErr) {
-                      this._log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
+                      Logger.log(`[BotPanel] renderDiagram open file error: ${openErr.message}`);
                       vscode.window.showErrorMessage(`Diagram rendered but failed to open: ${openErr.message}`);
                     }
                   } else {
-                    this._log(`[BotPanel] renderDiagram: no path found in result to open`);
+                    Logger.log(`[BotPanel] renderDiagram: no path found in result to open`);
                     vscode.window.showInformationMessage(result.message || 'Diagram rendered successfully');
                   }
                 } else {
@@ -1356,7 +1090,7 @@ class BotPanel {
                 if (this._botView) this._botView.botData = null;
                 await this._update();
               } catch (error) {
-                this._log(`[BotPanel] renderDiagram ERROR: ${error.message}`);
+                Logger.log(`[BotPanel] renderDiagram ERROR: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to render diagram: ${error.message}`);
               } finally {
                 setTimeout(() => { self._renderInProgress = false; }, 2000);
@@ -1373,7 +1107,7 @@ class BotPanel {
             const layoutScope = message.scope || '';
             const layoutScopeParam = layoutScope ? ` scope:"${layoutScope}"` : '';
             const layoutCmd = `${behaviorNameLayout}.render.saveDiagramLayout${layoutScopeParam}`;
-            this._log('[BotPanel] saveDiagramLayout -> ' + layoutCmd);
+            Logger.log('[BotPanel] saveDiagramLayout -> ' + layoutCmd);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
               title: 'Saving diagram layout...',
@@ -1388,7 +1122,7 @@ class BotPanel {
                 }
                 await this._update();
               } catch (error) {
-                this._log('[BotPanel] saveDiagramLayout ERROR: ' + error.message);
+                Logger.log('[BotPanel] saveDiagramLayout ERROR: ' + error.message);
                 vscode.window.showErrorMessage('Failed to save layout: ' + error.message);
               }
             });
@@ -1403,7 +1137,7 @@ class BotPanel {
             const clearScope = message.scope || '';
             const clearScopeParam = clearScope ? ` scope:"${clearScope}"` : '';
             const clearCmd = `${behaviorNameClear}.render.clearLayout${clearScopeParam}`;
-            this._log('[BotPanel] clearDiagramLayout -> ' + clearCmd);
+            Logger.log('[BotPanel] clearDiagramLayout -> ' + clearCmd);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
               title: 'Clearing diagram layout...',
@@ -1418,7 +1152,7 @@ class BotPanel {
                 }
                 await this._update();
               } catch (error) {
-                this._log('[BotPanel] clearDiagramLayout ERROR: ' + error.message);
+                Logger.log('[BotPanel] clearDiagramLayout ERROR: ' + error.message);
                 vscode.window.showErrorMessage('Failed to clear layout: ' + error.message);
               }
             });
@@ -1433,7 +1167,7 @@ class BotPanel {
             const reportScope = message.scope || '';
             const reportScopeParam = reportScope ? ` scope:"${reportScope}"` : '';
             const reportCmd = `${behaviorName2}.render.generateReport${reportScopeParam}`;
-            this._log(`[BotPanel] generateDiagramReport -> ${reportCmd}`);
+            Logger.log(`[BotPanel] generateDiagramReport -> ${reportCmd}`);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
               title: 'Generating update report from diagram...',
@@ -1441,17 +1175,17 @@ class BotPanel {
             }, async () => {
               try {
                 const result = await this._botView.execute(reportCmd);
-                this._log(`[BotPanel] generateDiagramReport result: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
+                Logger.log(`[BotPanel] generateDiagramReport result: ${JSON.stringify(result?.results || []).substring(0, 500)}`);
                 if (result?.status === 'success') {
                   const reportPath = (result.results || []).find(r => r.status === 'success' && r.report_path)?.report_path || result.report_path;
                   if (reportPath) {
                     try {
                       const reportUri = vscode.Uri.file(reportPath);
-                      this._log(`[BotPanel] generateDiagramReport opening: ${reportPath}`);
+                      Logger.log(`[BotPanel] generateDiagramReport opening: ${reportPath}`);
                       await vscode.commands.executeCommand('vscode.open', reportUri);
                       vscode.window.showInformationMessage(result.message || 'Report generated and opened');
                     } catch (openErr) {
-                      this._log(`[BotPanel] generateDiagramReport open file error: ${openErr.message}`);
+                      Logger.log(`[BotPanel] generateDiagramReport open file error: ${openErr.message}`);
                       vscode.window.showInformationMessage(result.message || 'Report generated successfully');
                     }
                   } else {
@@ -1462,7 +1196,7 @@ class BotPanel {
                 }
                 await this._update();
               } catch (error) {
-                this._log(`[BotPanel] generateDiagramReport ERROR: ${error.message}`);
+                Logger.log(`[BotPanel] generateDiagramReport ERROR: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to generate report: ${error.message}`);
               }
             });
@@ -1477,7 +1211,7 @@ class BotPanel {
             const updateScope = message.scope || '';
             const updateScopeParam = updateScope ? ` scope:"${updateScope}"` : '';
             const updateCmd = `${behaviorName3}.render.updateFromDiagram${updateScopeParam}`;
-            this._log(`[BotPanel] updateFromDiagram -> ${updateCmd}`);
+            Logger.log(`[BotPanel] updateFromDiagram -> ${updateCmd}`);
             vscode.window.withProgress({
               location: vscode.ProgressLocation.Notification,
               title: 'Updating story graph from diagram...',
@@ -1496,27 +1230,14 @@ class BotPanel {
                 }
                 await this._update();
               } catch (error) {
-                this._log(`[BotPanel] updateFromDiagram ERROR: ${error.message}`);
+                Logger.log(`[BotPanel] updateFromDiagram ERROR: ${error.message}`);
                 vscode.window.showErrorMessage(`Failed to update from diagram: ${error.message}`);
               }
             });
             return;
           }
           case "saveStrategyAssumptions":
-            if (message.assumptions) {
-              this._log(`[BotPanel] saveStrategyAssumptions -> ${JSON.stringify(message.assumptions)}`);
-              const assumptionsJson = JSON.stringify(message.assumptions).replace(/'/g, "\\'");
-              const cmd = `save --assumptions '${assumptionsJson}'`;
-              this._botView?.execute(cmd)
-                .then(() => {
-                  this._log(`[BotPanel] saveStrategyAssumptions success`);
-                  vscode.window.showInformationMessage('Additional strategies saved successfully');
-                })
-                .catch((error) => {
-                  this._log(`[BotPanel] saveStrategyAssumptions ERROR: ${error.message}`);
-                  vscode.window.showErrorMessage(`Failed to save additional strategies: ${error.message}`);
-                });
-            }
+            instructionsManager.handleInstructionsMessage(message.command, message, this._botView);
             return;
         }
       },
@@ -1631,7 +1352,7 @@ class BotPanel {
   async _handleOpenRelatedFiles(message) {
     try {
       const { command, nodeType, nodeName, nodePath, singleFileLink, storyGraphPath } = message;
-      this._log(`[BotPanel] _handleOpenRelatedFiles: ${command} for ${nodeType} "${nodeName}"`);
+      Logger.log(`[BotPanel] _handleOpenRelatedFiles: ${command} for ${nodeType} "${nodeName}"`);
       
       if (!this._botView) {
         vscode.window.showErrorMessage('Bot view not available');
@@ -1641,9 +1362,9 @@ class BotPanel {
 
       try {
         const storyGraph = await this._botView.execute('story_graph');
-        this._log(`[BotPanel] Story graph check result: ${JSON.stringify(storyGraph)}`);
+        Logger.log(`[BotPanel] Story graph check result: ${JSON.stringify(storyGraph)}`);
       } catch (error) {
-        this._log(`[BotPanel] Story graph check failed (continuing anyway): ${error.message}`);
+        Logger.log(`[BotPanel] Story graph check failed (continuing anyway): ${error.message}`);
       }
       
       const workspaceRoot = this._workspaceRoot;
@@ -1659,7 +1380,7 @@ class BotPanel {
       const openInColumn = async (filePath, column, options = {}) => {
         const absolutePath = resolvePath(filePath);
         if (!absolutePath || !fs.existsSync(absolutePath)) {
-          this._log(`[BotPanel] File not found: ${filePath}`);
+          Logger.log(`[BotPanel] File not found: ${filePath}`);
           return;
         }
         const fileUri = vscode.Uri.file(absolutePath);
@@ -1689,7 +1410,7 @@ class BotPanel {
           await openInColumn(singleFileLink, vscode.ViewColumn.One);
         } else {
 
-          this._log(`[BotPanel] Opening story files for ${nodeType} "${nodeName}"`);
+          Logger.log(`[BotPanel] Opening story files for ${nodeType} "${nodeName}"`);
           
 
           try {
@@ -1699,17 +1420,17 @@ class BotPanel {
               for (const filePath of result.files) {
                 await openInColumn(filePath, vscode.ViewColumn.One);
               }
-              this._log(`[BotPanel] Opened ${result.files.length} story files`);
+              Logger.log(`[BotPanel] Opened ${result.files.length} story files`);
             }
           } catch (error) {
-            this._log(`[BotPanel] Error getting story files: ${error.message}`);
+            Logger.log(`[BotPanel] Error getting story files: ${error.message}`);
 
 
           }
         }
       } else if (command === 'openTestFiles') {
 
-        this._log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
+        Logger.log(`[BotPanel] Opening test files for ${nodeType} "${nodeName}"`);
         
         try {
           const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openTest()`);
@@ -1718,12 +1439,12 @@ class BotPanel {
             await this._openTestFiles(paths);
           }
         } catch (error) {
-          this._log(`[BotPanel] Error getting test files: ${error.message}`);
+          Logger.log(`[BotPanel] Error getting test files: ${error.message}`);
           vscode.window.showErrorMessage(`Failed to open test files: ${error.message}`);
         }
       } else if (command === 'openCodeFiles') {
 
-        this._log(`[BotPanel] Opening code files traced from tests for ${nodeType} "${nodeName}"`);
+        Logger.log(`[BotPanel] Opening code files traced from tests for ${nodeType} "${nodeName}"`);
         
         try {
           const result = await this._botView.execute(`story_graph.${nodePath || `"${nodeName}"`}.openCode()`);
@@ -1745,15 +1466,15 @@ class BotPanel {
                     preserveFocus: false
                   });
                 }
-                this._log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
+                Logger.log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
               } else {
-                this._log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
+                Logger.log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
               }
             }
-            this._log(`[BotPanel] Opened ${result.files.length} traced code files`);
+            Logger.log(`[BotPanel] Opened ${result.files.length} traced code files`);
           }
         } catch (error) {
-          this._log(`[BotPanel] Error opening code files: ${error.message}`);
+          Logger.log(`[BotPanel] Error opening code files: ${error.message}`);
           vscode.window.showErrorMessage(`Failed to open code files: ${error.message}`);
         }
       } else if (command === 'openAllRelatedFiles') {
@@ -1763,7 +1484,7 @@ class BotPanel {
         const storyFiles = message.storyFiles || [];
         const selectedNode = message.selectedNode;
         
-        this._log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
+        Logger.log(`[BotPanel] Opening all related files for ${nodeType} "${nodeName}"`);
         
 
         await this._openGraphWithNodeSelected(graphPath, selectedNode);
@@ -1771,10 +1492,10 @@ class BotPanel {
         if (nodeType === 'sub-epic' || nodeType === 'epic') {
 
           if (singleFileLink) {
-            this._log(`[BotPanel] Opening exploration file for sub-epic "${nodeName}": ${singleFileLink}`);
+            Logger.log(`[BotPanel] Opening exploration file for sub-epic "${nodeName}": ${singleFileLink}`);
             await this._openStoryFile(singleFileLink);
           }
-          this._log(`[BotPanel] Opening ${storyFiles.length} story files for sub-epic "${nodeName}"`);
+          Logger.log(`[BotPanel] Opening ${storyFiles.length} story files for sub-epic "${nodeName}"`);
           for (const storyFilePath of storyFiles) {
             await this._openStoryFile(storyFilePath);
           }
@@ -1810,15 +1531,15 @@ class BotPanel {
                     preserveFocus: false
                   });
                 }
-                this._log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
+                Logger.log(`[BotPanel] Opened traced code file: ${codeFilePath}`);
               } else {
-                this._log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
+                Logger.log(`[BotPanel] Traced code file does not exist: ${absolutePath}`);
               }
             }
-            this._log(`[BotPanel] Opened ${codeResult.files.length} traced code files`);
+            Logger.log(`[BotPanel] Opened ${codeResult.files.length} traced code files`);
           }
         } catch (codeErr) {
-          this._log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
+          Logger.log(`[BotPanel] Error tracing code files: ${codeErr.message}`);
         }
         
 
@@ -1826,11 +1547,11 @@ class BotPanel {
         try {
           await vscode.commands.executeCommand('vscode.open', vscode.Uri.file(graphAbsPath));
         } catch (e) {
-          this._log(`[BotPanel] Could not re-activate story graph tab: ${e.message}`);
+          Logger.log(`[BotPanel] Could not re-activate story graph tab: ${e.message}`);
         }
       }
     } catch (error) {
-      this._log(`[BotPanel] ERROR in _handleOpenRelatedFiles: ${error.message}`);
+      Logger.log(`[BotPanel] ERROR in _handleOpenRelatedFiles: ${error.message}`);
       vscode.window.showErrorMessage(`Failed to open related files: ${error.message}`);
     }
   }
@@ -1874,12 +1595,12 @@ class BotPanel {
         }
       }
     } catch (e) {
-      this._log(`[BotPanel] Could not search for node in graph: ${e.message}`);
+      Logger.log(`[BotPanel] Could not search for node in graph: ${e.message}`);
     }
     
     const uri = vscode.Uri.file(absolutePath).with({ fragment: `L${startLine + 1}` });
     await vscode.commands.executeCommand('vscode.open', uri);
-    this._log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
+    Logger.log(`[BotPanel] Graph opened with node selected: ${selectedNode.name}`);
   }
 
 
@@ -1893,7 +1614,7 @@ class BotPanel {
       : path.join(this._workspaceRoot, cleanPath);
     
     if (!fs.existsSync(absolutePath)) {
-      this._log(`[BotPanel] Story file not found: ${absolutePath}`);
+      Logger.log(`[BotPanel] Story file not found: ${absolutePath}`);
       return;
     }
     
@@ -1904,7 +1625,7 @@ class BotPanel {
       preview: false,
       preserveFocus: true
     });
-    this._log(`[BotPanel] Story file opened: ${filePath}`);
+    Logger.log(`[BotPanel] Story file opened: ${filePath}`);
   }
 
 
@@ -1926,7 +1647,7 @@ class BotPanel {
           : path.join(this._workspaceRoot, cleanPath);
         
         if (!fs.existsSync(absolutePath)) {
-          this._log(`[BotPanel] Test file not found: ${absolutePath}`);
+          Logger.log(`[BotPanel] Test file not found: ${absolutePath}`);
           continue;
         }
         
@@ -1935,10 +1656,10 @@ class BotPanel {
           : vscode.Uri.file(absolutePath);
         await vscode.commands.executeCommand('vscode.open', uri);
       } catch (error) {
-        this._log(`[BotPanel] Error opening test file ${testFilePath}: ${error.message}`);
+        Logger.log(`[BotPanel] Error opening test file ${testFilePath}: ${error.message}`);
       }
     }
-    this._log(`[BotPanel] Opened ${testFiles.length} test files`);
+    Logger.log(`[BotPanel] Opened ${testFiles.length} test files`);
   }
 
   dispose() {
@@ -1974,7 +1695,7 @@ class BotPanel {
     }, async () => {
     const perfUpdateStart = performance.now();
     try {
-      this._log('[BotPanel] _updateWithCachedData() START - using cached data, skipping refresh');
+      Logger.log('[BotPanel] _updateWithCachedData() START - using cached data, skipping refresh');
       console.log("[BotPanel] _updateWithCachedData() called - skipping refresh");
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
@@ -1984,11 +1705,11 @@ class BotPanel {
         const perfBotViewStart = performance.now();
         this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
         const perfBotViewEnd = performance.now();
-        this._log(`[PERF] BotView creation: ${(perfBotViewEnd - perfBotViewStart).toFixed(2)}ms`);
+        Logger.log(`[PERF] BotView creation: ${(perfBotViewEnd - perfBotViewStart).toFixed(2)}ms`);
       }
       
 
-      this._log('[BotPanel] Skipping refresh() - using cached botData from navigation');
+      Logger.log('[BotPanel] Skipping refresh() - using cached botData from navigation');
       
 
       if (this._botView.storyMapView) {
@@ -2003,7 +1724,7 @@ class BotPanel {
       const currentAction = botData?.behaviors?.current_action || botData?.current_action || null;
       const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction, botData);
       const perfRenderEnd = performance.now();
-      this._log(`[PERF] HTML rendering: ${(perfRenderEnd - perfRenderStart).toFixed(2)}ms`);
+      Logger.log(`[PERF] HTML rendering: ${(perfRenderEnd - perfRenderStart).toFixed(2)}ms`);
       
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
@@ -2012,12 +1733,12 @@ class BotPanel {
       PanelView._lastResponse = null;
       
       const perfUpdateEnd = performance.now();
-      this._log(`[PERF] TOTAL _updateWithCachedData() duration: ${(perfUpdateEnd - perfUpdateStart).toFixed(2)}ms`);
-      this._log('[BotPanel] _updateWithCachedData() END');
+      Logger.log(`[PERF] TOTAL _updateWithCachedData() duration: ${(perfUpdateEnd - perfUpdateStart).toFixed(2)}ms`);
+      Logger.log('[BotPanel] _updateWithCachedData() END');
       
     } catch (err) {
       console.error(`[BotPanel] ERROR in _updateWithCachedData: ${err.message}`);
-      this._log(`[BotPanel] ERROR in _updateWithCachedData, falling back to full _update: ${err.message}`);
+      Logger.log(`[BotPanel] ERROR in _updateWithCachedData, falling back to full _update: ${err.message}`);
 
       return this._update();
     }
@@ -2047,7 +1768,7 @@ class BotPanel {
 
     const perfUpdateStart = performance.now();
     try {
-      this._log('[BotPanel] _update() START');
+      Logger.log('[BotPanel] _update() START');
       console.log("[BotPanel] _update() called");
       const webview = this._panel.webview;
       this._panel.title = "Bot Panel";
@@ -2057,18 +1778,18 @@ class BotPanel {
 
         const perfBotViewStart = performance.now();
         console.log("[BotPanel] Creating BotView");
-        this._log('[BotPanel] Creating BotView');
+        Logger.log('[BotPanel] Creating BotView');
         try {
           this._botView = new BotView(this._sharedCLI, this._panelVersion, webview, this._extensionUri);
           const perfBotViewEnd = performance.now();
           const botViewDuration = (perfBotViewEnd - perfBotViewStart).toFixed(2);
           console.log("[BotPanel] BotView created successfully");
-          this._log(`[BotPanel] BotView created successfully in ${botViewDuration}ms`);
-          this._log(`[PERF] BotView creation: ${botViewDuration}ms`);
+          Logger.log(`[BotPanel] BotView created successfully in ${botViewDuration}ms`);
+          Logger.log(`[PERF] BotView creation: ${botViewDuration}ms`);
         } catch (botViewError) {
           console.error(`[BotPanel] ERROR creating BotView: ${botViewError.message}`);
           console.error(`[BotPanel] ERROR stack: ${botViewError.stack}`);
-          this._log(`[BotPanel] ERROR creating BotView: ${botViewError.message}`);
+          Logger.log(`[BotPanel] ERROR creating BotView: ${botViewError.message}`);
           throw botViewError;
         }
       }
@@ -2083,17 +1804,17 @@ class BotPanel {
 
       const perfRefreshStart = performance.now();
       console.log("[BotPanel] Refreshing bot data...");
-      this._log('[BotPanel] Calling _botView.refresh() to fetch latest data');
+      Logger.log('[BotPanel] Calling _botView.refresh() to fetch latest data');
       await this._botView.refresh();
       const perfRefreshEnd = performance.now();
       const refreshDuration = (perfRefreshEnd - perfRefreshStart).toFixed(2);
-      this._log(`[BotPanel] Data refreshed successfully in ${refreshDuration}ms`);
-      this._log(`[PERF] Data refresh: ${refreshDuration}ms`);
+      Logger.log(`[BotPanel] Data refreshed successfully in ${refreshDuration}ms`);
+      Logger.log(`[PERF] Data refresh: ${refreshDuration}ms`);
       
 
       const perfRenderStart = performance.now();
       console.log("[BotPanel] Rendering HTML");
-      this._log('[BotPanel] _botView.render() starting');
+      Logger.log('[BotPanel] _botView.render() starting');
 
       const botData = this._botView.botData || await this._botView.execute('status');
       const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || null;
@@ -2101,31 +1822,31 @@ class BotPanel {
       const html = this._getWebviewContent(await this._botView.render(), currentBehavior, currentAction, botData);
       const perfRenderEnd = performance.now();
       const renderDuration = (perfRenderEnd - perfRenderStart).toFixed(2);
-      this._log(`[PERF] HTML rendering: ${renderDuration}ms`)
+      Logger.log(`[PERF] HTML rendering: ${renderDuration}ms`)
       
 
       const perfHtmlUpdateStart = performance.now();
       
 
       const htmlPreview = html.substring(0, 500).replace(/\s+/g, ' ');
-      this._log(`[BotPanel] Setting webview HTML (length: ${html.length}, preview: ${htmlPreview}...)`);
-      this._log(`[BotPanel] Current HTML length: ${this._lastHtmlLength || 0}, New HTML length: ${html.length}`);
+      Logger.log(`[BotPanel] Setting webview HTML (length: ${html.length}, preview: ${htmlPreview}...)`);
+      Logger.log(`[BotPanel] Current HTML length: ${this._lastHtmlLength || 0}, New HTML length: ${html.length}`);
       
       if (this._lastHtmlLength === html.length) {
-        this._log('[BotPanel] WARNING: HTML length unchanged - content may not have updated');
+        Logger.log('[BotPanel] WARNING: HTML length unchanged - content may not have updated');
       } else {
-        this._log('[BotPanel] HTML length changed - update should be visible');
+        Logger.log('[BotPanel] HTML length changed - update should be visible');
       }
       
       this._lastHtmlLength = html.length;
       this._panel.webview.html = html;
       
-      try { this._setupDiagramFileWatchers(botData); } catch (e) { this._log('[BotPanel] watcher setup error: ' + e.message); }
+      try { this._setupDiagramFileWatchers(botData); } catch (e) { Logger.log('[BotPanel] watcher setup error: ' + e.message); }
       
       const perfHtmlUpdateEnd = performance.now();
       const htmlUpdateDuration = (perfHtmlUpdateEnd - perfHtmlUpdateStart).toFixed(2);
-      this._log('[BotPanel] Webview HTML property set');
-      this._log(`[PERF] HTML update (set webview.html): ${htmlUpdateDuration}ms`);
+      Logger.log('[BotPanel] Webview HTML property set');
+      Logger.log(`[PERF] HTML update (set webview.html): ${htmlUpdateDuration}ms`);
       
 
       setTimeout(() => {
@@ -2135,22 +1856,22 @@ class BotPanel {
           state: 'refreshing',
           message: 'Refreshing...'
         });
-        this._log('[BotPanel] Sent refreshStatus refreshing message to webview');
+        Logger.log('[BotPanel] Sent refreshStatus refreshing message to webview');
       }, 100);
       
 
       const perfUpdateEnd = performance.now();
       const totalDuration = (perfUpdateEnd - perfUpdateStart).toFixed(2);
       console.log("[BotPanel] _update() completed successfully");
-      this._log('[BotPanel] _update() completed successfully');
-      this._log(`[PERF] TOTAL _update() duration: ${totalDuration}ms`);
-      this._log('[BotPanel] _update() END');
-      this._log('[PERF] Python timing: see .cursor/panel-perf.log in workspace');
+      Logger.log('[BotPanel] _update() completed successfully');
+      Logger.log(`[PERF] TOTAL _update() duration: ${totalDuration}ms`);
+      Logger.log('[BotPanel] _update() END');
+      Logger.log('[PERF] Python timing: see .cursor/panel-perf.log in workspace');
       
     } catch (err) {
       console.error(`[BotPanel] ERROR in _update: ${err.message}`);
       console.error(`[BotPanel] ERROR stack: ${err.stack}`);
-      this._log(`[BotPanel] ERROR in _update: ${err.message} | Stack: ${err.stack}`);
+      Logger.log(`[BotPanel] ERROR in _update: ${err.message} | Stack: ${err.stack}`);
       
 
       const errorMsg = err.isCliError 
@@ -2198,12 +1919,22 @@ class BotPanel {
     const workspaceClientPath = vscode.Uri.joinPath(this._extensionUri, 'workspace', 'workspace_client.js');
     const behaviorsClientPath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors_client.js');
     const behaviorsStylePath = vscode.Uri.joinPath(this._extensionUri, 'behaviors', 'behaviors.css');
+    const storyGraphClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph_client.js');
+    const storyMapClientPath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_map_client.js');
+    const storyGraphStylePath = vscode.Uri.joinPath(this._extensionUri, 'story_graph', 'story_graph.css');
+    const instructionsStylePath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions.css');
+    const instructionsClientPath = vscode.Uri.joinPath(this._extensionUri, 'instructions', 'instructions_client.js');
 
 		// And the uri we use to load this script in the webview
 		const botPanelClientUri = webview.asWebviewUri(botPanelClientPath);
     const workspaceClientUri = webview.asWebviewUri(workspaceClientPath);
     const behaviorsClientUri = webview.asWebviewUri(behaviorsClientPath);
     const behaviorsStyleUri = webview.asWebviewUri(behaviorsStylePath);
+    const storyGraphClientUri = webview.asWebviewUri(storyGraphClientPath);
+    const storyMapClientUri = webview.asWebviewUri(storyMapClientPath);
+    const storyGraphStyleUri = webview.asWebviewUri(storyGraphStylePath);
+    const instructionsStyleUri = webview.asWebviewUri(instructionsStylePath);
+    const instructionsClientUri = webview.asWebviewUri(instructionsClientPath);
     
     // Get branding colors for CSS theming
     const brandColor = branding.getTitleColor();
@@ -2230,7 +1961,7 @@ class BotPanel {
 
     // replace branding placeholders in css file
     // contentStyles(brandColor, brandColorRgb, bgColor, bgColorRgb, textColor, textColorRgb, textColorFaded, fontWeight, isLightBg)}  
-    const stylesPath = vscode.Uri.joinPath(this._extensionUri, 'styles', 'theme.css');
+    const stylesPath = vscode.Uri.joinPath(this._extensionUri, 'bot', 'bot_panel.css');
     let contentStyle = fs.readFileSync(stylesPath.fsPath, 'utf-8');    
     
     contentStyle = contentStyle.replace(/{{brandColor}}/g, brandColor)
@@ -2267,6 +1998,8 @@ class BotPanel {
             ${contentStyle}  
           </style>
           <link rel="stylesheet" href="${behaviorsStyleUri}">
+          <link rel="stylesheet" href="${storyGraphStyleUri}">
+          <link rel="stylesheet" href="${instructionsStyleUri}">
           ${currentBehaviorScript}
       </head>
       <body>
@@ -2274,6 +2007,9 @@ class BotPanel {
           <script nonce="${nonce}" src="${botPanelClientUri}"></script>
           <script nonce="${nonce}" src="${workspaceClientUri}"></script>
           <script nonce="${nonce}" src="${behaviorsClientUri}"></script>
+          <script nonce="${nonce}" src="${storyGraphClientUri}"></script>
+          <script nonce="${nonce}" src="${storyMapClientUri}"></script>
+          <script nonce="${nonce}" src="${instructionsClientUri}"></script>
       </body>
       </html>`;
   }

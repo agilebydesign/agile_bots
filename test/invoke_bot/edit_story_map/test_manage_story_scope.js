@@ -24,7 +24,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 const PanelView = require('../../../src/panel/panel_view');
-const StoryMapView = require('../../../src/panel/story_map_view');
+const StoryMapView = require('../../../src/panel/story_graph/story_map_view');
 
 // Setup - Use temp directory for test data to avoid modifying production
 const repoRoot = path.join(__dirname, '../../..');
@@ -54,6 +54,17 @@ function setupTestWorkspace() {
     const { verifyTestWorkspace } = require('../../helpers/prevent_production_writes');
     verifyTestWorkspace();
 }
+
+    /**
+     * Create mock extension URI
+     * @returns {Object} - Mock URI object
+     */
+function createMockExtensionUri() {
+        return {
+            fsPath: path.join(repoRoot, 'src', 'panel'),
+            toString: () => `file://${fsPath}`
+        };
+    }
 
 before(() => {
     setupTestWorkspace();
@@ -86,7 +97,7 @@ test('TestDisplayStoryScopeHierarchy', { concurrency: false }, async (t) => {
         assert.ok(scopeJSON, 'Should get scope data');
         
         // Render scope view
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Verify structure
@@ -95,7 +106,7 @@ test('TestDisplayStoryScopeHierarchy', { concurrency: false }, async (t) => {
     });
     
     await t.test('test_scope_has_filter_input', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Verify filter input
@@ -113,7 +124,7 @@ test('TestFilterStoryScope', { concurrency: false }, async (t) => {
         const scopeJSON = await cli.execute('scope');
         
         // Render view
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Verify filter is applied
@@ -153,7 +164,7 @@ test('TestShowAllScopeThroughPanel', { concurrency: false }, async (t) => {
 test('TestOpenStoryFiles', { concurrency: false }, async (t) => {
     
     await t.test('test_story_graph_and_story_map_links_visible', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Verify links exist
@@ -165,7 +176,7 @@ test('TestOpenStoryFiles', { concurrency: false }, async (t) => {
 test('TestScopeView', { concurrency: false }, async (t) => {
     
     await t.test('testScopeSectionRenders', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         assert.ok(typeof html === 'string', 'Should return HTML string');
@@ -173,14 +184,14 @@ test('TestScopeView', { concurrency: false }, async (t) => {
     });
     
     await t.test('testScopeHasFilterInput', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         assert.ok(html.includes('scopeFilterInput'), 'Should have filter input');
     });
     
     await t.test('testScopeHasHeader', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         assert.ok(html.includes('Scope'), 'Should have Scope header');
@@ -195,7 +206,7 @@ test('TestScopeView', { concurrency: false }, async (t) => {
         assert.ok(status, 'Should get status after filter');
         
         // Render view
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         assert.ok(html.includes('Scope'), 'Should render scope section');
     });
@@ -216,14 +227,14 @@ test('TestScopeView', { concurrency: false }, async (t) => {
         // Show all
         await cli.execute('scope showall');
         
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         assert.ok(html.includes('Scope'), 'Should render scope section');
     });
     
     await t.test('testScopeContentStructure', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Verify structural elements
@@ -232,7 +243,7 @@ test('TestScopeView', { concurrency: false }, async (t) => {
     });
     
     await t.test('testStoryLinksPresent', async () => {
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // If there's content, verify links
@@ -251,7 +262,7 @@ test('TestScopeView', { concurrency: false }, async (t) => {
          * WHEN: Scope section is displayed
          * THEN: All 7 include level radio buttons are present (stories, domain_concepts, acceptance, scenarios, examples, tests, code)
          */
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         assert.ok(html.includes('include-level-controls'), 'Should have include level controls');
@@ -274,7 +285,7 @@ test('TestScopeView', { concurrency: false }, async (t) => {
          */
         await cli.execute('scope include_level=code');
         
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // When includeLevel is 'code', the code button has full opacity (selected)
@@ -315,7 +326,7 @@ test('TestSetScopeToSelectedStoryNode', { concurrency: false }, async (t) => {
             'Scope command should execute successfully');
         
         // Verify panel renders without errors
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         assert.ok(html.length > 0, 'Panel should render HTML');
         assert.ok(html.includes('scopeFilterInput'), 'Panel should have filter input');
@@ -342,7 +353,7 @@ test('TestSetScopeToSelectedStoryNode', { concurrency: false }, async (t) => {
             'Scope command should execute successfully');
         
         // Verify panel renders without errors
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         assert.ok(html.length > 0, 'Panel should render HTML');
     });
@@ -368,7 +379,7 @@ test('TestSetScopeToSelectedStoryNode', { concurrency: false }, async (t) => {
             'Scope command should execute successfully');
         
         // Verify panel renders without errors
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         assert.ok(html.length > 0, 'Panel should render HTML');
     });
@@ -388,7 +399,7 @@ test('TestSetScopeToSelectedStoryNode', { concurrency: false }, async (t) => {
         await cli.execute('scope showall');
         
         // When - Render the view with root selected
-        const view = new StoryMapView(cli);
+        const view = new StoryMapView(cli, null, createMockExtensionUri());
         const html = await view.render();
         
         // Then - Panel should render successfully
