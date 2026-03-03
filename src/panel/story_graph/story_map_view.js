@@ -89,7 +89,7 @@ class StoryMapView extends PanelView {
         const dataSource = this.parentView?.botData ? 'cached' : 'fetched';
         Logger.log(`[StoryMapView] [PERF] Bot data (${dataSource}): ${(perfStatusEnd - perfStatusStart).toFixed(2)}ms`);
         
-        const scopeData = botData.scope || { type: 'all', filter: '', content: null, graphLinks: [] };
+        const scopeData = botData.scope || { type: 'showAll', filter: '', content: null, graphLinks: [] };
         
         // Get icon URIs using branding utility (handles ABD vs Scotia paths)
         const perfIconsStart = performance.now();
@@ -448,6 +448,7 @@ class StoryMapView extends PanelView {
             subEpics.forEach((subEpic, subEpicIndex) => {
                 renderSubEpic(subEpic, subEpicIndex, `epic-${epicIndex}`, 0);
             });
+            
             html += '</div>'; // Close epic collapsible-content
             
             return html;
