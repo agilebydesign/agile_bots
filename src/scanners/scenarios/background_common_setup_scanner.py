@@ -27,16 +27,19 @@ class BackgroundCommonSetupScanner(StoryScanner):
             scenarios = story_data.get('scenarios', [])
             background = story_data.get('background', [])
             
-            if background:
-                violation = self._check_background_has_when_then(background, node)
+            bg_steps = background
+            if isinstance(background, dict):
+                bg_steps = background.get('steps', [])
+            
+            if bg_steps:
+                violation = self._check_background_has_when_then(bg_steps, node)
                 if violation:
                     violations.append(violation)
                 
-                violation = self._check_background_scenario_specific(background, scenarios, node)
+                violation = self._check_background_scenario_specific(bg_steps, scenarios, node)
                 if violation:
                     violations.append(violation)
                 
-                # Check for hardcoded values in background (no parameters)
                 violation = self._check_background_missing_parameters(background, scenarios, node)
                 if violation:
                     violations.append(violation)
@@ -73,9 +76,16 @@ class BackgroundCommonSetupScanner(StoryScanner):
         
         return None
     
-    def _check_background_missing_parameters(self, background: List[str], scenarios: List[Dict[str, Any]], node: StoryNode) -> Optional[Dict[str, Any]]:
+    def _check_background_missing_parameters(self, background, scenarios: List[Dict[str, Any]], node: StoryNode) -> Optional[Dict[str, Any]]:
         """Check if background steps are missing {Concept} references (hardcoded values)."""
-        # Get all available example table names (these are the concepts)
+        bg_steps = background if isinstance(background, list) else []
+        if isinstance(background, dict):
+            bg_steps = background.get('steps', [])
+        
+        if not bg_steps:
+            return None
+        
+        # Get all domain concept names from the story graph context
         available_concepts = set()
         for scenario in scenarios:
             examples = scenario.get('examples', [])
@@ -84,30 +94,16 @@ class BackgroundCommonSetupScanner(StoryScanner):
                 if name:
                     available_concepts.add(name.lower())
         
-        # Check each background step for {Concept} notation
         hardcoded_steps = []
-        for step in background:
-            # Skip if step already has {Concept} parameters
+        for step in bg_steps:
+            if not isinstance(step, str):
+                continue
             if '{' in step and '}' in step:
                 continue
             
-            # Check for common domain concepts that should use {Concept} notation
             step_lower = step.lower()
-            
-            # Check for domain terms that typically need {Concept} reference
-            domain_terms = [
-                'user',
-                'enterprise', 
-                'entitlement',
-                'account',
-                'recipient',
-                'payment',
-            ]
-            
-            for term in domain_terms:
-                if term in step_lower and term in available_concepts:
-                    # Step mentions a domain term and corresponding table exists
-                    # but step doesn't use {Concept} notation
+            for concept in available_concepts:
+                if concept in step_lower:
                     hardcoded_steps.append(step)
                     break
         
@@ -115,7 +111,7 @@ class BackgroundCommonSetupScanner(StoryScanner):
             location = f"{node.map_location()}.background"
             return Violation(
                 rule=self.rule,
-                violation_message=f'Background steps have hardcoded values - use {{Concept}} notation: {hardcoded_steps[:2]}... Example: Given {{User}} is logged in, And {{User}} is entitled to {{Entitlement}}',
+                violation_message=f'Background steps have bare domain terms without {{Concept}} notation: {hardcoded_steps[:2]}',
                 location=location,
                 severity='error'
             ).to_dict()
@@ -124,17 +120,21 @@ class BackgroundCommonSetupScanner(StoryScanner):
     
     def _check_missing_background(self, scenarios: List[Dict[str, Any]], node: StoryNode) -> Optional[Dict[str, Any]]:
         if len(scenarios) >= 3:
-            first_scenario_steps = self._get_given_steps(scenarios[0])
-            if first_scenario_steps:
-                all_match = all(
-                    self._get_given_steps(scenario)[:len(first_scenario_steps)] == first_scenario_steps
-                    for scenario in scenarios[1:]
-                )
-                if all_match and len(first_scenario_steps) > 0:
+            from collections import Counter
+            first_givens = []
+            for scenario in scenarios:
+                given_steps = self._get_given_steps(scenario)
+                if given_steps:
+                    first_givens.append(given_steps[0])
+            
+            if first_givens:
+                counts = Counter(first_givens)
+                most_common, freq = counts.most_common(1)[0]
+                if freq >= 3:
                     location = f"{node.map_location()}"
                     return Violation(
                         rule=self.rule,
-                        violation_message=f'Story has {len(scenarios)} scenarios that all start with same Given steps - consider moving common setup to Background section',
+                        violation_message=f'Story has {freq}/{len(scenarios)} scenarios starting with same Given step - extract to Background: "{most_common[:80]}"',
                         location=location,
                         severity='info'
                     ).to_dict()
@@ -155,7 +155,10 @@ class BackgroundCommonSetupScanner(StoryScanner):
     def _get_scenario_steps(self, scenario: Dict[str, Any]) -> List[str]:
         if isinstance(scenario, dict):
             if 'steps' in scenario:
-                return scenario['steps']
+                steps = scenario['steps']
+                if isinstance(steps, str):
+                    return [s.strip() for s in steps.split('\n') if s.strip()]
+                return steps if isinstance(steps, list) else []
             elif 'scenario' in scenario:
                 scenario_text = scenario['scenario']
                 if isinstance(scenario_text, str):

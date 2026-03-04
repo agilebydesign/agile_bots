@@ -158,32 +158,25 @@ class ParameterizedScenariosScanner(ScenarioScannerBase):
         return violations
     
     def _check_hardcoded_domain_values(self, scenario: Scenario, story: Story, concept_names: Set[str]) -> List[Dict[str, Any]]:
-        """Flag hardcoded domain values that should be parameterized."""
+        """Flag bare domain concept names in steps that should use {Concept} notation."""
         violations = []
         
         steps_text = self._get_all_steps_text(scenario)
         
-        # Common patterns that suggest hardcoding
-        hardcode_patterns = [
-            # Dollar amounts without parameter
-            (r'(?<!\{)\$[\d,]+\.?\d*(?!\})', 'Payment amount should be parameterized: {PaymentAmount}'),
-            # User names without parameter
-            (r'(?<!\{)(Jane Doe|John Smith|Admin User)(?!\})', 'User name should be parameterized: {User}'),
-        ]
+        bare_concepts = []
+        for concept in concept_names:
+            pattern = r'(?<!\{)\b' + re.escape(concept) + r'\b(?!\})'
+            if re.search(pattern, steps_text):
+                bare_concepts.append(concept)
         
-        for pattern, message in hardcode_patterns:
-            if re.search(pattern, steps_text, re.IGNORECASE):
-                # Only flag if no {parameter} version exists nearby
-                has_params = self._extract_curly_params(steps_text)
-                if not has_params:
-                    location = f"{story.map_location()}.scenarios[{scenario.name}]"
-                    violations.append(Violation(
-                        rule=self.rule,
-                        violation_message=message,
-                        location=location,
-                        severity='info'
-                    ).to_dict())
-                    break  # One warning is enough
+        if bare_concepts:
+            location = f"{story.map_location()}.scenarios[{scenario.name}]"
+            violations.append(Violation(
+                rule=self.rule,
+                violation_message=f"Steps contain bare domain concept names without {{}} notation: {', '.join(bare_concepts[:5])}. Use {{{bare_concepts[0]}}} with matching example table.",
+                location=location,
+                severity='error'
+            ).to_dict())
         
         return violations
     
