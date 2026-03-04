@@ -248,8 +248,9 @@ class ParameterizedScenariosScanner(ScenarioScannerBase):
         """Get names of example tables (domain concept names)."""
         names = set()
         
-        if hasattr(scenario, '_data') and isinstance(scenario._data, dict):
-            examples = scenario._data.get('examples', [])
+        data = getattr(scenario, 'data', None) or getattr(scenario, '_data', None)
+        if data and isinstance(data, dict):
+            examples = data.get('examples', [])
             for example in examples:
                 if isinstance(example, dict):
                     name = example.get('name', '')
