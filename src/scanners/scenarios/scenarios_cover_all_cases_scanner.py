@@ -68,7 +68,12 @@ class ScenariosCoverAllCasesScanner(StoryScanner):
     
     def _get_scenario_text(self, scenario: Dict[str, Any]) -> str:
         if isinstance(scenario, dict):
-            return scenario.get('scenario', '') or scenario.get('name', '') or str(scenario)
+            parts = []
+            for field in ('name', 'scenario', 'steps'):
+                val = scenario.get(field, '')
+                if val:
+                    parts.append(val)
+            return ' '.join(parts) if parts else str(scenario)
         return str(scenario)
     
     def _is_happy_path(self, scenario_text: str) -> bool:
