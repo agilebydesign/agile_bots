@@ -318,7 +318,32 @@ document.addEventListener('contextmenu', function(e) {
         const nodePath = target.getAttribute('data-path');
         if (nodePath) {
             var scope = window.diagramScope || '';
-            _showCopyMenu(e, [
+            var fileLink = target.getAttribute('data-file-link');
+            var nodeType = target.getAttribute('data-node-type') || 'story';
+            var nodeName = target.getAttribute('data-node-name') || '';
+            var menuItems = [];
+            menuItems.push({ label: 'Open Story File', action: function() {
+                if (fileLink) {
+                    vscode.postMessage({ command: 'openFile', filePath: fileLink });
+                } else {
+                    vscode.postMessage({
+                        command: 'openStoryFiles',
+                        nodeType: nodeType,
+                        nodeName: nodeName,
+                        nodePath: nodePath
+                    });
+                }
+            }});
+            menuItems.push({ label: 'Open Test', action: function() {
+                vscode.postMessage({
+                    command: 'openTestFiles',
+                    nodeType: nodeType,
+                    nodeName: nodeName,
+                    nodePath: nodePath
+                });
+            }});
+            menuItems.push({ separator: true });
+            menuItems.push(
                 { label: 'Copy node name', action: function() {
                     vscode.postMessage({ command: 'copyNodeToClipboard', nodePath: nodePath, action: 'name' });
                 }},
@@ -341,7 +366,8 @@ document.addEventListener('contextmenu', function(e) {
                 { label: 'Update graph', action: function() {
                     vscode.postMessage({ command: 'updateFromDiagram', scope: scope });
                 }}
-            ]);
+            );
+            _showCopyMenu(e, menuItems);
             return;
         }
     }
