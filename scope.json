@@ -1,1 +1,7 @@
-{"type": "all", "value": [], "exclude": [], "skiprule": [], "include_level": "stories"}
+{
+  "type": "all",
+  "value": [],
+  "exclude": [],
+  "skiprule": [],
+  "include_level": "stories"
+}

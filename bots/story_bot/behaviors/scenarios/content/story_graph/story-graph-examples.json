@@ -1,9 +1,10 @@
 {
   "_explanation": {
     "purpose": "EXAMPLE TEMPLATE - shows correct format for writing scenarios with optional examples for data-driven testing",
-    "scenario_structure": "scenarios array: each has name, type (happy_path/edge_case/error_case), steps (Given/When/Then), and optional examples",
-    "background_structure": "background is a story-level field with steps (shared Given/And) and examples (tables for Background concepts). These are NOT duplicated per scenario.",
-    "examples_structure": "Scenario-level examples hold ONLY scenario-specific tables. Background tables go in story.background.examples, not per-scenario.",
+    "scenario_structure": "scenarios array: each has name, sequential_order, type (happy_path/edge_case/error_case), steps (single newline-delimited string of Given/When/Then), background (array), test_method, and optional examples",
+    "steps_format": "steps is a SINGLE STRING with newline separators. NOT an array of objects. Example: \"Given state exists\\nWhen action occurs\\nThen outcome is observed\"",
+    "background_format": "background is an ARRAY (empty [] when no shared setup). When used with examples, background holds shared Given/And steps as strings in the array.",
+    "examples_structure": "Scenario-level examples hold ONLY scenario-specific tables. Each table has name, columns, rows.",
     "variable_matching": "Every <variable_name> in steps MUST appear in example columns. Include both input variables and expected output/result variables",
     "domain_alignment": "Example tables MUST mirror domain_concepts structure: each domain concept with collaborators becomes a related table, responsibilities define the columns",
     "use_case": "Reference this template when writing scenarios to see correct Gherkin format and Examples table structure",
@@ -35,56 +36,54 @@
                   "story_type": "user",
                   "test_file": "",
                   "test_class": "",
-                  "background": {
-                    "steps": [
-                      "Given <common_setup_step>",
-                      "And <another_common_setup>"
-                    ],
-                    "examples": [
-                      {
-                        "name": "SharedConcept",
-                        "columns": ["shared_field_1", "shared_field_2"],
-                        "rows": [
-                          ["value1", "value2"]
-                        ]
-                      }
-                    ]
-                  },
+                  "background": [],
                   "scenarios": [
                     {
-                      "name": "Simple scenario with flat examples",
+                      "name": "Simple scenario without examples",
+                      "sequential_order": 1.0,
+                      "type": "happy_path",
+                      "background": [],
                       "test_method": "",
                       "context_source": {"file": "requirements.pdf", "page": "15", "section": "4.1 Basic Flow"},
-                      "steps": [
-                        {"text": "Given <scenario_specific_state> at \"<variable_path>\"", "sequential_order": 1},
-                        {"text": "When <action> with <variable_parameter>=\"<variable_value>\"", "sequential_order": 2},
-                        {"text": "Then <expected_outcome> equals \"<variable_expected_result>\"", "sequential_order": 3}
-                      ],
+                      "steps": "Given {Concept} exists with valid state\nWhen admin performs action on {Concept}\nThen {Concept} is updated\nAnd confirmation is displayed"
+                    },
+                    {
+                      "name": "Scenario with flat examples",
+                      "sequential_order": 2.0,
+                      "type": "happy_path",
+                      "background": [],
+                      "test_method": "",
+                      "context_source": {"file": "requirements.pdf", "page": "15", "section": "4.1 Basic Flow"},
+                      "steps": "Given {Concept} is in state \"<state>\"\nWhen admin performs \"<action>\" on {Concept}\nThen {Concept} result is \"<expected_result>\"",
                       "examples": [
                         {
                           "name": "Input",
-                          "columns": ["variable_path", "variable_parameter", "variable_value", "variable_expected_result"],
+                          "columns": ["state", "action", "expected_result"],
                           "rows": [
-                            ["value1", "param1", "input1", "result1"],
-                            ["value2", "param2", "input2", "result2"]
+                            ["active", "update", "updated successfully"],
+                            ["inactive", "activate", "activated successfully"]
                           ],
                           "context_source": {"file": "test-data.xlsx", "page": "Sheet1", "section": "Test Cases 1-2"}
                         }
                       ]
                     },
                     {
-                      "name": "Scenario with hierarchical domain-aligned examples",
+                      "name": "Error scenario",
+                      "sequential_order": 3.0,
+                      "type": "error_case",
+                      "background": [],
                       "test_method": "",
+                      "context_source": {"file": "requirements.pdf", "page": "18", "section": "4.3 Error Handling"},
+                      "steps": "Given {Concept} has invalid data\nWhen admin submits {Concept}\nThen error message is displayed\nAnd {Concept} is not saved"
+                    },
+                    {
+                      "name": "Scenario with hierarchical domain-aligned examples",
+                      "sequential_order": 4.0,
                       "type": "happy_path",
+                      "background": [],
+                      "test_method": "",
                       "context_source": {"file": "requirements.pdf", "page": "20", "section": "5.2 Customer Account Lookup"},
-                      "steps": [
-                        {"text": "Given Customer <customer_name> has account <account_number>", "sequential_order": 1},
-                        {"text": "And Account belongs to product <product_name>", "sequential_order": 2},
-                        {"text": "And Account has transactions shown in table", "sequential_order": 3},
-                        {"text": "When Customer looks up account", "sequential_order": 4},
-                        {"text": "Then Customer sees transactions for <product_name>", "sequential_order": 5},
-                        {"text": "And Customer sees <expected_outcome>", "sequential_order": 6}
-                      ],
+                      "steps": "Given Customer \"<customer_name>\" has account \"<account_number>\"\nAnd Account belongs to product \"<product_name>\"\nAnd Account has transactions shown in table\nWhen Customer looks up account\nThen Customer sees transactions for \"<product_name>\"\nAnd Customer sees \"<expected_outcome>\"",
                       "examples": [
                         {
                           "name": "Customer",

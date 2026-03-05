@@ -465,8 +465,10 @@ def create_story_content(story, epic_name, sub_epic_name, workspace_directory, s
         common_background = get_common_background(all_scenarios)
         common_examples = get_common_examples(all_scenarios)
     
-    # Format scenarios (pass common_examples so they aren't duplicated per scenario)
-    scenarios_formatted = format_scenarios(all_scenarios, common_background, common_examples, test_file, workspace_directory, story_file_path)
+    # Only pass common_examples when there IS a common_background to hold them
+    # Otherwise examples stay on individual scenarios where they belong
+    effective_common_examples = common_examples if common_background else []
+    scenarios_formatted = format_scenarios(all_scenarios, common_background, effective_common_examples, test_file, workspace_directory, story_file_path)
     
     # Default description if not provided
     description = story.get('description', f'{story_name} functionality for the mob minion system.')

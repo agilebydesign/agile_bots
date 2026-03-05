@@ -1,0 +1,149 @@
+sequenceDiagram
+    %%{init: {'theme': 'base', 'themeVariables': { 'actorTextColor': '#000000', 'signalTextColor': '#000000', 'labelTextColor': '#000000', 'noteBkgColor': '#ffffff', 'noteTextColor': '#000000' }}}%%
+    autonumber
+    
+    participant User
+    participant Client as behaviors_client.js
+    participant Panel as BotPanel
+    participant View as PanelView
+    participant CLI as CLISession
+    participant Bot as Bot
+    participant Behaviors as Behaviors
+    participant Actions as Actions
+    participant Action as Action
+    participant Settings as ExecutionSettings
+    
+    User->>Client: clicks "Submit to Chat"
+    activate Client
+    Client->>Panel: postMessage({command: 'sendToChat'})
+    activate Panel
+    
+    Note over Client,Panel: MESSAGE CROSSES WEBVIEW BOUNDARY
+    
+    Panel->>Panel: currentBehavior = botData.behaviors.current_behavior
+    Note right of Panel: "exploration"
+    Panel->>Panel: currentAction = botData.behaviors.current_action
+    Note right of Panel: null (collapsed)
+    Panel->>Panel: submitCmd = `submit ${currentBehavior}`
+    Note right of Panel: "submit exploration"
+    
+    Panel->>View: execute(submitCmd)
+    activate View
+    View->>CLI: stdin.write("submit exploration\n")
+    activate CLI
+    
+    Note over View,CLI: COMMAND CROSSES PROCESS BOUNDARY (Node.js → Python)
+    
+    CLI->>CLI: verb, args = _parse_command(cmd)
+    Note right of CLI: verb="submit", args="exploration"
+    CLI->>Bot: submit_current_action()
+    activate Bot
+    
+    Bot->>Behaviors: navigate_to("exploration")
+    activate Behaviors
+    Behaviors-->>Bot: behavior
+    deactivate Behaviors
+    
+    Bot->>Settings: get_execution_mode("exploration", "clarify")
+    activate Settings
+    Note right of Settings: Read logs/execution_settings.json
+    Settings-->>Bot: "skip"
+    deactivate Settings
+    
+    Note over Bot,Settings: clarify=skip, loop to find first non-skip
+    
+    Bot->>Settings: get_execution_mode("exploration", "strategy")
+    activate Settings
+    Settings-->>Bot: "skip"
+    deactivate Settings
+    
+    Note over Bot,Settings: strategy=skip, continue loop
+    
+    Bot->>Settings: get_execution_mode("exploration", "build")
+    activate Settings
+    Settings-->>Bot: "combine_next"
+    deactivate Settings
+    
+    Note over Bot,Settings: build≠skip, break loop and navigate
+    
+    Bot->>Actions: navigate_to("build")
+    activate Actions
+    Actions-->>Bot: action
+    deactivate Actions
+    
+    Bot->>Bot: context = ActionContext()
+    Bot->>Bot: context.scope = self._scope
+    
+    Bot->>Action: get_instructions(context, include_scope=True)
+    activate Action
+    Note right of Action: Load rules template
+    Action-->>Bot: instructions (build)
+    deactivate Action
+    
+    Note over Bot,Action: execution_mode=combine_next, append next actions
+    
+    Bot->>Settings: get_execution_mode("exploration", "validate")
+    activate Settings
+    Settings-->>Bot: "combine_next"
+    deactivate Settings
+    
+    Bot->>Actions: find_by_name("validate")
+    activate Actions
+    Actions-->>Bot: validate_action
+    deactivate Actions
+    
+    Bot->>Action: get_instructions(None, include_scope=False)
+    activate Action
+    Action-->>Bot: instructions (validate)
+    deactivate Action
+    
+    Bot->>Bot: instructions.add_display("## Next action: validate")
+    
+    Bot->>Settings: get_execution_mode("exploration", "render")
+    activate Settings
+    Settings-->>Bot: "combine_next"
+    deactivate Settings
+    
+    Bot->>Actions: find_by_name("render")
+    activate Actions
+    Actions-->>Bot: render_action
+    deactivate Actions
+    
+    Bot->>Action: get_instructions(None, include_scope=False)
+    activate Action
+    Action-->>Bot: instructions (render)
+    deactivate Action
+    
+    Bot->>Bot: instructions.add_display("## Next action: render")
+    
+    Note over Bot: Combined: build + validate + render<br/>Skipped: clarify, strategy
+    
+    Bot->>Bot: pyperclip.copy(instructions)
+    Bot->>Behaviors: save_state()
+    activate Behaviors
+    Behaviors-->>Bot: 
+    deactivate Behaviors
+    
+    Bot-->>CLI: {status: 'success', actions_run: [...], actions_skipped: [...]}
+    deactivate Bot
+    
+    CLI->>CLI: json_response = json.dumps(result)
+    CLI-->>View: stdout.write(json + "<<<END_OF_RESPONSE>>>")
+    deactivate CLI
+    
+    Note over View,CLI: RESPONSE CROSSES PROCESS BOUNDARY (Python → Node.js)
+    
+    View->>View: parse JSON from buffer
+    View-->>Panel: parsed result
+    deactivate View
+    
+    Panel->>Panel: showInformationMessage('Instructions submitted!')
+    Panel-->>Client: result
+    deactivate Panel
+    
+    Note over Client,Panel: UI UPDATE CROSSES BACK TO WEBVIEW
+    
+    Client-->>User: success notification
+    deactivate Client
+    
+    Note over User: Combined instructions in clipboard<br/>Pasted to Chat automatically
