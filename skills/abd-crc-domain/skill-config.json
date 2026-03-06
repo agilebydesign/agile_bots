@@ -1,0 +1,5 @@
+{
+  "name": "abd-crc-domain",
+  "version": "1.0.0",
+  "bot_path": "../../bots/crc_bot/behaviors/domain"
+}

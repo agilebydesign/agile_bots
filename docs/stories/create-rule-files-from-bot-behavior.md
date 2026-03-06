@@ -3,7 +3,7 @@
 **Output format:** Generated rule files go to workspace `.cursor/rules/` folder. (Commands deferred.)
 
 ## Acceptance Criteria
-WHEN generate context pagage command on bot 
+WHEN generate context package command on bot 
 **THEN Generator iterates over bot behaviors**
 - Walks `bots/{bot_name}/behaviors/` directory
 - Reads each `behavior.json`
@@ -56,5 +56,7 @@ Important ; save to clarification.strategy
 - Includes examples as code blocks
 
 **AND saved in Output format:** Generated rule files go to workspace `.cursor/rules/` folder. (Commands deferred.)
+
+**AND scenarios, tests, and code behaviors are built the same way** — Generator processes all behaviors uniformly (shape, scenarios, tests, code, exploration, prioritization). Each gets one `.mdc` file with header, clarification, strategy, build, and rules from `rules/*.json`. Skill generation (`generate_skills`) likewise produces skills for all behaviors with rules in `rules/*.md`.
 
 *(Validate: omit—already covered in rules. Commands: deferred.)*

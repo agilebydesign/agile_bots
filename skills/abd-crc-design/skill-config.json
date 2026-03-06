@@ -1,0 +1,5 @@
+{
+  "name": "abd-crc-design",
+  "version": "1.0.0",
+  "bot_path": "../../bots/crc_bot/behaviors/design"
+}

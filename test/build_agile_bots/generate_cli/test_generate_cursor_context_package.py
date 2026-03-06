@@ -218,6 +218,39 @@ class TestCreateRuleFilesFromBotBehavior:
         assert rule_file.exists()
         assert rule_file.suffix == ".mdc"
 
+    def test_generator_produces_rule_files_for_scenarios_tests_code_like_shape(self, tmp_path):
+        """Scenarios, tests, and code behaviors produce .mdc rule files same as shape (Create Rule Files From Bot Behavior)."""
+        bot_name = "story_bot"
+        bot_dir = given_bot_with_behaviors_directory(tmp_path, bot_name)
+        for behavior_name in ["shape", "scenarios", "tests", "code"]:
+            behavior_dir = given_behavior_with_valid_json(bot_dir, behavior_name)
+            rules_dir = behavior_dir / "rules"
+            rules_dir.mkdir(exist_ok=True)
+            (rules_dir / "example_rule.json").write_text(
+                json.dumps({
+                    "priority": 1,
+                    "description": f"Rule for {behavior_name}",
+                    "do": {"description": "Do this"},
+                    "dont": {"description": "Don't do that"},
+                }),
+                encoding="utf-8",
+            )
+        workspace_dir = tmp_path / "workspace"
+        workspace_dir.mkdir()
+
+        result = when_generator_runs(bot_dir, workspace_dir)
+
+        rules_dir = workspace_dir / ".cursor" / "rules"
+        for behavior_name in ["shape", "scenarios", "tests", "code"]:
+            rule_file = rules_dir / f"{bot_name}_{behavior_name}.mdc"
+            assert rule_file.exists(), f"Expected .mdc for {behavior_name} at {rule_file}"
+            content = rule_file.read_text(encoding="utf-8")
+            assert "# story_bot " in content and f" {behavior_name} Behavior" in content
+            assert "## Build" in content
+            assert "### Rules" in content
+            assert "DO" in content or "DON'T" in content
+        assert len(result["created_files"]) == 4
+
 
 class TestGenerateContextPackageViaCLI:
     """Generate context package via CLI - command executes on active bot."""

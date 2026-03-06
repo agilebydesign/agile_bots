@@ -1,0 +1,50 @@
+---
+title: identify-marketable-increments
+priority: 4
+---
+
+## identify-marketable-increments
+
+Identify marketable increments of value during prioritization. Name increments with business value terms that stakeholders understand
+not technical implementation terms.
+
+**DO**
+
+Name increments with business value terms
+
+Name increments to describe the business value or user capability being delivered
+not the technical implementation
+
+```
+MVI 1: Basic Phone Activation - Increment 1 - setup phone manually, activate via shell script, track order in spreadsheet
+```
+
+```
+MVI 2: Web-Based Activation - Increment 2 - setup via web form, activate via web interface, view orders in web page
+```
+
+```
+MVI 3: Self-Service Portal - Increment 3 - browse phone catalog, select phone and plan, automated activation, order dashboard
+```
+
+**DO NOT**
+
+Don't use technical implementation terms in increment names
+
+Don't name increments with technical implementation details - use business capabilities that describe value to users
+
+```
+MVI 1: API Endpoints (WRONG - technical, not business value)
+```
+
+```
+MVI 2: Database Schema (WRONG - technical, not business value)
+```
+
+```
+MVI 3: React Components (WRONG - technical, not business value)
+```
+
+```
+Should be: MVI 1: Basic Order Processing (business capability), MVI 2: Automated Payment Processing (business capability), MVI 3: Self-Service Account Management (business capability)
+```

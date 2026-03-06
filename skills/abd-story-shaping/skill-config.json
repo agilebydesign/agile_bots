@@ -1,0 +1,5 @@
+{
+  "name": "abd-story-shaping",
+  "version": "1.0.0",
+  "bot_path": "../../bots/story_bot/behaviors/shape"
+}

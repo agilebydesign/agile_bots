@@ -265,7 +265,14 @@ class RenderOutputAction(Action):
     def renderAll(self) -> Dict[str, Any]:
         """Execute all synchronizer-based render specs.
         CLI: <behavior>.render.renderAll
+
+        For exploration behavior, delegates to ExplorationRenderExecutor which
+        runs both template configs (story-map.txt, per-increment exploration md)
+        and synchronizer configs (DrawIO diagrams).
         """
+        if self.behavior.name == 'exploration':
+            return self._render_all_exploration()
+
         sync_specs = [spec for spec in self._render_specs if spec.synchronizer]
         if not sync_specs:
             return {'status': 'success', 'message': 'No synchronizer specs to execute', 'results': []}
@@ -285,6 +292,34 @@ class RenderOutputAction(Action):
             'status': 'success',
             'message': f'Rendered {rendered_count} spec(s)',
             'results': results
+        }
+
+    def _render_all_exploration(self) -> Dict[str, Any]:
+        """Run ExplorationRenderExecutor for exploration behavior."""
+        from synchronizers.exploration import ExplorationRenderExecutor
+
+        workspace_root = self.behavior.bot_paths.workspace_directory
+        story_graph_path = self.behavior.bot_paths.story_graph_paths.story_graph_path
+        behavior_render_dir = self.behavior.folder / 'content' / 'render'
+
+        executor = ExplorationRenderExecutor(
+            workspace_root=workspace_root,
+            story_graph_path=story_graph_path,
+            behavior_render_dir=behavior_render_dir,
+        )
+        result = executor.render_all()
+
+        created = result.get('created', [])
+        errors = result.get('errors', [])
+        results = [{'name': p, 'output': p, 'status': 'executed'} for p in created]
+        results.extend([{'name': e.get('config', 'unknown'), 'output': '', 'status': 'error', 'message': e.get('error', '')} for e in errors])
+
+        return {
+            'status': 'success' if not errors else 'partial',
+            'message': result.get('summary', f'Created {len(created)} output(s), {len(errors)} error(s)'),
+            'results': results,
+            'created': created,
+            'errors': errors,
         }
 
     def renderDiagram(self, scope: str = None) -> Dict[str, Any]:
