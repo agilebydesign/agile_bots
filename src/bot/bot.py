@@ -217,6 +217,19 @@ class Bot:
         )
         return generator.generate()
 
+    def generate_skills(self) -> dict:
+        """Generate abd-{bot}-{behavior} skills from all bot behaviors to workspace skills/.
+
+        Returns:
+            dict: Result with created_skills, created_files, and summary
+        """
+        from synchronizers.context_package.skill_file_generator import SkillFileGenerator
+        bot = self.active_bot
+        bots_root = bot.bot_directory.parent
+        skills_output = bot.workspace_directory / "skills"
+        generator = SkillFileGenerator(bots_root=bots_root, skills_output=skills_output)
+        return generator.generate()
+
 
 
     @property

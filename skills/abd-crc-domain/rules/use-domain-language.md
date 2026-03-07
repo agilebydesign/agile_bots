@@ -1,0 +1,611 @@
+---
+title: use-domain-language
+priority: 2
+---
+
+## use-domain-language
+
+Use domain-specific language rooted in core business concepts. Responsibilities must form meaningful domain sentences. Mine vocabulary from stories
+acceptance criteria
+and domain discussions. Avoid generic terms (Hold
+Get
+Has)
+technical patterns (Manager
+Service
+Handler
+Factory)
+and capability verbs (Exposes
+Provides
+Contains). Never leave collaborators empty—use a primitive type when no domain collaborator applies. Prefer domain concepts over primitive soup when multiple primitives form a cohesive concept.
+
+**DO**
+
+Use concrete domain language that creates meaningful sentences
+
+Define all collaborators for every responsibility. Use a primitive type (String
+Number
+Boolean
+Date
+Integer) when no domain collaborator can be used. Never leave collaborators empty.
+
+```
+Campaign
+```
+
+```
+    Is identified by code: String
+```
+
+```
+    Defines voucher capacity (max count): Number
+```
+
+```
+    Allows generation when exhausted (auto-increase): Boolean
+```
+
+```
+    Starts valid at date: Date
+```
+
+```
+    Expires at date (or never): Date or null
+```
+
+```
+    Is valid at date: Boolean, Date
+```
+
+```
+    Defines discount (amount or percent): String, Number
+```
+
+```
+    Generates vouchers: Voucher
+```
+
+```
+Voucher
+```
+
+```
+    Is identified by code: String
+```
+
+```
+    Defines redemption limit (redemptions allowed): Number
+```
+
+```
+    Inherits metadata from campaign: Campaign
+```
+
+```
+    Applies discount amount to order: Campaign
+```
+
+```
+    Is exhausted when fully redeemed: Boolean
+```
+
+```
+(Every responsibility has at least one collaborator—domain object or primitive)
+```
+
+Create responsibilities that form domain sentences with specific meaning. Extract vocabulary from stories and discussions.
+
+```
+Campaign
+```
+
+```
+    Is identified by code: String
+```
+
+```
+    Defines voucher capacity (max count): Number
+```
+
+```
+    Starts valid at date: Date
+```
+
+```
+    Expires at date (or never): Date or null
+```
+
+```
+    Is valid at date: Boolean, Date
+```
+
+```
+    Defines discount (amount or percent): String, Number
+```
+
+```
+    Generates vouchers: Voucher
+```
+
+```
+Voucher
+```
+
+```
+    Is identified by code: String
+```
+
+```
+    Defines redemption limit (redemptions allowed): Number
+```
+
+```
+    Inherits metadata from campaign: Campaign
+```
+
+```
+    Applies discount amount to order: Campaign
+```
+
+```
+    Is exhausted when fully redeemed: Boolean
+```
+
+```
+(Each responsibility reads as a domain sentence: 'Campaign is valid at date', 'Voucher is exhausted when fully redeemed')
+```
+
+Mine domain language from stories: size → defines voucher capacity; time frame → starts valid at
+expires at
+is valid at; code → is identified by code; validity → is valid at date
+
+```
+Instead of 'Hold size and auto-increase':
+```
+
+```
+    Defines voucher capacity (max count): Number
+```
+
+```
+    Allows generation when exhausted (auto-increase): Boolean
+```
+
+```
+Instead of 'Hold time frame and validity':
+```
+
+```
+    Starts valid at date: Date
+```
+
+```
+    Expires at date (or never): Date or null
+```
+
+```
+    Is valid at date: Boolean, Date
+```
+
+```
+Instead of 'Hold code':
+```
+
+```
+    Is identified by code: String
+```
+
+```
+Instead of 'Expose discount amount':
+```
+
+```
+    Applies discount amount to order: Campaign
+```
+
+Name concepts after what they represent in the domain
+not technical patterns
+
+```
+Portfolio
+```
+
+```
+    Reports holdings: Holding
+```
+
+```
+    Calculates total value with market prices: Money, Holding, MarketPrice
+```
+
+```
+    Evaluates risk score: RiskScore, RiskModel, Holding, MarketData
+```
+
+```
+Order
+```
+
+```
+    Lists line items: LineItem
+```
+
+```
+    Calculates subtotal from items: Money, LineItem
+```
+
+```
+    Calculates shipping cost based on address: Money, ShippingAddress, ShippingMethod
+```
+
+```
+(Concrete business concepts and domain verbs, not PortfolioManager or generic Get)
+```
+
+Use domain-specific collaborator types that have business meaning
+
+```
+Order
+```
+
+```
+    Calculates subtotal from items: Money, LineItem
+```
+
+```
+    Calculates shipping cost by method: Money, ShippingAddress, ShippingMethod
+```
+
+```
+Payment
+```
+
+```
+    Authorizes with payment gateway: AuthorizationCode, PaymentGateway
+```
+
+```
+    Retrieves transaction status: TransactionStatus, PaymentGateway
+```
+
+```
+(Collaborators: Money, ShippingAddress, AuthorizationCode have domain meaning)
+```
+
+Think of whole behaviors over data. Prefer collaborators with other domain classes
+not tons of primitives. When multiple primitives describe a cohesive concept
+create a domain concept instead.
+
+```
+Campaign
+```
+
+```
+    Runs for a period: Period
+```
+
+```
+    Defines discount (amount or percent): Discount
+```
+
+```
+    Is applicable to: CampaignMetaDataCollection
+```
+
+```
+    Generates vouchers: Voucher, VoucherCodeGenerator
+```
+
+```
+VoucherCodeGenerator
+```
+
+```
+    Generates code: String
+```
+
+```
+    Generates using prefix: String
+```
+
+```
+    Generates using suffix: String
+```
+
+```
+Period
+```
+
+```
+    Starts on: Date
+```
+
+```
+    Ends on: Date
+```
+
+```
+Discount
+```
+
+```
+    Value: Number
+```
+
+```
+    Percentage: Number
+```
+
+```
+CampaignMetaDataCollection
+```
+
+```
+    Entries key: String, value: String
+```
+
+```
+(Domain concepts as collaborators—Period, Discount, CampaignMetaDataCollection—instead of primitive soup)
+```
+
+Reference domain objects as collaborators
+not as raw parameters in a list. When a concept (Customer
+Campaign
+etc.) participates in a responsibility
+list it as a collaborator.
+
+```
+Redemption
+```
+
+```
+    Records voucher code, customer identity, amount, timestamp: Voucher, Customer (CORRECT: Customer is collaborator)
+```
+
+```
+Redemption
+```
+
+```
+    Records voucher code, customer, amount, timestamp: Voucher (WRONG: 'customer' is raw - flattened into parameter list)
+```
+
+```
+(Domain objects belong in collaborators, not as raw words in the responsibility text)
+```
+
+**DO NOT**
+
+Don't use Hold
+Get
+or Has as default—they are fallbacks that signal failure to find domain language. Don't leave collaborators empty. Avoid primitive soup (scattering primitives instead of domain concepts).
+
+Don't leave collaborators empty. Use a primitive (String
+Number
+Boolean
+Date
+Integer) when no domain collaborator applies.
+
+```
+Campaign (WRONG: empty collaborators)
+```
+
+```
+    Is identified by code:
+```
+
+```
+    Defines voucher capacity (max count):
+```
+
+```
+    Allows generation when exhausted (auto-increase):
+```
+
+```
+Campaign (CORRECT: primitives when no domain collaborator)
+```
+
+```
+    Is identified by code: String
+```
+
+```
+    Defines voucher capacity (max count): Number
+```
+
+```
+    Allows generation when exhausted (auto-increase): Boolean
+```
+
+```
+(Every responsibility must have at least one collaborator)
+```
+
+Don't use primitives that make up a concept—avoid primitive soup. Don't use Has
+Get
+Hold. Prefer domain concepts as collaborators over scattering String
+Number
+Boolean
+Date across responsibilities.
+
+```
+Campaign (WRONG: primitive soup, Has, empty collaborators)
+```
+
+```
+    Starts valid at date:
+```
+
+```
+    Expires at date (or never):
+```
+
+```
+    Is valid at date: Boolean, Date
+```
+
+```
+    Defines discount (amount or percent):
+```
+
+```
+    Has metadata (key-value):
+```
+
+```
+    Has voucher code generation parameters: VoucherCodeGenerationParameters
+```
+
+```
+    Generated voucher codes:
+```
+
+```
+Campaign (CORRECT: domain concepts as collaborators)
+```
+
+```
+    Runs for a period: Period
+```
+
+```
+    Defines discount (amount or percent): Discount
+```
+
+```
+    Is applicable to: CampaignMetaDataCollection
+```
+
+```
+    Generates vouchers: Voucher, VoucherCodeGenerator
+```
+
+```
+(Think whole behaviors—Period, Discount, CampaignMetaDataCollection—not tons of primitives)
+```
+
+Don't use Hold or Get. These are fallbacks when you cannot find actual domain language - and that is a sign of failure. Mine the domain first.
+
+```
+Campaign
+```
+
+```
+    Hold campaign definition: (WRONG: vague)
+```
+
+```
+    Hold size and auto-increase: (WRONG: vague)
+```
+
+```
+    Hold time frame and validity: (WRONG: vague)
+```
+
+```
+(Should be: Defines voucher capacity, Starts valid at date, Is valid at date - domain sentences)
+```
+
+Don't use Get as a substitute for Hold - it is equally vague. Find the actual responsibility.
+
+```
+Voucher
+```
+
+```
+    Get code: (WRONG: what does 'get' mean in domain terms?)
+```
+
+```
+    Get redemption limit: (WRONG: vague)
+```
+
+```
+(Should be: Is identified by code, Defines redemption limit - domain-specific)
+```
+
+Don't name concepts with suffixes like Manager
+Service
+Handler
+Factory
+
+```
+PortfolioManager (WRONG: xxxer abstraction)
+```
+
+```
+    Manages portfolio: Portfolio
+```
+
+```
+(Should be: Portfolio with clear domain responsibilities)
+```
+
+Don't use capability verbs like Exposes
+Provides
+Contains
+Represents
+
+```
+Portfolio
+```
+
+```
+    Exposes holdings: Holding (WRONG: capability)
+```
+
+```
+    Provides valuation: Money (WRONG: capability)
+```
+
+```
+(Should be: Reports holdings, Calculates total value - specific domain actions)
+```
+
+Don't use generic terms like Data
+Config
+Parameter
+Result without domain context
+
+```
+RebalanceRecommendation
+```
+
+```
+    Get result: ResultData (WRONG: generic)
+```
+
+```
+(Should be: Generates trades: Trade - domain action)
+```
+
+Don't describe system structure instead of behavior
+
+```
+PaymentSystem
+```
+
+```
+    Contains payment gateway: PaymentGateway (WRONG: structure)
+```
+
+```
+(Should be: Payment - Authorizes with payment gateway: AuthorizationCode, PaymentGateway)
+```
+
+Don't use raw parameters for domain concepts. When Customer
+Campaign
+or another domain object participates
+add it as a collaborator - don't flatten it into a parameter list.
+
+```
+Redemption
+```
+
+```
+    Records voucher code, customer, amount, timestamp: Voucher (WRONG: customer is raw parameter)
+```
+
+```
+(Should be: Records voucher code, customer identity, amount, timestamp: Voucher, Customer - Customer as collaborator)
+```

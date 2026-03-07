@@ -1,0 +1,283 @@
+---
+title: assign-helper-ownership
+priority: 3
+---
+
+## assign-helper-ownership
+
+Decompose large domain objects into focused assistants to maintain single responsibility and smaller surface area. Use Doer patterns (Helper
+Calculator
+Analyzer) when a concept has too many distinct responsibility areas. Assistants must be subordinate to and owned by the domain concept they serve. Example: Portfolio delegates to RiskAnalyzer
+RebalanceCalculator
+PerformanceAnalyzer.
+
+**DO**
+
+Decompose large domain objects into assistants to maintain single responsibility. Example: Portfolio delegates to RiskAnalyzer
+RebalanceCalculator
+PerformanceAnalyzer (focused assistants)
+
+Decompose when a domain concept has multiple distinct responsibility areas - extract each into a focused assistant
+
+```
+Portfolio (before: too many responsibility areas)
+```
+
+```
+    Get holdings: Holding
+```
+
+```
+    Calculates total value: Money
+```
+
+```
+    Evaluates risk score: RiskScore
+```
+
+```
+    Generates rebalance trades: Trade
+```
+
+```
+    Analyzes performance: PerformanceMetrics
+```
+
+```
+    Computes tax implications: TaxReport
+```
+
+```
+Portfolio (after: focused on core + delegates to assistants)
+```
+
+```
+    Get holdings: Holding
+```
+
+```
+    Calculates total value: Money, Holding
+```
+
+```
+    Evaluates risk using: RiskAnalyzer
+```
+
+```
+    Rebalances using: RebalanceCalculator
+```
+
+```
+    Analyzes performance using: PerformanceAnalyzer
+```
+
+```
+(Each responsibility area becomes a focused assistant with single responsibility)
+```
+
+Extract Doer when domain concept surface area becomes too large - keep concept focused
+
+```
+Order (domain concept with focused responsibilities)
+```
+
+```
+    Get line items: LineItem
+```
+
+```
+    Calculates total: Money, LineItem
+```
+
+```
+    Submits for fulfillment: FulfillmentRequest
+```
+
+```
+OrderValidator (extracted Doer - reduces Order surface area)
+```
+
+```
+    Validates inventory availability: Boolean, LineItem, InventoryService
+```
+
+```
+    Validates payment authorization: Boolean, Payment, PaymentGateway
+```
+
+```
+    Validates shipping address: Boolean, ShippingAddress, AddressService
+```
+
+```
+(Validation extracted because Order had too many validation responsibilities)
+```
+
+Make assistant classes subordinate to and owned by the domain concept they serve
+
+```
+Portfolio (domain concept - owns the assistant)
+```
+
+```
+    Get holdings: Holding
+```
+
+```
+    Calculates total value: Money, Holding, MarketPrice
+```
+
+```
+    Rebalances using: RebalanceCalculator
+```
+
+```
+RebalanceCalculator (subordinate assistant - owned by Portfolio)
+```
+
+```
+    Generates trades to target allocation: Trade, Holding, TargetAllocation
+```
+
+```
+    Minimizes transaction costs: Money, Trade, TradingFees
+```
+
+```
+(RebalanceCalculator is subordinate to Portfolio, not independent)
+```
+
+Assign helpers to the domain concept that uses them most frequently
+
+```
+File (domain concept)
+```
+
+```
+    Get content: Content
+```
+
+```
+    Saves to path: Path, FileSystem
+```
+
+```
+    Validates using: FileNamingChecker
+```
+
+```
+FileNamingChecker (helper owned by File)
+```
+
+```
+    Validates filename format: Boolean, Filename, NamingRules
+```
+
+```
+    Suggests valid name: Filename, NamingRules
+```
+
+```
+(FileNamingChecker assigned to File as its primary user)
+```
+
+**DO NOT**
+
+Don't create unnecessary Doers or leave them without clear ownership. Example: OrderCalculator
+OrderSubmitter (wrong - premature extraction) vs Order with Calculates/Submits (right)
+
+Don't extract Doers prematurely when domain concept can handle responsibilities
+
+```
+Order (WRONG: unnecessarily small)
+```
+
+```
+    Get line items: LineItem
+```
+
+```
+OrderCalculator (WRONG: premature extraction)
+```
+
+```
+    Calculates subtotal: Money
+```
+
+```
+OrderSubmitter (WRONG: premature extraction)
+```
+
+```
+    Submits order: FulfillmentRequest
+```
+
+```
+(Should be: Order with Calculates total and Submits for fulfillment - no need for separate Doers)
+```
+
+Don't create helpers without clear domain concept ownership
+
+```
+ValidationHelper (WRONG: orphaned - no owner)
+```
+
+```
+    Validates data: Boolean
+```
+
+```
+ProcessingService (WRONG: orphaned - serves no specific concept)
+```
+
+```
+    Processes items: Item
+```
+
+```
+(Every helper must be owned by a specific domain concept)
+```
+
+Don't duplicate helpers across multiple concepts
+
+```
+Order
+```
+
+```
+    Validates using: AddressValidator
+```
+
+```
+Customer
+```
+
+```
+    Validates using: AddressValidator (WRONG: duplicated)
+```
+
+```
+(Should be: One AddressValidator owned by Address concept, used by both Order and Customer)
+```
+
+Don't let Doers become independent of domain concepts
+
+```
+OrderService (WRONG: independent, not subordinate)
+```
+
+```
+    Creates order: Order
+```
+
+```
+    Updates order: Order
+```
+
+```
+    Deletes order: Order
+```
+
+```
+(Should be: Order with Creates from cart, Updates status - domain concept owns behavior, not service)
+```

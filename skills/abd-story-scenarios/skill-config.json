@@ -1,0 +1,5 @@
+{
+  "name": "abd-story-scenarios",
+  "version": "1.0.0",
+  "bot_path": "../../bots/story_bot/behaviors/scenarios"
+}

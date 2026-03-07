@@ -6,6 +6,9 @@ Parent Epic: Invoke Bot > Perform Action
 
 Domain tests verify DrawIO rendering, extraction, and synchronization.
 Tests NEW domain model classes - NOT old synchronizers.
+
+Uses test inheritance: TestRenderStoryMap extends BaseRenderDiagramTest for shared
+render scenarios; uses BotTestHelper and DrawIOStoryMapTestHelper for setup.
 """
 import json
 import pytest
@@ -18,12 +21,76 @@ from synchronizers.story_io.layout_data import LayoutData
 from synchronizers.story_io.update_report import UpdateReport
 from story_graph.nodes import StoryMap
 
+from invoke_bot.perform_action.synchronize_graph_with_rendered_diagram.base_render_diagram_test import BaseRenderDiagramTest
 
-class TestRenderStoryMap:
 
-    def test_render_outline_diagram_from_story_map_with_default_layout(self, tmp_path):
+# ============================================================================
+# Shared fixtures for outline domain (simple story map)
+# ============================================================================
+
+SIMPLE_STORY_MAP_DATA = {
+    "epics": [
+        {
+            "name": "Invoke Bot",
+            "sequential_order": 1.0,
+            "sub_epics": [
+                {
+                    "name": "Initialize Bot",
+                    "sequential_order": 1.0,
+                    "sub_epics": [],
+                    "story_groups": [
+                        {
+                            "type": "and",
+                            "connector": None,
+                            "stories": [
+                                {"name": "Load Config", "sequential_order": 1.0, "story_type": "user", "users": [], "acceptance_criteria": []},
+                                {"name": "Register Behaviors", "sequential_order": 2.0, "story_type": "system", "users": [], "acceptance_criteria": []}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
+SIMPLE_LAYOUT_DATA = {
+    "EPIC|Invoke Bot": {"x": 20, "y": 120, "width": 300, "height": 50},
+    "SUB_EPIC|Initialize Bot": {"x": 30, "y": 180, "width": 280, "height": 50},
+    "STORY|Invoke Bot|Initialize Bot|Load Config": {"x": 35, "y": 270, "width": 120, "height": 50},
+    "STORY|Invoke Bot|Initialize Bot|Register Behaviors": {"x": 165, "y": 270, "width": 120, "height": 50}
+}
+
+
+def _simple_outline_fixtures():
+    return {
+        'story_map_data': SIMPLE_STORY_MAP_DATA,
+        'diagram_type': 'outline',
+        'layout_data': SIMPLE_LAYOUT_DATA,
+        'expected_epic_count': 1,
+        'expected_sub_epic_count': 1,
+    }
+
+
+class TestRenderStoryMap(BaseRenderDiagramTest):
+    """
+    Story: Render story map (outline)
+    Inherits from BaseRenderDiagramTest: test_default_layout_renders_valid_output,
+    test_re_render_with_saved_layout_preserves_positions, test_render_writes_valid_drawio_file,
+    test_cells_have_required_styles.
+    Uses BotTestHelper and DrawIOStoryMapTestHelper for setup.
+    """
+
+    @property
+    def domain_fixtures(self):
+        return _simple_outline_fixtures()
+
+    # -- Outline-unique scenarios (beyond inherited base tests) --
+
+    def test_epic_and_sub_epic_positions_follow_layout_spec(self, tmp_path):
+        """Epic at EPIC_Y; sub-epic below epic; stories ordered left-to-right."""
         helper = BotTestHelper(tmp_path)
-        story_map = StoryMap(helper.drawio_story_map.create_simple_story_map_data())
+        story_map = StoryMap(SIMPLE_STORY_MAP_DATA)
 
         drawio_story_map = DrawIOStoryMap(diagram_type='outline')
         summary = drawio_story_map.render_from_story_map(story_map, layout_data=None)
@@ -38,8 +105,6 @@ class TestRenderStoryMap:
         assert sub_epics[0].position.y > epics[0].position.y
 
         stories = sub_epics[0].get_stories()
-        # In row-based layout sub-epic is a separate bar, not a container.
-        # Check stories are ordered left-to-right.
         for i in range(len(stories) - 1):
             assert stories[i].position.x < stories[i+1].position.x
 
@@ -47,25 +112,6 @@ class TestRenderStoryMap:
         drawio_story_map.save(output_file)
         assert output_file.exists()
         helper.drawio_story_map.assert_render_summary(summary, expected_epics=1, expected_sub_epic_count=1)
-
-    def test_render_outline_diagram_from_story_map_with_saved_layout_data(self, tmp_path):
-        helper = BotTestHelper(tmp_path)
-        story_map = StoryMap(helper.drawio_story_map.create_simple_story_map_data())
-        layout_file = helper.drawio_story_map.create_layout_data_file()
-        layout_data = LayoutData.load(layout_file)
-
-        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
-        drawio_story_map.render_from_story_map(story_map, layout_data=layout_data)
-
-        epics = drawio_story_map.get_epics()
-        # With layout data, epic uses saved position
-        assert epics[0].position.x == 20
-        assert epics[0].position.y == 120
-        sub_epics = epics[0].get_sub_epics()
-        # Sub-epic X = epic X + BAR_PADDING, Y computed by row layout
-        assert sub_epics[0].position.y > epics[0].position.y
-        stories = sub_epics[0].get_stories()
-        assert stories[0].sequential_order < stories[1].sequential_order
 
     @pytest.mark.parametrize('epic_count,sub_epic_count,story_count', [(1, 3, 7), (2, 5, 12)])
     def test_diagram_contains_correct_count_of_cells_matching_story_map_structure(self, tmp_path, epic_count, sub_epic_count, story_count):
@@ -128,20 +174,6 @@ class TestRenderStoryMap:
             node = drawio_story_map.get_sub_epics()[0]
         assert node.shape == expected_shape
         helper.drawio_story_map.assert_cell_style(node, expected_fill, expected_stroke, expected_font_color)
-
-    def test_render_completes_and_writes_drawio_file_to_specified_path(self, tmp_path):
-        helper = BotTestHelper(tmp_path)
-        story_map = StoryMap(helper.drawio_story_map.create_simple_story_map_data())
-
-        drawio_story_map = DrawIOStoryMap(diagram_type='outline')
-        summary = drawio_story_map.render_from_story_map(story_map, layout_data=None)
-        output_file = tmp_path / 'story-map.drawio'
-        drawio_story_map.save(output_file)
-
-        assert output_file.exists()
-        assert summary['diagram_generated'] is True
-        assert 'epics' in summary
-        assert 'sub_epic_count' in summary
 
     def test_render_outline_from_empty_story_map_produces_empty_diagram(self, tmp_path):
         story_map = StoryMap({"epics": []})

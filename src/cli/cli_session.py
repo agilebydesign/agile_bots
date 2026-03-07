@@ -44,6 +44,7 @@ class CLISession:
             'save': self._handle_save,
             'submit': self._handle_submit,
             'generate_context_package': self._handle_generate_context_package,
+            'generate_skills': self._handle_generate_skills,
             'generate': self._handle_generate,
         }
         if verb.startswith('submitrules:') or verb.startswith('submitrules '):
@@ -84,7 +85,29 @@ class CLISession:
     def _handle_generate(self, verb: str, args: str) -> CLICommandResponse:
         if args.strip() == "context package":
             return self._handle_generate_context_package(verb, args)
+        if args.strip() == "skills":
+            return self._handle_generate_skills(verb, args)
         return None
+
+    def _handle_generate_skills(self, verb: str, args: str) -> CLICommandResponse:
+        result = self.bot.generate_skills()
+        if self.mode == 'json':
+            import json
+            return CLICommandResponse(
+                output=json.dumps(result, indent=2),
+                status='success',
+                cli_terminated=False
+            )
+        created = result.get('created_skills', [])
+        summary = result.get('summary', '')
+        lines = [f"[OK] {summary}"]
+        for name in created:
+            lines.append(f"  - {name}")
+        return CLICommandResponse(
+            output='\n'.join(lines),
+            status='success',
+            cli_terminated=False
+        )
 
     def _handle_generate_context_package(self, verb: str, args: str) -> CLICommandResponse:
         result = self.bot.generate_context_package()
