@@ -8,7 +8,7 @@
 const vscode = require("vscode");
 const BotPanel = require("./bot/bot_panel.js");
 const BotPanelSidebarProvider = require("./bot/bot_panel_sidebar.js");
-const CounterView = require("./counter/counter_view.js");
+//const CounterView = require("./counter/counter_view.js");
 const { Logger } = require("./utils");
 const path = require("path");
 
@@ -108,13 +108,13 @@ function activate(context) {
     
     context.subscriptions.push(viewPanelCommand);
 
-    const viewCounterCommand = vscode.commands.registerCommand(
-      "agilebot.viewCounter",
-      () => {
-        CounterView.createOrShow(context.extensionUri);
-      }
-    );
-    context.subscriptions.push(viewCounterCommand);
+    // const viewCounterCommand = vscode.commands.registerCommand(
+    //   "agilebot.viewCounter",
+    //   () => {
+    //     CounterView.createOrShow(context.extensionUri);
+    //   }
+    // );
+    // context.subscriptions.push(viewCounterCommand);
     
     const perfActivateEnd = performance.now();
     const activationDuration = (perfActivateEnd - perfActivateStart).toFixed(2);
