@@ -11,6 +11,9 @@ from .base_helper import BaseTestHelper
 
 class StateTestHelper(BaseTestHelper):
     """Helper for state management - setting/getting/asserting state files."""
+
+    def _state_file_path(self) -> Path:
+        return self.workspace / 'logs' / 'behavior_action_state.json'
     
     def set_state(self, behavior: str, action: str, completed_actions: list = None):
        
@@ -30,7 +33,8 @@ class StateTestHelper(BaseTestHelper):
                 for action_state in completed_actions
             ]
         
-        state_file = self.workspace / 'behavior_action_state.json'
+        state_file = self._state_file_path()
+        state_file.parent.mkdir(parents=True, exist_ok=True)
         state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')
         
         # Reload the bot state from the file
@@ -40,7 +44,7 @@ class StateTestHelper(BaseTestHelper):
     
     def get_state(self) -> dict:
         """Read current bot state from workspace."""
-        state_file = self.workspace / 'behavior_action_state.json'
+        state_file = self._state_file_path()
         if not state_file.exists():
             return {}
         return json.loads(state_file.read_text(encoding='utf-8'))
@@ -59,12 +63,13 @@ class StateTestHelper(BaseTestHelper):
                 'timestamp': datetime.now().isoformat()
             })
         
-        state_file = self.workspace / 'behavior_action_state.json'
+        state_file = self._state_file_path()
+        state_file.parent.mkdir(parents=True, exist_ok=True)
         state_file.write_text(json.dumps(state, indent=2), encoding='utf-8')
     
     def clear_state(self):
         """Clear/delete behavior_action_state.json file."""
-        state_file = self.workspace / 'behavior_action_state.json'
+        state_file = self._state_file_path()
         if state_file.exists():
             state_file.unlink()
     

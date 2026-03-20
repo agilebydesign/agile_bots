@@ -183,8 +183,14 @@ class StrategyTestHelper(BaseHelper):
             # Actual format: behavior_data['decisions'] = {...}
             assert 'decisions' in behavior_data, "Behavior should have 'decisions'"
             for key, value in expected_decisions.items():
-                assert behavior_data['decisions'][key] == value, \
-                    f"Expected decision '{key}' = '{value}', got '{behavior_data['decisions'].get(key)}'"
+                actual_value = behavior_data['decisions'].get(key)
+                expected_value = value if isinstance(value, list) else [value]
+                if isinstance(actual_value, list):
+                    assert actual_value == expected_value, \
+                        f"Expected decision '{key}' = '{expected_value}', got '{actual_value}'"
+                else:
+                    assert actual_value in expected_value, \
+                        f"Expected decision '{key}' in '{expected_value}', got '{actual_value}'"
         
         if expected_assumptions:
             # Actual format: behavior_data uses 'additional_strategies' (or legacy 'assumptions')

@@ -12,7 +12,6 @@ class Behavior:
     def __init__(self, name: str, bot_paths: BotPath, bot_instance=None):
         if not isinstance(bot_paths, BotPath):
             raise TypeError('bot_paths must be an instance of BotPath')
-        import json; from pathlib import Path as P; log_path = P(r'c:\dev\augmented-teams\.cursor\debug.log'); log_path.parent.mkdir(parents=True, exist_ok=True); log_file = open(log_path, 'a', encoding='utf-8'); log_file.write(json.dumps({'location':'behavior.py:15','message':'Behavior.__init__ setting bot_name','data':{'name':name,'bot_directory':str(bot_paths.bot_directory),'bot_directory_name':bot_paths.bot_directory.name},'timestamp':__import__('time').time()*1000,'sessionId':'debug-session','hypothesisId':'H2'})+'\n'); log_file.close()
         self.bot_name = bot_paths.bot_directory.name
         self.name = name
         self.bot_paths = bot_paths
