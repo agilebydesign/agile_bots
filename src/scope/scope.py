@@ -322,7 +322,8 @@ class Scope:
         if not getattr(self, '_results_dirty', True) and getattr(self, '_cached_results', None) is not None:
             return self._cached_results
         
-        if self.type in (ScopeType.STORY, ScopeType.INCREMENT, ScopeType.SHOW_ALL):
+        # ALL ("scope set all") must load the full graph like SHOW_ALL; otherwise panel/instructions get no story graph.
+        if self.type in (ScopeType.STORY, ScopeType.INCREMENT, ScopeType.SHOW_ALL, ScopeType.ALL):
             cached = self._get_story_graph_results()
         elif self.type == ScopeType.FILES:
             cached = self._get_file_results()
