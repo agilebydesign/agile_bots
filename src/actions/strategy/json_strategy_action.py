@@ -55,10 +55,6 @@ class JSONStrategyAction(JSONAdapter):
         return self.action.typical_assumptions
     
     def to_dict(self) -> dict:
-        import time
-        with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-            f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H1','location':'json_strategy_action.py:67','message':'to_dict called','data':{'behavior_name':self.action.behavior.name if self.action.behavior else None,'has_strategy':bool(self.action.strategy)},'timestamp':int(time.time()*1000)})+'\n')
-        
         result = {
             'action_name': self.action.action_name,
             'description': self.action.description,
@@ -74,20 +70,11 @@ class JSONStrategyAction(JSONAdapter):
             from actions.strategy.strategy_decision import StrategyDecision
             saved_data = StrategyDecision.load_all(self.action.behavior.bot_paths)
             
-            with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-                f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H3,H4','location':'json_strategy_action.py:83','message':'loaded saved_data','data':{'saved_data_keys':list(saved_data.keys()) if saved_data else None,'saved_data':saved_data,'behavior_name':self.action.behavior.name},'timestamp':int(time.time()*1000)})+'\n')
-            
             behavior_data = saved_data.get(self.action.behavior.name, {}) if saved_data else {}
             saved_decisions = behavior_data.get('decisions', {})
             saved_assumptions = behavior_data.get('additional_strategies') or behavior_data.get('assumptions', [])
             
-            with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-                f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H3,H4','location':'json_strategy_action.py:93','message':'extracted behavior data','data':{'behavior_data':behavior_data,'saved_decisions':saved_decisions,'saved_assumptions':saved_assumptions},'timestamp':int(time.time()*1000)})+'\n')
-            
             serialized_criteria = {}
-            
-            with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-                f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H2,H6','location':'json_strategy_action.py:102','message':'before serializing criteria','data':{'has_strategy_criteria':bool(self.action.strategy_criteria),'criteria_type':str(type(self.action.strategy_criteria)),'criteria_len':len(self.action.strategy_criteria) if self.action.strategy_criteria else 0},'timestamp':int(time.time()*1000)})+'\n')
             
             if self.action.strategy_criteria:
                 for key, criteria in self.action.strategy_criteria.items():
@@ -100,9 +87,6 @@ class JSONStrategyAction(JSONAdapter):
                             'outcome': criteria.outcome if hasattr(criteria, 'outcome') else None
                         }
             
-            with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-                f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H2,H6','location':'json_strategy_action.py:120','message':'after serializing criteria','data':{'serialized_count':len(serialized_criteria),'serialized_keys':list(serialized_criteria.keys())},'timestamp':int(time.time()*1000)})+'\n')
-            
             result['strategy'] = {
                 'criteria_count': len(self.action.strategy_criteria) if self.action.strategy_criteria else 0,
                 'assumptions_count': len(self.action.typical_assumptions) if self.action.typical_assumptions else 0,
@@ -114,9 +98,6 @@ class JSONStrategyAction(JSONAdapter):
                     'assumptions_made': saved_assumptions
                 }
             }
-            
-            with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-                f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H5','location':'json_strategy_action.py:135','message':'final strategy structure','data':{'has_strategy_key':('strategy' in result),'strategy_criteria_criteria_keys':list(result['strategy']['strategy_criteria']['criteria'].keys()),'decisions_made_keys':list(result['strategy']['strategy_criteria']['decisions_made'].keys()),'assumptions_made_count':len(result['strategy']['assumptions']['assumptions_made'])},'timestamp':int(time.time()*1000)})+'\n')
             
             if self.action.strategy_criteria:
                 criteria_dict = self.action.strategy_criteria
@@ -134,9 +115,6 @@ class JSONStrategyAction(JSONAdapter):
             
             if self.action.typical_assumptions:
                 result['typical_assumptions'] = self.action.typical_assumptions
-        
-        with open(r'c:\dev\augmented-teams\.cursor\debug.log', 'a', encoding='utf-8') as f:
-            f.write(json.dumps({'sessionId':'debug-session','runId':'initial','hypothesisId':'H1','location':'json_strategy_action.py:152','message':'to_dict returning','data':{'result_keys':list(result.keys()),'has_strategy':('strategy' in result),'result_json_length':len(json.dumps(result))},'timestamp':int(time.time()*1000)})+'\n')
         
         return result
     
