@@ -122,11 +122,14 @@ def main():
         print("```powershell")
         workspace_root_str = str(workspace_directory).replace('\\', '\\')
         cli_script_str = "python -m cli.cli_main"
-        print(f"# Interactive mode (environment set automatically by script):")
-        print(cli_script_str)
+        launcher_str = "python run_cli.py"
+        print(f"# Interactive (use run_cli.py if another agile_bots checkout is on PYTHONPATH):")
+        print(launcher_str)
+        print(f"# Or: {cli_script_str}")
         print("")
-        print(f"# Piped mode (each command is a new process - script sets env vars automatically):")
-        print(f"echo '<command>' | {cli_script_str}")
+        print(f"# Piped mode (each command is a new process):")
+        print(f"echo '<command>' | {launcher_str}")
+        print(f"# Or: echo '<command>' | {cli_script_str}")
         print("")
         print("# Optional: Override environment variables if needed:")
         print(f"$env:PYTHONPATH = '{workspace_root_str}'")

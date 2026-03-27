@@ -555,8 +555,16 @@ class CLISession:
     
     def _parse_command(self, command: str) -> tuple[str, str]:
         parts = command.split(maxsplit=1)
-        verb = parts[0].lower()
+        token = parts[0]
         args = parts[1] if len(parts) > 1 else ""
+        # Lowercase only the first dot segment so top-level verbs stay normalized
+        # (e.g. scope, status) while behavior.action.method keeps camelCase (renderAll).
+        if '.' in token:
+            segs = token.split('.')
+            segs[0] = segs[0].lower()
+            verb = '.'.join(segs)
+        else:
+            verb = token.lower()
         return verb, args
     
     def _parse_save_params(self, args_string: str) -> Dict[str, Any]:

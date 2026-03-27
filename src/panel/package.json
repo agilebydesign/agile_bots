@@ -36,11 +36,6 @@
                 "command": "agilebot.viewPanel",
                 "title": "View Bot Panel",
                 "category": "AgileBot"
-            },
-            {
-                "command": "agilebot.viewCounter",
-                "title": "View Counter",
-                "category": "AgileBot"
             }
         ],
         "views": {

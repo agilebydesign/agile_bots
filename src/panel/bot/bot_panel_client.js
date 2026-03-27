@@ -498,7 +498,7 @@ document.addEventListener('dragend', function(e) {
     });
 }, true);
 
-let dragoverLogCounter = 0;
+let dragoverLogThrottle = 0;
 document.addEventListener('dragover', function(e) {
 
     if (draggedIncrement) {
@@ -535,7 +535,7 @@ document.addEventListener('dragover', function(e) {
     }
     
 
-    if (dragoverLogCounter++ % 20 === 0 && draggedNode) {
+    if (dragoverLogThrottle++ % 20 === 0 && draggedNode) {
         vscode.postMessage({
             command: 'logToFile',
             message: '[WebView] DRAGOVER - found target: ' + (target ? 'YES' : 'NO') + ', draggedNode: ' + (draggedNode ? draggedNode.name : 'null')
@@ -623,7 +623,7 @@ document.addEventListener('dragover', function(e) {
                 dropZone = 'inside';
                 target.style.backgroundColor = 'rgba(255, 140, 0, 0.3)';
                 indicator.style.display = 'none';
-                if (dragoverLogCounter % 20 === 0) {
+                if (dragoverLogThrottle % 20 === 0) {
                     vscode.postMessage({
                         command: 'logToFile',
                         message: '[WebView] DRAGOVER ON (inside) - will nest inside ' + target.getAttribute('data-node-name')
@@ -638,7 +638,7 @@ document.addEventListener('dragover', function(e) {
                 indicator.style.top = (rect.top + rect.height) + 'px';
                 indicator.style.width = rect.width + 'px';
 
-                if (dragoverLogCounter % 20 === 0) {
+                if (dragoverLogThrottle % 20 === 0) {
                     vscode.postMessage({
                         command: 'logToFile',
                         message: '[WebView] DRAGOVER AFTER - hovering over: "' + targetName + '", line at y=' + (rect.top + rect.height) + ' (BOTTOM of node), will insert AFTER this node'
