@@ -134,6 +134,12 @@ class StoryMapView extends PanelView {
         const injectExamplesIconPath = getIcon('inject_examples.png');
         const injectTestsIconPath = getIcon('inject_tests.png');
         const injectCodeIconPath = getIcon('inject_code.png');
+        const scopeHierarchyIconPath = getIcon('scope_hierarchy.png');
+        const scopeIncrementIconPath = getIcon('scope_increment.png');
+        const scopeFilesIconPath = getIcon('scope_files.png');
+        const incrementCollapseIconPath = getIcon('increment_collapse.png');
+        const incrementDeleteIconPath = getIcon('increment_delete.png');
+        const incrementStoryRemoveIconPath = getIcon('increment_story_remove.png');
         Logger.log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
         Logger.log(`[StoryMapView] Branding: ${branding.getBranding()}, icon sample: ${gearIconPath}`);
@@ -170,7 +176,12 @@ class StoryMapView extends PanelView {
         
         if (isIncrementView) {
             // Render increment columns view (read-only)
-            contentHtml = this.renderIncrementView(botData, documentIconPath);
+            contentHtml = this.renderIncrementView(botData, documentIconPath, {
+                incrementCollapseIconPath,
+                incrementDeleteIconPath,
+                incrementAddIconPath: plusIconPath,
+                incrementStoryRemoveIconPath,
+            });
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
             contentSummary = `${increments.length} increment${increments.length !== 1 ? 's' : ''}`;
             // Include epics section with increment's stories when scope is filtered to increment (injection level applies)
@@ -260,6 +271,9 @@ class StoryMapView extends PanelView {
             .replace(/\${showAllIconPath}/g, showAllIconPath)
             .replace(/\${clearIconPath}/g, clearIconPath)
             .replace(/\${injectToggleGroupHtml}/g, injectToggleGroupHtml)
+            .replace(/\${scopeHierarchyIconPath}/g, scopeHierarchyIconPath)
+            .replace(/\${scopeIncrementIconPath}/g, scopeIncrementIconPath)
+            .replace(/\${scopeFilesIconPath}/g, scopeFilesIconPath)
             .replace(/\${contentHtml}/g, contentHtml);
         const perfAssemblyEnd = performance.now();
         Logger.log(`[StoryMapView] [PERF] HTML assembly: ${(perfAssemblyEnd - perfAssemblyStart).toFixed(2)}ms`);
@@ -460,9 +474,16 @@ class StoryMapView extends PanelView {
      * 
      * @param {Object} botData - Bot data containing increments
      * @param {string} documentIconPath - Path to document icon for stories
+     * @param {Object} [incrementIcons] - Paths for increment toolbar (ABD 2024 SVGs)
      * @returns {string} HTML string for increment columns
      */
-    renderIncrementView(botData, documentIconPath) {
+    renderIncrementView(botData, documentIconPath, incrementIcons = {}) {
+        const {
+            incrementCollapseIconPath = '',
+            incrementDeleteIconPath = '',
+            incrementAddIconPath = '',
+            incrementStoryRemoveIconPath = '',
+        } = incrementIcons;
         // Load increment column template
         const incrementColumnTemplatePath = vscode.Uri.joinPath(this.extensionUri, 'story_graph', 'increment_column.html');
         const incrementColumnTemplate = fs.readFileSync(incrementColumnTemplatePath.fsPath, 'utf-8');
@@ -501,11 +522,14 @@ class StoryMapView extends PanelView {
             ? `<span class="increment-filter-hint">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
             : '';
 
+        const addIncBtn = incrementAddIconPath
+            ? `<button type="button" class="increment-add-button" onclick="addIncrement()" title="Add a new delivery increment" aria-label="Add a new delivery increment"><img src="${incrementAddIconPath}" class="increment-add-button-icon" alt="" /></button>`
+            : `<button type="button" class="increment-add-button" onclick="addIncrement()" title="Add a new delivery increment">+ Add Increment</button>`;
         let html = `
             <div class="increment-header">
                 <span class="increment-header-title">INCREMENTS</span>
                 ${filterHint}
-                <button class="increment-add-button" onclick="addIncrement()">+ Add Increment</button>
+                ${addIncBtn}
             </div>
             <div class="increment-columns-wrapper">
         `;
@@ -542,11 +566,14 @@ class StoryMapView extends PanelView {
                 : sortedStories.map((story, si) => {
                     const storyName = typeof story === 'string' ? story : (story.name || '');
                     const escapedStoryName = escapeForHtml(storyName);
+                    const removeBtn = incrementStoryRemoveIconPath
+                        ? `<button type="button" class="increment-story-remove" data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" title="Remove story from this increment" aria-label="Remove story from this increment"><img src="${incrementStoryRemoveIconPath}" class="increment-story-remove-icon" alt="" /></button>`
+                        : `<button type="button" class="increment-story-remove" data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" title="Remove story from this increment">x</button>`;
                     return `
                         <div class="story-node increment-story-node" draggable="true" data-node-type="story" data-node-name="${escapedStoryName}" data-path="story_graph.increments.${escapedName}.${escapedStoryName}" data-inc-source="${escapedName}" data-position="${si}">
                             ${storyIcon}
                             <span class="increment-story-name">${escapedStoryName}</span>
-                            <button class="increment-story-remove" data-inc="${escapedName}" data-story="${escapedStoryName}" onclick="event.stopPropagation(); removeStoryFromIncrement(this.getAttribute('data-inc'), this.getAttribute('data-story'))" title="Remove story from increment">x</button>
+                            ${removeBtn}
                         </div>`;
                 }).join('');
 
@@ -554,7 +581,9 @@ class StoryMapView extends PanelView {
             html += incrementColumnTemplate
                 .replace(/\${escapedName}/g, escapedName)
                 .replace(/\${behaviorNeeded}/g, escapeForHtml(behaviorNeeded))
-                .replace(/\${sortedStoryNames}/g, sortedStoryNames);
+                .replace(/\${sortedStoryNames}/g, sortedStoryNames)
+                .replace(/\${incrementCollapseIconPath}/g, incrementCollapseIconPath)
+                .replace(/\${incrementDeleteIconPath}/g, incrementDeleteIconPath);
         }
 
         html += '</div>';

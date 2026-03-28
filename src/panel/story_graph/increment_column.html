@@ -1,7 +1,7 @@
 <!-- Increment Column - Individual increment column container -->
 <div class="increment-column-container" data-inc="${escapedName}" data-behavior-needed="${behaviorNeeded}" data-collapsed="false" onclick="event.stopPropagation(); selectIncrement(this.getAttribute('data-inc'), this.getAttribute('data-behavior-needed'));">
     <div class="increment-column-header">
-        <button class="increment-collapse-button" onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" title="Collapse / expand">▼</button>
+        <button class="increment-collapse-button" onclick="event.stopPropagation(); toggleIncrementCollapse(this.closest('.increment-column-container'))" title="Collapse / expand increment column" aria-label="Collapse / expand increment column"><img src="${incrementCollapseIconPath}" class="increment-header-icon" alt="" /></button>
         <span class="increment-drag-handle" draggable="true" data-inc="${escapedName}" title="Drag to reorder">⠿</span>
         <span
             class="increment-name"
@@ -12,7 +12,7 @@
             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment-name');this.blur();}"
             title="Click to rename"
         >${escapedName}</span>
-        <button class="increment-delete-button" data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" title="Delete increment">x</button>
+        <button class="increment-delete-button" data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" title="Delete increment" aria-label="Delete increment"><img src="${incrementDeleteIconPath}" class="increment-header-icon" alt="" /></button>
     </div>
     <div class="increment-stories-body">
         ${sortedStoryNames}

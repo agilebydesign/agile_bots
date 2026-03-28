@@ -122,11 +122,78 @@ function getImageSubdir() {
 }
 
 /**
+ * Agile by Design 2024 brand icons (from branding kit) — bundled under img/abd2024/.
+ * Used for all panel toolbar / button imagery so the UI matches ABD illustration style.
+ */
+const ABD2024_DIR = 'abd2024';
+const ABD2024_ICON_POOL = [
+    `${ABD2024_DIR}/icon-culture.svg`,
+    `${ABD2024_DIR}/icon-descentralization.svg`,
+    `${ABD2024_DIR}/icon-mindset.svg`,
+    `${ABD2024_DIR}/icon-team.svg`,
+    `${ABD2024_DIR}/icon-validation.svg`,
+    `${ABD2024_DIR}/abd-illustration-02.svg`,
+    `${ABD2024_DIR}/abd-illustration-03.svg`,
+    `${ABD2024_DIR}/abd-illustration-04.svg`
+];
+
+/** Stable, readable overrides so key actions keep recognizable art across sessions */
+const ABD2024_EXPLICIT_PANEL_MAP = {
+    'plus.png': `${ABD2024_DIR}/icon-team.svg`,
+    'subtract.png': `${ABD2024_DIR}/icon-descentralization.svg`,
+    'close.png': `${ABD2024_DIR}/icon-mindset.svg`,
+    'delete.png': `${ABD2024_DIR}/icon-validation.svg`,
+    'delete_children.png': `${ABD2024_DIR}/icon-validation.svg`,
+    'refresh.png': `${ABD2024_DIR}/abd-illustration-02.svg`,
+    'submit.png': `${ABD2024_DIR}/abd-illustration-03.svg`,
+    'bullseye.png': `${ABD2024_DIR}/icon-culture.svg`,
+    'scope_map.png': `${ABD2024_DIR}/icon-team.svg`,
+    'scope_hierarchy.png': `${ABD2024_DIR}/icon-team.svg`,
+    'scope_increment.png': `${ABD2024_DIR}/icon-descentralization.svg`,
+    'scope_files.png': `${ABD2024_DIR}/icon-culture.svg`,
+    'increment_collapse.png': `${ABD2024_DIR}/abd-illustration-02.svg`,
+    'increment_delete.png': `${ABD2024_DIR}/icon-validation.svg`,
+    'increment_story_remove.png': `${ABD2024_DIR}/icon-mindset.svg`,
+    'company_icon.png': `${ABD2024_DIR}/icon-team.svg`
+};
+
+function _abd2024PoolPath(imageName) {
+    let h = 0;
+    for (let i = 0; i < imageName.length; i++) {
+        h = ((h << 5) - h) + imageName.charCodeAt(i);
+        h |= 0;
+    }
+    return ABD2024_ICON_POOL[Math.abs(h) % ABD2024_ICON_POOL.length];
+}
+
+/**
+ * Resolve panel image to ABD 2024 SVG when available (bundled assets).
+ * @param {string} imageName - Requested filename (e.g. 'gear.png')
+ * @returns {string|null} Path under img/ or null to use legacy branded PNG path
+ */
+function resolveAbd2024PanelAsset(imageName) {
+    if (!imageName || typeof imageName !== 'string') {
+        return null;
+    }
+    if (ABD2024_EXPLICIT_PANEL_MAP[imageName]) {
+        return ABD2024_EXPLICIT_PANEL_MAP[imageName];
+    }
+    if (/\.png$/i.test(imageName) || /\.svg$/i.test(imageName)) {
+        return _abd2024PoolPath(imageName);
+    }
+    return null;
+}
+
+/**
  * Get branded image path
  * @param {string} imageName - Image filename (e.g., 'gear.png')
  * @returns {string} Path relative to img/ (e.g., 'scotia/gear.png' or 'gear.png')
  */
 function getImagePath(imageName) {
+    const abd = resolveAbd2024PanelAsset(imageName);
+    if (abd) {
+        return abd;
+    }
     const subdir = getImageSubdir();
     if (subdir) {
         return `${subdir}/${imageName}`;

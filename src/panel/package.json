@@ -74,6 +74,7 @@
         "**/*.css",        
         "**/*.html",
         "img/**/*.png",
+        "img/**/*.svg",
         "LICENSE"
     ],
     "devDependencies": {

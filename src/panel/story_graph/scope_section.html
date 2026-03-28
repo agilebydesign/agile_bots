@@ -19,22 +19,25 @@
                                 id="btn-view-hierarchy"
                                 class="scope-view-button ${hierarchyActiveClass}"
                                 onclick="event.stopPropagation(); switchViewMode('Hierarchy');" 
-                                title="View story map hierarchy">
-                                hierarchy
+                                title="Hierarchy: view story map hierarchy"
+                                aria-label="Hierarchy: view story map hierarchy">
+                                <img src="${scopeHierarchyIconPath}" class="scope-view-button-icon" alt="" />
                             </button>
                             <button 
                                 id="btn-view-increment"
                                 class="scope-view-button ${incrementActiveClass}"
                                 onclick="event.stopPropagation(); switchViewMode('Increment');" 
-                                title="View by increments">
-                                increments
+                                title="Increments: view by delivery increments"
+                                aria-label="Increments: view by delivery increments">
+                                <img src="${scopeIncrementIconPath}" class="scope-view-button-icon" alt="" />
                             </button>
                             <button 
                                 id="btn-view-files"
                                 class="scope-view-button ${filesActiveClass}"
                                 onclick="event.stopPropagation(); switchViewMode('Files');" 
-                                title="View file list">
-                                files
+                                title="Files: view file list"
+                                aria-label="Files: view file list">
+                                <img src="${scopeFilesIconPath}" class="scope-view-button-icon" alt="" />
                             </button>
                         </div>
                     </div>
