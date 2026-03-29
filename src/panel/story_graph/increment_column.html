@@ -12,7 +12,7 @@
             onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();} if(event.key==='Escape'){this.innerText=this.getAttribute('data-increment-name');this.blur();}"
             title="Click to rename"
         >${escapedName}</span>
-        <button class="increment-delete-button" data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" title="Delete increment" aria-label="Delete increment"><img src="${incrementDeleteIconPath}" class="increment-header-icon" alt="" /></button>
+        <button class="increment-delete-button" data-inc="${escapedName}" onclick="event.stopPropagation(); deleteIncrement(this.getAttribute('data-inc'))" title="Delete increment" aria-label="Delete increment"><svg class="increment-delete-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 14h10l1-14"/></svg></button>
     </div>
     <div class="increment-stories-body">
         ${sortedStoryNames}

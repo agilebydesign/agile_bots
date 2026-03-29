@@ -269,7 +269,6 @@ class StoryMapView extends PanelView {
         const scopeIncrementIconPath = getIcon('prioritization.png');
         const scopeFilesIconPath = getIcon('files.png');
         const incrementCollapseIconPath = getIcon('increment_collapse.png');
-        const incrementDeleteIconPath = getIcon('increment_delete.png');
         const incrementStoryRemoveIconPath = getIcon('increment_story_remove.png');
         Logger.log(`[StoryMapView] [PERF] Icons loaded: ${(performance.now() - perfIconsStart).toFixed(2)}ms`);
         
@@ -309,7 +308,6 @@ class StoryMapView extends PanelView {
             // Render increment columns view (read-only)
             contentHtml = this.renderIncrementView(botData, documentIconPath, {
                 incrementCollapseIconPath,
-                incrementDeleteIconPath,
                 incrementStoryRemoveIconPath,
             });
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
@@ -689,13 +687,12 @@ class StoryMapView extends PanelView {
      * 
      * @param {Object} botData - Bot data containing increments
      * @param {string} documentIconPath - Path to document icon for stories
-     * @param {Object} [incrementIcons] - Paths for increment column icons (collapse, delete, story remove)
+     * @param {Object} [incrementIcons] - Paths for increment column icons (collapse, story remove); delete uses inline SVG
      * @returns {string} HTML string for increment columns
      */
     renderIncrementView(botData, documentIconPath, incrementIcons = {}) {
         const {
             incrementCollapseIconPath = '',
-            incrementDeleteIconPath = '',
             incrementStoryRemoveIconPath = '',
         } = incrementIcons;
         // Load increment column template
@@ -794,8 +791,7 @@ class StoryMapView extends PanelView {
                 .replace(/\${escapedName}/g, escapedName)
                 .replace(/\${behaviorNeeded}/g, escapeForHtml(behaviorNeeded))
                 .replace(/\${sortedStoryNames}/g, sortedStoryNames)
-                .replace(/\${incrementCollapseIconPath}/g, incrementCollapseIconPath)
-                .replace(/\${incrementDeleteIconPath}/g, incrementDeleteIconPath);
+                .replace(/\${incrementCollapseIconPath}/g, incrementCollapseIconPath);
         }
 
         html += '</div>';
