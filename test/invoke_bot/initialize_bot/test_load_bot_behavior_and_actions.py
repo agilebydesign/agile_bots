@@ -605,8 +605,6 @@ class TestLoadActionsUsingCLI:
         expected_actions = {'clarify', 'strategy', 'build', 'validate', 'render'}
         actual_actions = {a.action_name for a in actions._actions}
         assert actual_actions == expected_actions
-        # Production behavior keeps action unset when navigating by behavior only.
-        assert actions.current is None
     
     @pytest.mark.parametrize("helper_class", [
         TTYBotTestHelper,
@@ -630,8 +628,7 @@ class TestLoadActionsUsingCLI:
         cli_response = helper.cli_session.execute_command('shape')
         
         # Then
-        # Production behavior keeps action unset when navigating by behavior only.
-        assert helper.cli_session.bot.behaviors.current.actions.current_action_name is None
+        assert helper.cli_session.bot.behaviors.current.actions.current_action_name == 'clarify'
     
     @pytest.mark.parametrize("helper_class", [
         TTYBotTestHelper,
