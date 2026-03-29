@@ -71,6 +71,138 @@ class StoryMapView extends PanelView {
         anchor = anchor.replace(/^-+|-+$/g, '');
         return `scenario-${anchor}`;
     }
+
+    /**
+     * Normalize scenario steps/background into displayable strings.
+     *
+     * @param {string|Array|Object} steps - Scenario steps payload
+     * @returns {string[]} Array of step text strings
+     */
+    normalizeScenarioStepTexts(steps) {
+        if (!steps) {
+            return [];
+        }
+
+        if (typeof steps === 'string') {
+            return steps
+                .split('\n')
+                .map(step => step.trim())
+                .filter(Boolean);
+        }
+
+        if (Array.isArray(steps)) {
+            return steps
+                .map(step => {
+                    if (typeof step === 'string') {
+                        return step.trim();
+                    }
+                    if (step && typeof step === 'object') {
+                        if (typeof step.text === 'string') {
+                            return step.text.trim();
+                        }
+                        if (typeof step.name === 'string') {
+                            return step.name.trim();
+                        }
+                    }
+                    return '';
+                })
+                .filter(Boolean);
+        }
+
+        if (steps && typeof steps === 'object') {
+            if (typeof steps.text === 'string') {
+                return [steps.text.trim()].filter(Boolean);
+            }
+            if (typeof steps.name === 'string') {
+                return [steps.name.trim()].filter(Boolean);
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Return shared background steps when every scenario has the same background.
+     *
+     * @param {Array} scenarios - Story scenarios
+     * @returns {string[]} Shared background steps
+     */
+    getSharedScenarioBackground(scenarios) {
+        if (!Array.isArray(scenarios) || scenarios.length === 0) {
+            return [];
+        }
+
+        const normalizedBackgrounds = scenarios.map(scenario =>
+            this.normalizeScenarioStepTexts(scenario?.background)
+        );
+
+        const firstBackground = normalizedBackgrounds[0];
+        if (firstBackground.length === 0) {
+            return [];
+        }
+
+        const serialized = JSON.stringify(firstBackground);
+        const allMatch = normalizedBackgrounds.every(background =>
+            JSON.stringify(background) === serialized
+        );
+
+        return allMatch ? firstBackground : [];
+    }
+
+    /**
+     * Render a non-editable leaf row in the story tree.
+     *
+     * @param {string} label - Row label
+     * @param {number} marginLeft - Left margin in px
+     * @param {string} emptyIconPath - Placeholder icon path
+     * @param {string} nodeType - Semantic node type for tests/styling
+     * @returns {string} HTML string
+     */
+    renderStaticTreeLeaf(label, marginLeft, emptyIconPath, nodeType) {
+        const safeLabel = escapeForHtml(label);
+        const typeAttr = nodeType ? ` data-node-type="${nodeType}"` : '';
+        return `<div${typeAttr} class="story-tree-leaf" style="margin-left: ${marginLeft}px; margin-top: 2px; font-size: 12px;">
+            <span style="display: inline-block; min-width: 9px;"><img src="${emptyIconPath || ''}" style="width: 9px; height: 9px; vertical-align: middle;" alt="" /></span>
+            <span style="margin-left: 2px;">${safeLabel}</span>
+        </div>`;
+    }
+
+    /**
+     * Render a static branch row for grouped story content.
+     *
+     * @param {Object} options - Branch rendering options
+     * @returns {string} HTML string
+     */
+    renderStaticTreeBranch({
+        branchId,
+        label,
+        marginLeft,
+        plusIconPath,
+        subtractIconPath,
+        childrenHtml,
+        nodeType,
+        expanded = true,
+        selectable = false,
+        selectName = '',
+    }) {
+        const safeLabel = escapeForHtml(label);
+        const branchTypeAttr = nodeType ? ` data-node-type="${nodeType}"` : '';
+        const branchNameAttr = selectable
+            ? ` data-node-name="${escapeForHtml(selectName || label)}" data-has-children="true"`
+            : '';
+        const branchLabelClass = selectable ? 'story-node' : 'story-branch-label';
+        const iconPath = expanded ? (subtractIconPath || '') : (plusIconPath || '');
+        const iconState = expanded ? 'expanded' : 'collapsed';
+        const contentDisplay = expanded ? 'block' : 'none';
+
+        return `<div style="margin-left: ${marginLeft}px; margin-top: 2px; font-size: 12px;">
+                <span id="${branchId}-icon" onclick="event.stopPropagation(); toggleCollapse('${branchId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath || ''}" data-subtract="${subtractIconPath || ''}">
+                    <img class="collapse-icon" src="${iconPath}" data-state="${iconState}" style="width: 9px; height: 9px; vertical-align: middle;" alt="${expanded ? 'Collapse' : 'Expand'}" />
+                </span>
+                <span class="${branchLabelClass}"${branchTypeAttr}${branchNameAttr} style="margin-left: 2px; font-weight: 600; cursor: pointer;">${safeLabel}</span>
+            </div>
+            <div id="${branchId}" class="collapsible-content" style="display: ${contentDisplay};">${childrenHtml}</div>`;
+    }
     
     /**
      * Render scope section HTML.
@@ -97,8 +229,6 @@ class StoryMapView extends PanelView {
         
         const clearIconPath = getIcon('close.png');
         const showAllIconPath = getIcon('show_all.png');
-        const jsonIconPath = getIcon('json.png');
-        const filesIconPath = getIcon('files.png');
         const plusIconPath = getIcon('plus.png');
         const subtractIconPath = getIcon('subtract.png');
         const emptyIconPath = getIcon('empty.png');
@@ -134,9 +264,10 @@ class StoryMapView extends PanelView {
         const injectExamplesIconPath = getIcon('inject_examples.png');
         const injectTestsIconPath = getIcon('inject_tests.png');
         const injectCodeIconPath = getIcon('inject_code.png');
-        const scopeHierarchyIconPath = getIcon('scope_hierarchy.png');
-        const scopeIncrementIconPath = getIcon('scope_increment.png');
-        const scopeFilesIconPath = getIcon('scope_files.png');
+        // Use shipped panel icons (scope_hierarchy/increment/files.png were never added to img/)
+        const scopeHierarchyIconPath = getIcon('shape_icon.png');
+        const scopeIncrementIconPath = getIcon('prioritization.png');
+        const scopeFilesIconPath = getIcon('files.png');
         const incrementCollapseIconPath = getIcon('increment_collapse.png');
         const incrementDeleteIconPath = getIcon('increment_delete.png');
         const incrementStoryRemoveIconPath = getIcon('increment_story_remove.png');
@@ -179,7 +310,6 @@ class StoryMapView extends PanelView {
             contentHtml = this.renderIncrementView(botData, documentIconPath, {
                 incrementCollapseIconPath,
                 incrementDeleteIconPath,
-                incrementAddIconPath: plusIconPath,
                 incrementStoryRemoveIconPath,
             });
             const increments = botData?.scope?.content?.increments || botData?.increments || [];
@@ -393,8 +523,11 @@ class StoryMapView extends PanelView {
                                 const storyId = `${subEpicId}-story-${storyIndex}`;
                                 const storyIcon = documentIconPath ? `<img src="${documentIconPath}" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;" alt="Story" />` : '';
                                 
-                                // Check if story has scenarios - if so, make it collapsible
-                                const hasScenarios = story.scenarios && story.scenarios.length > 0;
+                                const acceptanceCriteria = Array.isArray(story.acceptance_criteria) ? story.acceptance_criteria : [];
+                                const scenarios = Array.isArray(story.scenarios) ? story.scenarios : [];
+                                const hasAcceptanceCriteria = acceptanceCriteria.length > 0;
+                                const hasScenarios = scenarios.length > 0;
+                                const hasStoryChildren = hasAcceptanceCriteria || hasScenarios;
                                 
                                 // Build story path for edit mode - use full parent chain for nested sub-epics
                                 // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
@@ -402,7 +535,7 @@ class StoryMapView extends PanelView {
                                 
                                 html += `<div style="margin-left: ${marginLeft + 7}px; margin-top: 2px; font-size: 12px;">`;
                                 
-                                if (hasScenarios) {
+                                if (hasStoryChildren) {
                                     // Collapsible story with scenarios - only icon is clickable
                                     html += `<span id="${storyId}-icon" onclick="event.stopPropagation(); toggleCollapse('${storyId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}"><img class="collapse-icon" src="${plusIconPath}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> `;
                                 } else {
@@ -419,34 +552,116 @@ class StoryMapView extends PanelView {
                                 // Story name: plain text, clickable to select (File/Test via toolbar)
                                 const storyBehavior = story.behavior_needed || '';
                                 const storyBehaviors = story.behaviors_needed ? JSON.stringify(story.behaviors_needed) : `["${storyBehavior}"]`;
-                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasScenarios}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${escapeForHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
+                                html += `<span class="story-node" draggable="true" data-node-type="story" data-node-name="${escapeForHtml(story.name)}" data-behavior-needed="${storyBehavior}" data-behaviors-needed='${storyBehaviors}' data-has-children="${hasStoryChildren}" data-position="${storyIndex}" data-path="${storyPath}"${storyDocLink ? ` data-file-link="${escapeForHtml(storyDocLink.url)}"` : ''}${storyTestFilesJson ? ` data-test-files="${storyTestFilesJson}"` : ''} style="cursor: pointer;">${storyIcon}${escapeForHtml(story.name)}</span>`;
                                 
                                 // No inline action buttons (all actions are in the toolbar)
                                 html += '</div>';
                                 
-                                // Render scenarios if they exist
-                                if (hasScenarios) {
+                                // Render acceptance criteria and scenarios if they exist
+                                if (hasStoryChildren) {
                                     html += `<div id="${storyId}" class="collapsible-content" style="display: none;">`;
-                                    story.scenarios.forEach((scenario, scenarioIndex) => {
-                                        html += `<div style="margin-left: ${marginLeft + 21}px; margin-top: 2px; font-size: 12px;">`;
-                                        
-                                        // Empty placeholder for alignment (scenarios don't have children)
-                                        html += `<span style="display: inline-block; min-width: 9px;"><img src="${emptyIconPath}" style="width: 9px; height: 9px; vertical-align: middle;" alt="" /></span> `;
-                                        
-                                        // Create scenario anchor ID from scenario name (matches synchronizer format)
-                                        const scenarioAnchor = this.createScenarioAnchor(scenario.name);
-                                        // CRITICAL: Escape the ENTIRE path including quotes - HTML parser stops at unescaped quotes
-                                        const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"."${escapeForHtml(story.name)}"."${escapeForHtml(scenario.name)}"`);
-                                        
-                                        // Scenario: plain text, clickable to select (File/Test via toolbar)
-                                        const scenarioBehavior = scenario.behavior_needed || '';
-                                        const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
-                                        const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
-                                        const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? escapeForHtml(JSON.stringify(scenarioTestFiles)) : '';
-                                        html += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="false" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${escapeForHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
-                                        
-                                        html += '</div>';
-                                    });
+                                    if (hasAcceptanceCriteria) {
+                                        const acceptanceCriteriaRows = acceptanceCriteria.map((ac, acIndex) => {
+                                            const acText = typeof ac === 'string'
+                                                ? ac
+                                                : (ac?.text || ac?.name || `Acceptance Criteria ${acIndex + 1}`);
+                                            return this.renderStaticTreeLeaf(
+                                                acText,
+                                                marginLeft + 28,
+                                                emptyIconPath,
+                                                'acceptance-criteria'
+                                            );
+                                        }).join('');
+
+                                        html += this.renderStaticTreeBranch({
+                                            branchId: `${storyId}-acceptance-criteria`,
+                                            label: `Acceptance Criteria (${acceptanceCriteria.length})`,
+                                            marginLeft: marginLeft + 14,
+                                            plusIconPath,
+                                            subtractIconPath,
+                                            childrenHtml: acceptanceCriteriaRows,
+                                            nodeType: 'acceptance-criteria-group',
+                                            expanded: true,
+                                        });
+                                    }
+
+                                    if (hasScenarios) {
+                                        const sharedBackgroundSteps = this.getSharedScenarioBackground(scenarios);
+                                        const scenarioRows = scenarios.map((scenario, scenarioIndex) => {
+                                            const scenarioAnchor = this.createScenarioAnchor(scenario.name);
+                                            const scenarioPath = escapeForHtml(`${baseStoryGraphPath}."${escapeForHtml(subEpic.name)}"."${escapeForHtml(story.name)}"."${escapeForHtml(scenario.name)}"`);
+                                            const scenarioBehavior = scenario.behavior_needed || '';
+                                            const scenarioLink = storyDocLink ? `${storyDocLink.url}#${scenarioAnchor}` : '';
+                                            const scenarioTestFiles = scenario.test_files?.length > 0 ? scenario.test_files : (scenario.test_file ? [scenario.test_file] : []);
+                                            const scenarioTestFilesJson = scenarioTestFiles.length > 0 ? escapeForHtml(JSON.stringify(scenarioTestFiles)) : '';
+                                            const backgroundSteps = sharedBackgroundSteps.length > 0
+                                                ? []
+                                                : this.normalizeScenarioStepTexts(scenario.background).map(step => `Background: ${step}`);
+                                            const mainSteps = this.normalizeScenarioStepTexts(scenario.steps);
+                                            const scenarioSteps = [...backgroundSteps, ...mainSteps];
+                                            const hasScenarioSteps = scenarioSteps.length > 0;
+                                            const scenarioNodeId = `${storyId}-scenario-${scenarioIndex}`;
+
+                                            let scenarioHtml = `<div style="margin-left: ${marginLeft + 28}px; margin-top: 2px; font-size: 12px;">`;
+
+                                            if (hasScenarioSteps) {
+                                                scenarioHtml += `<span id="${scenarioNodeId}-icon" onclick="event.stopPropagation(); toggleCollapse('${scenarioNodeId}')" style="display: inline-block; min-width: 9px; cursor: pointer;" data-plus="${plusIconPath || ''}" data-subtract="${subtractIconPath || ''}"><img class="collapse-icon" src="${plusIconPath || ''}" data-state="collapsed" style="width: 9px; height: 9px; vertical-align: middle;" alt="Expand" /></span> `;
+                                            } else {
+                                                scenarioHtml += `<span style="display: inline-block; min-width: 9px;"><img src="${emptyIconPath || ''}" style="width: 9px; height: 9px; vertical-align: middle;" alt="" /></span> `;
+                                            }
+
+                                            scenarioHtml += `<span class="story-node" draggable="true" data-node-type="scenario" data-node-name="${escapeForHtml(scenario.name)}" data-behavior-needed="${scenarioBehavior}" data-has-children="${hasScenarioSteps}" data-position="${scenarioIndex}" data-path="${scenarioPath}"${scenarioLink ? ` data-file-link="${escapeForHtml(scenarioLink)}"` : ''}${scenarioTestFilesJson ? ` data-test-files="${scenarioTestFilesJson}"` : ''} style="cursor: pointer;">${escapeForHtml(scenario.name)}</span>`;
+                                            scenarioHtml += '</div>';
+
+                                            if (hasScenarioSteps) {
+                                                const stepRows = scenarioSteps.map((stepText, stepIndex) =>
+                                                    this.renderStaticTreeLeaf(
+                                                        stepText,
+                                                        marginLeft + 42,
+                                                        emptyIconPath,
+                                                        'step'
+                                                    )
+                                                ).join('');
+                                                scenarioHtml += `<div id="${scenarioNodeId}" class="collapsible-content" style="display: none;">${stepRows}</div>`;
+                                            }
+
+                                            return scenarioHtml;
+                                        }).join('');
+
+                                        const sharedBackgroundHtml = sharedBackgroundSteps.length > 0
+                                            ? this.renderStaticTreeBranch({
+                                                branchId: `${storyId}-scenarios-background`,
+                                                label: 'Background',
+                                                marginLeft: marginLeft + 28,
+                                                plusIconPath,
+                                                subtractIconPath,
+                                                childrenHtml: sharedBackgroundSteps.map(step =>
+                                                    this.renderStaticTreeLeaf(
+                                                        step,
+                                                        marginLeft + 42,
+                                                        emptyIconPath,
+                                                        'background-step'
+                                                    )
+                                                ).join(''),
+                                                nodeType: 'background-group',
+                                                expanded: true,
+                                                selectable: true,
+                                                selectName: 'Background',
+                                            })
+                                            : '';
+
+                                        html += this.renderStaticTreeBranch({
+                                            branchId: `${storyId}-scenarios`,
+                                            label: `Scenarios (${scenarios.length})`,
+                                            marginLeft: marginLeft + 14,
+                                            plusIconPath,
+                                            subtractIconPath,
+                                            childrenHtml: sharedBackgroundHtml + scenarioRows,
+                                            nodeType: 'scenarios-group',
+                                            expanded: true,
+                                        });
+                                    }
+
                                     html += '</div>'; // Close scenario collapsible-content
                                 }
                             });
@@ -474,14 +689,13 @@ class StoryMapView extends PanelView {
      * 
      * @param {Object} botData - Bot data containing increments
      * @param {string} documentIconPath - Path to document icon for stories
-     * @param {Object} [incrementIcons] - Paths for increment toolbar (ABD 2024 SVGs)
+     * @param {Object} [incrementIcons] - Paths for increment column icons (collapse, delete, story remove)
      * @returns {string} HTML string for increment columns
      */
     renderIncrementView(botData, documentIconPath, incrementIcons = {}) {
         const {
             incrementCollapseIconPath = '',
             incrementDeleteIconPath = '',
-            incrementAddIconPath = '',
             incrementStoryRemoveIconPath = '',
         } = incrementIcons;
         // Load increment column template
@@ -522,9 +736,7 @@ class StoryMapView extends PanelView {
             ? `<span class="increment-filter-hint">filter: "${escapeForHtml(filterText)}" — ${displayIncrements.length} of ${allIncrements.length} increments</span>`
             : '';
 
-        const addIncBtn = incrementAddIconPath
-            ? `<button type="button" class="increment-add-button" onclick="addIncrement()" title="Add a new delivery increment" aria-label="Add a new delivery increment"><img src="${incrementAddIconPath}" class="increment-add-button-icon" alt="" /></button>`
-            : `<button type="button" class="increment-add-button" onclick="addIncrement()" title="Add a new delivery increment">+ Add Increment</button>`;
+        const addIncBtn = `<button type="button" class="increment-add-button" onclick="addIncrement()" title="Add a new delivery increment" aria-label="Add a new delivery increment"><span class="increment-add-button-plus" aria-hidden="true">+</span></button>`;
         let html = `
             <div class="increment-header">
                 <span class="increment-header-title">INCREMENTS</span>
