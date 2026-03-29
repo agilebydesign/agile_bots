@@ -208,15 +208,15 @@ class Behavior:
         raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
     
     def execute(self) -> Dict[str, Any]:
-        """Execute this behavior. Uses submit_current_action for combine flow, bot.execute for skip."""
+        """Execute this behavior. Uses submit_current for combine flow, bot.execute for skip."""
         if not self.bot:
             return {'status': 'error', 'message': 'No bot instance available', 'actions_run': [], 'actions_skipped': []}
         # When behavior is skip, bot.execute returns early with actions_skipped
         if self.bot.get_behavior_execute(self.name) == 'skip':
             return self.bot.execute(self.name, include_scope=True)
-        # Otherwise use submit_current_action (handles combine_next, manual, etc.)
+        # Otherwise use submit_current (handles combine_next, manual, etc.)
         self.bot.behaviors.navigate_to(self.name)
-        result = self.bot.submit_current_action()
+        result = self.bot.submit_current()
         if not isinstance(result, dict):
             result = {}
         # Ensure actions_run/actions_skipped for test assertions

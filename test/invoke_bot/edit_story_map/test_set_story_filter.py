@@ -314,6 +314,24 @@ class TestFilterScopeByStoriesUsingCLI:
         helper.scope.assert_scope_shows_target(cli_response.output, 'increment', 'Increment1')
 
 
+class TestScopeCommandParsesQuotedNames:
+    """Panel/CLI send quoted tokens for spaced names; stored scope.value must not include quote chars."""
+
+    def test_increment_scope_strips_quotes_from_spaced_form(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.scope('increment "Chat Space"')
+        s = helper.bot.scope()
+        assert s.type.value == 'increment'
+        assert s.value == ['Chat Space']
+
+    def test_increment_scope_strips_quotes_after_set_prefix(self, tmp_path):
+        helper = BotTestHelper(tmp_path)
+        helper.bot.scope('set increment "Chat Space"')
+        s = helper.bot.scope()
+        assert s.type.value == 'increment'
+        assert s.value == ['Chat Space']
+
+
 # ============================================================================
 # STORY: Filter Scope By Files
 # Maps to: TestFilterScopeByFiles in test_manage_scope.py (~many tests)

@@ -809,7 +809,7 @@
             : "";
         
         // Build command using the source path
-        return sourceNodePath + ".move_to target:" + targetParentPath.replace(/^story_graph\\./, "") + " at_position:" + position;
+        return sourceNodePath + ".move_to target:" + targetParentPath.replace(/^story_graph\./, "") + " at_position:" + position;
     }
     
     /**

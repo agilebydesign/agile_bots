@@ -38,7 +38,7 @@ print("Execution modes:")
 for a in ["clarify", "strategy", "build", "validate", "render"]:
     print(f"  {a}: {bot.get_execution_mode('shape', a)}")
 
-# Replicate submit_current_action combine logic
+# Replicate submit_current combine logic
 bot.behaviors.navigate_to("shape")
 bot.behaviors.current.actions.navigate_to("clarify")
 behavior = bot.behaviors.current

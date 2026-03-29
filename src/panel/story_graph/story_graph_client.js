@@ -912,7 +912,7 @@ window.handleScopeTo = function() {
     } else if (nodeType === 'epic') {
         scopeCommand = 'epic ' + nodeName;
     } else if (nodeType === 'increment') {
-        scopeCommand = 'increment "' + nodeName + '"';
+        scopeCommand = 'increment ' + nodeName;
     } else {
 
         scopeCommand = nodeName;

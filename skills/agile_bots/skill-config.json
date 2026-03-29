@@ -1,0 +1,8 @@
+{
+  "name": "agile_bots",
+  "version": "1.0.0",
+  "description": "Single entry-point skill documenting the Agile Bot CLI (workspace, bot, scope, behaviors, story_graph commands).",
+  "repository_path": "../../",
+  "cli_entry": "src/cli/cli_main.py",
+  "notes": "Hand-authored reference; not generated from bot behaviors."
+}

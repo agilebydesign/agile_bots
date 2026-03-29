@@ -394,9 +394,9 @@ behaviors_client.js (Webview Presentation)
                                                     -> behavior_name = args.strip()
                                                        # "exploration"
                                                     
-                                                    # Delegate to Bot.submit_current_action()
+                                                    # Delegate to Bot.submit_current()
                                                     # (behavior-level submit when no action specified)
-                                                    -> result = self.bot.submit_current_action()
+                                                    -> result = self.bot.submit_current()
                                                     
                                                         Bot (Application Layer)
                                                             # Navigate to the specified behavior

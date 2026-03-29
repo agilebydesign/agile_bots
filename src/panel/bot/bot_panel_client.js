@@ -1277,14 +1277,14 @@ window.restoreCollapseState = function(state) {
                     const behaviorNameSpan = header.querySelector('.behavior-name-clickable');
                     if (behaviorNameSpan) {
                         const isSkip = header.getAttribute('data-skip') === 'true';
-                        if (shouldBeExpanded || isSkip) {
+                        const behaviorName = header.getAttribute('data-behavior') || '';
+                        if (isSkip) {
                             behaviorNameSpan.removeAttribute('data-action');
                             behaviorNameSpan.removeAttribute('data-behavior-name');
                             behaviorNameSpan.removeAttribute('data-skip');
                             behaviorNameSpan.style.cursor = 'default';
                             behaviorNameSpan.style.textDecoration = 'none';
                         } else {
-                            const behaviorName = header.getAttribute('data-behavior') || '';
                             behaviorNameSpan.setAttribute('data-action', 'navigateToBehavior');
                             behaviorNameSpan.setAttribute('data-behavior-name', behaviorName);
                             behaviorNameSpan.setAttribute('data-skip', 'false');
@@ -1336,15 +1336,14 @@ window.toggleCollapse = function(elementId) {
                 const behaviorNameSpan = header.querySelector('.behavior-name-clickable');
                 if (behaviorNameSpan) {
                     const isSkip = header.getAttribute('data-skip') === 'true';
-                    const expanded = content.style.display !== 'none';
-                    if (expanded || isSkip) {
+                    const behaviorName = header.getAttribute('data-behavior') || '';
+                    if (isSkip) {
                         behaviorNameSpan.removeAttribute('data-action');
                         behaviorNameSpan.removeAttribute('data-behavior-name');
                         behaviorNameSpan.removeAttribute('data-skip');
                         behaviorNameSpan.style.cursor = 'default';
                         behaviorNameSpan.style.textDecoration = 'none';
                     } else {
-                        const behaviorName = header.getAttribute('data-behavior') || '';
                         behaviorNameSpan.setAttribute('data-action', 'navigateToBehavior');
                         behaviorNameSpan.setAttribute('data-behavior-name', behaviorName);
                         behaviorNameSpan.setAttribute('data-skip', 'false');

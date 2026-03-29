@@ -208,8 +208,11 @@ class BotView extends PanelView {
             }
             
             // Also fetch instructions based on current behavior and action
-            const currentBehavior = botJSON.behaviors?.current_behavior || botJSON.current_behavior;
-            const currentAction = botJSON.behaviors?.current_action || botJSON.current_action;
+            const currentBehavior = botJSON.current_behavior
+                || botJSON.behaviors?.current_behavior
+                || botJSON.behaviors?.current;
+            const currentAction = botJSON.current_action
+                || botJSON.behaviors?.current_action;
             
             if (currentBehavior && currentAction) {
                 log(`[BotView] Fetching instructions for behavior=${currentBehavior}, action=${currentAction}`);

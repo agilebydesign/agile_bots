@@ -9,6 +9,33 @@ class MarkdownInstructions(MarkdownAdapter):
         self.include_scope = include_scope
         self.action_only = action_only
     
+    @staticmethod
+    def behavior_section_lines(instructions: Instructions) -> list[str]:
+        """Lines for # Behavior / ## Behavior Instructions block (matches serialize() when behavior_metadata present).
+        Used when appending chained behaviors so each behavior gets a visible heading, not only action slices."""
+        instructions_dict = instructions.to_dict()
+        behavior_metadata = instructions_dict.get('behavior_metadata', {})
+        if not behavior_metadata:
+            return []
+        output_lines: list[str] = []
+        behavior_name = behavior_metadata.get('name', 'unknown')
+        output_lines.append(f"# Behavior: {behavior_name}")
+        output_lines.append("")
+        output_lines.append(f"## Behavior Instructions - {behavior_name}")
+        output_lines.append("")
+        behavior_description = behavior_metadata.get('description', '')
+        if behavior_description:
+            output_lines.append(f"The purpose of this behavior is to {behavior_description.lower()}")
+            output_lines.append("")
+        behavior_instructions = behavior_metadata.get('instructions', [])
+        if behavior_instructions:
+            if isinstance(behavior_instructions, list):
+                output_lines.extend(behavior_instructions)
+            elif isinstance(behavior_instructions, str):
+                output_lines.append(behavior_instructions)
+            output_lines.append("")
+        return output_lines
+    
     def serialize(self) -> str:
         if self.action_only:
             return self._serialize_action_only()

@@ -336,21 +336,17 @@ class Bot:
                 'status': 'error',
                 'message': 'No current behavior'
             }
-        
+
         behavior = self.behaviors.current
-        if not behavior.actions.current:
-            return {
-                'status': 'error',
-                'message': 'No current action'
-            }
-        
-        action = behavior.actions.current
-        
+        # Do not call actions.load_state() here: behavior-only nav keeps no current action in memory
+        # and on disk (at_behavior_level); reloading would resurrect position from completed_actions.
+
+        # Same combined instructions as submit (combine_next, manual remainder, next behavior when at behavior level).
         try:
-            from actions.action_context import ActionContext
-            context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
-            instructions = action.get_instructions(context)
-            
+            built = self._build_instructions_with_combine(None, None, None)
+            instructions, _, _, _ = built
+            if isinstance(instructions, dict) and instructions.get('status') == 'error':
+                return instructions
             return instructions
         except Exception as e:
             return {
@@ -491,6 +487,10 @@ class Bot:
         else:
             scope_type, prefix, scope_values = self._parse_undelimited_scope(scope_filter)
         
+        # Per-token quoting (e.g. increment "Chat Space") — parsers keep quotes on each comma/split
+        # segment; normalize so scope.value matches story graph names, not literal "Chat Space".
+        scope_values = [self._normalize_scope_filter(v) for v in scope_values]
+        
         self._scope.filter(scope_type, scope_values)
         self._scope.save()
         
@@ -623,7 +623,9 @@ class Bot:
                 'available_behaviors': [b.name for b in self.behaviors]
             }
         
-        self.behaviors.navigate_to(behavior_name, behavior_only=(action_name is None))
+        # behavior_only=False so load_state restores current_action / completed-actions from
+        # behavior_action_state.json. behavior_only=True is only for panel/CLI `bot.shape` (no action).
+        self.behaviors.navigate_to(behavior_name, behavior_only=False)
         
         if action_name:
             try:
@@ -747,7 +749,7 @@ class Bot:
             # and action-level combine_next are applied (shape+prioritization, etc.)
             scope_param = params.get('scope') if params and isinstance(params.get('scope'), dict) else None
             built = self._build_instructions_with_combine(behavior_name, current_action_name, scope_param)
-            instructions, _ = built
+            instructions, _, _, _ = built
             if isinstance(instructions, dict) and 'status' in instructions:
                 return instructions
             return instructions
@@ -883,6 +885,7 @@ class Bot:
                 instructions._display_content.insert(0, '')
                 instructions._display_content.insert(0, '**Combined instructions:** The following combines multiple actions. Perform them one after another.')
                 first_append = False
+            behavior_header_emitted = False
             for action_name in next_behavior.action_names:
                 if self.get_execution_mode(next_behavior.name, action_name) == 'skip':
                     continue
@@ -895,6 +898,10 @@ class Bot:
                     next_intro += ' Fix any errors found in the Violation.'
                 instructions.add_display('', '---', f'## Next action: {next_behavior.name}.{action_name}', next_intro, '')
                 from instructions.markdown_instructions import MarkdownInstructions
+                if not behavior_header_emitted:
+                    for line in MarkdownInstructions.behavior_section_lines(next_instructions):
+                        instructions.add_display(line)
+                    behavior_header_emitted = True
                 action_only_md = MarkdownInstructions(next_instructions, include_scope=False, action_only=True)
                 for line in action_only_md.serialize().split('\n'):
                     instructions.add_display(line)
@@ -1318,11 +1325,13 @@ class Bot:
         action_name: Optional[str] = None,
         scope: Optional[Dict[str, Any]] = None,
     ) -> tuple:
-        """Build instructions with combine_next/combine_with_next logic. Shared by submit_current_action and submit_action.
+        """Build instructions with combine_next/combine_with_next logic. Shared by submit_current and submit_action.
         When behavior_name/action_name are None, uses current. When action_name is 'first' or None with behavior_name set,
-        uses first non-skip action of that behavior (for collapsed/behavior-level mode). Returns (instructions, last_appended).
+        uses first non-skip action of that behavior (for collapsed/behavior-level mode).
+        Returns (instructions, last_appended, behavior_level_build, submit_action_name).
         When at action level (user navigated to specific action), we do not append next behavior's instructions."""
         at_action_level = False
+        behavior_level_build = False
         if behavior_name and action_name and action_name not in (None, 'first', ''):
             at_action_level = True
         elif not behavior_name and not action_name:
@@ -1340,37 +1349,39 @@ class Bot:
             except ValueError:
                 return (
                     {'status': 'error', 'message': f'Action {action_name} not found', 'available_actions': self.behaviors.current.action_names},
-                    None
+                    None,
+                    False,
+                    None,
                 )
             self.behaviors.save_state()
 
         current_behavior = self.behaviors.current
         if not current_behavior:
-            return ({'status': 'error', 'message': 'No current behavior set'}, None)
+            return ({'status': 'error', 'message': 'No current behavior set'}, None, False, None)
 
         current_action_name = current_behavior.actions.current_action_name
         if not current_action_name:
             first_action = self._first_non_skip_action(current_behavior.name) or (current_behavior.actions.names[0] if current_behavior.actions.names else None)
             if first_action:
-                current_behavior.actions.navigate_to(first_action)
+                behavior_level_build = True
                 current_action_name = first_action
-                self.behaviors.save_state()
             else:
-                return ({'status': 'error', 'message': 'No current action set'}, None)
+                return ({'status': 'error', 'message': 'No current action set'}, None, False, None)
 
         # Advance past skip actions to the first non-skip action
         if self.get_execution_mode(current_behavior.name, current_action_name) == 'skip':
             for an in current_behavior.actions.names:
                 if self.get_execution_mode(current_behavior.name, an) != 'skip':
                     current_action_name = an
-                    current_behavior.actions.navigate_to(current_action_name)
+                    if not behavior_level_build:
+                        current_behavior.actions.navigate_to(current_action_name)
                     break
             else:
-                return ({'status': 'error', 'message': f'All actions in {current_behavior.name} are set to skip'}, None)
+                return ({'status': 'error', 'message': f'All actions in {current_behavior.name} are set to skip'}, None, False, None)
 
         action = current_behavior.actions.find_by_name(current_action_name)
         if not action:
-            return ({'status': 'error', 'message': f'Action {current_action_name} not found'}, None)
+            return ({'status': 'error', 'message': f'Action {current_action_name} not found'}, None, False, None)
 
         from actions.action_context import ActionContext
         context = action.context_class() if hasattr(action, 'context_class') else ActionContext()
@@ -1409,7 +1420,8 @@ class Bot:
             self._append_next_behavior_instructions_if_combine_with_next(
                 current_behavior, instructions, first_append=(last_appended is None)
             )
-        return (instructions, last_appended)
+        submit_action_name = current_action_name
+        return (instructions, last_appended, behavior_level_build, submit_action_name)
 
     def submit_action(
         self,
@@ -1418,16 +1430,15 @@ class Bot:
         scope: Optional[Dict[str, Any]] = None,
         return_instructions: bool = False,
     ) -> Dict[str, Any]:
-        """Submit instructions for a specific behavior/action. Uses same combine_next logic as submit_current_action.
+        """Submit instructions for a specific behavior/action. Uses same combine_next logic as submit_current.
         When return_instructions=True (e.g. test mode), result includes 'instructions' key."""
         built = self._build_instructions_with_combine(behavior_name, action_name, scope)
-        instructions, last_appended = built
+        instructions, last_appended, behavior_level_build, submit_action_name = built
         if isinstance(instructions, dict) and 'status' in instructions:
             return instructions
         current_behavior = self.behaviors.current
-        current_action_name = current_behavior.actions.current_action_name
-        result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
-        if last_appended:
+        result = self.submit_instructions(instructions, current_behavior.name, submit_action_name)
+        if last_appended and not behavior_level_build:
             action_names = current_behavior.action_names
             try:
                 next_idx = action_names.index(last_appended) + 1
@@ -1442,16 +1453,22 @@ class Bot:
             result = {**result, 'instructions': instructions}
         return result
 
-    def submit_current_action(self, scope: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Submit instructions for current behavior/action. Uses combine_next/combine_with_next logic."""
+    def submit_current(self, scope: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Submit instructions for the current UI selection.
+
+        If a specific action is selected, submits that action's instructions (with combine_next,
+        manual remainder, and next-behavior handling per execution settings).
+
+        If only a behavior is selected (behavior-level / collapsed), submits the whole behavior
+        workflow from the first non-skip action—the same combined payload as navigating to that behavior.
+        """
         built = self._build_instructions_with_combine(None, None, scope)
-        instructions, last_appended = built
+        instructions, last_appended, behavior_level_build, submit_action_name = built
         if isinstance(instructions, dict) and 'status' in instructions:
             return instructions
         current_behavior = self.behaviors.current
-        current_action_name = current_behavior.actions.current_action_name
-        result = self.submit_instructions(instructions, current_behavior.name, current_action_name)
-        if last_appended:
+        result = self.submit_instructions(instructions, current_behavior.name, submit_action_name)
+        if last_appended and not behavior_level_build:
             action_names = current_behavior.action_names
             try:
                 next_idx = action_names.index(last_appended) + 1
@@ -1463,7 +1480,8 @@ class Bot:
             except ValueError as e:
                 logger.debug(f"Could not advance to next action after last_appended: {e}")
         return result
-    
+
+    submit_current_action = submit_current
 
     def tree(self) -> str:
         lines = []

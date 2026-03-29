@@ -73,7 +73,7 @@ class CLISession:
                 if hasattr(self.bot, behavior_name):
                     result = self.bot.submit_action(behavior_name, action_name)
                     return self._format_submit_response(result, "Instructions copied to clipboard!")
-        result = self.bot.submit_current_action()
+        result = self.bot.submit_current()
         return self._format_submit_response(result, "Instructions copied to clipboard!")
     
     def _handle_submitrules(self, verb: str, args: str) -> CLICommandResponse:
@@ -180,6 +180,12 @@ class CLISession:
         if verb == 'bot':
             return self._handle_bot_command(args), is_navigation_command
         
+        # Behavior name as a bare command (e.g. `shape`): restore workflow from state like execute(behavior),
+        # not panel-style behavior-only (getattr(bot, name) would use behavior_only=True via __getattr__).
+        # Second element True => _build_response appends current instructions (same as getattr(Behavior) path).
+        if hasattr(self.bot, 'behaviors') and self.bot.behaviors.find_by_name(verb):
+            return self._execute_cli_behavior_navigation(verb, args), True
+        
         if hasattr(self.bot, verb):
             return self._execute_bot_attribute(verb, args)
         
@@ -257,6 +263,11 @@ class CLISession:
             result = attr(raw_arg)
 
         return result, False
+
+    def _execute_cli_behavior_navigation(self, verb: str, args: str) -> dict:
+        """Navigate to a behavior from the CLI with persisted current_action / completed-actions (not behavior-only)."""
+        self.bot.behaviors.navigate_to(verb, behavior_only=False)
+        return {'status': 'success', 'message': f'Navigated to {verb}', 'behavior': verb}
 
     def _execute_bot_attribute(self, verb: str, args: str) -> tuple:
         # Check if verb is a navigation command that should include bot context in JSON response

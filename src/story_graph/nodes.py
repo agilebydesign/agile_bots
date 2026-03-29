@@ -2550,7 +2550,7 @@ class StoryMap:
                     if behavior and action:
                         result = self._bot.submit_action(behavior, action)
                     else:
-                        result = self._bot.submit_current_action()
+                        result = self._bot.submit_current()
                     results.append({'story': story_name, 'result': result})
                 except Exception as e:
                     results.append({'story': story_name, 'error': str(e)})

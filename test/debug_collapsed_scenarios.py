@@ -81,7 +81,7 @@ def test_submit_at_action_level_excludes_next_behavior(helper):
     bot = helper['bot']
     bot.behaviors.navigate_to('scenarios')
     bot.behaviors.current.actions.navigate_to('render')
-    result = bot.submit_current_action()
+    result = bot.submit_current()
     assert result.get('status') == 'success', result
     text = result.get('instructions', '') or ''
     # At action level, we must NOT append next behavior's instructions

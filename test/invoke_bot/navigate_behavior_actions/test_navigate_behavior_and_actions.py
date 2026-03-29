@@ -732,7 +732,7 @@ class TestSelectWorkspaceBehavior:
 
         helper.state.set_state('shape', 'clarify')
         state = helper.state.get_state()
-        assert state.get('current_behavior') == 'shape'
+        assert state.get('current_behavior') == 'story_bot.shape'
 
 
 # ============================================================================

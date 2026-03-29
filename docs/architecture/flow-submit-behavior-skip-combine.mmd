@@ -36,7 +36,7 @@ sequenceDiagram
     
     CLI->>CLI: verb, args = _parse_command(cmd)
     Note right of CLI: verb="submit", args="exploration"
-    CLI->>Bot: submit_current_action()
+    CLI->>Bot: submit_current()
     activate Bot
     
     Bot->>Behaviors: navigate_to("exploration")

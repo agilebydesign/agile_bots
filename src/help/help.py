@@ -1,4 +1,4 @@
-﻿
+
 from typing import List, Optional
 from dataclasses import dataclass
 
@@ -45,7 +45,7 @@ class CommandExamples:
     def examples(self) -> List[tuple[str, str]]:
         return [
             ('.', 'Execute current behavior.action.operation'),
-            ('shape', 'Jump to behavior and execute first action.operation'),
+            ('shape', 'Jump to behavior only (no action selected yet; use shape.action or next)'),
             ('build', 'Jump to action and execute first operation'),
             ('submit scope="s1"', 'Jump to operation with params and execute'),
             ('shape.build', 'Jump to behavior.action and execute first operation'),

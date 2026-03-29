@@ -59,6 +59,16 @@ function setupTestWorkspace() {
                                     {
                                         name: 'Login Form',
                                         sequential_order: 0,
+                                        acceptance_criteria: [
+                                            {
+                                                text: 'User can enter a username and password',
+                                                sequential_order: 0
+                                            },
+                                            {
+                                                text: 'Authentication errors are shown inline',
+                                                sequential_order: 1
+                                            }
+                                        ],
                                         scenarios: [
                                             {
                                                 name: 'Valid Login',
@@ -142,6 +152,83 @@ test('Scenario nodes have draggable and story-node attributes', async () => {
     assert.strictEqual(invalidPasswordNode.getAttribute('data-position'), '1', 'Should have data-position="1"');
     assert.ok(invalidPasswordNode.getAttribute('data-path'), 'Should have data-path attribute');
     assert.ok(invalidPasswordNode.getAttribute('data-path').includes('Invalid Password'), 'data-path should include scenario name');
+});
+
+test('Story renders separate acceptance criteria and scenarios branches', async () => {
+    setupTestWorkspace();
+    
+    const storyMapView = new StoryMapView(repoRoot);
+    
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphData = JSON.parse(fs.readFileSync(storyGraphPath, 'utf8'));
+    
+    const html = storyMapView.renderStoryTree(storyGraphData.epics, null, null, null, null, null, null, null);
+    const doc = parseHTML(html);
+    
+    const acceptanceCriteriaBranch = doc.querySelector('[data-node-type="acceptance-criteria-group"]');
+    const scenariosBranch = doc.querySelector('[data-node-type="scenarios-group"]');
+    const acceptanceCriteriaNodes = Array.from(doc.querySelectorAll('[data-node-type="acceptance-criteria"]'));
+    
+    assert.ok(acceptanceCriteriaBranch, 'Story should render an Acceptance Criteria branch');
+    assert.ok(acceptanceCriteriaBranch.textContent.includes('Acceptance Criteria'), 'Acceptance Criteria branch should be labeled');
+    assert.ok(scenariosBranch, 'Story should render a Scenarios branch');
+    assert.ok(scenariosBranch.textContent.includes('Scenarios'), 'Scenarios branch should be labeled');
+    assert.strictEqual(acceptanceCriteriaNodes.length, 2, 'Story should render both acceptance criteria entries');
+    assert.ok(acceptanceCriteriaNodes[0].textContent.includes('User can enter a username and password'));
+    assert.ok(acceptanceCriteriaNodes[1].textContent.includes('Authentication errors are shown inline'));
+});
+
+test('Scenario nodes render nested step rows', async () => {
+    setupTestWorkspace();
+    
+    const storyMapView = new StoryMapView(repoRoot);
+    
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphData = JSON.parse(fs.readFileSync(storyGraphPath, 'utf8'));
+    
+    const html = storyMapView.renderStoryTree(storyGraphData.epics, null, null, null, null, null, null, null);
+    const doc = parseHTML(html);
+    
+    const stepNodes = Array.from(doc.querySelectorAll('[data-node-type="step"]'));
+    
+    assert.strictEqual(stepNodes.length, 6, 'Each scenario should render all of its steps as nested step rows');
+    assert.ok(stepNodes.some(node => node.textContent.includes('Given I am on login page')), 'Rendered steps should include the first Given step');
+    assert.ok(stepNodes.some(node => node.textContent.includes('Then I see error message')), 'Rendered steps should include the final Then step');
+});
+
+test('Shared scenario background renders once at scenarios level', async () => {
+    setupTestWorkspace();
+    
+    const storyMapView = new StoryMapView(repoRoot);
+    
+    const storyGraphPath = path.join(tempWorkspaceDir, 'docs', 'stories', 'story-graph.json');
+    const storyGraphData = JSON.parse(fs.readFileSync(storyGraphPath, 'utf8'));
+
+    const sharedBackground = ['Given I am on the login page'];
+    storyGraphData.epics[0].sub_epics[0].story_groups[0].stories[0].scenarios.forEach((scenario) => {
+        scenario.background = sharedBackground;
+    });
+    
+    const html = storyMapView.renderStoryTree(storyGraphData.epics, null, null, null, null, null, null, null);
+    const doc = parseHTML(html);
+
+    const backgroundGroup = doc.querySelector('[data-node-type="background-group"]');
+    const backgroundSteps = Array.from(doc.querySelectorAll('[data-node-type="background-step"]'));
+    const stepNodes = Array.from(doc.querySelectorAll('[data-node-type="step"]'));
+
+    assert.ok(backgroundGroup, 'Shared scenario background should render at the scenarios branch level');
+    assert.ok(backgroundGroup.classList.contains('story-node'), 'Background group should be selectable like other tree nodes');
+    assert.ok(backgroundGroup.textContent.includes('Background'), 'Background group should be labeled');
+    assert.strictEqual(backgroundGroup.getAttribute('data-node-name'), 'Background', 'Background group should expose a stable node name');
+    assert.strictEqual(backgroundGroup.getAttribute('data-has-children'), 'true', 'Background group should present as expandable/selectable');
+    assert.strictEqual(backgroundGroup.getAttribute('draggable'), null, 'Background group should not be draggable');
+    assert.strictEqual(backgroundSteps.length, 1, 'Shared background should render only once');
+    assert.ok(backgroundSteps[0].textContent.includes('Given I am on the login page'));
+    assert.strictEqual(
+        stepNodes.filter(node => node.textContent.includes('Background: Given I am on the login page')).length,
+        0,
+        'Shared background should not be repeated inside each scenario'
+    );
 });
 
 test('Scenario data-path has correct format for CLI commands', async () => {

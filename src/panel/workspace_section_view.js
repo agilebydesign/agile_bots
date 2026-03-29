@@ -24,7 +24,16 @@ class WorkspaceSectionView extends PanelView {
         let instructionsData = lastResponse.instructions || botData?.instructions || {};
         const currentAction = lastResponse.bot?.current_action || lastResponse.current_action ||
             botData?.current_action || botData?.behaviors?.current_action || '';
-        const currentBehavior = botData?.behaviors?.current_behavior || botData?.current_behavior || '';
+        // Match behaviors_view: JSON bot has top-level current_behavior; nested behaviors uses "current" not "current_behavior"
+        const currentBehavior =
+            botData?.current_behavior
+            || botData?.behaviors?.current_behavior
+            || botData?.behaviors?.current
+            || '';
+        const currentBehaviorShort =
+            currentBehavior && String(currentBehavior).includes('.')
+                ? String(currentBehavior).split('.').pop()
+                : currentBehavior;
 
         // Fetch clarifications, strategies, rules via CLI (shape.clarifications, shape.strategies, shape.rules)
         const executor = this.parentView?.execute?.bind(this.parentView) || this.execute?.bind(this);
@@ -73,7 +82,11 @@ class WorkspaceSectionView extends PanelView {
         const allDrawioLinks = graphLinks.filter(l => l.url && l.url.endsWith('.drawio'));
         // Filter to current behavior (path contains /behavior/ or \behavior\) - restore behavior-scoped display
         const drawioLinks = currentBehavior
-            ? allDrawioLinks.filter(l => (l.url || '').includes('/' + currentBehavior + '/') || (l.url || '').includes('\\' + currentBehavior + '\\'))
+            ? allDrawioLinks.filter(l => {
+                const u = l.url || '';
+                return u.includes('/' + currentBehavior + '/') || u.includes('\\' + currentBehavior + '\\') ||
+                    (currentBehaviorShort && (u.includes('/' + currentBehaviorShort + '/') || u.includes('\\' + currentBehaviorShort + '\\')));
+            })
             : allDrawioLinks;
         const drawioPath = drawioLinks.length > 0 ? escapeForJs(drawioLinks[0].url) : '';
 
@@ -100,11 +113,14 @@ class WorkspaceSectionView extends PanelView {
             walkthrough: 'walkthrough_icon.png'
         };
         const wsBehaviorExecToggleId = 'ws-behavior-exec-toggle';
-        const currentBehaviorIcon = (currentBehavior && behaviorIconMap[currentBehavior] ? getIcon(behaviorIconMap[currentBehavior]) : null) || (behaviorNames[0] && behaviorIconMap[behaviorNames[0]] ? getIcon(behaviorIconMap[behaviorNames[0]]) : null);
-        const currentBehaviorLabel = (currentBehavior || behaviorNames[0] || '').charAt(0).toUpperCase() + (currentBehavior || behaviorNames[0] || '').slice(1);
+        const currentBehaviorIcon = (currentBehaviorShort && behaviorIconMap[currentBehaviorShort] ? getIcon(behaviorIconMap[currentBehaviorShort]) : null)
+            || (currentBehavior && behaviorIconMap[currentBehavior] ? getIcon(behaviorIconMap[currentBehavior]) : null)
+            || (behaviorNames[0] && behaviorIconMap[behaviorNames[0]] ? getIcon(behaviorIconMap[behaviorNames[0]]) : null);
+        const labelBase = currentBehaviorShort || currentBehavior || behaviorNames[0] || '';
+        const currentBehaviorLabel = labelBase.charAt(0).toUpperCase() + labelBase.slice(1);
         const behaviorCollapsedBtn = currentBehaviorIcon ? `<button class="execution-toggle-btn active execution-toggle-collapsed" data-action="toggleExecutionToggle" data-target="${wsBehaviorExecToggleId}" title="${escapeForHtml(currentBehaviorLabel)}"><img src="${currentBehaviorIcon}" alt="${escapeForHtml(currentBehaviorLabel)}" style="width: 20px; height: 20px; object-fit: contain; display: block;" /></button>` : '';
         const behaviorExpandedButtons = behaviorNames.length > 0 ? behaviorNames.map(name => {
-            const isActive = name === currentBehavior;
+            const isActive = name === currentBehavior || name === currentBehaviorShort;
             const iconFile = behaviorIconMap[name];
             const iconPath = iconFile ? getIcon(iconFile) : null;
             const label = name.charAt(0).toUpperCase() + name.slice(1);
@@ -132,7 +148,7 @@ class WorkspaceSectionView extends PanelView {
                 </div>
                 <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;">
                 ${behaviorToggleGroupHtml || ''}
-                <button id="ws-submit-btn" onclick="event.stopPropagation(); if(window.submitWorkspaceBehaviorInstructions) window.submitWorkspaceBehaviorInstructions()" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Submit ${escapeForHtml((currentBehavior || '').charAt(0).toUpperCase() + (currentBehavior || '').slice(1))} for all">
+                <button id="ws-submit-btn" onclick="event.stopPropagation(); if(window.submitWorkspaceBehaviorInstructions) window.submitWorkspaceBehaviorInstructions()" style="background: transparent; border: none; padding: 4px; cursor: pointer; transition: opacity 0.15s ease; min-width: 32px; min-height: 32px;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Submit ${escapeForHtml(currentBehaviorLabel)} for all">
                     <img src="${submitIconPath}" style="width: 24px; height: 24px; object-fit: contain; display: block;" alt="Submit" />
                 </button>
                 </div>

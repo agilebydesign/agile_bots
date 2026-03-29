@@ -28,6 +28,7 @@ class ActionStateManager:
         state_data['current_behavior'] = f'{self.behavior.bot_name}.{self.behavior.name}'
         if current_action_obj:
             state_data['current_action'] = f'{self.behavior.bot_name}.{self.behavior.name}.{current_action_obj.action_name}'
+            state_data['at_behavior_level'] = False
         else:
             state_data.pop('current_action', None)
         state_data['timestamp'] = datetime.now().isoformat()
@@ -42,6 +43,9 @@ class ActionStateManager:
         is_current = self._is_current_behavior(state_data)
         if not is_current:
             self._set_default_index(actions_list, current_index_ref)
+            return
+        if state_data.get('at_behavior_level'):
+            current_index_ref[0] = None
             return
         if self._try_set_from_current_action(state_data, actions_list, current_index_ref):
             return

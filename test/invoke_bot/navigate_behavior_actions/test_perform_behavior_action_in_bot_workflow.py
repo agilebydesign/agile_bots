@@ -344,7 +344,7 @@ class TestExecuteBehaviorAction:
         """
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')
-        result = helper.bot.behaviors.current.execute() if hasattr(helper.bot.behaviors.current, 'execute') else helper.bot.submit_current_action()
+        result = helper.bot.behaviors.current.execute() if hasattr(helper.bot.behaviors.current, 'execute') else helper.bot.submit_current()
         assert result is not None
         if isinstance(result, dict):
             assert result.get('status') in ('success', None) or 'actions_run' in result or 'behavior' in result
@@ -358,7 +358,7 @@ class TestExecuteBehaviorAction:
         helper = BotTestHelper(tmp_path)
         helper.bot.behaviors.navigate_to('shape')
         helper.bot.behaviors.current.actions.navigate_to('strategy')
-        result = helper.bot.submit_current_action()
+        result = helper.bot.submit_current()
         assert result is not None
         if isinstance(result, dict):
             assert result.get('behavior') == 'shape' and result.get('action') == 'strategy'
@@ -753,7 +753,7 @@ def given_panel_has_no_action_level_instructions(helper, behavior_name):
 
 
 def when_user_submits_instructions_in_panel(helper):
-    result = helper.bot.submit_current_action()
+    result = helper.bot.submit_current()
     if isinstance(result, dict) and "instructions" in result:
         return result["instructions"]
     return result
@@ -780,7 +780,7 @@ def then_cli_stores_for_shape_clarify(helper, instruction_text):
 
 
 def then_cli_includes_in_next_prompt(helper, instruction_text):
-    result = helper.bot.submit_current_action()
+    result = helper.bot.submit_current()
     content = result.get("instructions", "") if isinstance(result, dict) else str(result)
     if isinstance(content, dict):
         display = content.get("display_content", [])
@@ -985,7 +985,7 @@ class TestConfigureActionExecution:
     def test_combined_instructions_deduplicate_and_include_combining_text(self, tmp_path):
         """
         GIVEN Clarify and Strategy have execution set to Combine (combine_next)
-        WHEN Bot combines instructions for clarify and strategy (via submit_current_action)
+        WHEN Bot combines instructions for clarify and strategy (via submit_current)
         THEN combined output includes combining text at top
         AND second action uses action-only content (no duplicate behavior/context)
         """
@@ -1023,7 +1023,7 @@ class TestConfigureActionExecution:
         helper.bot.set_action_execution("shape", "strategy", "skip")
         helper.bot.behaviors.navigate_to("shape")
         helper.bot.behaviors.current.actions.navigate_to("clarify")
-        result = helper.bot.submit_current_action()
+        result = helper.bot.submit_current()
         assert result is not None and result.get("status") != "error"
         # Bot should advance past skip (strategy) - instructions should be for clarify, not strategy
         content = result.get("instructions", "") or ""
@@ -1049,7 +1049,7 @@ class TestConfigureActionExecution:
             helper.bot.set_action_execution("shape", action_name, "combine_next")
         helper.bot.behaviors.navigate_to("shape")
         helper.bot.behaviors.current.actions.navigate_to("clarify")
-        result = helper.bot.submit_current_action()
+        result = helper.bot.submit_current()
         assert result is not None and result.get("status") != "error"
         content = result.get("instructions", "") or ""
         assert "clarify" in content.lower() and "strategy" in content.lower()

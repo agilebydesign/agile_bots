@@ -215,8 +215,8 @@ class Behaviors:
                 self.current.actions._current_index = None
             else:
                 self.current.actions.load_state()
-        
-        self.save_state()
+
+        self.save_state(behavior_only=behavior_only)
 
     def close_current(self):
         if self._current_index is not None and self.current:
@@ -237,7 +237,7 @@ class Behaviors:
             raise
         return ''
 
-    def save_state(self):
+    def save_state(self, behavior_only: bool = False):
         if self.current is None or self.bot_paths is None:
             return
         workspace_dir = self.bot_paths.workspace_directory
@@ -278,11 +278,30 @@ class Behaviors:
             except Exception as e:
                 logger.warning(f'Failed to load state file {state_file}: {e}. Starting with empty state.')
                 state_data = {}
-        state_data['current_behavior'] = f'{self.bot_name}.{self.current.name}'
+        was_at_behavior_level = bool(state_data.get('at_behavior_level', False))
+        new_behavior_full = f'{self.bot_name}.{self.current.name}'
+        prev_behavior = state_data.get('current_behavior', '')
+        prev_action = state_data.get('current_action', '') or ''
+        state_data['current_behavior'] = new_behavior_full
         if self.current.actions and self.current.actions.current:
             state_data['current_action'] = f'{self.bot_name}.{self.current.name}.{self.current.actions.current.action_name}'
-        else:
+            state_data['at_behavior_level'] = False
+        elif behavior_only:
             state_data.pop('current_action', None)
+            state_data['at_behavior_level'] = True
+        else:
+            if prev_behavior != new_behavior_full:
+                state_data.pop('current_action', None)
+                state_data.pop('at_behavior_level', None)
+            elif was_at_behavior_level:
+                state_data.pop('current_action', None)
+                state_data['at_behavior_level'] = True
+            elif prev_action.startswith(f'{new_behavior_full}.'):
+                state_data['current_action'] = prev_action
+                state_data['at_behavior_level'] = False
+            else:
+                state_data.pop('current_action', None)
+                state_data.pop('at_behavior_level', None)
         state_data['timestamp'] = datetime.now().isoformat()
         state_file.parent.mkdir(parents=True, exist_ok=True)
         state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')
@@ -329,8 +348,6 @@ class Behaviors:
         except Exception:
             self._init_to_first_behavior()
 
-            self._init_to_first_behavior()
-
     def initialize_state(self, confirmed_behavior: str):
         if self.bot_paths is None:
             raise ValueError('Cannot initialize state without bot_paths')
@@ -342,6 +359,6 @@ class Behaviors:
         action_names = behavior_obj.actions.names
         first_action = action_names[0] if action_names else 'clarify'
         self.navigate_to(confirmed_behavior)
-        state_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'completed_actions': [], 'timestamp': datetime.now().isoformat()}
+        state_data = {'current_behavior': f'{self.bot_name}.{behavior_obj.name}', 'current_action': f'{self.bot_name}.{behavior_obj.name}.{first_action}', 'at_behavior_level': False, 'completed_actions': [], 'timestamp': datetime.now().isoformat()}
         state_file.parent.mkdir(parents=True, exist_ok=True)
         state_file.write_text(json.dumps(state_data, indent=2), encoding='utf-8')

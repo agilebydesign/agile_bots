@@ -83,7 +83,10 @@ class BehaviorsView extends PanelView {
         
         const executionSettings = botData.execution || {};
         const specialInstructions = botData.special_instructions || {};
-        const currentBehavior = botData.current_behavior || botData.behaviors?.current || null;
+        const currentBehavior = botData.current_behavior
+            || botData.behaviors?.current_behavior
+            || botData.behaviors?.current
+            || null;
         const currentAction = botData.current_action || null;
         const atActionLevel = !!(currentBehavior && currentAction);
         const behaviorsHtml = behaviorsData.map((behavior, bIdx) => {
@@ -175,7 +178,10 @@ class BehaviorsView extends PanelView {
 
     renderBehavior(behavior, bIdx, plusIconPath, subtractIconPath, tickIconPath, notTickedIconPath, clipboardIconPath, combinedIconPath, skipIconPath, manualIconPath, executionSettings = {}, specialInstructions = {}, navContext = {}) {
         const { atActionLevel = false, currentBehavior = null } = navContext;
-        const isCurrentBehavior = behavior.name === currentBehavior;
+        const currentBehaviorShort = currentBehavior && String(currentBehavior).includes('.')
+            ? String(currentBehavior).split('.').pop()
+            : currentBehavior;
+        const isCurrentBehavior = behavior.name === currentBehavior || behavior.name === currentBehaviorShort;
         const isCurrent = (behavior.isCurrent || behavior.is_current || false) && !(atActionLevel && isCurrentBehavior);
         const showActiveClass = isCurrentBehavior || isCurrent;
         const isCompleted = behavior.isCompleted || behavior.is_completed || false;
@@ -222,9 +228,10 @@ class BehaviorsView extends PanelView {
         const behaviorExpandedGroup = `<span class="execution-toggle-expanded" style="display: inline-flex; gap: 4px; align-items: center;" onclick="event.stopPropagation();">${behaviorSpecialInstructionsInput}${behaviorToggleButtons}${subtractIconPath ? `<button class="execution-toggle-collapse-btn" data-action="toggleExecutionToggle" data-target="${behaviorExecToggleId}" title="Collapse"><img src="${subtractIconPath}" style="width: 12px; height: 12px; object-fit: contain; display: block;" alt="Collapse" /></button>` : ''}</span>`;
         const behaviorToggleGroup = `<span class="execution-toggle-container" id="${behaviorExecToggleId}" style="flex-shrink: 0;" onclick="event.stopPropagation();">${behaviorCollapsedBtn}${behaviorExpandedGroup}</span>`;
         const behaviorRowStyle = 'display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 4px;';
-        const behaviorNameClickable = !behaviorExpanded && !isSkipBehavior;
-        const behaviorNameStyle = isSkipBehavior ? 'cursor: default; text-decoration: none; opacity: 0.6;' : (behaviorNameClickable ? 'cursor: pointer; text-decoration: underline;' : 'cursor: default; text-decoration: none;');
-        const behaviorNameDataAction = behaviorNameClickable ? ` data-action="navigateToBehavior" data-behavior-name="${behaviorNameJs}" data-skip="${isSkipBehavior}"` : '';
+        // Always allow selecting a behavior by clicking its name (expanded or collapsed), unless skip.
+        const behaviorNameNavigable = !isSkipBehavior;
+        const behaviorNameStyle = isSkipBehavior ? 'cursor: default; text-decoration: none; opacity: 0.6;' : 'cursor: pointer; text-decoration: underline;';
+        const behaviorNameDataAction = behaviorNameNavigable ? ` data-action="navigateToBehavior" data-behavior-name="${behaviorNameJs}" data-skip="${isSkipBehavior}"` : '';
         let html = `<div class="collapsible-header card-item${behaviorActiveClass}${behaviorSkipClass}" data-behavior="${behaviorName}" data-skip="${isSkipBehavior}" title="${behaviorTooltip}" style="${behaviorRowStyle}"><span><span id="${behaviorId}-icon" class="${behaviorIconClass}" style="display: inline-block; min-width: 12px; cursor: pointer;" data-action="toggleCollapse" data-target="${behaviorId}" data-plus="${plusIconPath}" data-subtract="${subtractIconPath}">${plusIconPath && subtractIconPath ? `<img src="${behaviorIconSrc}" alt="${behaviorIconAlt}" style="width: 12px; height: 12px; vertical-align: middle;" />` : ''}</span> <span class="behavior-name-clickable" style="${behaviorNameStyle}"${behaviorNameDataAction}>${behaviorMarker}${behaviorName}</span>${clipboardIconPath && !isSkipBehavior ? `<button class="behavior-rules-button" data-action="getBehaviorRules" data-behavior-name="${behaviorNameJs}" style="background: #000; border: none; padding: 2px 6px; margin: 0 0 0 8px; cursor: pointer; vertical-align: middle; display: inline-flex; align-items: center; transition: opacity 0.15s ease;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" title="Get rules for ${behaviorName} and send to chat"><img src="${clipboardIconPath}" style="width: 22px; height: 22px; object-fit: contain;" alt="Get Rules" /></button>` : ''}</span>${behaviorToggleGroup}</div>`;
         
 
