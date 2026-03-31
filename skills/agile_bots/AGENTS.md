@@ -4,7 +4,7 @@ description: Agile Bot CLI — why story_bot and crc_bot exist, what each behavi
 license: MIT
 metadata:
   author: agilebydesign
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Agile Bots CLI
@@ -26,6 +26,27 @@ Using this skill, the assistant works **through agile_bots** supporting you with
 - **This skill** = **`SKILL.md`** + **`content/`** (loaded by Cursor etc. as agent instructions).
 - **agile_bots** = the **repository and bot runtime** (`bots/`, `src/`, configs).
 - You **invoke** agile_bots by running the **CLI** (e.g. **`story_cli.ps1`**, repo **README**, then **`help`**). The assistant (or you) sends **commands**—**`path`**, **`bot`**, **`scope`**, **`shape.build`**, **`story_graph…`**, **`current`**, **`submit`**, …—that call into **`CLISession`**, **`Bot`**, and the configured behaviors. There is no second “skill runtime”; the CLI is the integration point.
+
+### WORKING_AREA — agents (critical)
+
+**Never** set the **`WORKING_AREA`** environment variable when invoking the CLI unless the user **explicitly** asks you to.
+
+- **`cli_main.py`** bootstraps **`WORKING_AREA`** from **`bots/<active_bot>/bot_config.json`** (`mcp.env.WORKING_AREA` or top-level `WORKING_AREA`) when the variable is **unset**. That chooses which project’s **`docs/story/story-graph.json`** is loaded and saved.
+- Setting **`WORKING_AREA`** in the shell **overrides** that config and can write the graph to the **wrong** repo.
+- **Do:** For piped one-liners, set **`PYTHONPATH`** (and **`BOT_DIRECTORY`** if your shell does not already match the repo’s defaults). **Do not** set **`WORKING_AREA`** unless the user requested a specific override.
+- **Do:** In an **interactive** CLI session, use **`path <dir>`** / **`workspace <dir>`** when the user needs to point at a different project than **`bot_config.json`** specifies.
+- **Only** set **`WORKING_AREA`** when the user asked for that override, or there is no workspace in config and they told you exactly which project root to use.
+
+The CLI **code** lives in **agile_bots**; the **story graph** on disk is under whatever **`WORKING_AREA`** resolves to—defaulting from **`bot_config.json`**, not from “whichever repo the agent guessed.”
+
+### Story graph in another project — point the CLI first (mandatory for agents)
+
+You often edit **`story-graph.json`** in a **different repo** than agile_bots (e.g. **`abd-answers`**). The assistant **must** aim the CLI at that project **before** running **`story_graph…`** or assuming which epic/stories exist. **Do not** hand-edit JSON for structural changes as a shortcut when the CLI is available.
+
+1. **Interactive CLI session:** Run **`path <absolute-project-root>`** or **`workspace <absolute-project-root>`** first (directory must exist). That reloads **`docs/story/story-graph.json`** and **`scope.json`** from that tree. Then use **`story_graph…`** per **`cli-reference.md`**.
+2. **Piped one-liners / automation:** Use the correct **`BOT_DIRECTORY`** (e.g. **`bots/story_bot`**). Leave **`WORKING_AREA` unset** in the shell so **`cli_main.py`** applies **`mcp.env.WORKING_AREA`** from **`bots/story_bot/bot_config.json`** (often already set to e.g. **`C:\dev\abd-answers`**). If commands still resolve the wrong graph, **fix bot/path/env**—not the JSON file on disk by hand.
+3. **If** **`path`** / config / bot selection is wrong, symptoms include “epic not found,” empty scope, or stories from the **agile_bots** graph. **Remedy:** correct **`path`** / **`bot`** / **`WORKING_AREA`** policy above; then retry **`story_graph…`**.
+4. **Only** edit **`story-graph.json`** directly when the CLI is unavailable **or** for tiny non-structural fixes the user requested—and **reload** (**`reload_story_graph`**) after unavoidable manual edits per project rules.
 
 ---
 
@@ -159,7 +180,7 @@ Commands are interpreted by `CLISession` (`src/cli/cli_session.py`) and `Bot` (`
 
 **Start:** Run the CLI and type **`help`**. You get TTY help from `src/help/help.py`: navigation, this bot’s behaviors and actions, operations, scope rules, and examples.
 
-**Running:** From the `agile_bots` repo, with `PYTHONPATH` including `src` and `BOT_DIRECTORY` / `WORKING_AREA` set (`src/cli/cli_main.py`, repo README). Tests in `test/` use the same strings against `CLISession`.
+**Running:** From the `agile_bots` repo, with `PYTHONPATH` including `src` and `BOT_DIRECTORY` as needed (`src/cli/cli_main.py`, repo README). If **`WORKING_AREA`** is **unset**, **`cli_main.py`** reads it from **`bots/<bot>/bot_config.json`** (`mcp.env.WORKING_AREA` or `WORKING_AREA`). **Agents:** do **not** set **`WORKING_AREA`** in the shell unless the user explicitly asked—overriding it sends graph edits to the wrong project. Tests in `test/` use the same strings against `CLISession`.
 
 **Line format:** One line per command unless noted; space-separated arguments; quote strings where needed.
 
@@ -256,10 +277,10 @@ Prefer **`story_graph...`** for structural edits so validation and saves stay co
 
 **Do not** hand-edit **`story-graph.json`** for moves, renames, or hierarchy changes when the CLI is available. The CLI runs **`StoryMap`** / **`DomainNavigator`**, persists correctly, and (for stories with **`test_class`**) can relocate tests. **`scope`** is only for *filtering* instructions—use **`story_graph...`** to *change* the tree.
 
-**Multi-repo / external project:** From **`agile_bots`**, set the target workspace **before** graph commands:
+**Multi-repo / external project:** The graph file lives under **`WORKING_AREA/docs/story/`**.
 
-- **`path C:\path\to\project`** (inside an interactive CLI session), or  
-- **`$env:WORKING_AREA = "C:\path\to\project"`** (PowerShell) then pipe each command to **`python src/cli/cli_main.py`** (see **`bots/cli_execute.ps1`**).
+- **Interactive CLI:** use **`path C:\path\to\project`** or **`workspace C:\path\to\project`** before **`story_graph...`**.
+- **Piped commands:** leave **`WORKING_AREA`** **unset** so **`cli_main.py`** uses **`bot_config.json`** (see **WORKING_AREA** note under **Running** above). **Do not** set **`$env:WORKING_AREA`** unless the user explicitly asked for that override.
 
 | Task | Command pattern (names with spaces use quoted segments `."Name"`) |
 |------|---------------------------------------------------------------------|
@@ -272,7 +293,7 @@ Prefer **`story_graph...`** for structural edits so validation and saves stay co
 | Rename a node | **`story_graph."…".rename name:"New Name"`** (method on the path segment being renamed) |
 | Reload JSON after an unavoidable manual edit | **`reload_story_graph`** |
 
-**Example (piped one-liner, Windows):** after **`cd`** to **`agile_bots`** and setting **`PYTHONPATH`**, **`BOT_DIRECTORY`**, **`WORKING_AREA`**:
+**Example (piped one-liner, Windows):** after **`cd`** to **`agile_bots`** and setting **`PYTHONPATH`** and **`BOT_DIRECTORY`** (if needed). **Do not** set **`WORKING_AREA`** unless the user asked—let **`bot_config.json`** pick the project.
 
 ```powershell
 echo 'story_graph."Answers Content Questions"."Manage Chat Space"."Open Chat Session".move_to target:story_graph."Answers Content Questions"."Chats With Assistant" at_position:0' | python src/cli/cli_main.py

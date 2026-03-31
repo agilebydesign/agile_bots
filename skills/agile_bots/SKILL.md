@@ -4,7 +4,7 @@ description: Agile Bot CLI — why story_bot and crc_bot exist, what each behavi
 license: MIT
 metadata:
   author: agilebydesign
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Agile Bots CLI
@@ -26,6 +26,27 @@ Using this skill, the assistant works **through agile_bots** supporting you with
 - **This skill** = **`SKILL.md`** + **`content/`** (loaded by Cursor etc. as agent instructions).
 - **agile_bots** = the **repository and bot runtime** (`bots/`, `src/`, configs).
 - You **invoke** agile_bots by running the **CLI** (e.g. **`story_cli.ps1`**, repo **README**, then **`help`**). The assistant (or you) sends **commands**—**`path`**, **`bot`**, **`scope`**, **`shape.build`**, **`story_graph…`**, **`current`**, **`submit`**, …—that call into **`CLISession`**, **`Bot`**, and the configured behaviors. There is no second “skill runtime”; the CLI is the integration point.
+
+### WORKING_AREA — agents (critical)
+
+**Never** set the **`WORKING_AREA`** environment variable when invoking the CLI unless the user **explicitly** asks you to.
+
+- **`cli_main.py`** bootstraps **`WORKING_AREA`** from **`bots/<active_bot>/bot_config.json`** (`mcp.env.WORKING_AREA` or top-level `WORKING_AREA`) when the variable is **unset**. That chooses which project’s **`docs/story/story-graph.json`** is loaded and saved.
+- Setting **`WORKING_AREA`** in the shell **overrides** that config and can write the graph to the **wrong** repo.
+- **Do:** For piped one-liners, set **`PYTHONPATH`** (and **`BOT_DIRECTORY`** if your shell does not already match the repo’s defaults). **Do not** set **`WORKING_AREA`** unless the user requested a specific override.
+- **Do:** In an **interactive** CLI session, use **`path <dir>`** / **`workspace <dir>`** when the user needs to point at a different project than **`bot_config.json`** specifies.
+- **Only** set **`WORKING_AREA`** when the user asked for that override, or there is no workspace in config and they told you exactly which project root to use.
+
+The CLI **code** lives in **agile_bots**; the **story graph** on disk is under whatever **`WORKING_AREA`** resolves to—defaulting from **`bot_config.json`**, not from “whichever repo the agent guessed.”
+
+### Story graph in another project — point the CLI first (mandatory for agents)
+
+You often edit **`story-graph.json`** in a **different repo** than agile_bots (e.g. **`abd-answers`**). The assistant **must** aim the CLI at that project **before** running **`story_graph…`** or assuming which epic/stories exist. **Do not** hand-edit JSON for structural changes as a shortcut when the CLI is available.
+
+1. **Interactive CLI session:** Run **`path <absolute-project-root>`** or **`workspace <absolute-project-root>`** first (directory must exist). That reloads **`docs/story/story-graph.json`** and **`scope.json`** from that tree. Then use **`story_graph…`** per **`cli-reference.md`**.
+2. **Piped one-liners / automation:** Use the correct **`BOT_DIRECTORY`** (e.g. **`bots/story_bot`**). Leave **`WORKING_AREA` unset** in the shell so **`cli_main.py`** applies **`mcp.env.WORKING_AREA`** from **`bots/story_bot/bot_config.json`** (often already set to e.g. **`C:\dev\abd-answers`**). If commands still resolve the wrong graph, **fix bot/path/env**—not the JSON file on disk by hand.
+3. **If** **`path`** / config / bot selection is wrong, symptoms include “epic not found,” empty scope, or stories from the **agile_bots** graph. **Remedy:** correct **`path`** / **`bot`** / **`WORKING_AREA`** policy above; then retry **`story_graph…`**.
+4. **Only** edit **`story-graph.json`** directly when the CLI is unavailable **or** for tiny non-structural fixes the user requested—and **reload** (**`reload_story_graph`**) after unavoidable manual edits per project rules.
 
 ---
 

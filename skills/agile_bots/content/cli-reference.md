@@ -4,7 +4,7 @@ Commands are interpreted by `CLISession` (`src/cli/cli_session.py`) and `Bot` (`
 
 **Start:** Run the CLI and type **`help`**. You get TTY help from `src/help/help.py`: navigation, this bot’s behaviors and actions, operations, scope rules, and examples.
 
-**Running:** From the `agile_bots` repo, with `PYTHONPATH` including `src` and `BOT_DIRECTORY` / `WORKING_AREA` set (`src/cli/cli_main.py`, repo README). Tests in `test/` use the same strings against `CLISession`.
+**Running:** From the `agile_bots` repo, with `PYTHONPATH` including `src` and `BOT_DIRECTORY` as needed (`src/cli/cli_main.py`, repo README). If **`WORKING_AREA`** is **unset**, **`cli_main.py`** reads it from **`bots/<bot>/bot_config.json`** (`mcp.env.WORKING_AREA` or `WORKING_AREA`). **Agents:** do **not** set **`WORKING_AREA`** in the shell unless the user explicitly asked—overriding it sends graph edits to the wrong project. Tests in `test/` use the same strings against `CLISession`.
 
 **Line format:** One line per command unless noted; space-separated arguments; quote strings where needed.
 
@@ -101,10 +101,10 @@ Prefer **`story_graph...`** for structural edits so validation and saves stay co
 
 **Do not** hand-edit **`story-graph.json`** for moves, renames, or hierarchy changes when the CLI is available. The CLI runs **`StoryMap`** / **`DomainNavigator`**, persists correctly, and (for stories with **`test_class`**) can relocate tests. **`scope`** is only for *filtering* instructions—use **`story_graph...`** to *change* the tree.
 
-**Multi-repo / external project:** From **`agile_bots`**, set the target workspace **before** graph commands:
+**Multi-repo / external project:** The graph file lives under **`WORKING_AREA/docs/story/`**.
 
-- **`path C:\path\to\project`** (inside an interactive CLI session), or  
-- **`$env:WORKING_AREA = "C:\path\to\project"`** (PowerShell) then pipe each command to **`python src/cli/cli_main.py`** (see **`bots/cli_execute.ps1`**).
+- **Interactive CLI:** use **`path C:\path\to\project`** or **`workspace C:\path\to\project`** before **`story_graph...`**.
+- **Piped commands:** leave **`WORKING_AREA`** **unset** so **`cli_main.py`** uses **`bot_config.json`** (see **WORKING_AREA** note under **Running** above). **Do not** set **`$env:WORKING_AREA`** unless the user explicitly asked for that override.
 
 | Task | Command pattern (names with spaces use quoted segments `."Name"`) |
 |------|---------------------------------------------------------------------|
@@ -117,7 +117,7 @@ Prefer **`story_graph...`** for structural edits so validation and saves stay co
 | Rename a node | **`story_graph."…".rename name:"New Name"`** (method on the path segment being renamed) |
 | Reload JSON after an unavoidable manual edit | **`reload_story_graph`** |
 
-**Example (piped one-liner, Windows):** after **`cd`** to **`agile_bots`** and setting **`PYTHONPATH`**, **`BOT_DIRECTORY`**, **`WORKING_AREA`**:
+**Example (piped one-liner, Windows):** after **`cd`** to **`agile_bots`** and setting **`PYTHONPATH`** and **`BOT_DIRECTORY`** (if needed). **Do not** set **`WORKING_AREA`** unless the user asked—let **`bot_config.json`** pick the project.
 
 ```powershell
 echo 'story_graph."Answers Content Questions"."Manage Chat Space"."Open Chat Session".move_to target:story_graph."Answers Content Questions"."Chats With Assistant" at_position:0' | python src/cli/cli_main.py

@@ -131,10 +131,11 @@ def main():
         print(f"echo '<command>' | {launcher_str}")
         print(f"# Or: echo '<command>' | {cli_script_str}")
         print("")
-        print("# Optional: Override environment variables if needed:")
+        print("# Optional env (piped mode): PYTHONPATH and BOT_DIRECTORY as needed.")
+        print("# Do NOT set WORKING_AREA unless explicitly required — when unset, cli_main.py")
+        print("# loads it from bot_config.json (mcp.env.WORKING_AREA). Setting it overrides that.")
         print(f"$env:PYTHONPATH = '{workspace_root_str}'")
         print(f"$env:BOT_DIRECTORY = '{str(bot_directory).replace(chr(92), chr(92)*2)}'")
-        print("$env:WORKING_AREA = '<project_path>'  # e.g. demo\\mob_minion")
         print("```")
         print("")
     

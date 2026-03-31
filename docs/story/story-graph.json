@@ -2,7 +2,7 @@
   "epics": [
     {
       "name": "Build Agile Bots",
-      "sequential_order": null,
+      "sequential_order": 0,
       "behavior": null,
       "domain_concepts": [],
       "sub_epics": [
@@ -402,7 +402,7 @@
     },
     {
       "name": "Invoke Bot",
-      "sequential_order": null,
+      "sequential_order": 1,
       "behavior": null,
       "domain_concepts": [],
       "sub_epics": [
@@ -1312,7 +1312,7 @@
                           "test": {
                             "method": "test_cli_session_sets_first_action_as_current",
                             "file": "invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py",
-                            "line": 615
+                            "line": 616
                           }
                         },
                         {
@@ -1325,7 +1325,7 @@
                           "test": {
                             "method": "test_cli_session_action_instructions_accessible",
                             "file": "invoke_bot/initialize_bot/test_load_bot_behavior_and_actions.py",
-                            "line": 639
+                            "line": 641
                           }
                         }
                       ],
@@ -13249,7 +13249,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
-                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build"
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build",
+                          "test": {
+                            "method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 702
+                          }
                         },
                         {
                           "name": "Panel remembers selection across section toggles",
@@ -13257,7 +13262,12 @@
                           "type": "edge_case",
                           "background": [],
                           "test_method": "test_behavior_selection_persists_across_state_refresh",
-                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected"
+                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected",
+                          "test": {
+                            "method": "test_behavior_selection_persists_across_state_refresh",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 722
+                          }
                         },
                         {
                           "name": "Default behavior shown when none selected",
@@ -13302,7 +13312,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
-                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build"
+                          "steps": "Given {Behavior} registry has shape and prioritization\nAnd {InstructionsSection} is visible in workspace\nWhen User selects {Behavior} \"shape\"\nThen {InstructionsSection} displays {Behavior} shape instructions\nAnd {InstructionsSection} shows actions clarify, strategy, build",
+                          "test": {
+                            "method": "test_selecting_behavior_updates_current_and_instructions_reflect_it",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 702
+                          }
                         },
                         {
                           "name": "Panel remembers selection across section toggles",
@@ -13310,7 +13325,12 @@
                           "type": "edge_case",
                           "background": [],
                           "test_method": "test_behavior_selection_persists_across_state_refresh",
-                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected"
+                          "steps": "Given User has selected {Behavior} \"shape\"\nAnd {InstructionsSection} displays shape instructions\nWhen User toggles workspace section collapsed\nAnd User expands workspace section\nThen {InstructionsSection} still displays {Behavior} shape instructions\nAnd {Behavior} \"shape\" remains selected",
+                          "test": {
+                            "method": "test_behavior_selection_persists_across_state_refresh",
+                            "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
+                            "line": 722
+                          }
                         },
                         {
                           "name": "Default behavior shown when none selected",
@@ -13360,7 +13380,7 @@
                           "test": {
                             "method": "test_cli_next_command_navigates_to_next_action",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 823
+                            "line": 872
                           }
                         },
                         {
@@ -13373,7 +13393,7 @@
                           "test": {
                             "method": "test_cli_next_progresses_through_entire_workflow",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 838
+                            "line": 887
                           }
                         },
                         {
@@ -13386,7 +13406,7 @@
                           "test": {
                             "method": "test_cli_next_at_final_action_advances_to_next_behavior",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 857
+                            "line": 906
                           }
                         },
                         {
@@ -13399,7 +13419,7 @@
                           "test": {
                             "method": "test_cli_status_shows_current_position",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 872
+                            "line": 921
                           }
                         },
                         {
@@ -13412,7 +13432,7 @@
                           "test": {
                             "method": "test_cli_next_respects_behavior_json_workflow",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 886
+                            "line": 935
                           }
                         },
                         {
@@ -13425,7 +13445,7 @@
                           "test": {
                             "method": "test_cli_navigate_to_specific_behavior_via_command",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 900
+                            "line": 949
                           }
                         },
                         {
@@ -13438,7 +13458,7 @@
                           "test": {
                             "method": "test_cli_back_command_navigates_to_previous_action",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 912
+                            "line": 961
                           }
                         },
                         {
@@ -13451,7 +13471,7 @@
                           "test": {
                             "method": "test_cli_pos_command_shows_current_position",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 925
+                            "line": 974
                           }
                         }
                       ],
@@ -13479,7 +13499,7 @@
                           "test": {
                             "method": "test_cli_execute_behavior_with_action_parameter",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 703
+                            "line": 752
                           }
                         },
                         {
@@ -13492,7 +13512,7 @@
                           "test": {
                             "method": "test_cli_execute_behavior_without_action_uses_current",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 716
+                            "line": 765
                           }
                         },
                         {
@@ -13505,7 +13525,7 @@
                           "test": {
                             "method": "test_cli_execute_behavior_with_no_state_starts_at_first",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 729
+                            "line": 778
                           }
                         },
                         {
@@ -13518,7 +13538,7 @@
                           "test": {
                             "method": "test_cli_workflow_order_determines_next_action",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 743
+                            "line": 792
                           }
                         },
                         {
@@ -13531,7 +13551,7 @@
                           "test": {
                             "method": "test_cli_starts_at_first_action_when_no_completed",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 757
+                            "line": 806
                           }
                         },
                         {
@@ -13544,7 +13564,7 @@
                           "test": {
                             "method": "test_cli_falls_back_to_completed_actions_list",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 770
+                            "line": 819
                           }
                         },
                         {
@@ -13557,7 +13577,7 @@
                           "test": {
                             "method": "test_cli_different_behaviors_have_different_workflows",
                             "file": "invoke_bot/navigate_behavior_actions/test_navigate_behavior_and_actions.py",
-                            "line": 789
+                            "line": 838
                           }
                         }
                       ],
@@ -14661,7 +14681,7 @@
                           "test": {
                             "method": "test_panel_stores_behavior_level_special_instructions",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 636
+                            "line": 663
                           }
                         },
                         {
@@ -14674,7 +14694,7 @@
                           "test": {
                             "method": "test_panel_stores_action_level_special_instructions",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 643
+                            "line": 670
                           }
                         },
                         {
@@ -14687,7 +14707,7 @@
                           "test": {
                             "method": "test_panel_injects_special_instructions_on_submit",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 651
+                            "line": 678
                           }
                         },
                         {
@@ -14700,7 +14720,7 @@
                           "test": {
                             "method": "test_cli_stores_and_includes_special_instructions_in_next_prompt",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 660
+                            "line": 687
                           }
                         },
                         {
@@ -14713,7 +14733,7 @@
                           "test": {
                             "method": "test_panel_injects_only_behavior_level_instructions_when_no_action_level_set",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 668
+                            "line": 695
                           }
                         },
                         {
@@ -14726,7 +14746,7 @@
                           "test": {
                             "method": "test_cli_reports_failed_when_special_instructions_command_fails",
                             "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
-                            "line": 677
+                            "line": 704
                           }
                         }
                       ],
@@ -14768,7 +14788,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_workspace_submit_button_sends_instructions",
-                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {InstructionsSection} displays shape instructions\nWhen User triggers submit from workspace\nThen System sends {Behavior} shape instructions to AI agent\nAnd Submit button is visible and enabled"
+                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {InstructionsSection} displays shape instructions\nWhen User triggers submit from workspace\nThen System sends {Behavior} shape instructions to AI agent\nAnd Submit button is visible and enabled",
+                          "test": {
+                            "method": "test_workspace_submit_button_sends_instructions",
+                            "file": "invoke_bot/navigate_behavior_actions/test_perform_behavior_action_in_bot_workflow.py",
+                            "line": 638
+                          }
                         },
                         {
                           "name": "Submit disabled when no behavior selected",
@@ -16626,7 +16651,12 @@
                           "type": "happy_path",
                           "background": [],
                           "test_method": "test_clarify_returns_key_questions_for_workspace_display",
-                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {GatherContextAction} defines {KeyQuestions} for shape\nWhen workspace section renders\nThen {ClarifyInstructionsSection} displays {KeyQuestions} in workspace\nAnd {ClarifyDataSubSection} shows editable answer fields"
+                          "steps": "Given {Behavior} \"shape\" is selected in workspace\nAnd {GatherContextAction} defines {KeyQuestions} for shape\nWhen workspace section renders\nThen {ClarifyInstructionsSection} displays {KeyQuestions} in workspace\nAnd {ClarifyDataSubSection} shows editable answer fields",
+                          "test": {
+                            "method": "test_clarify_returns_key_questions_for_workspace_display",
+                            "file": "invoke_bot/perform_action/test_clarify_requirements.py",
+                            "line": 264
+                          }
                         },
                         {
                           "name": "User edits answer and saves via CLI",

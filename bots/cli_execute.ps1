@@ -22,7 +22,8 @@
 #     cd C:\dev\agile_bots
 #     $env:PYTHONPATH = "C:\dev\agile_bots\src"
 #     $env:BOT_DIRECTORY = "C:\dev\agile_bots\bots\story_bot"
-#     $env:WORKING_AREA = "<project_path>"  # e.g. demo\mob_minion
+#     # Do NOT set WORKING_AREA here unless the user explicitly asked — cli_main.py
+#     # reads it from bots/story_bot/bot_config.json (mcp.env.WORKING_AREA) when unset.
 #     echo "status" | python src/cli/cli_main.py
 #   
 #   Step 2: Read output, do work (create files, etc.)
