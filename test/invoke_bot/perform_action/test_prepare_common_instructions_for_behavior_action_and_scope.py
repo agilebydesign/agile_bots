@@ -138,8 +138,8 @@ class TestSaveStrategyDecisions:
         helper.bot.behaviors.navigate_to('shape')
         
         test_decisions = {
-            "Approach": "Incremental development",
-            "Architecture": "Microservices"
+            "Approach": ["Incremental development"],
+            "Architecture": ["Microservices"]
         }
         
         helper.bot.save(
@@ -219,7 +219,7 @@ class TestSaveMultipleGuardrails:
         strategy_file = tmp_path / 'workspace' / 'docs' / 'story' / 'strategy.json'
         strategy_data = json.loads(strategy_file.read_text())
         # Actual format: behavior_data['decisions'] and behavior_data['additional_strategies']
-        assert strategy_data['shape']['decisions']['Approach'] == "Agile"
+        assert strategy_data['shape']['decisions']['Approach'] == ["Agile"]
         assert strategy_data['shape']['additional_strategies'] == ["Team has agile experience"]
     
     def test_save_preserves_data_across_behaviors(self, tmp_path):
