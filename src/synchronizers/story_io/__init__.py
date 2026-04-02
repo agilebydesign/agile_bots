@@ -6,6 +6,7 @@ from .drawio_story_node_serializer import DrawIOStoryNodeSerializer
 from .drawio_element import DrawIOElement
 from .layout_data import LayoutData
 from .update_report import UpdateReport
+from .map_model_spec_drawio import map_model_spec_to_drawio_xml, write_map_model_class_diagram
 
 __all__ = [
     'Boundary',
@@ -20,4 +21,6 @@ __all__ = [
     'DrawIOElement',
     'LayoutData',
     'UpdateReport',
+    'map_model_spec_to_drawio_xml',
+    'write_map_model_class_diagram',
 ]
