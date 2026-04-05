@@ -481,3 +481,12 @@
     object-fit: contain;
     display: block;
 }
+
+/* Deloitte: primary labels white; small hints use faded neutral (not green) */
+body[data-branding="Deloitte"] .scope-title {
+    color: var(--text-color) !important;
+}
+
+body[data-branding="Deloitte"] .increment-filter-hint {
+    color: var(--text-color-faded) !important;
+}

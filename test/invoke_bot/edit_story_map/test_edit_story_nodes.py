@@ -32,8 +32,8 @@ class TestNavigateStoryGraph:
     @staticmethod
     def _create_mock_bot(bot_directory: Path):
         """Helper: Create MockBot instance for testing StoryMap.from_bot().
-        
-        Used by: test_from_bot_loads_story_graph, test_from_bot_raises_when_file_not_found
+
+        Used by: test_from_bot_loads_story_graph, test_from_bot_uses_empty_graph_when_file_missing
         """
         class MockBot:
             def __init__(self, bot_directory):
@@ -334,7 +334,17 @@ class TestNavigateStoryGraph:
         story_map = StoryMap.from_bot(helper.bot_directory)
         # Then: Story map contains test epic
         helper.story.assert_story_map_matches(story_map)
-    
+
+    def test_from_bot_uses_empty_graph_when_file_missing(self, tmp_path):
+        """When story-graph.json is absent, from_bot returns an empty graph (shape/build create the file)."""
+        helper = BotTestHelper(tmp_path, bot_directory=tmp_path / 'bot')
+        stories_dir = helper.bot_directory / 'docs' / 'story'
+        stories_dir.mkdir(parents=True, exist_ok=True)
+        story_map = StoryMap.from_bot(helper.bot_directory)
+        assert list(story_map.epics) == []
+        assert story_map.story_graph.get('epics') == []
+        assert story_map.story_graph.get('increments') == []
+
     def test_scenario_map_location_duplicate(self, tmp_path):
         """
         SCENARIO: Scenario Map Location

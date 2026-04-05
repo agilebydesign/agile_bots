@@ -39,6 +39,17 @@ const DEFAULT_BRANDS = {
         textColor: '#CCCCCC',
         textColorFaded: '#6B6B6B',
         fontWeight: '400'
+    },
+    /** Deloitte: black depth like ABD; accent from brand reference (sampled ~#599932, less chartreuse than legacy #86BC25) */
+    Deloitte: {
+        path: 'deloitte',
+        title: 'Deloitte Context Engine',
+        color: '#5A9A33',
+        background: '#000000',
+        textColor: '#FFFFFF',
+        /* Muted neutral for secondary UI copy (not green — green stays for borders / PNG tint) */
+        textColorFaded: '#B0B0B0',
+        fontWeight: '400'
     }
 };
 
@@ -82,13 +93,13 @@ function loadConfig() {
     
     // Merge with defaults to ensure all properties exist
     config.brands = { ...DEFAULT_BRANDS, ...(config.brands || {}) };
-    
+
     return config;
 }
 
 /**
  * Get current branding mode
- * @returns {string} 'ABD' or 'Scotia'
+ * @returns {string} Brand key, e.g. 'ABD', 'Scotia', 'ACE', 'Deloitte'
  */
 function getBranding() {
     const config = loadConfig();
@@ -115,7 +126,7 @@ function isScotia() {
 
 /**
  * Get the image subdirectory for current branding
- * @returns {string} '' for ABD, 'scotia' for Scotia
+ * @returns {string} '' for ABD, or subdir name for other brands (e.g. 'scotia', 'deloitte')
  */
 function getImageSubdir() {
     return getBrandSettings().path;
@@ -136,7 +147,7 @@ function getImagePath(imageName) {
 
 /**
  * Get branded product name/title
- * @returns {string} 'Agile Bots' or 'Scotia Bots'
+ * @returns {string} Product title from config (e.g. 'Agile Bots', 'Deloitte Context Engine')
  */
 function getProductName() {
     return getBrandSettings().title;
@@ -187,6 +198,10 @@ function getTextColorFaded() {
  * @returns {string} style attribute value
  */
 function getTitleStyle() {
+    /* Wordmark is white on black; accent green is for chrome + icons, not product title */
+    if (getBranding() === 'Deloitte') {
+        return 'style="color: #FFFFFF;"';
+    }
     const color = getTitleColor();
     return `style="color: ${color};"`;
 }

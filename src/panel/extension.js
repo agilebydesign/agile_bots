@@ -10,6 +10,7 @@ const BotPanel = require("./bot/bot_panel.js");
 const BotPanelSidebarProvider = require("./bot/bot_panel_sidebar.js");
 const { Logger } = require("./utils");
 const path = require("path");
+const { getPanelWorkspaceRoot } = require("./workspace_root");
 
 let outputChannel = null;
 
@@ -71,7 +72,8 @@ function activate(context) {
           // #endregion
           log("View Bot Panel command invoked");
           log("[PERF] viewPanel command start");
-          const workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.env.PWD; // Fall-back to PWD env variable set in launch.json, should be the workspace folder
+          const workspaceRoot =
+            getPanelWorkspaceRoot(vscode) || process.env.PWD; // multi-root: prefer folder with conf/config.json + bots/story_bot
                     
           // #region agent log
           fetch('http://127.0.0.1:7242/ingest/cc11718e-e210-436d-8aa6-f3e81dc3fdfc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'extension.js:37',message:'Workspace root resolved',data:{workspaceRoot},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});

@@ -69,7 +69,9 @@
           "- One test_file per sub_epic (all stories share it)",
           "- One test_class per story (only if story has scenarios)",
           "- One test_method per scenario",
-          "- Read story-graph.json first, preserve existing fields"
+          "- Read story-graph.json first, preserve existing fields",
+          "",
+          "**Updating test_file / test_class / test_method on the graph:** Do **not** write ad-hoc scripts that rewrite `story-graph.json`. Prefer **`story_graph...`** CLI commands from the `agile_bots` repo root (piped: `echo 'story_graph.\"Epic\".\"SubEpic\".\"Story\"....' | python src/cli/cli_main.py`). Only the **`story_graph`** prefix is routed to the domain navigator—see `skills/agile_bots/content/cli-reference.md`. After any unavoidable manual JSON edit, run **`reload_story_graph`**."
         ]
       },
       

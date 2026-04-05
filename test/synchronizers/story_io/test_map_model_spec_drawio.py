@@ -32,9 +32,11 @@ def test_minimal_spec_emits_mxfile_and_edges():
         ]
     }
     xml = map_model_spec_to_drawio_xml(spec)
-    assert 'host="app.diagrams.net"' in xml
-    assert "mm-edge-0" in xml
-    assert "mm/ModA/Foo" in xml and "mm/ModA/Bar" in xml
+    assert "<mxfile" in xml
+    # Class names are in HTML inside value= (entity-escaped in XML)
+    assert "&lt;b&gt;Foo&lt;/b&gt;" in xml and "&lt;b&gt;Bar&lt;/b&gt;" in xml
+    assert 'edge="1"' in xml
+    assert "dashed=1" in xml
 
 
 def test_write_roundtrip_tmp_path(tmp_path: Path):

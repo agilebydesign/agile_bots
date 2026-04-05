@@ -5,6 +5,11 @@
       "source": "agilebydesign/agilebydesign-skills",
       "sourceType": "github",
       "computedHash": "22c6d48932ed3710430a10aac560598fbd332b06f057278dd51a2497ec5a4145"
+    },
+    "security-requirement-extraction": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "computedHash": "81adf97487a3f9d575a94f4ab616a3f42a852e0c1d3cb0a5759615b5b274c1b5"
     }
   }
 }

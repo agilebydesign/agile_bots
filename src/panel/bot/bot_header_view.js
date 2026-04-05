@@ -108,9 +108,11 @@ class BotHeaderView extends PanelView {
             }).join('\n                ');
         }
         
-        // Get the proper webview URIs for images using branding utility        
-        const imagePath = `<img src="${branding.getImageUri(this.webview, this.extensionUri, 'company_icon.png')}" class="main-header-icon" alt="Company Icon" onerror="console.error('Failed to load icon:', this.src); this.style.border='1px solid red';" />`;        
-        const refreshIconPath = `<img src="${branding.getImageUri(this.webview, this.extensionUri, 'refresh.png')}" style="width: 36px; height: 36px; object-fit: contain; filter: saturate(1.3) brightness(0.95) hue-rotate(-5deg);" alt="Refresh" />`;
+        // Get the proper webview URIs for images using branding utility (cache-bust company icon when panel version changes)
+        const companyIconUri = branding.getImageUri(this.webview, this.extensionUri, 'company_icon.png');
+        const companyIconSrc = companyIconUri + (companyIconUri.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(String(this.panelVersion || '0'));
+        const imagePath = `<img src="${companyIconSrc}" class="main-header-icon" alt="Company Icon" onerror="console.error('Failed to load icon:', this.src); this.style.border='1px solid red';" />`;
+        const refreshIconPath = `<img src="${branding.getImageUri(this.webview, this.extensionUri, 'refresh.png')}" class="main-header-refresh-icon" alt="Refresh" />`;
         
         const storyIconPath = branding.getImageUri(this.webview, this.extensionUri, 'story.png');
         const crcIconPath = branding.getImageUri(this.webview, this.extensionUri, 'crc.png');

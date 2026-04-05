@@ -16,15 +16,17 @@
 
 The target architecture moves **all business logic into TypeScript/Node.js**. The server (extension host) talks **directly** to business logic—no CLI, no subprocess, no IPC. The CLI is a **separate entry point** for direct use, also in TS, wrapping the same business logic layer. The webview client extends business logic to wrap the DOM with the same logic the server uses.
 
-| Principle | Meaning |
-|-----------|---------|
-| **Logic in TS** | Business logic in Node.js (TypeScript); no Python, no subprocess |
-| **Domain** | Pure TS (Counter, Engine)—no DOM, no VS Code, no persistence. |
-| **Server domain** | Inherits from domain; adds persistence (e.g. `CounterServer extends Counter`). |
-| **Server view** | EngineView, CounterView—handles postMessage; uses server domain. |
-| **Client → domain + DOM** | Webview loads shared domain (bundled); adds DOM only. Same logic, not duplicated. |
-| **CLI separate entry point** | `node engine_cli.js` (compiled from engine_cli.ts) for direct use; wraps same business logic as panel |
-| **CLI output adapters** | `ICounterOutputAdapter` wraps `ICounter`; `counter_adapter.total` → formatted string; `.internals` for debugging |
+
+| Principle                    | Meaning                                                                                                          |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Logic in TS**              | Business logic in Node.js (TypeScript); no Python, no subprocess                                                 |
+| **Domain**                   | Pure TS (Counter, Engine)—no DOM, no VS Code, no persistence.                                                    |
+| **Server domain**            | Inherits from domain; adds persistence (e.g. `CounterServer extends Counter`).                                   |
+| **Server view**              | EngineView, CounterView—handles postMessage; uses server domain.                                                 |
+| **Client → domain + DOM**    | Webview loads shared domain (bundled); adds DOM only. Same logic, not duplicated.                                |
+| **CLI separate entry point** | `node engine_cli.js` (compiled from engine_cli.ts) for direct use; wraps same business logic as panel            |
+| **CLI output adapters**      | `ICounterOutputAdapter` wraps `ICounter`; `counter_adapter.total` → formatted string; `.internals` for debugging |
+
 
 ---
 
@@ -62,7 +64,9 @@ The target architecture moves **all business logic into TypeScript/Node.js**. Th
 │  fs, path, JSON—as needed by business logic                                  │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
 ### Architecture Flow:
+
 CLI → args → lookup(engine, path) → domain. 
 
 or 
@@ -78,6 +82,7 @@ CLI:        cli_engine counter.count --amount 7  → engine.counter.count(7)
             cli_engine counter.foo.bar --value "yum"  → set
 Panel:      postMessage({ command: 'counter.count', value: 4 }) → view.counter.count(4) → postMessage({ total: 4 })
 ```
+
 ---
 
 ## Architecture Pattern Details
@@ -229,6 +234,7 @@ $ cli_engine counter.foo.bar                 # get
 ```
 
 **Example (engine/engine_cli.ts):**
+
 ```typescript
 import { Engine } from "./engine.js";
 import { CounterTty } from "../counter/adapters/counter_tty.js";
@@ -298,11 +304,13 @@ export class CounterTty implements ICounterOutputAdapter {
 // CounterMarkdown, CounterJson similarly implement ICounterOutputAdapter
 ```
 
-| Adapter | Role | Example |
-|---------|------|---------|
-| **CounterTty** | Human-readable terminal output | `counter_adapter.total` → `Total: 11\n` |
-| **CounterMarkdown** | Formatted for docs/panels | `counter_adapter.total` → `## Counter\n\n**Total:** 11\n` |
-| **CounterJson** | Machine-readable; for tooling | `counter_adapter.total` → `{"total":11}` |
+
+| Adapter             | Role                           | Example                                                   |
+| ------------------- | ------------------------------ | --------------------------------------------------------- |
+| **CounterTty**      | Human-readable terminal output | `counter_adapter.total` → `Total: 11\n`                   |
+| **CounterMarkdown** | Formatted for docs/panels      | `counter_adapter.total` → `## Counter\n\n**Total:** 11\n` |
+| **CounterJson**     | Machine-readable; for tooling  | `counter_adapter.total` → `{"total":11}`                  |
+
 
 ### Panel
 
@@ -353,15 +361,17 @@ User sets foo.bar:
 
 Immediate client feedback; server runs business logic async. `command` maps to view path (e.g. `counter.count`). Handler uses `_lookup(command)` to delegate.
 
-#### Layers
+#### Layersterm
 
-| Layer | Role |
-|-------|------|
-| **Engine** | Root domain; accepts counter (Counter or CounterServer). |
-| **BaseView** | Base class for server views: `renderTemplate(path, data)` centralizes placeholder replacement. Swap impl for Handlebars/etc without changing views. |
-| **EngineView** | Extends BaseView; loads Engine.html; owns Engine; delegates content to sub-views; handles postMessage. Does not know child markup. |
-| **CounterView** | Extends BaseView; loads Counter.html; delegates to domain (CounterServer); posts to webview. Owns counter markup. |
-| **engine_client.ts** | Client: uses **shared Counter** (bundled); DOM only (`updateDom`); `syncToServer(command, value)`. No duplicate business logic. |
+
+| Layer                | Role                                                                                                                                                |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Engine**           | Root domain; accepts counter (Counter or CounterServer).                                                                                            |
+| **BaseView**         | Base class for server views: `renderTemplate(path, data)` centralizes placeholder replacement. Swap impl for Handlebars/etc without changing views. |
+| **EngineView**       | Extends BaseView; loads Engine.html; owns Engine; delegates content to sub-views; handles postMessage. Does not know child markup.                  |
+| **CounterView**      | Extends BaseView; loads Counter.html; delegates to domain (CounterServer); posts to webview. Owns counter markup.                                   |
+| **engine_client.ts** | Client: uses **shared Counter** (bundled); DOM only (`updateDom`); `syncToServer(command, value)`. No duplicate business logic.                     |
+
 
 #### Code
 
@@ -401,7 +411,7 @@ export class BaseView {
 
   private _escapeHtml(value: unknown): string {
     if (value == null) return "";
-    return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    return String(value).replace(/&/g, "&").replace(/"/g, """).replace(/</g, "<");
   }
 }
 ```
@@ -599,7 +609,7 @@ import { initCounterClient } from "../counter/view/counter_client.js";
 
 ##### counter_client.ts
 
-**`domCounter` implements `ICounter`** — same interface as domain; each method runs domain op, then updates only the DOM element that changed. (Compiled to JS for webview.)
+`**domCounter` implements `ICounter**` — same interface as domain; each method runs domain op, then updates only the DOM element that changed. (Compiled to JS for webview.)
 
 ```typescript
 import { Counter } from "../counter.js";
@@ -719,12 +729,14 @@ src/
 
 Tests mirror the tiered architecture. Each layer adds tests for its specific responsibilities; higher layers inherit domain tests and add adapter/invocation coverage.
 
-| Layer | When to Add | Notes |
-|-------|--------------|-------|
-| **Domain / Server Domain** | Always (domain); when persistence exists (server) | Same test file; Template Method via `registerTests()` |
-| **CLI** | Always | Same Template Method; `createCounter()` returns `CliTestWrapper` (wraps `EngineCLI.run`) |
-| **Server View** | Always | Inherit from domain; test events, display |
-| **Client View** | When substantial logic (e.g. story tree) | Extend CounterTest; createCounter → initCounterClient; assertTotal → DOM |
+
+| Layer                      | When to Add                                       | Notes                                                                                    |
+| -------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Domain / Server Domain** | Always (domain); when persistence exists (server) | Same test file; Template Method via `registerTests()`                                    |
+| **CLI**                    | Always                                            | Same Template Method; `createCounter()` returns `CliTestWrapper` (wraps `EngineCLI.run`) |
+| **Server View**            | Always                                            | Inherit from domain; test events, display                                                |
+| **Client View**            | When substantial logic (e.g. story tree)          | Extend CounterTest; createCounter → initCounterClient; assertTotal → DOM                 |
+
 
 ### Tiered Architecture
 
@@ -772,26 +784,27 @@ Domain layer             Server Domain                 CLI layer              Se
 
 The base defines the scenarios but delegates setup and assertions to protected hooks. Subclasses override:
 
-- **`createCounter()`** — Returns the counter under test (domain object, CLI wrapper, client, webview adapter).
-- **`assertTotal(counter, expected)`** — Asserts the counter's total; subclasses add layer-specific checks (persistence, DOM, postMessage).
+- `**createCounter()**` — Returns the counter under test (domain object, CLI wrapper, client, webview adapter).
+- `**assertTotal(counter, expected)**` — Asserts the counter's total; subclasses add layer-specific checks (persistence, DOM, postMessage).
 
 The `it()` callbacks use arrow functions so `this` stays bound to the test instance when Vitest runs them.
 
 ### Class Roles in the Structure
 
-| Class | Role |
-|-------|------|
-| **CounterTest** | Base. Defines scenarios in `registerTests()`, helper methods (`startingCounter`, `counterWithCounts`), and default `assertTotal`. Abstract `createCounter()`. |
-| **DomainCounterTest** | Domain layer. Overrides `createCounter()` → `new Counter()`. |
-| **ServerCounterTest** | Server domain. Overrides `createCounter()` → `new CounterServer(path)`. Overrides `assertTotal()` to add persistence check (reload from file). |
-| **CliCounterTest** | CLI layer. Overrides `createCounter()` → `new CliTestWrapper` (implements `ICounter` via `EngineCLI.run`). Overrides `assertTotal()` for json/tty/markdown output. |
-| **CounterClientTest** | Client view. Overrides `createCounter()` → `initCounterClient` with mock postMessage. Overrides `assertTotal()` to add DOM check and sync assertion. |
-| **CounterWebViewE2ETest** | E2E webview. Overrides `createCounter()` → `WebViewCounterAdapter`. Overrides `assertTotal()` to add webview DOM check. |
+
+| Class                     | Role                                                                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **CounterTest**           | Base. Defines scenarios in `registerTests()`, helper methods (`startingCounter`, `counterWithCounts`), and default `assertTotal`. Abstract `createCounter()`.      |
+| **DomainCounterTest**     | Domain layer. Overrides `createCounter()` → `new Counter()`.                                                                                                       |
+| **ServerCounterTest**     | Server domain. Overrides `createCounter()` → `new CounterServer(path)`. Overrides `assertTotal()` to add persistence check (reload from file).                     |
+| **CliCounterTest**        | CLI layer. Overrides `createCounter()` → `new CliTestWrapper` (implements `ICounter` via `EngineCLI.run`). Overrides `assertTotal()` for json/tty/markdown output. |
+| **CounterClientTest**     | Client view. Overrides `createCounter()` → `initCounterClient` with mock postMessage. Overrides `assertTotal()` to add DOM check and sync assertion.               |
+| **CounterWebViewE2ETest** | E2E webview. Overrides `createCounter()` → `WebViewCounterAdapter`. Overrides `assertTotal()` to add webview DOM check.                                            |
+
 
 ### Base Test Class
 
 Helper methods live on the base test class. 
-
 
 ```typescript
 // test/counter/counter_test.ts

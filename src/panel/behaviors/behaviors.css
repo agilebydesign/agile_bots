@@ -208,3 +208,8 @@
     min-height: 18px;
     max-height: 80px;
 }
+
+/* Deloitte: section title = primary white (accent green reserved for borders / icons) */
+body[data-branding="Deloitte"] .behaviors-title {
+    color: var(--text-color) !important;
+}

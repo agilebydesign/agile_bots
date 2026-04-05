@@ -27,6 +27,15 @@
             "textColor": "#CCCCCC",
             "textColorFaded": "#6B6B6B",
             "fontWeight": "400"
+        },
+        "Deloitte": {
+            "path": "deloitte",
+            "title": "Deloitte Context Engine",
+            "color": "#5A9A33",
+            "background": "#000000",
+            "textColor": "#FFFFFF",
+            "textColorFaded": "#B0B0B0",
+            "fontWeight": "400"
         }
     }
 }

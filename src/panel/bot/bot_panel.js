@@ -2002,7 +2002,7 @@ class BotPanel {
           <link rel="stylesheet" href="${instructionsStyleUri}">
           ${currentBehaviorScript}
       </head>
-      <body>
+      <body data-branding="${branding.getBranding()}">
           ${contentHtml}    
           <script nonce="${nonce}" src="${botPanelClientUri}"></script>
           <script nonce="${nonce}" src="${workspaceClientUri}"></script>

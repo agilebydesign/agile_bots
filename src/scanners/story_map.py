@@ -330,11 +330,11 @@ class StoryMap:
             raise TypeError(f"Expected bot with bot_paths.story_graph_paths, bot_paths.workspace_directory, or Path/str, got {type(bot)}")
         
         if not story_graph_path.exists():
-            raise FileNotFoundError(f"Story graph not found at {story_graph_path}")
-        
+            return cls({'epics': [], 'increments': []})
+
         with open(story_graph_path, 'r', encoding='utf-8') as f:
             story_graph = json.load(f)
-        
+
         return cls(story_graph)
     
     def epics(self) -> List[Epic]:

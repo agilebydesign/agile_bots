@@ -369,6 +369,14 @@ img {
     background-color: rgba(255, 140, 0, 0.1);
 }
 
+/* Refresh glyph (orange asset); Deloitte overrides in [data-branding="Deloitte"] block */
+.main-header-refresh-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: saturate(1.3) brightness(0.95) hue-rotate(-5deg);
+}
+
 .main-header-status {
     display: flex;
     align-items: center;
@@ -529,4 +537,54 @@ a:hover {
     color: var(--text-color-faded);
     font-style: italic;
     padding: var(--space-sm);
+}
+
+/* Deloitte: neo-grotesque stack (wordmark); primary copy white; green = accents, dividers, chevrons, PNG hue-shift — not body type */
+body[data-branding="Deloitte"] {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body[data-branding="Deloitte"] .main-header-title {
+    color: #FFFFFF !important;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+body[data-branding="Deloitte"] .collapsible-header > div > span[style*="font-size: 20px"] {
+    color: var(--text-color) !important;
+}
+
+body[data-branding="Deloitte"] .execution-toggle-btn.active span[style*="font-size: 11px"] {
+    color: var(--text-color) !important;
+}
+
+body[data-branding="Deloitte"] .execution-toggle-btn:not(.active) span[style*="font-size: 11px"] {
+    color: var(--text-color-faded) !important;
+}
+
+/* Deloitte: default PNG set matches ABD (orange-tinted); hue-shift toward panel accent green (#5A9A33). Skip header logo and refresh (separate rules). */
+body[data-branding="Deloitte"] img:not(.main-header-icon):not(.main-header-refresh-icon) {
+    filter: hue-rotate(52deg) saturate(0.95) brightness(1.02);
+}
+
+/* Refresh control: green accent (inline filter was overriding this before) — not the D mark */
+body[data-branding="Deloitte"] .main-header-refresh-icon {
+    filter: hue-rotate(52deg) saturate(1.12) brightness(1.04);
+}
+
+body[data-branding="Deloitte"] .main-header-refresh:hover {
+    background-color: rgba(90, 154, 51, 0.18);
+}
+
+body[data-branding="Deloitte"] .main-header-collapse:hover {
+    background-color: rgba(90, 154, 51, 0.18);
+}
+
+/* Deloitte header mark: asset is cropped to the circular “D.”; show it slightly larger than default 28px.
+   Never apply hue-rotate / panel tint filters here — they shift the white D to unreadable (reads as black). */
+body[data-branding="Deloitte"] .main-header-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    filter: none;
 }

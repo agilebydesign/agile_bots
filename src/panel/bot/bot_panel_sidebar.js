@@ -8,6 +8,7 @@
 const vscode = require("vscode");
 const BotPanel = require("./bot_panel.js");
 const path = require("path");
+const { getPanelWorkspaceRoot } = require("../workspace_root");
 
 class BotPanelSidebarProvider {
     static viewType = "agilebot.botPanelView";
@@ -27,7 +28,10 @@ class BotPanelSidebarProvider {
      */
     async resolveWebviewView(webviewView, context, token) {
         this._view = webviewView;        
-        this._workspaceRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || vscode.Uri.parse(process.env.PWD).fsPath; // TO-DO: Find workspace by name "agile_bots?"; Fall-back to package.json ENV
+        this._workspaceRoot =
+            getPanelWorkspaceRoot(vscode) ||
+            vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ||
+            (process.env.PWD ? vscode.Uri.parse(process.env.PWD).fsPath : undefined);
         
         console.log("[BotPanelSidebar] resolveWebviewView called");
         console.log("[BotPanelSidebar] Workspace root:", this._workspaceRoot);

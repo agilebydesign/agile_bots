@@ -12,7 +12,7 @@ from help import Help
 from navigation import NavigationResult
 from exit_result import ExitResult
 from utils import read_json_file
-from story_graph import StoryMap
+from story_graph import StoryMap, EMPTY_STORY_GRAPH_DICT
 
 logger = logging.getLogger(__name__)
 __all__ = ['Bot', 'BotResult', 'Behavior']
@@ -100,15 +100,11 @@ class Bot:
     @property
     def story_map(self) -> StoryMap:
         """Lazy-load and return the story map from workspace.
-        
-        Returns:
-            StoryMap: The loaded story map with Epic/SubEpic/Story hierarchy
-            
-        Raises:
-            FileNotFoundError: If story-graph.json doesn't exist in workspace
+
+        If ``docs/story/story-graph.json`` is missing, returns an empty StoryMap so
+        shape/build (and submit_instructions) can run to create the graph.
         """
         story_graph_path = self.bot_paths.story_graph_paths.story_graph_path
-        
 
         if self._story_graph is not None and story_graph_path.exists():
             try:
@@ -119,26 +115,28 @@ class Bot:
                     self._story_graph_file_mtime = None
             except (OSError, ValueError) as e:
                 logger.debug(f"Could not read story graph mtime for cache invalidation: {e}")
-        
+
         if self._story_graph is None:
             if not story_graph_path.exists():
-                raise FileNotFoundError(
-                    f'Story graph not found at {story_graph_path}. '
-                    f'Please create a story-graph.json file in the docs/story directory.'
+                logger.debug(
+                    'No story-graph.json at %s; using empty StoryMap until the file is created',
+                    story_graph_path,
                 )
-            
-            with open(story_graph_path, 'r', encoding='utf-8') as f:
-                story_graph_data = json.load(f)
-            
-            self._story_graph = StoryMap(story_graph_data, bot=self)
+                self._story_graph = StoryMap(EMPTY_STORY_GRAPH_DICT.copy(), bot=self)
+                self._story_graph_file_mtime = None
+            else:
+                with open(story_graph_path, 'r', encoding='utf-8') as f:
+                    story_graph_data = json.load(f)
 
-            try:
-                self._story_graph_file_mtime = story_graph_path.stat().st_mtime
-            except (OSError, ValueError) as e:
-                import time
-                logger.debug(f"Could not get story graph mtime, using current time: {e}")
-                self._story_graph_file_mtime = time.time()
-        
+                self._story_graph = StoryMap(story_graph_data, bot=self)
+
+                try:
+                    self._story_graph_file_mtime = story_graph_path.stat().st_mtime
+                except (OSError, ValueError) as e:
+                    import time
+                    logger.debug(f"Could not get story graph mtime, using current time: {e}")
+                    self._story_graph_file_mtime = time.time()
+
         return self._story_graph
     
     def reload_story_graph(self) -> dict:

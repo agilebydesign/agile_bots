@@ -7,6 +7,9 @@ _LEVEL_SCENARIOS = frozenset(['scenarios', 'examples', 'tests', 'code'])
 _LEVEL_EXAMPLES = frozenset(['examples', 'tests', 'code'])
 _LEVEL_TESTS = frozenset(['tests', 'code'])
 
+# When story-graph.json is absent, shape/build still need a StoryMap (empty graph until first save).
+EMPTY_STORY_GRAPH_DICT: Dict[str, Any] = {'epics': [], 'increments': []}
+
 
 def _level_includes(level_set, include_level: Optional[str]) -> bool:
     return include_level is None or include_level in level_set
@@ -2381,15 +2384,19 @@ class StoryMap:
             raise TypeError(f'Expected bot with bot_paths.story_graph_paths, bot_paths.workspace_directory, or Path/str, got {type(bot)}')
         
         if not story_graph_path.exists():
-            raise FileNotFoundError(f'Story graph not found at {story_graph_path}')
-        
+            logger = logging.getLogger(__name__)
+            logger.debug(
+                'Story graph not found at %s; using empty graph (create or build will persist story-graph.json)',
+                story_graph_path,
+            )
+            return cls(EMPTY_STORY_GRAPH_DICT.copy(), bot=bot)
+
         # Load story graph with error handling for control characters
         try:
             with open(story_graph_path, 'r', encoding='utf-8') as f:
                 story_graph = json.load(f)
         except ValueError as e:
             if 'control character' in str(e).lower() or 'Invalid' in str(e):
-                import logging
                 logger = logging.getLogger(__name__)
                 logger.warning(f"[StoryMap] JSON parse error in story graph file, sanitizing: {str(e)}")
                 from utils import sanitize_json_string
@@ -2398,7 +2405,7 @@ class StoryMap:
                 story_graph = json.loads(sanitized_content)
             else:
                 raise
-        
+
         return cls(story_graph, bot=bot)
 
     def save(self) -> None:
