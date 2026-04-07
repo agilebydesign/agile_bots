@@ -261,7 +261,7 @@ class Scope:
         self.workspace_directory = Path(workspace_directory)
         self.bot_paths = bot_paths
         
-        self.type = ScopeType.ALL
+        self.type = ScopeType.SHOW_ALL
         self.value: List[str] = []
         self.exclude: List[str] = []
         self.skiprule: List[str] = []
@@ -456,7 +456,7 @@ class Scope:
         if not data:
             return scope
         
-        scope_type_str = data.get('type', 'all')
+        scope_type_str = data.get('type', 'showAll')
         try:
             scope_type = ScopeType(scope_type_str)
         except ValueError:
@@ -497,7 +497,7 @@ class Scope:
             scope_data = json.loads(scope_file.read_text())
             
             if scope_data:
-                scope_type_str = scope_data.get('type', 'all')
+                scope_type_str = scope_data.get('type', 'showAll')
                 scope_type = ScopeType(scope_type_str)
                 
                 value = scope_data.get('value', [])
