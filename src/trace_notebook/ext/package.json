@@ -39,9 +39,6 @@
             }
         ]
     },
-    "activationEvents": [
-        "onCustomEditor:storyTrace.editor"
-    ],
     "scripts": {
         "package": "vsce package --allow-missing-repository",
         "install-ext": "powershell -File trace_bump_and_install_cursor.ps1"

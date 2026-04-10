@@ -1,4 +1,4 @@
-# Agile Bots User Guide
+# Agile Context Engine User Guide
 
 **AI-powered bots that inject Agile delivery, product, and engineering best practices directly into your workflow.**
 
@@ -36,9 +36,9 @@
 
 ## 1. Introduction
 
-Agile Bots enables **Agile-AI Augmented Delivery** through a VS Code/Cursor plugin that steers your AI agent through agile workflows. It injects prompts with context, strategies, and best practices while generating and synchronizing common agile artifacts (stories, tests, code) and preventing the most common AI mistakes.
+Agile Context Engine enables **Agile-AI Augmented Delivery** through a VS Code/Cursor plugin that steers your AI agent through agile workflows. It injects prompts with context, strategies, and best practices while generating and synchronizing common agile artifacts (stories, tests, code) and preventing the most common AI mistakes.
 
-Integrating agile practices with AI-assisted delivery can have a dramatic impact on pace, quality, cost, and outcomes. Rather than fighting with your AI assistant to deliver well-crafted, simple, story-driven, testable code, Agile Bots guides the AI through proven workflows that produce quality results.
+Integrating agile practices with AI-assisted delivery can have a dramatic impact on pace, quality, cost, and outcomes. Rather than fighting with your AI assistant to deliver well-crafted, simple, story-driven, testable code, Agile Context Engine guides the AI through proven workflows that produce quality results.
 
 > *We use the term "Agile practices" to mean the pragmatic application of Kanban, story mapping, BDD scenarios, test-driven development, domain-driven design, clean code principles, and CI/CD/DevOps.*
 
@@ -46,7 +46,7 @@ Integrating agile practices with AI-assisted delivery can have a dramatic impact
 
 ## 2. How It Works
 
-Agile Bots works by injecting **context**, **previous work**, and **rules** into every AI prompt based on proven agile practices.
+Agile Context Engine works by injecting **context**, **previous work**, and **rules** into every AI prompt based on proven agile practices.
 
 ### The Core Mechanism
 
@@ -121,17 +121,17 @@ Models solution domains using CRC (Class-Responsibility-Collaborator) cards:
 
 ## 5. Opening the Panel
 
-To open the Agile Bots panel in VS Code:
+To open the Agile Context Engine panel in VS Code:
 
 1. Open the **Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. Type **"Agile Bots"**
-3. Select **"Agile Bots: Open Panel"**
+2. Type **"Agile Context Engine"**
+3. Select **"Agile Context Engine: Open Panel"**
 
-Or click the **Agile Bots icon** in the Activity Bar on the left side of VS Code.
+Or click the **Agile Context Engine icon** in the Activity Bar on the left side of VS Code.
 
 ![Panel Interface](1%20-%20panel%20opened.png)
 
-The panel opens as a sidebar showing the full Agile Bots interface.
+The panel opens as a sidebar showing the full Agile Context Engine interface.
 
 ---
 
@@ -341,7 +341,7 @@ In the Shape behavior, build creates the initial outline of your story map struc
 The story graph can then be **rendered** into readable forms—markdown documents, Mermaid diagrams, and detailed story files.
 
 #### The Story UI
-TAfter shaping the story graph will also appear in the Agile Bot Panel. The panel has a section dedicated to working with story graph data where you can :
+After shaping, the story graph also appears in the Agile Context Engine panel. The panel has a section dedicated to working with story graph data where you can:
 - **Navigate**  explore, filter, and select, and open files for epics, stories, acceptance criteria, scenarios and test code
 - **Edit** rename, move, delete, create story graph nodes (epics, stories, etc) in place
 - **Submit** Submit a node directly to AI chat for refinement 
@@ -632,7 +632,7 @@ Each behavior enriches the graph, and Render transforms it into readable documen
 
 ## 24. Using the CLI
 
-Agile Bots includes a **Command Line Interface** that provides the same functionality as the VS Code panel. The CLI is useful when:
+Agile Context Engine includes a **Command Line Interface** that provides the same functionality as the VS Code panel. The CLI is useful when:
 
 - **AI agents need direct access** — An AI chatbot or backend agent can invoke bot commands without a UI
 - **Scripting and automation** — Chain bot commands in shell scripts or CI/CD pipelines
