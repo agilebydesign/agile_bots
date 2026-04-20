@@ -3,6 +3,17 @@ from typing import Dict, Any, Optional, Union
 import json
 
 
+def load_story_graph_json(path: Path) -> Dict[str, Any]:
+    """Load story graph JSON; use **story-graph-ops** ``story_graph_file`` when on PYTHONPATH."""
+    try:
+        from story_graph_file import load_story_graph_dict
+
+        return load_story_graph_dict(path)
+    except ImportError:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+
+
 class DrawIOSynchronizer:
 
     def render(self, input_path: Union[str, Path], output_path: Union[str, Path],
@@ -14,8 +25,7 @@ class DrawIOSynchronizer:
         input_path = Path(input_path)
         output_path = Path(output_path)
 
-        with open(input_path, 'r', encoding='utf-8') as f:
-            graph_data = json.load(f)
+        graph_data = load_story_graph_json(input_path)
 
         story_map = StoryMap(graph_data)
 
