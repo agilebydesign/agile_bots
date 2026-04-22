@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "abd-acceptance-criteria": {
+      "source": "agilebydesign/agilebydesign-skills",
+      "sourceType": "github",
+      "computedHash": "7d4d245ade876f23fdc053cc34b219e15e7bad7504e9a34d1f390a87788d440b"
+    },
     "content-memory": {
       "source": "agilebydesign/agilebydesign-skills",
       "sourceType": "github",
