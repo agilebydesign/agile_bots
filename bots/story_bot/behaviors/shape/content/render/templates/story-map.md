@@ -4,11 +4,7 @@
             (S) Actor --> Story Name  
             (S) Actor --> Story Name  
             or (S) Actor --> Story Name  
-                (AC) Actor --> Acceptance Criteria  
-                (AC) Actor --> Acceptance Criteria  
-            (S) Actor --> Story Name  
-                (AC) Actor --> Acceptance Criteria  
-                (AC) Actor --> Acceptance Criteria  
+            (S) Actor --> Story Name   
         (E) Another Nested Sub-Epic Name  
             (S) Actor --> Story Name  
             (S) Actor --> Story Name  
@@ -21,16 +17,13 @@
             (AC) {actor} --> {acceptance_criteria}  
             (AC) {actor} --> {acceptance_criteria}  
             (S) {actor} --> {story_name}  
-                (AC) {actor} --> {acceptance_criteria}  
-                (AC) {actor} --> {acceptance_criteria}  
         (S) {actor} --> {story_name}  
 
 ## Instructions  
 
-- **Epics (E)**: Top-level features, no connectors  
+- **Epics (E)**: Top-level, no connectors  
 - **Sub-Epics (E)**: Nested epics, no connectors  
 - **Stories (S)**: User stories with actors, format: `Actor --> Story Name`  
-- **Acceptance Criteria (AC)**: Nested under stories, format: `Actor --> Acceptance Criteria`  
 - **Connectors**:  
   - "and" is the default - do NOT show in output (only stored in JSON)  
   - "or" shown explicitly for alternatives  

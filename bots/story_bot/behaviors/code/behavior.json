@@ -1,24 +1,44 @@
 {
   "behaviorName": "code",
   "order": 7,
-  "description": "Generate production source code that implements story behavior using domain language and patterns",
+  "skill": "agilebydesign-skills/skills/abd-clean-code",
+  "description": "Generate production source code that implements story behavior using domain language and clean code principles",
   "goal": "Create clean, maintainable production code that implements story behavior using domain concepts",
-  "inputs": "Story specifications, test files, and domain language/patterns",
-  "outputs": "Source code files (.py, .js, etc.) with production implementation",
+  "inputs": "Failing test files, story specifications, acceptance criteria, domain language, and patterns",
+  "outputs": "Source code files (.py, .js, etc.) with production implementation that makes tests pass",
   "baseActionsPath": "agile_bot/base_actions",
   "instructions": [
-    "Create clean, maintainable production code that implements story behavior",
-    "**CODE MUST FOLLOW CLEAN CODE PRINCIPLES:**"
+    "**STEP 0 — IDENTIFY DOMAIN NAMES (Priority 1)**",
+    "",
+    "BEFORE writing any production code, declare the structure explicitly:",
+    "  - Story Path: [Epic] -> [Sub-Epic] -> [Story]",
+    "  - Module: src/<area>/<domain_entity_snake_case>.py (or .js)",
+    "  - Class: <DomainEntity> (PascalCase domain entity from story)",
+    "  - Public methods: domain responsibility verbs from acceptance criteria",
+    "  - Dependencies (injected via constructor): list each collaborator",
+    "",
+    "**BEHAVIOR PURPOSE:**",
+    "This behavior WRITES PRODUCTION CODE. The primary output is implementation files that make failing tests pass.",
+    "Follow the abd-clean-code skill (agilebydesign-skills/skills/abd-clean-code/SKILL.md).",
+    "",
+    "**CODE MUST FOLLOW CLEAN CODE PRINCIPLES:**",
+    "- Functions: single responsibility, under 20 lines, 0-2 params, guard clauses",
+    "- Names: domain language, intention-revealing, consistent vocabulary",
+    "- Dependencies: all injected through constructor, no hidden globals",
+    "- Classes: SRP, under 200-300 lines, expose behavior not data",
+    "- Errors: domain exceptions, never swallow, isolate error handling"
   ],
   "actions_workflow": {
     "actions": [
-     
       {
         "name": "build",
         "order": 3,
         "next_action": "validate",
         "instructions": [
-          "code: render code required to implement all tests that have been recently built or updated"
+          "code: render production code required to implement all tests that have been recently built or updated",
+          "Use the clean-code.py or clean-code.js template from agilebydesign-skills/skills/abd-clean-code/templates/",
+          "Declare module, class, and method names from domain language before writing code",
+          "Each class gets one module file; each function stays under 20 lines; all deps injected via constructor"
         ]
       },
       {
@@ -27,7 +47,8 @@
         "next_action": "render",
         "instructions": [
           "code: validate source code quality and domain language usage",
-          "Validate that code uses proper domain terminology and follows domain patterns",
+          "Validate that code uses proper domain terminology (class names = domain entities, method names = domain responsibilities)",
+          "Validate against abd-clean-code rules: function size, SRP, explicit deps, encapsulation, domain language",
           "Validate that all source files, classes, and functions are properly mapped to story-graph.json",
           "MANDATORY: Discover and pass code_files parameter - CodeScanner requires explicit file paths to scan for violations"
         ]
