@@ -1,3 +1,5 @@
+<!-- CRC extension (responsible / not_responsible / collaborators lines): agilebydesign-skills agents/abd-ooad/skills/class-responsibility-collaborator/templates/crc-outline-template.md -->
+
 ## Module: {module}
 
 {concept}
